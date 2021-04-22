@@ -3,7 +3,7 @@ name: Epic
 about: Consisting of many user stories, tasks and UX activities, an Epic captures
   a large chunk of user needs
 title: ''
-labels: ''
+labels: Epic
 assignees: ''
 
 ---
