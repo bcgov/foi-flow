@@ -1,20 +1,20 @@
 # foi-flow
 Freedom of Information modernization 
 
-##Features
+## Features
 
-##Usage
+## Usage
 
-##Requirements
+## Requirements
 
-##Installation
+## Installation
 
-##Project Status
+## Project Status
 The project is just starting.
 
-##Goals/Roadmap
+## Goals/Roadmap
 
-##Getting Help or Reporting an Issue
+## Getting Help or Reporting an Issue
 To report bugs/issues/feature requests, please file an [issue.](https://github.com/bcgov/foi-flow/issues)
 
 ## How to Contribute
