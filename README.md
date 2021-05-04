@@ -1,4 +1,7 @@
-# foi-flow
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+
+## foi-flow
 Freedom of Information modernization 
 
 ## Features
@@ -10,7 +13,7 @@ Freedom of Information modernization
 ## Installation
 
 ## Project Status
-The project is just starting.
+The project is in the very early stages of development. The codebase will be changing frequently.
 
 ## Goals/Roadmap
 
