@@ -2,7 +2,7 @@
 name: Task
 about: Capture tasks such as OCM, tech debt, UX , architecture and development
 title: ''
-labels: ''
+labels: Task
 assignees: ''
 
 ---

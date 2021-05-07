@@ -11,6 +11,11 @@ assignees: ''
 * I want (goal) 
 * so that (reason/ why/ value) 
 
+**Assumptions & Scope**	
+What are the assumptions for this story?
+
+What is in and not in scope?
+
 **Acceptance Criteria**	
 
 **Scenario 1: xxxxxx**
