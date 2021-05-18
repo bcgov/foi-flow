@@ -53,7 +53,7 @@ What is in and not in scope?
 
 **Definition of Done**
 
-1.     [ ] Passes developer unit tests
+1.    [ ] Passes developer unit tests
 2.    [ ] Passes peer code review
 3.    [ ] If there's a user interface, passes UX assurance
 4.    [ ] Passes QA of Acceptance Criteria with verification in Dev and Test
