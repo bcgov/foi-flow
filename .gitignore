@@ -1,0 +1,4 @@
+request-management-api/__pycache__/*.*
+request-management-api/env/*
+request-management-api/env/Lib/*
+request-management-api/src/request_api/__pycache__/*
