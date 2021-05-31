@@ -51,14 +51,14 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     #     )
 
     #from request_api.resources import TEST_BLUEPRINT  # pylint: disable=import-outside-toplevel
-    #from request_api.resources import API_BLUEPRINT, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
+    from request_api.resources import API_BLUEPRINT, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
     #db.init_app(app)
     #ma.init_app(app)
     #mail.init_app(app)
 
-    #app.register_blueprint(API_BLUEPRINT)
-    #app.register_blueprint(OPS_BLUEPRINT)
+    app.register_blueprint(API_BLUEPRINT)
+    app.register_blueprint(OPS_BLUEPRINT)
 
     # if os.getenv('FLASK_ENV', 'production') in ['development', 'testing']:
     #     app.register_blueprint(TEST_BLUEPRINT)

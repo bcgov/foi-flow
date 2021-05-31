@@ -21,14 +21,14 @@ All services have 2 defaults sets of endpoints:
 That are used to expose operational health information about the service, and meta information.
 """
 
-from flask import Blueprint, current_app
-# noqa: I001, I003, I004
-from sbc_common_components.exception_handling.exception_handler import ExceptionHandler
-
+from flask import Blueprint
+# from sbc_common_components.exception_handling.exception_handler import ExceptionHandler
 
 from .apihelper import Api
 
 from .meta import API as META_API
+from .ops import API as OPS_API
+# from .status import API as STATUS_API
 
 
 
@@ -44,12 +44,12 @@ API_OPS = Api(
     OPS_BLUEPRINT,
     title='Service OPS API',
     version='1.0',
-    description='The Core API for the Authentication System',
+    description='The Core API for the Status Service',
     security=['apikey'],
     authorizations=AUTHORIZATIONS,
 )
 
-#API_OPS.add_namespace(OPS_API, path='/')
+API_OPS.add_namespace(OPS_API, path='/')
 
 API_BLUEPRINT = Blueprint('API', __name__, url_prefix='/api/v1')
 
@@ -62,22 +62,7 @@ API = Api(
     authorizations=AUTHORIZATIONS,
 )
 
-HANDLER = ExceptionHandler(API)
+# HANDLER = ExceptionHandler(API)
 
 API.add_namespace(META_API, path='/meta')
-
-
-TEST_BLUEPRINT = Blueprint('TEST', __name__, url_prefix='/test')
-
-API_TEST = Api(
-    TEST_BLUEPRINT,
-    title='Request API for testing',
-    version='1.0',
-    description='The API for the testing',
-    security=['apikey'],
-    authorizations=AUTHORIZATIONS,
-)
-
-HANDLER = ExceptionHandler(API_TEST)
-
-#API_TEST.add_namespace(RESET_API, path='/reset')
+# API.add_namespace(STATUS_API, path='/status/<string:service_name>')
