@@ -18,7 +18,7 @@ from flask_restx import Namespace, Resource
 
 API = Namespace('OPS', description='Service - OPS checks')
 
-@API.route('healthz')
+@API.route('/healthz')
 class Healthz(Resource):
     """Determines if the service and required dependencies are still working.
     This could be thought of as a heartbeat for the service.
@@ -30,7 +30,7 @@ class Healthz(Resource):
         return {'message': 'api is healthy'}, 200
 
 
-@API.route('readyz')
+@API.route('/readyz')
 class Readyz(Resource):
     """Determines if the service is ready to respond."""
 
