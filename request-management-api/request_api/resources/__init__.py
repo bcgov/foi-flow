@@ -21,6 +21,7 @@ All services have 2 defaults sets of endpoints:
 That are used to expose operational health information about the service, and meta information.
 """
 
+from functools import partialmethod
 from flask import Blueprint
 # from sbc_common_components.exception_handling.exception_handler import ExceptionHandler
 
@@ -28,7 +29,6 @@ from .apihelper import Api
 
 from .meta import API as META_API
 from .ops import API as OPS_API
-# from .status import API as STATUS_API
 
 
 
@@ -38,20 +38,9 @@ __all__ = ('API_BLUEPRINT')
 # TODO oauth2 & openid may not yet be supported by restplus <- check on this
 AUTHORIZATIONS = {'apikey': {'type': 'apiKey', 'in': 'header', 'name': 'Authorization'}}
 
-#OPS_BLUEPRINT = Blueprint('API_OPS', __name__, url_prefix='/ops')
 
-# API_OPS = Api(
-#     OPS_BLUEPRINT,
-#     title='Service OPS API',
-#     version='1.0',
-#     description='The Core API for the Status Service',
-#     security=['apikey'],
-#     authorizations=AUTHORIZATIONS,
-# )
+API_BLUEPRINT = Blueprint('API', __name__ )
 
-#API_OPS.add_namespace(OPS_API, path='/')
-
-API_BLUEPRINT = Blueprint('API', __name__, url_prefix='/api/v1')
 
 API = Api(
     API_BLUEPRINT,
@@ -62,8 +51,10 @@ API = Api(
     authorizations=AUTHORIZATIONS,
 )
 
+
 # HANDLER = ExceptionHandler(API)
 
-API.add_namespace(META_API, path='/meta')
-API.add_namespace(OPS_API,path="/ops")
-# API.add_namespace(STATUS_API, path='/status/<string:service_name>')
+API.add_namespace(META_API, path="/api")
+API.add_namespace(OPS_API ,path="/api")
+
+
