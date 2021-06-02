@@ -1,4 +1,4 @@
-# Copyright © 2019 Province of British Columbia
+# Copyright © 2021 Province of British Columbia
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ from .apihelper import Api
 
 from .meta import API as META_API
 from .ops import API as OPS_API
-
+from .request import API as REQUEST_API
 
 
 __all__ = ('API_BLUEPRINT')
@@ -56,5 +56,5 @@ API = Api(
 
 API.add_namespace(META_API, path="/api")
 API.add_namespace(OPS_API ,path="/api")
-
+API.add_namespace(REQUEST_API ,path="/api")
 
