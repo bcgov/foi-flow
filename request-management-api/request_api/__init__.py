@@ -18,27 +18,27 @@ This module is the API for the Authroization system.
 
 import json
 import os
-
+import logging
 #import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports,wrong-import-order; conflicts with Flake8
 from flask import Flask
 #from humps.main import camelize
-#from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
+from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
 #from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
 
 import request_api.config as config
-from request_api import models
-from request_api.auth import jwt
+#from request_api import models
+#from request_api.auth import jwt
 from request_api.config import _Config
 #from request_api.extensions import mail
 from request_api.models import db, ma
 #from request_api.utils.cache import cache
 # from request_api.utils.run_version import get_run_version
-from request_api.utils.util_logging import setup_logging
+from request_api.utils.util_logging import setup_logging, setup_filelogging
 
 setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
 
 
-def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
+def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""
     app = Flask(__name__)
     app.config.from_object(config.CONFIGURATION[run_mode])
@@ -69,7 +69,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     # if os.getenv('FLASK_ENV', 'production') != 'testing':
     #     setup_jwt_manager(app, jwt)
 
-    #ExceptionHandler(app)
+    ExceptionHandler(app)
 
     # @app.after_request
     # def handle_after_request(response):  # pylint: disable=unused-variable
@@ -87,6 +87,9 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
 
     register_shellcontext(app)
     
+    ###### Added handler to log to a file ######
+
+    setup_filelogging(app)
 
     return app
 
