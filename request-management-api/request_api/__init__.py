@@ -25,23 +25,23 @@ from flask import Flask
 #from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
 #from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
 
-#import request_api.config as config
-#from request_api import models
-#from request_api.auth import jwt
-#from request_api.config import _Config
+import request_api.config as config
+from request_api import models
+from request_api.auth import jwt
+from request_api.config import _Config
 #from request_api.extensions import mail
-#from request_api.models import db, ma
+from request_api.models import db, ma
 #from request_api.utils.cache import cache
 # from request_api.utils.run_version import get_run_version
-# from request_api.utils.util_logging import setup_logging
+from request_api.utils.util_logging import setup_logging
 
-#setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
+setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
 
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     """Return a configured Flask App using the Factory method."""
     app = Flask(__name__)
-    #app.config.from_object(config.CONFIGURATION[run_mode])
+    app.config.from_object(config.CONFIGURATION[run_mode])
 
     # Configure Sentry
     # if app.config.get('SENTRY_DSN', None):
@@ -53,8 +53,9 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     #from request_api.resources import TEST_BLUEPRINT  # pylint: disable=import-outside-toplevel
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
-    #db.init_app(app)
-    #ma.init_app(app)
+    print(run_mode)
+    db.init_app(app)
+    ma.init_app(app)
     #mail.init_app(app)
 
     app.register_blueprint(API_BLUEPRINT)
@@ -84,7 +85,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
     #     if response.headers['Content-Type'] == 'application/json':
     #         response.set_data(json.dumps(camelize(json.loads(response.get_data()))))
 
-    #register_shellcontext(app)
+    register_shellcontext(app)
     
 
     return app
@@ -101,14 +102,14 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'production')):
 #     jwt_manager.init_app(app)
 
 
-# def register_shellcontext(app):
-#     """Register shell context objects."""
+def register_shellcontext(app):
+    """Register shell context objects."""
 
-#     def shell_context():
-#         """Shell context objects."""
-#         return {'app': app, 'jwt': jwt, 'db': db, 'models': models}  # pragma: no cover
+    def shell_context():
+        """Shell context objects."""
+        return {'app': app, 'jwt': jwt, 'db': db, 'models': models}  # pragma: no cover
 
-#     app.shell_context_processor(shell_context)
+    app.shell_context_processor(shell_context)
 
 
 

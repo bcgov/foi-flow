@@ -15,13 +15,15 @@
 """This exports all of the models and schemas used by the application."""
 # noqa: I004
 # noqa: I001, I003, I004
-from sbc_common_components.tracing.db_tracing import DBTracing  # noqa: I001, I004
-from sqlalchemy import event  # noqa: I001
-from sqlalchemy.engine import Engine  # noqa: I001, I003, I004
+#from sbc_common_components.tracing.db_tracing import DBTracing  # noqa: I001, I004
+#from sqlalchemy import event  # noqa: I001
+#from sqlalchemy.engine import Engine  # noqa: I001, I003, I004
 
 
 from .db import db, ma
 
+from .FOIRawRequests import FOIRawRequest
 
 
-event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
+
+#event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
