@@ -20,13 +20,15 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException
 
-API = Namespace('FOIRequests', description='Endpoints for FOI request management')
+from request_api.models.FOIRawRequests import FOIRawRequest
+
+API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirequests')
-class FOIRequests(Resource):
-    """Resource for managing FOI requests."""
+@API.route('/foirawrequests')
+class FOIRawRequests(Resource):
+    """Resource for managing FOI Raw requests."""
 
     @staticmethod
     @TRACER.trace()
@@ -40,7 +42,11 @@ class FOIRequests(Resource):
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
-            response, status = ("Saved",200)
+            request_json = request.get_json()
+            requestdatajson = request_json['requestdata']
+            print(requestdatajson)
+            result = FOIRawRequest.saverawrequest(requestdatajson)           
+            return {'status': result.success, 'message':result.message} , 200
         except BusinessException as exception:
-            response, status = {'code': exception.code, 'message': exception.message}, exception.status_code
-        return response, status
+            response = {'code': exception.code, 'message': exception.message}
+            return response, 500
