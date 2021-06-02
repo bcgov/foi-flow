@@ -19,6 +19,10 @@ request-management-api/migrations/__pycache__/*.*
 request-management-api/.env
 
 *.pyc
+*/__pycache__/*
 request-management-api/request_api/__pycache__/*.pyc
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
+request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
+request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
+request-management-api/request_api/logs/app.log
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
