@@ -18,7 +18,7 @@ from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
-from request_api.exceptions import BusinessException
+from request_api.exceptions import BusinessException, Error
 
 from request_api.models.FOIRawRequests import FOIRawRequest
 
@@ -43,10 +43,8 @@ class FOIRawRequests(Resource):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestdata']
-            print(requestdatajson)
+            requestdatajson = request_json['requestdata']                       
             result = FOIRawRequest.saverawrequest(requestdatajson)           
             return {'status': result.success, 'message':result.message} , 200
-        except BusinessException as exception:
-            response = {'code': exception.code, 'message': exception.message}
-            return response, 500
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
