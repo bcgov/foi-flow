@@ -22,7 +22,7 @@ import logging
 #import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports,wrong-import-order; conflicts with Flake8
 from flask import Flask
 #from humps.main import camelize
-# from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
+from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
 #from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
 
 import request_api.config as config
@@ -68,7 +68,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     # if os.getenv('FLASK_ENV', 'production') != 'testing':
     #     setup_jwt_manager(app, jwt)
 
-    # ExceptionHandler(app)
+    ExceptionHandler(app)
 
     # @app.after_request
     # def handle_after_request(response):  # pylint: disable=unused-variable
