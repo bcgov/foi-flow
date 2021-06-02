@@ -15,7 +15,8 @@
 import logging.config
 import sys
 from os import path
-
+import os
+from pathlib import Path
 
 def setup_logging(conf):
     """Create the services logger.
@@ -23,7 +24,29 @@ def setup_logging(conf):
     TODO should be reworked to load in the proper loggers and remove others
     """
     if conf and path.isfile(conf):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # root = Path(__file__).parent
+        logdir = os.path.join(root, 'logs')
+        if not os.path.exists(logdir):
+            os.mkdir(logdir)
         logging.config.fileConfig(conf)
         print('Configure logging, from conf:{}'.format(conf), file=sys.stdout)
     else:
         print('Unable to configure logging, attempted conf:{}'.format(conf), file=sys.stderr)
+
+def setup_filelogging(app):
+    log_level = logging.INFO
+ 
+    for handler in app.logger.handlers:
+        app.logger.removeHandler(handler)
+
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+    logdir = os.path.join(root, 'logs')
+    if not os.path.exists(logdir):
+        os.mkdir(logdir)
+    log_file = os.path.join(logdir, 'app.log')
+    handler = logging.FileHandler(log_file)
+    handler.setLevel(log_level)
+    app.logger.addHandler(handler) 
+    app.logger.setLevel(log_level)
