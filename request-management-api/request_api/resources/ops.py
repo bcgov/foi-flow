@@ -14,7 +14,7 @@
 """Endpoints to check and manage the health of the service."""
 
 from flask_restx import Namespace, Resource
-
+from flask import current_app
 
 API = Namespace('OPS', description='Service - OPS checks')
 
@@ -27,6 +27,9 @@ class Healthz(Resource):
     @staticmethod   
     def get():
         """Made it here..so its all fine."""
+        current_app.logger.info('Info Logging')
+        current_app.logger.error('Error Logging')
+        current_app.logger.debug('Debug Logging')
         return {'message': 'api is healthy'}, 200
 
 
