@@ -35,7 +35,9 @@ from request_api.models import db, ma
 # from request_api.utils.run_version import get_run_version
 from request_api.utils.util_logging import setup_logging, setup_filelogging
 
-setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
+# Disable more logging.  
+# TODO - Put this behind an env var.
+# setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
 
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
