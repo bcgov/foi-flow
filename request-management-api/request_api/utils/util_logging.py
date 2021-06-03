@@ -22,11 +22,7 @@ def setup_logging(conf):
 
     TODO should be reworked to load in the proper loggers and remove others
     """
-    # Temporarily added False at beginning to bypass this
-    # This breaks OpenShift until we have PVC setup, so skip for now.
-    # Suggestion is to create to env vars (open to disucssion):
-    #   ENABLE_LOG_FILE and LOG_FILE_PATH
-    if False and conf and path.isfile(conf):
+    if conf and path.isfile(conf):
         logfilepath = 'request_api/logs/logfile.log'
         logdir = os.path.dirname(logfilepath)
         # root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

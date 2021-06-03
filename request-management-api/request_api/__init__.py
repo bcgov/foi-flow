@@ -89,7 +89,9 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     
     ###### Added handler to log to a file ######
 
-    setup_filelogging(app)
+    # This breaks OpenShift until we have PVC setup, so skip for now.
+    # Suggestion is to create to env vars (open to disucssion): ENABLE_LOG_FILE and LOG_FILE_PATH
+    # setup_filelogging(app)
 
     return app
 
