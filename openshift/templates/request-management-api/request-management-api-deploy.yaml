@@ -1,0 +1,193 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  annotations:
+    description: Deployment template for a adjudication api service.
+    tags: "${API_NAME}"
+  name: "${API_NAME}-deploy"
+objects:
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+        # pre:
+        #   failurePolicy: Abort
+          # execNewPod:
+            # command:
+            # - "/bin/bash"
+            # - "-c"
+            # - "python manage.py db upgrade"
+            # containerName: "${API_NAME}"
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - "${API_NAME}"
+        from:
+          kind: ImageStreamTag
+          namespace: "${IMAGE_NAMESPACE}"
+          name: "${API_NAME}:${TAG_NAME}"
+    - type: ConfigChange
+    replicas: 2
+    test: false
+    selector:
+      app: "${API_NAME}"
+      deploymentconfig: "${API_NAME}"
+    template:
+      metadata:
+        labels:
+          app: "${API_NAME}"
+          app-group: "${APP_GROUP}"
+          deploymentconfig: "${API_NAME}"
+          template: "${API_NAME}-deploy"
+      spec:
+        containers:
+        - name: "${API_NAME}"
+          image: "${API_NAME}"
+          imagePullPolicy: Always
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "${DB_SECRETS}"
+                  key: database-user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "${DB_SECRETS}"
+                  key: database-password
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: "${DB_SECRETS}"
+                  key: database-name
+            - name: DB_HOST
+              value: "${DB_SECRETS}"
+          # command:
+          #   - gunicorn
+          #   - '-b'
+          #   - :5000
+          #   - selfservice_api:create_app()
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          # envFrom:
+          # - configMapRef:
+          #     name: ${API_NAME}-config
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+            limits:
+              cpu: "750m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              # TODO - Change to proper health check once
+              path: "/health"
+              port: 3000
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: "/health"
+              port: 3000
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    creationTimestamp: 
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    ports:
+    - name: 3000-tcp
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+    selector:
+      deploymentconfig: "${API_NAME}"
+    type: ClusterIP
+    sessionAffinity: None
+  # status:
+  #   loadBalancer: {}
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    to:
+      kind: Service
+      name: "${API_NAME}"
+      weight: 100
+    port:
+      targetPort: 3000-tcp
+    tls:
+      termination: edge
+    wildcardPolicy: None
+    host: "${API_NAME}-${TAG_NAME}.apps.silver.devops.gov.bc.ca"
+parameters:
+- name: API_NAME
+  displayName: Name
+  description: The name assigned to all of the OpenShift resources associated to the
+    server instance.
+  required: true
+  value: request-management-api
+- name: APP_GROUP
+  displayName: App Group
+  description: The name assigned to all of the deployments in this project.
+  required: true
+  value: foi-requests
+- name: IMAGE_NAMESPACE
+  displayName: Image Namespace
+  required: true
+  description: The namespace of the OpenShift project containing the imagestream for
+    the application.
+  value: d7abee-tools
+- name: TAG_NAME
+  displayName: Environment TAG name
+  description: The TAG name for this environment, e.g., dev, test, prod
+  required: true
+  value: dev
+- name: DB_SECRETS
+  displayName: Environment TAG name
+  description: The TAG name for this environment, e.g., dev, test, prod
+  required: true
+  value: postgresql
