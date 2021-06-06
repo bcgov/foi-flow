@@ -160,13 +160,13 @@
           "type": "object",
           "properties": {
             "yourself": {
-              "type": "boolean"
+              "type": ["boolean","null"]
             },
             "child": {
-              "type": "boolean"
+              "type": ["boolean","null"]
             },
             "another": {
-              "type": "boolean"
+              "type": ["boolean","null"]
             }
           }
         },
@@ -174,13 +174,13 @@
           "type": "object",
           "properties": {
             "value": {
-              "type": "string"
+              "type": ["string","null"]
             },
             "text": {
-              "type": "string"
+              "type": ["string","null"]
             },
             "ministryCode": {
-              "type": "string"
+              "type": ["string","null"]
             }
           }
         },
@@ -200,6 +200,10 @@
               "type": ["string","null"]
             }
           }
+        },
+        "Attachments": {
+          "type": "array",
+          "items": {}
         }
       },
       "required": [
