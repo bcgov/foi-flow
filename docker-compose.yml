@@ -1,0 +1,40 @@
+version: '3'
+services:  
+  BACKEND:
+    build:
+      context: ./      
+      dockerfile: request-management-api/dockerfile
+    image: foirequestsbackendimage
+    container_name: aot_foi_requests_backend_api
+    depends_on: 
+      - foi-requests-DB     
+    networks:
+      services-network:
+        aliases:
+          - backendnw
+    ports:
+      - 5000:5000
+    environment:
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=Fo!123
+      - DATABASE_NAME=postgres
+      - DATABASE_HOST=foi-requests-DB
+      - DATABASE_PORT=5432
+      - FLASK_ENV:production
+  foi-requests-DB:
+    image: postgres
+    container_name: aot_foi_requests_db_pg
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Fo!123
+    networks:
+      services-network:
+        aliases:
+          - db   
+volumes:
+  dbdata:
+networks:
+  services-network:    
+    driver: bridge
