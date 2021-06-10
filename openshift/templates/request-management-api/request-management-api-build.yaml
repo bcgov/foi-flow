@@ -29,6 +29,8 @@ objects:
       type: Docker
       dockerStrategy:
         dockerfilePath: "${DOCKER_FILE_PATH}"
+        pullSecret: 
+          name: artifactory-creds
       # type: Source
       # sourceStrategy:
       #   from:
