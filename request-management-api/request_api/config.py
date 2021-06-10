@@ -79,7 +79,7 @@ class _Config():  # pylint: disable=too-few-public-methods
         port=int(DB_PORT),
         name=DB_NAME,
     )
-    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_ECHO = False 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT_OIDC Settings
@@ -139,5 +139,7 @@ class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
         SECRET_KEY = os.urandom(24)
         print('WARNING: SECRET_KEY being set as a one-shot', file=sys.stderr)
 
+    SQLALCHEMY_ECHO = True 
+    print('DEV ONLY, SQLALCHEMY URI {}'.format(_Config.SQLALCHEMY_DATABASE_URI))
     TESTING = False
     DEBUG = False
