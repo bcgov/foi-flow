@@ -21,6 +21,8 @@ from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 
 from request_api.models.FOIRawRequests import FOIRawRequest
+from flask_expects_json import expects_json
+import json
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -36,14 +38,18 @@ class FOIRawRequests(Resource):
     def get():
         return 'FOI Requests GET METHOD'
 
+    with open('request_api/schemas/schemas/rawrequest.json') as f:
+        schema = json.load(f)
+
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')
+    @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestdata']                       
+            requestdatajson = request_json['requestData']                       
             result = FOIRawRequest.saverawrequest(requestdatajson)           
             return {'status': result.success, 'message':result.message} , 200
         except BusinessException as exception:            
