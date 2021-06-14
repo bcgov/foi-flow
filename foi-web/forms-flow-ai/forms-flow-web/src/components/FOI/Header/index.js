@@ -1,3 +1,3 @@
-import FOIHeader from "./FOIHeader";
+import Header from "./Header";
 
-export default FOIHeader;
+export default Header;
