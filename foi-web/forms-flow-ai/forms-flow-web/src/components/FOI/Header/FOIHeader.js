@@ -1,6 +1,6 @@
 import React from "react";
-import "./header.scss";
-const Header = React.memo(() => {
+import "./foiheader.scss";
+const FOIHeader = React.memo(() => {
   //const today = new Date();
   return (
       <header>
@@ -13,4 +13,4 @@ const Header = React.memo(() => {
     </header>
   );
 });
-export default Header;
+export default FOIHeader;

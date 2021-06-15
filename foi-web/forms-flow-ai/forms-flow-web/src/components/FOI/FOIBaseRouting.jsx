@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 import {useSelector} from "react-redux";
 
-import Header from "./Header";
+import FOIHeader from "./Header";
 import Home from "./Home";
 import FOIFooter from "./Footer";
 import { ToastContainer } from 'react-toastify';
@@ -14,7 +14,7 @@ const FOIBaseRouting = React.memo(({store}) => {
   
     return (
       <>
-        <Header/>
+        <FOIHeader/>
        
               <ToastContainer />
               <Switch>

@@ -18,10 +18,10 @@ header {
 
 header h2 {
   font-family: 'BCSans-Bold';
-  font-weight: normal;  /* 400 */
+  font-weight: normal;  
   //margin: 5px 5px 0 40px;
-  margin: 0.5% 0.5% 0% 3%;
-  visibility: hidden;
+  //margin: 0.5% 0.5% 0% 3%;  
+  margin-left: 40px;  
 }
 
 header .banner {
@@ -38,19 +38,19 @@ header .banner {
   size: phone, tablet, full. 
 */
 
-@media screen and (min-width: 300px) and (max-width: 899px) {
-  header h2 {
-    font-size: calc(7px + 1.2vw);
-    font-family: 'BCSans-Bold';
-    visibility: visible;
-  }
-}
+// @media screen and (min-width: 300px) and (max-width: 899px) {
+//   header h2 {
+//     font-size: calc(7px + 1.2vw);
+//     font-family: 'BCSans-Bold';
+//     visibility: visible;
+//   }
+// }
 
-@media screen and (min-width: 900px) {
-  header h2 {
-    font-size: 1.5em;
-    font-family: 'BCSans-Bold';
-    visibility: visible;
-  }
-}
+// @media screen and (min-width: 900px) {
+//   header h2 {
+//     font-size: 1.5em;
+//     font-family: 'BCSans-Bold';
+//     visibility: visible;
+//   }
+// }
 
