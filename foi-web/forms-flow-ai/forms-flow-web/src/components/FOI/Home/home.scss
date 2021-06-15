@@ -20,24 +20,24 @@ div .rounded-rectangle {
     background: #FFFF;
     margin: auto;
     width: 40%;
-    height: 35%;   
-    padding: 10px;
-    margin-top: 10rem;
+    height: 32%;   
+    padding: 1%;
+    margin-top: 12%;
 }
 div .login-container {
-    padding: 50px 30px 50px 80px;
+    padding: 6% 3% 5% 8%;
   
 }
 div h1 {
     font-family: 'BCSans-Bold';
-    font-size: 10px;
-    font-weight: normal;  /* 400 */   
+    font-size: 6%;
+    color: #494949;
 }
 
 div button {
     border-radius: 4px;
     background-color: #38598A;
-    width: 35%;
+    width: 30%;
     padding: 5px;    
     font-family: 'BCSans-Bold';
     color: #FFFF;
@@ -49,13 +49,41 @@ div button {
     }
   }
 
-@media screen and (min-width: 600px) and (max-width: 899px) {
+@media screen and (min-width: 300px) and (max-width: 599px) {
     div h1 {
       font-size: calc(7px + 1.2vw);
       font-family: 'BCSans-Bold';
       visibility: visible;
     }
+    div .rounded-rectangle {
+      font-family: 'BCSans-Bold';
+      border-radius: 12px;
+      background: #FFFF;
+      // margin: auto;
+      width: calc(8rem + 2vw);
+      height: calc(8rem + 2vw);   
+      padding: 1%;
+      margin-top: 12%;
   }
+}
+
+@media screen and (min-width: 600px) and (max-width: 899px) {
+  div h1 {
+    font-size: calc(7px + 1.2vw);
+    font-family: 'BCSans-Bold';
+    visibility: visible;
+  }
+  div .rounded-rectangle {
+    font-family: 'BCSans-Bold';
+    border-radius: 12px;
+    background: #FFFF;
+    // margin: auto;
+    width: calc(20rem + 2vw);
+    height: calc(10rem + 2vw);   
+    padding: 1%;
+    margin-top: 12%;
+}
+}
   
 @media screen and (min-width: 900px) {
     div h1 {
@@ -63,7 +91,7 @@ div button {
       font-family: 'BCSans-Bold';
       visibility: visible;
     }
-  }
+}
 
 
   

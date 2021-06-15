@@ -6,9 +6,9 @@ import "./FOIFooter.scss"
 
 const FOIFooter = React.memo(() => {  
   return (
-    <div class="footerstyle">
-    <div class="row ">
-        <div class="col-md-3 offset-md-2">
+    <div className="footerstyle">
+    <div className="row ">
+        <div className="col-md-3 offset-md-2">
 
           <ul>
             <li><a href="#">Help</a></li>
@@ -16,7 +16,7 @@ const FOIFooter = React.memo(() => {
           </ul>
 
         </div>
-        <div class="col-md-3">
+        <div className="col-md-3">
         <ul>
             <li><a href="#">Disclaimer</a></li>
             <li><a href="#">Privacy</a></li>

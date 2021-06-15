@@ -7,10 +7,10 @@
 header {
   background-color: #036;
   border-bottom: 2px solid #fcba19;
-  padding: 0 65px 0 65px;
+  //padding: 0 65px 0 65px;
   color: #fff;
   display: flex;
-  height: 65px;
+  height: 10%;
   top: 0px;
   position: fixed;
   width: 100%;
@@ -19,7 +19,8 @@ header {
 header h2 {
   font-family: 'BCSans-Bold';
   font-weight: normal;  /* 400 */
-  margin: 5px 5px 0 40px;
+  //margin: 5px 5px 0 40px;
+  margin: 0.5% 0.5% 0% 3%;
   visibility: hidden;
 }
 
@@ -27,22 +28,9 @@ header .banner {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 1%;
   // padding: 5px;
 }
-
-header .other {
-  display: flex;
-  flex-grow: 1;
-  /* border-style: dotted;
-  border-width: 1px;
-  border-color: lightgrey; */
-}
-
-:focus {
-    outline: 4px solid #3B99FC;
-    outline-offset: 1px;
-  }
 
 /*
   These are sample media queries only. Media queries are quite subjective
