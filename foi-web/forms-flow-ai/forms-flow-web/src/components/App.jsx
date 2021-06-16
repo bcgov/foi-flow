@@ -22,7 +22,7 @@ const App = React.memo((props) => {
         <Provider store={store}>
           <ConnectedRouter history={history}>
             {/* <BaseRouting store={store}/> */}
-            <FOIBaseRouting />
+            <FOIBaseRouting  store={store}/>
           </ConnectedRouter>
         </Provider>
       </div>

@@ -4,6 +4,7 @@ import {useSelector} from "react-redux";
 
 import Header from "./Header";
 import Home from "./Home";
+import Dashboard from "./Dashboard";
 import FOIFooter from "./Footer";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
@@ -11,7 +12,7 @@ import 'react-toastify/dist/ReactToastify.css'
 
 const FOIBaseRouting = React.memo(({store}) => {
     const isAuth = useSelector((state) => state.user.isAuthenticated);
-  
+    console.log("Debug is authenticated "+ isAuth);
     return (
       <>
         <Header/>
@@ -20,7 +21,10 @@ const FOIBaseRouting = React.memo(({store}) => {
               <Switch>
                
                 <Route exact path="/">
-                <Home/>
+                    <Home/>
+                </Route>
+                <Route exact path="/Dashboard">
+                    <Dashboard/>
                 </Route>
               </Switch>
               
