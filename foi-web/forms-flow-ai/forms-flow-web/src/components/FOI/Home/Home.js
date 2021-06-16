@@ -1,6 +1,12 @@
 import React, { memo } from 'react';
+import {useDispatch} from "react-redux";
+import {push} from "connected-react-router";
 import "./home.scss";
-const Home = memo((props) => { 
+const Home = memo((props) => {
+  const dispatch = useDispatch();
+  const login = () => {
+    dispatch(push(`/Dashboard`));
+}
     return (      
         <div className="home-page">
           {/* <div className="rounded-rectangle">
@@ -14,7 +20,7 @@ const Home = memo((props) => {
           <div className="card rounded-rectangle">     
             <div className="card-body login-container">
               <h1 className="card-title">Welcome, Sign In</h1>
-              <button type="button" className="btn btn-primary login-btn">Log In</button>
+              <button type="button" className="btn btn-primary login-btn" onClick={login}>Log In</button>
             </div>
           </div>     
         </div>

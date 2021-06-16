@@ -2,10 +2,12 @@ import React, {useEffect} from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import UserService from "../../../services/UserService";
 import { setUserAuth } from "../../../actions/bpmActions";
+import DashboardImage from "../../../assets/FOI/images/DashboardImage.PNG"
 
 const Dashboard = React.memo((props) => { 
   const dispatch = useDispatch();
   useEffect(()=>{
+    console.log(JSON.stringify(props.store));
     if(props.store){
       UserService.initKeycloak(props.store, (err, res) => {
         dispatch(setUserAuth(res.authenticated));
@@ -15,7 +17,9 @@ const Dashboard = React.memo((props) => {
 
 
     return (      
-        <div class="row">This is the Dashboard!</div>
+        <div className="dashboard">
+          <img src={DashboardImage} alt="Dashboard" />
+        </div>
     );
   });
 

@@ -5,8 +5,8 @@ import {useSelector} from "react-redux";
 import "./foiheader.scss";
 import { Container } from "@material-ui/core";
 const FOIHeader = React.memo(() => {
-  //const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-  const isAuthenticated = true;  
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+  //const isAuthenticated = true;  
   return (
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark">
       <Container>

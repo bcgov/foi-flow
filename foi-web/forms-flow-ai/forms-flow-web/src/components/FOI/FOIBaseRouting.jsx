@@ -24,7 +24,7 @@ const FOIBaseRouting = React.memo(({store}) => {
                     <Home/>
                 </Route>
                 <Route exact path="/Dashboard">
-                    <Dashboard/>
+                    <Dashboard store={store}/>
                 </Route>
               </Switch>
               
