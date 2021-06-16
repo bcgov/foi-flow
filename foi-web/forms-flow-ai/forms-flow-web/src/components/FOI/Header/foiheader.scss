@@ -3,23 +3,11 @@
   src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
 }
 
-header {
-  background-color: #036;
-  border-bottom: 2px solid #fcba19;
-  padding-top:15px;
-  color: #fff;
-}
-header h2 {
-  font-family: 'BCSans-Bold';
-  font-weight: 100 !important;
-  color: #fff;
-  margin-left: 40px;  
-}
-
 nav {
   background-color: #036 !important;
   border-bottom: 2px solid #fcba19;
-  padding-top:15px;
+  // padding-top:10px !important;
+  // padding-bottom: 10px !important;
   color: #fff;
 }
 
@@ -34,16 +22,16 @@ nav h2 {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
+  margin: 0;
+  // margin-bottom: 20px;
 }
 .banner-right {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: 10px; 
-  margin-bottom: 20px;
-  margin-right: 80px;
+  //justify-content: flex-end;
+  //align-items: center;
+  //margin-top: 10px; 
+  //margin-bottom: 20px;
+  // margin-right: 80px;
   font-family: 'BCSans-Bold';
   color: #fff;
 }
@@ -51,12 +39,12 @@ nav h2 {
   font-family: 'BCSans-Bold';  
   color: #fff !important;
   margin-right: 40px;
-  margin-top: 10px; 
+  // margin-top: 10px; 
 }
 
 .bell-icon {
   margin-right: 40px;
-  margin-top: 18px;
+  // margin-top: 18px;
   
 }
 
@@ -69,5 +57,5 @@ nav h2 {
   color: #FFFF;
   border-color: #FFFF !important;
   position: relative;
-  margin-top: 8px;
+  // margin-top: 8px;
 }

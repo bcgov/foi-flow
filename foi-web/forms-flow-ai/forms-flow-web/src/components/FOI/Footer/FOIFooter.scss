@@ -1,5 +1,8 @@
 
-
+@font-face {
+  font-family: "BCSans-Bold";
+  src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
 .footerstyle {
     background-color: #003366;
     color: #ffff;
@@ -8,6 +11,7 @@
 }
 
 .footerstyle a   {
+  font-family: 'BCSans-Bold';
   color: #ffff;
   text-decoration: none;
 }

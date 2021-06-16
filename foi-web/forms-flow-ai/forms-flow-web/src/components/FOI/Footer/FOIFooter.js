@@ -8,7 +8,7 @@ const FOIFooter = React.memo(() => {
   return (
     <div className="footerstyle">
     <div className="row ">
-        <div className="col-md-3 offset-md-2">
+        <div className="col-md-3 offset-md-1">
 
           <ul>
             <li><a href="#">Help</a></li>
