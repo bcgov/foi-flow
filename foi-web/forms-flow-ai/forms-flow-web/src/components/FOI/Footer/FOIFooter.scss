@@ -1,7 +1,7 @@
 
 @font-face {
-  font-family: "BCSans-Bold";
-  src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+  font-family: "BCSans-Regualar";
+  src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
 }
 .footerstyle {
     background-color: #003366;
@@ -11,9 +11,11 @@
 }
 
 .footerstyle a   {
-  font-family: 'BCSans-Bold';
+  font-family: 'BCSans-Regualar';
   color: #ffff;
   text-decoration: none;
+  font-size: small;
+  
 }
 .footerstyle a:hover
 {
