@@ -4,6 +4,7 @@
     background-color: #003366;
     color: #ffff;
     padding-top:15px;
+    border-top: 2px solid #fcba19;
 }
 
 .footerstyle a   {
@@ -18,6 +19,7 @@
 
 .footerstyle ul {
   list-style: none;
+  padding-inline-start: unset;
 }
 
 .footerstyle li {

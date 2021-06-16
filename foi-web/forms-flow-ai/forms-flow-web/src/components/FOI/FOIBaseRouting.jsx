@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 import {useSelector} from "react-redux";
 
-import Header from "./Header";
+import FOIHeader from "./Header";
 import Home from "./Home";
 import Dashboard from "./Dashboard";
 import FOIFooter from "./Footer";
@@ -15,7 +15,7 @@ const FOIBaseRouting = React.memo(({store}) => {
     console.log("Debug is authenticated "+ isAuth);
     return (
       <>
-        <Header/>
+        <FOIHeader/>
        
               <ToastContainer />
               <Switch>

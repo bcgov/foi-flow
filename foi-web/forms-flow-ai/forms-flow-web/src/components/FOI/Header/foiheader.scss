@@ -1,0 +1,59 @@
+// @import url('https://fonts.googleapis.com/css?family=BC+Sans');
+@font-face {
+  font-family: "BCSans-Bold";
+  src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+
+header {
+  background-color: #036;
+  border-bottom: 2px solid #fcba19;
+  padding-top:15px;
+  //padding: 0 65px 0 65px;
+  color: #fff;
+  // display: flex;
+  // height: 10%;
+  // top: 0px;
+  // position: fixed;
+  // width: 100%;
+}
+
+header h2 {
+  font-family: 'BCSans-Bold';
+  font-weight: 100 !important;
+  color: #fff;
+  //margin: 5px 5px 0 40px;
+  //margin: 0.5% 0.5% 0% 3%;  
+  margin-left: 40px;  
+}
+
+header .banner {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  // padding: 5px;
+}
+
+/*
+  These are sample media queries only. Media queries are quite subjective
+  but, in general, should be made for the three different classes of screen
+  size: phone, tablet, full. 
+*/
+
+// @media screen and (min-width: 300px) and (max-width: 899px) {
+//   header h2 {
+//     font-size: calc(7px + 1.2vw);
+//     font-family: 'BCSans-Bold';
+//     visibility: visible;
+//   }
+// }
+
+// @media screen and (min-width: 900px) {
+//   header h2 {
+//     font-size: 1.5em;
+//     font-family: 'BCSans-Bold';
+//     visibility: visible;
+//   }
+// }
+
