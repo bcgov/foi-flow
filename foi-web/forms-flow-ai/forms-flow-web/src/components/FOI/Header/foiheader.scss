@@ -1,59 +1,61 @@
-// @import url('https://fonts.googleapis.com/css?family=BC+Sans');
 @font-face {
   font-family: "BCSans-Bold";
   src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
 }
 
-header {
-  background-color: #036;
+nav {
+  background-color: #036 !important;
   border-bottom: 2px solid #fcba19;
-  padding-top:15px;
-  //padding: 0 65px 0 65px;
+  padding-top:10px !important;
+  padding-bottom: 10px !important;
   color: #fff;
-  // display: flex;
-  // height: 10%;
-  // top: 0px;
-  // position: fixed;
-  // width: 100%;
 }
 
-header h2 {
-  font-family: 'BCSans-Bold';
+nav h2 {
+  font-family: 'BCSans-Bold' !important;
   font-weight: 100 !important;
   color: #fff;
-  //margin: 5px 5px 0 40px;
-  //margin: 0.5% 0.5% 0% 3%;  
   margin-left: 40px;  
 }
 
-header .banner {
+.banner-left {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  // padding: 5px;
+  margin: 0;
+  // margin-bottom: 20px;
+}
+.banner-right {
+  display: flex;
+  //justify-content: flex-end;
+  //align-items: center;
+  //margin-top: 10px; 
+  //margin-bottom: 20px;
+  // margin-right: 80px;
+  font-family: 'BCSans-Bold';
+  color: #fff;
+}
+.navbar-text {
+  font-family: 'BCSans-Bold';  
+  color: #fff !important;
+  margin-right: 40px;
+  // margin-top: 10px; 
 }
 
-/*
-  These are sample media queries only. Media queries are quite subjective
-  but, in general, should be made for the three different classes of screen
-  size: phone, tablet, full. 
-*/
+.bell-icon {
+  margin-right: 40px;
+  // margin-top: 18px;
+  
+}
 
-// @media screen and (min-width: 300px) and (max-width: 899px) {
-//   header h2 {
-//     font-size: calc(7px + 1.2vw);
-//     font-family: 'BCSans-Bold';
-//     visibility: visible;
-//   }
-// }
-
-// @media screen and (min-width: 900px) {
-//   header h2 {
-//     font-size: 1.5em;
-//     font-family: 'BCSans-Bold';
-//     visibility: visible;
-//   }
-// }
-
+.signout-btn {
+  border: none;
+  background-color:  #036 !important;
+  width: 120%;
+  height: 100%;   
+  font-family: 'BCSans-Bold';
+  color: #FFFF;
+  border-color: #FFFF !important;
+  position: relative;
+  // margin-top: 8px;
+}

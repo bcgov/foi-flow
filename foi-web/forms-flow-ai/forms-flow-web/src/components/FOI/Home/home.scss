@@ -1,4 +1,3 @@
-// @import url('https://fonts.googleapis.com/css?family=BC+Sans');
 @font-face {
     font-family: "BCSans-Bold";
     src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
@@ -8,8 +7,7 @@ div .home-page {
     background-image: url('../../../assets/FOI/images/BC.bmp');
     height:60vh;
     min-height: 90vh;
-    padding-top: 60px;
-    // margin-top: 2.8rem;
+    padding-top: 60px;    
     background-position: center;
     background-size: cover;
 }
@@ -20,9 +18,8 @@ div .rounded-rectangle {
     background: #FFFF;
     margin: auto;
     width: 40%;
-    height: 32%;   
-    // padding: 1%;
-    margin-top: 12%;
+    height: 28%;
+    margin-top: 200px;
 }
 div .login-container {
     padding: 6% 3% 5% 8%;   
@@ -35,79 +32,13 @@ div h1 {
 }
 
 .login-btn {
-    border: none;
-    // border-radius: 4px;
-    background-color: #38598A !important;
-    // width: 30%;
-    // padding: 5px;    
+    border: none;   
+    background-color: #38598A !important;   
     font-family: 'BCSans-Bold';
-    color: #FFFF;
-    //margin: 2px 40px 10px 40px;
+    color: #FFFF; 
     margin-top: 10px;
     position: relative;
 }
-@media (max-width: 768px) {
-    .home-page{
-      margin-left:0 !important;
-    }
-  }
-
-// @media screen and (min-width: 300px) and (max-width: 599px) {
-//     div h1 {
-//       font-size: calc(7px + 1.2vw);
-//       font-family: 'BCSans-Bold';
-//       visibility: visible;
-//     }
-//     div .rounded-rectangle {
-//       font-family: 'BCSans-Bold';
-//       border-radius: 12px;
-//       background: #FFFF;
-//       // margin: auto;
-//       width: calc(8rem + 2vw);
-//       height: calc(8rem + 2vw);   
-//       padding: 1%;
-//       margin-top: 12%;
-//   }
-//   .login-btn {
-//     border: none;
-//     border-radius: 4px;
-//     background-color: #38598A;
-//     width: calc(3rem + 2vw);
-//     height: calc(2rem + 1vw);   
-//     // width: 40%;
-//     padding: 5px;    
-//     font-family: 'BCSans-Bold';
-//     color: #FFFF;
-//     margin-top: 10px;
-//     font-size: small;
-// }
-// }
-
-// @media screen and (min-width: 600px) and (max-width: 899px) {
-//   div h1 {
-//     font-size: calc(7px + 1.2vw);
-//     font-family: 'BCSans-Bold';
-//     visibility: visible;
-//   }
-//   div .rounded-rectangle {
-//     font-family: 'BCSans-Bold';
-//     border-radius: 12px;
-//     background: #FFFF;
-//     // margin: auto;
-//     width: calc(20rem + 2vw);
-//     height: calc(10rem + 2vw);   
-//     padding: 1%;
-//     margin-top: 12%;
-// }
-// }
-  
-// @media screen and (min-width: 900px) {
-//     div h1 {
-//       font-size: 2.0em;
-//       font-family: 'BCSans-Bold';
-//       visibility: visible;
-//     }
-// }
 
 
   
