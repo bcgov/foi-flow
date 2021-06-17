@@ -32,3 +32,18 @@
   padding-top:3px;
   padding-bottom: 3px;
 }
+
+/*  Mobile screens (phones, 500px and down) */
+@media only screen and (max-width: 500px) {
+
+  .footerstyle {
+      padding: 5%!important;
+      text-align: center;
+      
+
+  }
+  .footerstyle a {
+    font-size: 15px;
+  }
+
+}

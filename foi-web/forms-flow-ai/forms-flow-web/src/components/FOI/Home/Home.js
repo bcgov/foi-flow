@@ -11,10 +11,10 @@ const Home = memo((props) => {
               </button>
             </div>
           </div> */}
-          <div className="card rounded-rectangle">     
+          <div className="card rounded-rectangle foiroundedrectangle">     
             <div className="card-body login-container">
               <h1 className="card-title">Welcome, Sign In</h1>
-              <button type="button" className="btn btn-primary login-btn">Log In</button>
+              <button type="button" className="btn btn-primary login-btn foiLogin">Log In</button>
             </div>
           </div>     
         </div>
