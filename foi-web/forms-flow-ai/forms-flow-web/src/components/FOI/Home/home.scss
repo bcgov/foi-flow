@@ -17,8 +17,8 @@ div .rounded-rectangle {
     border-radius: 12px;
     background: #FFFF;
     margin: auto;
-    width: 40%;
-    height: 28%;
+    width: 25%;
+    height: fit-content;
     margin-top: 200px;
 }
 div .login-container {
@@ -38,9 +38,26 @@ div h1 {
     color: #FFFF; 
     margin-top: 10px;
     position: relative;
+    width: 30%;
 }
 
+/*  Mobile screens (phones, 500px and down) */
+@media only screen and (max-width: 500px) {
 
+.foiroundedrectangle{
+    width: auto!important;
+    margin-left: 5%!important;
+    margin-right: 5%!important;
+}
+
+.foiroundedrectangle h1{
+    font-size: 30px;
+}
+.foiLogin{
+    width: 50%!important;
+}
+
+}
   
 
   

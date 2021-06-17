@@ -23,15 +23,11 @@ nav h2 {
   justify-content: flex-start;
   align-items: center;
   margin: 0;
-  // margin-bottom: 20px;
+  
 }
 .banner-right {
   display: flex;
-  //justify-content: flex-end;
-  //align-items: center;
-  //margin-top: 10px; 
-  //margin-bottom: 20px;
-  // margin-right: 80px;
+  
   font-family: 'BCSans-Bold';
   color: #fff;
 }
@@ -39,23 +35,53 @@ nav h2 {
   font-family: 'BCSans-Bold';  
   color: #fff !important;
   margin-right: 40px;
-  // margin-top: 10px; 
+  
 }
 
 .bell-icon {
   margin-right: 40px;
-  // margin-top: 18px;
+  
   
 }
 
 .signout-btn {
   border: none;
   background-color:  #036 !important;
-  width: 120%;
+  width: 100%;
   height: 100%;   
   font-family: 'BCSans-Bold';
   color: #FFFF;
   border-color: #FFFF !important;
   position: relative;
-  // margin-top: 8px;
+ 
+}
+
+.foiheaderLogosection{
+  display: inline;
+}
+
+.foiheaderAppNamesection{
+  display: inline-block;
+  width: auto!important;
+}
+
+/*  Mobile screens (phones, 500px and down) */
+@media only screen and (max-width: 500px) {
+
+  .foihamburgermenu , .foihamburgermenulist{
+   width:100%;
+  }
+  .foinavitem {
+    padding: 4px;
+  }
+
+  .foiContainer{
+    padding-left: 2px!important;
+    padding-right: 2px!important;
+  }
+
+  .foiNavBarToggle{
+    float: right;
+  }
+
 }
