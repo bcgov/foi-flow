@@ -1,14 +1,24 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
-import {useSelector} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import "./foiheader.scss";
 import { Container } from "@material-ui/core";
-import logo from '../../../assets/FOI/images/logo-banner.png'
+import UserService from "../../../services/UserService";
+import logo from "../../../assets/FOI/images/logo-banner.png";
+import {push} from "connected-react-router";
 
 const FOIHeader = React.memo(() => {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-  //const isAuthenticated = true;  
+  //const isAuthenticated = true;
+  const user = useSelector((state) => state.user.userDetail);
+  const dispatch = useDispatch();
+  
+  const signout = () => {    
+    dispatch(push(`/`));
+    UserService.userLogout();
+}
+
   return (
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark">
       <Container className="foiContainer">
@@ -35,7 +45,7 @@ const FOIHeader = React.memo(() => {
               <div className="ml-auto banner-right foihamburgermenu">       
                 <ul className="navbar-nav foihamburgermenulist">
                     <li className="nav-item username foinavitem">
-                        <span className="navbar-text"> Username </span>
+                        <span className="navbar-text">  {user.name || user.preferred_username || ""} </span>
                     </li>
                     <li className="nav-item bell-icon foinavitem">
                     <Badge color="secondary" badgeContent=" " variant="dot">
@@ -44,7 +54,7 @@ const FOIHeader = React.memo(() => {
                       
                     </li>
                     <li className="nav-item foinavitem">
-                      <button type="button" className="btn btn-primary signout-btn">Sign Out</button>
+                      <button type="button" className="btn btn-primary signout-btn" onClick={signout}>Sign Out</button>
                     </li>
                 </ul>
               </div>

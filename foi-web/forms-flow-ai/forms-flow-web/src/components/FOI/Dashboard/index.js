@@ -1,3 +1,3 @@
-import dashboard from "./dashboard";
+import Dashboard from "./Dashboard";
 
-export default dashboard;
+export default Dashboard;
