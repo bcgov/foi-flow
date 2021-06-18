@@ -154,6 +154,7 @@ const getToken = () => KeycloakData.token;
 const UserService ={
   initKeycloak,
   userLogout,
+  foiUserLogout,
   getToken,
   getFormioToken,
   authenticateAnonymousUser
