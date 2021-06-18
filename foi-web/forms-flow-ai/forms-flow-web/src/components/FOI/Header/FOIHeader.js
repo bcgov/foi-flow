@@ -19,7 +19,7 @@ const FOIHeader = React.memo(() => {
 }
 
   return (
-    <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark">
+    <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark" style={{borderBottom: "2px solid #fcba19"}}>
       <Container className="foiContainer">
       <Nav className="ml-auto">  
        <div className="col-md-6">
