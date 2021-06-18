@@ -91,6 +91,17 @@ const userLogout = () => {
   doLogout();
 };
 
+/**
+ * Logout function for FOI
+ */
+ const foiUserLogout = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  clearInterval(refreshInterval);
+  doLogout();
+  document.location.href = "/";
+};
+
 const setApiBaseUrlToLocalStorage = ()=> {
   localStorage.setItem("bpmApiUrl", BPM_BASE_URL);
   localStorage.setItem("formioApiUrl", AppConfig.projectUrl);

@@ -1,22 +1,21 @@
-import React, {useEffect} from "react";
+import React  from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
-import {useSelector, useDispatch} from "react-redux";
+import {useSelector} from "react-redux";
 import "./foiheader.scss";
 import { Container } from "@material-ui/core";
 import UserService from "../../../services/UserService";
 import logo from "../../../assets/FOI/images/logo-banner.png";
-import {push} from "connected-react-router";
+
 
 const FOIHeader = React.memo(() => {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   //const isAuthenticated = true;
   const user = useSelector((state) => state.user.userDetail);
-  const dispatch = useDispatch();
+
   
-  const signout = () => {    
-    dispatch(push(`/`));
-    UserService.userLogout();
+  const signout = () => {
+    UserService.foiuserLogout();    
 }
 
   return (
