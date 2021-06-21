@@ -1,10 +1,14 @@
 import React from 'react';
-import DashboardImage from "../../../assets/FOI/images/DashboardImage.PNG"
+import {useSelector} from "react-redux";
+// import DashboardImage from "../../../assets/FOI/images/DashboardImage.PNG"
 
-const Dashboard = React.memo(() => { 
+const Dashboard = React.memo(() => {
+  
+  const user = useSelector((state) => state.user.userDetail);
+
      return (      
         <div className="dashboard">
-          <img src={DashboardImage} alt="Dashboard" />
+          <span>Welcome {user.name || user.preferred_username || ""} !!!</span>
         </div>
     );
   });
