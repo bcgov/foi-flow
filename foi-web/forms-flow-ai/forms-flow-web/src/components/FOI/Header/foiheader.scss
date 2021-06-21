@@ -65,12 +65,28 @@ nav h2 {
   width: auto!important;
 }
 
+.foiheaderUserStatusSection {
+  display: inline;
+  width: auto!important;
+  float: right;
+}
+
 /*  Mobile screens (phones, 500px and down) */
-@media only screen and (max-width: 500px) {
+@media only screen  and (max-width: 500px) {
 
   .foihamburgermenu , .foihamburgermenulist{
    width:100%;
   }
+
+  .foiheaderLogosection , .foiheaderAppNamesection , .foiheaderUserStatusSection {
+    padding-left: 5px!important;
+    padding-right: 5px!important;
+  }
+  .foiheaderUserStatusSection {
+
+    float: none;
+  }
+
   .foinavitem {
     padding: 4px;
   }
@@ -83,5 +99,9 @@ nav h2 {
   .foiNavBarToggle{
     float: right;
   }
+
+.foiheaderAppNamesection > h2 {
+  margin-left: 5%;
+}
 
 }

@@ -11,6 +11,7 @@ import {push} from "connected-react-router";
 const FOIHeader = React.memo(() => {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   let isAuth = false;
+ 
   const user = useSelector((state) => state.user.userDetail);
   const dispatch = useDispatch();
   const authToken = localStorage.getItem("authToken"); 
@@ -25,27 +26,34 @@ const FOIHeader = React.memo(() => {
     dispatch(push(`/`));
     UserService.userLogout();
 }
+
+console.log("isAuthenticated"+isAuthenticated)
+console.log("isAuth"+isAuth)
+
   return (
+
+    
+
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark" style={{borderBottom: "2px solid #fcba19"}}>
       <Container className="foiContainer">
         <Nav className="ml-auto">  
-        <div className="col-md-6">
-          <div className="col-md-3 foiheaderLogosection">
+        <div className="col-md-12 col-sm-12">
+          <div className="col-md-3 col-sm-4 foiheaderLogosection">
           <a href="https://gov.bc.ca" alt="British Columbia">
               <img src={logo} alt="Go to the Government of British Columbia website" />
             </a>
           </div>
-          <div className="col-md-3 foiheaderAppNamesection">
+          <div className="col-md-3 col-sm-4 foiheaderAppNamesection">
           <h2>FOI</h2>
           </div>
             
             
-            </div>
-            <div className="col-md-6">
-          {isAuthenticated && isAuth?
+            
+            <div className="col-md-6 col-sm-4 foiheaderUserStatusSection">
+          {isAuth?
             <Navbar.Toggle aria-controls="responsive-navbar-nav" className="foiNavBarToggle" />
           :null}
-          {isAuthenticated && isAuth?
+          { isAuth?
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="ml-auto">
                 <div className="ml-auto banner-right foihamburgermenu">       
@@ -67,6 +75,7 @@ const FOIHeader = React.memo(() => {
               </Nav>
             </Navbar.Collapse>       
           :null}
+          </div>
           </div>
       </Nav>
     </Container>

@@ -41,6 +41,10 @@ div h1 {
     width: 30%;
 }
 
+.foiroundedrectangle h1{
+    font-size: 30px;
+}
+
 /*  Mobile screens (phones, 500px and down) */
 @media only screen and (max-width: 500px) {
 
@@ -50,12 +54,22 @@ div h1 {
     margin-right: 5%!important;
 }
 
-.foiroundedrectangle h1{
-    font-size: 30px;
-}
+
 .foiLogin{
     width: 50%!important;
 }
+
+}
+
+
+/*  Mobile screens (phones, 500px and down) */
+@media only screen and (min-width: 501px)  and (max-width: 1110px) { 
+
+    .foiroundedrectangle{ 
+        width: 50%!important;
+    }
+
+    
 
 }
   
