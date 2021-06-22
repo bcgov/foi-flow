@@ -29,8 +29,8 @@ const FOIHeader = React.memo((props) => {
 }
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
-console.log("isAuthenticated"+isAuthenticated)
-console.log("isAuth"+isAuth)
+console.log("isAuthenticated = "+isAuthenticated)
+console.log("isAuth = "+isAuth)
 
   return (
 

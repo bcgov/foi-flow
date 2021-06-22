@@ -1,10 +1,9 @@
-import React,  {useEffect} from 'react';
+import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {push} from "connected-react-router";
-import UserService from "../../../services/UserService";
-import { setUserAuth } from "../../../actions/bpmActions";
 import "./home.scss";
-const Home = React.memo((props) => {
+
+const Home = React.memo(() => {
   let isAuth = false;
 
   const authToken = localStorage.getItem("authToken"); 
@@ -14,9 +13,6 @@ const Home = React.memo((props) => {
   }
 
   const dispatch = useDispatch();
-
-
-
   const user = useSelector((state) => state.user.userDetail);
   const login = () => {
     dispatch(push(`/Dashboard`));

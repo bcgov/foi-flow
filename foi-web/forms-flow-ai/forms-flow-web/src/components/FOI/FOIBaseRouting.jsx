@@ -1,16 +1,12 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 import FOIAuthenticateRouting from "./FOIAuthenticateRouting";
 import FOIUnAuthenticateRouting from "./FOIUnAuthenticateRouting";
-import {useSelector} from "react-redux";
 
 const FOIBaseRouting = React.memo(({store}) => {
-  
-  const isAuth = useSelector((state) => state.user.isAuthenticated);
-  console.log("FOIBaseRouting "+ isAuth)
     return (
       <>
               
