@@ -1,32 +1,41 @@
-import React  from "react";
+import React , {useEffect} from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
 import "./foiheader.scss";
 import { Container } from "@material-ui/core";
 import UserService from "../../../services/UserService";
+import { setUserAuth } from "../../../actions/bpmActions";
 import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
 
-const FOIHeader = React.memo(() => {
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+const FOIHeader = React.memo((props) => {
+ 
   let isAuth = false;
  
-  const user = useSelector((state) => state.user.userDetail);
+  
   const dispatch = useDispatch();
   const authToken = localStorage.getItem("authToken"); 
   
   if(authToken !== null && authToken !== '' && authToken !== undefined) {
     isAuth = true;
   }
-    
-
+ 
+  useEffect(()=>{
+    if(props.store && isAuth){
+      UserService.initKeycloak(props.store, (err, res) => {
+        dispatch(setUserAuth(res.authenticated));
+      });
+    }
+  },[props.store, dispatch]);
+  
   const signout = () => {
     localStorage.removeItem('authToken');
     dispatch(push(`/`));
     UserService.userLogout();
 }
-
+const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+const user = useSelector((state) => state.user.userDetail);
 console.log("isAuthenticated"+isAuthenticated)
 console.log("isAuth"+isAuth)
 

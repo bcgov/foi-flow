@@ -7,10 +7,12 @@ import Home from "./Home";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import FOIAuthenticateRouting from "./FOIAuthenticateRouting";
-
+import {useSelector} from "react-redux";
 
 const FOIBaseRouting = React.memo(({store}) => {
   
+  const isAuth = useSelector((state) => state.user.isAuthenticated);
+  console.log("FOIBaseRouting "+ isAuth)
     return (
       <>
               
@@ -22,8 +24,8 @@ const FOIBaseRouting = React.memo(({store}) => {
                 </Route>
                
                 <Route exact path="/">
-                    <FOIHeader /> 
-                    <Home />
+                    <FOIHeader store={store}/> 
+                    <Home store={store} />
                     <FOIFooter />
                 </Route>
 
