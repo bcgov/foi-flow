@@ -22,7 +22,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
     }
   },[props.store, dispatch]);
 
-  console.log(`isAuth = ${isAuth}`);
   return (
       <>
         {isAuth ? (

@@ -1,27 +1,16 @@
-import React , {useEffect} from "react";
+import React from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
 import "./foiheader.scss";
 import { Container } from "@material-ui/core";
 import UserService from "../../../services/UserService";
-import { setUserAuth } from "../../../actions/bpmActions";
 import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
 
-const FOIHeader = React.memo((props) => {
- 
-  let isAuth = false;
- 
-  
-  const dispatch = useDispatch();
-  const authToken = localStorage.getItem("authToken"); 
-  
-  if(authToken !== null && authToken !== '' && authToken !== undefined) {
-    isAuth = true;
-  }
+const FOIHeader = React.memo(() => { 
 
-  
+  const dispatch = useDispatch();
   const signout = () => {
     localStorage.removeItem('authToken');
     dispatch(push(`/`));
@@ -29,13 +18,8 @@ const FOIHeader = React.memo((props) => {
 }
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
-console.log("isAuthenticated = "+isAuthenticated)
-console.log("isAuth = "+isAuth)
 
   return (
-
-    
-
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark" style={{borderBottom: "2px solid #fcba19"}}>
       <Container className="foiContainer">
         <Nav className="ml-auto">  
@@ -49,10 +33,10 @@ console.log("isAuth = "+isAuth)
           <h2>FOI</h2>
           </div>
             <div className="col-md-6 col-sm-4 foiheaderUserStatusSection">
-          {isAuth?
+          {isAuthenticated?
             <Navbar.Toggle aria-controls="responsive-navbar-nav" className="foiNavBarToggle" />
           :null}
-          { isAuth?
+          { isAuthenticated?
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="ml-auto">
                 <div className="ml-auto banner-right foihamburgermenu">       
