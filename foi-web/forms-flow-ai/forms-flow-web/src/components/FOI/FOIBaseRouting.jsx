@@ -3,10 +3,8 @@ import { Route, Switch } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import Home from "./Home";
-import FOIHeader from "./Header";
-import FOIFooter from "./Footer";
 import FOIAuthenticateRouting from "./FOIAuthenticateRouting";
+import FOIUnAuthenticateRouting from "./FOIUnAuthenticateRouting";
 import {useSelector} from "react-redux";
 
 const FOIBaseRouting = React.memo(({store}) => {
@@ -23,10 +21,8 @@ const FOIBaseRouting = React.memo(({store}) => {
                     <FOIAuthenticateRouting store={store} />
                 </Route>
                
-                <Route exact path="/">
-                    <FOIHeader store={store}/> 
-                    <Home store={store} />
-                    <FOIFooter />
+                <Route exact path="/">                   
+                    <FOIUnAuthenticateRouting store={store}/>
                 </Route>
 
               </Switch>   

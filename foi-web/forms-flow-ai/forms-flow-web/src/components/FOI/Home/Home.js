@@ -15,13 +15,6 @@ const Home = React.memo((props) => {
 
   const dispatch = useDispatch();
 
-  useEffect(()=>{
-    if(props.store && isAuth){
-      UserService.initKeycloak(props.store, (err, res) => {
-        dispatch(setUserAuth(res.authenticated));
-      });
-    }
-  },[props.store, dispatch]);
 
 
   const user = useSelector((state) => state.user.userDetail);

@@ -20,14 +20,7 @@ const FOIHeader = React.memo((props) => {
   if(authToken !== null && authToken !== '' && authToken !== undefined) {
     isAuth = true;
   }
- 
-  useEffect(()=>{
-    if(props.store && isAuth){
-      UserService.initKeycloak(props.store, (err, res) => {
-        dispatch(setUserAuth(res.authenticated));
-      });
-    }
-  },[props.store, dispatch]);
+
   
   const signout = () => {
     localStorage.removeItem('authToken');
@@ -48,16 +41,13 @@ console.log("isAuth"+isAuth)
         <Nav className="ml-auto">  
         <div className="col-md-12 col-sm-12">
           <div className="col-md-3 col-sm-4 foiheaderLogosection">
-          <a href="https://gov.bc.ca" alt="British Columbia">
+          <a href="/" alt="British Columbia">
               <img src={logo} alt="Go to the Government of British Columbia website" />
             </a>
           </div>
           <div className="col-md-3 col-sm-4 foiheaderAppNamesection">
           <h2>FOI</h2>
           </div>
-            
-            
-            
             <div className="col-md-6 col-sm-4 foiheaderUserStatusSection">
           {isAuth?
             <Navbar.Toggle aria-controls="responsive-navbar-nav" className="foiNavBarToggle" />
