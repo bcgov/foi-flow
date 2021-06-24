@@ -1,11 +1,15 @@
 @font-face {
     font-family: "BCSans-Regualar";
     src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-  }
+}
 
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
 div .foi-dashboard {    
     //height:60vh;
-    height: 300px;
+    //height: 600px;
     width: 100%;
     //min-height: 90vh;    
     background-position: center;
@@ -19,32 +23,78 @@ div .foi-dashboard {
     position: absolute;
     top: 10%;
     left: 5%;
-    
+    //background-color:#ffff;
     // width: 100%;
 }
 
-.foi-grid {
-    height: 400px;
-    width: 90%;
+.foi-dashboard-row2 {
+    display: flex;
+}
+.has-search .form-control {
+    padding-left: 2.375rem;
+    display: inline-block;
+    width: 200%;
 }
 
+.has-search .form-control-search {
+    position: absolute;
+    z-index: 2;    
+    width: 2.375rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: #aaa;
+}
+
+.has-search .apply-btn {
+    border: none;   
+    background-color: #38598A !important;   
+    font-family: 'BCSans-Bold';
+    color: #FFFF; 
+    margin-top: 10px;
+    position: absolute;
+    z-index: 2;    
+    width: 30%;
+}
+.foi-request-type {
+    margin-left: auto;
+    display: inline-block;
+    width: 40%;
+}
 .foi-data-grid {
     border: none !important;
-}
-
-.MuiDataGrid-selectedRowCount {
-    visibility: hidden  !important;
-}
-
-.MuiButtonBase-root {
-    border-radius: unset !important;
-    border : 2px solid !important;
-}
-.MuiDataGrid-columnsContainer {
     font-family: 'BCSans-Regualar' !important;
+}
+// .MuiButtonBase-root {
+//     border-radius: unset !important;
+//     border : 2px solid !important;
+// }
+.MuiDataGrid-columnsContainer {
+    font-family: 'BCSans-Bold' !important;
     border-top: 2px solid;
     border-bottom: 2px solid !important;
 }
 .MuiDataGrid-row {
-    border-bottom: 2px solid #d0d0cb//rgb(208 208 203);
+    border-bottom: 2px solid #e0e0dc;
+    //background-color: #cfd7e3; //#d0d0cb
+    
 }
+
+.MuiBadge-badge {
+    visibility: hidden;
+}
+
+.MuiDataGrid-columnHeaderWrapper {
+    // overflow: "hidden";
+    // white-space: "normal";
+    // line-height: "20px";
+    font-weight: bolder !important;
+    
+}
+
+.MuiDataGrid-footerContainer {
+    margin-bottom: 3%;
+}
+
+

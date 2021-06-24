@@ -1,0 +1,50 @@
+import { getThemePaletteMode } from '@material-ui/data-grid';
+import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
+
+const defaultTheme = createMuiTheme();
+const useStyles = makeStyles(
+  (theme) => {    
+    const getBackgroundColor = (color) =>
+      getThemePaletteMode(theme.palette) === 'dark'
+        ? darken(color, 0.94)
+        : lighten(color, 0.94);
+
+    const getHoverBackgroundColor = (color) =>
+      getThemePaletteMode(theme.palette) === 'dark'
+        ? darken(color, 0.9)
+        : lighten(color, 0.9);
+
+    return {
+      root: {
+        '& .super-app-theme--UnOpened': {
+          backgroundColor: '#cfd7e3', //getBackgroundColor(theme.palette.info.main),
+          '&:hover': {
+            backgroundColor: getHoverBackgroundColor(theme.palette.info.main),
+          },
+        },
+        '& .super-app-theme--testOpen': {
+          backgroundColor: getBackgroundColor(theme.palette.success.main),
+          '&:hover': {
+            backgroundColor: getHoverBackgroundColor(theme.palette.success.main),
+          },
+        },
+        '& .super-app-theme--PartiallyFilled': {
+          backgroundColor: getBackgroundColor(theme.palette.warning.main),
+          '&:hover': {
+            backgroundColor: getHoverBackgroundColor(theme.palette.warning.main),
+          },
+        },
+        '& .super-app-theme--Rejected': {
+          backgroundColor: getBackgroundColor(theme.palette.error.main),
+          '&:hover': {
+            backgroundColor: getHoverBackgroundColor(theme.palette.error.main),
+          },
+        },
+      },
+    };
+  },
+  { defaultTheme },
+);
+
+export default useStyles;
