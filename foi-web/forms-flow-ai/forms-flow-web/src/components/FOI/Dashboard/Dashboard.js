@@ -20,6 +20,7 @@ const Dashboard = React.memo(() => {
    ];
 const [filteredData, setFilteredData] = useState(rows);
 const [requestType, setRequestType] = useState("All");
+const [searchText, setSearchText] = useState("");
 const classes = useStyles();
 
 useEffect(() => {       
@@ -77,6 +78,15 @@ const sortModel=[
 const requestTypeChange = (e) => { 
   setRequestType(e.target.value);
 }
+
+const setSearch = (e) => {
+  setSearchText(e.target.value);
+}
+
+const search = (rows) => {
+  return rows.filter(row => (row.applicantName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
+}
      return (      
         <div className="foi-dashboard">
           <div className="col-md-12 foi-grid-container">
@@ -84,7 +94,7 @@ const requestTypeChange = (e) => {
              
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
-                <input type="text" className="form-control" placeholder="Search . . ." />
+                <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />
                 {/* <button type="button" className="btn btn-primary apply-btn">Apply</button> */}
               </div>
              
@@ -98,7 +108,7 @@ const requestTypeChange = (e) => {
             <div style={{ height: 450, width: '90%' }} className={classes.root}>
               <DataGrid 
                 className="foi-data-grid" 
-                rows={filteredData} 
+                rows={search(filteredData)} 
                 columns={columns}
                 rowHeight={30}
                 headerHeight={50}                
