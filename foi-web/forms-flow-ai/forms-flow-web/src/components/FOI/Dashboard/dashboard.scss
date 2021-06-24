@@ -1,7 +1,50 @@
-div .foidashboard {    
-    height:60vh;
-    min-height: 90vh;
-    margin-top: 120px;
+@font-face {
+    font-family: "BCSans-Regualar";
+    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+  }
+
+div .foi-dashboard {    
+    //height:60vh;
+    height: 300px;
+    width: 100%;
+    //min-height: 90vh;    
     background-position: center;
     background-size: cover;
+    //background-color:#f2f2f2;
+    position: relative;
+}
+
+.foi-grid-container {
+    margin-top: 100px;
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    
+    // width: 100%;
+}
+
+.foi-grid {
+    height: 400px;
+    width: 90%;
+}
+
+.foi-data-grid {
+    border: none !important;
+}
+
+.MuiDataGrid-selectedRowCount {
+    visibility: hidden  !important;
+}
+
+.MuiButtonBase-root {
+    border-radius: unset !important;
+    border : 2px solid !important;
+}
+.MuiDataGrid-columnsContainer {
+    font-family: 'BCSans-Regualar' !important;
+    border-top: 2px solid;
+    border-bottom: 2px solid !important;
+}
+.MuiDataGrid-row {
+    border-bottom: 2px solid #d0d0cb//rgb(208 208 203);
 }
