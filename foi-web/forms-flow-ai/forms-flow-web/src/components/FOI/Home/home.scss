@@ -1,0 +1,77 @@
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+  }
+  
+div .home-page {
+    background-image: url('../../../assets/FOI/images/BC.bmp');
+    height:60vh;
+    min-height: 90vh;
+    padding-top: 60px;    
+    background-position: center;
+    background-size: cover;
+}
+
+div .rounded-rectangle {
+    font-family: 'BCSans-Bold';
+    border-radius: 12px;
+    background: #FFFF;
+    margin: auto;
+    width: 25%;
+    height: fit-content;
+    margin-top: 200px;
+}
+div .login-container {
+    padding: 6% 3% 5% 8%;   
+  
+}
+div h1 {
+    font-family: 'BCSans-Bold';    
+    color: #494949;
+    position: relative;
+}
+
+.login-btn {
+    border: none;   
+    background-color: #38598A !important;   
+    font-family: 'BCSans-Bold';
+    color: #FFFF; 
+    margin-top: 10px;
+    position: relative;
+    width: 30%;
+}
+
+.foiroundedrectangle h1{
+    font-size: 30px;
+}
+
+/*  Mobile screens (phones, 500px and down) */
+@media only screen and (max-width: 500px) {
+
+.foiroundedrectangle{
+    width: auto!important;
+    margin-left: 5%!important;
+    margin-right: 5%!important;
+}
+
+
+.foiLogin{
+    width: 50%!important;
+}
+
+}
+
+
+/*  Mobile screens (phones, 500px and down) */
+@media only screen and (min-width: 501px)  and (max-width: 1110px) { 
+
+    .foiroundedrectangle{ 
+        width: 50%!important;
+    }
+
+    
+
+}
+  
+
+  
