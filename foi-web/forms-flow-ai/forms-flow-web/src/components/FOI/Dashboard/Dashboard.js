@@ -84,14 +84,14 @@ const requestTypeChange = (e) => {
              
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
-                <input type="text" className="form-control" placeholder="Search" />
+                <input type="text" className="form-control" placeholder="Search . . ." />
                 {/* <button type="button" className="btn btn-primary apply-btn">Apply</button> */}
               </div>
              
               <div className="foi-request-type">
-                <input type="radio" value="General" name="requestType" onChange={requestTypeChange} /> General
-                <input type="radio" value="Personal" name="requestType" onChange={requestTypeChange} /> Personal
-                <input type="radio" value="All" name="requestType" onChange={requestTypeChange} defaultChecked  /> All              
+                <input className="foi-general-radio" type="radio" value="General" name="requestType" onChange={requestTypeChange} /> General
+                <input className="foi-personal-radio" type="radio" value="Personal" name="requestType" onChange={requestTypeChange} /> Personal
+                <input className="foi-all-radio" type="radio" value="All" name="requestType" onChange={requestTypeChange} defaultChecked  /> All              
               </div>            
               
             </div>
