@@ -1,5 +1,10 @@
 version: '3'
-services:  
+services: 
+  foiredis:
+    image: redis:4.0
+    container_name: aot_foi_request_redis
+    ports:
+      - "6379:6379" 
   BACKEND:
     build:
       context: ./      
@@ -13,7 +18,7 @@ services:
         aliases:
           - backendnw
     ports:
-      - 5000:5000
+      - 15000:5000
     environment:
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=Fo!123
@@ -21,11 +26,15 @@ services:
       - DATABASE_HOST=foi-requests-DB
       - DATABASE_PORT=5432
       - FLASK_ENV:production
+      - FOI_REQUESTQUEUE_REDISHOST=10.0.0.143
+      - FOI_REQUESTQUEUE_REDISPORT=6379
+      - FOI_REQUESTQUEUE_REDISPASSWORD=
+      - FOI_REQUESTQUEUE_REDISCHANNEL=FOI_WF_REQUEST_CHANNEL
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg
     ports:
-      - "5432:5432"
+      - "15432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=Fo!123

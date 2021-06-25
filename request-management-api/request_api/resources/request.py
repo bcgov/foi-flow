@@ -23,9 +23,13 @@ from request_api.exceptions import BusinessException, Error
 from request_api.models.FOIRawRequests import FOIRawRequest
 from flask_expects_json import expects_json
 import json
+#import redis
+import asyncio
+from request_api.utils.redispublisher import RedisPublisherService
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
+redispubservice = RedisPublisherService()
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequests')
@@ -50,7 +54,9 @@ class FOIRawRequests(Resource):
         try:
             request_json = request.get_json()
             requestdatajson = request_json['requestData']                       
-            result = FOIRawRequest.saverawrequest(requestdatajson)           
+            result = FOIRawRequest.saverawrequest(requestdatajson)
+            if(result.success):            
+                asyncio.run(redispubservice.publishtoredischannel(result.identifier))       
             return {'status': result.success, 'message':result.message} , 200
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

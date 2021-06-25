@@ -18,5 +18,5 @@ class FOIRawRequest(db.Model):
         createdat = datetime.now().isoformat()
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='submitted',created_at=createdat)
         db.session.add(newrawrequest)
-        db.session.commit()        
-        return DefaultMethodResult(True,'Request added')
+        db.session.commit()               
+        return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
