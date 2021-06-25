@@ -21,8 +21,8 @@ div .foi-dashboard {
 .foi-grid-container {
     margin-top: 100px;
     position: absolute;
-    top: 10%;
-    left: 5%;
+     top: 10%;
+     left: 5%;
     //background-color:#ffff;
     // width: 100%;
 }
@@ -106,10 +106,9 @@ input[type='radio'] {
     border: none !important;
     font-family: 'BCSans-Regualar' !important;
 }
-// .MuiButtonBase-root {
-//     border-radius: unset !important;
-//     border : 2px solid !important;
-// }
+.MuiDataGrid-iconSeparator {
+    visibility: hidden;
+}
 .MuiDataGrid-columnsContainer {
     font-family: 'BCSans-Bold' !important;
     border-top: 2px solid;

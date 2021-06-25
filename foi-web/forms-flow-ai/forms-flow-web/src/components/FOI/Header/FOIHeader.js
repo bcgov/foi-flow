@@ -20,6 +20,8 @@ const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
 
   return (
+    <div>
+    <div className="row ">
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark" style={{borderBottom: "2px solid #fcba19"}}>
       <Container className="foiContainer">
         <Nav className="ml-auto">  
@@ -61,9 +63,30 @@ const user = useSelector((state) => state.user.userDetail);
           </div>
           </div>
       </Nav>
+      
     </Container>
-         </Navbar>   
-   
+    
+         </Navbar>
+        
+         <div class="row justify-content-between foi-menu-bar">
+          <div class="col-4 foi-home-menu">
+          
+          <a href="/Dashboard" alt="Home" className="foi-home-link">
+              Home
+            </a>
+           
+          </div>
+          <div class="col-4">
+          
+            <button type="button" className="foi-search-button">
+              <span className="fa fa-search foi-search-icon"></span>
+            </button>
+           
+          </div>
+        </div>
+       
+         </div>
+         </div>
   );
 });
 export default FOIHeader;

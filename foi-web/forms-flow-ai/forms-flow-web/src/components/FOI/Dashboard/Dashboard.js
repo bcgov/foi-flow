@@ -88,7 +88,7 @@ const search = (rows) => {
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
 }
      return (      
-        <div className="foi-dashboard">
+        <div className="container">
           <div className="col-md-12 foi-grid-container">
             <div className="foi-dashboard-row2">
              
