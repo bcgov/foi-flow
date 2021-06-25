@@ -90,8 +90,8 @@ const search = (rows) => {
      return (      
         <div className="container">
           <div className="col-md-12 foi-grid-container">
-            <div className="foi-dashboard-row2">
-             
+            <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
+            <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
                 <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />
@@ -105,7 +105,7 @@ const search = (rows) => {
               </div>            
               
             </div>
-            <div style={{ height: 450, width: '90%' }} className={classes.root}>
+            <div style={{ height: 410, width: '90%' }} className={classes.root}>
               <DataGrid 
                 className="foi-data-grid" 
                 rows={search(filteredData)} 

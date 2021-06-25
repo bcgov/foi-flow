@@ -19,7 +19,7 @@ div .foi-dashboard {
 }
 
 .foi-grid-container {
-    margin-top: 100px;
+    margin-top: 30px;
     position: absolute;
      top: 10%;
      left: 5%;
@@ -29,6 +29,13 @@ div .foi-dashboard {
 
 .foi-dashboard-row2 {
     display: flex;
+    margin-top: 20px;
+}
+
+
+.foi-request-queue-text {
+    font-family: "BCSans-Bold";
+    // font-size: 10px;
 }
 .has-search .form-control {
     padding-left: 2.375rem;
