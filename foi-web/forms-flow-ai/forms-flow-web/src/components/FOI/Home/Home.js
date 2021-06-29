@@ -9,7 +9,7 @@ const Home = React.memo(() => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userDetail);
   const login = () => {
-    dispatch(push(`/Dashboard`));
+    dispatch(push(`/foi/dashboard`));
 }
     return (      
         <div className="home-page">         
