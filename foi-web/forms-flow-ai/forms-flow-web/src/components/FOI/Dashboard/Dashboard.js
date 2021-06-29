@@ -2,8 +2,11 @@ import React, { useEffect, useState }  from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import "./dashboard.scss";
 import useStyles from './CustomStyle';
+import {useDispatch} from "react-redux";
+import {push} from "connected-react-router";
 
-const Dashboard = React.memo(() => {
+const Dashboard = React.memo((props) => {
+  console.log('dashboard');
   let rows = [
     { id: 1, applicantName: "Joe, James", requestType: "Personal", idNumber: "00123", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
     { id: 2, applicantName: "John, Walsh", requestType: "Personal", idNumber: "00124", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
@@ -18,74 +21,90 @@ const Dashboard = React.memo(() => {
     { id: 11,  applicantName: "James, Houston", requestType: "General", idNumber: "00133", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
     { id: 12,  applicantName: "James, Houston", requestType: "General", idNumber: "00134", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
    ];
+   const columns = [
+    { field: 'applicantName', headerName: 'APPLICANT NAME', width: 200 },
+    { field: 'requestType', headerName: 'REQUEST TYPE', width: 200, sortable: false },
+    { field: 'idNumber', headerName: 'ID NUMBER', width: 200 },
+    { field: 'currentState', headerName: 'CURRENT STATE', width: 200 },
+    {      
+      field: 'assignedTo',
+      headerName: 'ASSIGNED TO',
+      width: 200,
+      renderCell: (params) => (       
+        <select>
+            <option>Unassigned</option>
+            <option>Intake team</option>
+            <option>Program area</option>
+        </select>
+      ),
+      
+    },
+    { field: 'receivedDate', headerName: 'RECEIVED DATE', width: 200 },
+    { field: 'xgov', headerName: 'XGOV', width: 150 },
+    ];  
+    
+    const sortModel=[
+      {
+        field: 'currentState',
+        sort: 'desc',
+      },
+      {
+        field: 'applicantName',
+        sort: 'desc',
+      },
+      {
+        field: 'idNumber',
+        sort: 'desc',
+      },
+      {
+        field: 'assignedTo',
+        sort: 'desc',
+      },
+      {
+        field: 'receivedDate',
+        sort: 'desc',
+      },
+      {
+        field: 'xgov',
+        sort: 'desc',
+      },
+    ];
+
 const [filteredData, setFilteredData] = useState(rows);
 const [requestType, setRequestType] = useState("All");
 const [searchText, setSearchText] = useState("");
 const classes = useStyles();
 
-useEffect(() => {       
+useEffect(() => {   
+  console.log('useeffect');
     setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
 }, [requestType])
 
-const columns = [
-{ field: 'applicantName', headerName: 'APPLICANT NAME', width: 200 },
-{ field: 'requestType', headerName: 'REQUEST TYPE', width: 200, sortable: false },
-{ field: 'idNumber', headerName: 'ID NUMBER', width: 200 },
-{ field: 'currentState', headerName: 'CURRENT STATE', width: 200 },
-{      
-  field: 'assignedTo',
-  headerName: 'ASSIGNED TO',
-  width: 200,
-  renderCell: (params) => (       
-    <select>
-        <option>Unassigned</option>
-        <option>Intake team</option>
-        <option>Program area</option>
-    </select>
-  ),
-  
-},
-{ field: 'receivedDate', headerName: 'RECEIVED DATE', width: 200 },
-{ field: 'xgov', headerName: 'XGOV', width: 150 },
-];  
 
-const sortModel=[
-  {
-    field: 'currentState',
-    sort: 'desc',
-  },
-  {
-    field: 'applicantName',
-    sort: 'desc',
-  },
-  {
-    field: 'idNumber',
-    sort: 'desc',
-  },
-  {
-    field: 'assignedTo',
-    sort: 'desc',
-  },
-  {
-    field: 'receivedDate',
-    sort: 'desc',
-  },
-  {
-    field: 'xgov',
-    sort: 'desc',
-  },
-];
-const requestTypeChange = (e) => { 
+const requestTypeChange = (e) => {
+  console.log('setrequesttype') 
   setRequestType(e.target.value);
 }
 
 const setSearch = (e) => {
+  console.log('setsearch')
   setSearchText(e.target.value);
 }
 
 const search = (rows) => {
+  console.log('search')
   return rows.filter(row => (row.applicantName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
+}
+ const dispatch = useDispatch();
+ 
+const renderReviewRequest = () => {
+  console.log('rowclick')
+  dispatch(push('/foi/reviewrequest'));
+  // dispatch(history.push({
+  //   pathname:'/foi/reviewrequest',    
+  //   state: {reviewRequestData: rowData}
+  //}));
 }
      return (      
         <div className="container">
@@ -119,7 +138,9 @@ const search = (rows) => {
                 sortingMode={'client'}
                 getRowClassName={(params) =>
                   `super-app-theme--${params.getValue(params.id, 'currentState')}`
-                } />
+                } 
+                onRowClick={renderReviewRequest}
+                />
             </div>
           </div>
         </div>

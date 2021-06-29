@@ -9,12 +9,13 @@ import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import Dashboard from "./Dashboard";
-
+import ReviewRequest from "./ReviewRequest";
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated);
 
   useEffect(()=>{
+    console.log('authenticate')
     if(props.store){
       UserService.initKeycloak(props.store, (err, res) => {
         dispatch(setUserAuth(res.authenticated));
@@ -25,16 +26,21 @@ const FOIAuthenticateRouting = React.memo((props) => {
   return (
       <>
         {isAuth ? (
-         
-            <Route exact path="/Dashboard">
-                <FOIHeader /> 
-                <Dashboard />
-                <FOIFooter />
+          <>
+          <FOIHeader /> 
+            <Route exact path="/foi/dashboard">                
+                <Dashboard />                
             </Route>
-         
-        ) : (
+            <Route path="/foi/reviewrequest">   
+                   
+                <ReviewRequest />  
+                       
+            </Route>
+            <FOIFooter />
+            </>
+         ) : (
           <Loading />
-        )}
+        )} 
       </>
     );
 })
