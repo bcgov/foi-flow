@@ -1,4 +1,4 @@
-from .db import  db
+from .db import  db, ma
 from sqlalchemy.dialects.postgresql import JSON, JSONB
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
@@ -20,3 +20,13 @@ class FOIRawRequest(db.Model):
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
+
+    @classmethod
+    def getrequests(cls):
+        request_schema = FOIRawRequestSchema(many=True)
+        query = db.session.query(FOIRawRequest).all()
+        return request_schema.dump(query)
+
+class FOIRawRequestSchema(ma.Schema):
+    class Meta:
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at')

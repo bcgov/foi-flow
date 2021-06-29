@@ -40,14 +40,32 @@ class FOIRawRequests(Resource):
     @TRACER.trace()
     @cors.crossdomain(origin='*')
     def get():
-        return 'FOI Requests GET METHOD'
+        try:
+            requests = FOIRawRequest.getrequests()
+            unopenedrequests =[]
+            for  request in requests:
+                unopenrequest= {'id' : request['requestid'] ,
+                'firstName':request['requestrawdata']['contactInfo']['firstName'],
+                 'lastName':request['requestrawdata']['contactInfo']['lastName'],
+                 'requestType':request['requestrawdata']['requestType']['requestType'],
+                 'currentState':'open',
+                 'receivedDate':request['created_at'],
+                 'assignedTo': "Unassigned",
+                 'xgov':''
+                 }
+                unopenedrequests.append(unopenrequest)
+                  
+            jsondata = json.dumps(unopenedrequests)
+            return jsondata , 200
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500     
 
     with open('request_api/schemas/schemas/rawrequest.json') as f:
         schema = json.load(f)
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')
+    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
     @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
