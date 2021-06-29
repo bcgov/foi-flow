@@ -2,27 +2,53 @@ import React, { useEffect, useState }  from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import "./dashboard.scss";
 import useStyles from './CustomStyle';
-import {useDispatch} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 
+import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+
 const Dashboard = React.memo((props) => {
-  console.log('dashboard');
+
+  //START to uncomment from here - once the api is up
+
+  // const rows = useSelector(state=> state.foiRequests.foiRequestsList)
+
+  // useEffect(()=>{    
+  //   dispatch(fetchFOIRequestList());
+  // },[dispatch]);
+
+  //END
+
+  function getFullName(params) {   
+    return `${params.getValue(params.id, 'lastName') || ''}, ${
+      params.getValue(params.id, 'firstName') || ''
+    }`;
+  }
+  //Comment/remove rows
   let rows = [
-    { id: 1, applicantName: "Joe, James", requestType: "Personal", idNumber: "00123", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 2, applicantName: "John, Walsh", requestType: "Personal", idNumber: "00124", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 3,  applicantName: "Bob, Herm", requestType: "Personal", idNumber: "00125", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 4,  applicantName: "James, Houston", requestType: "General", idNumber: "00126", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 5,  applicantName: "James, Houston", requestType: "General", idNumber: "00127", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 6,  applicantName: "James, Houston", requestType: "General", idNumber: "00128", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 7,  applicantName: "James, Houston", requestType: "General", idNumber: "00129", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 8,  applicantName: "James, Houston", requestType: "General", idNumber: "00130", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 9,  applicantName: "James, Houston", requestType: "General", idNumber: "00131", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 10,  applicantName: "James, Houston", requestType: "General", idNumber: "00132", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 11,  applicantName: "James, Houston", requestType: "General", idNumber: "00133", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 12,  applicantName: "James, Houston", requestType: "General", idNumber: "00134", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 1, firstName: "Joe",  lastName: "James", requestType: "Personal", idNumber: "00123", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 2, firstName: "John",  lastName: "Walsh", requestType: "Personal", idNumber: "00124", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 3, firstName: "Bob",  lastName: "Herm", requestType: "Personal", idNumber: "00125", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 4, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00126", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 5, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00127", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 6, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00128", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 7, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00129", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 8, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00130", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 9, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00131", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 10, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00132", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 11, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00133", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
+    { id: 12, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00134", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
    ];
    const columns = [
-    { field: 'applicantName', headerName: 'APPLICANT NAME', width: 200 },
+    // { field: 'applicantName', headerName: 'APPLICANT NAME', width: 200 },
+    // { field: 'firstName', headerName: 'First name', width: 130 },
+    // { field: 'lastName', headerName: 'Last name', width: 130 },
+    {
+      field: 'applicantName',
+      headerName: 'APPLICANT NAME',
+      width: 200,
+      valueGetter: getFullName,     
+    },
     { field: 'requestType', headerName: 'REQUEST TYPE', width: 200, sortable: false },
     { field: 'idNumber', headerName: 'ID NUMBER', width: 200 },
     { field: 'currentState', headerName: 'CURRENT STATE', width: 200 },
@@ -75,36 +101,28 @@ const [requestType, setRequestType] = useState("All");
 const [searchText, setSearchText] = useState("");
 const classes = useStyles();
 
-useEffect(() => {   
-  console.log('useeffect');
+useEffect(() => {
     setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
 }, [requestType])
 
 
 const requestTypeChange = (e) => {
-  console.log('setrequesttype') 
   setRequestType(e.target.value);
 }
 
 const setSearch = (e) => {
-  console.log('setsearch')
   setSearchText(e.target.value);
 }
 
-const search = (rows) => {
-  console.log('search')
-  return rows.filter(row => (row.applicantName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+const search = (rows) => { 
+  return rows.filter(row => (row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+  (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
 }
  const dispatch = useDispatch();
  
-const renderReviewRequest = () => {
-  console.log('rowclick')
-  dispatch(push('/foi/reviewrequest'));
-  // dispatch(history.push({
-  //   pathname:'/foi/reviewrequest',    
-  //   state: {reviewRequestData: rowData}
-  //}));
+const renderReviewRequest = () => { 
+  dispatch(push('/foi/reviewrequest')); 
 }
      return (      
         <div className="container">
