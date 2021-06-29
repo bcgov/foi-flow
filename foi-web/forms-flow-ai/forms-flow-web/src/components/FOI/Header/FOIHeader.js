@@ -7,6 +7,7 @@ import { Container } from "@material-ui/core";
 import UserService from "../../../services/UserService";
 import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
+import HomeMenu from "./HomeMenu";
 
 const FOIHeader = React.memo(() => { 
 
@@ -20,6 +21,8 @@ const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
 
   return (
+    <div>
+    <div className="row ">
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark" style={{borderBottom: "2px solid #fcba19"}}>
       <Container className="foiContainer">
         <Nav className="ml-auto">  
@@ -60,10 +63,12 @@ const user = useSelector((state) => state.user.userDetail);
           :null}
           </div>
           </div>
-      </Nav>
-    </Container>
+      </Nav>      
+    </Container>    
          </Navbar>   
-   
+       <HomeMenu />
+         </div>
+         </div>
   );
 });
 export default FOIHeader;

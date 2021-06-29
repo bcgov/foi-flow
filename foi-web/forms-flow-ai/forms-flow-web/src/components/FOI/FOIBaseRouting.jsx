@@ -13,7 +13,7 @@ const FOIBaseRouting = React.memo(({store}) => {
               <ToastContainer />
               <Switch>
 
-                <Route path="/Dashboard">
+                <Route path="/foi">
                     <FOIAuthenticateRouting store={store} />
                 </Route>
                
