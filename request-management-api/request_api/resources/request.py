@@ -40,6 +40,7 @@ class FOIRawRequests(Resource):
     @TRACER.trace()
     @cors.crossdomain(origin='*')
     def get():
+        ## todo : This code will get re-furshibed with BPM WF validation to list
         try:
             requests = FOIRawRequest.getrequests()
             unopenedrequests =[]
