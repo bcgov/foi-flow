@@ -18,6 +18,7 @@ const API = {
   FORM: `${WEB_BASE_URL}/form`,
   FORM_PROCESSES: `${WEB_BASE_URL}/form/formid`,
   APPLICATION_EVENT_UPDATE:`${WEB_BASE_URL}/process/event`,
+ 
   GET_BPM_TASKS:`${BPM_BASE_URL}/task`,
   GET_BPM_TASK_DETAIL:`${BPM_BASE_URL}/task/<task_id>`,
   GET_BPM_TASK_VARIABLES:`${BPM_BASE_URL}/task/<task_id>/variables`,
@@ -32,6 +33,8 @@ const API = {
   BPM_FORM_SUBMIT:`${BPM_BASE_URL}/task/<task_id>/submit-form`,
   GET_BPM_FORM_LIST:`${BPM_BASE_URL_EXT}/form`,
   UPDATE_ASSIGNEE_BPM_TASK:`${BPM_BASE_URL}/task/<task_id>/assignee`,
+
+  FOI_GET_REQUESTS_API: 'http://localhost:15000/requests',//`${FOI_API_URL}/requests`,
 };
 
 export default API;
