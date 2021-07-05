@@ -28,6 +28,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
         {isAuth ? (
           <>
           <FOIHeader /> 
+          
             <Route exact path="/foi/dashboard">                
                 <Dashboard />                
             </Route>
@@ -36,6 +37,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
                 <ReviewRequest />  
                        
             </Route>
+           
             <FOIFooter />
             </>
          ) : (

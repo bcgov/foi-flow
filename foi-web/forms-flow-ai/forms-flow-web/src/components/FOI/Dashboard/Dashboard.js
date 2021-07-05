@@ -7,55 +7,44 @@ import {push} from "connected-react-router";
 
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
 
+
 const Dashboard = React.memo((props) => {
 
-  //START to uncomment from here - once the api is up
+  const dispatch = useDispatch();
 
-  // const rows = useSelector(state=> state.foiRequests.foiRequestsList)
+  const rows = useSelector(state=> state.foiRequests.foiRequestsList)
+  const [filteredData, setFilteredData] = useState(rows);
+  const [requestType, setRequestType] = useState("All");
+  const [searchText, setSearchText] = useState("");
+  const classes = useStyles();
+  
 
-  // useEffect(()=>{    
-  //   dispatch(fetchFOIRequestList());
-  // },[dispatch]);
-
-  //END
+  useEffect(()=>{    
+    dispatch(fetchFOIRequestList());
+    setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
+  },[dispatch], [requestType]);
 
   function getFullName(params) {   
     return `${params.getValue(params.id, 'lastName') || ''}, ${
       params.getValue(params.id, 'firstName') || ''
     }`;
   }
-  //Comment/remove rows
-  let rows = [
-    { id: 1, firstName: "Joe",  lastName: "James", requestType: "Personal", idNumber: "00123", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 2, firstName: "John",  lastName: "Walsh", requestType: "Personal", idNumber: "00124", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 3, firstName: "Bob",  lastName: "Herm", requestType: "Personal", idNumber: "00125", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 4, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00126", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 5, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00127", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 6, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00128", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 7, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00129", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 8, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00130", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 9, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00131", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 10, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00132", currentState: "UnOpened", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 11, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00133", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-    { id: 12, firstName: "James",  lastName: "Houston", requestType: "General", idNumber: "00134", currentState: "Open", assignedTo: "Unassigned", receivedDate: "2021 May 20", xgov: "No" },
-   ];
+   
    const columns = [
-    // { field: 'applicantName', headerName: 'APPLICANT NAME', width: 200 },
-    // { field: 'firstName', headerName: 'First name', width: 130 },
-    // { field: 'lastName', headerName: 'Last name', width: 130 },
+    
     {
       field: 'applicantName',
       headerName: 'APPLICANT NAME',
-      width: 200,
+      width: 170,
       valueGetter: getFullName,     
     },
-    { field: 'requestType', headerName: 'REQUEST TYPE', width: 200, sortable: false },
-    { field: 'idNumber', headerName: 'ID NUMBER', width: 200 },
-    { field: 'currentState', headerName: 'CURRENT STATE', width: 200 },
+    { field: 'requestType', headerName: 'REQUEST TYPE',  width: 150,  sortable: false },
+    { field: 'idNumber', headerName: 'ID NUMBER', width: 150},
+    { field: 'currentState', headerName: 'CURRENT STATE', width: 160 },
     {      
       field: 'assignedTo',
       headerName: 'ASSIGNED TO',
-      width: 200,
+      width: 150,
       renderCell: (params) => (       
         <select>
             <option>Unassigned</option>
@@ -65,8 +54,8 @@ const Dashboard = React.memo((props) => {
       ),
       
     },
-    { field: 'receivedDate', headerName: 'RECEIVED DATE', width: 200 },
-    { field: 'xgov', headerName: 'XGOV', width: 150 },
+    { field: 'receivedDate', headerName: 'RECEIVED DATE', width: 200,},
+    { field: 'xgov', headerName: 'XGOV', width: 130 }
     ];  
     
     const sortModel=[
@@ -96,18 +85,10 @@ const Dashboard = React.memo((props) => {
       },
     ];
 
-const [filteredData, setFilteredData] = useState(rows);
-const [requestType, setRequestType] = useState("All");
-const [searchText, setSearchText] = useState("");
-const classes = useStyles();
-
-useEffect(() => {
-    setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
-}, [requestType])
-
-
 const requestTypeChange = (e) => {
+  console.log(e);
   setRequestType(e.target.value);
+  
 }
 
 const setSearch = (e) => {
@@ -115,19 +96,27 @@ const setSearch = (e) => {
 }
 
 const search = (rows) => { 
-  return rows.filter(row => (row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+  console.log(rows.length);
+  console.log(requestType);
+  var _rt =  (requestType == "General" || requestType == "Personal") ? requestType : null ;
+
+  return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
+  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt!=null ? row.requestType == _rt : (row.requestType == "General" || row.requestType == "Personal") ) )
 }
- const dispatch = useDispatch();
  
+
 const renderReviewRequest = () => { 
   dispatch(push('/foi/reviewrequest')); 
 }
-     return (      
-        <div className="container">
-          <div className="col-md-12 foi-grid-container">
+     return (  
+       
+        
+        <div className="container foi-container">
+           { (rows != undefined && rows.length >0) ?
+          <div className="col-sm-12 col-md-12 foi-grid-container">
             <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
+           
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
@@ -142,11 +131,11 @@ const renderReviewRequest = () => {
               </div>            
               
             </div>
-            <div style={{ height: 410, width: '90%' }} className={classes.root}>
+            <div style={{ height: 410 }} className={classes.root}>
               <DataGrid 
                 className="foi-data-grid" 
-                rows={search(filteredData)} 
-                columns={columns}
+                rows={search(rows)} 
+                columns={columns}                
                 rowHeight={30}
                 headerHeight={50}                
                 pageSize={10}
@@ -159,9 +148,10 @@ const renderReviewRequest = () => {
                 } 
                 onRowClick={renderReviewRequest}
                 />
-            </div>
-          </div>
-        </div>
+            </div> 
+          </div>: null }
+        </div> 
+      
     );
   });
 

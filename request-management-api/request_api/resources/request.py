@@ -26,6 +26,7 @@ import json
 #import redis
 import asyncio
 from request_api.utils.redispublisher import RedisPublisherService
+from datetime import datetime
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -49,10 +50,11 @@ class FOIRawRequests(Resource):
                 'firstName':request['requestrawdata']['contactInfo']['firstName'],
                  'lastName':request['requestrawdata']['contactInfo']['lastName'],
                  'requestType':request['requestrawdata']['requestType']['requestType'],
-                 'currentState':'open',
+                 'currentState':'Unopened',
                  'receivedDate':request['created_at'],
                  'assignedTo': "Unassigned",
-                 'xgov':''
+                 'xgov':'No',
+                 'idNumber': "00123"
                  }
                 unopenedrequests.append(unopenrequest)
                   

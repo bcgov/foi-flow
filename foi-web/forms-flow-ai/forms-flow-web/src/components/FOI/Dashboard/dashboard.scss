@@ -8,23 +8,28 @@
     src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
 }
 div .foi-dashboard {    
-    //height:60vh;
-    //height: 600px;
-    width: 100%;
-    //min-height: 90vh;    
+   
+    width: 100%;   
     background-position: center;
-    background-size: cover;
-    //background-color:#f2f2f2;
+    background-size: cover;   
     position: relative;
 }
 
+.foi-container {
+    
+    width: 100%!important;
+    background-color: #f1f1f1;
+}
+
 .foi-grid-container {
-    margin-top: 30px;
-    position: absolute;
-     top: 10%;
-     left: 5%;
-    //background-color:#ffff;
-    // width: 100%;
+    padding-top: 30px;    
+    width: 75%!important;
+    position: relative;
+    margin-left: auto!important;
+    margin-right: auto!important;
+    right: 0px;
+    left: 0px;
+    background-color: white;    
 }
 
 .foi-dashboard-row2 {
@@ -35,7 +40,6 @@ div .foi-dashboard {
 
 .foi-request-queue-text {
     font-family: "BCSans-Bold";
-    // font-size: 10px;
 }
 .has-search .form-control {
     padding-left: 2.375rem;
@@ -71,7 +75,6 @@ div .foi-dashboard {
 .foi-request-type {
     margin-left: auto;
     display: inline-block;
-    width: 40%;
 }
 .foi-general-radio 
 {
@@ -123,8 +126,6 @@ input[type='radio'] {
 }
 .MuiDataGrid-row {
     border-bottom: 2px solid #e0e0dc;
-    //background-color: #cfd7e3; //#d0d0cb
-    
 }
 
 .MuiBadge-badge {
@@ -132,15 +133,26 @@ input[type='radio'] {
 }
 
 .MuiDataGrid-columnHeaderWrapper {
-    // overflow: "hidden";
-    // white-space: "normal";
-    // line-height: "20px";
-    font-weight: bolder !important;
-    
+    font-weight: bolder !important;    
 }
 
 .MuiDataGrid-footerContainer {
     margin-bottom: 3%;
 }
 
+div.MuiDataGrid-row >div:last-child {
+    width:1px!important;
+}
 
+div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
+    width:1px!important;
+}
+
+
+@media only screen  and (min-width: 1800px) { 
+
+    .foi-grid-container {
+        width: 62%!important;
+    }
+
+}

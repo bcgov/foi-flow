@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpOpenGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -12,15 +12,16 @@ import UserService from "../../../services/UserService";
 export const fetchFOIRequestList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
-    httpGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
+    httpOpenGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          const foiRequests = res.data.foiRequests;
-          console.log(`RequestList = ${JSON.stringify(foiRequests)}`)
+          const foiRequests = res.data;
+          //console.log(`RequestList = ${JSON.stringify(foiRequests)}`)
           let data = foiRequests.map((foiRequest) => {
-            const foiRequestData = foiRequestDataFormatter(foiRequest.variables);
-            delete foiRequest.variables;
-            return { ...foiRequest, ...foiRequestData };
+            //const foiRequestData = foiRequestDataFormatter(foiRequest.variables);
+            //delete foiRequest.variables;
+            //return { ...foiRequest, ...foiRequestData };
+            return { ...foiRequest};
           });
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false));

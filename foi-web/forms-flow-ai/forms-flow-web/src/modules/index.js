@@ -12,6 +12,7 @@ import applications from './applicationsReducer';
 import menu from './menuReducer';
 import bpmTasks from './bpmTaskReducer';
 import bpmForms from './bpmFormReducer';
+import foiRequests from  './FOI/foiRequestsReducer';
 
 const createRootReducer = (history) =>
   combineReducers({
@@ -29,7 +30,8 @@ const createRootReducer = (history) =>
     router: connectRouter(history),
     metrics,
     process,
-    menu
+    menu,
+    foiRequests
   });
 
 export default createRootReducer;

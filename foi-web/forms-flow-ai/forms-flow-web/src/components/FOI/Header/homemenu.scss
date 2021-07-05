@@ -6,11 +6,15 @@
 
 .foi-menu-bar {
     background-color: #38598a;
-    // width: -webkit-fill-available;
-    // height: 90px;
-    width: 800%;
+    width: 100%;
     margin-top: 64px;
     height: auto;
+  }
+
+  .foi-menu-bar-panel {
+    width: 150%;
+    margin-left: 5%!important;
+    margin-right: 0;
   }
   
   .foi-home-menu {
