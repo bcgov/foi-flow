@@ -26,6 +26,7 @@ import json
 #import redis
 import asyncio
 from request_api.utils.redispublisher import RedisPublisherService
+from dateutil.parser import *
 from datetime import datetime
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
@@ -46,15 +47,18 @@ class FOIRawRequests(Resource):
             requests = FOIRawRequest.getrequests()
             unopenedrequests =[]
             for  request in requests:
+                _createdDate = parse(request['created_at'],)
+                #print(_createdDate.strftime('%Y %b, %d'))
                 unopenrequest= {'id' : request['requestid'] ,
                 'firstName':request['requestrawdata']['contactInfo']['firstName'],
                  'lastName':request['requestrawdata']['contactInfo']['lastName'],
                  'requestType':request['requestrawdata']['requestType']['requestType'],
-                 'currentState':'Unopened',
-                 'receivedDate':request['created_at'],
+                 'currentState':'Unopened',#request['created_at']
+                 'receivedDate':_createdDate.strftime('%Y %b, %d'),
+                 'receivedDateUF':request['created_at'],
                  'assignedTo': "Unassigned",
                  'xgov':'No',
-                 'idNumber': "00123"
+                 'idNumber': 'U-00'+ str(request['requestid'])
                  }
                 unopenedrequests.append(unopenrequest)
                   

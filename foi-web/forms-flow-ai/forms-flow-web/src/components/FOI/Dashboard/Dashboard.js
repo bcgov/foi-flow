@@ -54,35 +54,16 @@ const Dashboard = React.memo((props) => {
       ),
       
     },
-    { field: 'receivedDate', headerName: 'RECEIVED DATE', width: 200,},
-    { field: 'xgov', headerName: 'XGOV', width: 130 }
+    { field: 'receivedDate', headerName: 'RECEIVED DATE', width: 200},    
+    { field: 'xgov', headerName: 'XGOV', width: 130 },
+    { field: 'receivedDateUF', headerName: '', width: 0,renderCell:(params)=>(<span></span>)}
     ];  
     
     const sortModel=[
       {
-        field: 'currentState',
+        field: 'receivedDateUF',
         sort: 'desc',
-      },
-      {
-        field: 'applicantName',
-        sort: 'desc',
-      },
-      {
-        field: 'idNumber',
-        sort: 'desc',
-      },
-      {
-        field: 'assignedTo',
-        sort: 'desc',
-      },
-      {
-        field: 'receivedDate',
-        sort: 'desc',
-      },
-      {
-        field: 'xgov',
-        sort: 'desc',
-      },
+      }      
     ];
 
 const requestTypeChange = (e) => {
@@ -98,11 +79,11 @@ const setSearch = (e) => {
 const search = (rows) => { 
   console.log(rows.length);
   console.log(requestType);
-  var _rt =  (requestType == "General" || requestType == "Personal") ? requestType : null ;
+  var _rt =  (requestType == "general" || requestType == "personal") ? requestType : null ;
 
   return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt!=null ? row.requestType == _rt : (row.requestType == "General" || row.requestType == "Personal") ) )
+  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt!=null ? row.requestType == _rt : (row.requestType == "general" || row.requestType == "personal") ) )
 }
  
 
@@ -110,10 +91,9 @@ const renderReviewRequest = () => {
   dispatch(push('/foi/reviewrequest')); 
 }
      return (  
-       
-        
+               
         <div className="container foi-container">
-           { (rows != undefined && rows.length >0) ?
+           
           <div className="col-sm-12 col-md-12 foi-grid-container">
             <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
            
@@ -125,13 +105,13 @@ const renderReviewRequest = () => {
               </div>
              
               <div className="foi-request-type">
-                <input className="foi-general-radio" type="radio" value="General" name="requestType" onChange={requestTypeChange} /> General
-                <input className="foi-personal-radio" type="radio" value="Personal" name="requestType" onChange={requestTypeChange} /> Personal
+                <input className="foi-general-radio" type="radio" value="general" name="requestType" onChange={requestTypeChange} /> General
+                <input className="foi-personal-radio" type="radio" value="personal" name="requestType" onChange={requestTypeChange} /> Personal
                 <input className="foi-all-radio" type="radio" value="All" name="requestType" onChange={requestTypeChange} defaultChecked  /> All              
               </div>            
               
             </div>
-            <div style={{ height: 410 }} className={classes.root}>
+            <div style={{ height: 450 }} className={classes.root}>
               <DataGrid 
                 className="foi-data-grid" 
                 rows={search(rows)} 
@@ -146,10 +126,10 @@ const renderReviewRequest = () => {
                 getRowClassName={(params) =>
                   `super-app-theme--${params.getValue(params.id, 'currentState')}`
                 } 
-                onRowClick={renderReviewRequest}
+                
                 />
             </div> 
-          </div>: null }
+          </div>
         </div> 
       
     );

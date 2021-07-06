@@ -66,7 +66,7 @@ const user = useSelector((state) => state.user.userDetail);
       </Nav>      
     </Container>    
          </Navbar>   
-       <HomeMenu />
+      {isAuthenticated ?  <HomeMenu /> : null}
          </div>
          </div>
   );
