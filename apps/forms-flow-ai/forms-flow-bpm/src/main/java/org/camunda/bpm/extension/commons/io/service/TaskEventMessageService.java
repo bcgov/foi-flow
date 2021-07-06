@@ -29,9 +29,6 @@ public class TaskEventMessageService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             template.convertAndSend("/topic/task-event", objectMapper.writeValueAsString(message));
-            Map<String,Object> obj = new HashMap<>();
-            obj.put("id","123");
-            template.convertAndSend("/topic/foi-rawrequest", objectMapper.writeValueAsString(obj));
         } catch (JsonProcessingException e) {
             LOGGER.log(Level.SEVERE,"Exception Occured in preparing message", e);
         }
