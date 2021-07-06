@@ -80,8 +80,11 @@ class FOIRawRequests(Resource):
             request_json = request.get_json()
             requestdatajson = request_json['requestData']                       
             result = FOIRawRequest.saverawrequest(requestdatajson)
-            if(result.success):            
-                asyncio.run(redispubservice.publishtoredischannel(result.identifier))       
+            if(result.success):
+                data = {}
+                data['id'] = result.identifier
+                json_data = json.dumps(data)
+                asyncio.run(redispubservice.publishtoredischannel(json_data))
             return {'status': result.success, 'message':result.message} , 200
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
