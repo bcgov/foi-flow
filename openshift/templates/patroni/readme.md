@@ -31,6 +31,18 @@ oc process -f deployment.yaml \
  -p "IMAGE_STREAM_TAG=patroni:v11-latest" \
  -p REPLICAS=3 \
  -p SUFFIX=-001 | oc apply -f -
+
+
+
+
+
+oc process -f deployment.yaml \
+ -p NAME=patroni \
+ -p "IMAGE_STREAM_NAMESPACE=$(oc project -q)" \
+ -p "IMAGE_STREAM_TAG=patroni:v11-latest" \
+ -p REPLICAS=3 \
+ -p SUFFIX=-001 | oc apply -f -
+
  
 
 ```
@@ -39,3 +51,36 @@ oc process -f deployment.yaml \
 should be able to pull from dev/test, why error?  check namespace names/strings are correct.
 
         Failed to pull image "image-registry.openshift-image-registry.svc:5000/d7abee-tools/patroni:v11-latest": rpc error: code = Unknown desc = Error reading manifest v11-latest in image-registry.openshift-image-registry.svc:5000/d7abee-tools/patroni: unauthorized: authentication required
+
+
+
+
+## Attempt 2: Using template
+
+```bash
+oc process -f openshift/templates/api/adjudication/build -o yaml | oc apply -f - -n d7abee-tools
+
+# in dev project
+oc process -f template_patroni_persistent.yaml  -o yaml | oc apply -f - 
+
+```
+
+
+## RocketChat
+
+
+```bash
+
+oc get is -n bcgov
+
+patroni-postgres   image-registry.apps.silver.devops.gov.bc.ca/bcgov/patroni-postgres   12.4-latest   4 days ago
+postgres           image-registry.apps.silver.devops.gov.bc.ca/bcgov/postgres           12.4          3 months ago
+
+
+
+```     
+
+
+## knp
+
+oc 
