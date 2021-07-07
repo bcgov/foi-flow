@@ -55,28 +55,29 @@ objects:
           app-group: "${APP_GROUP}"
           deploymentconfig: "${API_NAME}"
           template: "${API_NAME}-deploy"
+          role: api
       spec:
         containers:
         - name: "${API_NAME}"
           image: "${API_NAME}"
           imagePullPolicy: Always
           env:
-            - name: DB_USERNAME
+            - name: DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
                   key: database-user
-            - name: DB_PASSWORD
+            - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
                   key: database-password
-            - name: DB_DATABASE
+            - name: DATABASE_NAME
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
                   key: database-name
-            - name: DB_HOST
+            - name: DATABASE_HOST
               value: "${DB_SECRETS}"
           # command:
           #   - gunicorn
@@ -84,7 +85,7 @@ objects:
           #   - :5000
           #   - selfservice_api:create_app()
           ports:
-          - containerPort: 3000
+          - containerPort: 5000
             protocol: TCP
           # envFrom:
           # - configMapRef:
@@ -96,25 +97,25 @@ objects:
             limits:
               cpu: "750m"
               memory: "2Gi"
-          livenessProbe:
-            httpGet:
-              # TODO - Change to proper health check once
-              path: "/health"
-              port: 3000
-              scheme: HTTP
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: "/health"
-              port: 3000
-              scheme: HTTP
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
+          # livenessProbe:
+          #   httpGet:
+          #     # TODO - Change to proper health check once
+          #     path: "/"
+          #     port: 5000
+          #     scheme: HTTP
+          #   timeoutSeconds: 1
+          #   periodSeconds: 10
+          #   successThreshold: 1
+          #   failureThreshold: 3
+          # readinessProbe:
+          #   httpGet:
+          #     path: "/"
+          #     port: 5000
+          #     scheme: HTTP
+          #   timeoutSeconds: 1
+          #   periodSeconds: 10
+          #   successThreshold: 1
+          #   failureThreshold: 3
           terminationMessagePath: "/dev/termination-log"
           terminationMessagePolicy: File
           imagePullPolicy: Always
@@ -134,10 +135,10 @@ objects:
       template: "${API_NAME}-deploy"
   spec:
     ports:
-    - name: 3000-tcp
+    - name: 5000-tcp
       protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: 5000
+      targetPort: 5000
     selector:
       deploymentconfig: "${API_NAME}"
     type: ClusterIP
@@ -158,7 +159,7 @@ objects:
       name: "${API_NAME}"
       weight: 100
     port:
-      targetPort: 3000-tcp
+      targetPort: 5000-tcp
     tls:
       termination: edge
     wildcardPolicy: None
@@ -185,7 +186,7 @@ parameters:
   displayName: Environment TAG name
   description: The TAG name for this environment, e.g., dev, test, prod
   required: true
-  value: dev
+  value: test
 - name: DB_SECRETS
   displayName: Environment TAG name
   description: The TAG name for this environment, e.g., dev, test, prod
