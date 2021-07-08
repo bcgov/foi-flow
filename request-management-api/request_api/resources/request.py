@@ -36,9 +36,11 @@ class FOIRawRequest(Resource):
     @cors.crossdomain(origin='*')       
     def get(requestid=None):
         try :
+            print("reached1")
             jsondata = {}
             requestidisInteger = int(requestid)
             if requestidisInteger :
+                print("reached2")
                 baserequestInfo = rawrequestservice.getrawrequest(requestid)                                    
                 jsondata = json.dumps(baserequestInfo)
             return jsondata , 200 
@@ -49,18 +51,18 @@ class FOIRawRequest(Resource):
 
 
 @cors_preflight('GET,POST,PUT,OPTIONS')
-@API.route('/foirawrequestbpm')
+@API.route('/foirawrequestbpm/addwfinstanceid/<_requestid>')
 class FOIRawRequestBPMProcess(Resource):
 
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
-    def put():
+    def put(_requestid=None):
             request_json = request.get_json()
             try:
-                _requestid = request_json['requestid']
+
                 _wfinstanceid = request_json['wfinstanceid']
-                
+                               
                 requestid = int(_requestid)
                 wfinstanceid = uuid.UUID(_wfinstanceid, version=4)
                 result = rawrequestservice.updateworkflowinstance(wfinstanceid,requestid)

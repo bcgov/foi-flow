@@ -52,6 +52,7 @@ class rawrequestservice:
 
     def getrawrequest(requestid):        
         request = FOIRawRequest.get_request(requestid)
+        
         if request != {} :        
             requestrawdata = request['requestrawdata']
             requestType = requestrawdata['requestType']['requestType']
@@ -87,8 +88,7 @@ class rawrequestservice:
                             'publicServiceEmployeeNumber':decriptionTimeframe['publicServiceEmployeeNumber'],
                             'topic':decriptionTimeframe['topic'],
                             'selectedMinistries':requestrawdata['ministry']['selectedMinistry'],
-                            }
-
+                            }            
             if ispersonal:
                     childInformation = requestrawdata.get('childInformation')
                     anotherpersonInformation = requestrawdata.get('anotherInformation')                                   
@@ -120,7 +120,7 @@ class rawrequestservice:
                                 'adoptiveFatherLastName' : adoptiveParents['fatherLastName'] if hasadoptiveParentInfo else '',
                                 'adoptiveFatherFirstName' : adoptiveParents['fatherFirstName'] if hasadoptiveParentInfo else ''
                             } 
-                    baserequestInfo['additionalpersonalInfo'] = additionalpersonalInfo
-                    return baserequestInfo
+                    baserequestInfo['additionalpersonalInfo'] = additionalpersonalInfo                    
+            return baserequestInfo
         else:
             return None        

@@ -33,7 +33,7 @@ class FOIRawRequest(db.Model):
         if(existingrequestswithWFid.count() == 0) :
             dbquery.filter_by(requestid=requestid).update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"WF Instance created"}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Request updated',requestid)
+            return DefaultMethodResult(True,'Request updated with WF Instance Id',requestid)
         else:
              return DefaultMethodResult(False,'WF instance already exists',requestid)   
         
