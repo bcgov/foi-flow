@@ -25,6 +25,8 @@ from request_api import models  # pylint: disable=unused-import
 from request_api import create_app
 from request_api.models import db
 
+## python manage.py db upgrade
+## python manage.py db migrate
 
 APP = create_app()
 MIGRATE = Migrate(APP, db)

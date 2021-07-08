@@ -15,12 +15,14 @@
 
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
+
 from flask_expects_json import expects_json
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
 import json
+import uuid
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -45,6 +47,29 @@ class FOIRawRequest(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
+
+@cors_preflight('GET,POST,PUT,OPTIONS')
+@API.route('/foirawrequestbpm')
+class FOIRawRequestBPMProcess(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    def put():
+            request_json = request.get_json()
+            try:
+                _requestid = request_json['requestid']
+                _wfinstanceid = request_json['wfinstanceid']
+                
+                requestid = int(_requestid)
+                wfinstanceid = uuid.UUID(_wfinstanceid, version=4)
+                result = rawrequestservice.updateworkflowinstance(wfinstanceid,requestid)
+                return {'status': result.success, 'message':result.message}, 200
+            except KeyError as keyexception:
+                return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
+            except ValueError as valuexception:
+                return {'status': "BAD Request", 'message': str(valuexception)}, 500           
+                       
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequests')
 class FOIRawRequests(Resource):

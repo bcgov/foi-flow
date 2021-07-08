@@ -26,6 +26,10 @@ class rawrequestservice:
                 asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
 
+    def updateworkflowinstance(wfinstanceid, requestid):
+        result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid)
+        return result
+
     def getrawrequests():
         requests = FOIRawRequest.getrequests()
         unopenedrequests =[]
