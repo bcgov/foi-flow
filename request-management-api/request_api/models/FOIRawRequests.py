@@ -13,6 +13,9 @@ class FOIRawRequest(db.Model):
     notes = db.Column(db.String(120), unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now().isoformat())
 
+    def get_id(self):
+        return text_type(self.requestid)
+
     @classmethod
     def saverawrequest(cls,_requestrawdata)->DefaultMethodResult:        
         createdat = datetime.now().isoformat()
@@ -26,6 +29,12 @@ class FOIRawRequest(db.Model):
         request_schema = FOIRawRequestSchema(many=True)
         query = db.session.query(FOIRawRequest).all()
         return request_schema.dump(query)
+
+    @classmethod
+    def get_request(cls,requestid):   
+       request_schema = FOIRawRequestSchema()
+       request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).first()
+       return request_schema.dump(request)
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
