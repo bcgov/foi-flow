@@ -79,7 +79,7 @@ class _Config():  # pylint: disable=too-few-public-methods
         port=int(DB_PORT),
         name=DB_NAME,
     )
-    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_ECHO = False 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT_OIDC Settings

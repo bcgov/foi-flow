@@ -7,8 +7,10 @@ services:
       - "6379:6379" 
   BACKEND:
     build:
-      context: ./      
-      dockerfile: request-management-api/dockerfile
+      # context: ./      
+      # dockerfile: request-management-api/dockerfile
+      context: ./request-management-api  
+      dockerfile: dockerfile
     image: foirequestsbackendimage
     container_name: aot_foi_requests_backend_api
     depends_on: 
