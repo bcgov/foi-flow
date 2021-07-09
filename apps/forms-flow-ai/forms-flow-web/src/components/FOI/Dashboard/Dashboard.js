@@ -79,11 +79,13 @@ const setSearch = (e) => {
 const search = (rows) => { 
   console.log(rows.length);
   console.log(requestType);
-  var _rt =  (requestType == "general" || requestType == "personal") ? requestType : null ;
+  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;
 
+  console.log(_rt);
   return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt!=null ? row.requestType == _rt : (row.requestType == "general" || row.requestType == "personal") ) )
+  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
+
 }
  
 
@@ -126,6 +128,7 @@ const renderReviewRequest = () => {
                 getRowClassName={(params) =>
                   `super-app-theme--${params.getValue(params.id, 'currentState')}`
                 } 
+                onRowClick={renderReviewRequest}
                 
                 />
             </div> 

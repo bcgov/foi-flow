@@ -1,0 +1,33 @@
+@font-face {
+    font-family: "BCSans-Regular";
+    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+.foi-applicant-details-card {
+    margin-top: 50px;
+    box-shadow: none !important;
+    border: 1px solid #dfdede !important;
+    border-radius: 2px;
+}
+.foi-applcant-details-label {
+    font-family: "BCSans-Regular";
+    color: grey;
+    padding-left: 15px;
+
+}
+.foi-applicant-details-row {
+    display: flex;
+    width: 100%;
+}
+.foi-applicant-details-col {
+    display: -webkit-box;
+    align-items: flex-start; 
+}
+
+// .MuiTextField-root {
+//     margin: 1px;
+//     width: 25ch;
+//   }

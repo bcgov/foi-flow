@@ -1,0 +1,32 @@
+@font-face {
+    font-family: "BCSans-Regular";
+    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+.foi-child-details-card {
+    margin-top: 50px;
+    box-shadow: none !important;
+    border: 1px solid #dfdede !important;
+    border-radius: 2px;
+}
+.foi-child-details-label {
+    font-family: "BCSans-Regular";
+    color: grey;
+    padding-left: 15px;
+
+}
+.foi-child-details-row {
+    display: flex;
+    width: 100%;
+}
+.foi-child-details-col {
+    display: block;
+    align-items: flex-start; 
+}
+
+.foi-attached-documents-label {
+    margin: 10px;
+}

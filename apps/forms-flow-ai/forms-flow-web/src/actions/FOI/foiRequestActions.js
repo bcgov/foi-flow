@@ -43,3 +43,58 @@ export const serviceActionError = (data) => dispatch => {
     })
 }
 
+export const setFOICategoryList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_CATEGORYLIST,
+        payload:data
+    })
+}
+
+export const setFOISelectedCategory = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SELECTED_CATEGORY,
+        payload:data
+    })
+}
+
+export const setFOICountryList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_COUNTRYLIST,
+        payload:data
+    })
+}
+
+export const setFOIProvinceList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PROVINCELIST,
+        payload:data
+    })
+}
+
+export const setFOIRequestTypeList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_TYPELIST,
+        payload:data
+    })
+}
+
+export const setFOIReceiveModeList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST,
+        payload:data
+    })
+}
+
+export const setFOIDeliveryModeList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST,
+        payload:data
+    })
+}
+
+export const setFOIAssignedToList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST,
+        payload:data
+    })
+}

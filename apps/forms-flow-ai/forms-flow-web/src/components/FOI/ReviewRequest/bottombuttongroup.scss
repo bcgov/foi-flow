@@ -1,0 +1,38 @@
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+  }
+
+.foi-bottom-button-group {
+    display: flex;
+}
+
+.bottombtn-split-redirect {
+    border: 1px solid #38598A !important;
+    background-color: #FFFFFF !important;
+    color: #38598A !important;    
+    margin-right: 20px;
+    margin-top: 10px;
+    position: relative;
+    width: 30%;
+    font-family: "BCSans-Bold";
+}
+
+.bottombtn-openrequest {
+    border: none;
+    background-color: #eceaea !important;
+    color: #FFFFFF !important;    
+    margin-right: 20px;
+    margin-top: 10px;
+    position: relative;
+    width: 30%;
+    font-family: "BCSans-Bold";
+}
+
+.btn-bottom {
+    margin-right: 20px;
+    margin-top: 10px;
+    position: relative;
+    width: 30%;
+    font-family: "BCSans-Bold";
+}

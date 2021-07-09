@@ -1,24 +1,36 @@
-import React, {useEffect} from 'react';
-import {Form} from 'react-formio';
-import formData from './reviewrequest.json';
-import 'formiojs/dist/formio.builder.min.css';
+import React from 'react';
+import './reviewrequest.scss';
+import ReviewRequestHeader from './ReviewRequestHeader';
+import ApplicantDetails from './ApplicantDetails';
+import ChildDetails from './ChildDetails';
+import OnBehalfOfDetails from './OnBehalfOfDetails';
+import AddressContactDetails from './AddressContanctInfo';
+import RequestDescriptionBox from './RequestDescriptionBox';
+import RequestDetails from './RequestDetails';
+import AdditionalApplicantDetails from './AdditionalApplicantDetails';
+import RequestNotes from './RequestNotes';
+import BottomButtonGroup from './BottomButtonGroup';
+import { useSelector } from "react-redux";
+
 
 const ReviewRequest = React.memo((props) => {
-  
-    useEffect(() => {       
-        //console.log(`formdata = ${props.location.state.reviewRequestData}`)
-    }, [])
-
-     return (  
-        <div className="container">    
-        <div style={{maxWidth: '400px', margin: '50px'}}>
-            <Form form={formData}/>
-            
-         
-            {/* <h3>Your FOI Request Queue</h3> */}
-            
-            </div>
+  const selectedCategory = useSelector(state=> state.foiRequests.foiSelectedCategory);
+     return (
+      <div className="container foi-review-request-container">           
+        <div className="col-sm-12 col-md-12 foi-review-container">
+          <ReviewRequestHeader />
+          <ApplicantDetails />
+          <ChildDetails />
+          <OnBehalfOfDetails />
+          <AddressContactDetails />
+          <RequestDescriptionBox selectedCategory = {selectedCategory} />
+          <RequestDetails />
+          <AdditionalApplicantDetails />
+          <RequestNotes />
+          <BottomButtonGroup selectedCategory = {selectedCategory}/>
+        </div>
       </div>
+    
     );
   });
 

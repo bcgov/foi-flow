@@ -1,0 +1,22 @@
+.foi-review-request-container {
+    
+    width: 100%!important;
+    height: 100%;
+    background-color: #f1f1f1;    
+    
+}
+
+.foi-review-container {
+    padding-top: 30px;    
+    width: 75%!important;
+    position: relative;
+    margin-left: auto!important;
+    margin-right: auto!important;
+    right: 0px;
+    left: 0px;
+    background-color: white;
+    height: calc(95vh - 127px);
+    // height: auto;
+    // height: inherit; 
+    overflow: scroll;
+}
