@@ -30,6 +30,7 @@ from .apihelper import Api
 from .meta import API as META_API
 from .ops import API as OPS_API
 from .request import API as REQUEST_API
+from .foiflowmasterdata import API as FOIFLOWMASTERDATA_API
 
 
 __all__ = ('API_BLUEPRINT')
@@ -57,4 +58,4 @@ API = Api(
 API.add_namespace(META_API, path="/api")
 API.add_namespace(OPS_API ,path="/api")
 API.add_namespace(REQUEST_API ,path="/api")
-
+API.add_namespace(FOIFLOWMASTERDATA_API ,path="/api")

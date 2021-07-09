@@ -1,0 +1,37 @@
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+  }
+  
+
+.foi-menu-bar {
+    background-color: #38598a;
+    width: 100%;
+    margin-top: 64px;
+    height: auto;
+  }
+
+  .foi-menu-bar-panel {
+    width: 150%;
+    margin-left: 5%!important;
+    margin-right: 0;
+  }
+  
+  .foi-home-menu {
+    margin-left: 10%;
+    margin-top: auto;
+  }
+  
+  .foi-home-link {
+    color: #fcba19; 
+    border-bottom: 2px solid #fcba19;
+  }
+  
+  .foi-search-button {
+    background-color: #fcba19;
+    
+  }
+  
+  .foi-search-icon {
+    color: #FFFFFF;
+  }

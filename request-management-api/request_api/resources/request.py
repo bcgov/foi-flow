@@ -13,20 +13,65 @@
 # limitations under the License.
 """API endpoints for managing a FOI Requests resource."""
 
-
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
+
+from flask_expects_json import expects_json
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
-
-from request_api.models.FOIRawRequests import FOIRawRequest
-from flask_expects_json import expects_json
+from request_api.services.rawrequestservice import rawrequestservice
 import json
+import uuid
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
 
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirawrequest/<requestid>')
+class FOIRawRequest(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cors.crossdomain(origin='*')       
+    def get(requestid=None):
+        try :
+            print("reached1")
+            jsondata = {}
+            requestidisInteger = int(requestid)
+            if requestidisInteger :
+                print("reached2")
+                baserequestInfo = rawrequestservice.getrawrequest(requestid)                                    
+                jsondata = json.dumps(baserequestInfo)
+            return jsondata , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+@cors_preflight('GET,POST,PUT,OPTIONS')
+@API.route('/foirawrequestbpm/addwfinstanceid/<_requestid>')
+class FOIRawRequestBPMProcess(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    def put(_requestid=None):
+            request_json = request.get_json()
+            try:
+
+                _wfinstanceid = request_json['wfinstanceid']
+                               
+                requestid = int(_requestid)
+                wfinstanceid = uuid.UUID(_wfinstanceid, version=4)
+                result = rawrequestservice.updateworkflowinstance(wfinstanceid,requestid)
+                return {'status': result.success, 'message':result.message}, 200
+            except KeyError as keyexception:
+                return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
+            except ValueError as valuexception:
+                return {'status': "BAD Request", 'message': str(valuexception)}, 500           
+                       
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequests')
 class FOIRawRequests(Resource):
@@ -34,23 +79,29 @@ class FOIRawRequests(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')
-    def get():
-        return 'FOI Requests GET METHOD'
+    @cors.crossdomain(origin='*')   
+    def get(requestid=None):
+        ## todo : This code will get re-furshibed with BPM WF validation to list
+        try:                                       
+                unopenedrequests = rawrequestservice.getrawrequests()     
+                jsondata = json.dumps(unopenedrequests)
+                return jsondata , 200            
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500     
 
     with open('request_api/schemas/schemas/rawrequest.json') as f:
         schema = json.load(f)
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')
+    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
     @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestData']                       
-            result = FOIRawRequest.saverawrequest(requestdatajson)           
+            requestdatajson = request_json['requestData']           
+            result = rawrequestservice.saverawrequest(requestdatajson)
             return {'status': result.success, 'message':result.message} , 200
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
