@@ -10,7 +10,7 @@ services:
       # context: ./      
       # dockerfile: request-management-api/dockerfile
       context: ./request-management-api  
-      dockerfile: dockerfile
+      dockerfile: dockerfile.local
     image: foirequestsbackendimage
     container_name: aot_foi_requests_backend_api
     depends_on: 
