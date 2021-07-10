@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import { useSelector } from "react-redux";
 import "./requestdescriptionbox.scss";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -31,11 +32,10 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 const RequestDescription = React.memo(({selectedCategory}) => {
+   
     const classes = useStyles();
-    useEffect(() => {       
-        //console.log(`formdata = ${props.location.state.reviewRequestData}`)
-    }, [])
-
+    const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);
+    
     const startDateData = {
         "label": "Start Date",
         "format": "mm/dd/yyyy",
@@ -113,7 +113,7 @@ const RequestDescription = React.memo(({selectedCategory}) => {
                         InputLabelProps={{ shrink: true, }} 
                      />        
                     </div>
-                    <MinistriesList />
+                    <MinistriesList ministries={ministries}/>
                     <div className="foi-requestdescription-button-group">
                         <button type="button" className={`btn btn-bottom ${classes.btnenabled}`}>Save Updated Description</button>
                         <button type="button" className={`btn btn-bottom ${selectedCategory === '' ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={selectedCategory === ''}  >Split Request</button>

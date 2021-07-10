@@ -5,7 +5,7 @@ import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 
-import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIRequestList,fetchFOIRequestDetails } from "../../../apiManager/services/FOI/foiRequestServices";
 
 
 const Dashboard = React.memo((props) => {
@@ -89,8 +89,10 @@ const search = (rows) => {
 }
  
 
-const renderReviewRequest = () => { 
-  dispatch(push('/foi/reviewrequest')); 
+const renderReviewRequest = (e) => {
+  dispatch(fetchFOIRequestDetails(e.data.id));
+  // console.log(`rowData = ${JSON.stringify(e.data)}`);
+  dispatch(push('/foi/reviewrequest'));
 }
      return (  
                
@@ -128,7 +130,7 @@ const renderReviewRequest = () => {
                 getRowClassName={(params) =>
                   `super-app-theme--${params.getValue(params.id, 'currentState')}`
                 } 
-                onRowClick={renderReviewRequest}
+                onRowSelected={renderReviewRequest}
                 
                 />
             </div> 

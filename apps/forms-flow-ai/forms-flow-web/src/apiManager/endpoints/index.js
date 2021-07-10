@@ -1,4 +1,4 @@
-import { INSIGHTS_BASE_API, INSIGHTS_API_KEY, WEB_BASE_URL, BPM_BASE_URL, BPM_BASE_URL_EXT, FOI_BASE_API_URL } from "./config";
+import { INSIGHTS_BASE_API, INSIGHTS_API_KEY, WEB_BASE_URL, BPM_BASE_URL, BPM_BASE_URL_EXT } from "./config";
 
 const API = {
   INSIGHTS_API_KEY: INSIGHTS_API_KEY,
@@ -33,7 +33,11 @@ const API = {
   GET_BPM_FORM_LIST:`${BPM_BASE_URL_EXT}/form`,
   UPDATE_ASSIGNEE_BPM_TASK:`${BPM_BASE_URL}/task/<task_id>/assignee`,
 
-  FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/foirawrequests`, //'http://localhost:15000/api/foirawrequests'
+  //FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/foirawrequests`
+  FOI_GET_REQUESTS_API: 'http://localhost:15000/api/foirawrequests',//`${FOI_API_URL}/requests`,
+  FOI_GET_CATEGORIES_API: 'http://localhost:15000/api/foiflow/applicantcategories',
+  FOI_GET_PROGRAMAREAS_API: 'http://localhost:15000/api/foiflow/programareas',
+  FOI_GET_REQUEST_API: 'http://localhost:15000/api/foirawrequest/<requestid>',
 };
 
 export default API;

@@ -1,4 +1,5 @@
-import React, {useEffect} from 'react';
+import React from 'react';
+
 import "./applicantdetails.scss";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -15,12 +16,16 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const ApplicantDetails = React.memo((props) => {
-  
-    useEffect(() => {       
-        //console.log(`formdata = ${props.location.state.reviewRequestData}`)
-    }, [])
+const ApplicantDetails = React.memo(({requestDetails}) => {  
 
+console.log(`requestDetails = ${JSON.stringify(requestDetails)}`);
+ const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
+ const applicantMiddleName = requestDetails!==null && requestDetails.middleName !== null? requestDetails.middleName:"" ;
+ const applicantLastName = requestDetails!==null && requestDetails.lastName  !== null? requestDetails.lastName:"" ;
+const organization = requestDetails!==null && requestDetails.businessName !==null ? requestDetails.businessName: "";
+const selectDefaultValue = requestDetails!==null && requestDetails.currentState === "Unopened"? "Select Category":"Select Category";
+console.log(`select = ${selectDefaultValue}`);
+const email = requestDetails!==null && requestDetails.email !== null ? requestDetails.email:"";
     const category = useSelector(state=> state.foiRequests.foiCategoryList);
     // const foiRequestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
     
@@ -36,21 +41,21 @@ const ApplicantDetails = React.memo((props) => {
                         <TextField                            
                             label="Applicant First Name" 
                             InputLabelProps={{ shrink: true, }} 
-                            variant="outlined" 
-                            defaultValue="Jane"
+                            variant="outlined"                             
+                            value={applicantFirstName}
                             fullWidth
                         />
                         <TextField                          
                             label="Applicant Middle Name" 
                             InputLabelProps={{ shrink: true, }} 
-                            defaultValue="M" 
+                           value={applicantMiddleName}
                             variant="outlined"
                             fullWidth
                         />
                         <TextField                            
                             label="Applicant Last Name" 
                             InputLabelProps={{ shrink: true, }} 
-                            defaultValue="Deo" 
+                            value={applicantLastName}
                             variant="outlined"
                             fullWidth 
                         />                                                
@@ -60,16 +65,16 @@ const ApplicantDetails = React.memo((props) => {
                         <TextField                            
                             label="Organization" 
                             InputLabelProps={{ shrink: true, }} 
-                            defaultValue="The Canadian Cancer Society" 
+                            value={organization}
                             variant="outlined" 
                             fullWidth
                         /> 
-                        <SelectWithLegend selectData = {category} legend="Category" selectDefault="Select Category" required={true}/>
+                        <SelectWithLegend selectData = {category} legend="Category" selectDefault={selectDefaultValue} required={true}/>
                        
                         <TextField                           
                             label="Email" 
                             InputLabelProps={{ shrink: true, }} 
-                            defaultValue="email@gmail.com" 
+                            value={email}
                             variant="outlined" 
                             fullWidth
                         /> 
