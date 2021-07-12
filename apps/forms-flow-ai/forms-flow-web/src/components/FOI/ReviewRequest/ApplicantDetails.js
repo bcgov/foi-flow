@@ -18,15 +18,38 @@ const useStyles = makeStyles((theme) => ({
 }));
 const ApplicantDetails = React.memo(({requestDetails}) => {  
 
-console.log(`requestDetails = ${JSON.stringify(requestDetails)}`);
- const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
- const applicantMiddleName = requestDetails!==null && requestDetails.middleName !== null? requestDetails.middleName:"" ;
- const applicantLastName = requestDetails!==null && requestDetails.lastName  !== null? requestDetails.lastName:"" ;
-const organization = requestDetails!==null && requestDetails.businessName !==null ? requestDetails.businessName: "";
-const selectDefaultValue = requestDetails!==null && requestDetails.currentState === "Unopened"? "Select Category":"Select Category";
-console.log(`select = ${selectDefaultValue}`);
-const email = requestDetails!==null && requestDetails.email !== null ? requestDetails.email:"";
-    const category = useSelector(state=> state.foiRequests.foiCategoryList);
+  
+        const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
+        const applicantMiddleName = requestDetails!==null && requestDetails.middleName !== null? requestDetails.middleName:"" ;
+        const applicantLastName = requestDetails!==null && requestDetails.lastName  !== null? requestDetails.lastName:"" ;
+        const organization = requestDetails!==null && requestDetails.businessName !==null ? requestDetails.businessName: "";
+        const email = requestDetails!==null && requestDetails.email !== null ? requestDetails.email:"";
+        const selectDefaultValue = requestDetails!==null && requestDetails.currentState === "Unopened"? "Select Category":"Select Category";
+        const [applicantFirstNameText, setApplicantFirstName] = React.useState(applicantFirstName);
+        const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(applicantMiddleName);
+        const [applicantLastNameText, setApplicantLastName] = React.useState(applicantLastName);
+        const [organizationText, setOrganization] = React.useState(organization);
+        const [emailText, setEmail] = React.useState(email);
+        const category = useSelector(state=> state.foiRequests.foiCategoryList);
+    
+    // console.log(`firstName1 : ${applicantFirstName}`)
+    // console.log(`firstName2 : ${applicantFirstNameText}`)
+    const handleFirtNameChange = (e) => {
+         setApplicantFirstName(e.target.value);
+    }
+    const handleMiddleNameChange = (e) => {
+         setApplicantMiddleName(e.target.value);
+    }
+    const handleLastNameChange = (e) => {
+        setApplicantLastName(e.target.value);
+    }
+    const handleOrganizationChange = (e) => {
+        setOrganization(e.target.value);
+    }
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+    }
+
     // const foiRequestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
     
     const classes = useStyles();
@@ -42,22 +65,25 @@ const email = requestDetails!==null && requestDetails.email !== null ? requestDe
                             label="Applicant First Name" 
                             InputLabelProps={{ shrink: true, }} 
                             variant="outlined"                             
-                            value={applicantFirstName}
+                            value={applicantFirstNameText}
                             fullWidth
+                            onChange={handleFirtNameChange}
                         />
                         <TextField                          
                             label="Applicant Middle Name" 
                             InputLabelProps={{ shrink: true, }} 
-                           value={applicantMiddleName}
+                           value={applicantMiddleNameText}
                             variant="outlined"
                             fullWidth
+                            onChange={handleMiddleNameChange}
                         />
                         <TextField                            
                             label="Applicant Last Name" 
                             InputLabelProps={{ shrink: true, }} 
-                            value={applicantLastName}
+                            value={applicantLastNameText}
                             variant="outlined"
-                            fullWidth 
+                            fullWidth
+                            onChange={handleLastNameChange}
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-applicant-details-col">                      
@@ -65,18 +91,20 @@ const email = requestDetails!==null && requestDetails.email !== null ? requestDe
                         <TextField                            
                             label="Organization" 
                             InputLabelProps={{ shrink: true, }} 
-                            value={organization}
+                            value={organizationText}
                             variant="outlined" 
                             fullWidth
+                            onChange={handleOrganizationChange}
                         /> 
                         <SelectWithLegend selectData = {category} legend="Category" selectDefault={selectDefaultValue} required={true}/>
                        
                         <TextField                           
                             label="Email" 
                             InputLabelProps={{ shrink: true, }} 
-                            value={email}
+                            value={emailText}
                             variant="outlined" 
                             fullWidth
+                            onChange={handleEmailChange}
                         /> 
                     </div>
                 </div> 

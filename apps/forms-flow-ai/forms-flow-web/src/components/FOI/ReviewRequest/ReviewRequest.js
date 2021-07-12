@@ -12,25 +12,32 @@ import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { fetchFOICategoryList, fetchFOIProgramAreaList } from "../../../apiManager/services/FOI/foiRequestServices";
-
+import { useParams } from 'react-router-dom';
+import { fetchFOIRequestDetails } from "../../../apiManager/services/FOI/foiRequestServices";
 
 
 const ReviewRequest = React.memo((props) => {
+  const {requestId} = useParams();
   const selectedCategory = useSelector(state=> state.foiRequests.foiSelectedCategory);
-  const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
-  
+  const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);  
   const dispatch = useDispatch();
   useEffect(()=>{    
+    dispatch(fetchFOIRequestDetails(requestId));   
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
-  },[dispatch]);
-
+  },[requestId, dispatch]);
+  
      return (
       <div className="container foi-review-request-container">           
         <div className="col-sm-12 col-md-12 foi-review-container">
-          <ReviewRequestHeader />
+        {requestDetails.description !== undefined ? (
+          <>
+          <ReviewRequestHeader />     
           <ApplicantDetails requestDetails={requestDetails} />
-          <ChildDetails />
+          {requestDetails.additionalpersonalInfo.childFirstName !== undefined ?
+          <ChildDetails requestDetails={requestDetails}/> : null }
+          </>
+           ): null}
           <OnBehalfOfDetails />
           <AddressContactDetails />
           <RequestDescriptionBox selectedCategory = {selectedCategory} />
