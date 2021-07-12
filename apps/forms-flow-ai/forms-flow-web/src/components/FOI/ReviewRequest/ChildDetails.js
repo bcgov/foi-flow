@@ -1,12 +1,12 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import "./childdetails.scss";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import { DateTimeWithLegend } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
+import { formatDate } from "../../../helper/helper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,12 +16,14 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const ChildDetails = React.memo(({requestDetails}) => {
-    const [childFirstNameText, setChildFirstName] = React.useState(!!requestDetails.additionalpersonalInfo.childFirstName ? requestDetails.additionalpersonalInfo.childFirstName : "");
-    const [childMiddleNameText, setChildMiddleName] = React.useState(!!requestDetails.additionalpersonalInfo.childmiddleName ? requestDetails.additionalpersonalInfo.childmiddleName : "");
-    const [childLastNameText, setChildLastName] = React.useState(!!requestDetails.additionalpersonalInfo.childlastName ? requestDetails.additionalpersonalInfo.childlastName : "");
-    const [childNickNameText, setNickName] = React.useState(!!requestDetails.additionalpersonalInfo.childalsoKnownAs ? requestDetails.additionalpersonalInfo.childalsoKnownAs : "");
-    const [childDOBText, setDOB] = React.useState(!!requestDetails.additionalpersonalInfo.childbirthDate ? requestDetails.additionalpersonalInfo.childbirthDate : "");
+const ChildDetails = React.memo(({additionalInfo}) => {
+    const [childFirstNameText, setChildFirstName] = React.useState(!!additionalInfo.childFirstName ? additionalInfo.childFirstName : "");
+    const [childMiddleNameText, setChildMiddleName] = React.useState(!!additionalInfo.childmiddleName ? additionalInfo.childmiddleName : "");
+    const [childLastNameText, setChildLastName] = React.useState(!!additionalInfo.childlastName ? additionalInfo.childlastName : "");
+    const [childNickNameText, setNickName] = React.useState(!!additionalInfo.childalsoKnownAs ? additionalInfo.childalsoKnownAs : "");
+    const dob = !!additionalInfo.childbirthDate ? new Date(additionalInfo.childbirthDate) : "";
+    const dobString = formatDate(dob);
+    const [childDOBText, setDOB] = React.useState(dobString);
     
     const handleFirtNameChange = (e) => {
         setChildFirstName(e.target.value);

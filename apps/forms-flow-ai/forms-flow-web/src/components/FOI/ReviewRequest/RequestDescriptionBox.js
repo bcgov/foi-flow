@@ -31,35 +31,23 @@ const useStyles = makeStyles((theme) => ({
       }
   }));
 
-const RequestDescription = React.memo(({selectedCategory}) => {
+const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
    
     const classes = useStyles();
     const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);
-    
-    const startDateData = {
-        "label": "Start Date",
-        "format": "mm/dd/yyyy",
-        "value": "2021-05-07",
-        "disabled": false,
-        "required": true
-    }
-    const endDateData = {
-        "label": "End Date",
-        "format": "mm/dd/yyyy",
-        "value": "2021-06-18",
-        "disabled": false,
-        "required": true
-    }
-
-    const [startDate, setStartDate] = React.useState(moment(new Date(startDateData.value)).format("YYYY-MM-DD"));
+    // console.log(`ministries = ${JSON.stringify(ministries)}`);
+    const [startDate, setStartDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
+    const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
+    const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
-      };
-
-      const [endDate, setEndDate] = React.useState(moment(new Date(endDateData.value)).format("YYYY-MM-DD"));
-      const handleEndDateChange = (event) => {
+    };      
+    const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
-        };
+    };
+    const handleRequestDescriptionChange = (event) => {
+        setRequestDescription(event.target.value);
+    };
 
      return (
         
@@ -108,7 +96,7 @@ const RequestDescription = React.memo(({selectedCategory}) => {
                         label="Request Description"
                         multiline
                         rows={4}
-                        defaultValue="This is a test request"
+                        value={requestDescriptionText}
                         variant="outlined"
                         InputLabelProps={{ shrink: true, }} 
                      />        

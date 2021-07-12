@@ -35,16 +35,19 @@ const ReviewRequest = React.memo((props) => {
           <ReviewRequestHeader />     
           <ApplicantDetails requestDetails={requestDetails} />
           {requestDetails.additionalpersonalInfo.childFirstName !== undefined ?
-          <ChildDetails requestDetails={requestDetails}/> : null }
-          </>
-           ): null}
-          <OnBehalfOfDetails />
-          <AddressContactDetails />
-          <RequestDescriptionBox selectedCategory = {selectedCategory} />
-          <RequestDetails />
-          <AdditionalApplicantDetails />
+          <ChildDetails additionalInfo={requestDetails.additionalpersonalInfo}/> : null }
+          
+           {requestDetails.additionalpersonalInfo.anotherFirstName !== undefined ?
+          <OnBehalfOfDetails additionalInfo={requestDetails.additionalpersonalInfo} /> : null }          
+          <AddressContactDetails requestDetails={requestDetails} />
+          <RequestDescriptionBox selectedCategory = {selectedCategory} requestDetails={requestDetails} />
+          <RequestDetails  requestDetails={requestDetails}/>
+          {requestDetails.additionalpersonalInfo.childFirstName !== undefined ?
+          <AdditionalApplicantDetails additionalInfo={requestDetails.additionalpersonalInfo}/>: null }
           <RequestNotes />
           <BottomButtonGroup selectedCategory = {selectedCategory}/>
+          </>
+           ): null}
         </div>
       </div>
     

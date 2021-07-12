@@ -1,12 +1,12 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import "./onbehalfofdetails.scss";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import { DateTimeWithLegend } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
+import { formatDate } from "../../../helper/helper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,19 +16,31 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const OnBehalfOfDetails = React.memo((props) => {
+const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
   
-    useEffect(() => {       
-        
-    }, [])
-
-    const dateData = {
-        "label": "Date of Birth",
-        "format": "mm/dd/yyyy",
-        "value": "11/20/2001",
-        "disabled": false,
-        "required": false
-    } 
+    const [anotherFirstNameText, setAnotherFirstName] = React.useState(!!additionalInfo.anotherFirstName ? additionalInfo.anotherFirstName : "");
+    const [anotherMiddleNameText, setAnotherMiddleName] = React.useState(!!additionalInfo.anothermiddleName ? additionalInfo.anothermiddleName : "");
+    const [anotherLastNameText, setAnotherLastName] = React.useState(!!additionalInfo.anotherastName ? additionalInfo.anotherastName : "");
+    const [anotherNickNameText, setAnotherNickName] = React.useState(!!additionalInfo.anotheralsoKnownAs ? additionalInfo.anotheralsoKnownAs : "");
+    const dob = !!additionalInfo.anotherbirthDate ? new Date(additionalInfo.anotherbirthDate) : "";
+    const dobString = formatDate(dob);
+    const [anotherDOBText, setAnotherDOB] = React.useState(dobString);
+    
+    const handleFirtNameChange = (e) => {
+        setAnotherFirstName(e.target.value);
+    }
+    const handleMiddleNameChange = (e) => {
+        setAnotherMiddleName(e.target.value);
+    }
+    const handleLastNameChange = (e) => {
+        setAnotherLastName(e.target.value);
+    }
+    const handleNickNameChange = (e) => {
+        setAnotherNickName(e.target.value);
+    }
+    const handleDOBChange = (e) => {
+        setAnotherDOB(e.target.value);
+    }   
     const classes = useStyles();
      return (
         
@@ -42,29 +54,42 @@ const OnBehalfOfDetails = React.memo((props) => {
                             label="First Name" 
                             InputLabelProps={{ shrink: true, }} 
                             variant="outlined" 
-                            defaultValue="Jane"
+                            value={anotherFirstNameText}
+                            onChange={handleFirtNameChange}
                         />
                         <TextField                          
                             label="Middle Name" 
                             InputLabelProps={{ shrink: true, }} 
-                            defaultValue="M" 
+                            value={anotherMiddleNameText}
                             variant="outlined" 
+                            onChange={handleMiddleNameChange}
                         />
                         <TextField                           
                             label="Last Name" 
                             InputLabelProps={{ shrink: true, }} 
-                            defaultValue="Deo" 
-                            variant="outlined" 
+                            value={anotherLastNameText}
+                            variant="outlined"
+                            onChange={handleLastNameChange}
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-onbehalf-details-col"> 
                         <TextField                            
                             label="Also Known As" 
                             InputLabelProps={{ shrink: true, }} 
-                            defaultValue="nickname" 
+                            value={anotherNickNameText}
                             variant="outlined" 
+                            onChange={handleNickNameChange}
                         />                       
-                        <DateTimeWithLegend dateData = {dateData} />                       
+                        <TextField                
+                            label="Date of Birth"
+                            type="date" 
+                            value={anotherDOBText} 
+                            onChange={handleDOBChange}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                            variant="outlined" 
+                        />                   
                         <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>
                 </div> 

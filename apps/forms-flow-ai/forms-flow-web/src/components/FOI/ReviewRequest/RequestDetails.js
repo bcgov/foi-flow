@@ -3,8 +3,10 @@ import "./requestdetails.scss";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { useSelector } from "react-redux";
-import { SelectWithLegend, DateTimeWithLegend } from '../customComponents';
+import { SelectWithLegend } from '../customComponents';
+import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
+import { formatDate } from "../../../helper/helper";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -14,38 +16,30 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   }));
-const RequestDetails = React.memo((props) => {
+const RequestDetails = React.memo(({requestDetails}) => {
   
-    useEffect(() => {       
-       
-    }, [])
+  
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
-
     const receivedMode = useSelector(state=> state.foiRequests.foiReceiveModeList);
-
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
-    const receivedDate = {
-        "label": "Received Date",
-        "value": "2021-05-07",
-        "disabled": false,
-        "required": true
-    }
 
-    const startDate = {
-        "label": "Start Date",
-        "value": "2021-05-07",
-        "disabled": false,
-        "required": true
-    }
+    const receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+    const receivedDateString = formatDate(receivedDate);
+    const [receivedDateText, setReceivedDate] = React.useState(receivedDateString);
+    const [startDateText, setStartDate] = React.useState(receivedDateString);
+    const dueDate = new Date(startDateText);
+    dueDate.setDate(dueDate.getDate() + 40);
+    const dueDateString = formatDate(dueDate);
 
-    const dueDate = {
-        "label": "Due Date",
-        "value": "2021-06-18",
-        "disabled": true,
-        "required": true
+    const selectedRequestType = !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type";
+    
+    const handleReceivedDateChange = (e) => {
+      setReceivedDate(e.target.value);
     }
-
+    const handleStartDateChange = (e) => {
+      setStartDate(e.target.value);
+    }
     
     const classes = useStyles();
      return (
@@ -56,14 +50,45 @@ const RequestDetails = React.memo((props) => {
             <form className={classes.root} noValidate autoComplete="off">
                 <div className="row foi-applicant-details-row">
                     <div className="col-lg-6 foi-applicant-details-col">
-                    <SelectWithLegend selectData = {requestType} legend="Request Type" selectDefault="Select Request Type" required={true}/>
+                    <SelectWithLegend selectData = {requestType} legend="Request Type" selectDefault={selectedRequestType}required={true}/>
                     <SelectWithLegend selectData = {receivedMode} legend="Received Mode" selectDefault="Select Received Mode" required={true}/>
                     <SelectWithLegend selectData = {deliveryMode} legend="Delivery Mode" selectDefault="Select Delivery Mode" required={true}/>                                        
                     </div>
-                    <div className="col-lg-6 foi-applicant-details-col">                       
-                    <DateTimeWithLegend dateData = {receivedDate} />
-                    <DateTimeWithLegend dateData = {startDate} />
-                    <DateTimeWithLegend dateData = {dueDate} />
+                    <div className="col-lg-6 foi-applicant-details-col"> 
+                    <TextField                
+                            label="Received Date"
+                            type="date" 
+                            value={receivedDateText} 
+                            onChange={handleReceivedDateChange}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                            variant="outlined" 
+                            required
+                        />
+                        <TextField                
+                            label="Start Date"
+                            type="date" 
+                            value={startDateText} 
+                            onChange={handleStartDateChange}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                            variant="outlined" 
+                            required
+                        />
+                        <TextField                
+                            label="Due Date"
+                            type="date" 
+                            value={dueDateString} 
+                            // onChange={handleDOBChange}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                            variant="outlined" 
+                            required
+                            disabled
+                        />
                     </div>
                 </div> 
                 </form>             

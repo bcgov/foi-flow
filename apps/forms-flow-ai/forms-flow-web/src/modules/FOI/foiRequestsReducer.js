@@ -10,7 +10,7 @@ const initialState = {
   foiSelectedCategory: "",
   foiCountryList: [{"countryid":0, "name": "Select Country"},{"countryid":1, "name": "Canada"}],
   foiProvinceList: [{"provinceid":0, "name": "Select Province"},{"provinceid":1, "name": "British Columbia"}, {"provinceid":2, "name": "Ontario"}],
-  foiRequestTypeList:[{"requesttypeid":0, "name": "Select Request Type"}, {"requesttypeid":1, "name": "General"}, {"requesttypeid":2, "name": "Personal"}],
+  foiRequestTypeList:[{"requesttypeid":0, "name": "Select Request Type"}, {"requesttypeid":1, "name": "general"}, {"requesttypeid":2, "name": "personal"}],
   foiReceiveModeList:[{"receivemodeid":0, "name": "Select Received Mode"}, {"receivemodeid":1, "name": "Mode1"}, {"receivemodeid":2, "name": "Mode2"}],
   foiDeliveryModeList:[{"deliverymodeid":0, "name": "Select Delivery Mode"}, {"deliverymodeid":1, "name": "Mode1"}, {"deliverymodeid":2, "name": "Mode2"}],
   foiAssignedToList: [{"id":0, "name": "Select User"}, {"id":1, "name": "UserName1"}, {"id":2, "name": "UserName2"}, {"id":3, "name": "UserName3"}],

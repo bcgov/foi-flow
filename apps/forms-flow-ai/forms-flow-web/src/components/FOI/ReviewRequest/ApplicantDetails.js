@@ -31,9 +31,7 @@ const ApplicantDetails = React.memo(({requestDetails}) => {
         const [organizationText, setOrganization] = React.useState(organization);
         const [emailText, setEmail] = React.useState(email);
         const category = useSelector(state=> state.foiRequests.foiCategoryList);
-    
-    // console.log(`firstName1 : ${applicantFirstName}`)
-    // console.log(`firstName2 : ${applicantFirstNameText}`)
+       
     const handleFirtNameChange = (e) => {
          setApplicantFirstName(e.target.value);
     }
@@ -49,8 +47,7 @@ const ApplicantDetails = React.memo(({requestDetails}) => {
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
     }
-
-    // const foiRequestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
+    
     
     const classes = useStyles();
      return (

@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import './additionalapplicantdetails.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { DateTimeWithLegend } from '../customComponents';
+import { formatDate } from "../../../helper/helper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -15,15 +16,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AdditionalApplicantDetails = React.memo((props) => {
+const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
     const classes = useStyles();
-    const dateData = {
-      "label": "Date of Birth",
-      "format": "mm/dd/yyyy",
-      "value": "11/20/2001",
-      "disabled": false,
-      "required": false
+  
+    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(!!additionalInfo.personalHealthNumber ? additionalInfo.personalHealthNumber : "0000 000 00");
+    const [identityVerifiedText, setIdentityVerified] = React.useState(!!additionalInfo.identityVerified ? additionalInfo.identityVerified : "");  
+    const [correctionsNumberText, setCorrectionsNumber] = React.useState(!!additionalInfo.correctionsNumber ? additionalInfo.correctionsNumber : "0000 000 00");
+    const [employeeNumberText, setEmployeeNumber] = React.useState(!!additionalInfo.employeeNumber ? additionalInfo.employeeNumber : "0000 000 00");
+    const dob = !!additionalInfo.birthDate ? new Date(additionalInfo.birthDate) : "";
+    const dobString = formatDate(dob);
+    const [birthDateText, setDOB] = React.useState(dobString);
+
+  const handlePersonalHealthNumber = (e) => {
+    setPersonalHealthNumber(e.target.value);
   }
+
+  const handleIdentityVerified = (e) => {
+    setIdentityVerified(e.target.value);
+  }
+
+  const handleCorrectionsNumber = (e) => {
+    setCorrectionsNumber(e.target.value);
+  }
+
+  const handleEmployeeNumber = (e) => {
+    setEmployeeNumber(e.target.value);
+  }
+
+  const handleBirthDate = (e) => {
+    setDOB(e.target.value);
+  }
+
      return (
       <Card className="foi-child-details-card">            
       <label className="foi-child-details-label">ADDITIONAL APPLICANT DETAILS</label>
@@ -35,29 +58,43 @@ const AdditionalApplicantDetails = React.memo((props) => {
                       label="Personal Health Number" 
                       InputLabelProps={{ shrink: true, }} 
                       variant="outlined" 
-                      defaultValue="0000 000 00"
+                      value={personalHealthNumberText}
+                      onChange={handlePersonalHealthNumber}
                   />
-                  <DateTimeWithLegend dateData = {dateData} />
+                  {/* <DateTimeWithLegend dateData = {dateData} /> */}
+                  <TextField                
+                            label="Date of Birth"
+                            type="date" 
+                            value={birthDateText} 
+                            onChange={handleBirthDate}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                            variant="outlined" 
+                        />
                   
                   <TextField                            
                       label="Identity Verified" 
-                      InputLabelProps={{ shrink: true, }} 
-                      defaultValue="BC Services Card" 
-                      variant="outlined" 
+                      InputLabelProps={{ shrink: true, }}                       
+                      variant="outlined"
+                      value={identityVerifiedText}
+                      onChange={handleIdentityVerified}
                   />                                                
               </div>
               <div className="col-lg-6 foi-child-details-col">
                   <TextField                            
                       label="Corrections Number" 
                       InputLabelProps={{ shrink: true, }} 
-                      defaultValue="000 000 000" 
                       variant="outlined" 
+                      value={correctionsNumberText}
+                      onChange={handleCorrectionsNumber}
                   /> 
                   <TextField                            
                       label="Employee Number" 
-                      InputLabelProps={{ shrink: true, }} 
-                      defaultValue="0000" 
+                      InputLabelProps={{ shrink: true, }}                       
                       variant="outlined" 
+                      value={employeeNumberText}
+                      onChange={handleEmployeeNumber}
                   /> 
                   {/* <DateTimeWithLegend dateData = {dateData} /> 
                   <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel> */}
