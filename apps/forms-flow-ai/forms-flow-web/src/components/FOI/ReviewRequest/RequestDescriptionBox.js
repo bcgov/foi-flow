@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { useSelector } from "react-redux";
 import "./requestdescriptionbox.scss";
 import Card from '@material-ui/core/Card';
@@ -35,10 +35,19 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
    
     const classes = useStyles();
     const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);
-    // console.log(`ministries = ${JSON.stringify(ministries)}`);
+    
     const [startDate, setStartDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
     const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
+    const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
+    
+    if(selectedMinistries !== "") {
+        const selectedList = selectedMinistries.map(element => element.code);
+         ministries.map(ministry => {
+            ministry.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === ministry.bcgovcode);           
+       });      
+    }
+
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
     };      
@@ -99,6 +108,7 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
                         value={requestDescriptionText}
                         variant="outlined"
                         InputLabelProps={{ shrink: true, }} 
+                        onChange={handleRequestDescriptionChange}
                      />        
                     </div>
                     <MinistriesList ministries={ministries}/>
