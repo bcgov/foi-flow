@@ -123,7 +123,6 @@ jobs:
     runs-on: ubuntu-20.04
     # needs: python-build-check
     name: Python build and run migrations
-    container: python:3.8
 
     strategy:
       matrix:
