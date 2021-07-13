@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-20.04
     name: Build dockerfile to ensure it works
     # unsure if setup-job below is necessary
-    needs: setup-job
+    # needs: setup-job
 
     steps:
       - uses: actions/checkout@v2
