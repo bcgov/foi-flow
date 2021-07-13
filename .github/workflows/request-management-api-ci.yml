@@ -71,23 +71,22 @@ jobs:
 
 
     # # Service containers to run with `container-job`
-    # services:
-    #   # Label used to access the service container
-    #   postgres:
-    #     # Docker Hub image
-    #     image: postgres
-    #     # Provide the password for postgres
-    #     env:
-    #       POSTGRES_PASSWORD: postgres
-    #     # Set health checks to wait until postgres has started
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-# These steps below - are necessary even with "needs" task?
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -109,6 +108,13 @@ jobs:
         working-directory: ./request-management-api/tests
         run: |
           pytest
+        env:
+          - DATABASE_USERNAME: postgres
+          - DATABASE_PASSWORD: postgres
+          - DATABASE_NAME: postgres
+          - DATABASE_HOST: postgres
+          - DATABASE_PORT: 5432
+          - FLASK_ENV: development
      
 
 # Abin, how do we run unit tests? What command?
