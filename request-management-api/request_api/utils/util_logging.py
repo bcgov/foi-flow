@@ -61,16 +61,3 @@ def setup_filelogging(app):
 
     # finally add handler to logger    
     app.logger.addHandler(handler)  
-
-def setup_filelogging1(app):
-    log_level = logging.INFO   
-
-    for handler in app.logger.handlers:
-        app.logger.removeHandler(handler)
- 
-    log_file = os.path.abspath('request_api/logstest/logfile.log')
-    handler = TimedRotatingFileHandler(log_file, when="s", interval=1)
-    handler.setLevel(log_level)
-    app.logger.addHandler(handler) 
-    logger1 = logging.getLogger('DATA-MANUFACTURING')  
-    logger1.info('test info')
