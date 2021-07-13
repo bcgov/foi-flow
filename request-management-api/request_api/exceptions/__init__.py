@@ -8,7 +8,7 @@ status_code - where possible use HTTP Error Codes
 """
 import traceback
 
-from sbc_common_components.tracing.exception_tracing import ExceptionTracing  # noqa: I001, I003
+#from sbc_common_components.tracing.exception_tracing import ExceptionTracing  # noqa: I001, I003
 
 from request_api.exceptions.errors import Error  # noqa: I001, I003
 
@@ -27,7 +27,7 @@ class BusinessException(Exception):
         self.detail = exception
 
         # log/tracing exception
-        ExceptionTracing.trace(self, traceback.format_exc())
+        #ExceptionTracing.trace(self, traceback.format_exc())
 
 
 class ServiceUnavailableException(Exception):
