@@ -38,7 +38,7 @@ jobs:
       - name: docker build to check strictness
         id: docker-build
         run: |
-          docker build .
+          docker build -f dockerfile.local .
 
      
 
