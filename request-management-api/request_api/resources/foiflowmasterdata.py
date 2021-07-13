@@ -17,7 +17,7 @@ from flask import g, request
 from flask_restx import Namespace, Resource, cors
 
 
-#from request_api.tracer import Tracer
+from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicantcategoryservice import applicantcategoryservice
@@ -25,14 +25,14 @@ from request_api.services.programareaservice import programareaservice
 import json
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
-#TRACER = Tracer.get_instance()
+TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/applicantcategories')
 class FOIFlowApplicantCategories(Resource):
 
     @staticmethod
-    #@TRACER.trace()
+    @TRACER.trace()
     @cors.crossdomain(origin='*')       
     def get():
         try:
@@ -48,7 +48,7 @@ class FOIFlowApplicantCategories(Resource):
 class FOIFlowProgramAreas(Resource):
 
     @staticmethod
-    #@TRACER.trace()
+    @TRACER.trace()
     @cors.crossdomain(origin='*')       
     def get():
         try:

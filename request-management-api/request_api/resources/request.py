@@ -15,9 +15,9 @@
 
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
-#from flask_expects_json import expects_json
+from flask_expects_json import expects_json
 
-#from request_api.tracer import Tracer
+from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
@@ -25,14 +25,14 @@ import json
 import uuid
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
-#TRACER = Tracer.get_instance()
+TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
 class FOIRawRequest(Resource):
 
     @staticmethod
-    #@TRACER.trace()
+    @TRACER.trace()
     @cors.crossdomain(origin='*')       
     def get(requestid=None):
         try :            
@@ -53,7 +53,7 @@ class FOIRawRequest(Resource):
 class FOIRawRequestBPMProcess(Resource):
 
     @staticmethod
-    #@TRACER.trace()
+    @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
     def put(_requestid=None):
             request_json = request.get_json()
@@ -76,7 +76,7 @@ class FOIRawRequests(Resource):
     """Resource for managing FOI Raw requests."""
     
     @staticmethod
-    #@TRACER.trace()
+    @TRACER.trace()
     @cors.crossdomain(origin='*')   
     def get(requestid=None):
         ## todo : This code will get re-furshibed with BPM WF validation to list
@@ -93,9 +93,9 @@ class FOIRawRequests(Resource):
     
 
     @staticmethod
-    #@TRACER.trace()
+    @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
-    ##@expects_json(schema)
+    @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
