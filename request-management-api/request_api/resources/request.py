@@ -102,7 +102,7 @@ class FOIRawRequests(Resource):
             request_json = request.get_json()
             requestdatajson = request_json['requestData']           
             result = rawrequestservice.saverawrequest(requestdatajson)
-            return {'status': result.success, 'message':result.message} , 200
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
