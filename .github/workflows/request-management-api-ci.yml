@@ -173,7 +173,7 @@ jobs:
           DATABASE_USERNAME: postuser
           DATABASE_PASSWORD: Fo!123
           DATABASE_NAME: postgres
-          DATABASE_HOST: postgres
+          DATABASE_HOST: localhost
           DATABASE_PORT: 5432
           FLASK_ENV: development
      
