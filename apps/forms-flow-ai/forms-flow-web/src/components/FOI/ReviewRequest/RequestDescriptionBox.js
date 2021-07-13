@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
       }
   }));
 
+
 const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
    
     const classes = useStyles();
@@ -47,7 +48,13 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
             ministry.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === ministry.bcgovcode);           
        });      
     }
-
+    const [errors, setErrors] = React.useState([]);
+    const validate = (validations) => {
+        // let temp = {};
+        // temp.description = requestDescriptionText? "":"Request Description feild is required.";
+        // setErrors({...temp});
+        setErrors(validations.map(errorFor => errorFor(requestDescriptionText)));
+    }
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
     };      
@@ -58,6 +65,12 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
         setRequestDescription(event.target.value);
     };
 
+    const isRequired = (val) => {
+        console.log(`val = ${val}`);
+        return val.length > 0 ? "":"cannot be blank";
+    }
+    
+    
      return (
         
         <Card className="foi-request-description-card">            
@@ -80,6 +93,7 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
                             // InputProps={{inputProps: { min: "2001-04-21", max: "2020-05-04"} }}
                             variant="outlined"                            
                             required
+                            error={startDate === undefined}
                         />
 
                         <TextField                
@@ -95,6 +109,7 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
                              InputProps={{inputProps: { min: startDate} }}
                             variant="outlined"                            
                             required
+                            error={endDate === undefined}
                         />                                                                
                     </div>
                     </div>
@@ -109,7 +124,12 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
                         variant="outlined"
                         InputLabelProps={{ shrink: true, }} 
                         onChange={handleRequestDescriptionChange}
+                        // onBlur={() => { validate([isRequired])}}  
+                        error={requestDescriptionText===""}
                      />        
+                    </div>
+                    <div className='has-error'>
+                        {errors}
                     </div>
                     <MinistriesList ministries={ministries}/>
                     <div className="foi-requestdescription-button-group">

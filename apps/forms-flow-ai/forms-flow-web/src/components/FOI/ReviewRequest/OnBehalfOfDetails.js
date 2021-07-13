@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
-      width: '25ch',
+    //   width: '25ch',
     },
   },
 }));
@@ -47,7 +47,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
         <Card className="foi-onbehalf-details-card">            
             <label className="foi-onbehalf-details-label">ON BEHALF OF DETAILS</label>
             <CardContent>
-            <form className={classes.root} noValidate autoComplete="off">
+            {/* <form className={classes.root} noValidate autoComplete="off"> */}
                 <div className="row foi-onbehalf-details-row">
                     <div className="col-lg-6 foi-onbehalf-details-col">                        
                         <TextField                           
@@ -93,7 +93,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
                         <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>
                 </div> 
-                </form>             
+                {/* </form>              */}
             </CardContent>
         </Card>
        

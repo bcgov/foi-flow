@@ -63,7 +63,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
         <Card className="foi-address-details-card">            
             <label className="foi-address-details-label">ADDRESS AND CONTACT INFORMATION</label>
             <CardContent>
-            <form className={classes.root} noValidate autoComplete="off">
+            {/* <form className={classes.root} noValidate autoComplete="off"> */}
                 <div className="row foi-address-details-row">
                     <div className="col-lg-6 foi-address-details-col">                       
                         <TextField 
@@ -136,7 +136,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                          <SelectWithLegend selectData = {countryList} legend="Country" selectDefault={countryText} required={false}/>
                     </div>
                 </div> 
-                </form>             
+                {/* </form>              */}
             </CardContent>
         </Card>
        

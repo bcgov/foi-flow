@@ -24,7 +24,7 @@ const ChildDetails = React.memo(({additionalInfo}) => {
     const dob = !!additionalInfo.childbirthDate ? new Date(additionalInfo.childbirthDate) : "";
     const dobString = formatDate(dob);
     const [childDOBText, setDOB] = React.useState(dobString);
-    
+
     const handleFirtNameChange = (e) => {
         setChildFirstName(e.target.value);
     }
@@ -47,7 +47,7 @@ const ChildDetails = React.memo(({additionalInfo}) => {
         <Card className="foi-child-details-card">            
             <label className="foi-child-details-label">CHILD DETAILS</label>
             <CardContent>
-            <form className={classes.root} noValidate autoComplete="off">
+            {/* <form className={classes.root} noValidate autoComplete="off"> */}
                 <div className="row foi-child-details-row">
                     <div className="col-lg-6 foi-child-details-col">                       
                         <TextField                            
@@ -88,12 +88,12 @@ const ChildDetails = React.memo(({additionalInfo}) => {
                             InputLabelProps={{
                             shrink: true,
                             }}
-                            variant="outlined" 
+                            variant="outlined"
                         />
                         <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>
                 </div> 
-                </form>             
+                {/* </form>              */}
             </CardContent>
         </Card>
        

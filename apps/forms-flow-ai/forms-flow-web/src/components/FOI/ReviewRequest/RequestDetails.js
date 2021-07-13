@@ -47,7 +47,7 @@ const RequestDetails = React.memo(({requestDetails}) => {
         <Card className="foi-applicant-details-card">            
             <label className="foi-applcant-details-label">REQUEST DETAILS</label>
             <CardContent>
-            <form className={classes.root} noValidate autoComplete="off">
+            {/* <form className={classes.root} noValidate autoComplete="off"> */}
                 <div className="row foi-applicant-details-row">
                     <div className="col-lg-6 foi-applicant-details-col">
                     <SelectWithLegend selectData = {requestType} legend="Request Type" selectDefault={selectedRequestType}required={true}/>
@@ -65,6 +65,7 @@ const RequestDetails = React.memo(({requestDetails}) => {
                             }}
                             variant="outlined" 
                             required
+                            error={receivedDateText === undefined}
                         />
                         <TextField                
                             label="Start Date"
@@ -76,6 +77,7 @@ const RequestDetails = React.memo(({requestDetails}) => {
                             }}
                             variant="outlined" 
                             required
+                            error={startDateText === undefined}
                         />
                         <TextField                
                             label="Due Date"
@@ -91,7 +93,7 @@ const RequestDetails = React.memo(({requestDetails}) => {
                         />
                     </div>
                 </div> 
-                </form>             
+                {/* </form>              */}
             </CardContent>
         </Card>
        

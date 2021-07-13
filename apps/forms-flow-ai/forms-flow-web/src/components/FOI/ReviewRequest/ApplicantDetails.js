@@ -55,7 +55,7 @@ const ApplicantDetails = React.memo(({requestDetails}) => {
         <Card className="foi-applicant-details-card">            
             <label className="foi-applcant-details-label">APPLICANT DETAILS</label>
             <CardContent>
-            <form className={classes.root} noValidate autoComplete="off">
+            {/* <form className={classes.root} autoComplete="off"> */}
                 <div className="row foi-applicant-details-row">
                     <div className="col-lg-6 foi-applicant-details-col">                       
                         <TextField                            
@@ -105,7 +105,7 @@ const ApplicantDetails = React.memo(({requestDetails}) => {
                         /> 
                     </div>
                 </div> 
-                </form>             
+                {/* </form>              */}
             </CardContent>
         </Card>
        

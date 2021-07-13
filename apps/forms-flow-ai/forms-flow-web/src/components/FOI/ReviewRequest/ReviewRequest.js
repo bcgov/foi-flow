@@ -15,7 +15,15 @@ import { fetchFOICategoryList, fetchFOIProgramAreaList } from "../../../apiManag
 import { useParams } from 'react-router-dom';
 import { fetchFOIRequestDetails } from "../../../apiManager/services/FOI/foiRequestServices";
 
-
+import { makeStyles } from '@material-ui/core/styles';
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiTextField-root': {
+      margin: theme.spacing(1),
+    //   width: '25ch',
+    },
+  },
+}));
 const ReviewRequest = React.memo((props) => {
   const {requestId} = useParams();
   const selectedCategory = useSelector(state=> state.foiRequests.foiSelectedCategory);
@@ -26,28 +34,31 @@ const ReviewRequest = React.memo((props) => {
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
   },[requestId, dispatch]);
-  
+  // console.log(`${JSON.stringify(requestDetails)}`)
+  const classes = useStyles();
      return (
       <div className="container foi-review-request-container">           
         <div className="col-sm-12 col-md-12 foi-review-container">
+        <form className={classes.root} autoComplete="off">
         {requestDetails.description !== undefined ? (
           <>
-          <ReviewRequestHeader />     
+          <ReviewRequestHeader />
           <ApplicantDetails requestDetails={requestDetails} />
-          {requestDetails.additionalpersonalInfo.childFirstName !== undefined ?
+          {requestDetails.additionalpersonalInfo !== undefined && requestDetails.additionalpersonalInfo.childFirstName !== undefined ?
           <ChildDetails additionalInfo={requestDetails.additionalpersonalInfo}/> : null }
           
-           {requestDetails.additionalpersonalInfo.anotherFirstName !== undefined ?
+           {requestDetails.additionalpersonalInfo !== undefined && requestDetails.additionalpersonalInfo.anotherFirstName !== undefined ?
           <OnBehalfOfDetails additionalInfo={requestDetails.additionalpersonalInfo} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} />
           <RequestDescriptionBox selectedCategory = {selectedCategory} requestDetails={requestDetails} />
           <RequestDetails  requestDetails={requestDetails}/>
-          {requestDetails.additionalpersonalInfo.childFirstName !== undefined ?
+          {requestDetails.additionalpersonalInfo !== undefined ?
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalpersonalInfo}/>: null }
           <RequestNotes />
           <BottomButtonGroup selectedCategory = {selectedCategory}/>
           </>
            ): null}
+           </form>
         </div>
       </div>
     

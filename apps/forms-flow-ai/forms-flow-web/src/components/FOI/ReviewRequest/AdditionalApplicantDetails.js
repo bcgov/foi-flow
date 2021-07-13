@@ -51,7 +51,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
       <Card className="foi-child-details-card">            
       <label className="foi-child-details-label">ADDITIONAL APPLICANT DETAILS</label>
       <CardContent>
-      <form className={classes.root} noValidate autoComplete="off">
+      {/* <form className={classes.root} noValidate autoComplete="off"> */}
           <div className="row foi-child-details-row">
               <div className="col-lg-6 foi-child-details-col">                       
                   <TextField                            
@@ -100,7 +100,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                   <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel> */}
               </div>
           </div> 
-          </form>             
+          {/* </form>              */}
       </CardContent>
   </Card>
     );
