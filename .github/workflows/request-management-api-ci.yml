@@ -5,10 +5,12 @@ on:
   pull_request:
     branches:
       - main
-      # Remove dev-AC branch once stable
-      - dev-AC-109
     paths:
       - "request-management-api/**"
+  # Remove entire push section when done testing
+  push:
+    branches: 
+      - dev-AC-109
 
 defaults:
   run:
