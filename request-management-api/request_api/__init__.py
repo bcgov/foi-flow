@@ -26,20 +26,16 @@ from sbc_common_components.exception_handling.exception_handler import Exception
 #from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
 
 import request_api.config as config
-#from request_api import models
-#from request_api.auth import jwt
 from request_api.config import _Config
-#from request_api.extensions import mail
+
 from request_api.models import db, ma
-#from request_api.utils.cache import cache
-# from request_api.utils.run_version import get_run_version
 from request_api.utils.util_logging import setup_logging, setup_filelogging
 
 setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
 
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
-    """Return a configured Flask App using the Factory method."""
+    """Return a configured Flask App using the Factory method."""   
     app = Flask(__name__)
     app.config.from_object(config.CONFIGURATION[run_mode])
     #app.config['DEBUG'] = True
@@ -50,11 +46,10 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     #         dsn=app.config.get('SENTRY_DSN'),
     #         integrations=[FlaskIntegration()]
     #     )
-
-    #from request_api.resources import TEST_BLUEPRINT  # pylint: disable=import-outside-toplevel
+   
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
-    print(run_mode)
+    print("environment :" + run_mode)
     db.init_app(app)
     ma.init_app(app)
     #mail.init_app(app)

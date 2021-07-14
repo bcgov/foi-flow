@@ -15,8 +15,8 @@
 
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
-
 from flask_expects_json import expects_json
+
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
@@ -35,12 +35,10 @@ class FOIRawRequest(Resource):
     @TRACER.trace()
     @cors.crossdomain(origin='*')       
     def get(requestid=None):
-        try :
-            print("reached1")
+        try :            
             jsondata = {}
             requestidisInteger = int(requestid)
-            if requestidisInteger :
-                print("reached2")
+            if requestidisInteger :                
                 baserequestInfo = rawrequestservice.getrawrequest(requestid)                                    
                 jsondata = json.dumps(baserequestInfo)
             return jsondata , 200 
@@ -76,7 +74,7 @@ class FOIRawRequestBPMProcess(Resource):
 @API.route('/foirawrequests')
 class FOIRawRequests(Resource):
     """Resource for managing FOI Raw requests."""
-
+    
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')   
@@ -92,6 +90,8 @@ class FOIRawRequests(Resource):
     with open('request_api/schemas/schemas/rawrequest.json') as f:
         schema = json.load(f)
 
+    
+
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
@@ -102,6 +102,8 @@ class FOIRawRequests(Resource):
             request_json = request.get_json()
             requestdatajson = request_json['requestData']           
             result = rawrequestservice.saverawrequest(requestdatajson)
-            return {'status': result.success, 'message':result.message} , 200
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+        except TypeError:
+            return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
