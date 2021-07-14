@@ -8,10 +8,10 @@ import { formatDate } from "../../../helper/helper";
 
 const ChildDetails = React.memo(({additionalInfo}) => {
     const [childFirstNameText, setChildFirstName] = React.useState(!!additionalInfo.childFirstName ? additionalInfo.childFirstName : "");
-    const [childMiddleNameText, setChildMiddleName] = React.useState(!!additionalInfo.childmiddleName ? additionalInfo.childmiddleName : "");
-    const [childLastNameText, setChildLastName] = React.useState(!!additionalInfo.childlastName ? additionalInfo.childlastName : "");
-    const [childNickNameText, setNickName] = React.useState(!!additionalInfo.childalsoKnownAs ? additionalInfo.childalsoKnownAs : "");
-    const dob = !!additionalInfo.childbirthDate ? new Date(additionalInfo.childbirthDate) : "";
+    const [childMiddleNameText, setChildMiddleName] = React.useState(!!additionalInfo.childMiddleName ? additionalInfo.childMiddleName : "");
+    const [childLastNameText, setChildLastName] = React.useState(!!additionalInfo.childLastName ? additionalInfo.childLastName : "");
+    const [childNickNameText, setNickName] = React.useState(!!additionalInfo.childAlsoKnownAs ? additionalInfo.childAlsoKnownAs : "");
+    const dob = !!additionalInfo.childBirthDate ? new Date(additionalInfo.childBirthDate) : "";
     const dobString = formatDate(dob);
     const [childDOBText, setDOB] = React.useState(dobString);
 
@@ -42,7 +42,8 @@ const ChildDetails = React.memo(({additionalInfo}) => {
                             InputLabelProps={{ shrink: true, }} 
                             value={childFirstNameText}
                             variant="outlined"
-                            onChange={handleFirtNameChange}                            
+                            onChange={handleFirtNameChange}
+                            fullWidth                         
                         />
                         <TextField                            
                             label="Middle Name" 
@@ -50,6 +51,7 @@ const ChildDetails = React.memo(({additionalInfo}) => {
                             value={childMiddleNameText}
                             variant="outlined"
                             onChange={handleMiddleNameChange}
+                            fullWidth
                         />
                         <TextField                            
                             label="Last Name" 
@@ -57,6 +59,7 @@ const ChildDetails = React.memo(({additionalInfo}) => {
                             value={childLastNameText}
                             variant="outlined"
                             onChange={handleLastNameChange}
+                            fullWidth
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col">
@@ -66,6 +69,7 @@ const ChildDetails = React.memo(({additionalInfo}) => {
                             value={childNickNameText}
                             variant="outlined"
                             onChange={handleNickNameChange}
+                            fullWidth
                         />                        
                         <TextField                
                             label="Date of Birth"
@@ -76,6 +80,7 @@ const ChildDetails = React.memo(({additionalInfo}) => {
                             shrink: true,
                             }}
                             variant="outlined"
+                            fullWidth
                         />
                         <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>

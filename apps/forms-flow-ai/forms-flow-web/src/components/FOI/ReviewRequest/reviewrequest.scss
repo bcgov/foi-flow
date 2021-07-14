@@ -51,3 +51,24 @@
     //display: -webkit-box;
     align-items: flex-start; 
 }
+
+.MuiOutlinedInput-notchedOutline {
+    border: 1px solid !important; 
+    // color: #000000 !important;
+}
+
+
+.MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+    border-color: #f44336 !important;
+}
+
+// .PrivateNotchedOutline-legendNotched-5 {
+//     font-family: "BCSans-Bold";
+//     color: #000000 !important;
+//     font-size: large !important;
+// }
+
+// .MuiOutlinedInput-root.Mui-error .PrivateNotchedOutline-legendNotched-5 {
+//     // font-family: "BCSans-Bold";
+//     color: #f44336 !important;
+// }

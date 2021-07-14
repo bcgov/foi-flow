@@ -120,7 +120,7 @@ const ReviewRequest = React.memo((props) => {
     }
     setRequestDetailsValues(detailsData);
   }
-  console.log(`requestDetailsValues = ${JSON.stringify(requestDetailsValues)}`) 
+  console.log(`requestDetails = ${JSON.stringify(requestDetails)}`) 
 
   const isRequieredError = (requestDescriptionBoxData.startDate === undefined || requestDescriptionBoxData.endDate === undefined 
     || requestDescriptionBoxData.description === ""
@@ -141,15 +141,15 @@ const ReviewRequest = React.memo((props) => {
           <>
           <ReviewRequestHeader selectAssignedToValue={selectAssignedToValue} handleAssignedToOnChange={handleAssignedToOnChange} />
           <ApplicantDetails requestDetails={requestDetails} handleCategoryOnChange={handleCategoryOnChange} selectCategoryValue={selectCategoryValue} />
-          {requestDetails.additionalpersonalInfo !== undefined && requestDetails.additionalpersonalInfo.childFirstName !== undefined ?
-          <ChildDetails additionalInfo={requestDetails.additionalpersonalInfo}/> : null }          
-           {requestDetails.additionalpersonalInfo !== undefined && requestDetails.additionalpersonalInfo.anotherFirstName !== undefined ?
-          <OnBehalfOfDetails additionalInfo={requestDetails.additionalpersonalInfo} /> : null }          
+          {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.childFirstName !== undefined ?
+          <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo}/> : null }          
+           {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.anotherFirstName !== undefined ?
+          <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} />
-          <RequestDescriptionBox requestDetails = {requestDetails} isRequieredError = {isRequieredError} handleOnChangeRequestDescription={handleOnChangeRequestDescription} handleInitialValue={handleInitialValue} />
+          <RequestDescriptionBox requestDetails = {requestDetails} handleOnChangeRequestDescription={handleOnChangeRequestDescription} handleInitialValue={handleInitialValue} />
           <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue}/>
-          {requestDetails.additionalpersonalInfo !== undefined ?
-          <AdditionalApplicantDetails additionalInfo={requestDetails.additionalpersonalInfo}/>: null }
+          {requestDetails.additionalPersonalInfo !== undefined ?
+          <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo}/>: null }
           <RequestNotes />
           
           <BottomButtonGroup isRequieredError = {isRequieredError}/>

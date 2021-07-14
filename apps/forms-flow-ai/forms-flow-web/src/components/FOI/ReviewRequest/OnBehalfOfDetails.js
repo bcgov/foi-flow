@@ -10,10 +10,10 @@ import { formatDate } from "../../../helper/helper";
 const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
   
     const [anotherFirstNameText, setAnotherFirstName] = React.useState(!!additionalInfo.anotherFirstName ? additionalInfo.anotherFirstName : "");
-    const [anotherMiddleNameText, setAnotherMiddleName] = React.useState(!!additionalInfo.anothermiddleName ? additionalInfo.anothermiddleName : "");
-    const [anotherLastNameText, setAnotherLastName] = React.useState(!!additionalInfo.anotherastName ? additionalInfo.anotherastName : "");
-    const [anotherNickNameText, setAnotherNickName] = React.useState(!!additionalInfo.anotheralsoKnownAs ? additionalInfo.anotheralsoKnownAs : "");
-    const dob = !!additionalInfo.anotherbirthDate ? new Date(additionalInfo.anotherbirthDate) : "";
+    const [anotherMiddleNameText, setAnotherMiddleName] = React.useState(!!additionalInfo.anotherMiddleName ? additionalInfo.anotherMiddleName : "");
+    const [anotherLastNameText, setAnotherLastName] = React.useState(!!additionalInfo.anotherLastName ? additionalInfo.anotherLastName : "");
+    const [anotherNickNameText, setAnotherNickName] = React.useState(!!additionalInfo.anotherAlsoKnownAs ? additionalInfo.anotherAlsoKnownAs : "");
+    const dob = !!additionalInfo.anotherBirthDate ? new Date(additionalInfo.anotherBirthDate) : "";
     const dobString = formatDate(dob);
     const [anotherDOBText, setAnotherDOB] = React.useState(dobString);
     
@@ -45,6 +45,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
                             variant="outlined" 
                             value={anotherFirstNameText}
                             onChange={handleFirtNameChange}
+                            fullWidth
                         />
                         <TextField                          
                             label="Middle Name" 
@@ -52,6 +53,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
                             value={anotherMiddleNameText}
                             variant="outlined" 
                             onChange={handleMiddleNameChange}
+                            fullWidth
                         />
                         <TextField                           
                             label="Last Name" 
@@ -59,6 +61,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
                             value={anotherLastNameText}
                             variant="outlined"
                             onChange={handleLastNameChange}
+                            fullWidth
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col"> 
@@ -68,6 +71,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
                             value={anotherNickNameText}
                             variant="outlined" 
                             onChange={handleNickNameChange}
+                            fullWidth
                         />                       
                         <TextField                
                             label="Date of Birth"
@@ -77,7 +81,8 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
                             InputLabelProps={{
                             shrink: true,
                             }}
-                            variant="outlined" 
+                            variant="outlined"
+                            fullWidth
                         />                   
                         <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>

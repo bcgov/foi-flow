@@ -50,6 +50,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                       variant="outlined" 
                       value={personalHealthNumberText}
                       onChange={handlePersonalHealthNumber}
+                      fullWidth
                   />                 
                   <TextField                
                             label="Date of Birth"
@@ -60,6 +61,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                             shrink: true,
                             }}
                             variant="outlined" 
+                            fullWidth
                         />
                   
                   <TextField                            
@@ -68,6 +70,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                       variant="outlined"
                       value={identityVerifiedText}
                       onChange={handleIdentityVerified}
+                      fullWidth
                   />                                                
               </div>
               <div className="col-lg-6 foi-details-col">
@@ -77,6 +80,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                       variant="outlined" 
                       value={correctionsNumberText}
                       onChange={handleCorrectionsNumber}
+                      fullWidth
                   /> 
                   <TextField                            
                       label="Employee Number" 
@@ -84,6 +88,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                       variant="outlined" 
                       value={employeeNumberText}
                       onChange={handleEmployeeNumber}
+                      fullWidth
                   />                 
               </div>
           </div> 

@@ -89,6 +89,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             fullWidth
                             required
                             error={selectedRequestType.toLowerCase().includes("select")}
+                            fullWidth
                         >            
                         {requestTypes}
                         </TextField> 
@@ -104,6 +105,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             fullWidth
                             required
                             error={selectedReceivedMode.toLowerCase().includes("select")}
+                            fullWidth
                         >            
                         {receivedModes}
                         </TextField> 
@@ -119,6 +121,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             fullWidth
                             required
                             error={selectedDeliveryMode.toLowerCase().includes("select")}
+                            fullWidth
                         >            
                         {deliveryModes}
                         </TextField> 
@@ -135,6 +138,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined" 
                             required
                             error={receivedDateText === undefined}
+                            fullWidth
                         />
                         <TextField                
                             label="Start Date"
@@ -147,6 +151,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined" 
                             required
                             error={startDateText === undefined}
+                            fullWidth
                         />
                         <TextField                
                             label="Due Date"
@@ -158,6 +163,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined" 
                             required
                             disabled
+                            fullWidth
                         />
                     </div>
                 </div>                

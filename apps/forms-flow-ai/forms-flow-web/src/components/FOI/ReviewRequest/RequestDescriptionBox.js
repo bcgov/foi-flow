@@ -13,22 +13,7 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: theme.spacing(1),
         marginRight: theme.spacing(1),
         width: 200,
-      },
-      btndisabled: {
-        border: 'none',
-        backgroundColor: '#eceaea',
-        color: '#FFFFFF'
-      },
-      btnenabled: {
-        border: 'none',
-        backgroundColor: '#38598A',
-        color: '#FFFFFF'
-      },
-      btnsecondaryenabled: {
-        border: '1px solid #38598A',
-        backgroundColor: '#FFFFFF',
-        color: '#38598A'
-      },
+      },      
       headingError: {
         color: "#ff0000"    
       },
@@ -38,8 +23,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 const RequestDescription = React.memo(({      
-     requestDetails, 
-     isRequieredError, 
+     requestDetails,       
      handleOnChangeRequestDescription,
      handleInitialValue
     }) => {
@@ -116,6 +100,7 @@ const RequestDescription = React.memo(({
                             variant="outlined"                            
                             required
                             error={startDate === undefined}
+                            fullWidth
                         />
 
                         <TextField                
@@ -131,6 +116,7 @@ const RequestDescription = React.memo(({
                             variant="outlined"                            
                             required
                             error={endDate === undefined}
+                            fullWidth
                         />                                                                
                     </div>
                     </div>
@@ -146,16 +132,17 @@ const RequestDescription = React.memo(({
                         InputLabelProps={{ shrink: true, }} 
                         onChange={handleRequestDescriptionChange}
                         error={requestDescriptionText===""}
+                        fullWidth
                      />        
                     </div>                   
                     <MinistriesList ministries={checkboxItems} handleMinistrySelected={handleMinistrySelected} handleOnChange={handleOnChange}/>
                     
-                    <div className="foi-requestdescription-button-group">
+                    {/* <div className="foi-requestdescription-button-group">
                         <button type="button" className={`btn btn-bottom ${classes.btnenabled}`}>Save Updated Description</button>
                         <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}  >Split Request</button>
                         <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}  >Redirect in Full</button>
       
-                    </div>
+                    </div> */}
             </CardContent>
         </Card>
        

@@ -79,6 +79,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={homePhoneText}
                             onChange={handleHomePhoneChange}
+                            fullWidth
                         />
                         <TextField 
                             id="outlined-mobilePhone" 
@@ -87,6 +88,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={mobilePhoneText}
                             onChange={handleMobilePhoneChange}
+                            fullWidth
                         />
                         <TextField 
                             id="outlined-streetAddress" 
@@ -95,6 +97,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={streetAddressText}
                             onChange={handleStreetAddressChange}
+                            fullWidth
                         />
                         <TextField 
                             id="outlined-city" 
@@ -103,6 +106,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={CityText}
                             onChange={handleCityChange}
+                            fullWidth
                         />
                         <TextField 
                             id="outlined-postalCode" 
@@ -111,6 +115,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={PostalText}
                             onChange={handlePostalChange}
+                            fullWidth
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col">                       
@@ -121,6 +126,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                            value={workPhonePrimaryText}
                            onChange={handleWorkPhonePrimaryChange}
+                           fullWidth
                         />
                         <TextField 
                             id="outlined-workPhone2" 
@@ -129,6 +135,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={workPhoneSecondaryText}
                             onChange={handleWorkPhoneSecondarChange}
+                            fullWidth
                         />
                         <TextField 
                             id="outlined-scondaryStreetAddress" 
@@ -137,6 +144,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={secondaryStreetAddressText}
                             onChange={handleScondaryStreetAddressChange}
+                            fullWidth
                         />                        
                          <TextField
                             id="province"
