@@ -40,8 +40,10 @@ const ReviewRequest = React.memo((props) => {
 
   const selectDefaultCategoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
   const selectDefaultAssignedToValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";
+  const selectDefaultRequestTypeValue = Object.entries(requestDetails).length !== 0 ? requestDetails.requestType:"Select Request Type";
   const [selectCategoryValue, setSelectCategoryValue] = React.useState(selectDefaultCategoryValue);
   const [selectAssignedToValue, setSelectAssignedToValue] = React.useState(selectDefaultAssignedToValue);
+  // const [selectRequestType, setSelectRequestType] = React.useState(selectDefaultRequestTypeValue);
 
   // const requestStartDate = Object.entries(requestDetails).length !== 0 ? new Date(requestDetails.fromDate):"";
   // const requestEndDate = Object.entries(requestDetails).length !== 0 ? new Date(requestDetails.fromDate):"";
@@ -58,8 +60,15 @@ const ReviewRequest = React.memo((props) => {
     "isMinistrySelected": false
   }  
 
+  const requestDetailsInitialValues = {
+    "requestType":"",
+    "receivedMode": "",
+    "deliveryMode": "",
+    "receivedDate": "",
+    "requestStartDate": "",
+  }
   const [requestDescriptionBoxData, setRequestDescriptionBoxData] = React.useState(requestDescriptionBoxDefaultData);
-  
+  const [requestDetailsValues, setRequestDetailsValues] = React.useState(requestDetailsInitialValues);
   const handleCategoryOnChange = (e) => {
     setSelectCategoryValue(e.target.value);
   }
@@ -96,11 +105,40 @@ const ReviewRequest = React.memo((props) => {
   const handleInitialValue = (requestDescriptionObject) => {
     setRequestDescriptionBoxData(requestDescriptionObject);
   }
+  const handleRequestDetailsInitialValue = (value) => {
+    
+    setRequestDetailsValues(value);
+  }
+
+  const handleRequestDetailsValue = (value, name) => {
+    const detailsData = {...requestDetailsValues};
+    if (name === "requestTpe") {
+      detailsData.requestType = value;    
+    // setSelectRequestType(value);
+    }
+    else if (name === "receivedMode") {     
+      detailsData.receivedMode = value;
+      
+    }
+    else if (name === "deliveryMode") {
+      detailsData.deliveryMode = value;
+    }
+    setRequestDetailsValues(detailsData);
+  }
+  console.log(`requestDetailsValues = ${JSON.stringify(requestDetailsValues)}`)
+  // const handleRequestTypeOnChange = (e) => {
+  //   setSelectRequestType(e.target.value);
+  // }
   // console.log(`descriptionData = ${JSON.stringify(requestDescriptionBoxData)}`);
   const isRequieredError = (requestDescriptionBoxData.startDate === undefined || requestDescriptionBoxData.endDate === undefined 
     || requestDescriptionBoxData.description === ""
     || selectCategoryValue.toLowerCase().includes("select") 
-    || selectAssignedToValue.toLowerCase().includes("unassigned"));
+    || selectAssignedToValue.toLowerCase().includes("unassigned")
+    || requestDetailsValues.requestType.toLowerCase().includes("select")
+    || requestDetailsValues.receivedMode.toLowerCase().includes("select")
+    || requestDetailsValues.deliveryMode.toLowerCase().includes("select")
+    || requestDetailsValues.receivedDate === undefined
+    || requestDetailsValues.requestStartDate === undefined );
 
   const classes = useStyles();
      return (
@@ -117,7 +155,7 @@ const ReviewRequest = React.memo((props) => {
           <OnBehalfOfDetails additionalInfo={requestDetails.additionalpersonalInfo} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} />
           <RequestDescriptionBox requestDetails = {requestDetails} isRequieredError = {isRequieredError} requestDescriptionBoxData={requestDescriptionBoxData} handleOnChangeRequestDescription={handleOnChangeRequestDescription} handleInitialValue={handleInitialValue} />
-          <RequestDetails  requestDetails={requestDetails}/>
+          <RequestDetails  requestDetails={requestDetails} requestDetailsValues={requestDetailsValues} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue}/>
           {requestDetails.additionalpersonalInfo !== undefined ?
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalpersonalInfo}/>: null }
           <RequestNotes />
