@@ -105,3 +105,86 @@ export const setFOIProgramAreaList = (data) => dispatch =>{
         payload:data
     })
 }
+
+export const setIsRequiredError = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_IS_REQUIRED_ERROR,
+        payload:data
+    })
+}
+export const setRequiredFields = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUIRED_FIELDS,
+        payload:data
+    })
+}
+
+export const setAssignedTo = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SELECTED_ASSIGNED_TO,
+        payload:data
+    })
+}
+
+export const setRequestType = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SELECTED_REQUEST_TYPE,
+        payload:data
+    })
+}
+
+export const setReceivedMode = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SELECTED_RECEIVED_MODE,
+        payload:data
+    })
+}
+
+export const setDeliveryMode = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SELECTED_DELIVERY_MODE,
+        payload:data
+    })
+}
+
+export const setRequestDescription = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION,
+        payload:data
+    })
+}
+
+export const setStartDate = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_START_DATE,
+        payload:data
+    })
+}
+
+export const setEndDate = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_END_DATE,
+        payload:data
+    })
+}
+
+export const setReceivedDate = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_RECEIVED_DATE,
+        payload:data
+    })
+}
+
+export const setRequestStartDate = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_START_DATE,
+        payload:data
+    })
+}
+
+export const setIsMinistrySelected = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_IS_MINISTRY_SELECTED,
+        payload:data
+    })
+}

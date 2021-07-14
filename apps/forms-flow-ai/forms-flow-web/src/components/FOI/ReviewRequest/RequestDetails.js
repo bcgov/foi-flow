@@ -50,9 +50,9 @@ const RequestDetails = React.memo(({requestDetails}) => {
             {/* <form className={classes.root} noValidate autoComplete="off"> */}
                 <div className="row foi-applicant-details-row">
                     <div className="col-lg-6 foi-applicant-details-col">
-                    <SelectWithLegend selectData = {requestType} legend="Request Type" selectDefault={selectedRequestType}required={true}/>
-                    <SelectWithLegend selectData = {receivedMode} legend="Received Mode" selectDefault="Select Received Mode" required={true}/>
-                    <SelectWithLegend selectData = {deliveryMode} legend="Delivery Mode" selectDefault="Select Delivery Mode" required={true}/>                                        
+                    <SelectWithLegend id="requestType" selectData = {requestType} legend="Request Type" selectDefault={selectedRequestType}required={true}/>
+                    <SelectWithLegend id="receivedMode" selectData = {receivedMode} legend="Received Mode" selectDefault="Select Received Mode" required={true}/>
+                    <SelectWithLegend id="deliveryMode" selectData = {deliveryMode} legend="Delivery Mode" selectDefault="Select Delivery Mode" required={true}/>                                        
                     </div>
                     <div className="col-lg-6 foi-applicant-details-col"> 
                     <TextField                

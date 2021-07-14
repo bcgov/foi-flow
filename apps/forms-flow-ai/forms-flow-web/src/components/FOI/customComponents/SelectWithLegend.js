@@ -5,10 +5,13 @@ import TextField from '@material-ui/core/TextField';
 import './selectwithlegend.scss';
 import { useDispatch } from "react-redux";
 import {
-  setFOISelectedCategory
+  setFOISelectedCategory,
+  setIsRequiredError,
+  setRequiredFields
 } from "../../../actions/FOI/foiRequestActions";
 
 const SelectWithLegend = React.memo(({
+  id,
   selectData,
   selectDefault,
   legend,
@@ -22,9 +25,25 @@ const SelectWithLegend = React.memo(({
    const [selectValue, setSelectValue] = React.useState(selectDefault);   
     const handleChange = (event) => {   
       setSelectValue(event.target.value);
-      if (legend === "Category") {
+      if (id === "category") {
         dispatch(setFOISelectedCategory(event.target.value));
+        dispatch(setRequiredFields({property:id, value:event.target.value}));
       }
+      // else if (id === "assignedTo") {
+
+      // }
+      // else if (id === "requestType") {
+
+      // }
+      // else if (id === "receivedMode") {
+
+      // }
+      // else if (id === "deliveryMode") {
+
+      // }
+      else {
+        dispatch(setRequiredFields({property:id, value:event.target.value}));   
+      }      
     };
 
 //     const [isError, setIsError] = React.useState((legend === "Assigned To" || legend==="Category" || legend === "Request Type" || legend === "Received Mode" || legend === "Delivery Mode") && selectValue.toLowerCase().includes("select"));
@@ -33,6 +52,7 @@ const SelectWithLegend = React.memo(({
    
      return (
         <TextField
+          id={id}
           label={legend}
           InputLabelProps={{ shrink: true, }}          
           select

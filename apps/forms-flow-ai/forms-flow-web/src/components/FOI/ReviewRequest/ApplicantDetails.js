@@ -4,6 +4,8 @@ import "./applicantdetails.scss";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Input from '@material-ui/core/Input';
 import { useSelector } from "react-redux";
 import { SelectWithLegend } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const ApplicantDetails = React.memo(({requestDetails}) => {  
+const ApplicantDetails = React.memo(({requestDetails, selectCategoryValue, handleCategoryOnChange}) => {  
 
   
         const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
@@ -48,8 +50,12 @@ const ApplicantDetails = React.memo(({requestDetails}) => {
         setEmail(e.target.value);
     }
     
+    const menuItems = category.map((item) => {    
+        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+     });
     
     const classes = useStyles();
+    // const [selectValue, setSelectValue] = React.useState(selectDefaultValue);   
      return (
         
         <Card className="foi-applicant-details-card">            
@@ -69,7 +75,7 @@ const ApplicantDetails = React.memo(({requestDetails}) => {
                         <TextField                          
                             label="Applicant Middle Name" 
                             InputLabelProps={{ shrink: true, }} 
-                           value={applicantMiddleNameText}
+                            value={applicantMiddleNameText}
                             variant="outlined"
                             fullWidth
                             onChange={handleMiddleNameChange}
@@ -93,8 +99,22 @@ const ApplicantDetails = React.memo(({requestDetails}) => {
                             fullWidth
                             onChange={handleOrganizationChange}
                         /> 
-                        <SelectWithLegend selectData = {category} legend="Category" selectDefault={selectDefaultValue} required={true}/>
-                       
+                        {/* <SelectWithLegend id="category" selectData = {category} legend="Category" selectDefault={selectDefaultValue} required={true} onSelectChange={}/> */}
+                        <TextField
+                            id="category"
+                            label="Category"
+                            InputLabelProps={{ shrink: true, }}          
+                            select
+                            value={selectCategoryValue}
+                            onChange={handleCategoryOnChange}
+                            input={<Input />} 
+                            variant="outlined"
+                            fullWidth
+                            required
+                            error={selectCategoryValue.toLowerCase().includes("select")}
+                        >            
+                        {menuItems}
+                        </TextField> 
                         <TextField                           
                             label="Email" 
                             InputLabelProps={{ shrink: true, }} 

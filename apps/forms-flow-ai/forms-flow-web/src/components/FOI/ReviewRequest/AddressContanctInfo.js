@@ -132,8 +132,8 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             value={secondaryStreetAddressText}
                             onChange={handleScondaryStreetAddressChange}
                         />                        
-                         <SelectWithLegend selectData = {provinceList} legend="Province" selectDefault={provinceText} required={false}/>
-                         <SelectWithLegend selectData = {countryList} legend="Country" selectDefault={countryText} required={false}/>
+                         <SelectWithLegend id="province" selectData = {provinceList} legend="Province" selectDefault={provinceText} required={false}/>
+                         <SelectWithLegend id="country" selectData = {countryList} legend="Country" selectDefault={countryText} required={false}/>
                     </div>
                 </div> 
                 {/* </form>              */}

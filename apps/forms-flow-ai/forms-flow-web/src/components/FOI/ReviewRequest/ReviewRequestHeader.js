@@ -2,17 +2,23 @@ import React, {useEffect} from 'react';
 import Link from '@material-ui/core/Link';
 import { useSelector } from "react-redux";
 import "./reviewrequestheader.scss";
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Input from '@material-ui/core/Input';
 
 import { SelectWithLegend } from '../customComponents';
 
-const ReviewRequestHeader = React.memo((props) => {
+const ReviewRequestHeader = React.memo(({selectAssignedToValue, handleAssignedToOnChange}) => {
   
     useEffect(() => {       
         //console.log(`formdata = ${props.location.state.reviewRequestData}`)
     }, [])
 
+   
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
-
+    const menuItems = assignedToList.map((item) => {    
+        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("unassigned")}>{item.name}</MenuItem> )
+     });
     const preventDefault = (event) => event.preventDefault();
 
      return (
@@ -34,7 +40,22 @@ const ReviewRequestHeader = React.memo((props) => {
             
             <div className="foi-assigned-to-container">
                 <div className="foi-assigned-to-inner-container">
-                <SelectWithLegend selectData = {assignedToList} legend="Assigned To" selectDefault="Select User" required={true} />                
+                {/* <SelectWithLegend id="assignedTo" selectData = {assignedToList} legend="Assigned To" selectDefault="Unassigned" required={true} />                 */}
+                <TextField
+                    id="assignedTo"
+                    label="Assigned To"
+                    InputLabelProps={{ shrink: true, }}          
+                    select
+                    value={selectAssignedToValue}
+                    onChange={handleAssignedToOnChange}
+                    input={<Input />} 
+                    variant="outlined"
+                    fullWidth
+                    required
+                    error={selectAssignedToValue.toLowerCase().includes("unassigned")}
+                >            
+                    {menuItems}
+                </TextField> 
                 </div>
             </div>
         </div>

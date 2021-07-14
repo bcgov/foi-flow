@@ -31,18 +31,20 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({selectedCategory}) => {
+const BottomButtonGroup = React.memo(({selectedCategory, isRequieredError}) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const returnToQueue = () => {
       dispatch(push(`/foi/dashboard`));
     }
+    // var isRequiredError = (!requiredFields.assignedTo || !requiredFields.category || !requiredFields.reqestType || !requiredFields.receivedMode || !requiredFields.deliveryMode);
+    // console.log(`isRequiredError = ${isRequiredError}`)  
      return (
     <div className={classes.root}>
       <div className="foi-bottom-button-group">
-      <button type="button" className={`btn btn-bottom ${selectedCategory === '' ? classes.btndisabled : classes.btnenabled}`} disabled={selectedCategory===''} >Open Request</button>
-      
-      <button type="button" className={`btn btn-bottom ${selectedCategory === '' ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={selectedCategory===''}>Save</button>
+      {/* <button type="button" className={`btn btn-bottom ${selectedCategory === '' ? classes.btndisabled : classes.btnenabled}`} disabled={selectedCategory===''} >Open Request</button> */}
+      <button type="button" className={`btn btn-bottom ${isRequieredError  ? classes.btndisabled : classes.btnenabled}`} disabled={isRequieredError} >Open Request</button>
+      <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}>Save</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>
       
       </div>

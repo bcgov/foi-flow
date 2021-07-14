@@ -28,26 +28,57 @@ const useStyles = makeStyles((theme) => ({
         border: '1px solid #38598A',
         backgroundColor: '#FFFFFF',
         color: '#38598A'
+      },
+      headingError: {
+        color: "#ff0000"    
+      },
+      headingNormal: {
+        color: "000000"
       }
   }));
 
-
-const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
-   
-    const classes = useStyles();
+const RequestDescription = React.memo(({
+     requestDescriptionBoxData, 
+     requestDetails, 
+     isRequieredError, 
+     handleOnChangeRequestDescription,
+     handleInitialValue
+    }) => {
     const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);
+    const [checkboxItems, setCheckboxItems] = React.useState(ministries);
+    // console.log(`ministries = ${JSON.stringify(ministries)}`)
+    React.useEffect(() => {
+        const descriptionObject = {
+            "startDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),
+            "endDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),
+            "description": !!requestDetails.description ? requestDetails.description : "",
+            "isMinistrySelected": !!requestDetails.selectedMinistries
+        }    
+        handleInitialValue(descriptionObject);
+    },[])
+    React.useEffect(() => {      
+        setCheckboxItems(ministries);       
+    },[ministries])
+    
+    const classes = useStyles();
+    // const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);
     
     const [startDate, setStartDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
     const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
+    // const startDate = moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD")
+    // const endDate = moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD")
+    // const requestDescriptionText = !!requestDetails.description ? requestDetails.description : "";
+    // console.log(`descStartDate: ${startDate}`)
+    
     
     if(selectedMinistries !== "") {
         const selectedList = selectedMinistries.map(element => element.code);
          ministries.map(ministry => {
             ministry.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === ministry.bcgovcode);           
        });      
-    }
+    }    
     const [errors, setErrors] = React.useState([]);
     const validate = (validations) => {
         // let temp = {};
@@ -57,14 +88,26 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
     }
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
+        handleOnChangeRequestDescription(event.target.value, "startDate");
     };      
     const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
+        handleOnChangeRequestDescription(event.target.value, "endDate");
     };
     const handleRequestDescriptionChange = (event) => {
         setRequestDescription(event.target.value);
+        handleOnChangeRequestDescription(event.target.value, "description");
     };
 
+    const handleMinistrySelected = (isSelected) => {
+        // console.log(`newCheckboxes = ${JSON.stringify(newCheckboxes)}`);
+        // setCheckboxItems(newCheckboxes);
+        handleOnChangeRequestDescription(isSelected, "isMinistrySelected");
+    }
+
+    const handleOnChange = (newCheckboxes) => {
+        setCheckboxItems(newCheckboxes);
+    }
     const isRequired = (val) => {
         console.log(`val = ${val}`);
         return val.length > 0 ? "":"cannot be blank";
@@ -131,11 +174,12 @@ const RequestDescription = React.memo(({selectedCategory, requestDetails}) => {
                     <div className='has-error'>
                         {errors}
                     </div>
-                    <MinistriesList ministries={ministries}/>
+                    <MinistriesList ministries={checkboxItems} handleMinistrySelected={handleMinistrySelected} handleOnChange={handleOnChange}/>
+                    
                     <div className="foi-requestdescription-button-group">
                         <button type="button" className={`btn btn-bottom ${classes.btnenabled}`}>Save Updated Description</button>
-                        <button type="button" className={`btn btn-bottom ${selectedCategory === '' ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={selectedCategory === ''}  >Split Request</button>
-                        <button type="button" className={`btn btn-bottom ${selectedCategory === '' ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={selectedCategory === ''}  >Redirect in Full</button>
+                        <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}  >Split Request</button>
+                        <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}  >Redirect in Full</button>
       
                     </div>
                    
