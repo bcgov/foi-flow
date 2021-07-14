@@ -1,24 +1,14 @@
-import React, {useEffect} from 'react';
-import "./requestdetails.scss";
+import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { useSelector } from "react-redux";
-import { SelectWithLegend } from '../customComponents';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { makeStyles } from '@material-ui/core/styles';
 import { formatDate } from "../../../helper/helper";
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-      '& .MuiTextField-root': {
-        margin: theme.spacing(1),
-        width: '25ch',
-      },
-    },
-  }));
-const RequestDetails = React.memo(({requestDetails, requestDetailsValues, handleRequestDetailsValue, handleRequestDetailsInitialValue}) => {
+
+const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue}) => {
     
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
     const receivedMode = useSelector(state=> state.foiRequests.foiReceiveModeList);
@@ -80,16 +70,13 @@ const RequestDetails = React.memo(({requestDetails, requestDetailsValues, handle
       setSelectedDeliveryMode(e.target.value);
       handleRequestDetailsValue(e.target.value, "deliveryMode");
     }
-    const classes = useStyles();
      return (
         
-        <Card className="foi-applicant-details-card">            
-            <label className="foi-applcant-details-label">REQUEST DETAILS</label>
-            <CardContent>
-            {/* <form className={classes.root} noValidate autoComplete="off"> */}
-                <div className="row foi-applicant-details-row">
-                    <div className="col-lg-6 foi-applicant-details-col">
-                    {/* <SelectWithLegend id="requestType" selectData = {requestType} legend="Request Type" selectDefault={selectedRequestType}required={true}/> */}
+        <Card className="foi-details-card">            
+            <label className="foi-details-label">REQUEST DETAILS</label>
+            <CardContent>            
+                <div className="row foi-details-row">
+                    <div className="col-lg-6 foi-details-col">
                     <TextField
                             id="requestType"
                             label="Request Type"
@@ -105,7 +92,6 @@ const RequestDetails = React.memo(({requestDetails, requestDetailsValues, handle
                         >            
                         {requestTypes}
                         </TextField> 
-                    {/* <SelectWithLegend id="receivedMode" selectData = {receivedMode} legend="Received Mode" selectDefault="Select Received Mode" required={true}/> */}
                     <TextField
                             id="receivedMode"
                             label="Received Mode"
@@ -121,7 +107,6 @@ const RequestDetails = React.memo(({requestDetails, requestDetailsValues, handle
                         >            
                         {receivedModes}
                         </TextField> 
-                    {/* <SelectWithLegend id="deliveryMode" selectData = {deliveryMode} legend="Delivery Mode" selectDefault="Select Delivery Mode" required={true}/>                                         */}
                     <TextField
                             id="deliveryMode"
                             label="Delivery Mode"
@@ -138,7 +123,7 @@ const RequestDetails = React.memo(({requestDetails, requestDetailsValues, handle
                         {deliveryModes}
                         </TextField> 
                     </div>
-                    <div className="col-lg-6 foi-applicant-details-col"> 
+                    <div className="col-lg-6 foi-details-col"> 
                     <TextField                
                             label="Received Date"
                             type="date" 
@@ -166,8 +151,7 @@ const RequestDetails = React.memo(({requestDetails, requestDetailsValues, handle
                         <TextField                
                             label="Due Date"
                             type="date" 
-                            value={dueDateString} 
-                            // onChange={handleDOBChange}
+                            value={dueDateString}                            
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -176,8 +160,7 @@ const RequestDetails = React.memo(({requestDetails, requestDetailsValues, handle
                             disabled
                         />
                     </div>
-                </div> 
-                {/* </form>              */}
+                </div>                
             </CardContent>
         </Card>
        

@@ -3,21 +3,12 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import './additionalapplicantdetails.scss';
-import { makeStyles } from '@material-ui/core/styles';
-import { DateTimeWithLegend } from '../customComponents';
 import { formatDate } from "../../../helper/helper";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-      width: '25ch',
-    },
-  },
-}));
+
 
 const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
-    const classes = useStyles();
+
   
     const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(!!additionalInfo.personalHealthNumber ? additionalInfo.personalHealthNumber : "0000 000 00");
     const [identityVerifiedText, setIdentityVerified] = React.useState(!!additionalInfo.identityVerified ? additionalInfo.identityVerified : "");  
@@ -48,20 +39,18 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
   }
 
      return (
-      <Card className="foi-child-details-card">            
-      <label className="foi-child-details-label">ADDITIONAL APPLICANT DETAILS</label>
-      <CardContent>
-      {/* <form className={classes.root} noValidate autoComplete="off"> */}
-          <div className="row foi-child-details-row">
-              <div className="col-lg-6 foi-child-details-col">                       
+      <Card className="foi-details-card">            
+      <label className="foi-details-label">ADDITIONAL APPLICANT DETAILS</label>
+      <CardContent>     
+          <div className="row foi-details-row">
+              <div className="col-lg-6 foi-details-col">                       
                   <TextField                            
                       label="Personal Health Number" 
                       InputLabelProps={{ shrink: true, }} 
                       variant="outlined" 
                       value={personalHealthNumberText}
                       onChange={handlePersonalHealthNumber}
-                  />
-                  {/* <DateTimeWithLegend dateData = {dateData} /> */}
+                  />                 
                   <TextField                
                             label="Date of Birth"
                             type="date" 
@@ -81,7 +70,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                       onChange={handleIdentityVerified}
                   />                                                
               </div>
-              <div className="col-lg-6 foi-child-details-col">
+              <div className="col-lg-6 foi-details-col">
                   <TextField                            
                       label="Corrections Number" 
                       InputLabelProps={{ shrink: true, }} 
@@ -95,12 +84,10 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
                       variant="outlined" 
                       value={employeeNumberText}
                       onChange={handleEmployeeNumber}
-                  /> 
-                  {/* <DateTimeWithLegend dateData = {dateData} /> 
-                  <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel> */}
+                  />                 
               </div>
           </div> 
-          {/* </form>              */}
+
       </CardContent>
   </Card>
     );

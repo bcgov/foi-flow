@@ -1,6 +1,5 @@
 import React, { useEffect }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import moment from 'moment';
 import './reviewrequest.scss';
 import ReviewRequestHeader from './ReviewRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -28,9 +27,7 @@ const useStyles = makeStyles((theme) => ({
 const ReviewRequest = React.memo((props) => {
   const {requestId} = useParams();
   const selectedCategory = useSelector(state=> state.foiRequests.foiSelectedCategory);
-  const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);  
-  const requiredFields = useSelector(state=> state.foiRequests.foirequiredFields);
-
+  const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail); 
   const dispatch = useDispatch(); 
   useEffect(()=>{    
     dispatch(fetchFOIRequestDetails(requestId));   
@@ -39,8 +36,7 @@ const ReviewRequest = React.memo((props) => {
   },[requestId, dispatch]);
 
   const selectDefaultCategoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
-  const selectDefaultAssignedToValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";
-  const selectDefaultRequestTypeValue = Object.entries(requestDetails).length !== 0 ? requestDetails.requestType:"Select Request Type";
+  const selectDefaultAssignedToValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
   const [selectCategoryValue, setSelectCategoryValue] = React.useState(selectDefaultCategoryValue);
   const [selectAssignedToValue, setSelectAssignedToValue] = React.useState(selectDefaultAssignedToValue);
   // const [selectRequestType, setSelectRequestType] = React.useState(selectDefaultRequestTypeValue);
@@ -125,11 +121,8 @@ const ReviewRequest = React.memo((props) => {
     }
     setRequestDetailsValues(detailsData);
   }
-  console.log(`requestDetailsValues = ${JSON.stringify(requestDetailsValues)}`)
-  // const handleRequestTypeOnChange = (e) => {
-  //   setSelectRequestType(e.target.value);
-  // }
-  // console.log(`descriptionData = ${JSON.stringify(requestDescriptionBoxData)}`);
+  // console.log(`requestDetailsValues = ${JSON.stringify(requestDetailsValues)}`) 
+
   const isRequieredError = (requestDescriptionBoxData.startDate === undefined || requestDescriptionBoxData.endDate === undefined 
     || requestDescriptionBoxData.description === ""
     || selectCategoryValue.toLowerCase().includes("select") 
@@ -154,13 +147,13 @@ const ReviewRequest = React.memo((props) => {
            {requestDetails.additionalpersonalInfo !== undefined && requestDetails.additionalpersonalInfo.anotherFirstName !== undefined ?
           <OnBehalfOfDetails additionalInfo={requestDetails.additionalpersonalInfo} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} />
-          <RequestDescriptionBox requestDetails = {requestDetails} isRequieredError = {isRequieredError} requestDescriptionBoxData={requestDescriptionBoxData} handleOnChangeRequestDescription={handleOnChangeRequestDescription} handleInitialValue={handleInitialValue} />
-          <RequestDetails  requestDetails={requestDetails} requestDetailsValues={requestDetailsValues} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue}/>
+          <RequestDescriptionBox requestDetails = {requestDetails} isRequieredError = {isRequieredError} handleOnChangeRequestDescription={handleOnChangeRequestDescription} handleInitialValue={handleInitialValue} />
+          <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue}/>
           {requestDetails.additionalpersonalInfo !== undefined ?
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalpersonalInfo}/>: null }
           <RequestNotes />
           
-          <BottomButtonGroup selectedCategory = {selectedCategory} isRequieredError = {isRequieredError}/>
+          <BottomButtonGroup isRequieredError = {isRequieredError}/>
           </>
            ): null}
            </form>

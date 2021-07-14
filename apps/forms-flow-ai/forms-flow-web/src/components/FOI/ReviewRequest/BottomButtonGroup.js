@@ -31,14 +31,12 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({selectedCategory, isRequieredError}) => {
+const BottomButtonGroup = React.memo(({isRequieredError}) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const returnToQueue = () => {
       dispatch(push(`/foi/dashboard`));
-    }
-    // var isRequiredError = (!requiredFields.assignedTo || !requiredFields.category || !requiredFields.reqestType || !requiredFields.receivedMode || !requiredFields.deliveryMode);
-    // console.log(`isRequiredError = ${isRequiredError}`)  
+    }    
      return (
     <div className={classes.root}>
       <div className="foi-bottom-button-group">

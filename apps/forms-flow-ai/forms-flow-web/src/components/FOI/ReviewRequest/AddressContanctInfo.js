@@ -1,20 +1,11 @@
-import React, {useEffect} from 'react';
-import "./addresscontactinfo.scss";
+import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
-import { makeStyles } from '@material-ui/core/styles';
 import { SelectWithLegend } from '../customComponents';
 import { useSelector } from "react-redux";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-      width: '25ch',
-    },
-  },
-}));
+
 const AddressContactDetails = React.memo(({requestDetails}) => {
     const countryList = useSelector(state=> state.foiRequests.foiCountryList);
     const provinceList = useSelector(state=> state.foiRequests.foiProvinceList);
@@ -57,15 +48,14 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
     const handlePostalChange = (e) => {
         setPostal(e.target.value);
     }
-    const classes = useStyles();
+
      return (
         
-        <Card className="foi-address-details-card">            
-            <label className="foi-address-details-label">ADDRESS AND CONTACT INFORMATION</label>
-            <CardContent>
-            {/* <form className={classes.root} noValidate autoComplete="off"> */}
-                <div className="row foi-address-details-row">
-                    <div className="col-lg-6 foi-address-details-col">                       
+        <Card className="foi-details-card">            
+            <label className="foi-details-label">ADDRESS AND CONTACT INFORMATION</label>
+            <CardContent>         
+                <div className="row foi-details-row">
+                    <div className="col-lg-6 foi-details-col">                       
                         <TextField 
                             id="outlined-homePhone" 
                             label="Home Phone" 
@@ -107,7 +97,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             onChange={handlePostalChange}
                         />                                                
                     </div>
-                    <div className="col-lg-6 foi-address-details-col">                       
+                    <div className="col-lg-6 foi-details-col">                       
                     <TextField 
                             id="outlined-workPhone1" 
                             label="Work Phone" 
@@ -135,8 +125,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                          <SelectWithLegend id="province" selectData = {provinceList} legend="Province" selectDefault={provinceText} required={false}/>
                          <SelectWithLegend id="country" selectData = {countryList} legend="Country" selectDefault={countryText} required={false}/>
                     </div>
-                </div> 
-                {/* </form>              */}
+                </div>               
             </CardContent>
         </Card>
        

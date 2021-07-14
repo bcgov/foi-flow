@@ -37,8 +37,7 @@ const useStyles = makeStyles((theme) => ({
       }
   }));
 
-const RequestDescription = React.memo(({
-     requestDescriptionBoxData, 
+const RequestDescription = React.memo(({      
      requestDetails, 
      isRequieredError, 
      handleOnChangeRequestDescription,
@@ -61,16 +60,12 @@ const RequestDescription = React.memo(({
     },[ministries])
     
     const classes = useStyles();
-    // const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);
-    
+    // const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);    
     const [startDate, setStartDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
     const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
-    // const startDate = moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD")
-    // const endDate = moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD")
-    // const requestDescriptionText = !!requestDetails.description ? requestDetails.description : "";
-    // console.log(`descStartDate: ${startDate}`)
+  
     
     
     if(selectedMinistries !== "") {
@@ -78,13 +73,6 @@ const RequestDescription = React.memo(({
          ministries.map(ministry => {
             ministry.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === ministry.bcgovcode);           
        });      
-    }    
-    const [errors, setErrors] = React.useState([]);
-    const validate = (validations) => {
-        // let temp = {};
-        // temp.description = requestDescriptionText? "":"Request Description feild is required.";
-        // setErrors({...temp});
-        setErrors(validations.map(errorFor => errorFor(requestDescriptionText)));
     }
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
@@ -108,32 +96,23 @@ const RequestDescription = React.memo(({
     const handleOnChange = (newCheckboxes) => {
         setCheckboxItems(newCheckboxes);
     }
-    const isRequired = (val) => {
-        console.log(`val = ${val}`);
-        return val.length > 0 ? "":"cannot be blank";
-    }
-    
-    
      return (
         
-        <Card className="foi-request-description-card">            
-            <label className="foi-request-description-label">REQUEST DESCRIPTION</label>
+        <Card className="foi-details-card">            
+            <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
-            {/* <form className={classes.root} noValidate autoComplete="off"> */}
-                <div className="row foi-request-description-row">
-                    <div className="col-lg-10 foi-request-description-row1">
+                <div className="row foi-details-row">
+                    <div className="col-lg-10 foi-request-description-row">
                         <h3>Date Range for Record Search</h3>
                         <TextField                
                             label="Start Date"
-                            type="date"                
-                            // defaultValue={dateData.value}                
+                            type="date"
                             value={startDate}        
                             className={classes.textField}
                             onChange={handleStartDateChange}
                             InputLabelProps={{
                             shrink: true,
-                            }}
-                            // InputProps={{inputProps: { min: "2001-04-21", max: "2020-05-04"} }}
+                            }}    
                             variant="outlined"                            
                             required
                             error={startDate === undefined}
@@ -141,8 +120,7 @@ const RequestDescription = React.memo(({
 
                         <TextField                
                             label="End Date"
-                            type="date"                
-                            // defaultValue={dateData.value}                
+                            type="date" 
                             value={endDate}        
                             className={classes.textField}
                             onChange={handleEndDateChange}
@@ -167,13 +145,9 @@ const RequestDescription = React.memo(({
                         variant="outlined"
                         InputLabelProps={{ shrink: true, }} 
                         onChange={handleRequestDescriptionChange}
-                        // onBlur={() => { validate([isRequired])}}  
                         error={requestDescriptionText===""}
                      />        
-                    </div>
-                    <div className='has-error'>
-                        {errors}
-                    </div>
+                    </div>                   
                     <MinistriesList ministries={checkboxItems} handleMinistrySelected={handleMinistrySelected} handleOnChange={handleOnChange}/>
                     
                     <div className="foi-requestdescription-button-group">
@@ -182,8 +156,6 @@ const RequestDescription = React.memo(({
                         <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}  >Redirect in Full</button>
       
                     </div>
-                   
-                {/* </form>              */}
             </CardContent>
         </Card>
        

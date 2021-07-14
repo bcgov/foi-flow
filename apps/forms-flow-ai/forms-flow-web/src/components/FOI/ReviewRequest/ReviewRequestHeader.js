@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Link from '@material-ui/core/Link';
 import { useSelector } from "react-redux";
 import "./reviewrequestheader.scss";
@@ -6,14 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 
-import { SelectWithLegend } from '../customComponents';
 
 const ReviewRequestHeader = React.memo(({selectAssignedToValue, handleAssignedToOnChange}) => {
-  
-    useEffect(() => {       
-        //console.log(`formdata = ${props.location.state.reviewRequestData}`)
-    }, [])
-
    
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
     const menuItems = assignedToList.map((item) => {    
