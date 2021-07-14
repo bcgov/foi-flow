@@ -26,7 +26,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       }
       // const requestTpeValue = !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type";        
       handleRequestDetailsInitialValue(requestDetailsObject);
-  },[])
+  },[requestDetails])
 
     const receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
     const receivedDateString = formatDate(receivedDate);

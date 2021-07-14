@@ -2,7 +2,8 @@ import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
-import { SelectWithLegend } from '../customComponents';
+import Input from '@material-ui/core/Input';
+import MenuItem from '@material-ui/core/MenuItem';
 import { useSelector } from "react-redux";
 
 
@@ -19,9 +20,16 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
     const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState("");
     const [CityText, setCity] = React.useState(!!requestDetails.city ? requestDetails.city : "");
     const [PostalText, setPostal] = React.useState(!!requestDetails.postal ? requestDetails.postal : "");    
+    const [selectProvinceValue, setProvinceValue] = React.useState(!!requestDetails.province ? requestDetails.province : "Select Province");
+    const [selectCountryValue, setCountryValue] = React.useState(!!requestDetails.country ? requestDetails.country : "Select Country");    
+
     
-    const provinceText = !!requestDetails.province ? requestDetails.province : "Select Province";
-    const countryText = !!requestDetails.country ? requestDetails.country : "Select Country";
+    const provinceItems = provinceList.map((item) => {    
+        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+     });
+     const countryItems = countryList.map((item) => {    
+        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+     });
 
     const handleHomePhoneChange = (e) => {
         setHomePhone(e.target.value);
@@ -47,6 +55,14 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
     }
     const handlePostalChange = (e) => {
         setPostal(e.target.value);
+    }
+
+    const handleProvinceOnChange = (e) => {
+        setProvinceValue(e.target.value);
+    }
+
+    const handleCountryOnChange = (e) => {
+        setCountryValue(e.target.value);
     }
 
      return (
@@ -122,8 +138,32 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             value={secondaryStreetAddressText}
                             onChange={handleScondaryStreetAddressChange}
                         />                        
-                         <SelectWithLegend id="province" selectData = {provinceList} legend="Province" selectDefault={provinceText} required={false}/>
-                         <SelectWithLegend id="country" selectData = {countryList} legend="Country" selectDefault={countryText} required={false}/>
+                         <TextField
+                            id="province"
+                            label="Province"
+                            InputLabelProps={{ shrink: true, }}          
+                            select
+                            value={selectProvinceValue}
+                            onChange={handleProvinceOnChange}
+                            input={<Input />} 
+                            variant="outlined"
+                            fullWidth                            
+                        >            
+                            {provinceItems}
+                        </TextField> 
+                         <TextField
+                            id="country"
+                            label="Country"
+                            InputLabelProps={{ shrink: true, }}          
+                            select
+                            value={selectCountryValue}
+                            onChange={handleCountryOnChange}
+                            input={<Input />} 
+                            variant="outlined"
+                            fullWidth                            
+                        >            
+                            {countryItems}
+                        </TextField> 
                     </div>
                 </div>               
             </CardContent>

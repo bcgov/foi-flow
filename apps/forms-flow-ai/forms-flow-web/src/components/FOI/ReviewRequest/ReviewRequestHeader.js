@@ -34,7 +34,6 @@ const ReviewRequestHeader = React.memo(({selectAssignedToValue, handleAssignedTo
             
             <div className="foi-assigned-to-container">
                 <div className="foi-assigned-to-inner-container">
-                {/* <SelectWithLegend id="assignedTo" selectData = {assignedToList} legend="Assigned To" selectDefault="Unassigned" required={true} />                 */}
                 <TextField
                     id="assignedTo"
                     label="Assigned To"

@@ -54,7 +54,7 @@ const RequestDescription = React.memo(({
             "isMinistrySelected": !!requestDetails.selectedMinistries
         }    
         handleInitialValue(descriptionObject);
-    },[])
+    },[requestDetails])
     React.useEffect(() => {      
         setCheckboxItems(ministries);       
     },[ministries])
@@ -70,8 +70,8 @@ const RequestDescription = React.memo(({
     
     if(selectedMinistries !== "") {
         const selectedList = selectedMinistries.map(element => element.code);
-         ministries.map(ministry => {
-            ministry.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === ministry.bcgovcode);           
+        ministries.map(ministry => {
+           return ministry.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === ministry.bcgovcode);           
        });      
     }
     const handleStartDateChange = (event) => {

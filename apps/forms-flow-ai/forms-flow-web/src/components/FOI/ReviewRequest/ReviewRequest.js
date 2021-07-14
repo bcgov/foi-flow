@@ -25,8 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const ReviewRequest = React.memo((props) => {
-  const {requestId} = useParams();
-  const selectedCategory = useSelector(state=> state.foiRequests.foiSelectedCategory);
+  const {requestId} = useParams(); 
   const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail); 
   const dispatch = useDispatch(); 
   useEffect(()=>{    
@@ -121,7 +120,7 @@ const ReviewRequest = React.memo((props) => {
     }
     setRequestDetailsValues(detailsData);
   }
-  // console.log(`requestDetailsValues = ${JSON.stringify(requestDetailsValues)}`) 
+  console.log(`requestDetailsValues = ${JSON.stringify(requestDetailsValues)}`) 
 
   const isRequieredError = (requestDescriptionBoxData.startDate === undefined || requestDescriptionBoxData.endDate === undefined 
     || requestDescriptionBoxData.description === ""

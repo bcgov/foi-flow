@@ -1,5 +1,4 @@
 import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
-import { formatDate } from "../../helper/helper";
 
 const initialState = {
   isLoading:true,
