@@ -33,7 +33,7 @@ const RequestDescription = React.memo(({
     React.useEffect(() => {
         const descriptionObject = {
             "startDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),
-            "endDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),
+            "endDate": moment(new Date(requestDetails.toDate)).format("YYYY-MM-DD"),
             "description": !!requestDetails.description ? requestDetails.description : "",
             "isMinistrySelected": !!requestDetails.selectedMinistries
         }    
@@ -46,7 +46,7 @@ const RequestDescription = React.memo(({
     const classes = useStyles();
     // const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);    
     const [startDate, setStartDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
-    const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
+    const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.toDate)).format("YYYY-MM-DD"));
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
   

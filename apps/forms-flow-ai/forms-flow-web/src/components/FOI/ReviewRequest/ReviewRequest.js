@@ -41,7 +41,7 @@ const ReviewRequest = React.memo((props) => {
   // const [selectRequestType, setSelectRequestType] = React.useState(selectDefaultRequestTypeValue);
 
   // const requestStartDate = Object.entries(requestDetails).length !== 0 ? new Date(requestDetails.fromDate):"";
-  // const requestEndDate = Object.entries(requestDetails).length !== 0 ? new Date(requestDetails.fromDate):"";
+  // const requestEndDate = Object.entries(requestDetails).length !== 0 ? new Date(requestDetails.toDate):"";
   // const description = Object.entries(requestDetails).length !== 0 && !!requestDetails.description ? requestDetails.description : "";
   // const [startDate, setStartDate] = React.useState(moment(requestStartDate).format("YYYY-MM-DD"));
   // const [endDate, setEndDate] = React.useState(moment(requestEndDate).format("YYYY-MM-DD"));
