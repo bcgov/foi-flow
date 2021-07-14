@@ -9,11 +9,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import moment from 'moment';
 
 const useStyles = makeStyles((theme) => ({
-    textField: {
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1),
-        width: 200,
-      },      
       headingError: {
         color: "#ff0000"    
       },
@@ -86,8 +81,11 @@ const RequestDescription = React.memo(({
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
                 <div className="row foi-details-row">
-                    <div className="col-lg-10 foi-request-description-row">
-                        <h3>Date Range for Record Search</h3>
+                    <div className="col-lg-12 foi-request-description-row">
+                        <div className="col-lg-6">
+                        <h3 className="foi-date-range-h3">Date Range for Record Search</h3>
+                        </div>
+                        <div className="col-lg-6 foi-request-dates">
                         <TextField                
                             label="Start Date"
                             type="date"
@@ -101,8 +99,7 @@ const RequestDescription = React.memo(({
                             required
                             error={startDate === undefined}
                             fullWidth
-                        />
-
+                        />                       
                         <TextField                
                             label="End Date"
                             type="date" 
@@ -117,7 +114,8 @@ const RequestDescription = React.memo(({
                             required
                             error={endDate === undefined}
                             fullWidth
-                        />                                                                
+                        />  
+                        </div>                                                              
                     </div>
                     </div>
                     <div className="foi-request-description-textbox">

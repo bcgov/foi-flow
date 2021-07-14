@@ -61,7 +61,24 @@
 .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
     border-color: #f44336 !important;
 }
+.MuiInputBase-root {
+    font-family: "BCSans-Regular" !important;
+}
 
+.MuiFormLabel-root {
+    font-family: "BCSans-Bold" !important;
+    color: black !important;   
+}
+
+.MuiFormLabel-root.Mui-error {
+    font-family: "BCSans-Bold" !important;
+    color: #f44336 !important;
+
+}
+
+.PrivateNotchedOutline-legendLabelled-4 {
+    font-size: 0.80rem !important;
+}
 // .PrivateNotchedOutline-legendNotched-5 {
 //     font-family: "BCSans-Bold";
 //     color: #000000 !important;
