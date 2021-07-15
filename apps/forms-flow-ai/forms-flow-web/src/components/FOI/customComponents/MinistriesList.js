@@ -13,14 +13,15 @@ const useStyles = makeStyles((theme) => ({
 const MinistriesList = React.memo(({ministries}) => { 
     const classes = useStyles();
     const [checkboxItems, setCheckboxItems] = React.useState(ministries);
+    const [isError, setError] = React.useState(false);
     useEffect(() => {
       setCheckboxItems(ministries);
+      var isMatch = ministries.some((checkbox) => {
+        return checkbox.isChecked === true;
+      });
+      setError(!isMatch);
     },[ministries])
-
-    var isMatch = checkboxItems.some((checkbox) => {
-      return checkbox.isChecked === true;
-    });
-    const [isError, setError] = React.useState(!isMatch);
+    
     const checkSelected = () => {
       var isMatch = checkboxItems.some((checkbox) => {
         return checkbox.isChecked === true;
