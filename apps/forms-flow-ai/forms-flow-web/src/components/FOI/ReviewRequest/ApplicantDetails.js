@@ -6,9 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { useSelector } from "react-redux";
 
-const ApplicantDetails = React.memo(({requestDetails, selectCategoryValue, handleCategoryOnChange}) => {  
-
-  
+const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue, handleCategoryValue}) => {  
         const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
         const applicantMiddleName = requestDetails!==null && requestDetails.middleName !== null? requestDetails.middleName:"" ;
         const applicantLastName = requestDetails!==null && requestDetails.lastName  !== null? requestDetails.lastName:"" ;
@@ -21,7 +19,11 @@ const ApplicantDetails = React.memo(({requestDetails, selectCategoryValue, handl
         const [organizationText, setOrganization] = React.useState(organization);
         const [emailText, setEmail] = React.useState(email);
         const category = useSelector(state=> state.foiRequests.foiCategoryList);
-       
+        React.useEffect(() => {       
+            const categoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
+            handleCategoryInitialValue(categoryValue);
+        },[requestDetails, handleCategoryInitialValue])
+        const [selectedCategory, setCategoryValue] = React.useState(Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category");
     const handleFirtNameChange = (e) => {
          setApplicantFirstName(e.target.value);
     }
@@ -36,6 +38,10 @@ const ApplicantDetails = React.memo(({requestDetails, selectCategoryValue, handl
     }
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
+    }
+    const handleCategoryOnChange = (e) => {
+        setCategoryValue(e.target.value);
+        handleCategoryValue(e.target.value);
     }
     
     const menuItems = category.map((item) => {    
@@ -89,13 +95,13 @@ const ApplicantDetails = React.memo(({requestDetails, selectCategoryValue, handl
                             label="Category"
                             InputLabelProps={{ shrink: true, }}          
                             select
-                            value={selectCategoryValue}
+                            value={selectedCategory}
                             onChange={handleCategoryOnChange}
                             input={<Input />} 
                             variant="outlined"
                             fullWidth
                             required
-                            error={selectCategoryValue.toLowerCase().includes("select")}
+                            error={selectedCategory.toLowerCase().includes("select")}
                         >            
                         {menuItems}
                         </TextField> 

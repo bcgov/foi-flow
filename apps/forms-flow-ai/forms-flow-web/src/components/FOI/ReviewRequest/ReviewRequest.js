@@ -14,6 +14,7 @@ import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
 import { fetchFOIRequestDetails, fetchFOICategoryList, fetchFOIProgramAreaList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -32,10 +33,10 @@ const ReviewRequest = React.memo((props) => {
     dispatch(fetchFOIProgramAreaList());
   },[requestId, dispatch]);
 
-  const selectDefaultCategoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
-  const selectDefaultAssignedToValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
-  const [selectCategoryValue, setSelectCategoryValue] = React.useState(selectDefaultCategoryValue);
-  const [selectAssignedToValue, setSelectAssignedToValue] = React.useState(selectDefaultAssignedToValue);
+  // const selectDefaultCategoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
+  // const selectDefaultAssignedToValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
+  const [selectCategoryValue, setSelectCategoryValue] = React.useState("Select Category");
+  const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
  
   const requestDescriptionBoxDefaultData = {
     "startDate": "",
@@ -53,16 +54,9 @@ const ReviewRequest = React.memo((props) => {
   }
   const [requestDescriptionBoxData, setRequestDescriptionBoxData] = React.useState(requestDescriptionBoxDefaultData);
   const [requestDetailsValues, setRequestDetailsValues] = React.useState(requestDetailsInitialValues);
-  const handleCategoryOnChange = (e) => {
-    setSelectCategoryValue(e.target.value);
-  }
-  const handleAssignedToOnChange = (e) => {
-    setSelectAssignedToValue(e.target.value);
-  }
+  
 
   const handleOnChangeRequestDescription = (value, name) => {
-
-    console.log(`value = ${value}, name = ${name}`);
     if(name === "startDate") {
       const descriptionData = {...requestDescriptionBoxData};
       descriptionData.startDate = value;
@@ -89,32 +83,40 @@ const ReviewRequest = React.memo((props) => {
   const handleInitialValue = React.useCallback((requestDescriptionObject) => {
     setRequestDescriptionBoxData(requestDescriptionObject);
   },[])
-  const handleRequestDetailsInitialValue = React.useCallback((value) => {
-    
+  const handleRequestDetailsInitialValue = React.useCallback((value) => {    
     setRequestDetailsValues(value);
   },[])
-
+  const handleAssignedToInitialValue = React.useCallback((value) => {    
+    setAssignedToValue(value);
+  },[])
+  const handleCategoryInitialValue = React.useCallback((value) => {    
+    setSelectCategoryValue(value);
+  },[])
+  
   const handleRequestDetailsValue = (value, name) => {
     const detailsData = {...requestDetailsValues};
     if (name === "requestTpe") {
-      detailsData.requestType = value;    
-    // setSelectRequestType(value);
+      detailsData.requestType = value;
     }
-    else if (name === "receivedMode") {     
+    else if (name === "receivedMode") {
       detailsData.receivedMode = value;
-      
     }
     else if (name === "deliveryMode") {
       detailsData.deliveryMode = value;
     }
     setRequestDetailsValues(detailsData);
   }
-  // console.log(`requestDetails = ${JSON.stringify(requestDetails)}`) 
-
+  const handleAssignedToValue = (value) => {
+    setAssignedToValue(value);
+  }
+  const handleCategoryValue = (value) => {
+    setSelectCategoryValue(value);
+  }
+  
   const isRequieredError = (requestDescriptionBoxData.startDate === undefined || requestDescriptionBoxData.endDate === undefined 
     || requestDescriptionBoxData.description === ""
     || selectCategoryValue.toLowerCase().includes("select") 
-    || selectAssignedToValue.toLowerCase().includes("unassigned")
+    || assignedToValue.toLowerCase().includes("unassigned")
     || requestDetailsValues.requestType.toLowerCase().includes("select")
     || requestDetailsValues.receivedMode.toLowerCase().includes("select")
     || requestDetailsValues.deliveryMode.toLowerCase().includes("select")
@@ -125,12 +127,11 @@ const ReviewRequest = React.memo((props) => {
      return (
       <div className="container foi-review-request-container">           
         <div className="col-sm-12 col-md-12 foi-review-container">
-        <form className={classes.root} autoComplete="off">
-          {/* <GetRequestDetails getRequestDetails={getRequestDetails}/> */}
+        <form className={classes.root} autoComplete="off">        
         {requestDetails.description !== undefined ? (
           <>
-          <ReviewRequestHeader selectAssignedToValue={selectAssignedToValue} handleAssignedToOnChange={handleAssignedToOnChange} />
-          <ApplicantDetails requestDetails={requestDetails} handleCategoryOnChange={handleCategoryOnChange} selectCategoryValue={selectCategoryValue} />
+          <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue}/>
+          <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleCategoryValue={handleCategoryValue} />
           {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.childFirstName !== undefined ?
           <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo}/> : null }          
            {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.anotherFirstName !== undefined ?
