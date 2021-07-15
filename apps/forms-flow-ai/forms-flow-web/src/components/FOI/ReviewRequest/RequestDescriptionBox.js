@@ -33,7 +33,7 @@ const RequestDescription = React.memo(({
             "isMinistrySelected": !!requestDetails.selectedMinistries
         }    
         handleInitialValue(descriptionObject);
-    },[requestDetails])
+    },[requestDetails, handleInitialValue])
     React.useEffect(() => {      
         setCheckboxItems(ministries);       
     },[ministries])
