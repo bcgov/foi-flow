@@ -4,7 +4,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
-import { formatDate } from "../../../helper/helper";
+import { formatDate } from "../../../helper/FOI/helper";
 
 
 const OnBehalfOfDetails = React.memo(({additionalInfo}) => {

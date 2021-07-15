@@ -10,7 +10,7 @@ import {
   clearRequestDetails,
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
-import {replaceUrl} from "../../../helper/helper";
+import {replaceUrl} from "../../../helper/FOI/helper";
 
 export const fetchFOIRequestList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
