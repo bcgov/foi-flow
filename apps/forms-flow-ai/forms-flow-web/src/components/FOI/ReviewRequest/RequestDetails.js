@@ -26,7 +26,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       }
       // const requestTpeValue = !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type";        
       handleRequestDetailsInitialValue(requestDetailsObject);
-  },[requestDetails])
+  },[requestDetails, handleRequestDetailsInitialValue])
 
     const receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
     const receivedDateString = formatDate(receivedDate);
@@ -88,8 +88,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined"
                             fullWidth
                             required
-                            error={selectedRequestType.toLowerCase().includes("select")}
-                            fullWidth
+                            error={selectedRequestType.toLowerCase().includes("select")}                            
                         >            
                         {requestTypes}
                         </TextField> 
@@ -104,8 +103,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined"
                             fullWidth
                             required
-                            error={selectedReceivedMode.toLowerCase().includes("select")}
-                            fullWidth
+                            error={selectedReceivedMode.toLowerCase().includes("select")}                            
                         >            
                         {receivedModes}
                         </TextField> 
@@ -120,8 +118,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined"
                             fullWidth
                             required
-                            error={selectedDeliveryMode.toLowerCase().includes("select")}
-                            fullWidth
+                            error={selectedDeliveryMode.toLowerCase().includes("select")}                            
                         >            
                         {deliveryModes}
                         </TextField> 

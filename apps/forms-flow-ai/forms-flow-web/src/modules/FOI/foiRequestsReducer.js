@@ -109,7 +109,9 @@ const foiRequests = (state = initialState, action)=> {
     // case FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST:
     //     return {...state, foiDeliveryModeList: action.payload};
     // case FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST:
-    //     return {...state, foiAssignedToList: action.payload};              
+    //     return {...state, foiAssignedToList: action.payload};
+    case FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS:
+      return {...state, foiRequestDetail: action.payload};         
     default:
       return state;
   }

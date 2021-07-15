@@ -188,3 +188,10 @@ export const setIsMinistrySelected = (data) => dispatch => {
         payload:data
     })
 }
+
+export const clearRequestDetails = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS,
+        payload:data      
+    })
+}

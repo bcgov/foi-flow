@@ -45,8 +45,7 @@ const ReviewRequestHeader = React.memo(({selectAssignedToValue, handleAssignedTo
                     variant="outlined"
                     fullWidth
                     required
-                    error={selectAssignedToValue.toLowerCase().includes("unassigned")}
-                    fullWidth
+                    error={selectAssignedToValue.toLowerCase().includes("unassigned")}                    
                 >            
                     {menuItems}
                 </TextField> 

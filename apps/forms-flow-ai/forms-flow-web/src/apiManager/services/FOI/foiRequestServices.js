@@ -7,6 +7,7 @@ import {
   setFOIRequestDetail,
   setFOICategoryList,
   setFOIProgramAreaList,
+  clearRequestDetails,
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/helper";
@@ -24,6 +25,7 @@ export const fetchFOIRequestList = (...rest) => {
             //return { ...foiRequest, ...foiRequestData };
             return { ...foiRequest};
           });
+          dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -61,6 +63,7 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
           //   //return { ...foiRequest, ...foiRequestData };
           //   return { ...foiRequest};
           // });
+
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(setFOILoader(false));
           done(null, res.data);

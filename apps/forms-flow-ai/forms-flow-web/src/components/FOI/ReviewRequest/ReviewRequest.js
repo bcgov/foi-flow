@@ -11,10 +11,8 @@ import RequestDetails from './RequestDetails';
 import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
-import { fetchFOICategoryList, fetchFOIProgramAreaList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { useParams } from 'react-router-dom';
-import { fetchFOIRequestDetails } from "../../../apiManager/services/FOI/foiRequestServices";
-
+import { fetchFOIRequestDetails, fetchFOICategoryList, fetchFOIProgramAreaList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,10 +23,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const ReviewRequest = React.memo((props) => {
-  const {requestId} = useParams(); 
-  const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail); 
-  const dispatch = useDispatch(); 
-  useEffect(()=>{    
+  const {requestId} = useParams();
+  const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
+  const dispatch = useDispatch();
+  useEffect(() => {
     dispatch(fetchFOIRequestDetails(requestId));   
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
@@ -38,16 +36,7 @@ const ReviewRequest = React.memo((props) => {
   const selectDefaultAssignedToValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
   const [selectCategoryValue, setSelectCategoryValue] = React.useState(selectDefaultCategoryValue);
   const [selectAssignedToValue, setSelectAssignedToValue] = React.useState(selectDefaultAssignedToValue);
-  // const [selectRequestType, setSelectRequestType] = React.useState(selectDefaultRequestTypeValue);
-
-  // const requestStartDate = Object.entries(requestDetails).length !== 0 ? new Date(requestDetails.fromDate):"";
-  // const requestEndDate = Object.entries(requestDetails).length !== 0 ? new Date(requestDetails.toDate):"";
-  // const description = Object.entries(requestDetails).length !== 0 && !!requestDetails.description ? requestDetails.description : "";
-  // const [startDate, setStartDate] = React.useState(moment(requestStartDate).format("YYYY-MM-DD"));
-  // const [endDate, setEndDate] = React.useState(moment(requestEndDate).format("YYYY-MM-DD"));
-  // const [requestDescriptionText, setRequestDescription] = React.useState(Object.entries(requestDetails).length !== 0 && !!requestDetails.description ? requestDetails.description : "");
-
-  
+ 
   const requestDescriptionBoxDefaultData = {
     "startDate": "",
     "endDate": "",
@@ -97,13 +86,13 @@ const ReviewRequest = React.memo((props) => {
       // setRequestDescriptionBoxData(descriptionData);
     }
   }
-  const handleInitialValue = (requestDescriptionObject) => {
+  const handleInitialValue = React.useCallback((requestDescriptionObject) => {
     setRequestDescriptionBoxData(requestDescriptionObject);
-  }
-  const handleRequestDetailsInitialValue = (value) => {
+  },[])
+  const handleRequestDetailsInitialValue = React.useCallback((value) => {
     
     setRequestDetailsValues(value);
-  }
+  },[])
 
   const handleRequestDetailsValue = (value, name) => {
     const detailsData = {...requestDetailsValues};
@@ -120,7 +109,7 @@ const ReviewRequest = React.memo((props) => {
     }
     setRequestDetailsValues(detailsData);
   }
-  console.log(`requestDetails = ${JSON.stringify(requestDetails)}`) 
+  // console.log(`requestDetails = ${JSON.stringify(requestDetails)}`) 
 
   const isRequieredError = (requestDescriptionBoxData.startDate === undefined || requestDescriptionBoxData.endDate === undefined 
     || requestDescriptionBoxData.description === ""
@@ -137,6 +126,7 @@ const ReviewRequest = React.memo((props) => {
       <div className="container foi-review-request-container">           
         <div className="col-sm-12 col-md-12 foi-review-container">
         <form className={classes.root} autoComplete="off">
+          {/* <GetRequestDetails getRequestDetails={getRequestDetails}/> */}
         {requestDetails.description !== undefined ? (
           <>
           <ReviewRequestHeader selectAssignedToValue={selectAssignedToValue} handleAssignedToOnChange={handleAssignedToOnChange} />
