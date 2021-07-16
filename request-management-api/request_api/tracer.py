@@ -19,6 +19,7 @@
 from sbc_common_components.tracing.api_tracer import ApiTracer
 from sbc_common_components.tracing.api_tracing import ApiTracing
 
+
 class Tracer():  # pylint: disable=too-few-public-methods
     """Singleton class that wraps sbc_common_components tracing."""
 

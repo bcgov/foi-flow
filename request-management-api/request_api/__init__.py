@@ -22,15 +22,18 @@ import logging
 #import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports,wrong-import-order; conflicts with Flake8
 from flask import Flask
 #from humps.main import camelize
-from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
+#from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
 #from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
 
 import request_api.config as config
+#from request_api import models
+#from request_api.auth import jwt
 from request_api.config import _Config
-
+#from request_api.extensions import mail
 from request_api.models import db, ma
-from request_api.utils.util_logging import setup_logging, setup_filelogging
-
+#from request_api.utils.cache import cache
+# from request_api.utils.run_version import get_run_version
+#from request_api.utils.util_logging import setup_logging, setup_filelogging
 
 # Disable more logging.  
 # TODO - Put this behind an env var.
@@ -49,10 +52,11 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     #         dsn=app.config.get('SENTRY_DSN'),
     #         integrations=[FlaskIntegration()]
     #     )
-   
+
+    #from request_api.resources import TEST_BLUEPRINT  # pylint: disable=import-outside-toplevel
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
-    print("environment :" + run_mode)
+    print(run_mode)
     db.init_app(app)
     ma.init_app(app)
     #mail.init_app(app)
@@ -68,7 +72,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     # if os.getenv('FLASK_ENV', 'production') != 'testing':
     #     setup_jwt_manager(app, jwt)
 
-    ExceptionHandler(app)
+    #ExceptionHandler(app)
 
     # @app.after_request
     # def handle_after_request(response):  # pylint: disable=unused-variable
@@ -87,7 +91,6 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     register_shellcontext(app)
     
     ###### Added handler to log to a file ######
-
 
     # This breaks OpenShift until we have PVC setup, so skip for now.
     # Suggestion is to create to env vars (open to disucssion): ENABLE_LOG_FILE and LOG_FILE_PATH

@@ -17,8 +17,8 @@ class rawrequestservice:
     
 
     def saverawrequest(requestdatajson):
-        result = FOIRawRequest.saverawrequest(requestdatajson)        
-        if result.success :
+        result = FOIRawRequest.saverawrequest(requestdatajson)
+        if(result.success and os.getenv('FLASK_ENV') != 'development'):
                 redispubservice = RedisPublisherService()
                 data = {}
                 data['id'] = result.identifier
@@ -84,7 +84,6 @@ class rawrequestservice:
                             'country':contactInfoOptions['country'],
                             'description':decriptionTimeframe['description'],
                             'fromDate':decriptionTimeframe['fromDate'],
-                            'toDate':decriptionTimeframe['toDate'],
                             'correctionalServiceNumber':decriptionTimeframe['correctionalServiceNumber'],
                             'publicServiceEmployeeNumber':decriptionTimeframe['publicServiceEmployeeNumber'],
                             'topic':decriptionTimeframe['topic'],
@@ -105,23 +104,23 @@ class rawrequestservice:
                                 'birthDate':contactInfo['birthDate'] ,
                                 
                                 'childFirstName':childInformation['firstName'] if haschildInfo   else '',
-                                'childMiddleName':childInformation['middleName'] if haschildInfo else '',
-                                'childLastName':childInformation['lastName'] if haschildInfo else '',
-                                'childAlsoKnownAs':childInformation['alsoKnownAs'] if haschildInfo else '',                    
-                                'childBirthDate':childInformation['dateOfBirth'] if haschildInfo else '',
+                                'childmiddleName':childInformation['middleName'] if haschildInfo else '',
+                                'childlastName':childInformation['lastName'] if haschildInfo else '',
+                                'childalsoKnownAs':childInformation['alsoKnownAs'] if haschildInfo else '',                    
+                                'childbirthDate':childInformation['dateOfBirth'] if haschildInfo else '',
 
                                 'anotherFirstName':anotherpersonInformation['firstName'] if hasanotherpersonInfo else '',
-                                'anotherMiddleName':anotherpersonInformation['middleName'] if hasanotherpersonInfo else '',
-                                'anotherLastName':anotherpersonInformation['lastName'] if hasanotherpersonInfo else '',
-                                'anotherAlsoKnownAs':anotherpersonInformation['alsoKnownAs'] if hasanotherpersonInfo else '',
-                                'anotherBirthDate':anotherpersonInformation['dateOfBirth'] if hasanotherpersonInfo else '',
+                                'anothermiddleName':anotherpersonInformation['middleName'] if hasanotherpersonInfo else '',
+                                'anotherastName':anotherpersonInformation['lastName'] if hasanotherpersonInfo else '',
+                                'anotheralsoKnownAs':anotherpersonInformation['alsoKnownAs'] if hasanotherpersonInfo else '',
+                                'anotherbirthDate':anotherpersonInformation['dateOfBirth'] if hasanotherpersonInfo else '',
 
                                 'adoptiveMotherFirstName' : adoptiveParents['motherFirstName'] if hasadoptiveParentInfo else '',
                                 'adoptiveMotherLastName' : adoptiveParents['motherLastName'] if hasadoptiveParentInfo else '',
                                 'adoptiveFatherLastName' : adoptiveParents['fatherLastName'] if hasadoptiveParentInfo else '',
                                 'adoptiveFatherFirstName' : adoptiveParents['fatherFirstName'] if hasadoptiveParentInfo else ''
                             } 
-                    baserequestInfo['additionalPersonalInfo'] = additionalpersonalInfo                    
+                    baserequestInfo['additionalpersonalInfo'] = additionalpersonalInfo                    
             return baserequestInfo
         else:
             return None        
