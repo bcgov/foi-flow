@@ -8,9 +8,9 @@ on:
     paths:
       - "request-management-api/**"
   # Remove entire push section when done testing
-  push:
-    branches: 
-      - dev-AC-109
+  # push:
+  #   branches: 
+  #     - dev-AC-109
 
 defaults:
   run:
