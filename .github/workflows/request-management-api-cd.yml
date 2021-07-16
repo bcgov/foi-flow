@@ -44,10 +44,10 @@ jobs:
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
 
-      - name: Whoami Openshift
+      - name: Start Build Openshift
         shell: bash
         run: |
-          oc whoami
+          oc start-build request-management-api-build --wait
 
       # - name: CD Flow
       #   shell: bash
