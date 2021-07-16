@@ -8,14 +8,19 @@ import { formatDate } from "../../../helper/FOI/helper";
 
 
 const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
-  
+    
+     /**
+     *  On Behalf of details box in the UI
+     *  No mandatory fields here
+     */ 
+    
+    //local states for Another person FirstName, MiddleName, LastName, NickName and DOB
     const [anotherFirstNameText, setAnotherFirstName] = React.useState(!!additionalInfo.anotherFirstName ? additionalInfo.anotherFirstName : "");
     const [anotherMiddleNameText, setAnotherMiddleName] = React.useState(!!additionalInfo.anotherMiddleName ? additionalInfo.anotherMiddleName : "");
     const [anotherLastNameText, setAnotherLastName] = React.useState(!!additionalInfo.anotherLastName ? additionalInfo.anotherLastName : "");
     const [anotherNickNameText, setAnotherNickName] = React.useState(!!additionalInfo.anotherAlsoKnownAs ? additionalInfo.anotherAlsoKnownAs : "");
     const dob = !!additionalInfo.anotherBirthDate ? new Date(additionalInfo.anotherBirthDate) : "";
-    const dobString = formatDate(dob);
-    const [anotherDOBText, setAnotherDOB] = React.useState(dobString);
+    const [anotherDOBText, setAnotherDOB] = React.useState(formatDate(dob));
     
     const handleFirtNameChange = (e) => {
         setAnotherFirstName(e.target.value);

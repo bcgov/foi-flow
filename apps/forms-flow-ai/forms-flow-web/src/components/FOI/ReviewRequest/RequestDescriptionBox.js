@@ -33,7 +33,7 @@ const RequestDescription = React.memo(({
     //gets the program area list master data
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
     
-    //updates the default values from the request details    
+    //updates the default values from the request description box    
     React.useEffect(() => {
         const descriptionObject = {
             "startDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),

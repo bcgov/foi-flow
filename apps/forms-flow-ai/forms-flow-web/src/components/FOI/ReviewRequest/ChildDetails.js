@@ -7,13 +7,19 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { formatDate } from "../../../helper/FOI/helper";
 
 const ChildDetails = React.memo(({additionalInfo}) => {
+
+     /**
+     *  Child details box in the UI
+     *  No mandatory fields here
+     */ 
+    
+    //local states for Child FirstName, MiddleName, LastName, NickName and DOB
     const [childFirstNameText, setChildFirstName] = React.useState(!!additionalInfo.childFirstName ? additionalInfo.childFirstName : "");
     const [childMiddleNameText, setChildMiddleName] = React.useState(!!additionalInfo.childMiddleName ? additionalInfo.childMiddleName : "");
     const [childLastNameText, setChildLastName] = React.useState(!!additionalInfo.childLastName ? additionalInfo.childLastName : "");
     const [childNickNameText, setNickName] = React.useState(!!additionalInfo.childAlsoKnownAs ? additionalInfo.childAlsoKnownAs : "");
     const dob = !!additionalInfo.childBirthDate ? new Date(additionalInfo.childBirthDate) : "";
-    const dobString = formatDate(dob);
-    const [childDOBText, setDOB] = React.useState(dobString);
+    const [childDOBText, setDOB] = React.useState(formatDate(dob));
 
     const handleFirtNameChange = (e) => {
         setChildFirstName(e.target.value);

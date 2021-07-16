@@ -8,15 +8,18 @@ import { formatDate } from "../../../helper/FOI/helper";
 
 
 const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
-
+    /**
+     *  Addition Applicant details box in the UI
+     *  No mandatory fields here
+     */ 
   
+    //local state management for personalHealthNumber, identityVerified, correctionNumber, and birthDate
     const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(!!additionalInfo.personalHealthNumber ? additionalInfo.personalHealthNumber : "0000 000 00");
     const [identityVerifiedText, setIdentityVerified] = React.useState(!!additionalInfo.identityVerified ? additionalInfo.identityVerified : "");  
     const [correctionsNumberText, setCorrectionsNumber] = React.useState(!!additionalInfo.correctionsNumber ? additionalInfo.correctionsNumber : "0000 000 00");
     const [employeeNumberText, setEmployeeNumber] = React.useState(!!additionalInfo.employeeNumber ? additionalInfo.employeeNumber : "0000 000 00");
-    const dob = !!additionalInfo.birthDate ? new Date(additionalInfo.birthDate) : "";
-    const dobString = formatDate(dob);
-    const [birthDateText, setDOB] = React.useState(dobString);
+    const dob = !!additionalInfo.birthDate ? new Date(additionalInfo.birthDate) : "";   
+    const [birthDateText, setDOB] = React.useState(formatDate(dob));
 
   const handlePersonalHealthNumber = (e) => {
     setPersonalHealthNumber(e.target.value);

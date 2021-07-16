@@ -9,11 +9,18 @@ import { formatDate } from "../../../helper/FOI/helper";
 
 
 const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue}) => {
-    
+
+    /**
+     *  Request details box in the UI
+     *  All fields are mandatory here
+     */ 
+
+    //get the RequestType, ReceivedMode and DeliveryMode master data
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
     const receivedMode = useSelector(state=> state.foiRequests.foiReceiveModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
+    //updates the default values from the request details    
     React.useEffect(() => {
       const receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
       const receivedDateString = formatDate(receivedDate);
@@ -24,23 +31,27 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
         "receivedDate": receivedDateString,
         "requestStartDate": receivedDateString,
       }
-      // const requestTpeValue = !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type";        
+      //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
   },[requestDetails, handleRequestDetailsInitialValue])
 
+    //local state management for received date and start date
     const receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
     const receivedDateString = formatDate(receivedDate);
     const [receivedDateText, setReceivedDate] = React.useState(receivedDateString);
     const [startDateText, setStartDate] = React.useState(receivedDateString);
+
+    //due date calculation
     const dueDate = new Date(startDateText);
     dueDate.setDate(dueDate.getDate() + 40);
     const dueDateString = formatDate(dueDate);
 
-    // const selectedRequestType = !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type";
+    //local state management for RequestType, ReceivedMode and DeliveryMode
     const [selectedRequestType, setSelectedRequestType] = React.useState(!!requestDetails.requestType ? requestDetails.requestType : "Select Request Type");
     const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(!!requestDetails.receivedMode ? requestDetails.receivedMode : "Select Received Mode");
     const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(!!requestDetails.deliveryMode ? requestDetails.deliveryMode : "Select Delivery Mode");
 
+    //generating the menuItems for RequestTypes, ReceivedModes and DeliveryModes
     const requestTypes = requestType.map((item) => {    
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
     });
@@ -50,24 +61,30 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const deliveryModes = deliveryMode.map((item) => {    
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
     });
+    //handling the received date change
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
+      //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, "receivedDate");
     }
     const handleStartDateChange = (e) => {
       setStartDate(e.target.value);
+      //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, "requestStartDate");
     }  
     const handleRequestTypeChange = (e) => {
       setSelectedRequestType(e.target.value);
+      //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, "requestType");
     }
     const handleReceivedModeChange = (e) => {
       setSelectedReceivedMode(e.target.value);
+      //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, "receivedMode");
     }
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
+      //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, "deliveryMode");
     }
      return (

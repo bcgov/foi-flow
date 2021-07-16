@@ -7,6 +7,11 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 
 const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue, handleCategoryValue, handleEmailValidation}) => {
+    /**
+     *  Applicant Details box in the UI
+     *  Category - Mandatory field
+     */ 
+
     //gets the category list master data
     const category = useSelector(state=> state.foiRequests.foiCategoryList);
 

@@ -114,7 +114,7 @@ const ReviewRequest = React.memo((props) => {
   const handleCategoryValue = (value) => {
     setSelectCategoryValue(value);
   }
-  
+
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {    
@@ -135,7 +135,7 @@ const ReviewRequest = React.memo((props) => {
     || requiredRequestDescriptionValues.description === ""
     || !requiredRequestDescriptionValues.isProgramAreaSelected
     || selectCategoryValue.toLowerCase().includes("select")
-    || validation.helperTextValue !== undefined && validation.helperTextValue !== ""
+    || (validation.helperTextValue !== undefined && validation.helperTextValue !== "")
     || assignedToValue.toLowerCase().includes("unassigned")
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
     || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
@@ -146,7 +146,7 @@ const ReviewRequest = React.memo((props) => {
 
   const classes = useStyles();
      return (
-      <div className="container foi-review-request-container">           
+      <div className="container foi-review-request-container">      
         <div className="col-sm-12 col-md-12 foi-review-container">
         <form className={classes.root} autoComplete="off">        
         {Object.entries(requestDetails).length !== 0 ? (

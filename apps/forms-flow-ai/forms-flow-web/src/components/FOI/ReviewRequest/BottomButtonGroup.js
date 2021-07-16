@@ -32,7 +32,12 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 const BottomButtonGroup = React.memo(({isValidationError}) => {
+  /**
+   * Bottom Button Group of Review request Page
+   * Button enable/disable is handled here based on the validation
+   */
     const classes = useStyles();
+    
     const dispatch = useDispatch();
     const returnToQueue = () => {
       dispatch(push(`/foi/dashboard`));

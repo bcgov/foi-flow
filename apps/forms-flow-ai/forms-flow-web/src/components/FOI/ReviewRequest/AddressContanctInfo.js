@@ -8,14 +8,21 @@ import { useSelector } from "react-redux";
 
 
 const AddressContactDetails = React.memo(({requestDetails}) => {
+
+    /**
+     *  Address and Contact box in the UI
+     *  No mandatory fields here
+     */ 
+    
+    //get the master data for country and province
     const countryList = useSelector(state=> state.foiRequests.foiCountryList);
     const provinceList = useSelector(state=> state.foiRequests.foiProvinceList);
     
+    //local state management for homePhone, mobilePhone, workPhone1, workPhone2, streetAddress1, streetAddress2, city, postalcode, province and country
     const [homePhoneText, setHomePhone] = React.useState(!!requestDetails.phonePrimary ? requestDetails.phonePrimary : "() -");
     const [mobilePhoneText, setMobilePhone] = React.useState(!!requestDetails.phoneSecondary ? requestDetails.phoneSecondary : "() -");
     const [workPhonePrimaryText, setWorkPhonePrimary] = React.useState("() -");
     const [workPhoneSecondaryText, setWorkPhoneSecondary] = React.useState("() -");
-
     const [streetAddressText, setStreetAddress] = React.useState(!!requestDetails.address ? requestDetails.address : "");
     const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState("");
     const [CityText, setCity] = React.useState(!!requestDetails.city ? requestDetails.city : "");
@@ -23,7 +30,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
     const [selectProvinceValue, setProvinceValue] = React.useState(!!requestDetails.province ? requestDetails.province : "Select Province");
     const [selectCountryValue, setCountryValue] = React.useState(!!requestDetails.country ? requestDetails.country : "Select Country");    
 
-    
+    //create menuItems for province and country
     const provinceItems = provinceList.map((item) => {    
         return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
      });

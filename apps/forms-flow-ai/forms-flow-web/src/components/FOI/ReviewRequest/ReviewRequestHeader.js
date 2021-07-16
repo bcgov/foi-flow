@@ -9,21 +9,37 @@ import Input from '@material-ui/core/Input';
 
 const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue}) => {
    
+     /**
+     *  Header of Review request in the UI
+     *  AssignedTo - Mandatory field
+     */ 
+
+     //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+    
+    //handle default value for the validation of required fields
     React.useEffect(() => {
-        const assignedTo = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
+        const assignedTo = requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
         handleAssignedToInitialValue(assignedTo);
     },[requestDetails, handleAssignedToInitialValue])
 
+    //creates the menu items for assignedTo combobox
     const menuItems = assignedToList.map((item) => {    
         return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("unassigned")}>{item.name}</MenuItem> )
      });
-    const [selectedAssignedTo, setAssignedTo] = React.useState(Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned");
+    
+     //local state management for assignedTo
+    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned");
+
     const preventDefault = (event) => event.preventDefault();
+    
+    //handle onChange event for assigned To
     const handleAssignedToOnChange = (event) => {
         setAssignedTo(event.target.value);
+        //event bubble up - to validate required fields
         handleAssignedToValue(event.target.value);
     }
+
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
