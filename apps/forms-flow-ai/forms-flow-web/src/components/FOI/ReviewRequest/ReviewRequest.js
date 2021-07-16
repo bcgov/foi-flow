@@ -18,8 +18,7 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    //   width: '25ch',
+      margin: theme.spacing(1),  
     },
   },
 }));
@@ -147,8 +146,8 @@ const ReviewRequest = React.memo((props) => {
   const classes = useStyles();
      return (
       <div className="container foi-review-request-container">      
-        <div className="col-sm-12 col-md-12 foi-review-container">
-        <form className={classes.root} autoComplete="off">        
+        <div className="foi-review-container">
+        <form className={`${classes.root} foi-request-form`} autoComplete="off">        
         {Object.entries(requestDetails).length !== 0 ? (
           <>
           <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue}/>

@@ -6,12 +6,25 @@
     font-family: "BCSans-Bold";
     src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
 }
+.scrollable-page {
+    position: inherit !important;    
+}
 
+#app {
+    background-color: #f1f1f1 !important;
+}
+
+.foi-request-form {
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 60px;
+    padding-right: 60px;
+    padding-bottom: 10px;
+}
 .foi-review-request-container {
     
-    width: 100%!important;
-    height: 100%;
-    background-color: #f1f1f1;    
+    width: 100%!important;     
     
 }
 
@@ -24,10 +37,7 @@
     right: 0px;
     left: 0px;
     background-color: white;
-    height: calc(95vh - 127px);
-    // height: auto;
-    // height: inherit; 
-    overflow: scroll;
+    height: calc(95vh - 127px);    
 }
 
 .foi-details-card {
@@ -47,14 +57,12 @@
     width: 100%;
 }
 .foi-details-col {
-    display: block; // for additional
-    //display: -webkit-box;
+    display: block;    
     align-items: flex-start; 
 }
 
 .MuiOutlinedInput-notchedOutline {
-    border: 1px solid !important; 
-    // color: #000000 !important;
+    border: 1px solid !important;     
 }
 
 
@@ -79,13 +87,3 @@
 .PrivateNotchedOutline-legendLabelled-4 {
     font-size: 0.80rem !important;
 }
-// .PrivateNotchedOutline-legendNotched-5 {
-//     font-family: "BCSans-Bold";
-//     color: #000000 !important;
-//     font-size: large !important;
-// }
-
-// .MuiOutlinedInput-root.Mui-error .PrivateNotchedOutline-legendNotched-5 {
-//     // font-family: "BCSans-Bold";
-//     color: #f44336 !important;
-// }
