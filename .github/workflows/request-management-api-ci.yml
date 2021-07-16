@@ -5,12 +5,9 @@ on:
   pull_request:
     branches:
       - main
+      - dev
     paths:
       - "request-management-api/**"
-  # Remove entire push section when done testing
-  # push:
-  #   branches: 
-  #     - dev-AC-109
 
 defaults:
   run:
@@ -18,15 +15,6 @@ defaults:
     working-directory: ./request-management-api
 
 jobs:
-  # setup-job:
-  #   runs-on: ubuntu-20.04
-
-  #   if: github.repository == 'bcgov/foi-flow'
-
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - run: "true"
-
   docker-build-check:
     runs-on: ubuntu-20.04
     name: Build dockerfile to ensure it works
@@ -178,8 +166,3 @@ jobs:
   #         DATABASE_PORT: 5432
   #         FLASK_ENV: development
      
-
-# Abin, how do we run unit tests? What command?
-# "pytest"
-# merge in dev-AA-20
-# set FLASK_ENV to "development"
