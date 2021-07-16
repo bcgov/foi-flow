@@ -79,8 +79,10 @@ class _Config():  # pylint: disable=too-few-public-methods
         port=int(DB_PORT),
         name=DB_NAME,
     )
-    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_ECHO = False 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    print('SQLAlchemy URL (base): {}'.format(SQLALCHEMY_DATABASE_URI))
 
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
@@ -129,6 +131,7 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
                                             name=DB_NAME,
                                         ))
     
+    print('SQLAlchemy URL (Test): {}'.format(SQLALCHEMY_DATABASE_URI))
 
 class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
     """Production environment configuration."""
@@ -139,5 +142,6 @@ class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
         SECRET_KEY = os.urandom(24)
         print('WARNING: SECRET_KEY being set as a one-shot', file=sys.stderr)
 
+    print('SQLAlchemy URL (prod/base): {}'.format(_Config.SQLALCHEMY_DATABASE_URI))
     TESTING = False
     DEBUG = False

@@ -31,7 +31,10 @@ from request_api.config import _Config
 from request_api.models import db, ma
 from request_api.utils.util_logging import setup_logging, setup_filelogging
 
-setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
+
+# Disable more logging.  
+# TODO - Put this behind an env var.
+# setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
 
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
@@ -85,7 +88,10 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     
     ###### Added handler to log to a file ######
 
-    setup_filelogging(app)
+
+    # This breaks OpenShift until we have PVC setup, so skip for now.
+    # Suggestion is to create to env vars (open to disucssion): ENABLE_LOG_FILE and LOG_FILE_PATH
+    # setup_filelogging(app)
 
     return app
 
