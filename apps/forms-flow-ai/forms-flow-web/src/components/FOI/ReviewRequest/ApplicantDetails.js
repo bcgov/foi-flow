@@ -39,8 +39,19 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
     const handleOrganizationChange = (e) => {
         setOrganization(e.target.value);
     }
+    const [validation, setValidation] = React.useState({});
     const handleEmailChange = (e) => {
-        setEmail(e.target.value);
+        var helperText = "";
+        if (e.target.value) {
+          const helperText =  /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e.target.value)
+          ? ""
+          : "Email is not valid."         
+          setValidation({field: "Email", helperTextValue: helperText});
+        }
+
+        if(helperText === "") {
+            setEmail(e.target.value);
+        }        
     }
     const handleCategoryOnChange = (e) => {
         setCategoryValue(e.target.value);
@@ -115,6 +126,8 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
                             variant="outlined" 
                             fullWidth
                             onChange={handleEmailChange}
+                            error={validation.helperTextValue !== undefined && validation.helperTextValue !== ""}
+                            helperText={validation.helperTextValue}
                         /> 
                     </div>
                 </div>             
