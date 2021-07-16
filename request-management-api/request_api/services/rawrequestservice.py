@@ -4,7 +4,7 @@ from dateutil.parser import *
 from datetime import datetime
 import json
 import asyncio
-
+import os 
 from request_api.utils.redispublisher import RedisPublisherService
 
 class rawrequestservice:
@@ -18,7 +18,7 @@ class rawrequestservice:
 
     def saverawrequest(requestdatajson):
         result = FOIRawRequest.saverawrequest(requestdatajson)
-        if(result.success):
+        if(result.success and os.getenv('FLASK_ENV') != 'development'):
                 redispubservice = RedisPublisherService()
                 data = {}
                 data['id'] = result.identifier
