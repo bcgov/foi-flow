@@ -25,66 +25,45 @@ const useStyles = makeStyles((theme) => ({
 }));
 const ReviewRequest = React.memo((props) => {
   const {requestId} = useParams();
+
+  //gets the request detail from the store
   const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
+  
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchFOIRequestDetails(requestId));   
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
-  },[requestId, dispatch]);
+  },[requestId, dispatch]); 
 
-  // const selectDefaultCategoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
-  // const selectDefaultAssignedToValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
-  const [selectCategoryValue, setSelectCategoryValue] = React.useState("Select Category");
-  const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
- 
-  const requestDescriptionBoxDefaultData = {
+  const requiredRequestDescriptionDefaultData = {
     "startDate": "",
     "endDate": "",
     "description": "",
-    "isMinistrySelected": false
+    "isProgramAreaSelected": false
   }  
 
-  const requestDetailsInitialValues = {
+  const requiredRequestDetailsInitialValues = {
     "requestType":"",
     "receivedMode": "",
     "deliveryMode": "",
     "receivedDate": "",
     "requestStartDate": "",
   }
-  const [requestDescriptionBoxData, setRequestDescriptionBoxData] = React.useState(requestDescriptionBoxDefaultData);
-  const [requestDetailsValues, setRequestDetailsValues] = React.useState(requestDetailsInitialValues);
   
+  //below states are used to find if required fields are set or not
+  const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
+  const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);
+  const [selectCategoryValue, setSelectCategoryValue] = React.useState("Select Category");
+  const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
 
-  const handleOnChangeRequestDescription = (value, name) => {
-    if(name === "startDate") {
-      const descriptionData = {...requestDescriptionBoxData};
-      descriptionData.startDate = value;
-      setRequestDescriptionBoxData(descriptionData);
-    }    
-    else if(name === "endDate") {
-      const descriptionData = {...requestDescriptionBoxData};
-      descriptionData.endDate = value;
-      setRequestDescriptionBoxData(descriptionData);
-    }
-    else if (name === "description") {
-      const descriptionData = {...requestDescriptionBoxData};
-      descriptionData.description = value;
-      setRequestDescriptionBoxData(descriptionData);
-    }
-    else if (name === "isMinistrySelected") {
-      
-      const descriptionData = {...requestDescriptionBoxData};
-      descriptionData.isMinistrySelected = value;
-      console.log(`descriptionData == ${JSON.stringify(descriptionData)}`);
-      // setRequestDescriptionBoxData(descriptionData);
-    }
-  }
-  const handleInitialValue = React.useCallback((requestDescriptionObject) => {
-    setRequestDescriptionBoxData(requestDescriptionObject);
+  //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
+  const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
+    setRequiredRequestDescriptionValues(requestDescriptionObject);
   },[])
   const handleRequestDetailsInitialValue = React.useCallback((value) => {    
-    setRequestDetailsValues(value);
+    setRequiredRequestDetailsValues(value);
   },[])
   const handleAssignedToInitialValue = React.useCallback((value) => {    
     setAssignedToValue(value);
@@ -92,9 +71,28 @@ const ReviewRequest = React.memo((props) => {
   const handleCategoryInitialValue = React.useCallback((value) => {    
     setSelectCategoryValue(value);
   },[])
+
+  //Update required fields of request description box with latest value
+  const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
+    const descriptionData = {...requiredRequestDescriptionValues};
+    if(name === "startDate") {      
+      descriptionData.startDate = value;      
+    }    
+    else if(name === "endDate") {    
+      descriptionData.endDate = value;      
+    }
+    else if (name === "description") {     
+      descriptionData.description = value;      
+    }
+    else if (name === "isProgramAreaSelected") {
+      descriptionData.isProgramAreaSelected = value;      
+    }
+    setRequiredRequestDescriptionValues(descriptionData);
+  }
   
+  //Update required fields of request details box with latest value
   const handleRequestDetailsValue = (value, name) => {
-    const detailsData = {...requestDetailsValues};
+    const detailsData = {...requiredRequestDetailsValues};
     if (name === "requestTpe") {
       detailsData.requestType = value;
     }
@@ -104,24 +102,40 @@ const ReviewRequest = React.memo((props) => {
     else if (name === "deliveryMode") {
       detailsData.deliveryMode = value;
     }
-    setRequestDetailsValues(detailsData);
+    setRequiredRequestDetailsValues(detailsData);
   }
+
+  //gets the latest assigned to value
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   }
+
+  //gets the latest category value
   const handleCategoryValue = (value) => {
     setSelectCategoryValue(value);
   }
+
+  //to get the updated program area list with isChecked=true/false
+  const [programAreaList, setProgramAreaList] = React.useState([]);
   
-  const isRequieredError = (requestDescriptionBoxData.startDate === undefined || requestDescriptionBoxData.endDate === undefined 
-    || requestDescriptionBoxData.description === ""
+  const handleUpdatedProgramAreaList = (programAreaList) => {    
+    //get the updated program area list with isChecked=true/false
+    setProgramAreaList(programAreaList); 
+  } 
+
+  //Variable to find if all required fields are filled or not
+  const isRequieredError = (
+    requiredRequestDescriptionValues.startDate === undefined || requiredRequestDescriptionValues.endDate === undefined 
+    || requiredRequestDescriptionValues.description === ""
+    || !requiredRequestDescriptionValues.isProgramAreaSelected
     || selectCategoryValue.toLowerCase().includes("select") 
     || assignedToValue.toLowerCase().includes("unassigned")
-    || requestDetailsValues.requestType.toLowerCase().includes("select")
-    || requestDetailsValues.receivedMode.toLowerCase().includes("select")
-    || requestDetailsValues.deliveryMode.toLowerCase().includes("select")
-    || requestDetailsValues.receivedDate === undefined
-    || requestDetailsValues.requestStartDate === undefined );
+    || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
+    || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
+    || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
+    || requiredRequestDetailsValues.receivedDate === undefined
+    || requiredRequestDetailsValues.requestStartDate === undefined 
+    );
 
   const classes = useStyles();
      return (
@@ -131,13 +145,13 @@ const ReviewRequest = React.memo((props) => {
         {requestDetails.description !== undefined ? (
           <>
           <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue}/>
-          <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleCategoryValue={handleCategoryValue} />
+          <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleCategoryValue={handleCategoryValue} /> 
           {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.childFirstName !== undefined ?
           <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo}/> : null }          
            {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.anotherFirstName !== undefined ?
           <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} />
-          <RequestDescriptionBox requestDetails = {requestDetails} handleOnChangeRequestDescription={handleOnChangeRequestDescription} handleInitialValue={handleInitialValue} />
+          <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} />
           <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue}/>
           {requestDetails.additionalPersonalInfo !== undefined ?
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo}/>: null }

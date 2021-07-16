@@ -18,13 +18,22 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 const RequestDescription = React.memo(({      
-     requestDetails,       
-     handleOnChangeRequestDescription,
-     handleInitialValue
+    programAreaList, 
+    requestDetails,       
+     handleOnChangeRequiredRequestDescriptionValues,
+     handleInitialRequiredRequestDescriptionValues,
+     handleUpdatedProgramAreaList
     }) => {
-    const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);
-    const [checkboxItems, setCheckboxItems] = React.useState(ministries);
-    // console.log(`ministries = ${JSON.stringify(ministries)}`)
+    
+
+    /* All fields in this component are mandatory */
+    
+    const classes = useStyles();
+
+    //gets the program area list master data
+    var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
+    
+    //updates the default values from the request details    
     React.useEffect(() => {
         const descriptionObject = {
             "startDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),
@@ -32,48 +41,54 @@ const RequestDescription = React.memo(({
             "description": !!requestDetails.description ? requestDetails.description : "",
             "isMinistrySelected": !!requestDetails.selectedMinistries
         }    
-        handleInitialValue(descriptionObject);
-    },[requestDetails, handleInitialValue])
-    React.useEffect(() => {      
-        setCheckboxItems(ministries);       
-    },[ministries])
+        handleInitialRequiredRequestDescriptionValues(descriptionObject);
+    },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
     
-    const classes = useStyles();
-    // const ministries = useSelector(state=> state.foiRequests.foiProgramAreaList);    
+    //if updated program area list not exists then, update the master list with selected ministries
+    if (Object.entries(programAreaList).length === 0){
+        const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";     
+        
+        if(selectedMinistries !== "" && Object.entries(masterProgramAreaList).length !== 0) {
+            const selectedList = selectedMinistries.map(element => element.code);
+            masterProgramAreaList.map(programArea => {
+            return programArea.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === programArea.bcgovcode);           
+        });      
+        }
+    }
+    //if updated program area list exists then use that list instead of master data
+    else {
+        masterProgramAreaList = programAreaList;       
+    }
+
+    //component state management for startDate, endDate and Description
     const [startDate, setStartDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
     const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.toDate)).format("YYYY-MM-DD"));
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
-    const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
-  
-    
-    
-    if(selectedMinistries !== "") {
-        const selectedList = selectedMinistries.map(element => element.code);
-        ministries.map(ministry => {
-           return ministry.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === ministry.bcgovcode);           
-       });      
-    }
+
+    //handle onchange of start date and set state with latest value
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
-        handleOnChangeRequestDescription(event.target.value, "startDate");
-    };      
+        //event bubble up- update the required fields to validate later
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, "startDate");
+    };
+    //handle onchange of end date and set state with latest value
     const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
-        handleOnChangeRequestDescription(event.target.value, "endDate");
+        //event bubble up- update the required fields to validate later
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, "endDate");
     };
+    //handle onchange of description and set state with latest value
     const handleRequestDescriptionChange = (event) => {
         setRequestDescription(event.target.value);
-        handleOnChangeRequestDescription(event.target.value, "description");
-    };
-
-    const handleMinistrySelected = (isSelected) => {
-        // console.log(`newCheckboxes = ${JSON.stringify(newCheckboxes)}`);
-        // setCheckboxItems(newCheckboxes);
-        handleOnChangeRequestDescription(isSelected, "isMinistrySelected");
-    }
-
-    const handleOnChange = (newCheckboxes) => {
-        setCheckboxItems(newCheckboxes);
+        //event bubble up- update the required fields to validate later
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, "description");
+    };  
+    //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
+    const handleUpdatedMasterProgramAreaList = (programAreaList) => {
+        //event bubble up- update the required fields to validate later
+        handleOnChangeRequiredRequestDescriptionValues(programAreaList.some(programArea => programArea.isChecked), "isProgramAreaSelected");     
+        //event bubble up - Updated program area list
+        handleUpdatedProgramAreaList(programAreaList);
     }
      return (
         
@@ -89,7 +104,7 @@ const RequestDescription = React.memo(({
                         <TextField                
                             label="Start Date"
                             type="date"
-                            value={startDate}        
+                            value={startDate}
                             className={classes.textField}
                             onChange={handleStartDateChange}
                             InputLabelProps={{
@@ -132,15 +147,10 @@ const RequestDescription = React.memo(({
                         error={requestDescriptionText===""}
                         fullWidth
                      />        
-                    </div>                   
-                    <MinistriesList ministries={checkboxItems} handleMinistrySelected={handleMinistrySelected} handleOnChange={handleOnChange}/>
-                    
-                    {/* <div className="foi-requestdescription-button-group">
-                        <button type="button" className={`btn btn-bottom ${classes.btnenabled}`}>Save Updated Description</button>
-                        <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}  >Split Request</button>
-                        <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}  >Redirect in Full</button>
-      
-                    </div> */}
+                    </div>
+                    { Object.entries(masterProgramAreaList).length !== 0 ?
+                    <MinistriesList masterProgramAreaList={masterProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} />
+                    :null}
             </CardContent>
         </Card>
        

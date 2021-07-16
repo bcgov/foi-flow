@@ -7,23 +7,26 @@ import Input from '@material-ui/core/Input';
 import { useSelector } from "react-redux";
 
 const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue, handleCategoryValue}) => {  
-        const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
-        const applicantMiddleName = requestDetails!==null && requestDetails.middleName !== null? requestDetails.middleName:"" ;
-        const applicantLastName = requestDetails!==null && requestDetails.lastName  !== null? requestDetails.lastName:"" ;
-        const organization = requestDetails!==null && requestDetails.businessName !==null ? requestDetails.businessName: "";
-        const email = requestDetails!==null && requestDetails.email !== null ? requestDetails.email:"";
-        // const selectDefaultValue = requestDetails!==null && requestDetails.currentState === "Unopened"? "Select Category":"Select Category";
-        const [applicantFirstNameText, setApplicantFirstName] = React.useState(applicantFirstName);
-        const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(applicantMiddleName);
-        const [applicantLastNameText, setApplicantLastName] = React.useState(applicantLastName);
-        const [organizationText, setOrganization] = React.useState(organization);
-        const [emailText, setEmail] = React.useState(email);
-        const category = useSelector(state=> state.foiRequests.foiCategoryList);
-        React.useEffect(() => {       
-            const categoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
-            handleCategoryInitialValue(categoryValue);
-        },[requestDetails, handleCategoryInitialValue])
-        const [selectedCategory, setCategoryValue] = React.useState(Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category");
+    const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
+    const applicantMiddleName = requestDetails!==null && requestDetails.middleName !== null? requestDetails.middleName:"" ;
+    const applicantLastName = requestDetails!==null && requestDetails.lastName  !== null? requestDetails.lastName:"" ;
+    const organization = requestDetails!==null && requestDetails.businessName !==null ? requestDetails.businessName: "";
+    const email = requestDetails!==null && requestDetails.email !== null ? requestDetails.email:"";
+       
+    const [applicantFirstNameText, setApplicantFirstName] = React.useState(applicantFirstName);
+    const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(applicantMiddleName);
+    const [applicantLastNameText, setApplicantLastName] = React.useState(applicantLastName);
+    const [organizationText, setOrganization] = React.useState(organization);
+    const [emailText, setEmail] = React.useState(email);
+
+    const category = useSelector(state=> state.foiRequests.foiCategoryList);
+
+    React.useEffect(() => {       
+        const categoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
+        handleCategoryInitialValue(categoryValue);
+    },[requestDetails, handleCategoryInitialValue])
+
+    const [selectedCategory, setCategoryValue] = React.useState(Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category");
     const handleFirtNameChange = (e) => {
          setApplicantFirstName(e.target.value);
     }

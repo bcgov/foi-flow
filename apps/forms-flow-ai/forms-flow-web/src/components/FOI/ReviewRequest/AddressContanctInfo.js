@@ -115,6 +115,7 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             variant="outlined" 
                             value={PostalText}
                             onChange={handlePostalChange}
+                            inputProps={{ maxLength: 6 }}
                             fullWidth
                         />                                                
                     </div>
