@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1mtucpv" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:collaboration id="Collaboration_1gduz3b">
+    <bpmn:participant id="Participant_0c2mqj5" name="FOI Request Processing" processRef="foi-request" />
+  </bpmn:collaboration>
+  <bpmn:process id="foi-request" name="FOI Request Processing" isExecutable="true" camunda:versionTag="1">
+    <bpmn:laneSet id="LaneSet_1j1sa3c">
+      <bpmn:lane id="Lane_1u899ed" name="Intake Team">
+        <bpmn:flowNodeRef>Event_043z2u1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0dlg5q0</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1pyw9il</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0kfxcdd</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0llulpa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_055skr3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1ik7b3c</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:endEvent id="Event_043z2u1">
+      <bpmn:incoming>Flow_0auugyb</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1hzo78o" name="apply Settings" sourceRef="StartEvent_1" targetRef="Activity_1pyw9il">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="take">
+          <camunda:script scriptFormat="javascript">var system = java.lang.System;
+execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
+execution.setVariable("pid", execution.getProcessInstanceId());
+execution.setVariable("wfretry",0);</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0xibrtk" sourceRef="Activity_1pyw9il" targetRef="Activity_0dlg5q0" />
+    <bpmn:sequenceFlow id="Flow_0auugyb" sourceRef="Activity_0dlg5q0" targetRef="Event_043z2u1" />
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1hzo78o</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_0dlg5q0" name="Intake Analyst">
+      <bpmn:incoming>Flow_0xibrtk</bpmn:incoming>
+      <bpmn:outgoing>Flow_0auugyb</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Activity_1pyw9il" name="Update FOI RawRequest">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${foiApiUrl}/api/foirawrequestbpm/addwfinstanceid/${id}</camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">{
+"wfinstanceid": "${pid}"
+}</camunda:inputParameter>
+            <camunda:outputParameter name="wfResponseCode">
+              <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-WF-UPDATE-ERR", response);
+}
+connector.getVariable("statusCode");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1hzo78o</bpmn:incoming>
+      <bpmn:incoming>Flow_0n0281z</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xibrtk</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_1ik7b3c" attachedToRef="Activity_1pyw9il">
+      <bpmn:outgoing>Flow_1dqni4v</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_12f9sgc" errorRef="Error_0m1kxx7" camunda:errorCodeVariable="wfResponseCode" />
+    </bpmn:boundaryEvent>
+    <bpmn:intermediateCatchEvent id="Event_0kfxcdd">
+      <bpmn:incoming>Flow_1dqni4v</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ycndzh</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0ylgpdv">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1dqni4v" sourceRef="Event_1ik7b3c" targetRef="Event_0kfxcdd" />
+    <bpmn:exclusiveGateway id="Gateway_0llulpa">
+      <bpmn:incoming>Flow_1ycndzh</bpmn:incoming>
+      <bpmn:outgoing>Flow_0n0281z</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ngmcfu</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1ycndzh" sourceRef="Event_0kfxcdd" targetRef="Gateway_0llulpa">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#34;wfretry&#34;, execution.getVariable(&#34;wfretry&#34;)+1)}" event="take" />
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0n0281z" name="Retry [1..3]" sourceRef="Gateway_0llulpa" targetRef="Activity_1pyw9il">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${wfretry &lt;= 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1ngmcfu" name="Retry &#62; 3" sourceRef="Gateway_0llulpa" targetRef="Event_055skr3" />
+    <bpmn:intermediateThrowEvent id="Event_055skr3" name="FOI API Failure Message">
+      <bpmn:incoming>Flow_1ngmcfu</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0lllqxd" messageRef="Message_0x03q45" />
+    </bpmn:intermediateThrowEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0m1kxx7" name="FOI-WF-UPDATE-ERR" camunda:errorMessage="FOI Request update failed." />
+  <bpmn:message id="Message_0x03q45" name="foi-api-request-failure" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1gduz3b">
+      <bpmndi:BPMNShape id="Participant_0c2mqj5_di" bpmnElement="Participant_0c2mqj5" isHorizontal="true">
+        <dc:Bounds x="129" y="100" width="711" height="270" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1u899ed_di" bpmnElement="Lane_1u899ed" isHorizontal="true">
+        <dc:Bounds x="159" y="100" width="681" height="270" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0auugyb_di" bpmnElement="Flow_0auugyb">
+        <di:waypoint x="590" y="170" />
+        <di:waypoint x="652" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xibrtk_di" bpmnElement="Flow_0xibrtk">
+        <di:waypoint x="440" y="170" />
+        <di:waypoint x="490" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hzo78o_di" bpmnElement="Flow_1hzo78o">
+        <di:waypoint x="228" y="170" />
+        <di:waypoint x="340" y="170" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="245" y="152" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dqni4v_di" bpmnElement="Flow_1dqni4v">
+        <di:waypoint x="390" y="228" />
+        <di:waypoint x="390" y="252" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ycndzh_di" bpmnElement="Flow_1ycndzh">
+        <di:waypoint x="372" y="270" />
+        <di:waypoint x="355" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n0281z_di" bpmnElement="Flow_0n0281z">
+        <di:waypoint x="305" y="270" />
+        <di:waypoint x="290" y="270" />
+        <di:waypoint x="290" y="190" />
+        <di:waypoint x="340" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="233" y="243" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ngmcfu_di" bpmnElement="Flow_1ngmcfu">
+        <di:waypoint x="330" y="295" />
+        <di:waypoint x="330" y="310" />
+        <di:waypoint x="662" y="310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="462" y="293" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_043z2u1_di" bpmnElement="Event_043z2u1">
+        <dc:Bounds x="652" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="192" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00jf4da_di" bpmnElement="Activity_0dlg5q0">
+        <dc:Bounds x="490" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0c5opcg_di" bpmnElement="Activity_1pyw9il">
+        <dc:Bounds x="340" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0uo68an_di" bpmnElement="Event_0kfxcdd">
+        <dc:Bounds x="372" y="252" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0llulpa_di" bpmnElement="Gateway_0llulpa" isMarkerVisible="true">
+        <dc:Bounds x="305" y="245" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1gqk1si_di" bpmnElement="Event_055skr3">
+        <dc:Bounds x="662" y="292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="641" y="335.5" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10d3xky_di" bpmnElement="Event_1ik7b3c">
+        <dc:Bounds x="372" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
