@@ -1,11 +1,16 @@
-name: Auth Web CD
+name: Request Management API CD
+
 
 on:
-  push:
+  pull_request:
     branches:
       - main
     paths:
-      - "auth-web/**"
+      - "request-management-api/**"
+  # Remove entire push section when done testing
+  push:
+    branches: 
+      - dev-AC-109
   workflow_dispatch:
     inputs:
       environment:
@@ -16,10 +21,10 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: ./auth-web
+    working-directory: ./request-management-api
 
 env:
-  APP_NAME: "auth-web"
+  APP_NAME: "request-management-api"
   TAG_NAME: "dev"
 
 jobs:
@@ -38,76 +43,82 @@ jobs:
         run: |
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
-      - name: CD Flow
+
+      - name: Whoami Openshift
         shell: bash
-        env:
-          OPS_REPOSITORY: ${{ secrets.OPS_REPOSITORY }}
-          OPENSHIFT_DOCKER_REGISTRY: ${{ secrets.OPENSHIFT4_DOCKER_REGISTRY }}
-          OPENSHIFT_SA_NAME: ${{ secrets.OPENSHIFT4_SA_NAME }}
-          OPENSHIFT_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
-          OPENSHIFT_REPOSITORY: ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}
-          TAG_NAME: ${{ env.TAG_NAME }}
         run: |
-          make cd
+          oc whoami
+
+      # - name: CD Flow
+      #   shell: bash
+      #   env:
+      #     OPS_REPOSITORY: ${{ secrets.OPS_REPOSITORY }}
+      #     OPENSHIFT_DOCKER_REGISTRY: ${{ secrets.OPENSHIFT4_DOCKER_REGISTRY }}
+      #     OPENSHIFT_SA_NAME: ${{ secrets.OPENSHIFT4_SA_NAME }}
+      #     OPENSHIFT_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
+      #     OPENSHIFT_REPOSITORY: ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}
+      #     TAG_NAME: ${{ env.TAG_NAME }}
+      #   run: |
+      #     make cd
 
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }}-${{ env.TAG_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
 
-      - name: Rocket.Chat Notification
-        uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
-        if: failure()
-        with:
-          type: ${{ job.status }}
-          job_name: "*Auth Web Built and Deployed to ${{env.TAG_NAME}}*"
-          channel: "#registries-bot"
-          url: ${{ secrets.ROCKETCHAT_WEBHOOK }}
-          commit: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Rocket.Chat Notification
+      #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
+      #   if: failure()
+      #   with:
+      #     type: ${{ job.status }}
+      #     job_name: "*Auth Web Built and Deployed to ${{env.TAG_NAME}}*"
+      #     channel: "#registries-bot"
+      #     url: ${{ secrets.ROCKETCHAT_WEBHOOK }}
+      #     commit: true
+      #     token: ${{ secrets.GITHUB_TOKEN }}
 
-  auth-web-cd-by-dispatch:
-    runs-on: ubuntu-20.04
+  # auth-web-cd-by-dispatch:
+  #   runs-on: ubuntu-20.04
 
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'bcgov/sbc-auth'
-    environment:
-      name: "${{ github.event.inputs.environment }}"
+  #   if: github.event_name == 'workflow_dispatch' && github.repository == 'bcgov/sbc-auth'
+  #   environment:
+  #     name: "${{ github.event.inputs.environment }}"
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set env by input
-        run: |
-          echo "TAG_NAME=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Set env by input
+  #       run: |
+  #         echo "TAG_NAME=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
 
-      - name: Login Openshift
-        shell: bash
-        run: |
-          oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
+  #     - name: Login Openshift
+  #       shell: bash
+  #       run: |
+  #         oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
-      - name: CD Flow
-        shell: bash
-        env:
-          OPS_REPOSITORY: ${{ secrets.OPS_REPOSITORY }}
-          OPENSHIFT_DOCKER_REGISTRY: ${{ secrets.OPENSHIFT4_DOCKER_REGISTRY }}
-          OPENSHIFT_SA_NAME: ${{ secrets.OPENSHIFT4_SA_NAME }}
-          OPENSHIFT_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
-          OPENSHIFT_REPOSITORY: ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}
-          TAG_NAME: ${{ env.TAG_NAME }}
-        run: |
-          make cd
+  #     - name: CD Flow
+  #       shell: bash
+  #       env:
+  #         OPS_REPOSITORY: ${{ secrets.OPS_REPOSITORY }}
+  #         OPENSHIFT_DOCKER_REGISTRY: ${{ secrets.OPENSHIFT4_DOCKER_REGISTRY }}
+  #         OPENSHIFT_SA_NAME: ${{ secrets.OPENSHIFT4_SA_NAME }}
+  #         OPENSHIFT_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
+  #         OPENSHIFT_REPOSITORY: ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}
+  #         TAG_NAME: ${{ env.TAG_NAME }}
+  #       run: |
+  #         make cd
 
-      - name: Watch new rollout (trigger by image change in Openshift)
-        shell: bash
-        run: |
-          oc rollout status dc/${{ env.APP_NAME }}-${{ env.TAG_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+  #     - name: Watch new rollout (trigger by image change in Openshift)
+  #       shell: bash
+  #       run: |
+  #         oc rollout status dc/${{ env.APP_NAME }}-${{ env.TAG_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
 
-      - name: Rocket.Chat Notification
-        uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
-        if: failure()
-        with:
-          type: ${{ job.status }}
-          job_name: "*Auth Web Built and Deployed to ${{env.TAG_NAME}}*"
-          channel: "#registries-bot"
-          url: ${{ secrets.ROCKETCHAT_WEBHOOK }}
-          commit: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Rocket.Chat Notification
+  #       uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
+  #       if: failure()
+  #       with:
+  #         type: ${{ job.status }}
+  #         job_name: "*Auth Web Built and Deployed to ${{env.TAG_NAME}}*"
+  #         channel: "#registries-bot"
+  #         url: ${{ secrets.ROCKETCHAT_WEBHOOK }}
+  #         commit: true
+  #         token: ${{ secrets.GITHUB_TOKEN }}
