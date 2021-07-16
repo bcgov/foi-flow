@@ -39,7 +39,7 @@ const RequestDescription = React.memo(({
             "startDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),
             "endDate": moment(new Date(requestDetails.toDate)).format("YYYY-MM-DD"),
             "description": !!requestDetails.description ? requestDetails.description : "",
-            "isMinistrySelected": !!requestDetails.selectedMinistries
+            "isProgramAreaSelected": !!requestDetails.selectedMinistries
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     

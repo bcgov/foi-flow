@@ -1,63 +1,74 @@
 import React from 'react';
+import { useSelector } from "react-redux";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { useSelector } from "react-redux";
 
-const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue, handleCategoryValue}) => {  
-    const applicantFirstName = requestDetails!==null && requestDetails.firstName!==null ? requestDetails.firstName: "";
-    const applicantMiddleName = requestDetails!==null && requestDetails.middleName !== null? requestDetails.middleName:"" ;
-    const applicantLastName = requestDetails!==null && requestDetails.lastName  !== null? requestDetails.lastName:"" ;
-    const organization = requestDetails!==null && requestDetails.businessName !==null ? requestDetails.businessName: "";
-    const email = requestDetails!==null && requestDetails.email !== null ? requestDetails.email:"";
-       
-    const [applicantFirstNameText, setApplicantFirstName] = React.useState(applicantFirstName);
-    const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(applicantMiddleName);
-    const [applicantLastNameText, setApplicantLastName] = React.useState(applicantLastName);
-    const [organizationText, setOrganization] = React.useState(organization);
-    const [emailText, setEmail] = React.useState(email);
-
+const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue, handleCategoryValue, handleEmailValidation}) => {
+    //gets the category list master data
     const category = useSelector(state=> state.foiRequests.foiCategoryList);
 
+    //state management of Applicant FirstName, MiddleName, LastName, Organization, Email and Category
+    const [applicantFirstNameText, setApplicantFirstName] = React.useState(requestDetails.firstName? requestDetails.firstName: "");
+    const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(requestDetails.middleName? requestDetails.middleName:"" );
+    const [applicantLastNameText, setApplicantLastName] = React.useState(requestDetails.lastName? requestDetails.lastName:"");
+    const [organizationText, setOrganization] = React.useState(requestDetails.businessName? requestDetails.businessName: "");
+    const [emailText, setEmail] = React.useState(requestDetails.email ? requestDetails.email:"");
+    const [selectedCategory, setCategoryValue] = React.useState(requestDetails.currentState !== "Unopened"? "Select Category":"Select Category");
+
+    //handle initial value for required field validation
     React.useEffect(() => {       
-        const categoryValue = Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
+        const categoryValue = requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
         handleCategoryInitialValue(categoryValue);
     },[requestDetails, handleCategoryInitialValue])
 
-    const [selectedCategory, setCategoryValue] = React.useState(Object.entries(requestDetails).length !== 0 && requestDetails.currentState !== "Unopened"? "Select Category":"Select Category");
+    //handle onchange of firstName
     const handleFirtNameChange = (e) => {
          setApplicantFirstName(e.target.value);
     }
+    //handle onchange of middleName
     const handleMiddleNameChange = (e) => {
          setApplicantMiddleName(e.target.value);
     }
+    //handle onchange of lastName
     const handleLastNameChange = (e) => {
         setApplicantLastName(e.target.value);
     }
+    //handle onchange of organization
     const handleOrganizationChange = (e) => {
         setOrganization(e.target.value);
     }
-    const [validation, setValidation] = React.useState({});
-    const handleEmailChange = (e) => {
-        var helperText = "";
-        if (e.target.value) {
-          const helperText =  /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e.target.value)
-          ? ""
-          : "Email is not valid."         
-          setValidation({field: "Email", helperTextValue: helperText});
-        }
 
-        if(helperText === "") {
-            setEmail(e.target.value);
-        }        
+    //state management for email validation
+    const [validation, setValidation] = React.useState({});
+    //handle onchange of email and the validation
+    const handleEmailChange = (e) => {
+        var emailValidation = {};
+        if(e.target.value) {
+            const helperText =  /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e.target.value)
+                ? ""
+                : "Email is not valid.";
+            emailValidation = {field: "Email", helperTextValue: helperText};
+            setValidation(emailValidation);        
+        }
+        else {
+            emailValidation = {field: "Email", helperTextValue: ""}
+            setValidation(emailValidation);
+        }
+        handleEmailValidation(emailValidation);
+        setEmail(e.target.value);
+              
     }
+    //handle category change
     const handleCategoryOnChange = (e) => {
         setCategoryValue(e.target.value);
+        //event bubble up - send the updated category for required field validation
         handleCategoryValue(e.target.value);
     }
     
+    //generate the menu items for the category
     const menuItems = category.map((item) => {    
         return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
      });    

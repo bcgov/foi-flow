@@ -114,6 +114,12 @@ const ReviewRequest = React.memo((props) => {
   const handleCategoryValue = (value) => {
     setSelectCategoryValue(value);
   }
+  
+  //handle email validation
+  const [validation, setValidation] = React.useState({});
+  const handleEmailValidation = (validationObj) => {    
+    setValidation(validationObj);
+  }
 
   //to get the updated program area list with isChecked=true/false
   const [programAreaList, setProgramAreaList] = React.useState([]);
@@ -124,11 +130,12 @@ const ReviewRequest = React.memo((props) => {
   } 
 
   //Variable to find if all required fields are filled or not
-  const isRequieredError = (
+  const isValidationError = (
     requiredRequestDescriptionValues.startDate === undefined || requiredRequestDescriptionValues.endDate === undefined 
     || requiredRequestDescriptionValues.description === ""
     || !requiredRequestDescriptionValues.isProgramAreaSelected
-    || selectCategoryValue.toLowerCase().includes("select") 
+    || selectCategoryValue.toLowerCase().includes("select")
+    || validation.helperTextValue !== undefined && validation.helperTextValue !== ""
     || assignedToValue.toLowerCase().includes("unassigned")
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
     || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
@@ -142,10 +149,10 @@ const ReviewRequest = React.memo((props) => {
       <div className="container foi-review-request-container">           
         <div className="col-sm-12 col-md-12 foi-review-container">
         <form className={classes.root} autoComplete="off">        
-        {requestDetails.description !== undefined ? (
+        {Object.entries(requestDetails).length !== 0 ? (
           <>
           <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue}/>
-          <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleCategoryValue={handleCategoryValue} /> 
+          <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleEmailValidation={handleEmailValidation} handleCategoryValue={handleCategoryValue} /> 
           {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.childFirstName !== undefined ?
           <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo}/> : null }          
            {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.anotherFirstName !== undefined ?
@@ -157,7 +164,7 @@ const ReviewRequest = React.memo((props) => {
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo}/>: null }
           <RequestNotes />
           
-          <BottomButtonGroup isRequieredError = {isRequieredError}/>
+          <BottomButtonGroup isValidationError = {isValidationError}/>
           </>
            ): null}
            </form>

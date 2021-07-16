@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({isRequieredError}) => {
+const BottomButtonGroup = React.memo(({isValidationError}) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const returnToQueue = () => {
@@ -40,11 +40,10 @@ const BottomButtonGroup = React.memo(({isRequieredError}) => {
      return (
     <div className={classes.root}>
       <div className="foi-bottom-button-group">
-      {/* <button type="button" className={`btn btn-bottom ${selectedCategory === '' ? classes.btndisabled : classes.btnenabled}`} disabled={selectedCategory===''} >Open Request</button> */}
-      <button type="button" className={`btn btn-bottom ${isRequieredError  ? classes.btndisabled : classes.btnenabled}`} disabled={isRequieredError} >Save</button>
-      <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}>Open Request</button>
-      <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}>Split Request</button>
-      <button type="button" className={`btn btn-bottom ${isRequieredError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isRequieredError}>Redirect in Full</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} >Save</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Open Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>
