@@ -6,7 +6,11 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate } from "../../../helper/FOI/helper";
+import moment from "moment-business-days";
 
+moment.updateLocale('en-ca', {
+  workingWeekdays: [1, 2, 3, 4, 5]
+});
 
 const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue}) => {
 
@@ -14,15 +18,22 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
      *  Request details box in the UI
      *  All fields are mandatory here
      */ 
-
+    const ADD_DAYS = 30;
     //get the RequestType, ReceivedMode and DeliveryMode master data
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
     const receivedMode = useSelector(state=> state.foiRequests.foiReceiveModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
+    const calculateReceivedDate = (receivedDateString) => {     
+      if (receivedDateString !== "" && receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) {        
+        receivedDateString.setDate(receivedDateString.getDate() + 1);
+      }
+      return receivedDateString;
+    }
     //updates the default values from the request details    
     React.useEffect(() => {
-      const receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+      let receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+      receivedDate = calculateReceivedDate(receivedDate);
       const receivedDateString = formatDate(receivedDate);
       const requestDetailsObject = {
         "requestType": !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type",
@@ -36,14 +47,15 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
   },[requestDetails, handleRequestDetailsInitialValue])
 
     //local state management for received date and start date
-    const receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+    let receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+    receivedDate = calculateReceivedDate(receivedDate);
     const receivedDateString = formatDate(receivedDate);
     const [receivedDateText, setReceivedDate] = React.useState(receivedDateString);
     const [startDateText, setStartDate] = React.useState(receivedDateString);
 
     //due date calculation
-    const dueDate = new Date(startDateText);
-    dueDate.setDate(dueDate.getDate() + 40);
+    let dueDate = new Date(receivedDateText);   
+    dueDate = moment(dueDate, 'DD-MM-YYYY').businessAdd(ADD_DAYS + 1)._d;    
     const dueDateString = formatDate(dueDate);
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
