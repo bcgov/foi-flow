@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
 import moment from 'moment';
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
       headingError: {
@@ -69,24 +70,24 @@ const RequestDescription = React.memo(({
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(event.target.value, "startDate");
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.START_DATE);
     };
     //handle onchange of end date and set state with latest value
     const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(event.target.value, "endDate");
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.END_DATE);
     };
     //handle onchange of description and set state with latest value
     const handleRequestDescriptionChange = (event) => {
         setRequestDescription(event.target.value);
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(event.target.value, "description");
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.DESCRIPTION);
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
     const handleUpdatedMasterProgramAreaList = (programAreaList) => {
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(programAreaList.some(programArea => programArea.isChecked), "isProgramAreaSelected");     
+        handleOnChangeRequiredRequestDescriptionValues(programAreaList.some(programArea => programArea.isChecked), FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     
         //event bubble up - Updated program area list
         handleUpdatedProgramAreaList(programAreaList);
     }

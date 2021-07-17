@@ -14,11 +14,11 @@ const ChildDetails = React.memo(({additionalInfo}) => {
      */ 
     
     //local states for Child FirstName, MiddleName, LastName, NickName and DOB
-    const [childFirstNameText, setChildFirstName] = React.useState(!!additionalInfo.childFirstName ? additionalInfo.childFirstName : "");
-    const [childMiddleNameText, setChildMiddleName] = React.useState(!!additionalInfo.childMiddleName ? additionalInfo.childMiddleName : "");
-    const [childLastNameText, setChildLastName] = React.useState(!!additionalInfo.childLastName ? additionalInfo.childLastName : "");
-    const [childNickNameText, setNickName] = React.useState(!!additionalInfo.childAlsoKnownAs ? additionalInfo.childAlsoKnownAs : "");
-    const dob = !!additionalInfo.childBirthDate ? new Date(additionalInfo.childBirthDate) : "";
+    const [childFirstNameText, setChildFirstName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childFirstName ? additionalInfo.childFirstName : "");
+    const [childMiddleNameText, setChildMiddleName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childMiddleName ? additionalInfo.childMiddleName : "");
+    const [childLastNameText, setChildLastName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childLastName ? additionalInfo.childLastName : "");
+    const [childNickNameText, setNickName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childAlsoKnownAs ? additionalInfo.childAlsoKnownAs : "");
+    const dob = additionalInfo !== undefined && !!additionalInfo.childBirthDate ? new Date(additionalInfo.childBirthDate) : "";
     const [childDOBText, setDOB] = React.useState(formatDate(dob));
 
     const handleFirtNameChange = (e) => {

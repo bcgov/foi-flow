@@ -15,6 +15,8 @@ import { useParams } from 'react-router-dom';
 import { fetchFOIRequestDetails, fetchFOICategoryList, fetchFOIProgramAreaList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -22,8 +24,9 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+
 const ReviewRequest = React.memo((props) => {
-  const {requestId} = useParams();
+  const {requestId} = useParams();  
 
   //gets the request detail from the store
   const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
@@ -74,16 +77,16 @@ const ReviewRequest = React.memo((props) => {
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
     const descriptionData = {...requiredRequestDescriptionValues};
-    if(name === "startDate") {      
+    if(name === FOI_COMPONENT_CONSTANTS.START_DATE) {      
       descriptionData.startDate = value;      
     }    
-    else if(name === "endDate") {    
+    else if(name === FOI_COMPONENT_CONSTANTS.END_DATE) {    
       descriptionData.endDate = value;      
     }
-    else if (name === "description") {     
+    else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {     
       descriptionData.description = value;      
     }
-    else if (name === "isProgramAreaSelected") {
+    else if (name === FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED) {
       descriptionData.isProgramAreaSelected = value;      
     }
     setRequiredRequestDescriptionValues(descriptionData);
@@ -92,15 +95,15 @@ const ReviewRequest = React.memo((props) => {
   //Update required fields of request details box with latest value
   const handleRequestDetailsValue = (value, name) => {
     const detailsData = {...requiredRequestDetailsValues};
-    if (name === "requestTpe") {
+    if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {      
       detailsData.requestType = value;
     }
-    else if (name === "receivedMode") {
+    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
       detailsData.receivedMode = value;
     }
-    else if (name === "deliveryMode") {
+    else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
       detailsData.deliveryMode = value;
-    }
+    }    
     setRequiredRequestDetailsValues(detailsData);
   }
 
@@ -143,6 +146,7 @@ const ReviewRequest = React.memo((props) => {
     || requiredRequestDetailsValues.requestStartDate === undefined 
     );
 
+  
   const classes = useStyles();
      return (
       <div className="container foi-review-request-container">      
@@ -152,9 +156,9 @@ const ReviewRequest = React.memo((props) => {
           <>
           <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue}/>
           <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleEmailValidation={handleEmailValidation} handleCategoryValue={handleCategoryValue} /> 
-          {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.childFirstName !== undefined ?
+          {requestDetails.additionalPersonalInfo !== undefined || requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
           <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo}/> : null }          
-           {requestDetails.additionalPersonalInfo !== undefined && requestDetails.additionalPersonalInfo.anotherFirstName !== undefined ?
+           {requestDetails.additionalPersonalInfo !== undefined || requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
           <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} />
           <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} />

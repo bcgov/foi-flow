@@ -7,6 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate } from "../../../helper/FOI/helper";
 import moment from "moment-business-days";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 moment.updateLocale('en-ca', {
   workingWeekdays: [1, 2, 3, 4, 5]
@@ -77,27 +78,27 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
       //event bubble up - for required feild validation
-      handleRequestDetailsValue(e.target.value, "receivedDate");
+      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
     }
     const handleStartDateChange = (e) => {
       setStartDate(e.target.value);
       //event bubble up - for required feild validation
-      handleRequestDetailsValue(e.target.value, "requestStartDate");
+      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE);
     }  
     const handleRequestTypeChange = (e) => {
       setSelectedRequestType(e.target.value);
       //event bubble up - for required feild validation
-      handleRequestDetailsValue(e.target.value, "requestType");
+      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
     }
     const handleReceivedModeChange = (e) => {
       setSelectedReceivedMode(e.target.value);
       //event bubble up - for required feild validation
-      handleRequestDetailsValue(e.target.value, "receivedMode");
+      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE);
     }
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
-      handleRequestDetailsValue(e.target.value, "deliveryMode");
+      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
     }
      return (
         

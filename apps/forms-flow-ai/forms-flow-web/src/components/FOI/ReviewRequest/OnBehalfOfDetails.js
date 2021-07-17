@@ -15,11 +15,11 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
      */ 
     
     //local states for Another person FirstName, MiddleName, LastName, NickName and DOB
-    const [anotherFirstNameText, setAnotherFirstName] = React.useState(!!additionalInfo.anotherFirstName ? additionalInfo.anotherFirstName : "");
-    const [anotherMiddleNameText, setAnotherMiddleName] = React.useState(!!additionalInfo.anotherMiddleName ? additionalInfo.anotherMiddleName : "");
-    const [anotherLastNameText, setAnotherLastName] = React.useState(!!additionalInfo.anotherLastName ? additionalInfo.anotherLastName : "");
-    const [anotherNickNameText, setAnotherNickName] = React.useState(!!additionalInfo.anotherAlsoKnownAs ? additionalInfo.anotherAlsoKnownAs : "");
-    const dob = !!additionalInfo.anotherBirthDate ? new Date(additionalInfo.anotherBirthDate) : "";
+    const [anotherFirstNameText, setAnotherFirstName] = React.useState(additionalInfo !== undefined && !!additionalInfo.anotherFirstName ? additionalInfo.anotherFirstName : "");
+    const [anotherMiddleNameText, setAnotherMiddleName] = React.useState(additionalInfo !== undefined && !!additionalInfo.anotherMiddleName ? additionalInfo.anotherMiddleName : "");
+    const [anotherLastNameText, setAnotherLastName] = React.useState(additionalInfo !== undefined && !!additionalInfo.anotherLastName ? additionalInfo.anotherLastName : "");
+    const [anotherNickNameText, setAnotherNickName] = React.useState(additionalInfo !== undefined && !!additionalInfo.anotherAlsoKnownAs ? additionalInfo.anotherAlsoKnownAs : "");
+    const dob = additionalInfo !== undefined && !!additionalInfo.anotherBirthDate ? new Date(additionalInfo.anotherBirthDate) : "";
     const [anotherDOBText, setAnotherDOB] = React.useState(formatDate(dob));
     
     const handleFirtNameChange = (e) => {
