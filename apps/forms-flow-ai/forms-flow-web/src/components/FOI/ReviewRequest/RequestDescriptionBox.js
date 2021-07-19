@@ -6,8 +6,8 @@ import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
-import moment from 'moment';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { formatDate } from "../../../helper/FOI/helper";
 
 const useStyles = makeStyles((theme) => ({
       headingError: {
@@ -37,8 +37,8 @@ const RequestDescription = React.memo(({
     //updates the default values from the request description box    
     React.useEffect(() => {
         const descriptionObject = {
-            "startDate": moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"),
-            "endDate": moment(new Date(requestDetails.toDate)).format("YYYY-MM-DD"),
+            "startDate": formatDate(new Date(requestDetails.fromDate)),
+            "endDate": formatDate(new Date(requestDetails.toDate)),
             "description": !!requestDetails.description ? requestDetails.description : "",
             "isProgramAreaSelected": !!requestDetails.selectedMinistries
         }    
@@ -62,8 +62,8 @@ const RequestDescription = React.memo(({
     }
 
     //component state management for startDate, endDate and Description
-    const [startDate, setStartDate] = React.useState(moment(new Date(requestDetails.fromDate)).format("YYYY-MM-DD"));
-    const [endDate, setEndDate] = React.useState(moment(new Date(requestDetails.toDate)).format("YYYY-MM-DD"));
+    const [startDate, setStartDate] = React.useState(formatDate(new Date(requestDetails.fromDate)));
+    const [endDate, setEndDate] = React.useState(formatDate(new Date(requestDetails.toDate)));
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
 
     //handle onchange of start date and set state with latest value
