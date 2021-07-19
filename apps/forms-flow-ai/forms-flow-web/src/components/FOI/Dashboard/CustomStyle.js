@@ -1,5 +1,5 @@
 import { getThemePaletteMode } from '@material-ui/data-grid';
-import { createMuiTheme, darken, lighten } from '@material-ui/core/styles';
+import { createMuiTheme , darken, lighten } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/styles';
 
 const defaultTheme = createMuiTheme();

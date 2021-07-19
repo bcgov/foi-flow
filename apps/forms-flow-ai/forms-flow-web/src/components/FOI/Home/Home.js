@@ -15,7 +15,7 @@ const Home = React.memo(() => {
         <div className="home-page">         
           <div className="card rounded-rectangle foiroundedrectangle">     
             <div className="card-body login-container">
-            {isAuthenticated?<h1 className="card-title">Welcome {user.name || user.preferred_username || ""}</h1> : <div> <h1 className="card-title">Welcome, Sign In</h1> <button type="button" className="btn btn-primary login-btn foiLogin" onClick={login}>Log In</button> </div>}
+            {isAuthenticated?<h1 className="card-title">Welcome {user.name || user.preferred_username || ""}</h1> : <div> <h1 className="card-title">Welcome, Sign In</h1> <button type="button" className="btn btn-primary foi-btn foibtn" onClick={login}>Log In</button> </div>}
               
             </div>
           </div>     

@@ -1,0 +1,59 @@
+@font-face {
+    font-family: "BCSans-Regular";
+    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+
+.foi-request-review-header-row1 {
+    display: flex;
+    margin-top: 40px;
+}
+.foi-request-review-header-col1{
+    display: block;
+    
+}
+.foi-request-status {
+    font-family: "BCSans-Regular";
+    background-color: black;
+    color: white;
+    width: fit-content;
+    margin-top: 10px;    
+    padding: 3px 25px;
+}
+.foi-request-review-header-col1-row {
+    // margin-left: auto;
+    margin-top: 40px;
+    //display: inline-block;
+    display: inline-flex;
+    height: fit-content;
+}
+
+.foi-review-request-text {
+    font-family: "BCSans-Bold";
+    color: #036 ;
+}
+
+.foi-period-text {
+    font-family: "BCSans-Bold";
+    color: #036 ;
+    padding-left: 10px;
+    padding-right: 10px;
+
+}
+.foi-correspondence-text {
+    font-family: "BCSans-Bold";
+    color: #49648d;
+}
+
+.foi-assigned-to-container {
+    margin-left: auto;
+    display: inline-block;
+}
+
+.foi-assigned-to-inner-container {
+    display: inline-block;
+    margin-top: 40px;
+}

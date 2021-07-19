@@ -66,8 +66,7 @@ const Dashboard = React.memo((props) => {
       }      
     ];
 
-const requestTypeChange = (e) => {
-  console.log(e);
+const requestTypeChange = (e) => { 
   setRequestType(e.target.value);
   
 }
@@ -76,19 +75,18 @@ const setSearch = (e) => {
   setSearchText(e.target.value);
 }
 
-const search = (rows) => { 
-  console.log(rows.length);
-  console.log(requestType);
-  var _rt =  (requestType == "general" || requestType == "personal") ? requestType : null ;
-
+const search = (rows) => {   
+  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;
+  
   return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt!=null ? row.requestType == _rt : (row.requestType == "general" || row.requestType == "personal") ) )
+  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
+
 }
  
 
-const renderReviewRequest = () => { 
-  dispatch(push('/foi/reviewrequest')); 
+const renderReviewRequest = (e) => {  
+  dispatch(push(`/foi/reviewrequest/${e.data.id}`));
 }
      return (  
                
@@ -126,6 +124,7 @@ const renderReviewRequest = () => {
                 getRowClassName={(params) =>
                   `super-app-theme--${params.getValue(params.id, 'currentState')}`
                 } 
+                onRowSelected={renderReviewRequest}
                 
                 />
             </div> 
