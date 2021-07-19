@@ -20,9 +20,6 @@ export const fetchFOIRequestList = (...rest) => {
         if (res.data) {
           const foiRequests = res.data;         
           let data = foiRequests.map((foiRequest) => {
-            //const foiRequestData = foiRequestDataFormatter(foiRequest.variables);
-            //delete foiRequest.variables;
-            //return { ...foiRequest, ...foiRequestData };
             return { ...foiRequest};
           });
           dispatch(clearRequestDetails({}));
@@ -56,14 +53,6 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-
-          // let data = foiRequests.map((foiRequest) => {
-          //   //const foiRequestData = foiRequestDataFormatter(foiRequest.variables);
-          //   //delete foiRequest.variables;
-          //   //return { ...foiRequest, ...foiRequestData };
-          //   return { ...foiRequest};
-          // });
-
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(setFOILoader(false));
           done(null, res.data);
