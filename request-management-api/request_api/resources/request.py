@@ -13,7 +13,6 @@
 # limitations under the License.
 """API endpoints for managing a FOI Requests resource."""
 
-import re
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
