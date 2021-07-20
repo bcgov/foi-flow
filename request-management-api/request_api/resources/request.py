@@ -64,7 +64,11 @@ class FOIRawRequestBPMProcess(Resource):
                 requestid = int(_requestid)
                 wfinstanceid = uuid.UUID(_wfinstanceid, version=4)
                 result = rawrequestservice.updateworkflowinstance(wfinstanceid,requestid)
-                return {'status': result.success, 'message':result.message}, 200
+
+                if result.identifier != -1 :                
+                    return {'status': result.success, 'message':result.message}, 200
+                else:
+                    return {'status': result.success, 'message':result.message}, 404
             except KeyError as keyexception:
                 return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
             except ValueError as valuexception:
