@@ -13,6 +13,7 @@
 # limitations under the License.
 """API endpoints for managing a FOI Requests resource."""
 
+import re
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
@@ -64,7 +65,11 @@ class FOIRawRequestBPMProcess(Resource):
                 requestid = int(_requestid)
                 wfinstanceid = uuid.UUID(_wfinstanceid, version=4)
                 result = rawrequestservice.updateworkflowinstance(wfinstanceid,requestid)
-                return {'status': result.success, 'message':result.message}, 200
+
+                if result.identifier != -1 :                
+                    return {'status': result.success, 'message':result.message}, 200
+                else:
+                    return {'status': result.success, 'message':result.message}, 404
             except KeyError as keyexception:
                 return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
             except ValueError as valuexception:
