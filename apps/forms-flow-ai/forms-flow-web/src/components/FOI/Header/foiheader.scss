@@ -1,0 +1,108 @@
+@font-face {
+  font-family: "BCSans-Bold";
+  src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+
+nav {
+  background-color: #036 !important;
+  
+  padding-top:10px !important;
+  padding-bottom: 10px !important;
+  color: #fff;
+}
+
+nav h2 {
+  font-family: 'BCSans-Bold' !important;
+  font-weight: 100 !important;
+  color: #fff;
+  margin-left: 40px;  
+}
+
+.banner-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  
+}
+.banner-right {
+  display: flex;
+  
+  font-family: 'BCSans-Bold';
+  color: #fff;
+}
+.navbar-text {
+  font-family: 'BCSans-Bold';  
+  color: #fff !important;
+  margin-right: 40px;
+  
+}
+
+.bell-icon {
+  margin-right: 40px;
+  
+  
+}
+
+.signout-btn {
+  border: none;
+  background-color:  #036 !important;
+  width: 100%;
+  height: 100%;   
+  font-family: 'BCSans-Bold';
+  color: #FFFF;
+  border-color: #FFFF !important;
+  position: relative;
+ 
+}
+
+.foiheaderLogosection{
+  display: inline;
+}
+
+.foiheaderAppNamesection{
+  display: inline-block;
+  width: auto!important;
+}
+
+.foiheaderUserStatusSection {
+  display: inline;
+  width: auto!important;
+  float: right;
+}
+
+
+/*  Mobile screens (phones, 500px and down) */
+@media only screen  and (max-width: 500px) {
+
+  .foihamburgermenu , .foihamburgermenulist{
+   width:100%;
+  }
+
+  .foiheaderLogosection , .foiheaderAppNamesection , .foiheaderUserStatusSection {
+    padding-left: 5px!important;
+    padding-right: 5px!important;
+  }
+  .foiheaderUserStatusSection {
+
+    float: none;
+  }
+
+  .foinavitem {
+    padding: 4px;
+  }
+
+  .foiContainer{
+    padding-left: 2px!important;
+    padding-right: 2px!important;
+  }
+
+  .foiNavBarToggle{
+    float: right;
+  }
+
+.foiheaderAppNamesection > h2 {
+  margin-left: 5%;
+}
+
+}
