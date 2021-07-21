@@ -1,4 +1,4 @@
-name: [TEST] Request Management API CD to TEST
+name: TEST Request Management API CD to TEST
 
 
 on:
