@@ -154,7 +154,10 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     width:1px!important;
 }
 
-
+.scrollable-page {
+    position: relative!important;
+    height: -webkit-fill-available;
+}
 @media only screen  and (min-width: 1800px) { 
 
     .foi-grid-container {
