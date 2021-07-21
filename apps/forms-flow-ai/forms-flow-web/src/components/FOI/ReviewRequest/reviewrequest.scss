@@ -7,8 +7,7 @@
     src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
 }
 .scrollable-page {
-    position: relative !important;  
-    height:auto;  
+    position: inherit !important;    
 }
 
 #app {
@@ -25,9 +24,8 @@
 }
 .foi-review-request-container {
     
-    width: 100%!important;
-    height: auto;
-    display: inline-block;
+    width: 100%!important;     
+    
 }
 
 .foi-review-container {
@@ -39,7 +37,7 @@
     right: 0px;
     left: 0px;
     background-color: white;
-    
+    height: calc(95vh - 127px);    
 }
 
 .foi-details-card {
