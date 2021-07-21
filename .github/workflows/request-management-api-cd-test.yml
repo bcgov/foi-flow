@@ -7,6 +7,10 @@ on:
       - main
     paths:
       - "request-management-api/**"
+  # Remove this "push" section when done developing.
+  push:
+    branches: 
+      - dev-AC-212
   workflow_dispatch:
     inputs:
       environment:
@@ -48,7 +52,6 @@ jobs:
         shell: bash
         run: |
           oc tag request-management-api:latest request-management-api:dev
-
 
       - name: Tag+Deploy for TEST
         shell: bash
