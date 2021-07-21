@@ -1,10 +1,10 @@
-name: DEV Request Management API CD
+name: TEST Request Management API CD to TEST
 
 
 on:
   push:
     branches:
-      - dev
+      - main
     paths:
       - "request-management-api/**"
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
       environment:
         description: "Environment (dev/test/prod)"
         required: true
-        default: "dev"
+        default: "test"
 
 defaults:
   run:
@@ -21,7 +21,7 @@ defaults:
 
 env:
   APP_NAME: "request-management-api"
-  TAG_NAME: "dev"
+  TAG_NAME: "test"
 
 jobs:
   request-management-api-cd-by-push:
@@ -29,7 +29,7 @@ jobs:
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
     environment:
-      name: "dev"
+      name: "test"
 
     steps:
       - uses: actions/checkout@v2
@@ -39,10 +39,10 @@ jobs:
         run: |
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
-      - name: Build from dev branch
+      - name: Build from main branch
         shell: bash
         run: |
-          oc patch bc/request-management-api-build -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
+          oc patch bc/request-management-api-build -p '{"spec":{"source":{"git":{"ref":"main"}}}}'
 
       - name: Start Build Openshift
         shell: bash
@@ -53,6 +53,11 @@ jobs:
         shell: bash
         run: |
           oc tag request-management-api:latest request-management-api:dev
+
+      - name: Tag+Deploy for TEST
+        shell: bash
+        run: |
+          oc tag request-management-api:dev request-management-api:${{ env.TAG_NAME }}
 
       # - name: Watch new rollout (trigger by image change in Openshift)
       #   shell: bash

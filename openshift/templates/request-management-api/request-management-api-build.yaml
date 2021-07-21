@@ -40,9 +40,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        # TODO - Go back to 'latest' once we have test env.
-        # name: "${API_NAME}:latest"
-        name: "${API_NAME}:dev"
+        name: "${API_NAME}:latest"
 parameters:
 - name: API_NAME
   displayName: Name
