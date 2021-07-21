@@ -1,4 +1,4 @@
-name: Request Management API CD
+name: [DEV] Request Management API CD
 
 
 on:
@@ -39,6 +39,10 @@ jobs:
         run: |
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
+      - name: Build from dev branch
+        shell: bash
+        run: |
+          oc patch bc/request-management-api-build -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
 
       - name: Start Build Openshift
         shell: bash
