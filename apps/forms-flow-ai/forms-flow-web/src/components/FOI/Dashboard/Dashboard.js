@@ -86,7 +86,6 @@ const search = (rows) => {
  
 
 const renderReviewRequest = (e) => {  
-  console.log('renderReviewRequest called', e)
   dispatch(push(`/foi/reviewrequest/${e.row.id}`));
 }
 
