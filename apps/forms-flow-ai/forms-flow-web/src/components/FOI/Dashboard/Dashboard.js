@@ -86,12 +86,10 @@ const search = (rows) => {
  
 
 const renderReviewRequest = (e) => {  
-  dispatch(push(`/foi/reviewrequest/${e.data.id}`));
+  console.log('renderReviewRequest called', e)
+  dispatch(push(`/foi/reviewrequest/${e.row.id}`));
 }
-const debug = (e) => {  
-  console.log('Debug called', e)
-  dispatch(push(`/foi/reviewrequest/${e.data.id}`));
-}
+
      return (  
                
         <div className="container foi-container">
@@ -128,9 +126,7 @@ const debug = (e) => {
                 getRowClassName={(params) =>
                   `super-app-theme--${params.getValue(params.id, 'currentState')}`
                 } 
-                onRowSelected={renderReviewRequest}
-                onRowClick={debug}
-                
+                onRowClick={renderReviewRequest}
                 />
             </div> 
           </div>
