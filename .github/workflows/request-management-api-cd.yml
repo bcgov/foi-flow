@@ -45,6 +45,10 @@ jobs:
         run: |
           oc start-build request-management-api-build --wait
 
+      - name: Tag+Deploy for DEV
+        shell: bash
+        run: |
+          oc tag request-management-api:latest request-management-api:dev
 
       # - name: Watch new rollout (trigger by image change in Openshift)
       #   shell: bash
