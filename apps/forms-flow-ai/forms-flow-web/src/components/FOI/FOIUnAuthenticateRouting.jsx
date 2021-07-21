@@ -35,8 +35,6 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
                 <Home />
                 <FOIFooter />
             </Route>
-         
-        ) 
       </>
     );
 })
