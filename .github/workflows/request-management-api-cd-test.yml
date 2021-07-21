@@ -1,16 +1,14 @@
-name: Request Management API CD
+name: Request Management API CD to TEST
 
 
 on:
   push:
     branches:
       - main
+      - dev-AC-212
     paths:
       - "request-management-api/**"
-  # Remove this "push" section when done developing.
-  push:
-    branches: 
-      - dev-AC-212
+      - ".github/workflows/request-management-api-cd-test.yml"
   workflow_dispatch:
     inputs:
       environment:
