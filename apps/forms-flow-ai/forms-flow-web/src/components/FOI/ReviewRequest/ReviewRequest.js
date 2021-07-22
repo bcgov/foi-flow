@@ -270,6 +270,27 @@ const ReviewRequest = React.memo((props) => {
       else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
         requestObject.identityVerified = value;
       }
+      else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {
+        requestObject.description = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.START_DATE) {
+        requestObject.fromDate = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.END_DATE) {
+        requestObject.toDate = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST) {
+        requestObject.selectedMinistries = [];
+        const filteredData = value.filter(programArea => programArea.isChecked)
+        .map(filteredProgramArea => {
+          return {
+            "code": filteredProgramArea.bcgovcode,
+            "name": filteredProgramArea.name,
+            "isSelected": filteredProgramArea.isChecked
+          }
+        });
+        requestObject.selectedMinistries = filteredData;
+      }
         
     }
     else {
@@ -292,7 +313,7 @@ const ReviewRequest = React.memo((props) => {
            {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
           <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} />
-          <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} />
+          <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
           <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
           {requestDetails.additionalPersonalInfo !== undefined ?
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }

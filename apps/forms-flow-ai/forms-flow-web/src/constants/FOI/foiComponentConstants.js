@@ -35,6 +35,7 @@ const FOI_COMPONENT_CONSTANTS = {
     END_DATE: "endDate",
     DESCRIPTION: "description",
     IS_PROGRAM_AREA_SELECTED: "isProgramAreaSelected",
+    PROGRAM_AREA_LIST: "programAreaList",
 
     REQUEST_TYPE: "requestType",
     RECEIVED_MODE: "receivedMode",
