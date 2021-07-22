@@ -5,8 +5,9 @@ import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
 import { formatDate } from "../../../helper/FOI/helper";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const ChildDetails = React.memo(({additionalInfo}) => {
+const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
 
      /**
      *  Child details box in the UI
@@ -23,18 +24,23 @@ const ChildDetails = React.memo(({additionalInfo}) => {
 
     const handleFirtNameChange = (e) => {
         setChildFirstName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME, e.target.value);
     }
     const handleMiddleNameChange = (e) => {
         setChildMiddleName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME, e.target.value);
     }
     const handleLastNameChange = (e) => {
         setChildLastName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME, e.target.value);
     }
     const handleNickNameChange = (e) => {
         setNickName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME, e.target.value);
     }
     const handleDOBChange = (e) => {
         setDOB(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_DOB, e.target.value);
     }  
      return (
         

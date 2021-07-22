@@ -68,13 +68,13 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
         }
         else {
             emailValidation = {field: "Email", helperTextValue: ""}
-            setValidation(emailValidation);
+            setValidation(emailValidation);            
         }
         handleEmailValidation(emailValidation);
         setEmail(e.target.value);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL, e.target.value);
-              
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL, e.target.value);    
     }
+
     //handle category change
     const handleCategoryOnChange = (e) => {
         setCategoryValue(e.target.value);

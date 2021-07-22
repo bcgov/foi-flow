@@ -150,13 +150,16 @@ const ReviewRequest = React.memo((props) => {
     || requiredRequestDetailsValues.requestStartDate === undefined 
     );
 
-  
   const classes = useStyles();  
+
   const createSaveRequestObject = (name, value) => 
   {
     const requestObject = {...saveRequestObject};   
     if(Object.entries(requestObject).length !== 0) {      
-      if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
+      if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {       
+        requestObject.assignedTo = value;
+      }      
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
           requestObject.firstName = value;
       }
       else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {        
@@ -168,17 +171,46 @@ const ReviewRequest = React.memo((props) => {
       else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
           requestObject.businessName = value;
       }
-      else if (name === FOI_COMPONENT_CONSTANTS.EMAIL) {
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
           requestObject.email = value;
       }
       else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
           requestObject.category = value;
       }
+      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME) {
+        requestObject.additionalPersonalInfo.childFirstName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME) {
+        requestObject.additionalPersonalInfo.childMiddleName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME) {
+        requestObject.additionalPersonalInfo.childLastName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME) {
+        requestObject.additionalPersonalInfo.childAlsoKnownAs = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_DOB) {
+        requestObject.additionalPersonalInfo.childBirthDate = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME) {
+        requestObject.additionalPersonalInfo.anotherFirstName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME) {
+        requestObject.additionalPersonalInfo.anotherMiddleName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME) {
+        requestObject.additionalPersonalInfo.anotherLastName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME) {
+        requestObject.additionalPersonalInfo.anotherAlsoKnownAs = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_DOB) {
+        requestObject.additionalPersonalInfo.anotherBirthDate = value;
+      }  
     }
     else {
       console.log(`inside else`);
-    }
-    console.log(`inside = ${JSON.stringify(requestObject)}`);
+    }    
     setSaveRequestObject(requestObject);    
   }
   console.log(`outside = ${JSON.stringify(saveRequestObject)}`);
@@ -189,12 +221,12 @@ const ReviewRequest = React.memo((props) => {
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
         {Object.entries(requestDetails).length !== 0 ? (
           <>
-          <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue}/>
+          <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
           <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleEmailValidation={handleEmailValidation} handleCategoryValue={handleCategoryValue} createSaveRequestObject={createSaveRequestObject} /> 
           {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
-          <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo}/> : null }          
+          <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject}/> : null }          
            {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-          <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} /> : null }          
+          <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
           <AddressContactDetails requestDetails={requestDetails} />
           <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} />
           <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue}/>

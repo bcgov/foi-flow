@@ -5,9 +5,10 @@ import "./reviewrequestheader.scss";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 
-const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue}) => {
+const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
    
      /**
      *  Header of Review request in the UI
@@ -38,6 +39,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
         setAssignedTo(event.target.value);
         //event bubble up - to validate required fields
         handleAssignedToValue(event.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
     }
 
      return (
