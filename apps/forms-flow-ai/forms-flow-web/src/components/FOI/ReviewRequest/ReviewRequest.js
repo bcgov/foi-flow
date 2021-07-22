@@ -254,7 +254,22 @@ const ReviewRequest = React.memo((props) => {
       }
       else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
         requestObject.deliveryMode = value;
-      }           
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
+        requestObject.additionalPersonalInfo.birthDate = value;
+      }      
+      else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+        requestObject.correctionalServiceNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
+        requestObject.publicServiceEmployeeNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
+        requestObject.personalHealthNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
+        requestObject.identityVerified = value;
+      }
         
     }
     else {
@@ -280,7 +295,7 @@ const ReviewRequest = React.memo((props) => {
           <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} />
           <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
           {requestDetails.additionalPersonalInfo !== undefined ?
-          <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo}/>: null }
+          <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
           <RequestNotes />
           
           <BottomButtonGroup isValidationError = {isValidationError}/>

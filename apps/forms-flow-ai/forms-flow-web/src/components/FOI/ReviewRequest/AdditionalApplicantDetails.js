@@ -5,9 +5,9 @@ import TextField from '@material-ui/core/TextField';
 import './additionalapplicantdetails.scss';
 import { formatDate } from "../../../helper/FOI/helper";
 
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-
-const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
+const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
     /**
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
@@ -23,22 +23,27 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo}) => {
 
   const handlePersonalHealthNumber = (e) => {
     setPersonalHealthNumber(e.target.value);
+    createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, e.target.value);
   }
 
   const handleIdentityVerified = (e) => {
     setIdentityVerified(e.target.value);
+    createSaveRequestObject(FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED, e.target.value);
   }
 
   const handleCorrectionsNumber = (e) => {
     setCorrectionsNumber(e.target.value);
+    createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER, e.target.value);
   }
 
   const handleEmployeeNumber = (e) => {
     setEmployeeNumber(e.target.value);
+    createSaveRequestObject(FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER, e.target.value);
   }
 
   const handleBirthDate = (e) => {
     setDOB(e.target.value);
+    createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DOB, e.target.value);
   }
 
      return (
