@@ -13,7 +13,7 @@ moment.updateLocale('en-ca', {
   workingWeekdays: [1, 2, 3, 4, 5]
 });
 
-const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue}) => {
+const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject}) => {
 
     /**
      *  Request details box in the UI
@@ -53,11 +53,16 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const receivedDateString = formatDate(receivedDate);
     const [receivedDateText, setReceivedDate] = React.useState(receivedDateString);
     const [startDateText, setStartDate] = React.useState(receivedDateString);
+    
 
     //due date calculation
-    let dueDate = new Date(receivedDateText);   
-    dueDate = moment(dueDate, 'DD-MM-YYYY').businessAdd(ADD_DAYS + 1)._d;    
-    const dueDateString = formatDate(dueDate);
+    const dueDateCalculation = (dateText) => {
+      let dueDate = new Date(dateText);   
+      dueDate = moment(dueDate, 'DD-MM-YYYY').businessAdd(ADD_DAYS + 1)._d;    
+      return formatDate(dueDate);
+    }    
+
+    const [dueDateText, setDueDate] = React.useState(dueDateCalculation(receivedDateString));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
     const [selectedRequestType, setSelectedRequestType] = React.useState(!!requestDetails.requestType ? requestDetails.requestType : "Select Request Type");
@@ -77,28 +82,35 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //handling the received date change
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
+      const dueDate = dueDateCalculation(e.target.value);
+      setDueDate(dueDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value, dueDate);
     }
     const handleStartDateChange = (e) => {
       setStartDate(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, e.target.value);
     }  
     const handleRequestTypeChange = (e) => {
       setSelectedRequestType(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_TYPE, e.target.value);
     }
     const handleReceivedModeChange = (e) => {
       setSelectedReceivedMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_MODE, e.target.value);
     }
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
      return (
         
@@ -183,7 +195,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                         <TextField                
                             label="Due Date"
                             type="date" 
-                            value={dueDateString}                            
+                            value={dueDateText}                            
                             InputLabelProps={{
                             shrink: true,
                             }}

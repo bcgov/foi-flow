@@ -5,9 +5,9 @@ import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import { useSelector } from "react-redux";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-
-const AddressContactDetails = React.memo(({requestDetails}) => {
+const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObject}) => {
 
     /**
      *  Address and Contact box in the UI
@@ -40,36 +40,46 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
 
     const handleHomePhoneChange = (e) => {
         setHomePhone(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.HOME_PHONE, e.target.value);
     }
     const handleMobilePhoneChange = (e) => {
         setMobilePhone(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.MOBILE_PHONE, e.target.value);
     }
     const handleWorkPhonePrimaryChange = (e) => {
         setWorkPhonePrimary(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY, e.target.value);
     }
     const handleWorkPhoneSecondarChange = (e) => {
         setWorkPhoneSecondary(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY, e.target.value);
     }
 
     const handleStreetAddressChange = (e) => {
         setStreetAddress(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY, e.target.value);
     }
     const handleScondaryStreetAddressChange = (e) => {
         setSecondaryStreetAddress(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY, e.target.value);
     }
     const handleCityChange = (e) => {
         setCity(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CITY, e.target.value);
     }
     const handlePostalChange = (e) => {
         setPostal(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.POSTALCODE, e.target.value);
     }
 
     const handleProvinceOnChange = (e) => {
         setProvinceValue(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROVINCE, e.target.value);
     }
 
     const handleCountryOnChange = (e) => {
         setCountryValue(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.COUNTRY, e.target.value);
     }
 
      return (

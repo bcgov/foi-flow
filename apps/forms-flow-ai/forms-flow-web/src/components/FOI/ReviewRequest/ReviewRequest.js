@@ -152,7 +152,7 @@ const ReviewRequest = React.memo((props) => {
 
   const classes = useStyles();  
 
-  const createSaveRequestObject = (name, value) => 
+  const createSaveRequestObject = (name, value, value2) => 
   {
     const requestObject = {...saveRequestObject};   
     if(Object.entries(requestObject).length !== 0) {      
@@ -206,7 +206,56 @@ const ReviewRequest = React.memo((props) => {
       }
       else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_DOB) {
         requestObject.additionalPersonalInfo.anotherBirthDate = value;
-      }  
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.HOME_PHONE) {
+        requestObject.phonePrimary = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) {
+        requestObject.phoneSecondary = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) {
+        requestObject.workPhonePrimary = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) {
+        requestObject.workPhoneSecondary = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
+        requestObject.address = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) {
+        requestObject.addressSecondary = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
+        requestObject.city = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
+        requestObject.postal = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
+        requestObject.province = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
+        requestObject.country = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
+        requestObject.receivedDate = value;
+        const receivedDateUTC = new Date(value).toISOString();
+        requestObject.receivedDateUF = receivedDateUTC;
+        requestObject.dueDate = value2;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
+        requestObject.requestProcessStart = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
+        requestObject.requestType = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
+        requestObject.receivedMode = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
+        requestObject.deliveryMode = value;
+      }           
+        
     }
     else {
       console.log(`inside else`);
@@ -227,9 +276,9 @@ const ReviewRequest = React.memo((props) => {
           <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject}/> : null }          
            {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
           <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
-          <AddressContactDetails requestDetails={requestDetails} />
+          <AddressContactDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} />
           <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} />
-          <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue}/>
+          <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
           {requestDetails.additionalPersonalInfo !== undefined ?
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo}/>: null }
           <RequestNotes />
