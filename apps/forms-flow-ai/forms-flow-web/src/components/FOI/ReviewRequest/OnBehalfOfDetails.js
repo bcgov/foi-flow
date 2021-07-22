@@ -86,7 +86,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
                         <TextField                
                             label="Date of Birth"
                             type="date" 
-                            value={anotherDOBText} 
+                            value={anotherDOBText||''} 
                             onChange={handleDOBChange}
                             InputLabelProps={{
                             shrink: true,

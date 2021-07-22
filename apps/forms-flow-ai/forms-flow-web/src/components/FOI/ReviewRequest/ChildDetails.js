@@ -21,7 +21,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
     const [childNickNameText, setNickName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childAlsoKnownAs ? additionalInfo.childAlsoKnownAs : "");
     const dob = additionalInfo !== undefined && !!additionalInfo.childBirthDate ? new Date(additionalInfo.childBirthDate) : "";
     const [childDOBText, setDOB] = React.useState(formatDate(dob));
-
+ 
     const handleFirtNameChange = (e) => {
         setChildFirstName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME, e.target.value);
@@ -86,7 +86,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
                         <TextField                
                             label="Date of Birth"
                             type="date" 
-                            value={childDOBText} 
+                            value={childDOBText||''} 
                             onChange={handleDOBChange}
                             InputLabelProps={{
                             shrink: true,
