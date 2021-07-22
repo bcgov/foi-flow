@@ -30,7 +30,7 @@ const ReviewRequest = React.memo((props) => {
 
   //gets the request detail from the store
   const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
-  
+  const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -38,6 +38,10 @@ const ReviewRequest = React.memo((props) => {
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
   },[requestId, dispatch]); 
+
+  useEffect(() => {
+    setSaveRequestObject(requestDetails);
+  },[requestDetails]);
 
   const requiredRequestDescriptionDefaultData = {
     "startDate": "",
@@ -147,7 +151,38 @@ const ReviewRequest = React.memo((props) => {
     );
 
   
-  const classes = useStyles();
+  const classes = useStyles();  
+  const createSaveRequestObject = (name, value) => 
+  {
+    const requestObject = {...saveRequestObject};   
+    if(Object.entries(requestObject).length !== 0) {      
+      if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
+          requestObject.firstName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {        
+          requestObject.middleName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
+          requestObject.lastName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
+          requestObject.businessName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.EMAIL) {
+          requestObject.email = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
+          requestObject.category = value;
+      }
+    }
+    else {
+      console.log(`inside else`);
+    }
+    console.log(`inside = ${JSON.stringify(requestObject)}`);
+    setSaveRequestObject(requestObject);    
+  }
+  console.log(`outside = ${JSON.stringify(saveRequestObject)}`);
+  
      return (
       <div className="container foi-review-request-container">      
         <div className="foi-review-container">
@@ -155,7 +190,7 @@ const ReviewRequest = React.memo((props) => {
         {Object.entries(requestDetails).length !== 0 ? (
           <>
           <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue}/>
-          <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleEmailValidation={handleEmailValidation} handleCategoryValue={handleCategoryValue} /> 
+          <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleEmailValidation={handleEmailValidation} handleCategoryValue={handleCategoryValue} createSaveRequestObject={createSaveRequestObject} /> 
           {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
           <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo}/> : null }          
            {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
