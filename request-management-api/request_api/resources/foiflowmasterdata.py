@@ -22,6 +22,7 @@ from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.programareaservice import programareaservice
+from request_api.services.keycloakadminservice import KeycloakAdminService
 import json
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
@@ -40,7 +41,7 @@ class FOIFlowApplicantCategories(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except:
-            return "Error happened while accessing applicant categories" , 200
+            return "Error happened while accessing applicant categories" , 500
 
 
 @cors_preflight('GET,OPTIONS')
@@ -56,4 +57,19 @@ class FOIFlowProgramAreas(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except:
-            return "Error happened while accessing applicant categories" , 200
+            return "Error happened while accessing applicant categories" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/intake/teammembers')
+class IntakeTeamMembers(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cors.crossdomain(origin='*')       
+    def get():
+        try:
+            keycloakadminservice = KeycloakAdminService()
+            data = keycloakadminservice.getusers()              
+            return json.dumps(data) , 200
+        except:
+            return "Error happened while accessing intake teammembers from keycloak" , 500          
