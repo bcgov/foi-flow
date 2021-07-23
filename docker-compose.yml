@@ -32,6 +32,13 @@ services:
       - FOI_REQUESTQUEUE_REDISPORT=6379
       - FOI_REQUESTQUEUE_REDISPASSWORD=
       - FOI_REQUESTQUEUE_REDISCHANNEL=FOI_WF_REQUEST_CHANNEL
+      - KEYCLOAK_ADMIN_HOST=https://dev.oidc.gov.bc.ca/
+      - KEYCLOAK_ADMIN_REALM=
+      - KEYCLOAK_ADMIN_CLIENT_ID=foi-lob-api
+      - KEYCLOAK_ADMIN_CLIENT_SECRET=
+      - KEYCLOAK_ADMIN_SRVACCOUNT=foisrcaccount
+      - KEYCLOAK_ADMIN_SRVPASSWORD=
+      - KEYCLOAK_ADMIN_INTAKE_GROUPID=
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg
