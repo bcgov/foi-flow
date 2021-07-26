@@ -1,14 +1,19 @@
+from enum import unique
+import re
+
+from sqlalchemy.sql.expression import distinct
 from .db import  db, ma
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
+from sqlalchemy import insert, and_
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequests' 
     # Defining the columns
     requestid = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    version = db.Column(db.Integer, primary_key=True)
+    version = db.Column(db.Integer, primary_key=True,nullable=False)
     requestrawdata = db.Column(JSON, unique=False, nullable=True)
     status = db.Column(db.String(25), unique=False, nullable=True)
     notes = db.Column(db.String(120), unique=False, nullable=True)
@@ -28,14 +33,27 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
+    def saverawrequestversion(cls,_requestrawdata,requestid,assignee,status)->DefaultMethodResult:        
+        updatedat = datetime.now().isoformat()
+        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()        
+        _version = request.version+1
+        insertstmt =(
+            insert(FOIRawRequest).
+            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee)
+        )                 
+        db.session.execute(insertstmt)               
+        db.session.commit()                
+        return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid)    
+
+    @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid)->DefaultMethodResult:
         updatedat = datetime.now().isoformat()
         dbquery = db.session.query(FOIRawRequest)
-        requestraqw = dbquery.filter_by(requestid=requestid)
+        requestraqw = dbquery.filter_by(requestid=requestid,version = 1)
         if(requestraqw.count() > 0) :
             existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
             if(existingrequestswithWFid.count() == 0) :
-                dbquery.filter_by(requestid=requestid).update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"WF Instance created"}, synchronize_session = False)
+                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"WF Instance created"}, synchronize_session = False)
                 db.session.commit()
                 return DefaultMethodResult(True,'Request updated with WF Instance Id',requestid)
             else:
@@ -47,13 +65,21 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequests(cls):
         request_schema = FOIRawRequestSchema(many=True)
-        query = db.session.query(FOIRawRequest).all()
-        return request_schema.dump(query)
+        _session = db.session
+        _requestids = _session.query(distinct(FOIRawRequest.requestid)).all()
+        requests = []
+        for _requestid in _requestids:
+           request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid).order_by(FOIRawRequest.version.desc()).first()           
+           requests.append(request)
+        #query = db.session.query(FOIRawRequest).all()
+        #query = db.session.query(FOIRawRequest).distinct(FOIRawRequest.requestid).all()
+        #return request_schema.dump(query)
+        return requests
 
     @classmethod
     def get_request(cls,requestid):   
        request_schema = FOIRawRequestSchema()
-       request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).first()
+       request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
        return request_schema.dump(request)
 
 class FOIRawRequestSchema(ma.Schema):
