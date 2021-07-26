@@ -23,9 +23,12 @@ from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
 import json
 import uuid
+import warlock
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
+with open('request_api/schemas/schemas/rawrequest.json') as f:
+        schema = json.load(f)
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
@@ -47,6 +50,24 @@ class FOIRawRequest(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
+    @staticmethod
+    #@Tracer.trace()
+    @cors.crossdomain(origin='*')
+    def post(requestid=None):
+        try :                        
+            updaterequest = request.get_json()            
+            requestidisInteger = int(requestid)
+            if requestidisInteger :     
+
+                ##TODO : WorkFlow Claiming  here.
+                
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],'intake in progress')
+                                                                       
+                return {'status': result.success, 'message':result.message}, 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,POST,PUT,OPTIONS')
 @API.route('/foirawrequestbpm/addwfinstanceid/<_requestid>')
@@ -91,8 +112,7 @@ class FOIRawRequests(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500     
 
-    with open('request_api/schemas/schemas/rawrequest.json') as f:
-        schema = json.load(f)
+    
 
     
 
