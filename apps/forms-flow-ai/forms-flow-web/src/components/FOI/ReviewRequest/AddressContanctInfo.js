@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import { useSelector } from "react-redux";
+import {getCountryList, getProvinceList} from '../../../services/FOI/CountryProvinceListervice';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObject}) => {
@@ -15,8 +16,8 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
      */ 
     
     //get the master data for country and province
-    const countryList = useSelector(state=> state.foiRequests.foiCountryList);
-    const provinceList = useSelector(state=> state.foiRequests.foiProvinceList);
+    const countryList = getCountryList();//useSelector(state=> state.foiRequests.foiCountryList);
+    //const provinceList = useSelector(state=> state.foiRequests.foiProvinceList);
     
     //local state management for homePhone, mobilePhone, workPhone1, workPhone2, streetAddress1, streetAddress2, city, postalcode, province and country
     const [homePhoneText, setHomePhone] = React.useState(!!requestDetails.phonePrimary ? requestDetails.phonePrimary : "() -");
@@ -29,13 +30,13 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
     const [PostalText, setPostal] = React.useState(!!requestDetails.postal ? requestDetails.postal : "");    
     const [selectProvinceValue, setProvinceValue] = React.useState(!!requestDetails.province ? requestDetails.province : "Select Province");
     const [selectCountryValue, setCountryValue] = React.useState(!!requestDetails.country ? requestDetails.country : "Select Country");    
-
+    const [provinceNameList, setProvinceNameList] = React.useState(["Select Province"]);
     //create menuItems for province and country
-    const provinceItems = provinceList.map((item) => {    
-        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+    const provinceItems = provinceNameList.map((item) => {    
+        return ( <MenuItem key={item} value={item} disabled={item.toLowerCase().includes("select")}>{item}</MenuItem> )
      });
      const countryItems = countryList.map((item) => {    
-        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+        return ( <MenuItem key={item} value={item} disabled={item.toLowerCase().includes("select")}>{item}</MenuItem> )
      });
 
     const handleHomePhoneChange = (e) => {
@@ -79,6 +80,7 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
 
     const handleCountryOnChange = (e) => {
         setCountryValue(e.target.value);
+        setProvinceNameList(getProvinceList(e.target.value));
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.COUNTRY, e.target.value);
     }
 
