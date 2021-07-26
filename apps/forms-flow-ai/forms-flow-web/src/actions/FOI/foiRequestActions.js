@@ -14,8 +14,6 @@ export const setFOIUpdateLoader = (data) => dispatch =>{
     })
 }
 
-//TODO Update set to get on below cases
-
 export const setFOIRequestList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS,

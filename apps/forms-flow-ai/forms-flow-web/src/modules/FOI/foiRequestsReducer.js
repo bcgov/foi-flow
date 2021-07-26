@@ -12,7 +12,7 @@ const initialState = {
   foiRequestTypeList:[{"requesttypeid":0, "name": "Select Request Type"}, {"requesttypeid":1, "name": "general"}, {"requesttypeid":2, "name": "personal"}],
   foiReceiveModeList:[{"receivemodeid":0, "name": "Select Received Mode"}, {"receivemodeid":1, "name": "Mode1"}, {"receivemodeid":2, "name": "Mode2"}],
   foiDeliveryModeList:[{"deliverymodeid":0, "name": "Select Delivery Mode"}, {"deliverymodeid":1, "name": "Mode1"}, {"deliverymodeid":2, "name": "Mode2"}],
-  foiAssignedToList: [{"id":0, "name": "Unassigned"}, {"id":1, "name": "UserName1"}, {"id":2, "name": "UserName2"}, {"id":3, "name": "UserName3"}],
+  foiAssignedToList: [],
   foiProgramAreaList:[], 
 }
 
@@ -71,8 +71,8 @@ const foiRequests = (state = initialState, action)=> {
     //     return {...state, foiReceiveModeList: action.payload};
     // case FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST:
     //     return {...state, foiDeliveryModeList: action.payload};
-    // case FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST:
-    //     return {...state, foiAssignedToList: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST:
+        return {...state, foiAssignedToList: action.payload};
     case FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS:
       return {...state, foiRequestDetail: action.payload};         
     default:

@@ -8,6 +8,7 @@ import {
   setFOICategoryList,
   setFOIProgramAreaList,
   clearRequestDetails,
+  setFOIAssignedToList,
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -102,7 +103,7 @@ export const fetchFOICategoryList = (...rest) => {
 };
 
 export const fetchFOIProgramAreaList = (...rest) => {
-  const done = rest.length ? rest[0] : () => {};  
+  const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
     httpOpenGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
       .then((res) => {
@@ -112,6 +113,37 @@ export const fetchFOIProgramAreaList = (...rest) => {
             return { ...programArea, isChecked: false};
           });
           dispatch(setFOIProgramAreaList(data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+
+export const fetchFOIAssignedToList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const unAssigned = {"id": 0, "username": "Unassigned"};
+  return (dispatch) => {
+    httpOpenGETRequest(API.FOI_GET_ASSIGNEDTOLIST_API, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiAssignedToList = res.data;          
+          let data = foiAssignedToList.map((assignedTo) => {
+            return { ...assignedTo};
+          });
+          data.unshift(unAssigned);
+          dispatch(setFOIAssignedToList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {

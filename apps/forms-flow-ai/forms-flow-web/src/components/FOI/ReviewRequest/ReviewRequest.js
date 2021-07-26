@@ -12,7 +12,7 @@ import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
-import { fetchFOIRequestDetails, fetchFOICategoryList, fetchFOIProgramAreaList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIRequestDetails, fetchFOICategoryList, fetchFOIProgramAreaList, fetchFOIAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -37,6 +37,7 @@ const ReviewRequest = React.memo((props) => {
     dispatch(fetchFOIRequestDetails(requestId));   
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
+    dispatch(fetchFOIAssignedToList());
   },[requestId, dispatch]); 
 
   useEffect(() => {
@@ -298,7 +299,6 @@ const ReviewRequest = React.memo((props) => {
     }    
     setSaveRequestObject(requestObject);    
   }
-  console.log(`outside = ${JSON.stringify(saveRequestObject)}`);
   
      return (
       <div className="container foi-review-request-container">      

@@ -20,17 +20,17 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
-        const assignedTo = requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
+        const assignedTo = requestDetails.assignedTo;
         handleAssignedToInitialValue(assignedTo);
     },[requestDetails, handleAssignedToInitialValue])
 
     //creates the menu items for assignedTo combobox
     const menuItems = assignedToList.map((item) => {    
-        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("unassigned")}>{item.name}</MenuItem> )
+        return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{item.username}</MenuItem> )
      });
     
      //local state management for assignedTo
-    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned");
+    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.assignedTo);
 
     const preventDefault = (event) => event.preventDefault();
     
