@@ -11,7 +11,7 @@ class DeliveryMode(db.Model):
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
 
     @classmethod
-    def getapplicantcategories(cls):
+    def getdeliverymodes(cls):
         deliverymode_schema = DeliveryModeSchema(many=True)
         query = db.session.query(DeliveryMode).filter_by(isactive=True).all()
         return deliverymode_schema.dump(query)

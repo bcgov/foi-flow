@@ -11,7 +11,7 @@ class ReceivedMode(db.Model):
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
 
     @classmethod
-    def getapplicantcategories(cls):
+    def getreceivedmodes(cls):
         receivedmode_schema = ReceivedModeSchema(many=True)
         query = db.session.query(ReceivedMode).filter_by(isactive=True).all()
         return receivedmode_schema.dump(query)
