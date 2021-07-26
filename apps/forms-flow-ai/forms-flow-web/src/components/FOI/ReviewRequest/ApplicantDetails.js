@@ -9,7 +9,6 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 
 const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue, 
     handleCategoryValue, handleEmailValidation, createSaveRequestObject}) => {
-        
     /**
      *  Applicant Details box in the UI
      *  Category - Mandatory field
@@ -24,11 +23,11 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
     const [applicantLastNameText, setApplicantLastName] = React.useState(requestDetails.lastName? requestDetails.lastName:"");
     const [organizationText, setOrganization] = React.useState(requestDetails.businessName? requestDetails.businessName: "");
     const [emailText, setEmail] = React.useState(requestDetails.email ? requestDetails.email:"");
-    const [selectedCategory, setCategoryValue] = React.useState(requestDetails.currentState !== "Unopened"? "Select Category":"Select Category");
+    const [selectedCategory, setCategoryValue] = React.useState(requestDetails.category !== undefined? requestDetails.category:"Select Category");
 
     //handle initial value for required field validation
     React.useEffect(() => {       
-        const categoryValue = requestDetails.currentState !== "Unopened"? "Select Category":"Select Category";
+        const categoryValue = requestDetails.category !== undefined? requestDetails.category:"Select Category";
         handleCategoryInitialValue(categoryValue);
     },[requestDetails, handleCategoryInitialValue])
 

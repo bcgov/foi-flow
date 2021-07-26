@@ -31,6 +31,11 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
     const [selectProvinceValue, setProvinceValue] = React.useState(!!requestDetails.province ? requestDetails.province : "Select Province");
     const [selectCountryValue, setCountryValue] = React.useState(!!requestDetails.country ? requestDetails.country : "Select Country");    
     const [provinceNameList, setProvinceNameList] = React.useState(["Select Province"]);
+
+    React.useEffect(() => {     
+        setProvinceNameList(getProvinceList(requestDetails.country));
+    },[requestDetails])
+    
     //create menuItems for province and country
     const provinceItems = provinceNameList.map((item) => {    
         return ( <MenuItem key={item} value={item} disabled={item.toLowerCase().includes("select")}>{item}</MenuItem> )
@@ -80,6 +85,7 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
 
     const handleCountryOnChange = (e) => {
         setCountryValue(e.target.value);
+        setProvinceValue("Select Province");
         setProvinceNameList(getProvinceList(e.target.value));
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.COUNTRY, e.target.value);
     }

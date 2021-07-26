@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest, httpOpenGETRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpOpenPOSTRequest, httpOpenGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -47,7 +47,7 @@ export const fetchFOIRequestList = (...rest) => {
 export const fetchFOIRequestDetails = (requestId,...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const apiUrlgetRequestDetails = replaceUrl(
-    API.FOI_GET_REQUEST_API,
+    API.FOI_REQUEST_API,
     "<requestid>",
     requestId
   );
@@ -219,6 +219,31 @@ export const fetchFOIReceivedModeList = (...rest) => {
         console.log("Error", error);
         dispatch(serviceActionError(error));
         dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const saveRequestDetails = (data, ...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  console.log(data.id);
+  const apiUrl = replaceUrl(
+    API.FOI_REQUEST_API,
+    "<requestid>",
+    data.id
+  );
+  return (dispatch) => {
+    httpOpenPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error Posting data");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
         done(error);
       });
   };

@@ -8,7 +8,10 @@ const getCountryList = () => {
 
 const getProvinceList = (countryName) => {
     const [provinceList] = CountryList.filter(country => country.name === countryName);
-    const provinceNameList = provinceList.states.map(province => province.name);
+    let provinceNameList = [];
+    if (provinceList !== undefined) {
+        provinceNameList = provinceList.states.map(province => province.name);        
+    }
     provinceNameList.unshift("Select Province");
     return provinceNameList;
 }

@@ -12,7 +12,14 @@ import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
-import { fetchFOIRequestDetails, fetchFOICategoryList, fetchFOIProgramAreaList, fetchFOIAssignedToList, fetchFOIDeliveryModeList, fetchFOIReceivedModeList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { 
+  fetchFOIRequestDetails, 
+  fetchFOICategoryList, 
+  fetchFOIProgramAreaList, 
+  fetchFOIAssignedToList, 
+  fetchFOIDeliveryModeList, 
+  fetchFOIReceivedModeList 
+} from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -323,7 +330,7 @@ const ReviewRequest = React.memo((props) => {
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
           <RequestNotes />
           
-          <BottomButtonGroup isValidationError = {isValidationError}/>
+          <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject}/>
           </>
            ): null}
            </form>
