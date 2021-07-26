@@ -23,7 +23,7 @@ from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
 import json
 import uuid
-import warlock
+
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
