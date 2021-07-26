@@ -27,8 +27,13 @@ def test_get_programareas(client):
 
 def test_get_applicantcategories(client):    
     response = client.get('api/foiflow/applicantcategories')    
-    jsondata = json.loads(response.data)    
-    assert response.status_code == 200 and len(jsondata) >=1        
+    jsondata = json.loads(response.data)     
+    assert response.status_code == 200 and len(jsondata) >=1
+
+def test_get_intaketeammembers(client):    
+    response = client.get('api/foiflow/intake/teammembers')    
+    jsondata = json.loads(response.data)     
+    assert response.status_code == 200 and len(jsondata) >=1              
 
 
 
