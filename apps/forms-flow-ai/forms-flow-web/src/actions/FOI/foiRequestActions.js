@@ -65,7 +65,7 @@ export const setFOIRequestTypeList = (data) => dispatch =>{
         payload:data
     })
 }
-export const setFOIReceiveModeList = (data) => dispatch =>{
+export const setFOIReceivedModeList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST,
         payload:data

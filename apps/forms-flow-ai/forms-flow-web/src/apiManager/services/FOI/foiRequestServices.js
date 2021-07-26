@@ -9,6 +9,8 @@ import {
   setFOIProgramAreaList,
   clearRequestDetails,
   setFOIAssignedToList,
+  setFOIDeliveryModeList,
+  setFOIReceivedModeList,
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -144,6 +146,67 @@ export const fetchFOIAssignedToList = (...rest) => {
           });
           data.unshift(unAssigned);
           dispatch(setFOIAssignedToList(data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIDeliveryModeList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const firstDeliveryMode = {"deliverymodeid": 0, "name": "Select Delivery Mode"};
+  return (dispatch) => {
+    httpOpenGETRequest(API.FOI_GET_DELIVERY_MODELIST, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiDeliveryModeList = res.data;                 
+          let data = foiDeliveryModeList.map((deliveryMode) => {
+            return { ...deliveryMode};
+          });
+          data.unshift(firstDeliveryMode);
+          dispatch(setFOIDeliveryModeList(data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIReceivedModeList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const firstReceivedMode = {"receivedmodeid": 0, "name": "Select Received Mode"};
+  return (dispatch) => {
+    httpOpenGETRequest(API.FOI_GET_RECEIVED_MODELIST, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiReceivedModeList = res.data;
+          let data = foiReceivedModeList.map((receivedMode) => {
+            return { ...receivedMode};
+          });
+          data.unshift(firstReceivedMode);
+        
+          dispatch(setFOIReceivedModeList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {

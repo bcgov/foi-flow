@@ -22,7 +22,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const ADD_DAYS = 30;
     //get the RequestType, ReceivedMode and DeliveryMode master data
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
-    const receivedMode = useSelector(state=> state.foiRequests.foiReceiveModeList);
+    const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
     const calculateReceivedDate = (receivedDateString) => {     
