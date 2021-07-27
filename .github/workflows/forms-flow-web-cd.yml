@@ -60,10 +60,11 @@ jobs:
       #   run: |
       #     oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:dev
 
-      # - name: Watch new rollout (trigger by image change in Openshift)
-      #   shell: bash
-      #   run: |
-      #     oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+      # TODO: Verify this works. Does SA have permissions?
+      - name: Watch new rollout (trigger by image change in Openshift)
+        shell: bash
+        run: |
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
 
       # - name: Rocket.Chat Notification
       #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
