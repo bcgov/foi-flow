@@ -53,7 +53,7 @@ jobs:
       - name: Build from dev branch
         shell: bash
         run: |
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev-AC-212"}}}}'
 
       - name: Start Build Openshift
         shell: bash

@@ -1,5 +1,6 @@
 # base image
-FROM node:14.17.0-alpine as build-stage
+# FROM node:14.17.0-alpine as build-stage
+FROM node:14.17.0 build-stage
 
 # set working directory
 WORKDIR /forms-flow-web/app
