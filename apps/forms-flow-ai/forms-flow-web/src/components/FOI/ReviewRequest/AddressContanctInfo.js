@@ -27,23 +27,10 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
     const [streetAddressText, setStreetAddress] = React.useState(!!requestDetails.address ? requestDetails.address : "");
     const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState("");
     const [CityText, setCity] = React.useState(!!requestDetails.city ? requestDetails.city : "");
-    const [PostalText, setPostal] = React.useState(!!requestDetails.postal ? requestDetails.postal : "");    
-    const [selectProvinceValue, setProvinceValue] = React.useState(!!requestDetails.province ? requestDetails.province : "Select Province");
-    const [selectCountryValue, setCountryValue] = React.useState(!!requestDetails.country ? requestDetails.country : "Select Country");    
-    const [provinceNameList, setProvinceNameList] = React.useState(["Select Province"]);
-
-    React.useEffect(() => {     
-        setProvinceNameList(getProvinceList(requestDetails.country));
-    },[requestDetails])
+    const [PostalText, setPostal] = React.useState(!!requestDetails.postal ? requestDetails.postal : "");
+    const [ProvinceText, setProvince] = React.useState(!!requestDetails.province ? requestDetails.province : "");
+    const [CountryText, setCountry] = React.useState(!!requestDetails.country ? requestDetails.country : ""); 
     
-    //create menuItems for province and country
-    const provinceItems = provinceNameList.map((item) => {    
-        return ( <MenuItem key={item} value={item} disabled={item.toLowerCase().includes("select")}>{item}</MenuItem> )
-     });
-     const countryItems = countryList.map((item) => {    
-        return ( <MenuItem key={item} value={item} disabled={item.toLowerCase().includes("select")}>{item}</MenuItem> )
-     });
-
     const handleHomePhoneChange = (e) => {
         setHomePhone(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.HOME_PHONE, e.target.value);
@@ -78,15 +65,13 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.POSTALCODE, e.target.value);
     }
 
-    const handleProvinceOnChange = (e) => {
-        setProvinceValue(e.target.value);
+    const handleProvinceChange = (e) => {
+        setProvince(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROVINCE, e.target.value);
     }
 
-    const handleCountryOnChange = (e) => {
-        setCountryValue(e.target.value);
-        setProvinceValue("Select Province");
-        setProvinceNameList(getProvinceList(e.target.value));
+    const handleCountryChange = (e) => {
+        setCountry(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.COUNTRY, e.target.value);
     }
 
@@ -171,33 +156,25 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
                             value={secondaryStreetAddressText}
                             onChange={handleScondaryStreetAddressChange}
                             fullWidth
-                        />                        
-                         <TextField
-                            id="province"
-                            label="Province"
-                            InputLabelProps={{ shrink: true, }}          
-                            select
-                            value={selectProvinceValue}
-                            onChange={handleProvinceOnChange}
-                            input={<Input />} 
-                            variant="outlined"
-                            fullWidth                            
-                        >            
-                            {provinceItems}
-                        </TextField> 
-                         <TextField
-                            id="country"
-                            label="Country"
-                            InputLabelProps={{ shrink: true, }}          
-                            select
-                            value={selectCountryValue}
-                            onChange={handleCountryOnChange}
-                            input={<Input />} 
-                            variant="outlined"
-                            fullWidth                            
-                        >            
-                            {countryItems}
-                        </TextField> 
+                        />  
+                        <TextField 
+                            id="outlined-province" 
+                            label="Province" 
+                            InputLabelProps={{ shrink: true, }}                             
+                            variant="outlined" 
+                            value={ProvinceText}
+                            onChange={handleProvinceChange}
+                            fullWidth
+                        />
+                        <TextField 
+                            id="outlined-country" 
+                            label="Country" 
+                            InputLabelProps={{ shrink: true, }}                             
+                            variant="outlined" 
+                            value={CountryText}
+                            onChange={handleCountryChange}
+                            fullWidth
+                        /> 
                     </div>
                 </div>               
             </CardContent>
