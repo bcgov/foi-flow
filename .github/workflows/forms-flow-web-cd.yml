@@ -5,8 +5,12 @@ on:
   push:
     branches:
       - dev
+      # Remove after testing
+      - dev-AC-212
     paths:
       - "apps/forms-flow-ai/forms-flow-web/**"
+      # Remove after testing
+      - ".github/workflows/forms-flow-web-cd.yml"
   workflow_dispatch:
     inputs:
       environment:
