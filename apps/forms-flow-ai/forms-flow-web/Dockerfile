@@ -1,6 +1,6 @@
 # base image
 # FROM node:14.17.0-alpine as build-stage
-FROM docker-remote.artifacts.developer.gov.bc.ca/node:14.8.0 as build-stage
+FROM docker-remote.artifacts.developer.gov.bc.ca/node:lts as build-stage
 
 # set working directory
 WORKDIR /forms-flow-web/app
