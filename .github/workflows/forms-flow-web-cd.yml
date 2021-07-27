@@ -43,6 +43,13 @@ jobs:
         run: |
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
+
+      - name: DEBUG get pods
+        shell: bash
+        # Todo revert below branch to dev before merging
+        run: |
+          oc get pods
+
       - name: Build from dev branch
         shell: bash
         # Todo revert below branch to dev before merging
