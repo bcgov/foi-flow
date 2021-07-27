@@ -5,9 +5,10 @@ import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate } from "../../../helper/FOI/helper";
+import { formatDate, addBusinessDays } from "../../../helper/FOI/helper";
 import moment from "moment-business-days";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+
 
 moment.updateLocale('en-ca', {
   workingWeekdays: [1, 2, 3, 4, 5]
@@ -57,9 +58,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     //due date calculation
     const dueDateCalculation = (dateText) => {
-      let dueDate = new Date(dateText);   
-      dueDate = moment(dueDate, 'DD-MM-YYYY').businessAdd(ADD_DAYS + 1)._d;    
-      return formatDate(dueDate);
+      return addBusinessDays(dateText,ADD_DAYS);
     }    
 
     const [dueDateText, setDueDate] = React.useState(dueDateCalculation(receivedDateString));
@@ -112,6 +111,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
+	
      return (
         
         <Card className="foi-details-card">            
