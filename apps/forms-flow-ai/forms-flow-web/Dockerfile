@@ -52,8 +52,8 @@ ENV REACT_APP_APPLICATION_NAME ${REACT_APP_APPLICATION_NAME}
 # add `/app/node_modules/.bin` to $PATH
 ENV PATH /forms-flow-web/app/node_modules/.bin:$PATH
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+RUN apt-get update && apt-get upgrade && \
+    apt-get add --no-cache bash git openssh
 
 # install and cache app dependencies
 
