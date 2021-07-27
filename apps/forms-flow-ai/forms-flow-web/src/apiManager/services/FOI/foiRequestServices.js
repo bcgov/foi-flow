@@ -1,4 +1,4 @@
-import { httpGETRequest, httpOpenPOSTRequest, httpOpenGETRequest } from "../../httpRequestHandler";
+import { httpOpenPOSTRequest, httpOpenGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -232,6 +232,7 @@ export const saveRequestDetails = (data, ...rest) => {
     "<requestid>",
     data.id
   );
+  console.log(apiUrl);
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
       .then((res) => {

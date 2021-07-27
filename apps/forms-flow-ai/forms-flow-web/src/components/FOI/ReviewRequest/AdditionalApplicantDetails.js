@@ -14,11 +14,11 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
      */ 
   
     //local state management for personalHealthNumber, identityVerified, correctionNumber, and birthDate
-    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(!!additionalInfo.personalHealthNumber ? additionalInfo.personalHealthNumber : "0000 000 00");
-    const [identityVerifiedText, setIdentityVerified] = React.useState(!!additionalInfo.identityVerified ? additionalInfo.identityVerified : "");  
-    const [correctionsNumberText, setCorrectionsNumber] = React.useState(!!additionalInfo.correctionsNumber ? additionalInfo.correctionsNumber : "0000 000 00");
-    const [employeeNumberText, setEmployeeNumber] = React.useState(!!additionalInfo.employeeNumber ? additionalInfo.employeeNumber : "0000 000 00");
-    const dob = !!additionalInfo.birthDate ? new Date(additionalInfo.birthDate) : "";   
+    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(additionalInfo !== undefined && !!additionalInfo.personalHealthNumber ? additionalInfo.personalHealthNumber : "0000 000 00");
+    const [identityVerifiedText, setIdentityVerified] = React.useState(additionalInfo !== undefined && !!additionalInfo.identityVerified ? additionalInfo.identityVerified : "");  
+    const [correctionsNumberText, setCorrectionsNumber] = React.useState(additionalInfo !== undefined && !!additionalInfo.correctionsNumber ? additionalInfo.correctionsNumber : "0000 000 00");
+    const [employeeNumberText, setEmployeeNumber] = React.useState(additionalInfo !== undefined && !!additionalInfo.employeeNumber ? additionalInfo.employeeNumber : "0000 000 00");
+    const dob = additionalInfo !== undefined && !!additionalInfo.birthDate ? new Date(additionalInfo.birthDate) : "";   
     const [birthDateText, setDOB] = React.useState(formatDate(dob));
 
   const handlePersonalHealthNumber = (e) => {
