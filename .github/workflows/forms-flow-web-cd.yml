@@ -5,12 +5,8 @@ on:
   push:
     branches:
       - dev
-      # Remove after testing
-      - dev-AC-212
     paths:
       - "apps/forms-flow-ai/forms-flow-web/**"
-      # Remove after testing
-      - ".github/workflows/forms-flow-web-cd.yml"
   workflow_dispatch:
     inputs:
       environment:
@@ -46,14 +42,13 @@ jobs:
 
       - name: Tools project
         shell: bash
-        # Todo revert below branch to dev before merging
         run: |
           oc project ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-tools
 
       - name: Build from dev branch
         shell: bash
         run: |
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev-AC-212"}}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
 
       - name: Start Build Openshift
         shell: bash
