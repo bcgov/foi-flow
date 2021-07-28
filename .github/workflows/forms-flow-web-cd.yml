@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - dev
+      - dev-AC-212b
     paths:
       - "apps/forms-flow-ai/forms-flow-web/**"
   workflow_dispatch:
