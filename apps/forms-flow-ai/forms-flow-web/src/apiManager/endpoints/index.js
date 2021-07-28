@@ -38,7 +38,10 @@ const API = {
 
   FOI_GET_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/applicantcategories`,
   FOI_GET_PROGRAMAREAS_API: `${FOI_BASE_API_URL}/api/foiflow/programareas`,
-  FOI_GET_REQUEST_API: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>`,
+  FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>`,
+  FOI_GET_ASSIGNEDTOLIST_API: `${FOI_BASE_API_URL}/api/foiflow/intake/teammembers`,
+  FOI_GET_DELIVERY_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/deliverymodes`,
+  FOI_GET_RECEIVED_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/receivedmodes`,
 };
 
 export default API;

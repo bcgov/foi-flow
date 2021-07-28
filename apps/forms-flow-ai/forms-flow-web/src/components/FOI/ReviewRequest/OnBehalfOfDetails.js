@@ -5,9 +5,9 @@ import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import InputLabel from '@material-ui/core/InputLabel';
 import { formatDate } from "../../../helper/FOI/helper";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-
-const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
+const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
     
      /**
      *  On Behalf of details box in the UI
@@ -24,18 +24,23 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
     
     const handleFirtNameChange = (e) => {
         setAnotherFirstName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME, e.target.value);
     }
     const handleMiddleNameChange = (e) => {
         setAnotherMiddleName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME, e.target.value);
     }
     const handleLastNameChange = (e) => {
         setAnotherLastName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME, e.target.value);
     }
     const handleNickNameChange = (e) => {
         setAnotherNickName(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME, e.target.value);
     }
     const handleDOBChange = (e) => {
         setAnotherDOB(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_DOB, e.target.value);
     }   
      return (
         
@@ -81,7 +86,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo}) => {
                         <TextField                
                             label="Date of Birth"
                             type="date" 
-                            value={anotherDOBText} 
+                            value={anotherDOBText||''} 
                             onChange={handleDOBChange}
                             InputLabelProps={{
                             shrink: true,

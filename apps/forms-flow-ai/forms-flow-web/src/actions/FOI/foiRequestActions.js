@@ -9,12 +9,10 @@ export const setFOILoader = (data) => dispatch =>{
 
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATING,
+        type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
         payload:data
     })
 }
-
-//TODO Update set to get on below cases
 
 export const setFOIRequestList = (data) => dispatch =>{
     dispatch({
@@ -67,7 +65,7 @@ export const setFOIRequestTypeList = (data) => dispatch =>{
         payload:data
     })
 }
-export const setFOIReceiveModeList = (data) => dispatch =>{
+export const setFOIReceivedModeList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST,
         payload:data

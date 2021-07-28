@@ -5,9 +5,10 @@ import "./reviewrequestheader.scss";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 
-const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue}) => {
+const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
    
      /**
      *  Header of Review request in the UI
@@ -19,17 +20,17 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
-        const assignedTo = requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned";  
+        const assignedTo = requestDetails.assignedTo;
         handleAssignedToInitialValue(assignedTo);
     },[requestDetails, handleAssignedToInitialValue])
 
     //creates the menu items for assignedTo combobox
     const menuItems = assignedToList.map((item) => {    
-        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("unassigned")}>{item.name}</MenuItem> )
+        return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{item.username}</MenuItem> )
      });
     
      //local state management for assignedTo
-    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.currentState !== "Unopened"? requestDetails.assignedTo:"Unassigned");
+    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.assignedTo);
 
     const preventDefault = (event) => event.preventDefault();
     
@@ -38,6 +39,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
         setAssignedTo(event.target.value);
         //event bubble up - to validate required fields
         handleAssignedToValue(event.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
     }
 
      return (
