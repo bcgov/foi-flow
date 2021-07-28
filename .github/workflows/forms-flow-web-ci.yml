@@ -1,4 +1,4 @@
-name: Request Management API CI
+name: Forms Flow Web CI
 
 
 on:
@@ -29,5 +29,5 @@ jobs:
       - name: docker build to check strictness
         id: docker-build
         run: |
-          docker build -f Dockerfile .
+          docker build -f Dockerfile.local .
 
