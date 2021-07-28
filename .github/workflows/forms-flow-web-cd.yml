@@ -56,11 +56,10 @@ jobs:
           oc start-build ${{ env.APP_NAME }} --wait
 
 
-      # TODO TODO: Need to change bc to deploy to :latest before next step.
-      # - name: Tag+Deploy for DEV
-      #   shell: bash
-      #   run: |
-      #     oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:dev
+      - name: Tag+Deploy for DEV
+        shell: bash
+        run: |
+          oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:dev
 
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
