@@ -58,7 +58,7 @@ RUN apk update && apk upgrade && \
 # install and cache app dependencies
 
 # package-lock.json commented out due to issues with node-canvas on alpine (musl issue)
-# COPY package-lock.json /forms-flow-web/app/package-lock.json
+COPY package-lock.json /forms-flow-web/app/package-lock.json
 COPY package.json /forms-flow-web/app/package.json
 COPY forms-flow-util/package.json /forms-flow-web/app/forms-flow-util/package.json
 COPY forms-flow-util/package-lock.json /forms-flow-web/app/forms-flow-util/package-lock.json
