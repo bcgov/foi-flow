@@ -23,7 +23,8 @@ const RequestDescription = React.memo(({
     requestDetails,       
      handleOnChangeRequiredRequestDescriptionValues,
      handleInitialRequiredRequestDescriptionValues,
-     handleUpdatedProgramAreaList
+     handleUpdatedProgramAreaList,
+     createSaveRequestObject
     }) => {
     
 
@@ -71,18 +72,21 @@ const RequestDescription = React.memo(({
         setStartDate(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.START_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.START_DATE, event.target.value);
     };
     //handle onchange of end date and set state with latest value
     const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.END_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.END_DATE, event.target.value);
     };
     //handle onchange of description and set state with latest value
     const handleRequestDescriptionChange = (event) => {
         setRequestDescription(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.DESCRIPTION);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DESCRIPTION, event.target.value);
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
     const handleUpdatedMasterProgramAreaList = (programAreaList) => {
@@ -90,6 +94,7 @@ const RequestDescription = React.memo(({
         handleOnChangeRequiredRequestDescriptionValues(programAreaList.some(programArea => programArea.isChecked), FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     
         //event bubble up - Updated program area list
         handleUpdatedProgramAreaList(programAreaList);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, programAreaList);
     }
      return (
         

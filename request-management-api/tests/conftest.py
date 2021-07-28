@@ -43,16 +43,16 @@ def db(app):  # pylint: disable=redefined-outer-name, invalid-name
 
     Drops schema, and recreate.
     """
-    # with app.app_context():
-    #     drop_schema_sql = """DROP SCHEMA public CASCADE;
-    #                          CREATE SCHEMA public;
-    #                          GRANT ALL ON SCHEMA public TO postgres;
-    #                          GRANT ALL ON SCHEMA public TO public;
-    #                       """
+    with app.app_context():
+        drop_schema_sql = """DROP SCHEMA public CASCADE;
+                             CREATE SCHEMA public;
+                             GRANT ALL ON SCHEMA public TO postgres;
+                             GRANT ALL ON SCHEMA public TO public;
+                          """
 
-    #     sess = _db.session()
-    #     sess.execute(drop_schema_sql)
-    #     sess.commit()
+        sess = _db.session()
+        #sess.execute(drop_schema_sql)
+        #sess.commit()
 
         # ############################################
         # There are 2 approaches, an empty database, or the same one that the app will use
@@ -64,8 +64,8 @@ def db(app):  # pylint: disable=redefined-outer-name, invalid-name
 
         # even though this isn't referenced directly, it sets up the internal configs that upgrade needs
 
-        #Migrate(app, _db)
-        #upgrade()
+        Migrate(app, _db)
+        upgrade()
 
     return _db
 

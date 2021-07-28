@@ -6,13 +6,11 @@ const initialState = {
   foiRequestsCount:0,
   foiRequestDetail: {},
   foiIsRequestUpdating:false,
-  foiCategoryList: [],  
-  foiCountryList: [{"countryid":0, "name": "Select Country"},{"countryid":1, "name": "Canada"}],
-  foiProvinceList: [{"provinceid":0, "name": "Select Province"},{"provinceid":1, "name": "British Columbia"}, {"provinceid":2, "name": "Ontario"}],
+  foiCategoryList: [], 
   foiRequestTypeList:[{"requesttypeid":0, "name": "Select Request Type"}, {"requesttypeid":1, "name": "general"}, {"requesttypeid":2, "name": "personal"}],
-  foiReceiveModeList:[{"receivemodeid":0, "name": "Select Received Mode"}, {"receivemodeid":1, "name": "Mode1"}, {"receivemodeid":2, "name": "Mode2"}],
-  foiDeliveryModeList:[{"deliverymodeid":0, "name": "Select Delivery Mode"}, {"deliverymodeid":1, "name": "Mode1"}, {"deliverymodeid":2, "name": "Mode2"}],
-  foiAssignedToList: [{"id":0, "name": "Unassigned"}, {"id":1, "name": "UserName1"}, {"id":2, "name": "UserName2"}, {"id":3, "name": "UserName3"}],
+  foiReceivedModeList:[],
+  foiDeliveryModeList:[],
+  foiAssignedToList: [],
   foiProgramAreaList:[], 
 }
 
@@ -60,19 +58,13 @@ const foiRequests = (state = initialState, action)=> {
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_START_DATE:
       return {...state, foiRequestStartDate: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_IS_MINISTRY_SELECTED:
-      return {...state, foiIsMinistrySelected: action.payload}; 
-    // case FOI_ACTION_CONSTANTS.FOI_COUNTRYLIST:
-    //     return {...state, foiCountryList: action.payload};  
-    // case FOI_ACTION_CONSTANTS.FOI_PROVINCELIST:
-    //     return {...state, foiProvinceList: action.payload};
-    // case FOI_ACTION_CONSTANTS.FOI_REQUEST_TYPELIST:
-    //     return {...state, foiRequestTypeList: action.payload};
-    // case FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST:
-    //     return {...state, foiReceiveModeList: action.payload};
-    // case FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST:
-    //     return {...state, foiDeliveryModeList: action.payload};
-    // case FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST:
-    //     return {...state, foiAssignedToList: action.payload};
+      return {...state, foiIsMinistrySelected: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST:
+        return {...state, foiReceivedModeList: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST:
+        return {...state, foiDeliveryModeList: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST:
+        return {...state, foiAssignedToList: action.payload};
     case FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS:
       return {...state, foiRequestDetail: action.payload};         
     default:

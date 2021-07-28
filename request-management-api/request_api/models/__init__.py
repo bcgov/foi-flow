@@ -25,6 +25,8 @@ from .db import db, ma
 from .FOIRawRequests import FOIRawRequest
 from .ProgramAreas import ProgramArea
 from .ApplicantCategories import ApplicantCategory
+from .DeliveryModes import DeliveryMode
+from .ReceivedModes import ReceivedMode
 
 
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
