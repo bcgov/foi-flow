@@ -21,6 +21,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
+from request_api.services.external.bpmservice import bpmservice
 import json
 import uuid
 
@@ -59,11 +60,12 @@ class FOIRawRequest(Resource):
             requestidisInteger = int(requestid)
             if requestidisInteger :     
 
-                ##TODO : WorkFlow Claiming  here.
-                
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],'intake in progress')
-                                                                       
-                return {'status': result.success, 'message':result.message}, 200 
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],'Claim in progress')
+                if result.success == True:      
+                    bpmResponse = bpmservice.claim(result.identifier[1], result.identifier[2]);
+                    if(bpmResponse.status_code != 204):
+                        return {'status': bpmResponse.status_code, 'message':bpmResponse.content}, bpmResponse.status_code                                                       
+                    return {'status': result.success, 'message':result.message}, 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
         except BusinessException as exception:            

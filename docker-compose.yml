@@ -39,6 +39,10 @@ services:
       - KEYCLOAK_ADMIN_SRVACCOUNT=foisrcaccount
       - KEYCLOAK_ADMIN_SRVPASSWORD=
       - KEYCLOAK_ADMIN_INTAKE_GROUPID=
+      - BPM_ENGINE_REST_URL=
+      - BPM_TOKEN_URL=
+      - BPM_CLIENT_ID=forms-flow-bpm
+      - BPM_CLIENT_SECRET=
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg

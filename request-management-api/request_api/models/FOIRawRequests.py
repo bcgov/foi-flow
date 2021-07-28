@@ -39,11 +39,11 @@ class FOIRawRequest(db.Model):
         _version = request.version+1
         insertstmt =(
             insert(FOIRawRequest).
-            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee)
+            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid)
         )                 
         db.session.execute(insertstmt)               
         db.session.commit()                
-        return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid)    
+        return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
 
     @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid)->DefaultMethodResult:
