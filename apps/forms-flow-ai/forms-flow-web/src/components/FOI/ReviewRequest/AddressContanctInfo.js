@@ -2,10 +2,6 @@ import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import { useSelector } from "react-redux";
-import {getCountryList, getProvinceList} from '../../../services/FOI/CountryProvinceListervice';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObject}) => {
@@ -15,21 +11,56 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
      *  No mandatory fields here
      */ 
     
-    //get the master data for country and province
-    const countryList = getCountryList();//useSelector(state=> state.foiRequests.foiCountryList);
-    //const provinceList = useSelector(state=> state.foiRequests.foiProvinceList);
+    
+    const validateFields = (request, name) => {
+        if (request !== undefined) {
+          if (name === FOI_COMPONENT_CONSTANTS.HOME_PHONE) {
+            return !!request.phonePrimary ? request.phonePrimary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) {
+            return !!request.phoneSecondary ? request.phoneSecondary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) {
+            return !!request.workPhonePrimary ? request.workPhonePrimary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) {
+            return !!request.workPhoneSecondary ? request.workPhoneSecondary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
+            return !!request.address ? request.address : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) {
+            return !!request.addressSecondary ? request.addressSecondary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
+            return !!request.city ? request.city : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
+            return !!request.postal ? request.postal : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
+            return !!request.province ? request.province : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
+            return !!request.country ? request.country : "";
+          }
+        }
+        else {
+          return "";
+        }
+    }
     
     //local state management for homePhone, mobilePhone, workPhone1, workPhone2, streetAddress1, streetAddress2, city, postalcode, province and country
-    const [homePhoneText, setHomePhone] = React.useState(!!requestDetails.phonePrimary ? requestDetails.phonePrimary : "() -");
-    const [mobilePhoneText, setMobilePhone] = React.useState(!!requestDetails.phoneSecondary ? requestDetails.phoneSecondary : "() -");
-    const [workPhonePrimaryText, setWorkPhonePrimary] = React.useState("() -");
-    const [workPhoneSecondaryText, setWorkPhoneSecondary] = React.useState("() -");
-    const [streetAddressText, setStreetAddress] = React.useState(!!requestDetails.address ? requestDetails.address : "");
-    const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState("");
-    const [CityText, setCity] = React.useState(!!requestDetails.city ? requestDetails.city : "");
-    const [PostalText, setPostal] = React.useState(!!requestDetails.postal ? requestDetails.postal : "");
-    const [ProvinceText, setProvince] = React.useState(!!requestDetails.province ? requestDetails.province : "");
-    const [CountryText, setCountry] = React.useState(!!requestDetails.country ? requestDetails.country : ""); 
+    const [homePhoneText, setHomePhone] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.HOME_PHONE));
+    const [mobilePhoneText, setMobilePhone] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.MOBILE_PHONE));
+    const [workPhonePrimaryText, setWorkPhonePrimary] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY));
+    const [workPhoneSecondaryText, setWorkPhoneSecondary] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY));
+    const [streetAddressText, setStreetAddress] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY));
+    const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY));
+    const [CityText, setCity] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY));
+    const [PostalText, setPostal] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE));
+    const [ProvinceText, setProvince] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE));
+    const [CountryText, setCountry] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)); 
     
     const handleHomePhoneChange = (e) => {
         setHomePhone(e.target.value);

@@ -9,7 +9,7 @@ export const setFOILoader = (data) => dispatch =>{
 
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATING,
+        type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
         payload:data
     })
 }

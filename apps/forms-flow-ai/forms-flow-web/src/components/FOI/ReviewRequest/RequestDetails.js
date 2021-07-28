@@ -21,6 +21,28 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
      *  All fields are mandatory here
      */ 
     const ADD_DAYS = 30;
+    const validateFields = (request, name) => {
+      if (request !== undefined) {
+        if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
+          return !!request.requestType ? request.requestType : "Select Request Type";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
+          return !!request.receivedMode ? request.receivedMode : "Select Received Mode";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
+          return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {
+          return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
+          return !!request.requestStartDate ? new Date(request.requestStartDate) : !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
+        }
+      }
+      else {
+        return "";
+      }
+    }
     //get the RequestType, ReceivedMode and DeliveryMode master data
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
@@ -35,26 +57,26 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     }
     //updates the default values from the request details    
     React.useEffect(() => {
-      let receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+      let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
       receivedDate = calculateReceivedDate(receivedDate);
       const receivedDateString = formatDate(receivedDate);
       const requestDetailsObject = {
-        "requestType": !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type",
-        "receivedMode": !!requestDetails.receivedMode ? requestDetails.receivedMode : "Select Received Mode",
-        "deliveryMode": !!requestDetails.deliveryMode ? requestDetails.deliveryMode : "Select Delivery Mode",
+        "requestType": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
+        "receivedMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
+        "deliveryMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
         "receivedDate": receivedDateString,
-        "requestStartDate": receivedDateString,
+        "requestStartDate": formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)),
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
   },[requestDetails, handleRequestDetailsInitialValue])
 
     //local state management for received date and start date
-    let receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+    let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
     receivedDate = calculateReceivedDate(receivedDate);
     const receivedDateString = formatDate(receivedDate);
     const [receivedDateText, setReceivedDate] = React.useState(receivedDateString);
-    const [startDateText, setStartDate] = React.useState(receivedDateString);
+    const [startDateText, setStartDate] = React.useState(formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)));
     
 
     //due date calculation
@@ -65,9 +87,9 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const [dueDateText, setDueDate] = React.useState(dueDateCalculation(receivedDateString));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
-    const [selectedRequestType, setSelectedRequestType] = React.useState(!!requestDetails.requestType ? requestDetails.requestType : "Select Request Type");
-    const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(!!requestDetails.receivedMode ? requestDetails.receivedMode : "Select Received Mode");
-    const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(!!requestDetails.deliveryMode ? requestDetails.deliveryMode : "Select Delivery Mode");
+    const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
+    const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
+    const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
 
     //generating the menuItems for RequestTypes, ReceivedModes and DeliveryModes
     const requestTypes = requestType.map((item) => {    

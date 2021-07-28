@@ -12,13 +12,35 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
      */ 
-  
+
+    const validateFields = (request, name) => {
+      if (request !== undefined) {
+        if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
+          return !!request.personalHealthNumber ? request.personalHealthNumber : "";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
+          return !!request.identityVerified ? request.identityVerified : "";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+          return !!request.correctionsNumber ? request.correctionsNumber : "";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
+          return !!request.employeeNumber ? request.employeeNumber : "";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
+          return !!request.birthDate ? new Date(request.birthDate) : "";
+        }
+      }
+      else {
+        return "";
+      }
+    }
     //local state management for personalHealthNumber, identityVerified, correctionNumber, and birthDate
-    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(additionalInfo !== undefined && !!additionalInfo.personalHealthNumber ? additionalInfo.personalHealthNumber : "0000 000 00");
-    const [identityVerifiedText, setIdentityVerified] = React.useState(additionalInfo !== undefined && !!additionalInfo.identityVerified ? additionalInfo.identityVerified : "");  
-    const [correctionsNumberText, setCorrectionsNumber] = React.useState(additionalInfo !== undefined && !!additionalInfo.correctionsNumber ? additionalInfo.correctionsNumber : "0000 000 00");
-    const [employeeNumberText, setEmployeeNumber] = React.useState(additionalInfo !== undefined && !!additionalInfo.employeeNumber ? additionalInfo.employeeNumber : "0000 000 00");
-    const dob = additionalInfo !== undefined && !!additionalInfo.birthDate ? new Date(additionalInfo.birthDate) : "";   
+    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER));
+    const [identityVerifiedText, setIdentityVerified] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED));  
+    const [correctionsNumberText, setCorrectionsNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER));
+    const [employeeNumberText, setEmployeeNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER));
+    const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.DOB);   
     const [birthDateText, setDOB] = React.useState(formatDate(dob));
 
   const handlePersonalHealthNumber = (e) => {

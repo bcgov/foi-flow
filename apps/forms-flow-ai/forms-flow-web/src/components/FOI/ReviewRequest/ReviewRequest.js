@@ -1,5 +1,6 @@
 import React, { useEffect }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer, toast } from 'react-toastify';
 import './reviewrequest.scss';
 import ReviewRequestHeader from './ReviewRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -39,6 +40,10 @@ const ReviewRequest = React.memo((props) => {
   const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
+
+  const unLoad = () => {
+    window.BeforeUnloadEvent()
+  }
 
   useEffect(() => {
     dispatch(fetchFOIRequestDetails(requestId));   
@@ -309,7 +314,18 @@ const ReviewRequest = React.memo((props) => {
     setSaveRequestObject(requestObject);    
   }
 
-  
+  const isRequestUpdated = useSelector(state=> state.foiRequests.foiIsRequestUpdated);  
+  if (isRequestUpdated) {    
+    toast.success('The request has been saved successfully.', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+  }
      return (
       <div className="container foi-review-request-container">      
         <div className="foi-review-container">
