@@ -62,7 +62,6 @@ jobs:
       #   run: |
       #     oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:dev
 
-      # TODO: Verify this works. Does SA have permissions?
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
