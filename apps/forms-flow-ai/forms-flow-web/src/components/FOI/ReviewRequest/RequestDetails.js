@@ -28,7 +28,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     const calculateReceivedDate = (receivedDateString) => {     
       if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {        
-        receivedDateString.setDate(receivedDateString.getDate() + 1);
+        addBusinessDays(receivedDateString,1);
+        //receivedDateString.setDate(receivedDateString.getDate() + 1);
       }
       return receivedDateString;
     }

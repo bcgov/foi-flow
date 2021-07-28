@@ -50,7 +50,7 @@ const reconcileObserveDays = (startDate, endDate) => {
 	return endDate;
 }
 const addBusinessDays = (dateText, days) => {
-let startDate = datejs(dateText);   
+let startDate = dayjs(dateText);   
 let endDate = startDate.businessDaysAdd(days);
 return reconcileObserveDays(startDate,endDate).format('YYYY-MM-DD');	
 }
