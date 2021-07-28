@@ -134,6 +134,7 @@ class rawrequestservice:
                 baserequestInfo['additionalPersonalInfo'] = additionalpersonalInfo
             return baserequestInfo
         elif request != {} and request['version'] > 1:
+            request['requestrawdata']['currentState'] = request['status']
             return request['requestrawdata']
         else:
             return None
