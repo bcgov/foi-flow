@@ -1,6 +1,6 @@
 import React, { useEffect }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import './reviewrequest.scss';
 import ReviewRequestHeader from './ReviewRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -40,10 +40,6 @@ const ReviewRequest = React.memo((props) => {
   const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
-
-  const unLoad = () => {
-    window.BeforeUnloadEvent()
-  }
 
   useEffect(() => {
     dispatch(fetchFOIRequestDetails(requestId));   
@@ -165,10 +161,12 @@ const ReviewRequest = React.memo((props) => {
     || requiredRequestDetailsValues.requestStartDate === undefined 
     );
 
-  const classes = useStyles();  
+  const classes = useStyles();
+  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
   const createSaveRequestObject = (name, value, value2) => 
   {
+    setUnSavedRequest(true);
     const requestObject = {...saveRequestObject};   
     if(Object.entries(requestObject).length !== 0) {      
       if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {       

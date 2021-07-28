@@ -27,8 +27,7 @@ const getPublicHoliDays = (startDate, endDate) => {
 	}
 	for(const year of years) {
 		const holidays = hd.getHolidays(year);
-		for (const entry of holidays) {
-			const day = dayjs(entry.date).day();
+		for (const entry of holidays) {			
 			if(entry.type === "public" && dayjs(entry.date).isBetween(startDate, endDate, null, '[]')) {
 				publicHoliDays++;
 			}		
@@ -49,8 +48,8 @@ const reconcilePublicHoliDays = (startDate, endDate) => {
 	return endDate;
 }
 const addBusinessDays = (dateText, days) => {
-let startDate = dayjs(dateText);   
-let endDate = startDate.businessDaysAdd(days);
-return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
+	let startDate = dayjs(dateText);   
+	let endDate = startDate.businessDaysAdd(days);
+	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
 export { replaceUrl, formatDate, addBusinessDays };
