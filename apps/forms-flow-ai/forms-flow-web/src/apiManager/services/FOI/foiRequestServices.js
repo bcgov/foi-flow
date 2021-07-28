@@ -226,13 +226,11 @@ export const fetchFOIReceivedModeList = (...rest) => {
 
 export const saveRequestDetails = (data, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  console.log(data.id);
   const apiUrl = replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
     data.id
   );
-  console.log(apiUrl);
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
       .then((res) => {

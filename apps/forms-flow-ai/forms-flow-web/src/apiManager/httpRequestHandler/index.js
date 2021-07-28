@@ -22,12 +22,10 @@ export const httpOpenGETRequest = (url) => {
 export const httpOpenPOSTRequest = (url, data) => {
   const axiosConfig = {
     headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Content-Type': 'application/json'       
     }
   };
   return axios.post(url, data, axiosConfig);
-  // return axios.post(url, data);
 };
 
 export const httpPOSTRequest = (url, data, token, isBearer = true) => {

@@ -309,7 +309,6 @@ const ReviewRequest = React.memo((props) => {
     setSaveRequestObject(requestObject);    
   }
 
-  console.log(`saveRequestObject = ${JSON.stringify(saveRequestObject)}`);
   
      return (
       <div className="container foi-review-request-container">      
