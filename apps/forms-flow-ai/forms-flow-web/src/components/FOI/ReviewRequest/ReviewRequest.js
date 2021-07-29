@@ -21,7 +21,6 @@ import {
   fetchFOIReceivedModeList 
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
-
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
@@ -160,34 +159,32 @@ const ReviewRequest = React.memo((props) => {
     || requiredRequestDetailsValues.requestStartDate === undefined 
     );
 
-  const classes = useStyles();  
+  const classes = useStyles();
+  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
-  const createSaveRequestObject = (name, value, value2) => 
-  {
-    const requestObject = {...saveRequestObject};   
-    if(Object.entries(requestObject).length !== 0) {      
-      if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {       
-        requestObject.assignedTo = value;
-      }      
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
-          requestObject.firstName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {        
-          requestObject.middleName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
-          requestObject.lastName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
-          requestObject.businessName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
-          requestObject.email = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
-          requestObject.category = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME) {
+  const updateAdditionalInfo = (name, value, requestObject) => {
+    if (requestObject.additionalPersonalInfo === undefined) {
+      requestObject.additionalPersonalInfo = {
+           "alsoKnownAs":"",            
+           "birthDate":"",
+           "childFirstName":"",
+           "childMiddleName":"",
+           "childLastName":"",
+           "childAlsoKnownAs":"",
+           "childBirthDate":"",
+           "anotherFirstName":"",
+           "anotherMiddleName":"",
+           "anotherLastName":"",
+           "anotherAlsoKnownAs":"",
+           "anotherBirthDate":"",
+           "adoptiveMotherFirstName":"",
+           "adoptiveMotherLastName":"",
+           "adoptiveFatherLastName":"",
+           "adoptiveFatherFirstName":""
+        };
+    }
+    else {
+      if (name === FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME) {
         requestObject.additionalPersonalInfo.childFirstName = value;
       }
       else if (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME) {
@@ -217,6 +214,40 @@ const ReviewRequest = React.memo((props) => {
       else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_DOB) {
         requestObject.additionalPersonalInfo.anotherBirthDate = value;
       }
+      else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
+        requestObject.additionalPersonalInfo.birthDate = value;
+      }
+    }
+  }
+
+  const createSaveRequestObject = (name, value, value2) => 
+  {
+    setUnSavedRequest(true);
+    const requestObject = {...saveRequestObject};
+    if(Object.entries(requestObject).length !== 0) {      
+      updateAdditionalInfo(name, value, requestObject);
+      if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {       
+        requestObject.assignedTo = value;
+      }      
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
+          requestObject.firstName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {        
+          requestObject.middleName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
+          requestObject.lastName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
+          requestObject.businessName = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
+          requestObject.email = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
+          requestObject.category = value;
+      }
+      
       else if (name === FOI_COMPONENT_CONSTANTS.HOME_PHONE) {
         requestObject.phonePrimary = value;
       }
@@ -265,9 +296,6 @@ const ReviewRequest = React.memo((props) => {
       else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
         requestObject.deliveryMode = value;
       }
-      else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
-        requestObject.additionalPersonalInfo.birthDate = value;
-      }      
       else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
         requestObject.correctionalServiceNumber = value;
       }
@@ -308,9 +336,7 @@ const ReviewRequest = React.memo((props) => {
     }    
     setSaveRequestObject(requestObject);    
   }
-
-  
-     return (
+  return (
       <div className="container foi-review-request-container">      
         <div className="foi-review-container">
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
@@ -329,7 +355,7 @@ const ReviewRequest = React.memo((props) => {
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
           <RequestNotes />
           
-          <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject}/>
+          <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest}/>
           </>
            ): null}
            </form>

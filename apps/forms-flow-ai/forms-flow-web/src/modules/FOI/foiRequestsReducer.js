@@ -5,7 +5,7 @@ const initialState = {
   foiRequestsList:[],
   foiRequestsCount:0,
   foiRequestDetail: {},
-  foiIsRequestUpdating:false,
+  foiIsRequestUpdated:false,
   foiCategoryList: [], 
   foiRequestTypeList:[{"requesttypeid":0, "name": "Select Request Type"}, {"requesttypeid":1, "name": "general"}, {"requesttypeid":2, "name": "personal"}],
   foiReceivedModeList:[],
@@ -25,8 +25,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, foiRequestsCount: action.payload.count};
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_DETAIL:      
       return {...state, foiRequestDetail: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATING:
-      return {...state, foiIsRequestUpdating: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED:
+      return {...state, foiIsRequestUpdated: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_CATEGORYLIST:
         return {...state, foiCategoryList: action.payload};   
     case FOI_ACTION_CONSTANTS.FOI_SELECTED_CATEGORY:

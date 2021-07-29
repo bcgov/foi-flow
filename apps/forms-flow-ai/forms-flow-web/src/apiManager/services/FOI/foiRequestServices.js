@@ -3,6 +3,7 @@ import API from "../../endpoints";
 import {
   setFOIRequestList,
   serviceActionError,
+  setFOIUpdateLoader,
   setFOILoader,
   setFOIRequestDetail,
   setFOICategoryList,
@@ -14,65 +15,6 @@ import {
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
-
-export const fetchFOIRequestList = (...rest) => {
-  const done = rest.length ? rest[0] : () => {};
-  return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          const foiRequests = res.data;         
-          let data = foiRequests.map((foiRequest) => {
-            return { ...foiRequest};
-          });
-          dispatch(clearRequestDetails({}));
-          dispatch(setFOIRequestList(data));
-          dispatch(setFOILoader(false));
-          done(null, res.data);
-        } else {
-          console.log("Error", res);
-          dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
-        }
-      })
-      .catch((error) => {
-        console.log("Error", error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
-      });
-  };
-};
-
-export const fetchFOIRequestDetails = (requestId,...rest) => {
-  const done = rest.length ? rest[0] : () => {};
-  const apiUrlgetRequestDetails = replaceUrl(
-    API.FOI_REQUEST_API,
-    "<requestid>",
-    requestId
-  );
-  return (dispatch) => {
-    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          const foiRequest = res.data;
-          dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(setFOILoader(false));
-          done(null, res.data);
-        } else {
-          console.log("Error", res);
-          dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
-        }
-      })
-      .catch((error) => {
-        console.log("Error", error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
-      });
-  };
-};
 
 export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
@@ -224,6 +166,65 @@ export const fetchFOIReceivedModeList = (...rest) => {
   };
 };
 
+export const fetchFOIRequestList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  return (dispatch) => {
+    httpOpenGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequests = res.data;         
+          let data = foiRequests.map((foiRequest) => {
+            return { ...foiRequest};
+          });
+          dispatch(clearRequestDetails({}));
+          dispatch(setFOIRequestList(data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIRequestDetails = (requestId,...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const apiUrlgetRequestDetails = replaceUrl(
+    API.FOI_REQUEST_API,
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));        
+        done(error);
+      });
+  };
+};
+
 export const saveRequestDetails = (data, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const apiUrl = replaceUrl(
@@ -234,9 +235,9 @@ export const saveRequestDetails = (data, ...rest) => {
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
       .then((res) => {
-        if (res.data) {
+        if (res.data) {                   
           done(null, res.data);
-        } else {
+        } else {         
           dispatch(serviceActionError(res));
           done("Error Posting data");
         }
