@@ -57,14 +57,15 @@ class FOIRawRequest(Resource):
     def post(requestid=None):
         try :                        
             updaterequest = request.get_json()            
-            requestidisInteger = int(requestid)
-            if requestidisInteger :     
-
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],'Claim in progress')
-                if result.success == True:      
-                    bpmResponse = bpmservice.claim(result.args[0], result.args[1]);
-                    if(bpmResponse.status_code != 204):
-                        return {'status': bpmResponse.status_code, 'message':bpmResponse.content}, bpmResponse.status_code                                                       
+            if int(requestid) :
+                status = 'Assignment in progress'     
+                rawRequest = rawrequestservice.getrawrequest(requestid)
+                bpmResponse = bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']);
+                if(bpmResponse.status_code == 204):
+                    status = 'Intake in progress'         
+                    #return {'status': bpmResponse.status_code, 'message':bpmResponse.content}, bpmResponse.status_code
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],status)                
+                if result.success == True:   
                     return {'status': result.success, 'message':result.message}, 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
