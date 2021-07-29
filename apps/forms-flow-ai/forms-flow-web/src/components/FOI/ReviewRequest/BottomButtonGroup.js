@@ -59,6 +59,7 @@ const BottomButtonGroup = React.memo(({isValidationError, saveRequestObject, unS
             draggable: true,
             progress: undefined,
             });
+            unSavedRequest = false;
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
@@ -69,6 +70,7 @@ const BottomButtonGroup = React.memo(({isValidationError, saveRequestObject, unS
             draggable: true,
             progress: undefined,
             });
+            unSavedRequest = true;
         }
       }));      
     }
