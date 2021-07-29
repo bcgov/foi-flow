@@ -70,6 +70,9 @@ const RequestDescription = React.memo(({
     //handle onchange of start date and set state with latest value
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
+        
+        if(new Date(event.target.value) > new Date(endDate))
+          setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.START_DATE);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.START_DATE, event.target.value);
@@ -115,7 +118,8 @@ const RequestDescription = React.memo(({
                             onChange={handleStartDateChange}
                             InputLabelProps={{
                             shrink: true,
-                            }}    
+                            }} 
+                            InputProps={{inputProps: { max: formatDate(new Date())} }}   
                             variant="outlined"                            
                             required
                             error={startDate === undefined}
@@ -130,7 +134,7 @@ const RequestDescription = React.memo(({
                             InputLabelProps={{
                             shrink: true,
                             }}
-                             InputProps={{inputProps: { min: startDate} }}
+                             InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
                             variant="outlined"                            
                             required
                             error={endDate === undefined}
