@@ -1,6 +1,5 @@
 import React, { useEffect }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from 'react-toastify';
 import './reviewrequest.scss';
 import ReviewRequestHeader from './ReviewRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -22,7 +21,6 @@ import {
   fetchFOIReceivedModeList 
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
-
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
@@ -310,21 +308,9 @@ const ReviewRequest = React.memo((props) => {
       console.log(`inside else`);
     }    
     setSaveRequestObject(requestObject);    
-  }
-
-  const isRequestUpdated = useSelector(state=> state.foiRequests.foiIsRequestUpdated);  
-  if (isRequestUpdated) {    
-    toast.success('The request has been saved successfully.', {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      });
-  }
-     return (
+  }   
+  
+  return (
       <div className="container foi-review-request-container">      
         <div className="foi-review-container">
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
@@ -343,7 +329,7 @@ const ReviewRequest = React.memo((props) => {
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
           <RequestNotes />
           
-          <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject}/>
+          <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject} />
           </>
            ): null}
            </form>

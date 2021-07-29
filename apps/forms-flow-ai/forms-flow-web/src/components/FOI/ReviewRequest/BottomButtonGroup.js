@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
 import {saveRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,20 +33,42 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({isValidationError, saveRequestObject}) => {
+const BottomButtonGroup = React.memo(({isValidationError, saveRequestObject }) => {
   /**
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
     const classes = useStyles();
-    
+        
     const dispatch = useDispatch();
     const returnToQueue = () => {
       dispatch(push(`/foi/dashboard`));
     }
-    const saveRequest = () => {
-      dispatch(saveRequestDetails(saveRequestObject));
-    }   
+    const saveRequest = async () => {      
+      dispatch(saveRequestDetails(saveRequestObject, (err, res) => {
+        if (!err) {
+          toast.success('The request has been saved successfully.', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            });                
+        } else {
+          toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            });   
+        }
+      }));      
+    }
      return (
     <div className={classes.root}>
       <div className="foi-bottom-button-group">

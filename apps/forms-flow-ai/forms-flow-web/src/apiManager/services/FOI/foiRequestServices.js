@@ -179,20 +179,17 @@ export const fetchFOIRequestList = (...rest) => {
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false));
-          dispatch(setFOIUpdateLoader(false));
           done(null, res.data);
         } else {
           console.log("Error", res);
           dispatch(serviceActionError(res));
           dispatch(setFOILoader(false));
-          dispatch(setFOIUpdateLoader(false));
         }
       })
       .catch((error) => {
         console.log("Error", error);
         dispatch(serviceActionError(error));
         dispatch(setFOILoader(false));
-        dispatch(setFOIUpdateLoader(false));
         done(error);
       });
   };
@@ -212,20 +209,17 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
           const foiRequest = res.data;
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(setFOILoader(false));
-          dispatch(setFOIUpdateLoader(false));
           done(null, res.data);
         } else {
           console.log("Error", res);
           dispatch(serviceActionError(res));
           dispatch(setFOILoader(false));
-          dispatch(setFOIUpdateLoader(false));
         }
       })
       .catch((error) => {
         console.log("Error", error);
         dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        dispatch(setFOIUpdateLoader(false));
+        dispatch(setFOILoader(false));        
         done(error);
       });
   };
@@ -241,11 +235,9 @@ export const saveRequestDetails = (data, ...rest) => {
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
       .then((res) => {
-        if (res.data) {          
-          dispatch(setFOIUpdateLoader(true));
+        if (res.data) {                   
           done(null, res.data);
-        } else {          
-          dispatch(setFOIUpdateLoader(false));
+        } else {         
           dispatch(serviceActionError(res));
           done("Error Posting data");
         }
