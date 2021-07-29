@@ -224,7 +224,6 @@ const ReviewRequest = React.memo((props) => {
   {
     setUnSavedRequest(true);
     const requestObject = {...saveRequestObject};
-    console.log(requestDetails.additionalPersonalInfo)
     if(Object.entries(requestObject).length !== 0) {      
       updateAdditionalInfo(name, value, requestObject);
       if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {       
@@ -336,8 +335,7 @@ const ReviewRequest = React.memo((props) => {
       console.log(`inside else`);
     }    
     setSaveRequestObject(requestObject);    
-  }   
-  
+  }
   return (
       <div className="container foi-review-request-container">      
         <div className="foi-review-container">
@@ -357,7 +355,7 @@ const ReviewRequest = React.memo((props) => {
           <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
           <RequestNotes />
           
-          <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject} />
+          <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest}/>
           </>
            ): null}
            </form>
