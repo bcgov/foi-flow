@@ -104,6 +104,9 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //handling the received date change
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
+      if(new Date(e.target.value) > new Date(startDateText))     
+        setStartDate(e.target.value);
+
       const dueDate = dueDateCalculation(e.target.value);
       setDueDate(dueDate);
       //event bubble up - for required feild validation
@@ -210,6 +213,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             InputLabelProps={{
                             shrink: true,
                             }}
+                            InputProps={{inputProps: { min: receivedDateText} }}
                             variant="outlined" 
                             required
                             error={startDateText === undefined}
