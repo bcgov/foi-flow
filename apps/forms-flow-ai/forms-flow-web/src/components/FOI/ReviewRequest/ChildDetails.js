@@ -14,12 +14,35 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
      *  No mandatory fields here
      */ 
     
+      const validateFields = (request, name) => {
+        if (request !== undefined) {
+          if (name === FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME) {
+            return !!request.childFirstName ? request.childFirstName : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME) {
+            return !!request.childMiddleName ? request.childMiddleName : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME) {
+            return !!request.childLastName ? request.childLastName : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME) {
+            return !!request.childAlsoKnownAs ? request.childAlsoKnownAs : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_DOB) {
+            return !!request.childBirthDate ? new Date(request.childBirthDate) : "";
+          }
+        }
+        else {
+          return "";
+        }
+      }
+
     //local states for Child FirstName, MiddleName, LastName, NickName and DOB
-    const [childFirstNameText, setChildFirstName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childFirstName ? additionalInfo.childFirstName : "");
-    const [childMiddleNameText, setChildMiddleName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childMiddleName ? additionalInfo.childMiddleName : "");
-    const [childLastNameText, setChildLastName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childLastName ? additionalInfo.childLastName : "");
-    const [childNickNameText, setNickName] = React.useState(additionalInfo !== undefined && !!additionalInfo.childAlsoKnownAs ? additionalInfo.childAlsoKnownAs : "");
-    const dob = additionalInfo !== undefined && !!additionalInfo.childBirthDate ? new Date(additionalInfo.childBirthDate) : "";
+    const [childFirstNameText, setChildFirstName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME));
+    const [childMiddleNameText, setChildMiddleName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME));
+    const [childLastNameText, setChildLastName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME));
+    const [childNickNameText, setNickName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME));
+    const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_DOB);
     const [childDOBText, setDOB] = React.useState(formatDate(dob));
  
     const handleFirtNameChange = (e) => {
