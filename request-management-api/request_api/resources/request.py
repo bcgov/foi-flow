@@ -62,7 +62,7 @@ class FOIRawRequest(Resource):
 
                 result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],'Claim in progress')
                 if result.success == True:      
-                    bpmResponse = bpmservice.claim(result.identifier[1], result.identifier[2]);
+                    bpmResponse = bpmservice.claim(result.args[0], result.args[1]);
                     if(bpmResponse.status_code != 204):
                         return {'status': bpmResponse.status_code, 'message':bpmResponse.content}, bpmResponse.status_code                                                       
                     return {'status': result.success, 'message':result.message}, 200 
@@ -85,8 +85,7 @@ class FOIRawRequestBPMProcess(Resource):
                 _wfinstanceid = request_json['wfinstanceid']
                                
                 requestid = int(_requestid)
-                wfinstanceid = uuid.UUID(_wfinstanceid, version=4)
-                result = rawrequestservice.updateworkflowinstance(wfinstanceid,requestid)
+                result = rawrequestservice.updateworkflowinstance(_wfinstanceid,requestid)
 
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200
