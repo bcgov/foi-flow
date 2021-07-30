@@ -31,7 +31,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
 
     //creates the menu items for assignedTo combobox
     const menuItems = assignedToList.map((item) => {    
-        return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname)}</MenuItem> )
+        return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
      });
     
      //local state management for assignedTo
