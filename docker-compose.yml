@@ -71,7 +71,7 @@ services:
   forms-flow-bpm:
     build:
       context: ./apps/forms-flow-ai/forms-flow-bpm/
-      dockerfile: Dockerfile
+      dockerfile: windows.Dockerfile
     restart: always
     links:
       - forms-flow-bpm-db
