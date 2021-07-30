@@ -71,6 +71,7 @@ class rawrequestservice:
             _createdDate = parse(request['created_at'])
 
             baserequestInfo = {'id': request['requestid'],
+                               'wfinstanceid': request['wfinstanceid'],
                                'requestType': requestType,
                                'firstName': contactInfo['firstName'],
                                'middleName': requestrawdata['contactInfo']['middleName'],
