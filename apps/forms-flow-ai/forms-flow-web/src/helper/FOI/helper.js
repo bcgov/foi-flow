@@ -53,7 +53,4 @@ const addBusinessDays = (dateText, days) => {
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
 
-const capitalizeFirstLetter = (string) => {
-	return string.charAt(0).toUpperCase() + string.slice(1);
-}
-export { replaceUrl, formatDate, addBusinessDays, capitalizeFirstLetter };
+export { replaceUrl, formatDate, addBusinessDays };

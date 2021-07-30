@@ -25,8 +25,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
     },[requestDetails, handleAssignedToInitialValue])
 
     const getFullName = (lastName, firstName, username) => {
-         var displayName =  firstName!= "" ? `${lastName}, ${firstName}` : username;              
-         return  displayName == undefined ? 'Unassigned' : displayName;
+         return  firstName!= "" ? `${lastName}, ${firstName}` : username;         
     }
 
     //creates the menu items for assignedTo combobox

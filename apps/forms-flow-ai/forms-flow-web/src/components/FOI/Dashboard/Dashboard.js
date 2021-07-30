@@ -4,9 +4,7 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
-import { capitalizeFirstLetter } from "../../../helper/FOI/helper";
 
 const Dashboard = React.memo((props) => {
 
