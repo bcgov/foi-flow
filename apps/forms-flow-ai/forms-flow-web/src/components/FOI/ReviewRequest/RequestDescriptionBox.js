@@ -23,7 +23,8 @@ const RequestDescription = React.memo(({
     requestDetails,       
      handleOnChangeRequiredRequestDescriptionValues,
      handleInitialRequiredRequestDescriptionValues,
-     handleUpdatedProgramAreaList
+     handleUpdatedProgramAreaList,
+     createSaveRequestObject
     }) => {
     
 
@@ -69,20 +70,26 @@ const RequestDescription = React.memo(({
     //handle onchange of start date and set state with latest value
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
+        
+        if(new Date(event.target.value) > new Date(endDate))
+          setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.START_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.START_DATE, event.target.value);
     };
     //handle onchange of end date and set state with latest value
     const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.END_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.END_DATE, event.target.value);
     };
     //handle onchange of description and set state with latest value
     const handleRequestDescriptionChange = (event) => {
         setRequestDescription(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.DESCRIPTION);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DESCRIPTION, event.target.value);
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
     const handleUpdatedMasterProgramAreaList = (programAreaList) => {
@@ -90,6 +97,7 @@ const RequestDescription = React.memo(({
         handleOnChangeRequiredRequestDescriptionValues(programAreaList.some(programArea => programArea.isChecked), FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     
         //event bubble up - Updated program area list
         handleUpdatedProgramAreaList(programAreaList);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, programAreaList);
     }
      return (
         
@@ -110,7 +118,8 @@ const RequestDescription = React.memo(({
                             onChange={handleStartDateChange}
                             InputLabelProps={{
                             shrink: true,
-                            }}    
+                            }} 
+                            InputProps={{inputProps: { max: formatDate(new Date())} }}   
                             variant="outlined"                            
                             required
                             error={startDate === undefined}
@@ -125,7 +134,7 @@ const RequestDescription = React.memo(({
                             InputLabelProps={{
                             shrink: true,
                             }}
-                             InputProps={{inputProps: { min: startDate} }}
+                             InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
                             variant="outlined"                            
                             required
                             error={endDate === undefined}

@@ -19,6 +19,15 @@ export const httpOpenGETRequest = (url) => {
   return axios.get(url);
 };
 
+export const httpOpenPOSTRequest = (url, data) => {
+  const axiosConfig = {
+    headers: {
+        'Content-Type': 'application/json'       
+    }
+  };
+  return axios.post(url, data, axiosConfig);
+};
+
 export const httpPOSTRequest = (url, data, token, isBearer = true) => {
   return axios.post(url, data, {
     headers: {

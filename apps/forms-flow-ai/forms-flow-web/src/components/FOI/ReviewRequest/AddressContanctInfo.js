@@ -2,74 +2,108 @@ import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import { useSelector } from "react-redux";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-
-const AddressContactDetails = React.memo(({requestDetails}) => {
+const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObject}) => {
 
     /**
      *  Address and Contact box in the UI
      *  No mandatory fields here
      */ 
     
-    //get the master data for country and province
-    const countryList = useSelector(state=> state.foiRequests.foiCountryList);
-    const provinceList = useSelector(state=> state.foiRequests.foiProvinceList);
+    
+    const validateFields = (request, name) => {
+        if (request !== undefined) {
+          if (name === FOI_COMPONENT_CONSTANTS.HOME_PHONE) {
+            return !!request.phonePrimary ? request.phonePrimary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) {
+            return !!request.phoneSecondary ? request.phoneSecondary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) {
+            return !!request.workPhonePrimary ? request.workPhonePrimary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) {
+            return !!request.workPhoneSecondary ? request.workPhoneSecondary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
+            return !!request.address ? request.address : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) {
+            return !!request.addressSecondary ? request.addressSecondary : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
+            return !!request.city ? request.city : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
+            return !!request.postal ? request.postal : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
+            return !!request.province ? request.province : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
+            return !!request.country ? request.country : "";
+          }
+        }
+        else {
+          return "";
+        }
+    }
     
     //local state management for homePhone, mobilePhone, workPhone1, workPhone2, streetAddress1, streetAddress2, city, postalcode, province and country
-    const [homePhoneText, setHomePhone] = React.useState(!!requestDetails.phonePrimary ? requestDetails.phonePrimary : "() -");
-    const [mobilePhoneText, setMobilePhone] = React.useState(!!requestDetails.phoneSecondary ? requestDetails.phoneSecondary : "() -");
-    const [workPhonePrimaryText, setWorkPhonePrimary] = React.useState("() -");
-    const [workPhoneSecondaryText, setWorkPhoneSecondary] = React.useState("() -");
-    const [streetAddressText, setStreetAddress] = React.useState(!!requestDetails.address ? requestDetails.address : "");
-    const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState("");
-    const [CityText, setCity] = React.useState(!!requestDetails.city ? requestDetails.city : "");
-    const [PostalText, setPostal] = React.useState(!!requestDetails.postal ? requestDetails.postal : "");    
-    const [selectProvinceValue, setProvinceValue] = React.useState(!!requestDetails.province ? requestDetails.province : "Select Province");
-    const [selectCountryValue, setCountryValue] = React.useState(!!requestDetails.country ? requestDetails.country : "Select Country");    
-
-    //create menuItems for province and country
-    const provinceItems = provinceList.map((item) => {    
-        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
-     });
-     const countryItems = countryList.map((item) => {    
-        return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
-     });
-
+    const [homePhoneText, setHomePhone] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.HOME_PHONE));
+    const [mobilePhoneText, setMobilePhone] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.MOBILE_PHONE));
+    const [workPhonePrimaryText, setWorkPhonePrimary] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY));
+    const [workPhoneSecondaryText, setWorkPhoneSecondary] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY));
+    const [streetAddressText, setStreetAddress] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY));
+    const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY));
+    const [CityText, setCity] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY));
+    const [PostalText, setPostal] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE));
+    const [ProvinceText, setProvince] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE));
+    const [CountryText, setCountry] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)); 
+    
     const handleHomePhoneChange = (e) => {
         setHomePhone(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.HOME_PHONE, e.target.value);
     }
     const handleMobilePhoneChange = (e) => {
         setMobilePhone(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.MOBILE_PHONE, e.target.value);
     }
     const handleWorkPhonePrimaryChange = (e) => {
         setWorkPhonePrimary(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY, e.target.value);
     }
     const handleWorkPhoneSecondarChange = (e) => {
         setWorkPhoneSecondary(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY, e.target.value);
     }
 
     const handleStreetAddressChange = (e) => {
         setStreetAddress(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY, e.target.value);
     }
     const handleScondaryStreetAddressChange = (e) => {
         setSecondaryStreetAddress(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY, e.target.value);
     }
     const handleCityChange = (e) => {
         setCity(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CITY, e.target.value);
     }
     const handlePostalChange = (e) => {
         setPostal(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.POSTALCODE, e.target.value);
     }
 
-    const handleProvinceOnChange = (e) => {
-        setProvinceValue(e.target.value);
+    const handleProvinceChange = (e) => {
+        setProvince(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROVINCE, e.target.value);
     }
 
-    const handleCountryOnChange = (e) => {
-        setCountryValue(e.target.value);
+    const handleCountryChange = (e) => {
+        setCountry(e.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.COUNTRY, e.target.value);
     }
 
      return (
@@ -153,33 +187,25 @@ const AddressContactDetails = React.memo(({requestDetails}) => {
                             value={secondaryStreetAddressText}
                             onChange={handleScondaryStreetAddressChange}
                             fullWidth
-                        />                        
-                         <TextField
-                            id="province"
-                            label="Province"
-                            InputLabelProps={{ shrink: true, }}          
-                            select
-                            value={selectProvinceValue}
-                            onChange={handleProvinceOnChange}
-                            input={<Input />} 
-                            variant="outlined"
-                            fullWidth                            
-                        >            
-                            {provinceItems}
-                        </TextField> 
-                         <TextField
-                            id="country"
-                            label="Country"
-                            InputLabelProps={{ shrink: true, }}          
-                            select
-                            value={selectCountryValue}
-                            onChange={handleCountryOnChange}
-                            input={<Input />} 
-                            variant="outlined"
-                            fullWidth                            
-                        >            
-                            {countryItems}
-                        </TextField> 
+                        />  
+                        <TextField 
+                            id="outlined-province" 
+                            label="Province" 
+                            InputLabelProps={{ shrink: true, }}                             
+                            variant="outlined" 
+                            value={ProvinceText}
+                            onChange={handleProvinceChange}
+                            fullWidth
+                        />
+                        <TextField 
+                            id="outlined-country" 
+                            label="Country" 
+                            InputLabelProps={{ shrink: true, }}                             
+                            variant="outlined" 
+                            value={CountryText}
+                            onChange={handleCountryChange}
+                            fullWidth
+                        /> 
                     </div>
                 </div>               
             </CardContent>

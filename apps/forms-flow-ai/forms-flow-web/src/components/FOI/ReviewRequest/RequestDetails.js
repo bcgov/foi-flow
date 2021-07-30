@@ -5,64 +5,91 @@ import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate } from "../../../helper/FOI/helper";
+import { formatDate, addBusinessDays } from "../../../helper/FOI/helper";
 import moment from "moment-business-days";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+
 
 moment.updateLocale('en-ca', {
   workingWeekdays: [1, 2, 3, 4, 5]
 });
 
-const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue}) => {
+const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject}) => {
 
     /**
      *  Request details box in the UI
      *  All fields are mandatory here
      */ 
     const ADD_DAYS = 30;
+    const validateFields = (request, name) => {
+      if (request !== undefined) {
+        if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
+          return !!request.requestType ? request.requestType : "Select Request Type";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
+          return !!request.receivedMode ? request.receivedMode : "Select Received Mode";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
+          return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {
+          return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
+          return !!request.requestStartDate ? new Date(request.requestStartDate) : !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
+        }
+      }
+      else {
+        return "";
+      }
+    }
     //get the RequestType, ReceivedMode and DeliveryMode master data
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
-    const receivedMode = useSelector(state=> state.foiRequests.foiReceiveModeList);
+    const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
     const calculateReceivedDate = (receivedDateString) => {     
       if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {        
-        receivedDateString.setDate(receivedDateString.getDate() + 1);
+        addBusinessDays(receivedDateString,1);
+        //receivedDateString.setDate(receivedDateString.getDate() + 1);
       }
       return receivedDateString;
     }
     //updates the default values from the request details    
     React.useEffect(() => {
-      let receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+      let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
       receivedDate = calculateReceivedDate(receivedDate);
       const receivedDateString = formatDate(receivedDate);
       const requestDetailsObject = {
-        "requestType": !!requestDetails.requestType ? requestDetails.requestType : "Select Request Type",
-        "receivedMode": !!requestDetails.receivedMode ? requestDetails.receivedMode : "Select Received Mode",
-        "deliveryMode": !!requestDetails.deliveryMode ? requestDetails.deliveryMode : "Select Delivery Mode",
+        "requestType": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
+        "receivedMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
+        "deliveryMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
         "receivedDate": receivedDateString,
-        "requestStartDate": receivedDateString,
+        "requestStartDate": formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)),
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
   },[requestDetails, handleRequestDetailsInitialValue])
 
     //local state management for received date and start date
-    let receivedDate = !!requestDetails.receivedDateUF ? new Date(requestDetails.receivedDateUF) : "";
+    let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
     receivedDate = calculateReceivedDate(receivedDate);
     const receivedDateString = formatDate(receivedDate);
     const [receivedDateText, setReceivedDate] = React.useState(receivedDateString);
-    const [startDateText, setStartDate] = React.useState(receivedDateString);
+    const [startDateText, setStartDate] = React.useState(formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)));
+    
 
     //due date calculation
-    let dueDate = new Date(receivedDateText);   
-    dueDate = moment(dueDate, 'DD-MM-YYYY').businessAdd(ADD_DAYS + 1)._d;    
-    const dueDateString = formatDate(dueDate);
+    const dueDateCalculation = (dateText) => {
+      return addBusinessDays(dateText,ADD_DAYS);
+    }    
+
+    const [dueDateText, setDueDate] = React.useState(dueDateCalculation(receivedDateString));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
-    const [selectedRequestType, setSelectedRequestType] = React.useState(!!requestDetails.requestType ? requestDetails.requestType : "Select Request Type");
-    const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(!!requestDetails.receivedMode ? requestDetails.receivedMode : "Select Received Mode");
-    const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(!!requestDetails.deliveryMode ? requestDetails.deliveryMode : "Select Delivery Mode");
+    const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
+    const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
+    const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
 
     //generating the menuItems for RequestTypes, ReceivedModes and DeliveryModes
     const requestTypes = requestType.map((item) => {    
@@ -77,29 +104,40 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //handling the received date change
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
+      if(new Date(e.target.value) > new Date(startDateText))     
+        setStartDate(e.target.value);
+
+      const dueDate = dueDateCalculation(e.target.value);
+      setDueDate(dueDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value, dueDate);
     }
     const handleStartDateChange = (e) => {
       setStartDate(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, e.target.value);
     }  
     const handleRequestTypeChange = (e) => {
       setSelectedRequestType(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_TYPE, e.target.value);
     }
     const handleReceivedModeChange = (e) => {
       setSelectedReceivedMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_MODE, e.target.value);
     }
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
+	
      return (
         
         <Card className="foi-details-card">            
@@ -175,6 +213,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             InputLabelProps={{
                             shrink: true,
                             }}
+                            InputProps={{inputProps: { min: receivedDateText} }}
                             variant="outlined" 
                             required
                             error={startDateText === undefined}
@@ -183,7 +222,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                         <TextField                
                             label="Due Date"
                             type="date" 
-                            value={dueDateString}                            
+                            value={dueDateText}                            
                             InputLabelProps={{
                             shrink: true,
                             }}

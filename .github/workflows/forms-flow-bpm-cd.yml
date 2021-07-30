@@ -1,12 +1,13 @@
-name: DEV Request Management API CD
+name: DEV Forms-Flow-bpm CD
 
 
 on:
   push:
     branches:
       - dev
+      - dev-AC-212d
     paths:
-      - "request-management-api/**"
+      - "apps/forms-flow-ai/forms-flow-bpm/**"
   workflow_dispatch:
     inputs:
       environment:
@@ -17,14 +18,14 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: ./request-management-api
+    working-directory: ./apps/forms-flow-ai/forms-flow-bpm
 
 env:
-  APP_NAME: "request-management-api"
+  APP_NAME: "forms-flow-bpm"
   TAG_NAME: "dev"
 
 jobs:
-  request-management-api-cd-by-push:
+  forms-flow-bpm-cd-by-push:
     runs-on: ubuntu-20.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
@@ -39,6 +40,7 @@ jobs:
         run: |
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
+
       - name: Tools project
         shell: bash
         run: |
@@ -47,29 +49,30 @@ jobs:
       - name: Build from dev branch
         shell: bash
         run: |
-          oc patch bc/request-management-api-build -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
 
       - name: Start Build Openshift
         shell: bash
         run: |
-          oc start-build request-management-api-build --wait
+          oc start-build ${{ env.APP_NAME }} --wait
+
 
       - name: Tag+Deploy for DEV
         shell: bash
         run: |
-          oc tag request-management-api:latest request-management-api:dev
+          oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
 
-      # - name: Watch new rollout (trigger by image change in Openshift)
-      #   shell: bash
-      #   run: |
-      #     oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+      - name: Watch new rollout (trigger by image change in Openshift)
+        shell: bash
+        run: |
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
 
       # - name: Rocket.Chat Notification
       #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
       #   if: failure()
       #   with:
       #     type: ${{ job.status }}
-      #     job_name: "*Auth Web Built and Deployed to ${{env.TAG_NAME}}*"
+      #     job_name: "*Auth web Built and Deployed to ${{env.TAG_NAME}}*"
       #     channel: "#registries-bot"
       #     url: ${{ secrets.ROCKETCHAT_WEBHOOK }}
       #     commit: true

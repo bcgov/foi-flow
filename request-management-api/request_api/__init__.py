@@ -21,6 +21,7 @@ import os
 import logging
 #import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports,wrong-import-order; conflicts with Flake8
 from flask import Flask
+from flask_cors import CORS
 #from humps.main import camelize
 from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
 #from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
@@ -53,6 +54,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
     print("environment :" + run_mode)
+    CORS(app)
     db.init_app(app)
     ma.init_app(app)
     #mail.init_app(app)

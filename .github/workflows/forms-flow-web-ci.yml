@@ -1,0 +1,33 @@
+name: Forms Flow Web CI
+
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - "apps/forms-flow-ai/forms-flow-web/**"
+  # Todo - Remove before merging in.
+  push:
+    branches:
+      - dev-AC-212d
+
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./apps/forms-flow-ai/forms-flow-web
+
+jobs:
+  forms-flow-web-docker-build-check:
+    runs-on: ubuntu-20.04
+    name: Build dockerfile to ensure it works
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker build to check strictness
+        id: docker-build
+        run: |
+          docker build -f Dockerfile.local .
+
