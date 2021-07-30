@@ -18,7 +18,7 @@ const useStyles = makeStyles(
     return {
       root: {
         '& .super-app-theme--unopened': {
-          backgroundColor: '#cfd7e3', //getBackgroundColor(theme.palette.info.main),
+          backgroundColor: '#cfd7e3', 
           '&:hover': {
             backgroundColor: getHoverBackgroundColor(theme.palette.info.main),
           },
@@ -26,21 +26,21 @@ const useStyles = makeStyles(
         '& .super-app-theme--intakeinprogress': {
           backgroundColor: '#FFFFF',
           '&:hover': {
-            backgroundColor: '#f1f1f1', //getHoverBackgroundColor(theme.palette.success.main),
+            backgroundColor: '#f1f1f1',
           },
         },
-        // '& .super-app-theme--PartiallyFilled': {
-        //   backgroundColor: getBackgroundColor(theme.palette.warning.main),
-        //   '&:hover': {
-        //     backgroundColor: getHoverBackgroundColor(theme.palette.warning.main),
-        //   },
-        // },
-        // '& .super-app-theme--Rejected': {
-        //   backgroundColor: getBackgroundColor(theme.palette.error.main),
-        //   '&:hover': {
-        //     backgroundColor: getHoverBackgroundColor(theme.palette.error.main),
-        //   },
-        // },
+        '& .super-app-theme--PartiallyFilled': {
+          backgroundColor: getBackgroundColor(theme.palette.warning.main),
+          '&:hover': {
+            backgroundColor: getHoverBackgroundColor(theme.palette.warning.main),
+          },
+        },
+        '& .super-app-theme--Rejected': {
+          backgroundColor: getBackgroundColor(theme.palette.error.main),
+          '&:hover': {
+            backgroundColor: getHoverBackgroundColor(theme.palette.error.main),
+          },
+        },        
       },
     };
   },
