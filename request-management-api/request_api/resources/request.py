@@ -21,6 +21,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
+from request_api.services.external.bpmservice import bpmservice
 import json
 import uuid
 
@@ -56,14 +57,16 @@ class FOIRawRequest(Resource):
     def post(requestid=None):
         try :                        
             updaterequest = request.get_json()            
-            requestidisInteger = int(requestid)
-            if requestidisInteger :     
-
-                ##TODO : WorkFlow Claiming  here.
-                
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],'intake in progress')
-                                                                       
-                return {'status': result.success, 'message':result.message}, 200 
+            if int(requestid) :
+                status = 'Assignment in progress'     
+                rawRequest = rawrequestservice.getrawrequest(requestid)
+                bpmResponse = bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']);
+                if(bpmResponse.status_code == 204):
+                    status = 'Intake in progress'         
+                    #return {'status': bpmResponse.status_code, 'message':bpmResponse.content}, bpmResponse.status_code
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],status)                
+                if result.success == True:   
+                    return {'status': result.success, 'message':result.message}, 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
         except BusinessException as exception:            
@@ -83,8 +86,7 @@ class FOIRawRequestBPMProcess(Resource):
                 _wfinstanceid = request_json['wfinstanceid']
                                
                 requestid = int(_requestid)
-                wfinstanceid = uuid.UUID(_wfinstanceid, version=4)
-                result = rawrequestservice.updateworkflowinstance(wfinstanceid,requestid)
+                result = rawrequestservice.updateworkflowinstance(_wfinstanceid,requestid)
 
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200

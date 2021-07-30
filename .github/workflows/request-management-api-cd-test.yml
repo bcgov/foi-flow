@@ -39,6 +39,11 @@ jobs:
         run: |
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
 
+      - name: Tools project
+        shell: bash
+        run: |
+          oc project ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-tools
+
       - name: Build from main branch
         shell: bash
         run: |

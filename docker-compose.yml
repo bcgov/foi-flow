@@ -28,7 +28,7 @@ services:
       - DATABASE_HOST=foi-requests-DB
       - DATABASE_PORT=5432
       - FLASK_ENV:production
-      - FOI_REQUESTQUEUE_REDISHOST=10.0.0.143
+      - FOI_REQUESTQUEUE_REDISHOST=
       - FOI_REQUESTQUEUE_REDISPORT=6379
       - FOI_REQUESTQUEUE_REDISPASSWORD=
       - FOI_REQUESTQUEUE_REDISCHANNEL=FOI_WF_REQUEST_CHANNEL
@@ -39,6 +39,10 @@ services:
       - KEYCLOAK_ADMIN_SRVACCOUNT=foisrcaccount
       - KEYCLOAK_ADMIN_SRVPASSWORD=
       - KEYCLOAK_ADMIN_INTAKE_GROUPID=
+      - BPM_ENGINE_REST_URL=
+      - BPM_TOKEN_URL=
+      - BPM_CLIENT_ID=forms-flow-bpm
+      - BPM_CLIENT_SECRET=
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg

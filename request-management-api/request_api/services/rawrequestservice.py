@@ -71,6 +71,7 @@ class rawrequestservice:
             _createdDate = parse(request['created_at'])
 
             baserequestInfo = {'id': request['requestid'],
+                               'wfinstanceid': request['wfinstanceid'],
                                'requestType': requestType,
                                'firstName': contactInfo['firstName'],
                                'middleName': requestrawdata['contactInfo']['middleName'],
@@ -134,6 +135,7 @@ class rawrequestservice:
                 baserequestInfo['additionalPersonalInfo'] = additionalpersonalInfo
             return baserequestInfo
         elif request != {} and request['version'] > 1:
+            request['requestrawdata']['currentState'] = request['status']
             return request['requestrawdata']
         else:
             return None
