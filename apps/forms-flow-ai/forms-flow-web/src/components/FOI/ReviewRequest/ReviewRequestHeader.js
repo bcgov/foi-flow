@@ -45,7 +45,6 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
     }
-    const status = !!requestDetails.currentState ? requestDetails.currentState: "Unopened";
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
