@@ -17,30 +17,30 @@ const useStyles = makeStyles(
 
     return {
       root: {
-        '& .super-app-theme--UnOpened': {
+        '& .super-app-theme--unopened': {
           backgroundColor: '#cfd7e3', //getBackgroundColor(theme.palette.info.main),
           '&:hover': {
             backgroundColor: getHoverBackgroundColor(theme.palette.info.main),
           },
         },
-        '& .super-app-theme--testOpen': {
-          backgroundColor: getBackgroundColor(theme.palette.success.main),
+        '& .super-app-theme--intakeinprogress': {
+          backgroundColor: '#FFFFF',
           '&:hover': {
-            backgroundColor: getHoverBackgroundColor(theme.palette.success.main),
+            backgroundColor: '#f1f1f1', //getHoverBackgroundColor(theme.palette.success.main),
           },
         },
-        '& .super-app-theme--PartiallyFilled': {
-          backgroundColor: getBackgroundColor(theme.palette.warning.main),
-          '&:hover': {
-            backgroundColor: getHoverBackgroundColor(theme.palette.warning.main),
-          },
-        },
-        '& .super-app-theme--Rejected': {
-          backgroundColor: getBackgroundColor(theme.palette.error.main),
-          '&:hover': {
-            backgroundColor: getHoverBackgroundColor(theme.palette.error.main),
-          },
-        },
+        // '& .super-app-theme--PartiallyFilled': {
+        //   backgroundColor: getBackgroundColor(theme.palette.warning.main),
+        //   '&:hover': {
+        //     backgroundColor: getHoverBackgroundColor(theme.palette.warning.main),
+        //   },
+        // },
+        // '& .super-app-theme--Rejected': {
+        //   backgroundColor: getBackgroundColor(theme.palette.error.main),
+        //   '&:hover': {
+        //     backgroundColor: getHoverBackgroundColor(theme.palette.error.main),
+        //   },
+        // },
       },
     };
   },
