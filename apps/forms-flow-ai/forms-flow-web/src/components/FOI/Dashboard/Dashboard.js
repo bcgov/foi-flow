@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
-
+import { capitalizeFirstLetter } from "../../../helper/FOI/helper";
 
 const Dashboard = React.memo((props) => {
 
@@ -40,7 +40,7 @@ const Dashboard = React.memo((props) => {
     },
     { field: 'requestType', headerName: 'REQUEST TYPE',  width: 150,  sortable: false },
     { field: 'idNumber', headerName: 'ID NUMBER', width: 150},
-    { field: 'currentState', headerName: 'CURRENT STATE', width: 160 },
+    { field: 'currentState', headerName: 'CURRENT STATUS', width: 160 },
     {      
       field: 'assignedTo',
       headerName: 'ASSIGNED TO',
@@ -60,6 +60,10 @@ const Dashboard = React.memo((props) => {
     ];  
     
     const sortModel=[
+      {
+        field: 'currentState',
+        sort: 'desc',
+      },
       {
         field: 'receivedDateUF',
         sort: 'desc',
@@ -123,7 +127,7 @@ const renderReviewRequest = (e) => {
                 sortModel={sortModel}
                 sortingMode={'client'}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'currentState')}`
+                  `super-app-theme--${params.getValue(params.id, 'currentState').replace(/ +/g, "")}`
                 } 
                 onRowClick={renderReviewRequest}
                 />
