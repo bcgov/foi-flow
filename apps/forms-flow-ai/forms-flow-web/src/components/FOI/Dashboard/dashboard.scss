@@ -40,9 +40,12 @@ div .foi-dashboard {
 
 .foi-dashboard-row2 {
     display: flex;
-    margin-top: 20px;
+    margin-top: 40px;
 }
 
+.MuiDataGrid-cell {
+    text-transform: capitalize !important;
+}
 
 .foi-request-queue-text {
     font-family: "BCSans-Bold";

@@ -55,7 +55,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
                     </Link>
                 </div>            
             <div className="foi-request-status">
-                UnOpened
+                {!!requestDetails.currentState ? requestDetails.currentState: "Unopened"}
             </div>
             </div>
             
