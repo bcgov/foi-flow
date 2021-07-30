@@ -77,7 +77,7 @@ export const fetchFOIProgramAreaList = (...rest) => {
 
 export const fetchFOIAssignedToList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  const unAssigned = {"id": 0, "username": "Unassigned"};
+  const unAssigned = {"id": 0, "username": "Unassigned", "firstname":"", "lastname":""};
   return (dispatch) => {
     httpOpenGETRequest(API.FOI_GET_ASSIGNEDTOLIST_API, {}, UserService.getToken())
       .then((res) => {
