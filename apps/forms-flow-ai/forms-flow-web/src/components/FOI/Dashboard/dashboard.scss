@@ -141,8 +141,16 @@ input[type='radio'] {
     visibility: hidden;
 }
 
+.MuiDataGrid-columnHeaderTitleContainer {
+    padding: 0px !important;
+}
 .MuiDataGrid-columnHeaderWrapper {
     font-weight: bolder !important;    
+}
+
+.MuiDataGrid-columnHeaderTitle {
+    overflow: visible !important;
+    text-overflow: unset !important;
 }
 
 .MuiDataGrid-footerContainer {
