@@ -23,7 +23,7 @@ ANONYMOUS_ID=60c2a2be92a29bd9f5cbfd3b
 USER_RESOURCE_ID=60c2a2be92a29b2662cbfd3e
 
 #URL of forms-flow-forms
-FORMIO_DEFAULT_PROJECT_URL=http://10.0.0.143:3001
+FORMIO_DEFAULT_PROJECT_URL=http://IPADDRESS:3001
 
 ##Keycloak-client-name for web
 KEYCLOAK_WEB_CLIENTID=forms-flow-web
@@ -32,21 +32,21 @@ KEYCLOAK_WEB_CLIENTID=forms-flow-web
 KEYCLOAK_URL_REALM=5k8dbl4h
 
 ##Keycloak base URL
-KEYCLOAK_URL=https://dev.oidc.gov.bc.ca
+KEYCLOAK_URL=
 
 ##Insight Api End point
-INSIGHT_API_URL=http://10.0.0.143:7000
+INSIGHT_API_URL=http://IPADDRESS:7000
 INSIGHT_API_KEY={API Key from Redash}
 
 #formsflow web Api End point
-FORMSFLOW_API_URL=http://10.0.0.143:5000
+FORMSFLOW_API_URL=http://IPADDRESS:5000
 
 ##camunda Api End point
-CAMUNDA_API_URL=http://10.0.0.143:8000/camunda
+CAMUNDA_API_URL=http://IPADDRESS:8000/camunda
 
 ##for socket implementation
 WEBSOCKET_ENCRYPT_KEY={Secret phrase from camunda websocket implementation}
 
 #application name
 APPLICATION_NAME=foi-flow
-REACT_APP_FOI_BASE_API_URL=http://10.0.0.143:15000
+REACT_APP_FOI_BASE_API_URL=http://IPADDRESS:15000
