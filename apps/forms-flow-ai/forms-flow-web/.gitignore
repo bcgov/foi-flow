@@ -26,5 +26,6 @@ yarn-error.log*
 # IntelliJ IDEA
 .idea
 *.iml
+*.snap
 
 
