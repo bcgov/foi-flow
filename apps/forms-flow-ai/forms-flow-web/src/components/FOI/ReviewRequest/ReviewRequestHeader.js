@@ -25,8 +25,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
     },[requestDetails, handleAssignedToInitialValue])
 
     const getFullName = (lastName, firstName, username) => {
-         var displayName =  firstName!= "" ? `${lastName}, ${firstName}` : username;              
-         return  displayName == undefined ? 'Unassigned' : displayName;
+         return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
     }
 
     //creates the menu items for assignedTo combobox
@@ -46,7 +45,6 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
     }
-
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">

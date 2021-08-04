@@ -4,9 +4,7 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
-
 
 const Dashboard = React.memo((props) => {
 
@@ -35,16 +33,26 @@ const Dashboard = React.memo((props) => {
     {
       field: 'applicantName',
       headerName: 'APPLICANT NAME',
-      width: 170,
+      width: 170,      
+      headerAlign: 'left',
       valueGetter: getFullName,     
     },
-    { field: 'requestType', headerName: 'REQUEST TYPE',  width: 150,  sortable: false },
-    { field: 'idNumber', headerName: 'ID NUMBER', width: 150},
-    { field: 'currentState', headerName: 'CURRENT STATUS', width: 160 },
+     { field: 'requestType', headerName: 'REQUEST TYPE',  flex: 1, headerAlign: 'left',//width: 150,  
+      sortable: false },
+    { field: 'idNumber', headerName: 'ID NUMBER',
+       flex: 1, 
+       headerAlign: 'left',      
+    },
+    { field: 'currentState', headerName: 'CURRENT STATUS', 
+      
+       headerAlign: 'left',
+       width: 160 
+    },
     {      
       field: 'assignedTo',
       headerName: 'ASSIGNED TO',
-      width: 150,
+      flex: 1,
+      headerAlign: 'left',     
       renderCell: (params) => (       
         <select>
             <option>Unassigned</option>
@@ -54,9 +62,15 @@ const Dashboard = React.memo((props) => {
       ),
       
     },
-    { field: 'receivedDate', headerName: 'RECEIVED DATE', width: 200},    
-    { field: 'xgov', headerName: 'XGOV', width: 130 },
-    { field: 'receivedDateUF', headerName: '', width: 0,renderCell:(params)=>(<span></span>)}
+    { field: 'receivedDate', headerName: 'RECEIVED DATE', 
+      flex: 1,     
+      headerAlign: 'left',
+    },    
+    { field: 'xgov', headerName: 'XGOV', 
+      flex: 1,      
+      headerAlign: 'left',
+    },
+    { field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
     ];  
     
     const sortModel=[
