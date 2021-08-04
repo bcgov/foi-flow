@@ -103,7 +103,13 @@ execution.setVariable("wfretry",0);</camunda:script>
     <bpmn:sequenceFlow id="Flow_0n60fpl" sourceRef="Activity_0dlg5q0" targetRef="Event_043z2u1" />
     <bpmn:boundaryEvent id="Event_1bb8y9d" name="Request Claimed" cancelActivity="false" attachedToRef="Activity_0dlg5q0">
       <bpmn:extensionElements>
-        <camunda:executionListener expression="${execution.getProcessEngineServices().getTaskService().claim(execution.getVariable(&#34;taskId&#34;),execution.getVariable(&#34;intakeAnalystId&#34;))}" event="start" />
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">var assignee = execution.getProcessEngineServices().getTaskService().createTaskQuery().taskId(execution.getVariable("taskId")).singleResult().getAssignee();
+if(assignee != null) {
+execution.getProcessEngineServices().getTaskService().claim(execution.getVariable("taskId"),null)
+}
+execution.getProcessEngineServices().getTaskService().claim(execution.getVariable("taskId"),execution.getVariable("intakeAnalystId"))</camunda:script>
+        </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0qv8667" messageRef="Message_0wv0zhq" />
     </bpmn:boundaryEvent>
@@ -188,14 +194,14 @@ execution.setVariable("wfretry",0);</camunda:script>
       <bpmndi:BPMNShape id="Event_043z2u1_di" bpmnElement="Event_043z2u1">
         <dc:Bounds x="742" y="152" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_10d3xky_di" bpmnElement="Event_1ik7b3c">
-        <dc:Bounds x="372" y="192" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0a2tut9_di" bpmnElement="Event_1bb8y9d">
         <dc:Bounds x="562" y="192" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="538" y="235" width="85" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10d3xky_di" bpmnElement="Event_1ik7b3c">
+        <dc:Bounds x="372" y="192" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
