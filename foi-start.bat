@@ -13,7 +13,7 @@ if exist "%BPM_DIRECTORY%/../rc4.0.2" echo "Folder already exists"
 if not exist "%BPM_DIRECTORY%/../rc4.0.2" echo "Folder does not exist", echo "Creating Directory for version 4.0.2"
 if not exist "%BPM_DIRECTORY%/../rc4.0.2" mkdir "%FFA_DIRECTORY%"
 
-if not exist "%BPM_DIRECTORY%/../rc4.0.2/forms-flow-bpm" (
+if exist "%BPM_DIRECTORY%/../rc4.0.2/forms-flow-bpm" (
 echo "Clone formsflow.ai"
 git clone -b %REPO_BRANCH% %REPO_URL% "%FFA_DIRECTORY%"
 )
