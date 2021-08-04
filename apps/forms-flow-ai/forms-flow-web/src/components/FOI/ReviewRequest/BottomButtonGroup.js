@@ -76,8 +76,10 @@ const BottomButtonGroup = React.memo(({isValidationError, saveRequestObject, unS
     }
 
     const alertUser = e => {
-      e.preventDefault()
-      e.returnValue = ''
+      e.preventDefault();
+      if (unSavedRequest) {
+        e.returnValue = '';
+      }
     }
 
     React.useEffect(() => { 

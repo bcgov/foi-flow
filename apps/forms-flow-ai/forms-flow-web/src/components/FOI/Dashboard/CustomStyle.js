@@ -1,6 +1,9 @@
-import { getThemePaletteMode } from '@material-ui/data-grid';
 import { createMuiTheme , darken, lighten } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/styles';
+
+function getThemePaletteMode(palette) {
+  return palette.type || palette.mode;
+}
 
 const defaultTheme = createMuiTheme();
 const useStyles = makeStyles(
@@ -17,16 +20,16 @@ const useStyles = makeStyles(
 
     return {
       root: {
-        '& .super-app-theme--UnOpened': {
-          backgroundColor: '#cfd7e3', //getBackgroundColor(theme.palette.info.main),
+        '& .super-app-theme--unopened': {
+          backgroundColor: '#cfd7e3', 
           '&:hover': {
             backgroundColor: getHoverBackgroundColor(theme.palette.info.main),
           },
         },
-        '& .super-app-theme--testOpen': {
-          backgroundColor: getBackgroundColor(theme.palette.success.main),
+        '& .super-app-theme--intakeinprogress': {
+          backgroundColor: '#FFFFF',
           '&:hover': {
-            backgroundColor: getHoverBackgroundColor(theme.palette.success.main),
+            backgroundColor: '#f1f1f1',
           },
         },
         '& .super-app-theme--PartiallyFilled': {
@@ -40,7 +43,7 @@ const useStyles = makeStyles(
           '&:hover': {
             backgroundColor: getHoverBackgroundColor(theme.palette.error.main),
           },
-        },
+        },        
       },
     };
   },
