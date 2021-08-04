@@ -15,7 +15,7 @@ class KeycloakAdminService:
         
     def get_token(self):
         
-        url = '{0}auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)
+        url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
         params = {
 
             'client_id': self.keycloakclientid,
@@ -31,7 +31,7 @@ class KeycloakAdminService:
 
         token = self.get_token() ##TODO: IMPLEMENT TOKEN CACHING < 1000
 
-        url ='{0}auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,self.keycloakadminintakegroupid)
+        url ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,self.keycloakadminintakegroupid)
         headers = {
                 'content-type': 'application/json',
                 'Authorization' : 'Bearer '+ str(token)
