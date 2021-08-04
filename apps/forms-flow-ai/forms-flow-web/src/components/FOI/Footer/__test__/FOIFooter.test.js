@@ -7,12 +7,12 @@ import FOIFooter from '../FOIFooter';
 afterEach(() => {
   cleanup();
 })
-describe('With React Testing Library', () => {
+describe('Footer component', () => {
     const initialState = {output:10}
     const mockStore = configureStore()
     let store,wrapper
   
-    it('matches snapshot', () => {
+    it('matches Footer snapshot', () => {
         store = mockStore(initialState)
         const tree = renderer.create(<Provider store={store}><FOIFooter/></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
