@@ -71,7 +71,7 @@ services:
   forms-flow-bpm:
     build:
       context: ./apps/forms-flow-ai/forms-flow-bpm/
-      dockerfile: Dockerfile
+      dockerfile: windows.Dockerfile
     restart: always
     links:
       - forms-flow-bpm-db
@@ -134,7 +134,7 @@ services:
         - REACT_APP_KEYCLOAK_URL_REALM=${KEYCLOAK_URL_REALM:-forms-flow-ai}
         - REACT_APP_KEYCLOAK_URL=${KEYCLOAK_URL}
         - REACT_APP_APPLICATION_NAME=${APPLICATION_NAME:-foi-flow}
-        - FOI_BASE_API_URL=${FOI_REQ_MANAGEMENT_API_URL}
+        - REACT_APP_FOI_BASE_API_URL=${FOI_REQ_MANAGEMENT_API_URL}
     volumes:
       - ".:/app"
       - "/app/node_modules"
