@@ -4,43 +4,49 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-import TextField from '@material-ui/core/TextField';
+import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import Input from '@material-ui/core/Input';
-import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIRequestList, fetchFOIAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
 
 const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
 
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList);
-  const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+  const rows = useSelector(state=> state.foiRequests.foiRequestsList);  
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const [selectedAssignedTo, setAssignedTo] = React.useState('Unassigned');
+  
 
   const classes = useStyles(); 
 
-  useEffect(()=>{    
+  useEffect(()=>{
+    dispatch(fetchFOIAssignedToList());
     dispatch(fetchFOIRequestList());
     setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
   },[dispatch], [requestType]);
 
-  function getFullName(params) {   
+  const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+  const [selectedAssignedTo, setAssignedTo] = React.useState('Unassigned');
+
+  function getFullName(params) {    
     return `${params.getValue(params.id, 'lastName') || ''}, ${
       params.getValue(params.id, 'firstName') || ''
     }`;
   }
+
+  const getAssigneeFullName = (lastName, firstName, username) => {
+    return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
+}
+
   //handle onChange event for assigned To
   const handleAssignedToOnChange = (event) => {
     setAssignedTo(event.target.value);    
 }
-  const menuItems = assignedToList.map((item) => {    
-    return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
- });
-   const columns = [
-    
+const menuItems = assignedToList.map((item) => {    
+  return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getAssigneeFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
+});
+   const columns = [    
     {
       field: 'applicantName',
       headerName: 'APPLICANT NAME',
@@ -64,17 +70,17 @@ const Dashboard = React.memo((props) => {
       headerName: 'ASSIGNED TO',
       flex: 1,
       headerAlign: 'left',     
-      renderCell: (params) => (       
-        <TextField
-                    id="assignedTo" 
-                    select
-                    value={selectedAssignedTo}
-                    onChange={handleAssignedToOnChange}
-                    input={<Input />}
-                    fullWidth
-                >            
-                    {menuItems}
-                </TextField> 
+      renderCell: (params) => (         
+        <Select
+          className="foi-dashboard-asignedTo"
+          id="assignedTo" 
+          value={selectedAssignedTo}
+          onChange={handleAssignedToOnChange}
+          variant="outlined"
+          fullWidth
+        >
+          {menuItems}
+        </Select> 
       ),
       
     },
