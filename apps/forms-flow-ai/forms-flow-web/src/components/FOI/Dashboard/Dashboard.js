@@ -4,18 +4,23 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Input from '@material-ui/core/Input';
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
 
 const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
 
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList)
+  const rows = useSelector(state=> state.foiRequests.foiRequestsList);
+  const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const classes = useStyles();
-  
+  const [selectedAssignedTo, setAssignedTo] = React.useState('Unassigned');
+
+  const classes = useStyles(); 
 
   useEffect(()=>{    
     dispatch(fetchFOIRequestList());
@@ -27,7 +32,13 @@ const Dashboard = React.memo((props) => {
       params.getValue(params.id, 'firstName') || ''
     }`;
   }
-   
+  //handle onChange event for assigned To
+  const handleAssignedToOnChange = (event) => {
+    setAssignedTo(event.target.value);    
+}
+  const menuItems = assignedToList.map((item) => {    
+    return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
+ });
    const columns = [
     
     {
@@ -54,11 +65,16 @@ const Dashboard = React.memo((props) => {
       flex: 1,
       headerAlign: 'left',     
       renderCell: (params) => (       
-        <select>
-            <option>Unassigned</option>
-            <option>Intake team</option>
-            <option>Program area</option>
-        </select>
+        <TextField
+                    id="assignedTo" 
+                    select
+                    value={selectedAssignedTo}
+                    onChange={handleAssignedToOnChange}
+                    input={<Input />}
+                    fullWidth
+                >            
+                    {menuItems}
+                </TextField> 
       ),
       
     },
