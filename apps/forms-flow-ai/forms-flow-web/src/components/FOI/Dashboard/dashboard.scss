@@ -102,8 +102,7 @@ input[type='radio'] {
     height:15px;
     border:1px solid darkgray;
     border-radius:50%;
-    outline:none;
-    box-shadow:0 0 5px 0px gray inset;
+    outline:none;    
   }
   
   input[type='radio']:hover {
@@ -136,13 +135,23 @@ input[type='radio'] {
 .MuiDataGrid-row {
     border-bottom: 2px solid #e0e0dc;
 }
-
+.foi-dashboard-asignedTo .MuiOutlinedInput-input {
+    padding: 5px 14px !important;   
+}
 .MuiBadge-badge {
     visibility: hidden;
 }
 
+.MuiDataGrid-columnHeaderTitleContainer {
+    padding: 0px !important;
+}
 .MuiDataGrid-columnHeaderWrapper {
     font-weight: bolder !important;    
+}
+
+.MuiDataGrid-columnHeaderTitle {
+    overflow: visible !important;
+    text-overflow: unset !important;
 }
 
 .MuiDataGrid-footerContainer {
