@@ -62,7 +62,22 @@ class FOIRawRequest(db.Model):
                 return DefaultMethodResult(False,'WF instance already exists',requestid) 
         else:
             return DefaultMethodResult(False,'Requestid not exists',-1)              
-        
+
+    @classmethod
+    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status)->DefaultMethodResult:
+        updatedat = datetime.now().isoformat()
+        dbquery = db.session.query(FOIRawRequest)
+        requestraqw = dbquery.filter_by(requestid=requestid,version = 1)
+        if(requestraqw.count() > 0) :
+            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
+            if(existingrequestswithWFid.count() == 0) :
+                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"WF Instance created, along with status",FOIRawRequest.status:status}, synchronize_session = False)
+                db.session.commit()
+                return DefaultMethodResult(True,'Request updated with WF Instance Id',requestid)
+            else:
+                return DefaultMethodResult(False,'WF instance already exists',requestid) 
+        else:
+            return DefaultMethodResult(False,'Requestid not exists',-1)    
 
     @classmethod
     def getrequests(cls):

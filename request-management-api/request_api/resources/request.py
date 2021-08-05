@@ -67,7 +67,7 @@ class FOIRawRequest(Resource):
                 if result.success == True:   
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice.saverawrequest(updaterequest,"intake")
+                result = rawrequestservice.saverawrequest(updaterequest,"intake")               
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
