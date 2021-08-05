@@ -50,7 +50,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     const calculateReceivedDate = (receivedDateString) => {     
       if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {        
-        addBusinessDays(receivedDateString,1);
+        receivedDateString = addBusinessDays(receivedDateString,1);
         //receivedDateString.setDate(receivedDateString.getDate() + 1);
       }
       return receivedDateString;
@@ -58,13 +58,13 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //updates the default values from the request details    
     React.useEffect(() => {
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
-      receivedDate = calculateReceivedDate(receivedDate);
-      const receivedDateString = formatDate(receivedDate);
+      receivedDate = calculateReceivedDate(receivedDate);     
+      const receivedDateString = formatDate(receivedDate);      
       const requestDetailsObject = {
         "requestType": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
         "receivedMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         "deliveryMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
-        "receivedDate": receivedDateString,
+        "receivedDate": !!receivedDateString ? receivedDateString: "",
         "requestStartDate": formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)),
       }
       //event bubble up - sets the initial value to validate the required fields      
@@ -81,7 +81,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     //due date calculation
     const dueDateCalculation = (dateText) => {
-      return addBusinessDays(dateText,ADD_DAYS);
+      return dateText? addBusinessDays(dateText,ADD_DAYS) : "";
+      
     }    
 
     const [dueDateText, setDueDate] = React.useState(dueDateCalculation(startDateText));
@@ -105,19 +106,18 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
       if(new Date(e.target.value) > new Date(startDateText))     
-        setStartDate(e.target.value);
-
-      const dueDate = dueDateCalculation(e.target.value);
-      setDueDate(dueDate);
+        setStartDate(e.target.value);      
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value, dueDate);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value);
     }
     const handleStartDateChange = (e) => {
       setStartDate(e.target.value);
+      const dueDate = dueDateCalculation(e.target.value);
+      setDueDate(dueDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, e.target.value);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, e.target.value, dueDate);
     }  
     const handleRequestTypeChange = (e) => {
       setSelectedRequestType(e.target.value);
@@ -195,7 +195,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                     <TextField                
                             label="Received Date"
                             type="date" 
-                            value={receivedDateText} 
+                            value={receivedDateText || ''} 
                             onChange={handleReceivedDateChange}
                             InputLabelProps={{
                             shrink: true,
@@ -208,7 +208,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                         <TextField                
                             label="Start Date"
                             type="date" 
-                            value={startDateText} 
+                            value={startDateText || ''} 
                             onChange={handleStartDateChange}
                             InputLabelProps={{
                             shrink: true,
@@ -222,7 +222,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                         <TextField                
                             label="Due Date"
                             type="date" 
-                            value={dueDateText}                            
+                            value={dueDateText || ''}                            
                             InputLabelProps={{
                             shrink: true,
                             }}
