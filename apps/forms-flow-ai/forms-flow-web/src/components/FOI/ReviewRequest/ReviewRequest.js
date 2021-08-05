@@ -119,7 +119,13 @@ const ReviewRequest = React.memo((props) => {
     }
     else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
       detailsData.deliveryMode = value;
-    }    
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
+      detailsData.receivedDate = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
+      detailsData.requestStartDate = value;
+    }
     setRequiredRequestDetailsValues(detailsData);
   }
 
@@ -223,120 +229,117 @@ const ReviewRequest = React.memo((props) => {
     }
   }
 
+  const createRequestDetailsObject = (requestObject, name, value, value2) => {
+    if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
+      requestObject.assignedTo = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
+        requestObject.firstName = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {        
+        requestObject.middleName = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
+        requestObject.lastName = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
+        requestObject.businessName = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
+        requestObject.email = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
+        requestObject.category = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.HOME_PHONE) {
+      requestObject.phonePrimary = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) {
+      requestObject.phoneSecondary = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) {
+      requestObject.workPhonePrimary = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) {
+      requestObject.workPhoneSecondary = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
+      requestObject.address = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) {
+      requestObject.addressSecondary = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
+      requestObject.city = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
+      requestObject.postal = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
+      requestObject.province = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
+      requestObject.country = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
+      requestObject.receivedDate = value;
+      const receivedDateUTC = new Date(value).toISOString();
+      requestObject.receivedDateUF = receivedDateUTC;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
+      requestObject.requestProcessStart = value;
+      requestObject.dueDate = value2;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
+      requestObject.requestType = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
+      requestObject.receivedMode = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
+      requestObject.deliveryMode = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+      requestObject.correctionalServiceNumber = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
+      requestObject.publicServiceEmployeeNumber = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
+      requestObject.personalHealthNumber = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
+      requestObject.identityVerified = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {
+      requestObject.description = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.START_DATE) {
+      requestObject.fromDate = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.END_DATE) {
+      requestObject.toDate = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST) {
+      requestObject.selectedMinistries = [];
+      const filteredData = value.filter(programArea => programArea.isChecked)
+      .map(filteredProgramArea => {
+        return {
+          "code": filteredProgramArea.bcgovcode,
+          "name": filteredProgramArea.name,
+          "isSelected": filteredProgramArea.isChecked
+        }
+      });
+      requestObject.selectedMinistries = filteredData;
+    }
+  }
+
   const createSaveRequestObject = (name, value, value2) => 
   {
     setUnSavedRequest(true);
-    const requestObject = {...saveRequestObject};
-    if(Object.entries(requestObject).length !== 0) {      
-      updateAdditionalInfo(name, value, requestObject);
-      if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {       
-        requestObject.assignedTo = value;
-      }      
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
-          requestObject.firstName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {        
-          requestObject.middleName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
-          requestObject.lastName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
-          requestObject.businessName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
-          requestObject.email = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
-          requestObject.category = value;
-      }
-      
-      else if (name === FOI_COMPONENT_CONSTANTS.HOME_PHONE) {
-        requestObject.phonePrimary = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) {
-        requestObject.phoneSecondary = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) {
-        requestObject.workPhonePrimary = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) {
-        requestObject.workPhoneSecondary = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
-        requestObject.address = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) {
-        requestObject.addressSecondary = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
-        requestObject.city = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
-        requestObject.postal = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
-        requestObject.province = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
-        requestObject.country = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
-        requestObject.receivedDate = value;
-        const receivedDateUTC = new Date(value).toISOString();
-        requestObject.receivedDateUF = receivedDateUTC;
-        requestObject.dueDate = value2;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-        requestObject.requestProcessStart = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
-        requestObject.requestType = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
-        requestObject.receivedMode = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
-        requestObject.deliveryMode = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-        requestObject.correctionalServiceNumber = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-        requestObject.publicServiceEmployeeNumber = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
-        requestObject.personalHealthNumber = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
-        requestObject.identityVerified = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {
-        requestObject.description = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.START_DATE) {
-        requestObject.fromDate = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.END_DATE) {
-        requestObject.toDate = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST) {
-        requestObject.selectedMinistries = [];
-        const filteredData = value.filter(programArea => programArea.isChecked)
-        .map(filteredProgramArea => {
-          return {
-            "code": filteredProgramArea.bcgovcode,
-            "name": filteredProgramArea.name,
-            "isSelected": filteredProgramArea.isChecked
-          }
-        });
-        requestObject.selectedMinistries = filteredData;
-      }
-        
-    }
-    else {
-      console.log(`inside else`);
-    }    
+    const requestObject = {...saveRequestObject};      
+    updateAdditionalInfo(name, value, requestObject);
+    createRequestDetailsObject(requestObject, name, value, value2); 
     setSaveRequestObject(requestObject);    
   }
   return (

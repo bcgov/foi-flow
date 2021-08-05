@@ -101,6 +101,8 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
                             value={applicantFirstNameText}
                             fullWidth
                             onChange={handleFirtNameChange}
+                            required={true}
+                            error={applicantFirstNameText===""}
                         />
                         <TextField                          
                             label="Applicant Middle Name" 
@@ -117,6 +119,8 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
                             variant="outlined"
                             fullWidth
                             onChange={handleLastNameChange}
+                            required={true}
+                            error={applicantLastNameText===""}
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col">                      

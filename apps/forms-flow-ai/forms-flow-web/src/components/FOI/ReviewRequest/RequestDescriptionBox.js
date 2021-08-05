@@ -120,9 +120,7 @@ const RequestDescription = React.memo(({
                             shrink: true,
                             }} 
                             InputProps={{inputProps: { max: formatDate(new Date())} }}   
-                            variant="outlined"                            
-                            required
-                            error={startDate === undefined}
+                            variant="outlined"
                             fullWidth
                         />                       
                         <TextField                
@@ -135,9 +133,7 @@ const RequestDescription = React.memo(({
                             shrink: true,
                             }}
                              InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
-                            variant="outlined"                            
-                            required
-                            error={endDate === undefined}
+                            variant="outlined" 
                             fullWidth
                         />  
                         </div>                                                              
