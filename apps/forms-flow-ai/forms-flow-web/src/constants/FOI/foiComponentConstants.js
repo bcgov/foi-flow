@@ -61,6 +61,7 @@ const FOI_COMPONENT_CONSTANTS = {
     PROGRAM_AREA_NAME: "name",
     PROGRAM_AREA_SELECTED: "selected",
     ADDITIONAL_PERSONAL_INFORMATION: "additionalPersonalInfo",
+    CREATE_REQUEST: "createrequest"
 
 
 

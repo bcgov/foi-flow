@@ -29,6 +29,14 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),  
     },
   },
+  validationErrorMessage: {
+    marginTop:'30px',
+    color: "#fd0404",
+  },
+  validationMessage: {
+    marginTop:'30px',
+    color: "#000000",
+  },
 }));
 
 const ReviewRequest = React.memo((props) => {
@@ -40,7 +48,7 @@ const ReviewRequest = React.memo((props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (url.indexOf('createrequest') === -1)
+    if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1)
       dispatch(fetchFOIRequestDetails(requestId));   
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
@@ -51,30 +59,46 @@ const ReviewRequest = React.memo((props) => {
 
   
   useEffect(() => {    
-    requestDetails = url.indexOf('createrequest') > -1 ? {} : requestDetails;
+    requestDetails = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetails);
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
-    "startDate": "",
-    "endDate": "",
-    "description": "",
-    "isProgramAreaSelected": false
+    startDate: "",
+    endDate: "",
+    description: "",
+    isProgramAreaSelected: false
   }  
 
   const requiredRequestDetailsInitialValues = {
-    "requestType":"",
-    "receivedMode": "",
-    "deliveryMode": "",
-    "receivedDate": "",
-    "requestStartDate": "",
+    requestType:"",
+    receivedMode: "",
+    deliveryMode: "",
+    receivedDate: "",
+    requestStartDate: "",
+  }
+
+  const requiredApplicantDetailsValues = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    category: "",
+  }
+
+  const requiredContactDetailsValue = {
+   primaryAddress: "",  
+   city: "",
+   province: "",
+   country: "",
+   postalCode: "",
   }
   
   //below states are used to find if required fields are set or not
   const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
-  const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);
-  const [selectCategoryValue, setSelectCategoryValue] = React.useState("Select Category");
+  const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);  
   const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
+  const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
+  const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
 
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
@@ -85,10 +109,50 @@ const ReviewRequest = React.memo((props) => {
   },[])
   const handleAssignedToInitialValue = React.useCallback((value) => {    
     setAssignedToValue(value);
+  },[]) 
+  const handleApplicantDetailsInitialValue = React.useCallback((value) => {    
+    setRequiredApplicantDetails(value);
   },[])
-  const handleCategoryInitialValue = React.useCallback((value) => {    
-    setSelectCategoryValue(value);
+  const handleContactDetailsInitialValue = React.useCallback((value) => {    
+    setrequiredContactDetails(value);
   },[])
+
+  const handleApplicantDetailsValue = (value, name) => {
+    const detailsData = {...requiredApplicantDetails};
+    if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {
+      detailsData.firstName = value;
+    }    
+    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
+        detailsData.lastName = value;
+    }    
+    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
+        detailsData.email = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
+      detailsData.category = value
+    }
+    setRequiredApplicantDetails(detailsData);
+  }
+
+  const handleContanctDetailsValue = (value, name) => {
+    const detailsData = {...requiredContactDetails};
+    if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
+      detailsData.primaryAddress = value;
+    } 
+    else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
+        detailsData.city = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
+      detailsData.province = value
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
+      detailsData.country = value
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
+      detailsData.postalCode = value
+    }
+    setrequiredContactDetails(detailsData);
+  }
 
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
@@ -133,11 +197,7 @@ const ReviewRequest = React.memo((props) => {
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   }
-
-  //gets the latest category value
-  const handleCategoryValue = (value) => {
-    setSelectCategoryValue(value);
-  }
+ 
 
   //handle email validation
   const [validation, setValidation] = React.useState({});
@@ -153,12 +213,15 @@ const ReviewRequest = React.memo((props) => {
     setProgramAreaList(programAreaList); 
   } 
 
+  const contactDetailsNotGiven = ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
+
   //Variable to find if all required fields are filled or not
   const isValidationError = (
-    requiredRequestDescriptionValues.startDate === undefined || requiredRequestDescriptionValues.endDate === undefined 
+    requiredApplicantDetails.firstName === "" || requiredApplicantDetails.lastName === "" 
+    || requiredApplicantDetails.category.toLowerCase().includes("select")
+    || contactDetailsNotGiven
     || requiredRequestDescriptionValues.description === ""
-    || !requiredRequestDescriptionValues.isProgramAreaSelected
-    || selectCategoryValue.toLowerCase().includes("select")
+    || !requiredRequestDescriptionValues.isProgramAreaSelected   
     || (validation.helperTextValue !== undefined && validation.helperTextValue !== "")
     || assignedToValue.toLowerCase().includes("unassigned")
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
@@ -174,22 +237,22 @@ const ReviewRequest = React.memo((props) => {
   const updateAdditionalInfo = (name, value, requestObject) => {
     if (requestObject.additionalPersonalInfo === undefined) {
       requestObject.additionalPersonalInfo = {
-           "alsoKnownAs":"",            
-           "birthDate":"",
-           "childFirstName":"",
-           "childMiddleName":"",
-           "childLastName":"",
-           "childAlsoKnownAs":"",
-           "childBirthDate":"",
-           "anotherFirstName":"",
-           "anotherMiddleName":"",
-           "anotherLastName":"",
-           "anotherAlsoKnownAs":"",
-           "anotherBirthDate":"",
-           "adoptiveMotherFirstName":"",
-           "adoptiveMotherLastName":"",
-           "adoptiveFatherLastName":"",
-           "adoptiveFatherFirstName":""
+           alsoKnownAs:"",            
+           birthDate:"",
+           childFirstName:"",
+           childMiddleName:"",
+           childLastName:"",
+           childAlsoKnownAs:"",
+           childBirthDate:"",
+           anotherFirstName:"",
+           anotherMiddleName:"",
+           anotherLastName:"",
+           anotherAlsoKnownAs:"",
+           anotherBirthDate:"",
+           adoptiveMotherFirstName:"",
+           adoptiveMotherLastName:"",
+           adoptiveFatherLastName:"",
+           adoptiveFatherFirstName:""
         };
     }
     else {
@@ -325,9 +388,9 @@ const ReviewRequest = React.memo((props) => {
       const filteredData = value.filter(programArea => programArea.isChecked)
       .map(filteredProgramArea => {
         return {
-          "code": filteredProgramArea.bcgovcode,
-          "name": filteredProgramArea.name,
-          "isSelected": filteredProgramArea.isChecked
+          code: filteredProgramArea.bcgovcode,
+          name: filteredProgramArea.name,
+          isSelected: filteredProgramArea.isChecked
         }
       });
       requestObject.selectedMinistries = filteredData;
@@ -342,19 +405,21 @@ const ReviewRequest = React.memo((props) => {
     createRequestDetailsObject(requestObject, name, value, value2); 
     setSaveRequestObject(requestObject);    
   }
+
   return (
       <div className="container foi-review-request-container">      
         <div className="foi-review-container">
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
-        { (url.indexOf('createrequest') === -1 && Object.entries(requestDetails).length !== 0) || url.indexOf('createrequest') > -1 ? (
+        { (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1 && Object.entries(requestDetails).length !== 0) || url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1 ? (
           <>
             <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
-            <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleEmailValidation={handleEmailValidation} handleCategoryValue={handleCategoryValue} createSaveRequestObject={createSaveRequestObject} /> 
+            <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information (Email or Full Address).</div>
+            <ApplicantDetails requestDetails={requestDetails} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
             <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject}/> : null }          
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
             <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
-            <AddressContactDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} />
+            <AddressContactDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
             <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
             <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?

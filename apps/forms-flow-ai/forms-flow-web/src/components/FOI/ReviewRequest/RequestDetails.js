@@ -50,8 +50,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     const calculateReceivedDate = (receivedDateString) => {     
       if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {        
-        receivedDateString = addBusinessDays(receivedDateString,1);
-        //receivedDateString.setDate(receivedDateString.getDate() + 1);
+        receivedDateString = addBusinessDays(receivedDateString,1);       
       }
       return receivedDateString;
     }
@@ -61,11 +60,11 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       receivedDate = calculateReceivedDate(receivedDate);     
       const receivedDateString = formatDate(receivedDate);      
       const requestDetailsObject = {
-        "requestType": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
-        "receivedMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
-        "deliveryMode": validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
-        "receivedDate": !!receivedDateString ? receivedDateString: "",
-        "requestStartDate": formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)),
+        requestType: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
+        receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
+        deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
+        receivedDate: !!receivedDateString ? receivedDateString: "",
+        requestStartDate: formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)),
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);

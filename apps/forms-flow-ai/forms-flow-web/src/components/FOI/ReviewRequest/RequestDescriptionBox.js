@@ -38,10 +38,10 @@ const RequestDescription = React.memo(({
     //updates the default values from the request description box    
     React.useEffect(() => {        
         const descriptionObject = {
-            "startDate": !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
-            "endDate": !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
-            "description": !!requestDetails.description ? requestDetails.description : "",
-            "isProgramAreaSelected": !!requestDetails.selectedMinistries
+            startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
+            endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
+            description: !!requestDetails.description ? requestDetails.description : "",
+            isProgramAreaSelected: !!requestDetails.selectedMinistries
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
@@ -70,8 +70,7 @@ const RequestDescription = React.memo(({
     //handle onchange of start date and set state with latest value
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
-        
-        if(new Date(event.target.value) > new Date(endDate))
+        if(endDate === "" || new Date(event.target.value) > new Date(endDate))
           setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.START_DATE);

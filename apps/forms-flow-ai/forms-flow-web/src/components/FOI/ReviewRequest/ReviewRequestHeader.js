@@ -46,16 +46,13 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
     }
+    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : "Review Request";
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
                 <div className="foi-request-review-header-col1-row">
                     <Link href="#" onClick={preventDefault}>
-                        <h3 className="foi-review-request-text">Review Request</h3>
-                    </Link>
-                    <h3 className="foi-period-text">  |  </h3>
-                    <Link href="#" onClick={preventDefault}>
-                    <h3 className="foi-correspondence-text"> Correspondence</h3>
+                        <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
                 </div>            
             <div className="foi-request-status">

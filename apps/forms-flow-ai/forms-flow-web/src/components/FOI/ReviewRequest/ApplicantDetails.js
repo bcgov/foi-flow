@@ -7,33 +7,64 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue, 
-    handleCategoryValue, handleEmailValidation, createSaveRequestObject}) => {
+const ApplicantDetails = React.memo(({requestDetails, handleApplicantDetailsInitialValue, 
+    handleApplicantDetailsValue, handleEmailValidation, createSaveRequestObject}) => {
     /**
      *  Applicant Details box in the UI
-     *  Category - Mandatory field
+     *  FirstName, LastName and Category - Mandatory fields
      */ 
 
     //gets the category list master data
     const category = useSelector(state=> state.foiRequests.foiCategoryList);
-
+    
+    const validateFields = (request, name) => {
+        if (request !== undefined) {
+            if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {
+              return request.firstName? requestDetails.firstName: ""
+            }
+            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {
+                return request.middleName? requestDetails.middleName: ""
+            }
+            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
+                return request.lastName? requestDetails.lastName: ""
+            }
+            else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
+                return request.businessName? requestDetails.businessName: ""
+            }
+            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
+                return request.email? requestDetails.email: ""
+            }
+            else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
+              return requestDetails.category !== undefined? requestDetails.category:"Select Category";
+            }            
+          }
+          else {
+            return "";
+          }
+    }
     //state management of Applicant FirstName, MiddleName, LastName, Organization, Email and Category
-    const [applicantFirstNameText, setApplicantFirstName] = React.useState(requestDetails.firstName? requestDetails.firstName: "");
-    const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(requestDetails.middleName? requestDetails.middleName:"" );
-    const [applicantLastNameText, setApplicantLastName] = React.useState(requestDetails.lastName? requestDetails.lastName:"");
-    const [organizationText, setOrganization] = React.useState(requestDetails.businessName? requestDetails.businessName: "");
-    const [emailText, setEmail] = React.useState(requestDetails.email ? requestDetails.email:"");
-    const [selectedCategory, setCategoryValue] = React.useState(requestDetails.category !== undefined? requestDetails.category:"Select Category");
+    const [applicantFirstNameText, setApplicantFirstName] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME));
+    const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME));
+    const [applicantLastNameText, setApplicantLastName] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME));
+    const [organizationText, setOrganization] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.ORGANIZATION));
+    const [emailText, setEmail] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL));
+    const [selectedCategory, setCategoryValue] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY));
 
     //handle initial value for required field validation
-    React.useEffect(() => {       
-        const categoryValue = requestDetails.category !== undefined? requestDetails.category:"Select Category";
-        handleCategoryInitialValue(categoryValue);
-    },[requestDetails, handleCategoryInitialValue])
+    React.useEffect(() => {
+        const applicantDetailsObject = {
+            firstName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME),
+            lastName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME),
+            email: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL),
+            category: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY),            
+          }
+        handleApplicantDetailsInitialValue(applicantDetailsObject);
+    },[requestDetails, handleApplicantDetailsInitialValue])
 
     //handle onchange of firstName
     const handleFirtNameChange = (e) => {
          setApplicantFirstName(e.target.value);
+         handleApplicantDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME);
          createSaveRequestObject(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME, e.target.value);
     }
     //handle onchange of middleName
@@ -44,6 +75,7 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
     //handle onchange of lastName
     const handleLastNameChange = (e) => {
         setApplicantLastName(e.target.value);
+        handleApplicantDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME, e.target.value);
     }
     //handle onchange of organization
@@ -71,6 +103,7 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
         }
         handleEmailValidation(emailValidation);
         setEmail(e.target.value);
+        handleApplicantDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL, e.target.value);    
     }
 
@@ -78,7 +111,7 @@ const ApplicantDetails = React.memo(({requestDetails, handleCategoryInitialValue
     const handleCategoryOnChange = (e) => {
         setCategoryValue(e.target.value);
         //event bubble up - send the updated category for required field validation
-        handleCategoryValue(e.target.value);
+        handleApplicantDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY, e.target.value);   
     }
     
