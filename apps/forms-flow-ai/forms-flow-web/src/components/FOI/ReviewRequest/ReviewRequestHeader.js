@@ -20,7 +20,8 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
-        const assignedTo = requestDetails.assignedTo;
+        let assignedTo = requestDetails.assignedTo;
+        assignedTo = assignedTo ? assignedTo: "Unassigned";
         handleAssignedToInitialValue(assignedTo);
     },[requestDetails, handleAssignedToInitialValue])
 
@@ -34,7 +35,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
      });
     
      //local state management for assignedTo
-    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.assignedTo);
+    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.assignedTo ? requestDetails.assignedTo : "Unassigned");
 
     const preventDefault = (event) => event.preventDefault();
     

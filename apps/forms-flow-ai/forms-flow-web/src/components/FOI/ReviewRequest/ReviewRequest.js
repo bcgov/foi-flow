@@ -33,25 +33,28 @@ const useStyles = makeStyles((theme) => ({
 
 const ReviewRequest = React.memo((props) => {
   const {requestId} = useParams();  
-
+  const url = window.location.href;
   //gets the request detail from the store
-  const requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
+  let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchFOIRequestDetails(requestId));   
+    if (url.indexOf('createrequest') === -1)
+      dispatch(fetchFOIRequestDetails(requestId));   
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIAssignedToList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
-  },[requestId, dispatch]); 
+  },[requestId, dispatch]);
 
-  useEffect(() => {
+  
+  useEffect(() => {    
+    requestDetails = url.indexOf('createrequest') > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetails);
   },[requestDetails]);
-
+  
   const requiredRequestDescriptionDefaultData = {
     "startDate": "",
     "endDate": "",
@@ -340,7 +343,7 @@ const ReviewRequest = React.memo((props) => {
       <div className="container foi-review-request-container">      
         <div className="foi-review-container">
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
-        {Object.entries(requestDetails).length !== 0 ? (
+        { (url.indexOf('createrequest') === -1 && Object.entries(requestDetails).length !== 0) || url.indexOf('createrequest') > -1 ? (
           <>
             <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
             <ApplicantDetails requestDetails={requestDetails} handleCategoryInitialValue={handleCategoryInitialValue} handleEmailValidation={handleEmailValidation} handleCategoryValue={handleCategoryValue} createSaveRequestObject={createSaveRequestObject} /> 
@@ -357,7 +360,7 @@ const ReviewRequest = React.memo((props) => {
             
             <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest}/>
           </>
-           ): null}
+          ): null}
            </form>
         </div>
       </div>

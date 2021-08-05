@@ -170,6 +170,22 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     position: relative!important;
     height: -webkit-fill-available;
 }
+.foi-dashboard-header {
+    display: flex;
+}
+.foi-btn-create {
+    margin-right: 20px;
+    margin-top: 10px;
+    margin-left: auto;
+    position: relative;
+    width: 20% !important;
+    font-family: "BCSans-Bold";
+    border: none !important;
+    background-color: #38598A !important;
+    color: #FFFFFF !important;
+}
+
+
 @media only screen  and (min-width: 1800px) { 
 
     .foi-grid-container {

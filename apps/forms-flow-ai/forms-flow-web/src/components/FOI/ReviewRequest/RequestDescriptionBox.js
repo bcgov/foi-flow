@@ -36,10 +36,10 @@ const RequestDescription = React.memo(({
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
     
     //updates the default values from the request description box    
-    React.useEffect(() => {
+    React.useEffect(() => {        
         const descriptionObject = {
-            "startDate": formatDate(new Date(requestDetails.fromDate)),
-            "endDate": formatDate(new Date(requestDetails.toDate)),
+            "startDate": !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
+            "endDate": !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             "description": !!requestDetails.description ? requestDetails.description : "",
             "isProgramAreaSelected": !!requestDetails.selectedMinistries
         }    
@@ -63,8 +63,8 @@ const RequestDescription = React.memo(({
     }
 
     //component state management for startDate, endDate and Description
-    const [startDate, setStartDate] = React.useState(formatDate(new Date(requestDetails.fromDate)));
-    const [endDate, setEndDate] = React.useState(formatDate(new Date(requestDetails.toDate)));
+    const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
+    const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
 
     //handle onchange of start date and set state with latest value

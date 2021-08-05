@@ -84,7 +84,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       return addBusinessDays(dateText,ADD_DAYS);
     }    
 
-    const [dueDateText, setDueDate] = React.useState(dueDateCalculation(receivedDateString));
+    const [dueDateText, setDueDate] = React.useState(dueDateCalculation(startDateText));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
     const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));

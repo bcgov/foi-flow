@@ -130,14 +130,19 @@ const search = (rows) => {
 const renderReviewRequest = (e) => {  
   dispatch(push(`/foi/reviewrequest/${e.row.id}`));
 }
+const createRequest = (e) => {
+  dispatch(push(`/foi/createrequest`));
+}
 
      return (  
                
         <div className="container foi-container">
            
           <div className="col-sm-12 col-md-12 foi-grid-container">
-            <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
-           
+            <div className="foi-dashboard-row2">
+              <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
+              <button type="button" className="btn foi-btn-create" onClick={createRequest} >Create Request</button>
+            </div>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
