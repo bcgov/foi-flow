@@ -135,7 +135,9 @@ input[type='radio'] {
 .MuiDataGrid-row {
     border-bottom: 2px solid #e0e0dc;
 }
-
+.foi-dashboard-asignedTo .MuiOutlinedInput-input {
+    padding: 5px 14px !important;   
+}
 .MuiBadge-badge {
     visibility: hidden;
 }

@@ -4,32 +4,49 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import { fetchFOIRequestList, fetchFOIAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
 
 const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
 
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList)
+  const rows = useSelector(state=> state.foiRequests.foiRequestsList);  
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const classes = useStyles();
   
 
-  useEffect(()=>{    
+  const classes = useStyles(); 
+
+  useEffect(()=>{
+    dispatch(fetchFOIAssignedToList());
     dispatch(fetchFOIRequestList());
     setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
   },[dispatch], [requestType]);
 
-  function getFullName(params) {   
+  const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+  const [selectedAssignedTo, setAssignedTo] = React.useState('Unassigned');
+
+  function getFullName(params) {    
     return `${params.getValue(params.id, 'lastName') || ''}, ${
       params.getValue(params.id, 'firstName') || ''
     }`;
   }
-   
-   const columns = [
-    
+
+  const getAssigneeFullName = (lastName, firstName, username) => {
+    return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
+}
+
+  //handle onChange event for assigned To
+  const handleAssignedToOnChange = (event) => {
+    setAssignedTo(event.target.value);    
+}
+const menuItems = assignedToList.map((item) => {    
+  return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getAssigneeFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
+});
+   const columns = [    
     {
       field: 'applicantName',
       headerName: 'APPLICANT NAME',
@@ -53,12 +70,17 @@ const Dashboard = React.memo((props) => {
       headerName: 'ASSIGNED TO',
       flex: 1,
       headerAlign: 'left',     
-      renderCell: (params) => (       
-        <select>
-            <option>Unassigned</option>
-            <option>Intake team</option>
-            <option>Program area</option>
-        </select>
+      renderCell: (params) => (         
+        <Select
+          className="foi-dashboard-asignedTo"
+          id="assignedTo" 
+          value={selectedAssignedTo}
+          onChange={handleAssignedToOnChange}
+          variant="outlined"
+          fullWidth
+        >
+          {menuItems}
+        </Select> 
       ),
       
     },
@@ -98,7 +120,9 @@ const search = (rows) => {
   
   return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
+  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) || 
+  (row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
+  && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
 
 }
  
