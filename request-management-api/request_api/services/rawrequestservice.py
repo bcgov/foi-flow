@@ -16,8 +16,8 @@ class rawrequestservice:
 
     """
 
-    def saverawrequest(requestdatajson):
-        result = FOIRawRequest.saverawrequest(requestdatajson)
+    def saverawrequest(requestdatajson,sourceofsubmission):
+        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
