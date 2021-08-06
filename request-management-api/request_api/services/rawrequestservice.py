@@ -24,6 +24,7 @@ class rawrequestservice:
             redispubservice = RedisPublisherService()
             data = {}
             data['id'] = result.identifier
+            data['assignedTo'] = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None  else ''
             json_data = json.dumps(data)
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
