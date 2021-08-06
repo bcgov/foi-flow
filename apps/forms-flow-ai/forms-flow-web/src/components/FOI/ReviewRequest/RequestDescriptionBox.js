@@ -47,14 +47,19 @@ const RequestDescription = React.memo(({
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
     
     //if updated program area list not exists then, update the master list with selected ministries
-    if (Object.entries(programAreaList).length === 0){
-        const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";     
-        
+    if (Object.entries(programAreaList).length === 0){       
+        const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
         if(selectedMinistries !== "" && Object.entries(masterProgramAreaList).length !== 0) {
             const selectedList = selectedMinistries.map(element => element.code);
             masterProgramAreaList.map(programArea => {
             return programArea.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === programArea.bcgovcode);           
         });      
+        }
+        else {
+            //if it is create request then keep all check boxes unchecked
+            masterProgramAreaList.map(programArea => {
+                return programArea.isChecked = false;
+            });
         }
     }
     //if updated program area list exists then use that list instead of master data
