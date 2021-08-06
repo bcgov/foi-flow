@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({isValidationError, saveRequestObject, unSavedRequest }) => {
+const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest, saveRequestObject, unSavedRequest }) => {
   /**
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
@@ -103,9 +103,9 @@ const BottomButtonGroup = React.memo(({isValidationError, saveRequestObject, unS
     <div className={classes.root}>
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Open Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Open Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>

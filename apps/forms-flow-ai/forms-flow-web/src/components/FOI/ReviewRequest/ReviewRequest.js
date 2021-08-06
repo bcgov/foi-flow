@@ -406,27 +406,28 @@ const ReviewRequest = React.memo((props) => {
     setSaveRequestObject(requestObject);    
   }
 
+  const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST);
   return (
-      <div className="container foi-review-request-container">      
+      <div className="container foi-review-request-container">
         <div className="foi-review-container">
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
-        { (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1 && Object.entries(requestDetails).length !== 0) || url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1 ? (
+        { (urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
           <>
             <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
-            <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information (Email or Full Address).</div>
+            <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information for the applicant, either EMAIL or MAILING ADDRESS.</div>
             <ApplicantDetails requestDetails={requestDetails} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
             <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject}/> : null }          
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
             <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
             <AddressContactDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
-            <RequestDescriptionBox programAreaList={programAreaList} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
+            <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
             <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
             <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
             <RequestNotes />
             
-            <BottomButtonGroup isValidationError = {isValidationError} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest}/>
+            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest}/>
           </>
           ): null}
            </form>
