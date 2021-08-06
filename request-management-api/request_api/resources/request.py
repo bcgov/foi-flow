@@ -57,16 +57,18 @@ class FOIRawRequest(Resource):
     def post(requestid=None):
         try :                        
             updaterequest = request.get_json()            
-            if int(requestid) :
+            if int(requestid) and str(requestid) != "-1" :
                 status = 'Assignment in progress'     
                 rawRequest = rawrequestservice.getrawrequest(requestid)
                 bpmResponse = bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']);
                 if(bpmResponse.status_code == 204):
-                    status = 'Intake in progress'         
-                    #return {'status': bpmResponse.status_code, 'message':bpmResponse.content}, bpmResponse.status_code
+                    status = 'Intake in progress'                             
                 result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],status)                
                 if result.success == True:   
-                    return {'status': result.success, 'message':result.message}, 200 
+                    return {'status': result.success, 'message':result.message}, 200
+            elif int(requestid) and str(requestid) == "-1":
+                result = rawrequestservice.saverawrequest(updaterequest,"intake")               
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
         except BusinessException as exception:            
@@ -127,7 +129,7 @@ class FOIRawRequests(Resource):
         try:
             request_json = request.get_json()
             requestdatajson = request_json['requestData']           
-            result = rawrequestservice.saverawrequest(requestdatajson)
+            result = rawrequestservice.saverawrequest(requestdatajson,"onlineform")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
