@@ -26,10 +26,10 @@ class FOIRawRequest(db.Model):
     
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission)->DefaultMethodResult:        
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:        
         createdat = datetime.now().isoformat()
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedto=assignee)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -67,7 +67,8 @@ class FOIRawRequest(db.Model):
     def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status)->DefaultMethodResult:
         updatedat = datetime.now().isoformat()
         dbquery = db.session.query(FOIRawRequest)
-        requestraqw = dbquery.filter_by(requestid=requestid,version = 1)
+        _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
         if(requestraqw.count() > 0) :
             existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
             if(existingrequestswithWFid.count() == 0) :

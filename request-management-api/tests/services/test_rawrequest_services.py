@@ -33,6 +33,6 @@ def test_get_rawrequests(session):
         requestid = item['id']        
         assert item['id'] and item['requestType']
     getresponse = rawrequestservice.getrawrequest(requestid)
-    assert getresponse['id'] and getresponse['requestType']        
+    assert getresponse['requestType']        
 
 
