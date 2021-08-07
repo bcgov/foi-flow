@@ -71,12 +71,14 @@ class FOIRawRequest(db.Model):
         requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
         if(requestraqw.count() > 0) :
             existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
-            if(existingrequestswithWFid.count() == 0) :
-                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"WF Instance created, along with status",FOIRawRequest.status:status}, synchronize_session = False)
+            if(existingrequestswithWFid.count() == 1) :
+                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"Status update",FOIRawRequest.status:status}, synchronize_session = False)
+                db.session.commit()
+                return DefaultMethodResult(True,'Request updated with status',requestid)
+            else:
+                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"Workflow ID update",FOIRawRequest.status:status}, synchronize_session = False)
                 db.session.commit()
                 return DefaultMethodResult(True,'Request updated with WF Instance Id',requestid)
-            else:
-                return DefaultMethodResult(False,'WF instance already exists',requestid) 
         else:
             return DefaultMethodResult(False,'Requestid not exists',-1)    
 
