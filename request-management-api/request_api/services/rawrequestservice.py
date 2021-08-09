@@ -155,6 +155,7 @@ class rawrequestservice:
             request['requestrawdata']['currentState'] = request['status']
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
+            request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['currentState'] = request['status']
             return request['requestrawdata']
         else:
