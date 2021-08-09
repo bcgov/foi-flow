@@ -19,7 +19,7 @@ class rawrequestservice:
     """
 
     def saverawrequest(requestdatajson,sourceofsubmission):
-        assignee = requestdatajson["assignedTxo"] if requestdatajson.get("assignedTo") != None else None
+        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
         result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,assignee)
         if result.success:
             redispubservice = RedisPublisherService()
