@@ -12,9 +12,9 @@ class ContactType(db.Model):
 
     @classmethod
     def getcontacttypes(cls):
-        deliverymode_schema = ContactTypeSchema(many=True)
+        contacttype_schema = ContactTypeSchema(many=True)
         query = db.session.query(ContactType).filter_by(isactive=True).all()
-        return deliverymode_schema.dump(query)
+        return contacttype_schema.dump(query)
 
 
 class ContactTypeSchema(ma.Schema):

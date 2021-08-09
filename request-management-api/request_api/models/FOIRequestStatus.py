@@ -12,9 +12,9 @@ class FOIRequestStatus(db.Model):
 
     @classmethod
     def getrequeststatuses(cls):
-        deliverymode_schema = RequestStatusSchema(many=True)
+        requeststatus_schema = RequestStatusSchema(many=True)
         query = db.session.query(FOIRequestStatus).filter_by(isactive=True).all()
-        return deliverymode_schema.dump(query)
+        return requeststatus_schema.dump(query)
 
 
 class RequestStatusSchema(ma.Schema):
