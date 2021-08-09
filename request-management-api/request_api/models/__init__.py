@@ -33,5 +33,6 @@ from .FOIRequestStatus import FOIRequestStatus
 from .FOIMinistryRequests import FOIMinistryRequest
 
 from .ContactTypes import ContactType
+from .FOIRequestContactInformation import FOIRequestContactInformation
 
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
