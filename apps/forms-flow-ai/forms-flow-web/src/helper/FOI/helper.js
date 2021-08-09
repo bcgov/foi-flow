@@ -53,4 +53,24 @@ const addBusinessDays = (dateText, days) => {
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
 
-export { replaceUrl, formatDate, addBusinessDays };
+const countWeekendDays = (startDate, endDate) =>
+{
+  var ndays = 1 + Math.round((endDate.getTime()-startDate.getTime())/(24*3600*1000));
+  var nsaturdays = Math.floor( (startDate.getDay()+ndays) / 7 );
+  return 2*nsaturdays + (startDate.getDay() === 0) - (endDate.getDay() === 6);
+}
+
+const daysBetween = (startDate, endDate) => {
+    var millisecondsPerDay = 24 * 60 * 60 * 1000;
+    return (new Date(endDate) - new Date(startDate)) / millisecondsPerDay;
+}
+const calculateDaysRemaining = (endDate) => {
+	const startDate = formatDate(new Date());
+	const publicHoliDays = getPublicHoliDays(startDate, endDate);
+	const weekendDays = countWeekendDays(startDate, endDate);
+	const noOfDays = daysBetween(startDate, endDate);
+
+	return noOfDays - publicHoliDays - weekendDays;
+}
+
+export { replaceUrl, formatDate, addBusinessDays, calculateDaysRemaining };
