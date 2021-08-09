@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
 import {saveRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
+import { ConfirmationModal } from '../customComponents';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,6 +40,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
+    const {requestId} = useParams();  
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -48,7 +51,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
       }
     }
     const saveRequest = async () => {      
-      dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, (err, res) => {
+      dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
             position: "top-right",
@@ -98,12 +101,16 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
         
       }
     });
-
+    let isOpen = false;
+    const openRequest = () => {
+      
+    }
   return (
     <div className={classes.root}>
+      {/* <ConfirmationModal isOpen={true}/>   */}
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Open Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError} onClick={openRequest}>Open Request</button>
       <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
       <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
