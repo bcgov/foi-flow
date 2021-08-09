@@ -225,9 +225,9 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
   };
 };
 
-export const saveRequestDetails = (data, urlIndexCreateRequest, ...rest) => {
+export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  let id = urlIndexCreateRequest > -1? -1: data.id;  
+  let id = urlIndexCreateRequest > -1? -1: requestId;  
   const apiUrl = replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",

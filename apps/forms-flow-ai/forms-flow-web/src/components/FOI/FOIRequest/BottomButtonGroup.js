@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
 import {saveRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,6 +39,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
+    const {requestId} = useParams();  
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -48,7 +50,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
       }
     }
     const saveRequest = async () => {      
-      dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, (err, res) => {
+      dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
             position: "top-right",
