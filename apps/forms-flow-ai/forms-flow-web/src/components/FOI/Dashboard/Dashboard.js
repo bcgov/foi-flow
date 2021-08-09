@@ -54,21 +54,22 @@ const menuItems = assignedToList.map((item) => {
       headerAlign: 'left',
       valueGetter: getFullName,     
     },
-     { field: 'requestType', headerName: 'REQUEST TYPE',  flex: 1, headerAlign: 'left',//width: 150,  
+     { field: 'requestType', headerName: 'REQUEST TYPE',  width: 150, headerAlign: 'left',//width: 150,  
       sortable: false },
     { field: 'idNumber', headerName: 'ID NUMBER',
-       flex: 1, 
+       width: 150, 
        headerAlign: 'left',      
     },
     { field: 'currentState', headerName: 'CURRENT STATUS', 
       
        headerAlign: 'left',
-       width: 160 
+       width: 180 
+     
     },
     {      
       field: 'assignedTo',
       headerName: 'ASSIGNED TO',
-      flex: 1,
+      width: 210,
       headerAlign: 'left',     
       renderCell: (params) => (         
         <Select
@@ -76,8 +77,7 @@ const menuItems = assignedToList.map((item) => {
           id="assignedTo" 
           value={selectedAssignedTo}
           onChange={handleAssignedToOnChange}
-          variant="outlined"
-          fullWidth
+          variant="outlined"                    
         >
           {menuItems}
         </Select> 
@@ -85,11 +85,11 @@ const menuItems = assignedToList.map((item) => {
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
-      flex: 1,     
+      width: 150,    
       headerAlign: 'left',
     },    
     { field: 'xgov', headerName: 'XGOV', 
-      flex: 1,      
+      width: 100,      
       headerAlign: 'left',
     },
     { field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
@@ -120,9 +120,9 @@ const search = (rows) => {
   
   return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ) || 
-  (row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
+  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
+  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+  ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
 
 }
  
@@ -130,14 +130,19 @@ const search = (rows) => {
 const renderReviewRequest = (e) => {  
   dispatch(push(`/foi/reviewrequest/${e.row.id}`));
 }
+const createRequest = (e) => {
+  dispatch(push(`/foi/createrequest`));
+}
 
      return (  
                
         <div className="container foi-container">
            
           <div className="col-sm-12 col-md-12 foi-grid-container">
-            <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
-           
+            <div className="foi-dashboard-row2">
+              <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
+              <button type="button" className="btn foi-btn-create" onClick={createRequest} >Create Request</button>
+            </div>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>

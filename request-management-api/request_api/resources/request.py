@@ -60,10 +60,10 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()            
             if int(requestid) and str(requestid) != "-1" :
                 status = 'Assignment in progress'     
-                rawRequest = rawrequestservice.getrawrequest(requestid)
-                bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']);                                             
+                rawRequest = rawrequestservice.getrawrequest(requestid)                                              
                 result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],status)                
                 if result.success == True:   
+                    bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice.saverawrequest(updaterequest,"intake")               
@@ -86,8 +86,9 @@ class FOIRawRequestBPMProcess(Resource):
 
                 _wfinstanceid = request_json['wfinstanceid']
                 status = request_json['status'] if request_json.get('status') is not None else 'unopened'
+                notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
-                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status)
+                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes)
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200
                 else:

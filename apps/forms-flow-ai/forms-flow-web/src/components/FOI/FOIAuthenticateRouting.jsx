@@ -9,7 +9,7 @@ import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import Dashboard from "./Dashboard";
-import ReviewRequest from "./ReviewRequest";
+import FOIRequest from "./FOIRequest";
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated);
@@ -32,10 +32,11 @@ const FOIAuthenticateRouting = React.memo((props) => {
             <Route exact path="/foi/dashboard">                
                 <Dashboard />                
             </Route>
-            <Route path="/foi/reviewrequest/:requestId">   
-                   
-                <ReviewRequest />  
-                       
+            <Route path="/foi/reviewrequest/:requestId">                   
+                <FOIRequest /> 
+            </Route>
+            <Route path="/foi/createrequest">
+                <FOIRequest /> 
             </Route>
            
             <FOIFooter />
