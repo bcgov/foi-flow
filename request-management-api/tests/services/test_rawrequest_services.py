@@ -13,7 +13,7 @@ def pytest_namespace():
     return {'requestidtoupdate': 0}
 
 def test_save_rawrequest(session):
-    response = rawrequestservice.saverawrequest(requestjson)
+    response = rawrequestservice.saverawrequest(requestjson,'onlineform')
     requestid = response.identifier
     pytest.approxrequestidtoupdate = requestid
     wfupdateresponse = rawrequestservice.updateworkflowinstance(str(uuid.uuid4()),requestid)
@@ -33,6 +33,6 @@ def test_get_rawrequests(session):
         requestid = item['id']        
         assert item['id'] and item['requestType']
     getresponse = rawrequestservice.getrawrequest(requestid)
-    assert getresponse['id'] and getresponse['requestType']        
+    assert getresponse['requestType']        
 
 

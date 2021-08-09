@@ -49,3 +49,8 @@ request-management-api/src
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
+
+.env
+apps/forms-flow-ai/rc4.0.2
+apps/forms-flow-ai/rc4.0.2/*
+request-management-api/.localenv
