@@ -39,4 +39,6 @@ from .RequestorType import RequestorType
 from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 
+from .PersonalInformationAttributes import PersonalInformationAttribute
+
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
