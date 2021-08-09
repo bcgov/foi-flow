@@ -85,7 +85,7 @@ const menuItems = assignedToList.map((item) => {
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
-      flex: 1,     
+      width: 150,    
       headerAlign: 'left',
     },    
     { field: 'xgov', headerName: 'XGOV', 
