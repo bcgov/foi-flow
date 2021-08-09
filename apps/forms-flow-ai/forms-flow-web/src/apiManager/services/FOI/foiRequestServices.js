@@ -225,12 +225,13 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
   };
 };
 
-export const saveRequestDetails = (data, ...rest) => {
+export const saveRequestDetails = (data, urlIndexCreateRequest, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
+  let id = urlIndexCreateRequest > -1? -1: data.id;  
   const apiUrl = replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
-    data.id
+    id
   );
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
