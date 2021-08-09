@@ -41,4 +41,6 @@ from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 
 from .PersonalInformationAttributes import PersonalInformationAttribute
 
+from .FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
+
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
