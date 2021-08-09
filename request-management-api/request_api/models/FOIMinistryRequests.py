@@ -16,8 +16,8 @@ class FOIMinistryRequest(db.Model):
 
     filenumber = db.Column(db.String(50), unique=False, nullable=False)
     description = db.Column(db.String(500), unique=False, nullable=False)
-    recordsearchfromdate = db.Column(db.DateTime, nullable=False)
-    recordsearchtodate = db.Column(db.DateTime, nullable=False)
+    recordsearchfromdate = db.Column(db.DateTime, nullable=True)
+    recordsearchtodate = db.Column(db.DateTime, nullable=True)
 
     startdate = db.Column(db.DateTime, nullable=False,default=datetime.now().isoformat())
     duedate = db.Column(db.DateTime, nullable=False)
