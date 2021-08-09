@@ -28,5 +28,6 @@ from .ApplicantCategories import ApplicantCategory
 from .DeliveryModes import DeliveryMode
 from .ReceivedModes import ReceivedMode
 
+from .FOIRequests import FOIRequest
 
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
