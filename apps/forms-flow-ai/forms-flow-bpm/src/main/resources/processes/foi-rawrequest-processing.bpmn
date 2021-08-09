@@ -23,7 +23,8 @@
         <camunda:taskListener event="assignment">
           <camunda:script scriptFormat="javascript">var rawReqPayload = {
 "wfinstanceid": task.execution.getVariable("pid"),
-"status" : "Intake in Progress"
+"status" : "Intake in Progress",
+"notes":"Status update"
 };
 task.execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-rawrequest-update").setVariables(task.execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).correlateWithResult();</camunda:script>
         </camunda:taskListener>
@@ -66,7 +67,8 @@ execution.setVariable("pid", execution.getProcessInstanceId());</camunda:script>
       <bpmn:extensionElements>
         <camunda:executionListener event="start">
           <camunda:script scriptFormat="javascript">var rawReqPayload = {
-"wfinstanceid": execution.getVariable("pid")
+"wfinstanceid": execution.getVariable("pid"),
+"notes":"Workflow ID update"
 };
 execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-rawrequest-update").setVariables(execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).correlateWithResult();</camunda:script>
         </camunda:executionListener>
