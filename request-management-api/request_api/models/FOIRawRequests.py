@@ -1,5 +1,5 @@
 from enum import unique
-import re
+
 
 from sqlalchemy.sql.expression import distinct
 from .db import  db, ma
@@ -22,12 +22,14 @@ class FOIRawRequest(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now().isoformat())
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    sourceofsubmission = db.Column(db.String(120),  nullable=True)
+    
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata)->DefaultMethodResult:        
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:        
         createdat = datetime.now().isoformat()
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened',created_at=createdat,version=version)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedto=assignee)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -39,7 +41,7 @@ class FOIRawRequest(db.Model):
         _version = request.version+1
         insertstmt =(
             insert(FOIRawRequest).
-            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid)
+            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
         )                 
         db.session.execute(insertstmt)               
         db.session.commit()                
@@ -60,7 +62,20 @@ class FOIRawRequest(db.Model):
                 return DefaultMethodResult(False,'WF instance already exists',requestid) 
         else:
             return DefaultMethodResult(False,'Requestid not exists',-1)              
-        
+
+    @classmethod
+    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes)-> DefaultMethodResult:
+        updatedat = datetime.now().isoformat()
+        dbquery = db.session.query(FOIRawRequest)
+        _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
+        if(requestraqw.count() > 0) :
+            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)        
+            requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated',requestid)       
+        else:
+            return DefaultMethodResult(False,'Requestid not exists',-1)    
 
     @classmethod
     def getrequests(cls):
@@ -71,9 +86,7 @@ class FOIRawRequest(db.Model):
         for _requestid in _requestids:
            request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid).order_by(FOIRawRequest.version.desc()).first()           
            requests.append(request)
-        #query = db.session.query(FOIRawRequest).all()
-        #query = db.session.query(FOIRawRequest).distinct(FOIRawRequest.requestid).all()
-        #return request_schema.dump(query)
+
         return requests
 
     @classmethod
@@ -84,4 +97,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedto','updatedby')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedto','updatedby','sourceofsubmission')

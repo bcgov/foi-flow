@@ -4,7 +4,7 @@ import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObject}) => {
+const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObject, handleContactDetailsInitialValue, handleContanctDetailsValue}) => {
 
     /**
      *  Address and Contact box in the UI
@@ -61,7 +61,16 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
     const [PostalText, setPostal] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE));
     const [ProvinceText, setProvince] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE));
     const [CountryText, setCountry] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)); 
-    
+    React.useEffect(() => {
+      const contanctDetailsObject = {
+          primaryAddress: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY),
+          city: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY),
+          province: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE),
+          country: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY),
+          postalCode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE),
+        }
+        handleContactDetailsInitialValue(contanctDetailsObject);
+    },[requestDetails, handleContactDetailsInitialValue])
     const handleHomePhoneChange = (e) => {
         setHomePhone(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.HOME_PHONE, e.target.value);
@@ -81,6 +90,7 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
 
     const handleStreetAddressChange = (e) => {
         setStreetAddress(e.target.value);
+        handleContanctDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY, e.target.value);
     }
     const handleScondaryStreetAddressChange = (e) => {
@@ -89,20 +99,24 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
     }
     const handleCityChange = (e) => {
         setCity(e.target.value);
+        handleContanctDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.CITY);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CITY, e.target.value);
     }
     const handlePostalChange = (e) => {
         setPostal(e.target.value);
+        handleContanctDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.POSTALCODE);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.POSTALCODE, e.target.value);
     }
 
     const handleProvinceChange = (e) => {
         setProvince(e.target.value);
+        handleContanctDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.PROVINCE);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROVINCE, e.target.value);
     }
 
     const handleCountryChange = (e) => {
         setCountry(e.target.value);
+        handleContanctDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.COUNTRY);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.COUNTRY, e.target.value);
     }
 

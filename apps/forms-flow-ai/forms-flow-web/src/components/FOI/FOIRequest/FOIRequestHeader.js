@@ -1,12 +1,11 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
 import { useSelector } from "react-redux";
-import "./reviewrequestheader.scss";
+import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-
 
 const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
    
@@ -20,7 +19,8 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
-        const assignedTo = requestDetails.assignedTo;
+        let assignedTo = requestDetails.assignedTo;
+        assignedTo = assignedTo ? assignedTo: "Unassigned";
         handleAssignedToInitialValue(assignedTo);
     },[requestDetails, handleAssignedToInitialValue])
 
@@ -34,7 +34,7 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
      });
     
      //local state management for assignedTo
-    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.assignedTo);
+    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.assignedTo ? requestDetails.assignedTo : "Unassigned");
 
     const preventDefault = (event) => event.preventDefault();
     
@@ -45,16 +45,13 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
     }
+    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : "Review Request";
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
                 <div className="foi-request-review-header-col1-row">
                     <Link href="#" onClick={preventDefault}>
-                        <h3 className="foi-review-request-text">Review Request</h3>
-                    </Link>
-                    <h3 className="foi-period-text">  |  </h3>
-                    <Link href="#" onClick={preventDefault}>
-                    <h3 className="foi-correspondence-text"> Correspondence</h3>
+                        <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
                 </div>            
             <div className="foi-request-status">

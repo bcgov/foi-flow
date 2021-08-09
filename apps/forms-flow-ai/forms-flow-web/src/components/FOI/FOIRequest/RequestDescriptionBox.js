@@ -36,25 +36,30 @@ const RequestDescription = React.memo(({
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
     
     //updates the default values from the request description box    
-    React.useEffect(() => {
+    React.useEffect(() => {        
         const descriptionObject = {
-            "startDate": formatDate(new Date(requestDetails.fromDate)),
-            "endDate": formatDate(new Date(requestDetails.toDate)),
-            "description": !!requestDetails.description ? requestDetails.description : "",
-            "isProgramAreaSelected": !!requestDetails.selectedMinistries
+            startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
+            endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
+            description: !!requestDetails.description ? requestDetails.description : "",
+            isProgramAreaSelected: !!requestDetails.selectedMinistries
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
     
     //if updated program area list not exists then, update the master list with selected ministries
-    if (Object.entries(programAreaList).length === 0){
-        const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";     
-        
+    if (Object.entries(programAreaList).length === 0){       
+        const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
         if(selectedMinistries !== "" && Object.entries(masterProgramAreaList).length !== 0) {
             const selectedList = selectedMinistries.map(element => element.code);
             masterProgramAreaList.map(programArea => {
             return programArea.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === programArea.bcgovcode);           
         });      
+        }
+        else {
+            //if it is create request then keep all check boxes unchecked
+            masterProgramAreaList.map(programArea => {
+                return programArea.isChecked = false;
+            });
         }
     }
     //if updated program area list exists then use that list instead of master data
@@ -63,15 +68,14 @@ const RequestDescription = React.memo(({
     }
 
     //component state management for startDate, endDate and Description
-    const [startDate, setStartDate] = React.useState(formatDate(new Date(requestDetails.fromDate)));
-    const [endDate, setEndDate] = React.useState(formatDate(new Date(requestDetails.toDate)));
+    const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
+    const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
 
     //handle onchange of start date and set state with latest value
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
-        
-        if(new Date(event.target.value) > new Date(endDate))
+        if(endDate === "" || new Date(event.target.value) > new Date(endDate))
           setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
         handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.START_DATE);
@@ -120,9 +124,7 @@ const RequestDescription = React.memo(({
                             shrink: true,
                             }} 
                             InputProps={{inputProps: { max: formatDate(new Date())} }}   
-                            variant="outlined"                            
-                            required
-                            error={startDate === undefined}
+                            variant="outlined"
                             fullWidth
                         />                       
                         <TextField                
@@ -135,9 +137,7 @@ const RequestDescription = React.memo(({
                             shrink: true,
                             }}
                              InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
-                            variant="outlined"                            
-                            required
-                            error={endDate === undefined}
+                            variant="outlined" 
                             fullWidth
                         />  
                         </div>                                                              

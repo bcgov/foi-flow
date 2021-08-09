@@ -1,5 +1,7 @@
 
 from typing import Counter
+
+from flask.signals import request_started
 from request_api.models.FOIRawRequests import FOIRawRequest
 from dateutil.parser import *
 from datetime import datetime
@@ -16,12 +18,14 @@ class rawrequestservice:
 
     """
 
-    def saverawrequest(requestdatajson):
-        result = FOIRawRequest.saverawrequest(requestdatajson)
+    def saverawrequest(requestdatajson,sourceofsubmission):
+        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
+        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,assignee)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
             data['id'] = result.identifier
+            data['assignedTo'] = assignee
             json_data = json.dumps(data)
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
@@ -35,17 +39,30 @@ class rawrequestservice:
         result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid)
         return result
 
+    def updateworkflowinstancewithstatus(wfinstanceid, requestid,status,notes):
+        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes)
+        return result    
+
     def getrawrequests():
-        requests = FOIRawRequest.getrequests()
-        cnt = 0
+        requests = FOIRawRequest.getrequests()        
         unopenedrequests = []
         for request in requests:
 
+            firstName , lastName, requestType = '','',''            
+            if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
+                firstName = request.requestrawdata['firstName']
+                lastName =  request.requestrawdata['lastName']
+                requestType =  request.requestrawdata['requestType']
+            elif (request.sourceofsubmission!= "intake" and request.version == 1):               
+                firstName = request.requestrawdata['contactInfo']['firstName']
+                lastName = request.requestrawdata['contactInfo']['lastName']
+                requestType = request.requestrawdata['requestType']['requestType']    
+
             _createdDate = request.created_at
             unopenrequest = {'id': request.requestid,
-                             'firstName': request.requestrawdata['contactInfo']['firstName'] if request.version == 1 else request.requestrawdata['firstName'],
-                             'lastName': request.requestrawdata['contactInfo']['lastName'] if request.version == 1 else request.requestrawdata['lastName'],
-                             'requestType': request.requestrawdata['requestType']['requestType'] if request.version == 1 else request.requestrawdata['requestType'],
+                             'firstName': firstName,
+                             'lastName': lastName,
+                             'requestType': requestType,
                              'currentState': request.status,
                              'receivedDate': _createdDate.strftime('%Y %b, %d'),
                              'receivedDateUF': str(_createdDate),
@@ -60,8 +77,8 @@ class rawrequestservice:
 
     def getrawrequest(requestid):
         request = FOIRawRequest.get_request(requestid)
-
-        if request != {} and request['version'] == 1:
+        
+        if request != {} and request['version'] == 1 and  request['sourceofsubmission'] != "intake":
             requestrawdata = request['requestrawdata']
             requestType = requestrawdata['requestType']['requestType']
             ispersonal = True if requestType == 'personal' else False
@@ -134,7 +151,11 @@ class rawrequestservice:
                 }
                 baserequestInfo['additionalPersonalInfo'] = additionalpersonalInfo
             return baserequestInfo
-        elif request != {} and request['version'] > 1:
+        elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":
+            request['requestrawdata']['currentState'] = request['status']
+            return request['requestrawdata']    
+        elif request != {} and request['sourceofsubmission'] == "intake":
+            request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['currentState'] = request['status']
             return request['requestrawdata']
         else:
