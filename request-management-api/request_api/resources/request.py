@@ -13,6 +13,7 @@
 # limitations under the License.
 """API endpoints for managing a FOI Requests resource."""
 
+
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
@@ -59,12 +60,10 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()            
             if int(requestid) and str(requestid) != "-1" :
                 status = 'Assignment in progress'     
-                rawRequest = rawrequestservice.getrawrequest(requestid)
-                bpmResponse = bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']);
-                if(bpmResponse.status_code == 204):
-                    status = 'Intake in progress'                             
+                rawRequest = rawrequestservice.getrawrequest(requestid)                                              
                 result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],status)                
                 if result.success == True:   
+                    bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice.saverawrequest(updaterequest,"intake")               
@@ -86,10 +85,10 @@ class FOIRawRequestBPMProcess(Resource):
             try:
 
                 _wfinstanceid = request_json['wfinstanceid']
-                               
-                requestid = int(_requestid)
-                result = rawrequestservice.updateworkflowinstance(_wfinstanceid,requestid)
-
+                status = request_json['status'] if request_json.get('status') is not None else 'unopened'
+                notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
+                requestid = int(_requestid)                                                               
+                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes)
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200
                 else:

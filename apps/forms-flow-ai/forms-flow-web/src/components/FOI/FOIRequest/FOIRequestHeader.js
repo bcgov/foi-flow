@@ -1,12 +1,11 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
 import { useSelector } from "react-redux";
-import "./reviewrequestheader.scss";
+import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-
 
 const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
    

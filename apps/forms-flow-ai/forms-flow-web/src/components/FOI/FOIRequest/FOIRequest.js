@@ -1,7 +1,7 @@
 import React, { useEffect }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import './reviewrequest.scss';
-import ReviewRequestHeader from './ReviewRequestHeader';
+import './foirequest.scss';
+import FOIRequestHeader from './FOIRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
 import ChildDetails from './ChildDetails';
 import OnBehalfOfDetails from './OnBehalfOfDetails';
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ReviewRequest = React.memo((props) => {
+const FOIRequest = React.memo((props) => {
   const {requestId} = useParams();  
   const url = window.location.href;
   //gets the request detail from the store
@@ -413,7 +413,7 @@ const ReviewRequest = React.memo((props) => {
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
         { (urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
           <>
-            <ReviewRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
+            <FOIRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
             <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information for the applicant, either EMAIL or MAILING ADDRESS.</div>
             <ApplicantDetails requestDetails={requestDetails} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
@@ -437,4 +437,4 @@ const ReviewRequest = React.memo((props) => {
     );
   });
 
-export default ReviewRequest;
+export default FOIRequest;
