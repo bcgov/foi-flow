@@ -26,10 +26,10 @@ class FOIRawRequest(db.Model):
     
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission)->DefaultMethodResult:        
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:        
         createdat = datetime.now().isoformat()
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedto=assignee)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -64,18 +64,16 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(False,'Requestid not exists',-1)              
 
     @classmethod
-    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status)->DefaultMethodResult:
+    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes)-> DefaultMethodResult:
         updatedat = datetime.now().isoformat()
         dbquery = db.session.query(FOIRawRequest)
-        requestraqw = dbquery.filter_by(requestid=requestid,version = 1)
+        _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
         if(requestraqw.count() > 0) :
-            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
-            if(existingrequestswithWFid.count() == 0) :
-                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"WF Instance created, along with status",FOIRawRequest.status:status}, synchronize_session = False)
-                db.session.commit()
-                return DefaultMethodResult(True,'Request updated with WF Instance Id',requestid)
-            else:
-                return DefaultMethodResult(False,'WF instance already exists',requestid) 
+            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)        
+            requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated',requestid)       
         else:
             return DefaultMethodResult(False,'Requestid not exists',-1)    
 

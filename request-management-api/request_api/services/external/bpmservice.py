@@ -24,7 +24,7 @@ class bpmservice:
         messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId, 
                                               "messageName": MessageType.claim.value, 
                                               "processVariables":{
-                                                  "intakeAnalystId": ProcessVariableSchema().dump({"type" : VariableType.String.value, "value": userId})
+                                                  "assignedTo": ProcessVariableSchema().dump({"type" : VariableType.String.value, "value": userId})
                                                   }
                                               })
         return requests.post(self._getUrl_(self,MessageType.claim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))

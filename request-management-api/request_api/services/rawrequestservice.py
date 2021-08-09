@@ -19,12 +19,13 @@ class rawrequestservice:
     """
 
     def saverawrequest(requestdatajson,sourceofsubmission):
-        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission)
+        assignee = requestdatajson["assignedTxo"] if requestdatajson.get("assignedTo") != None else None
+        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,assignee)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
             data['id'] = result.identifier
-            data['assignedTo'] = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None  else ''
+            data['assignedTo'] = assignee
             json_data = json.dumps(data)
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
@@ -37,6 +38,10 @@ class rawrequestservice:
     def updateworkflowinstance(wfinstanceid, requestid):
         result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid)
         return result
+
+    def updateworkflowinstancewithstatus(wfinstanceid, requestid,status,notes):
+        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes)
+        return result    
 
     def getrawrequests():
         requests = FOIRawRequest.getrequests()        
