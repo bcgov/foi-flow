@@ -25,7 +25,7 @@ def upgrade():
                                  column('description',String),
                                  column('isactive',Boolean),
                                    )
-    op.execute('Truncate table public."ReceivedModes" RESTART IDENTITY CASCADE;commit;')                               
+    op.execute('Truncate table public."FOIRequestStatuses" RESTART IDENTITY CASCADE;commit;')                               
     op.bulk_insert(
         requeststatus_table,
         [
@@ -38,4 +38,4 @@ def upgrade():
 
 
 def downgrade():
-    op.execute('Truncate table public."ReceivedModes" RESTART IDENTITY CASCADE;commit;') 
+    op.execute('Truncate table public."FOIRequestStatuses" RESTART IDENTITY CASCADE;commit;') 
