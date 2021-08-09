@@ -19,7 +19,7 @@ class rawrequestservice:
     """
 
     def saverawrequest(requestdatajson,sourceofsubmission):
-        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None  else ''
+        assignee = requestdatajson["assignedTxo"] if requestdatajson.get("assignedTo") != None else None
         result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,assignee)
         if result.success:
             redispubservice = RedisPublisherService()
@@ -39,8 +39,8 @@ class rawrequestservice:
         result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid)
         return result
 
-    def updateworkflowinstancewithstatus(wfinstanceid, requestid,status):
-        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid, requestid,status)
+    def updateworkflowinstancewithstatus(wfinstanceid, requestid,status,notes):
+        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes)
         return result    
 
     def getrawrequests():
