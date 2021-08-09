@@ -136,7 +136,11 @@ input[type='radio'] {
     border-bottom: 2px solid #e0e0dc;
 }
 .foi-dashboard-asignedTo .MuiOutlinedInput-input {
-    padding: 5px 14px !important;   
+    padding: 5px 14px !important;
+    width: 300%;   
+}
+.MuiSelect-icon {
+    position: relative !important;
 }
 .MuiBadge-badge {
     visibility: hidden;
