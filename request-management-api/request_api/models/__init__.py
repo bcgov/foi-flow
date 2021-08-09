@@ -29,5 +29,7 @@ from .DeliveryModes import DeliveryMode
 from .ReceivedModes import ReceivedMode
 
 from .FOIRequests import FOIRequest
+from .FOIRequestStatus import FOIRequestStatus
+from .FOIMinistryRequests import FOIMinistryRequest
 
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
