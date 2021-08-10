@@ -1,4 +1,4 @@
-import React, { useEffect }  from 'react';
+import React, { useEffect, useState }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import './foirequest.scss';
 import FOIRequestHeader from './FOIRequestHeader';
@@ -22,6 +22,7 @@ import {
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -406,6 +407,14 @@ const FOIRequest = React.memo((props) => {
     setSaveRequestObject(requestObject);    
   }
 
+  const [headerValue, setHeader] = useState("");
+  const handleOpenRequest = (value) => {
+    if (value) {
+      const daysRemaining = calculateDaysRemaining(saveRequestObject.dueDate);
+      setHeader(`${daysRemaining}|FileNumber`);      
+    }
+  }
+
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST);
   return (
       <div className="container foi-review-request-container">
@@ -413,7 +422,7 @@ const FOIRequest = React.memo((props) => {
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
         { (urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
           <>
-            <FOIRequestHeader requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
+            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
             <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information for the applicant, either EMAIL or MAILING ADDRESS.</div>
             <ApplicantDetails requestDetails={requestDetails} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
@@ -427,7 +436,7 @@ const FOIRequest = React.memo((props) => {
             <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
             <RequestNotes />
             
-            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest}/>
+            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleOpenRequest={handleOpenRequest}/>
           </>
           ): null}
            </form>

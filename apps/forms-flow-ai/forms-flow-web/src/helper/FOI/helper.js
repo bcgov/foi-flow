@@ -69,8 +69,7 @@ const calculateDaysRemaining = (endDate) => {
     endDate = new Date(endDate);
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);
-	const noOfDays = daysBetween(startDate, endDate);
-    console.log(`publicHolidays = ${publicHoliDays}, weekendDays = ${weekendDays}, noOfDays = ${noOfDays}`);
+	const noOfDays = daysBetween(startDate, endDate);   
 	return Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays);
 }
 

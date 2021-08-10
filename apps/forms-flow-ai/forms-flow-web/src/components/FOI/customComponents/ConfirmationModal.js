@@ -6,34 +6,36 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function ConfirmationModal({isOpen}) {
+export default function ConfirmationModal({openModal, handleModal}) {    
     
-    const [open, setOpen] = React.useState(isOpen);  
     const handleClose = () => {
-        setOpen(false);
+      handleModal(false);
     };
+
+    const handleYes = () => {
+      handleModal(true);
+    }
   
     return (
       <div>        
         <Dialog
-          open={open}
+          open={openModal}
           onClose={handleClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{"Open Request"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Let Google help apps determine location. This means sending anonymous location data to
-              Google, even when no apps are running.
+              Are you sure you want to open the request?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="primary">
-              Disagree
+              No
             </Button>
-            <Button onClick={handleClose} color="primary" autoFocus>
-              Agree
+            <Button onClick={handleYes} color="primary" autoFocus>
+              Yes
             </Button>
           </DialogActions>
         </Dialog>

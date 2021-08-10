@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest, saveRequestObject, unSavedRequest }) => {
+const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest, saveRequestObject, unSavedRequest, handleOpenRequest }) => {
   /**
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
@@ -101,13 +101,21 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
         
       }
     });
-    let isOpen = false;
+    const [openModal, setOpenModal] = useState(false);
+   
     const openRequest = () => {
-      
+      setOpenModal(true);     
+    }
+    const handleModal = (value) => {
+      setOpenModal(false);
+      handleOpenRequest(value);
+      if (value) {
+        console.log(`API call`);
+      }
     }
   return (
     <div className={classes.root}>
-      {/* <ConfirmationModal isOpen={true}/>   */}
+      <ConfirmationModal openModal={openModal} handleModal={handleModal}/>  
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
       <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError} onClick={openRequest}>Open Request</button>

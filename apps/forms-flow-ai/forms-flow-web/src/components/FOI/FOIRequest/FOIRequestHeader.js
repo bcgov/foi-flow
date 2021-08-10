@@ -7,7 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
+const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
    
      /**
      *  Header of Review request in the UI
@@ -45,7 +45,11 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
     }
-    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : "Review Request";
+   
+    const headerTextArray = headerValue ? headerValue.split("|") : [];
+    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (headerTextArray[1] ? headerTextArray[1] : "Review Request");
+    const hideDaysRemaining = headerTextArray[0] ? false: true;
+ 
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
@@ -53,9 +57,12 @@ const ReviewRequestHeader = React.memo(({requestDetails, handleAssignedToInitial
                     <Link href="#" onClick={preventDefault}>
                         <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
-                </div>            
+                </div>
             <div className="foi-request-status">
                 {!!requestDetails.currentState ? requestDetails.currentState: "Unopened"}
+            </div>
+            <div className="foi-request-daysremaining" hidden={hideDaysRemaining}>
+                {headerTextArray[0] ? `${headerTextArray[0]} Days Remaining`: ""}
             </div>
             </div>
             
