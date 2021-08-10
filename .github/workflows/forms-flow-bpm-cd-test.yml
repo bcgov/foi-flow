@@ -22,7 +22,7 @@ defaults:
 
 env:
   APP_NAME: "forms-flow-bpm"
-  TAG_NAME: "main"
+  TAG_NAME: "test"
 
 jobs:
   forms-flow-bpm-cd-by-push:
