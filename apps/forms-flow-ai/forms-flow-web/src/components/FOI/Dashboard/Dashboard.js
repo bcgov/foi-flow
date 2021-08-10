@@ -69,23 +69,12 @@ const menuItems = assignedToList.map((item) => {
     {      
       field: 'assignedTo',
       headerName: 'ASSIGNED TO',
-      width: 210,
-      headerAlign: 'left',     
-      renderCell: (params) => (         
-        <Select
-          className="foi-dashboard-asignedTo"
-          id="assignedTo" 
-          value={selectedAssignedTo}
-          onChange={handleAssignedToOnChange}
-          variant="outlined"                    
-        >
-          {menuItems}
-        </Select> 
-      ),
+      width: 180,
+      headerAlign: 'left',
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
-      width: 150,    
+      width: 180,    
       headerAlign: 'left',
     },    
     { field: 'xgov', headerName: 'XGOV', 
