@@ -30,7 +30,7 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
 
     //creates the menu items for assignedTo combobox
     const menuItems = assignedToList.map((item) => {    
-        return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
+        return ( <MenuItem key={item.id} value={item.username} name={getFullName(item.lastname,item.firstname,item.username)} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
      });
     
      //local state management for assignedTo
@@ -43,13 +43,13 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
         setAssignedTo(event.target.value);
         //event bubble up - to validate required fields
         handleAssignedToValue(event.target.value);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);
     }
    
     const headerTextArray = headerValue ? headerValue.split("|") : [];
-    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (headerTextArray[1] ? headerTextArray[1] : "Review Request");
-    const hideDaysRemaining = headerTextArray[0] ? false: true;
- 
+    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (headerTextArray[2] ? headerTextArray[2] : "Review Request");
+    const hideDaysRemaining = headerTextArray[2] ? false: true;
+    const status = headerTextArray[0] ? headerTextArray[0] : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
@@ -59,10 +59,10 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
                     </Link>
                 </div>
             <div className="foi-request-status">
-                {!!requestDetails.currentState ? requestDetails.currentState: "Unopened"}
+                {status}
             </div>
             <div className="foi-request-daysremaining" hidden={hideDaysRemaining}>
-                {headerTextArray[0] ? `${headerTextArray[0]} Days Remaining`: ""}
+                {headerTextArray[1] ? `${headerTextArray[1]} Days Remaining`: ""}
             </div>
             </div>
             

@@ -296,6 +296,7 @@ const FOIRequest = React.memo((props) => {
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
     if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       requestObject.assignedTo = value;
+      requestObject.assignedToName = value2;      
     }
     else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
         requestObject.firstName = value;
@@ -408,10 +409,14 @@ const FOIRequest = React.memo((props) => {
   }
 
   const [headerValue, setHeader] = useState("");
+  const handleSaveRequest = (value, value2) => {
+    setHeader(value);
+    setUnSavedRequest(value2);
+  }  
   const handleOpenRequest = (value) => {
     if (value) {
       const daysRemaining = calculateDaysRemaining(saveRequestObject.dueDate);
-      setHeader(`${daysRemaining}|FileNumber`);      
+      setHeader(`Open|${daysRemaining}|FileNumber`);      
     }
   }
 
@@ -436,7 +441,7 @@ const FOIRequest = React.memo((props) => {
             <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
             <RequestNotes />
             
-            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleOpenRequest={handleOpenRequest}/>
+            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest}/>
           </>
           ): null}
            </form>
