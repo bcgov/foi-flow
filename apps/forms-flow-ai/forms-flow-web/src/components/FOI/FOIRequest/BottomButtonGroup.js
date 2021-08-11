@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
@@ -34,7 +34,13 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest, saveRequestObject, unSavedRequest }) => {
+const BottomButtonGroup = React.memo(({
+  isValidationError, 
+  urlIndexCreateRequest, 
+  saveRequestObject, 
+  unSavedRequest,
+  handleSaveRequest
+  }) => {
   /**
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
@@ -61,7 +67,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
             draggable: true,
             progress: undefined,
             });
-            unSavedRequest = false;
+            handleSaveRequest("Intake in progress", false);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
@@ -72,7 +78,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
             draggable: true,
             progress: undefined,
             });
-            unSavedRequest = true;
+            handleSaveRequest("Unopened", true);
         }
       }));      
     }
@@ -84,7 +90,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
       }
     }
 
-    React.useEffect(() => { 
+    React.useEffect(() => {
       const handleOnHashChange = (e) => {       
         returnToQueue(e);
       };  

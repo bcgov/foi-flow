@@ -4,9 +4,7 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import { fetchFOIRequestList, fetchFOIAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
 
 const Dashboard = React.memo((props) => {
 
@@ -16,18 +14,12 @@ const Dashboard = React.memo((props) => {
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
-  
-
   const classes = useStyles(); 
 
   useEffect(()=>{
-    dispatch(fetchFOIAssignedToList());
     dispatch(fetchFOIRequestList());
     setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
   },[dispatch], [requestType]);
-
-  const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
-  const [selectedAssignedTo, setAssignedTo] = React.useState('Unassigned');
 
   function getFullName(params) {    
     return `${params.getValue(params.id, 'lastName') || ''}, ${
@@ -35,17 +27,9 @@ const Dashboard = React.memo((props) => {
     }`;
   }
 
-  const getAssigneeFullName = (lastName, firstName, username) => {
-    return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
-}
-
-  //handle onChange event for assigned To
-  const handleAssignedToOnChange = (event) => {
-    setAssignedTo(event.target.value);    
-}
-const menuItems = assignedToList.map((item) => {    
-  return ( <MenuItem key={item.id} value={item.username} disabled={item.username.toLowerCase().includes("unassigned")}>{getAssigneeFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
-});
+  const getAssigneeFullName = (params) => {
+    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo');
+  }
    const columns = [    
     {
       field: 'applicantName',
@@ -67,25 +51,15 @@ const menuItems = assignedToList.map((item) => {
      
     },
     {      
-      field: 'assignedTo',
+      field: 'assignedToFullName',
       headerName: 'ASSIGNED TO',
-      width: 210,
-      headerAlign: 'left',     
-      renderCell: (params) => (         
-        <Select
-          className="foi-dashboard-asignedTo"
-          id="assignedTo" 
-          value={selectedAssignedTo}
-          onChange={handleAssignedToOnChange}
-          variant="outlined"                    
-        >
-          {menuItems}
-        </Select> 
-      ),
+      width: 180,
+      headerAlign: 'left',
+      valueGetter: getAssigneeFullName,
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
-      width: 150,    
+      width: 180,    
       headerAlign: 'left',
     },    
     { field: 'xgov', headerName: 'XGOV', 
