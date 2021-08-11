@@ -57,7 +57,7 @@ class rawrequestservice:
                 firstName = request.requestrawdata['contactInfo']['firstName']
                 lastName = request.requestrawdata['contactInfo']['lastName']
                 requestType = request.requestrawdata['requestType']['requestType']    
-
+            assignedtovalue = request.assignedto if request.assignedto else "Unassigned"
             _createdDate = request.created_at
             unopenrequest = {'id': request.requestid,
                              'firstName': firstName,
@@ -66,7 +66,7 @@ class rawrequestservice:
                              'currentState': request.status,
                              'receivedDate': _createdDate.strftime('%Y %b, %d'),
                              'receivedDateUF': str(_createdDate),
-                             'assignedTo': request.assignedto,
+                             'assignedTo': assignedtovalue,
                              'xgov': 'No',
                              'idNumber': 'U-00' + str(request.requestid),
                              'version':request.version
