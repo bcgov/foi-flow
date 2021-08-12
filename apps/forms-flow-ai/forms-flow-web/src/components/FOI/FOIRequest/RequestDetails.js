@@ -50,9 +50,9 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     const calculateReceivedDate = (receivedDateString) => {
       if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {
-        receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
+        return addBusinessDays(formatDate(receivedDateString), 1);
       }
-      return receivedDateString;
+      return formatDate(receivedDateString);
     }
     //updates the default values from the request details    
     React.useEffect(() => {
