@@ -23,7 +23,6 @@ from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.requestservice import requestservice
 import json
-import uuid
 
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
@@ -45,7 +44,7 @@ class FOIRawRequests(Resource):
             request_json = request.get_json()    
             requestdatajson = request_json['requestData']                       
             result = requestservice.saverequest(requestdatajson)
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            

@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 
-
+import json
 class FOIRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequests' 
@@ -57,8 +57,11 @@ class FOIRequest(db.Model):
     @classmethod
     def saverequest(cls,foiRequest)->DefaultMethodResult:
         db.session.add(foiRequest)
-        db.session.commit()               
-        return DefaultMethodResult(True,'Request added',foiRequest.foirequestid)
+        db.session.commit()
+        ministryArr = [] 
+        for ministry in foiRequest.ministryRequests:
+            ministryArr.append({'id': ministry.foiministryrequestid, 'filenumber': ministry.filenumber})    
+        return DefaultMethodResult(True,'Request added',foiRequest.foirequestid,ministryArr)
                           
 
 class FOIRequestsSchema(ma.Schema):
