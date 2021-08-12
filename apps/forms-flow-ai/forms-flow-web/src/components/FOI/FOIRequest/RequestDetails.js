@@ -21,7 +21,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
      *  All fields are mandatory here
      */ 
     const ADD_DAYS = 30;
-    const validateFields = (request, name) => {
+    const validateFields = (request, name, value) => {
       if (request !== undefined) {
         if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
           return !!request.requestType ? request.requestType : "Select Request Type";
@@ -36,7 +36,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          return !!request.requestStartDate ? new Date(request.requestStartDate) : !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
+          return !!request.requestStartDate ? new Date(request.requestStartDate) : value ? new Date(value.replace(/-/g,'/')) : "";
         }
       }
       else {
@@ -48,23 +48,22 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
-    const calculateReceivedDate = (receivedDateString) => {     
-      if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {        
-        receivedDateString = addBusinessDays(receivedDateString,1);       
+    const calculateReceivedDate = (receivedDateString) => {
+      if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {
+        receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
       }
       return receivedDateString;
     }
     //updates the default values from the request details    
     React.useEffect(() => {
-      let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
+      let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
       receivedDate = calculateReceivedDate(receivedDate);     
-      const receivedDateString = formatDate(receivedDate);      
       const requestDetailsObject = {
         requestType: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
-        receivedDate: !!receivedDateString ? receivedDateString: "",
-        requestStartDate: formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)),
+        receivedDate: !!receivedDate ? receivedDate: "",
+        requestStartDate: formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate)),
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
@@ -73,9 +72,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //local state management for received date and start date
     let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
     receivedDate = calculateReceivedDate(receivedDate);
-    const receivedDateString = formatDate(receivedDate);
-    const [receivedDateText, setReceivedDate] = React.useState(receivedDateString);
-    const [startDateText, setStartDate] = React.useState(formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE)));
+    const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
+    const [startDateText, setStartDate] = React.useState(formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate)));
     
 
     //due date calculation
