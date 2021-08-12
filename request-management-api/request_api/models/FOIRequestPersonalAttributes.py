@@ -9,6 +9,11 @@ from .FOIRequests import FOIRequest
 class FOIRequestPersonalAttribute(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestPersonalAttributes' 
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["foirequest_id", "foirequestversion_id"], ["FOIRequests.foirequestid", "FOIRequests.version"]
+        ),
+    )  
     # Defining the columns
     foirequestpersonalattributeid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     
@@ -26,10 +31,10 @@ class FOIRequestPersonalAttribute(db.Model):
     personalattributeid = db.Column(db.Integer,ForeignKey('PersonalInformationAttributes.attributeid'))
     personalattribute =  relationship("PersonalInformationAttribute",backref=backref("PersonalInformationAttributes"),uselist=False)
 
-    foirequestid = db.Column(db.Integer)
-    foirequestversion = db.Column(db.Integer)
-
-    foirequest =  (ForeignKeyConstraint([foirequestid,foirequestversion],[FOIRequest.foirequestid,FOIRequest.version]),{})
+    foirequest_id =db.Column(db.Integer, db.ForeignKey('FOIRequests.foirequestid'))
+    foirequestversion_id = db.Column(db.Integer, db.ForeignKey('FOIRequests.version'))
+    foirequestkey = relationship("FOIRequest",foreign_keys="[FOIRequestPersonalAttribute.foirequest_id]")
+    foirequestversion = relationship("FOIRequest",foreign_keys="[FOIRequestPersonalAttribute.foirequestversion_id]")
     
 
 

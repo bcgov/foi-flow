@@ -9,6 +9,11 @@ from .FOIRequests import FOIRequest
 class FOIRequestApplicantMapping(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestApplicantMappings' 
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["foirequest_id", "foirequestversion_id"], ["FOIRequests.foirequestid", "FOIRequests.version"]
+        ),
+    )     
     # Defining the columns
     
     foirequestapplicantmappingid = db.Column(db.Integer, primary_key=True,autoincrement=True)            
@@ -25,10 +30,10 @@ class FOIRequestApplicantMapping(db.Model):
     foirequestapplicantid = db.Column(db.Integer,ForeignKey('FOIRequestApplicants.foirequestapplicantid'))
     foirequestapplicant =  relationship("FOIRequestApplicant",backref=backref("FOIRequestApplicants"),uselist=False)
 
-    foirequestid = db.Column(db.Integer)
-    foirequestversion = db.Column(db.Integer)
-
-    foirequest =  (ForeignKeyConstraint([foirequestid,foirequestversion],[FOIRequest.foirequestid,FOIRequest.version]),{})
+    foirequest_id =db.Column(db.Integer, db.ForeignKey('FOIRequests.foirequestid'))
+    foirequestversion_id = db.Column(db.Integer, db.ForeignKey('FOIRequests.version'))
+    foirequestkey = relationship("FOIRequest",foreign_keys="[FOIRequestApplicantMapping.foirequest_id]")
+    foirequestversion = relationship("FOIRequest",foreign_keys="[FOIRequestApplicantMapping.foirequestversion_id]")
     
             
 class FOIRequestApplicantMappingSchema(ma.Schema):

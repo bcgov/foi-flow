@@ -26,6 +26,29 @@ class FOIRequestApplicant(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
+    @classmethod
+    def getrequest(cls,foiRequestApplicant):
+        request_schema = FOIRequestApplicantSchema()
+        dbquery = db.session.query(FOIRequestApplicant)
+        dbquery = dbquery.filter_by(firstname=foiRequestApplicant.firstname)
+        if foiRequestApplicant.middlename is not None:
+            dbquery = dbquery.filter_by(middlename=foiRequestApplicant.middlename)
+        if foiRequestApplicant.lastname is not None:
+            dbquery = dbquery.filter_by(lastname=foiRequestApplicant.lastname)
+        if foiRequestApplicant.businessname is not None:
+            dbquery = dbquery.filter_by(businessname=foiRequestApplicant.businessname)
+        if foiRequestApplicant.alsoknownas is not None:
+            dbquery = dbquery.filter_by(alsoknownas=foiRequestApplicant.alsoknownas)
+        if foiRequestApplicant.dob is not None:
+            dbquery = dbquery.filter_by(dob=foiRequestApplicant.dob)
+        result = dbquery.first()   
+        return request_schema.dump(result)
+
+    @classmethod
+    def saverequest(cls,foiRequestApplicant)->DefaultMethodResult:
+        db.session.add(foiRequestApplicant)
+        db.session.commit()               
+        return DefaultMethodResult(True,'Request added',foiRequestApplicant.foirequestapplicantid)
                 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:

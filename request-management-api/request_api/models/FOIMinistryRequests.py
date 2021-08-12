@@ -8,7 +8,14 @@ from .FOIRequests import FOIRequest
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
-    __tablename__ = 'FOIMinistryRequests' 
+    __tablename__ = 'FOIMinistryRequests'
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["foirequest_id", "foirequestversion_id"], ["FOIRequests.foirequestid", "FOIRequests.version"]
+        ),
+    )
+    
+    
     # Defining the columns
     foiministryrequestid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     version = db.Column(db.Integer, primary_key=True,nullable=False)    
@@ -28,6 +35,7 @@ class FOIMinistryRequest(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
+
     #ForeignKey References
     
     programareaid = db.Column(db.Integer,ForeignKey('ProgramAreas.programareaid'))
@@ -36,12 +44,12 @@ class FOIMinistryRequest(db.Model):
     requeststatusid = db.Column(db.Integer,ForeignKey('FOIRequestStatuses.requeststatusid'))
     requeststatus =  relationship("FOIRequestStatus",backref=backref("FOIRequestStatuses"),uselist=False)
 
-    foirequestid = db.Column(db.Integer)
-    foirequestversion = db.Column(db.Integer)
+    foirequest_id =db.Column(db.Integer, db.ForeignKey('FOIRequests.foirequestid'))
+    foirequestversion_id = db.Column(db.Integer, db.ForeignKey('FOIRequests.version'))
+    foirequestkey = relationship("FOIRequest",foreign_keys="[FOIMinistryRequest.foirequest_id]")
+    foirequestversion = relationship("FOIRequest",foreign_keys="[FOIMinistryRequest.foirequestversion_id]")
 
-    foirequest =  (ForeignKeyConstraint([foirequestid,foirequestversion],[FOIRequest.foirequestid,FOIRequest.version]),{})
-    
-            
+         
     @classmethod
     def getrequest(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema(many=True)
