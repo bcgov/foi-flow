@@ -42,9 +42,9 @@ def upgrade():
     sa.Column('updatedby', sa.String(length=120), nullable=True),
     sa.Column('programareaid', sa.Integer(), nullable=True),
     sa.Column('requeststatusid', sa.Integer(), nullable=True),
-    sa.Column('foirequestid', sa.Integer(), nullable=True),
-    sa.Column('foirequestversion', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['foirequestid', 'foirequestversion'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
+    sa.Column('foirequest_id', sa.Integer(), nullable=True),
+    sa.Column('foirequestversion_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['foirequest_id', 'foirequestversion_id'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
     sa.ForeignKeyConstraint(['programareaid'], ['ProgramAreas.programareaid'], ),
     sa.ForeignKeyConstraint(['requeststatusid'], ['FOIRequestStatuses.requeststatusid'], ),
     sa.PrimaryKeyConstraint('foiministryrequestid', 'version')

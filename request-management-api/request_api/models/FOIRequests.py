@@ -34,13 +34,32 @@ class FOIRequest(db.Model):
     receivedmode =  relationship("ReceivedMode",backref=backref("ReceivedModes"),uselist=False)
 
     foirawrequestid = db.Column(db.Integer,unique=False, nullable=True)
-    
 
+    ministryRequests = relationship('FOIMinistryRequest', primaryjoin="and_(FOIRequest.foirequestid==FOIMinistryRequest.foirequest_id, "
+                        "FOIRequest.version==FOIMinistryRequest.foirequestversion_id)")
+    
+    contactInformations = relationship('FOIRequestContactInformation', primaryjoin="and_(FOIRequest.foirequestid==FOIRequestContactInformation.foirequest_id, "
+                        "FOIRequest.version==FOIRequestContactInformation.foirequestversion_id)")
+    
+    personalAttributes = relationship('FOIRequestPersonalAttribute', primaryjoin="and_(FOIRequest.foirequestid==FOIRequestPersonalAttribute.foirequest_id, "
+                        "FOIRequest.version==FOIRequestPersonalAttribute.foirequestversion_id)")
+    
+    requestApplicants = relationship('FOIRequestApplicantMapping', primaryjoin="and_(FOIRequest.foirequestid==FOIRequestApplicantMapping.foirequest_id, "
+                        "FOIRequest.version==FOIRequestApplicantMapping.foirequestversion_id)")
+    
+    
     @classmethod
-    def getrequest(cls,requestid):
-        request_schema = FOIRequestsSchema(many=True)
-        query = db.session.query(FOIRequest).filter_by(foirequestid=requestid).order_by(FOIRequest.version.desc()).first()
+    def getrequest(cls,foirequestid):
+        request_schema = FOIRequestsSchema()
+        query = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
         return request_schema.dump(query)
+   
+    @classmethod
+    def saverequest(cls,foiRequest)->DefaultMethodResult:
+        db.session.add(foiRequest)
+        db.session.commit()               
+        return DefaultMethodResult(True,'Request added',foiRequest.foirequestid)
+                          
 
 class FOIRequestsSchema(ma.Schema):
     class Meta:

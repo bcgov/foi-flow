@@ -41,17 +41,17 @@ def upgrade():
 
     op.create_table('FOIRequestContactInformation',
     sa.Column('foirequestcontactid', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('ContactInformation', sa.String(length=500), nullable=False),
-    sa.Column('DataFormat', sa.String(length=40), nullable=True),
+    sa.Column('contactinformation', sa.String(length=500), nullable=False),
+    sa.Column('dataformat', sa.String(length=40), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('createdby', sa.String(length=120), nullable=True),
     sa.Column('updatedby', sa.String(length=120), nullable=True),
     sa.Column('contacttypeid', sa.Integer(), nullable=True),
-    sa.Column('foirequestid', sa.Integer(), nullable=True),
-    sa.Column('foirequestversion', sa.Integer(), nullable=True),
+    sa.Column('foirequest_id', sa.Integer(), nullable=True),
+    sa.Column('foirequestversion_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['contacttypeid'], ['ContactTypes.contacttypeid'], ),
-    sa.ForeignKeyConstraint(['foirequestid', 'foirequestversion'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
+    sa.ForeignKeyConstraint(['foirequest_id', 'foirequestversion_id'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
     sa.PrimaryKeyConstraint('foirequestcontactid')
     )
     # ### end Alembic commands ###
