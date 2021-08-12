@@ -38,6 +38,19 @@ class FOIRequestWrapperSchema(Schema):
     receivedMode = fields.Int(data_key="receivedMode")
     receivedDate = fields.Date(data_key="receivedDate")
     isactive=fields.Bool(data_key="isactive")
+    
+    phonePrimary = fields.Str(data_key="phonePrimary")  
+    workPhonePrimary = fields.Str(data_key="workPhonePrimary")  
+    phoneSecondary = fields.Str(data_key="phoneSecondary")  
+    workPhoneSecondary = fields.Str(data_key="workPhoneSecondary")  
+    address = fields.Str(data_key="address")  
+    addressSecondary = fields.Str(data_key="addressSecondary")  
+    city = fields.Str(data_key="city")  
+    province = fields.Str(data_key="province")  
+    postal = fields.Str(data_key="postal")  
+    country = fields.Str(data_key="country")  
+
+    
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
 
     

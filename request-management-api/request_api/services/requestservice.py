@@ -14,21 +14,6 @@ from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from enum import Enum
 import datetime
 from random import randint
-class ContactType(Enum):
-    """This enum provides the list of bpm endpoints type."""
-
-    phonePrimary = "Home Phone"
-    workPhonePrimary = "Work Phone"
-    phoneSecondary = "Mobile Phone"
-    workPhoneSecondary = "Work Phone 2"
-    address = "Street Address"
-    addressSecondary = "Street Address"
-    city = "Street Address"
-    province = "Street Address"
-    postal = "Street Address"
-    country = "Street Address"
-
-
 class requestservice:
     """ FOI Request management service
 
@@ -88,12 +73,24 @@ class requestservice:
         requestApplicantArr.append(requestApplicant)
                  
       
+        #Prepare contact information
+        contactTypes = ContactType.getcontacttypes()
+        fOIRequestUtil = FOIRequestUtil()
+        for contact in fOIRequestUtil.contactTypeMapping():
+            if fOIRequestsSchema.get(contact["key"]) is not None:   
+                contactInformationArr.append(
+                    fOIRequestUtil.createContactInformation(contact["key"],
+                                                            contact["name"],
+                                                            fOIRequestsSchema.get(contact["key"]),
+                                                            contactTypes)
+                    )
+
         # FOI Request
         _fOIRequest = FOIRequest()
         _fOIRequest.version = activeVersion, 
         _fOIRequest.requesttype = fOIRequestsSchema.get("requestType")
         _fOIRequest.ministryRequests = foiMinistryRequestArr
-        #_fOIRequest.contactInformations = contactInformationArr
+        _fOIRequest.contactInformations = contactInformationArr
         #_fOIRequest.personalAttributes = personalAttributeArr
         _fOIRequest.requestApplicants = requestApplicantArr
         
@@ -101,6 +98,31 @@ class requestservice:
            _fOIRequest.foirequestid = foirequestid 
         
         return FOIRequest.saverequest(_fOIRequest)
+    
+
+class FOIRequestUtil:   
+    
+    def createContactInformation(self,dataformat, name, value, contactTypes):
+        contactInformation = FOIRequestContactInformation()
+        contactInformation.contactinformation = value
+        contactInformation.dataformat = dataformat
+        for contactType in contactTypes:
+            if contactType["name"] == name:
+              contactInformation.contacttypeid =contactType["contacttypeid"]              
+        return contactInformation
+            
+    def contactTypeMapping(self):
+        return [{"name": "Home Phone", "key" : "phonePrimary"},
+            {"name": "Work Phone", "key" : "workPhonePrimary"},
+            {"name": "Mobile Phone", "key" : "phoneSecondary"},
+            {"name": "Work Phone 2", "key" : "workPhoneSecondary"},
+            {"name": "Street Address", "key" : "address"},
+            {"name": "Street Address", "key" : "addressSecondary"},
+            {"name": "Street Address", "key" : "city"},
+            {"name": "Street Address", "key" : "province"},
+            {"name": "Street Address", "key" : "postal"},
+            {"name": "Street Address", "key" : "country"}]
+
             
     
     
