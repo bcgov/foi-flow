@@ -1,4 +1,5 @@
 
+import re
 from request_api import version
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
@@ -87,7 +88,12 @@ class requestservice:
         
         return FOIRequest.saverequest(_fOIRequest)
             
-    
+    def getrequest(foirequestid,foiministryrequestid):
+        
+        request = FOIRequest.getrequest(foirequestid)
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        
+        return {}
     
 
 

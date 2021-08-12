@@ -66,5 +66,5 @@ class FOIRequest(db.Model):
 
 class FOIRequestsSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestid','version','requesttype','receiveddate','initialdescription','initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid','deliverymode.deliverymodeid')
+        fields = ('foirequestid','version','requesttype','receiveddate','initialdescription','initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid','deliverymode.deliverymodeid','receivedmode.name','deliverymode.name')
     
