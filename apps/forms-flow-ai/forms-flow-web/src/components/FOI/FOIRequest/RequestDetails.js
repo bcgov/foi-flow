@@ -57,7 +57,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //updates the default values from the request details    
     React.useEffect(() => {
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
-      receivedDate = calculateReceivedDate(receivedDate);     
+      receivedDate = calculateReceivedDate(receivedDate);      
       const requestDetailsObject = {
         requestType: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
@@ -71,7 +71,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     //local state management for received date and start date
     let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
-    receivedDate = calculateReceivedDate(receivedDate);
+    receivedDate = formatDate(calculateReceivedDate(receivedDate));    
     const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
     const [startDateText, setStartDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate));
     
@@ -79,7 +79,6 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //due date calculation
     const dueDateCalculation = (dateText) => {
       return dateText? addBusinessDays(dateText,ADD_DAYS) : "";
-      
     }    
 
     const [dueDateText, setDueDate] = React.useState(dueDateCalculation(startDateText));
@@ -102,7 +101,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //handling the received date change
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
-      if(new Date(e.target.value) > new Date(startDateText))     
+      if(new Date(e.target.value) > new Date(startDateText))
         setStartDate(e.target.value);      
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);

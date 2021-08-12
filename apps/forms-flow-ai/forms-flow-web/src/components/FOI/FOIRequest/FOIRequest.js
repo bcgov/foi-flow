@@ -22,7 +22,7 @@ import {
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-import { calculateDaysRemaining } from "../../../helper/FOI/helper";
+import { calculateDaysRemaining, formatDate } from "../../../helper/FOI/helper";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -346,8 +346,8 @@ const FOIRequest = React.memo((props) => {
     else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
       requestObject.country = value;
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
-      requestObject.receivedDate = value;
+    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {     
+      requestObject.receivedDate = formatDate(value, 'YYYY MM, DD');
       const receivedDateUTC = new Date(value).toISOString();
       requestObject.receivedDateUF = receivedDateUTC;
     }
