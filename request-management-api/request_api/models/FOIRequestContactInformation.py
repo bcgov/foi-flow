@@ -36,10 +36,7 @@ class FOIRequestContactInformation(db.Model):
     foirequestkey = relationship("FOIRequest",foreign_keys="[FOIRequestContactInformation.foirequest_id]")
     foirequestversion = relationship("FOIRequest",foreign_keys="[FOIRequestContactInformation.foirequestversion_id]")
 
- 
-    
 
-    
 
 class FOIRequestContactInformationSchema(ma.Schema):
     class Meta:
