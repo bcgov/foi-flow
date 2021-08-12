@@ -16,7 +16,13 @@ class ApplicantCategory(db.Model):
         query = db.session.query(ApplicantCategory).filter_by(isactive=True).all()
         return applicantcategory_schema.dump(query)
 
-
+    @classmethod
+    def getapplicantcategory(cls,category):
+        applicantCategory_schema = ApplicantCategorySchema()
+        query = db.session.query(ApplicantCategory).filter_by(name=category).first()
+        return applicantCategory_schema.dump(query)
+    
+    
 class ApplicantCategorySchema(ma.Schema):
     class Meta:
         fields = ('applicantcategoryid', 'name', 'description','isactive')

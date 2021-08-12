@@ -18,6 +18,11 @@ class ProgramArea(db.Model):
         query = db.session.query(ProgramArea).filter_by(isactive=True).all()
         return programarea_schema.dump(query)
 
+    @classmethod
+    def getprogramarea(cls,pgname):
+        programarea_schema = ProgramAreaSchema()
+        query = db.session.query(ProgramArea).filter_by(name=pgname).first()
+        return programarea_schema.dump(query)
 
 class ProgramAreaSchema(ma.Schema):
     class Meta:
