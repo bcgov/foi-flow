@@ -36,7 +36,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          return !!request.requestStartDate ? new Date(request.requestStartDate) : value ? new Date(value.replace(/-/g,'/')) : "";
+          return !!request.requestProcessStart ? request.requestProcessStart : value ? value : "";
         }
       }
       else {
@@ -63,7 +63,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
         receivedDate: !!receivedDate ? receivedDate: "",
-        requestStartDate: formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate)),
+        requestStartDate: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate),
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
@@ -73,7 +73,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
     receivedDate = calculateReceivedDate(receivedDate);
     const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
-    const [startDateText, setStartDate] = React.useState(formatDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate)));
+    const [startDateText, setStartDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate));
     
 
     //due date calculation
