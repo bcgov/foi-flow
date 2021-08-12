@@ -14,7 +14,34 @@ class FOIMinistryRequestWrapperSchema(Schema):
     code = fields.Str(data_key="code")
     name = fields.Str(data_key="name")
     isSelected = fields.Bool(data_key="isSelected")
- 
+    
+class FOIAdditionallPersonalInfoWrapperSchema(Schema):
+    
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE 
+    childFirstName = fields.Str(data_key="childFirstName")
+    childMiddleName = fields.Str(data_key="childMiddleName")
+    childLastName = fields.Str(data_key="childLastName")
+    childAlsoKnownAs = fields.Str(data_key="childAlsoKnownAs")
+    childBirthDate = fields.Str(data_key="childBirthDate")
+    
+    anotherFirstName = fields.Str(data_key="anotherFirstName")
+    anotherMiddleName = fields.Str(data_key="anotherMiddleName")
+    anotherLastName = fields.Str(data_key="anotherLastName")
+    anotherAlsoKnownAs = fields.Str(data_key="anotherAlsoKnownAs")
+    anotherBirthDate = fields.Str(data_key="anotherBirthDate")
+    
+    adoptiveMotherFirstName = fields.Str(data_key="adoptiveMotherFirstName")
+    adoptiveMotherLastName = fields.Str(data_key="adoptiveMotherLastName")
+    adoptiveFatherFirstName = fields.Str(data_key="adoptiveFatherFirstName")
+    adoptiveFatherLastName = fields.Str(data_key="adoptiveFatherLastName")
+    
+    birthDate = fields.Str(data_key="birthDate")
+    alsoKnownAs = fields.Str(data_key="alsoKnownAs")
+    
+        
 class FOIRequestWrapperSchema(Schema):
 
     class Meta:  # pylint: disable=too-few-public-methods
@@ -34,8 +61,8 @@ class FOIRequestWrapperSchema(Schema):
     fromDate = fields.DateTime(data_key="fromDate")
     toDate = fields.DateTime(data_key="toDate")
     dueDate = fields.Date(data_key="dueDate")
-    deliveryMode = fields.Int(data_key="deliveryMode")
-    receivedMode = fields.Int(data_key="receivedMode")
+    deliveryMode = fields.Str(data_key="deliveryMode")
+    receivedMode = fields.Str(data_key="receivedMode")
     receivedDate = fields.Date(data_key="receivedDate")
     isactive=fields.Bool(data_key="isactive")
     
@@ -52,5 +79,6 @@ class FOIRequestWrapperSchema(Schema):
 
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
+    additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)
 
     
