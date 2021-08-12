@@ -26,9 +26,9 @@ def upgrade():
     sa.Column('createdby', sa.String(length=120), nullable=True),
     sa.Column('updatedby', sa.String(length=120), nullable=True),
     sa.Column('personalattributeid', sa.Integer(), nullable=True),
-    sa.Column('foirequestid', sa.Integer(), nullable=True),
-    sa.Column('foirequestversion', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['foirequestid', 'foirequestversion'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
+    sa.Column('foirequest_id', sa.Integer(), nullable=True),
+    sa.Column('foirequestversion_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['foirequest_id', 'foirequestversion_id'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
     sa.ForeignKeyConstraint(['personalattributeid'], ['PersonalInformationAttributes.attributeid'], ),
     sa.PrimaryKeyConstraint('foirequestpersonalattributeid')
     )

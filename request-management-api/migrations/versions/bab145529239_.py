@@ -26,10 +26,10 @@ def upgrade():
     sa.Column('updatedby', sa.String(length=120), nullable=True),
     sa.Column('requestortypeid', sa.Integer(), nullable=True),
     sa.Column('foirequestapplicantid', sa.Integer(), nullable=True),
-    sa.Column('foirequestid', sa.Integer(), nullable=True),
-    sa.Column('foirequestversion', sa.Integer(), nullable=True),
+    sa.Column('foirequest_id', sa.Integer(), nullable=True),
+    sa.Column('foirequestversion_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['foirequestapplicantid'], ['FOIRequestApplicants.foirequestapplicantid'], ),
-    sa.ForeignKeyConstraint(['foirequestid', 'foirequestversion'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
+    sa.ForeignKeyConstraint(['foirequest_id', 'foirequestversion_id'], ['FOIRequests.foirequestid', 'FOIRequests.version'], ),
     sa.ForeignKeyConstraint(['requestortypeid'], ['RequestorTypes.requestortypeid'], ),
     sa.PrimaryKeyConstraint('foirequestapplicantmappingid')
     )
