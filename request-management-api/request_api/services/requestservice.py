@@ -39,6 +39,7 @@ class requestservice:
                 foiministryRequest = FOIMinistryRequest()
                 foiministryRequest.__dict__.update(ministry)
                 foiministryRequest.version = activeVersion
+                foiministryRequest.requeststatusid = 1
                 foiMinistryRequestArr.append(foiministryRequest)
            
         #Prepare contact information records
