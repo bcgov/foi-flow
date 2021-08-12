@@ -19,7 +19,6 @@ class FOIMinistryRequestSchema(Schema):
     duedate = fields.Date(data_key="dueDate")
     assignedto = fields.Str(data_key="assignedTo")
     programareaid = fields.Int(data_key="programAreaId")
-    requeststatusid = fields.Int(data_key="requestStatusId")
 
 class FOIContactInformationSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
