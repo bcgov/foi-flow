@@ -36,6 +36,12 @@ class FOIRequestPersonalAttribute(db.Model):
     foirequestkey = relationship("FOIRequest",foreign_keys="[FOIRequestPersonalAttribute.foirequest_id]")
     foirequestversion = relationship("FOIRequest",foreign_keys="[FOIRequestPersonalAttribute.foirequestversion_id]")
     
+    @classmethod
+    def getrequestpersonalattributes(cls,foirequest_id,foirequestversion):
+        requestpersonalattribute_schema = FOIRequestPersonalAttributeSchema(many=True)
+        _personalattributes = db.session.query(FOIRequestPersonalAttribute).filter(FOIRequestPersonalAttribute.foirequest_id == foirequest_id , FOIRequestPersonalAttribute.foirequestversion_id == foirequestversion).order_by(FOIRequestPersonalAttribute.foirequestpersonalattributeid.asc()).all()
+        personalattributes = requestpersonalattribute_schema.dump(_personalattributes)       
+        return personalattributes
 
 
 class FOIRequestPersonalAttributeSchema(ma.Schema):

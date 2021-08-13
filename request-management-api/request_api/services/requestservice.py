@@ -1,5 +1,5 @@
 
-import re
+
 from request_api import version
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
@@ -8,7 +8,7 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.schemas.foirequest import  FOIRequestSchema
-
+from dateutil.parser import *
 
 class requestservice:
     """ FOI Request management service
@@ -93,7 +93,88 @@ class requestservice:
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)        
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
-        return requestcontactinformation
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+        personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
+
+        _receivedDate = parse(request['receiveddate'])
+        baserequestInfo = {
+            'id': request['foirequestid'],
+            'requestType': request['requesttype'],
+            'receivedDate': _receivedDate.strftime('%Y %b, %d'),
+            'receivedDateUF': request['receiveddate'],
+            'deliverymodeid':request['deliverymode.deliverymodeid'],
+            'receivedmodeid':request['receivedmode.receivedmodeid'],
+            'assignedTo': requestministry["assignedto"],
+            'idNumber':requestministry["filenumber"],
+            'description': requestministry['description'],
+            'fromDate': requestministry['recordsearchfromdate'],
+            'toDate': requestministry['recordsearchtodate'],
+            'currentState':requestministry['requeststatus.name'],
+            'requeststatusid':requestministry['requeststatus.requeststatusid'],
+            'startdate':requestministry['startdate'],
+            'duedate':requestministry['duedate'],
+            'programareaid':requestministry['programarea.programareaid'],
+         }
+
+        if(requestcontactinformation is not None):
+            for contactinfo in requestcontactinformation:
+                if contactinfo['contacttype.name'] == 'Email':
+                    baserequestInfo.update({'Email':contactinfo['contactinformation']})
+                else:
+                    baserequestInfo.update({contactinfo['dataformat']:contactinfo['contactinformation']})
+
+
+        if requestapplicants is not None:
+            for applicant in requestapplicants:
+                if applicant['requestortype.requestortypeid'] == 1:
+                    baserequestInfo.update(
+                        {
+                            'firstName':applicant['foirequestapplicant.firstname'],
+                            'middleName': applicant['foirequestapplicant.middlename'],
+                            'lastName': applicant['foirequestapplicant.lastname'],
+                            'businessName': applicant['foirequestapplicant.businessname'],
+                            'birthDate' : applicant['foirequestapplicant.dob'],
+                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
+                        }                    
+                    )
+                elif applicant['requestortype.requestortypeid'] == 2:
+                    baserequestInfo.update(
+                        {
+                            'anotherFirstName':applicant['foirequestapplicant.firstname'],
+                            'anotherMiddleName': applicant['foirequestapplicant.middlename'],
+                            'anotherLastName': applicant['foirequestapplicant.lastname'],
+                            'businessName': applicant['foirequestapplicant.businessname'],
+                            'birthDate' : applicant['foirequestapplicant.dob'],  
+                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
+                        }                    
+                    )
+                elif applicant['requestortype.requestortypeid'] == 3:
+                    baserequestInfo.update(
+                        {
+                        'childFirstName': applicant['foirequestapplicant.firstname'],
+                        'childMiddleName': applicant['foirequestapplicant.firstname'],
+                        'childLastName': applicant['foirequestapplicant.firstname'],
+                        'childAlsoKnownAs': applicant['foirequestapplicant.firstname'],
+                        'childBirthDate': applicant['foirequestapplicant.firstname'],                      
+                        }                    
+                    ) 
+
+        if personalattributes is not None:
+            for personalattribute in personalattributes:
+                if personalattribute['personalattributeid'] == 1:                   
+                    baserequestInfo.update({'publicServiceEmployeeNumber': personalattribute['attributevalue']})
+                elif  personalattribute['personalattributeid'] == 2 :    
+                    baserequestInfo.update({'correctionalServiceNumber': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 4:     
+                    baserequestInfo.update({'adoptiveMotherFirstName': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 5:     
+                    baserequestInfo.update({'adoptiveMotherLastName': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 6:     
+                    baserequestInfo.update({'adoptiveFatherFirstName': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 7:     
+                    baserequestInfo.update({'adoptiveFatherLastName': personalattribute['attributevalue']})        
+
+        return baserequestInfo
     
 
 
