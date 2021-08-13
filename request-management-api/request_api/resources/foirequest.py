@@ -22,6 +22,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.requestservice import requestservice
+from request_api.services.rawrequestservice import rawrequestservice
 import json
 
 
@@ -41,8 +42,13 @@ class FOIRawRequests(Resource):
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
-            request_json = request.get_json()                        
-            result = requestservice.saverequest(request_json)
+            request_json = request.get_json() 
+            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],request_json['assignedTo'],"Open In Progress")               
+            if rawresult.success == True:
+                result = requestservice.saverequest(request_json)
+                if result.success == True:
+                    metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                    requestservice.postEventToWorkflow(request_json["id"], json.loads(metadata))
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
