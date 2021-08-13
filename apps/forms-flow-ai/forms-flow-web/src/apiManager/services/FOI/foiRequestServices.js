@@ -195,13 +195,44 @@ export const fetchFOIRequestList = (...rest) => {
   };
 };
 
-export const fetchFOIRequestDetails = (requestId,...rest) => {
+export const fetchFOIRawRequestDetails = (requestId,...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
     requestId
   );
+  return (dispatch) => {
+    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));        
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+    API.FOI_RAW_REQUEST_API,
+    "<requestid>",
+    requestId
+  ),"<ministryid>", ministryId);
+  console.log(apiUrlgetRequestDetails);
   return (dispatch) => {
     httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {

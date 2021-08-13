@@ -47,7 +47,7 @@ const BottomButtonGroup = React.memo(({
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
-    const {requestId} = useParams();  
+    const {requestId, ministryId} = useParams();  
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -115,9 +115,7 @@ const BottomButtonGroup = React.memo(({
     }
     const handleModal = (value) => {
       setOpenModal(false);
-      handleOpenRequest(value);
-      if (value) {
-        console.log(`API call`);
+      if (value) {        
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
             const parentRequestId = res.id;           
@@ -129,7 +127,10 @@ const BottomButtonGroup = React.memo(({
               return 0;
             });  
             const firstMinistry = res.ministryRequests[0];
-            //handleOpenRequest("Open", parentRequestId, firstMinistry.id, firstMinistry.filenumber);
+            handleOpenRequest(parentRequestId, firstMinistry.id, false);
+          }
+          else {
+            handleOpenRequest("","",true);
           }
         })); 
       }
@@ -139,9 +140,9 @@ const BottomButtonGroup = React.memo(({
       <ConfirmationModal openModal={openModal} handleModal={handleModal}/>  
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError} onClick={openRequest}>Open Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError} onClick={openRequest}>Open Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>

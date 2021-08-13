@@ -12,7 +12,8 @@ import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
-import { 
+import {
+  fetchFOIRawRequestDetails,
   fetchFOIRequestDetails, 
   fetchFOICategoryList, 
   fetchFOIProgramAreaList, 
@@ -22,7 +23,8 @@ import {
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-import { calculateDaysRemaining, formatDate } from "../../../helper/FOI/helper";
+import { formatDate } from "../../../helper/FOI/helper";
+import {push} from "connected-react-router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FOIRequest = React.memo((props) => {
-  const {requestId} = useParams();  
+  const {requestId, ministryId} = useParams();
+  console.log(`requestId = ${requestId}, ministryId = ${ministryId}`);
   const url = window.location.href;
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
@@ -50,7 +53,9 @@ const FOIRequest = React.memo((props) => {
 
   useEffect(() => {
     if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1)
-      dispatch(fetchFOIRequestDetails(requestId));   
+      dispatch(fetchFOIRawRequestDetails(requestId));
+    if (ministryId)  
+      dispatch(fetchFOIRequestDetails(requestId));
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIAssignedToList());
@@ -417,11 +422,13 @@ const FOIRequest = React.memo((props) => {
     setHeader(value);
     setUnSavedRequest(value2);
   }  
-  const handleOpenRequest = (value) => {
-    if (value) {
-      const daysRemaining = calculateDaysRemaining(saveRequestObject.dueDate);
-      setHeader(`Open|${daysRemaining}|FileNumber`);      
-    }
+  const handleOpenRequest = (parendId, ministryId, unSaved) => {
+      //const daysRemaining = calculateDaysRemaining(saveRequestObject.dueDate);
+      //setHeader(`Open|${daysRemaining}|FileNumber`);
+      setSaveRequestObject(unSaved);
+      if (!unSaved) {
+        dispatch(push(`/foi/request/${parendId}/ministry/${ministryId}`));
+      }
   }
 
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST);

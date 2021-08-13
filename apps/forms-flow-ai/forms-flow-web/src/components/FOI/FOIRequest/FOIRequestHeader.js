@@ -6,6 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { useParams } from 'react-router-dom';
+import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 
 const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
    
@@ -13,7 +15,7 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
-
+    const {ministryId} = useParams();  
      //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
     
@@ -45,11 +47,12 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);
     }
-   
-    const headerTextArray = headerValue ? headerValue.split("|") : [];
-    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (headerTextArray[2] ? headerTextArray[2] : "Review Request");
-    const hideDaysRemaining = headerTextArray[2] ? false: true;
-    const status = headerTextArray[0] ? headerTextArray[0] : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
+    
+    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (!!requestDetails.fileNumber ? requestDetails.fileNumber : "Review Request");
+    const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
+    const hideDaysRemaining = ministryId && daysRemaining ? false: true;
+    const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
+    
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
@@ -62,7 +65,7 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
                 {status}
             </div>
             <div className="foi-request-daysremaining" hidden={hideDaysRemaining}>
-                {headerTextArray[1] ? `${headerTextArray[1]} Days Remaining`: ""}
+                {`${daysRemaining} Days Remaining`}
             </div>
             </div>
             
