@@ -433,7 +433,7 @@ const FOIRequest = React.memo((props) => {
       //setHeader(`Open|${daysRemaining}|FileNumber`);
       setSaveRequestObject(unSaved);
       if (!unSaved) {
-        dispatch(push(`/foi/request/${parendId}/ministry/${ministryId}`));
+        dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
       }
   }
 
