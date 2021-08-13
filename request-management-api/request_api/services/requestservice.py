@@ -315,7 +315,8 @@ class FOIRequestUtil:
     
             
     def contactTypeMapping(self):
-        return [{"name": "Home Phone", "key" : "phonePrimary"},
+        return [{"name": "Email", "key" : "email"},
+            {"name": "Home Phone", "key" : "phonePrimary"},
             {"name": "Work Phone", "key" : "workPhonePrimary"},
             {"name": "Mobile Phone", "key" : "phoneSecondary"},
             {"name": "Work Phone 2", "key" : "workPhoneSecondary"},
