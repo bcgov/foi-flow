@@ -37,11 +37,15 @@ class FOIRequestContactInformation(db.Model):
     foirequestversion = relationship("FOIRequest",foreign_keys="[FOIRequestContactInformation.foirequestversion_id]")
 
  
-    
+    @classmethod
+    def getrequestcontactinformation(cls,foirequest_id,foirequestversion):
+        requestcontact_schema = FOIRequestContactInformationSchema(many=True)
+        _contactinfos = db.session.query(FOIRequestContactInformation).filter(FOIRequestContactInformation.foirequest_id == foirequest_id , FOIRequestContactInformation.foirequestversion_id == foirequestversion).order_by(FOIRequestContactInformation.foirequestcontactid.asc()).all()
+        contactinfos = requestcontact_schema.dump(_contactinfos)       
+        return str(contactinfos)
 
-    
 
 class FOIRequestContactInformationSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestcontactid','ContactInformation','DataFormat','contacttype.contacttypeid','contacttype.name','foirequest.foirequestid','foirequest.version')
+        fields = ('foirequestcontactid','contactinformation','dataformat','contacttype.contacttypeid','contacttype.name','foirequest.foirequestid','foirequest.version')
     

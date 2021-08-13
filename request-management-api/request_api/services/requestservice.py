@@ -91,9 +91,9 @@ class requestservice:
     def getrequest(foirequestid,foiministryrequestid):
         
         request = FOIRequest.getrequest(foirequestid)
-        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        
-        return {}
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)        
+        requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
+        return requestcontactinformation
     
 
 
