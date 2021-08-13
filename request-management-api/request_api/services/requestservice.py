@@ -171,7 +171,7 @@ class requestservice:
             'toDate': requestministry['recordsearchtodate'],
             'currentState':requestministry['requeststatus.name'],
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
-            'startdate':requestministry['startdate'],
+            'requestProcessStart':requestministry['startdate'],
             'dueDate':requestministry['duedate'],
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
@@ -194,11 +194,12 @@ class requestservice:
                         {
                             'firstName':applicant['foirequestapplicant.firstname'],
                             'middleName': applicant['foirequestapplicant.middlename'],
-                            'lastName': applicant['foirequestapplicant.lastname']                                                  
+                            'lastName': applicant['foirequestapplicant.lastname'],
+                            'businessName': applicant['foirequestapplicant.businessname'],                                                
                         }                    
                     )
                     additionalPersonalInfo.update({
-                            'businessName': applicant['foirequestapplicant.businessname'],
+                            
                             'birthDate' : applicant['foirequestapplicant.dob'],
                             'alsoKnownAs': applicant['foirequestapplicant.alsoknownas']
                     })
