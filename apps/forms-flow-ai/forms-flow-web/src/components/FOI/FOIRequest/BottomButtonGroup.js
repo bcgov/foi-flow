@@ -118,6 +118,7 @@ const BottomButtonGroup = React.memo(({
       if (value) {        
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
+            console.log(res);
             const parentRequestId = res.id;           
             res.ministryRequests.sort(function(a, b) {
               var keyA = a.filenumber,

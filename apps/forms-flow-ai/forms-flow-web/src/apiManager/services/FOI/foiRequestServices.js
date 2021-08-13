@@ -207,6 +207,7 @@ export const fetchFOIRawRequestDetails = (requestId,...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
+          dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -238,6 +239,8 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
+          console.log(foiRequest);
+          dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -283,7 +286,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...re
 };
 
 export const openRequestDetails = (data, ...rest) => {
-  // console.log(`data = ${JSON.stringify(data)}`);
+  console.log(`data = ${JSON.stringify(data)}`);
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
     httpOpenPOSTRequest(API.FOI_POST_REQUEST_POST, data)

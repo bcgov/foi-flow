@@ -28,7 +28,8 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
           return !!request.employeeNumber ? request.employeeNumber : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
-          return !!request.birthDate ? new Date(request.birthDate) : "";
+          console.log(request.birthDate);
+          return !!request.birthDate ? request.birthDate : "";
         }
       }
       else {

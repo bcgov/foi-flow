@@ -36,7 +36,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          return !!request.requestProcessStart ? request.requestProcessStart : value ? value : "";
+          return !!request.requestProcessStart ? formatDate(request.requestProcessStart) : value ? value : "";
         }
       }
       else {
