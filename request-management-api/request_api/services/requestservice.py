@@ -57,6 +57,10 @@ class requestservice:
                 foiministryRequest.programareaid = programArea["programareaid"]
                 foiministryRequest.description = fOIRequestsSchema.get("description")
                 foiministryRequest.duedate = fOIRequestsSchema.get("dueDate")
+                if fOIRequestsSchema.get("fromDate") is not None and fOIRequestsSchema.get("fromDate")  and fOIRequestsSchema.get("fromDate")  != "":
+                    foiministryRequest.recordsearchfromdate = fOIRequestsSchema.get("fromDate")
+                if fOIRequestsSchema.get("toDate") is not None and fOIRequestsSchema.get("toDate")  and fOIRequestsSchema.get("toDate")  != "":
+                    foiministryRequest.recordsearchtodate = fOIRequestsSchema.get("toDate")
                 foiministryRequest.assignedto = fOIRequestsSchema.get("assignedTo")
                 foiMinistryRequestArr.append(foiministryRequest)           
         
@@ -127,9 +131,13 @@ class requestservice:
         openfOIRequest = FOIRequest()
         openfOIRequest.version = activeVersion 
         openfOIRequest.requesttype = fOIRequestsSchema.get("requestType")
+        openfOIRequest.initialdescription = fOIRequestsSchema.get("description")
         openfOIRequest.ministryRequests = foiMinistryRequestArr
         openfOIRequest.contactInformations = contactInformationArr       
-        
+        if fOIRequestsSchema.get("fromDate") is not None and fOIRequestsSchema.get("fromDate")  and fOIRequestsSchema.get("fromDate")  != "":
+            openfOIRequest.initialrecordsearchfromdate = fOIRequestsSchema.get("fromDate")
+        if fOIRequestsSchema.get("toDate") is not None and fOIRequestsSchema.get("toDate")  and fOIRequestsSchema.get("toDate")  != "":
+            openfOIRequest.initialrecordsearchtodate = fOIRequestsSchema.get("toDate")
         if fOIRequestsSchema.get("deliveryMode") is not None and fOIRequestsSchema.get("deliveryMode") and fOIRequestsSchema.get("deliveryMode") != "":
             dmode = DeliveryMode().getdeliverymode(fOIRequestsSchema.get("deliveryMode"))
             openfOIRequest.deliverymodeid = dmode["deliverymodeid"]
