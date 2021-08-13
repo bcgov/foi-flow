@@ -144,9 +144,7 @@ class requestservice:
         
         return FOIRequest.saverequest(openfOIRequest)
     
-    def postEventToWorkflow(foirawrequestid, data):
-        rawRequest = rawrequestservice.getrawrequest(foirawrequestid)
-        workflowId = rawRequest["wfinstanceid"]
+    def postEventToWorkflow(workflowId, data):
         return bpmservice.complete(workflowId, data)
         
 

@@ -48,7 +48,7 @@ class FOIRawRequests(Resource):
                 result = requestservice.saverequest(request_json)
                 if result.success == True:
                     metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                    requestservice.postEventToWorkflow(request_json["id"], json.loads(metadata))
+                    requestservice.postEventToWorkflow(rawresult.args[0], json.loads(metadata))
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
