@@ -219,10 +219,9 @@ class requestservice:
                         {
                             'anotherFirstName':applicant['foirequestapplicant.firstname'],
                             'anotherMiddleName': applicant['foirequestapplicant.middlename'],
-                            'anotherLastName': applicant['foirequestapplicant.lastname'],
-                            'businessName': applicant['foirequestapplicant.businessname'],
-                            'birthDate' : applicant['foirequestapplicant.dob'],  
-                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
+                            'anotherLastName': applicant['foirequestapplicant.lastname'],                            
+                            'anotherBirthDate' : applicant['foirequestapplicant.dob'],  
+                            'anotherAlsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
                         }                    
                     )
                 elif applicant['requestortype.requestortypeid'] == 3:
