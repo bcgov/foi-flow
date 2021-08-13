@@ -12,10 +12,10 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
-from request_api.schemas.foirequest import  FOIRequestSchema
 from dateutil.parser import *
-
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
+from request_api.services.rawrequestservice import rawrequestservice
+from request_api.services.external.bpmservice import bpmservice
 from enum import Enum
 import datetime
 import random
@@ -64,7 +64,7 @@ class requestservice:
         requestApplicantArr.append(
             fOIRequestUtil.createApplicant(fOIRequestsSchema.get("firstName"),
                                            fOIRequestsSchema.get("lastName"),
-                                           None,
+                                           "Self",
                                            fOIRequestsSchema.get("middleName"),                                            
                                            fOIRequestsSchema.get("businessName"),
                                            fOIRequestsSchema.get("alsoknownas"),
@@ -145,6 +145,9 @@ class requestservice:
         
         return FOIRequest.saverequest(openfOIRequest)
     
+    def postEventToWorkflow(workflowId, data):
+        return bpmservice.complete(workflowId, data)
+        
 
     def getrequest(foirequestid,foiministryrequestid):
         
