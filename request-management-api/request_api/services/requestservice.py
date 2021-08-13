@@ -7,6 +7,7 @@ from request_api.models.RequestorType import RequestorType
 from request_api.models.ContactTypes import ContactType
 from request_api.models.DeliveryModes import DeliveryMode
 from request_api.models.ReceivedModes import ReceivedMode
+from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
@@ -14,7 +15,6 @@ from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.schemas.foirequest import  FOIRequestSchema
 from dateutil.parser import *
-
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.external.bpmservice import bpmservice
@@ -58,6 +58,10 @@ class requestservice:
                 foiministryRequest.programareaid = programArea["programareaid"]
                 foiministryRequest.description = fOIRequestsSchema.get("description")
                 foiministryRequest.duedate = fOIRequestsSchema.get("dueDate")
+                if fOIRequestsSchema.get("fromDate") is not None and fOIRequestsSchema.get("fromDate")  and fOIRequestsSchema.get("fromDate")  != "":
+                    foiministryRequest.recordsearchfromdate = fOIRequestsSchema.get("fromDate")
+                if fOIRequestsSchema.get("toDate") is not None and fOIRequestsSchema.get("toDate")  and fOIRequestsSchema.get("toDate")  != "":
+                    foiministryRequest.recordsearchtodate = fOIRequestsSchema.get("toDate")
                 foiministryRequest.assignedto = fOIRequestsSchema.get("assignedTo")
                 foiMinistryRequestArr.append(foiministryRequest)           
         
@@ -128,9 +132,13 @@ class requestservice:
         openfOIRequest = FOIRequest()
         openfOIRequest.version = activeVersion 
         openfOIRequest.requesttype = fOIRequestsSchema.get("requestType")
+        openfOIRequest.initialdescription = fOIRequestsSchema.get("description")
         openfOIRequest.ministryRequests = foiMinistryRequestArr
         openfOIRequest.contactInformations = contactInformationArr       
-        
+        if fOIRequestsSchema.get("fromDate") is not None and fOIRequestsSchema.get("fromDate")  and fOIRequestsSchema.get("fromDate")  != "":
+            openfOIRequest.initialrecordsearchfromdate = fOIRequestsSchema.get("fromDate")
+        if fOIRequestsSchema.get("toDate") is not None and fOIRequestsSchema.get("toDate")  and fOIRequestsSchema.get("toDate")  != "":
+            openfOIRequest.initialrecordsearchtodate = fOIRequestsSchema.get("toDate")
         if fOIRequestsSchema.get("deliveryMode") is not None and fOIRequestsSchema.get("deliveryMode") and fOIRequestsSchema.get("deliveryMode") != "":
             dmode = DeliveryMode().getdeliverymode(fOIRequestsSchema.get("deliveryMode"))
             openfOIRequest.deliverymodeid = dmode["deliverymodeid"]
@@ -138,6 +146,10 @@ class requestservice:
         if fOIRequestsSchema.get("receivedMode") is not None and fOIRequestsSchema.get("receivedMode") and fOIRequestsSchema.get("receivedMode") != "":    
             rmode = ReceivedMode().getreceivedmode(fOIRequestsSchema.get("receivedMode"))
             openfOIRequest.receivedmodeid = rmode["receivedmodeid"]
+        
+        if fOIRequestsSchema.get("category") is not None and fOIRequestsSchema.get("category") and fOIRequestsSchema.get("category") != "":    
+            applcategory = ApplicantCategory().getapplicantcategory(fOIRequestsSchema.get("category"))
+            openfOIRequest.applicantcategoryid = applcategory["applicantcategoryid"]
             
         openfOIRequest.personalAttributes = personalAttributeArr
         openfOIRequest.requestApplicants = requestApplicantArr
