@@ -28,9 +28,21 @@ class bpmservice:
                                                   }
                                               })
         return requests.post(self._getUrl_(self,MessageType.claim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+
+    @classmethod
+    def complete(self,processInstanceId, data, token=None): 
+           
+        messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId, 
+                                              "messageName": MessageType.openrequest.value, 
+                                              "processVariables":{
+                                                  "foiRequestMetaData": ProcessVariableSchema().dump({"data" : VariableType.String.value, "value": data})
+                                                  }
+                                              })
+        return requests.post(self._getUrl_(self,MessageType.claim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
         
+
     def _getUrl_(self, messageType):
-        if(MessageType.claim.value == messageType):
+        if(MessageType.claim.value == messageType or MessageType.openrequest.value == messageType):
             return self.bpmEngineRestUrl+"/message"
         return self.bpmEngineRestUrl
     
@@ -52,6 +64,7 @@ class bpmservice:
         
 class MessageType(Enum):
     claim = "foi-unopened-assignment"
+    openrequest = "foi-open-request"
     
 class VariableType(Enum):
     String = "String"

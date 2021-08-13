@@ -21,25 +21,25 @@ class FOIAdditionallPersonalInfoWrapperSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE 
-    childFirstName = fields.Str(data_key="childFirstName")
-    childMiddleName = fields.Str(data_key="childMiddleName")
-    childLastName = fields.Str(data_key="childLastName")
-    childAlsoKnownAs = fields.Str(data_key="childAlsoKnownAs")
-    childBirthDate = fields.Str(data_key="childBirthDate")
+    childFirstName = fields.Str(data_key="childFirstName",allow_none=True)
+    childMiddleName = fields.Str(data_key="childMiddleName",allow_none=True)
+    childLastName = fields.Str(data_key="childLastName",allow_none=True)
+    childAlsoKnownAs = fields.Str(data_key="childAlsoKnownAs",allow_none=True)
+    childBirthDate = fields.Str(data_key="childBirthDate",allow_none=True)
     
-    anotherFirstName = fields.Str(data_key="anotherFirstName")
-    anotherMiddleName = fields.Str(data_key="anotherMiddleName")
-    anotherLastName = fields.Str(data_key="anotherLastName")
-    anotherAlsoKnownAs = fields.Str(data_key="anotherAlsoKnownAs")
-    anotherBirthDate = fields.Str(data_key="anotherBirthDate")
+    anotherFirstName = fields.Str(data_key="anotherFirstName",allow_none=True)
+    anotherMiddleName = fields.Str(data_key="anotherMiddleName",allow_none=True)
+    anotherLastName = fields.Str(data_key="anotherLastName",allow_none=True)
+    anotherAlsoKnownAs = fields.Str(data_key="anotherAlsoKnownAs",allow_none=True)
+    anotherBirthDate = fields.Str(data_key="anotherBirthDate",allow_none=True)
     
-    adoptiveMotherFirstName = fields.Str(data_key="adoptiveMotherFirstName")
-    adoptiveMotherLastName = fields.Str(data_key="adoptiveMotherLastName")
-    adoptiveFatherFirstName = fields.Str(data_key="adoptiveFatherFirstName")
-    adoptiveFatherLastName = fields.Str(data_key="adoptiveFatherLastName")
+    adoptiveMotherFirstName = fields.Str(data_key="adoptiveMotherFirstName",allow_none=True)
+    adoptiveMotherLastName = fields.Str(data_key="adoptiveMotherLastName",allow_none=True)
+    adoptiveFatherFirstName = fields.Str(data_key="adoptiveFatherFirstName",allow_none=True)
+    adoptiveFatherLastName = fields.Str(data_key="adoptiveFatherLastName",allow_none=True)
     
-    birthDate = fields.Str(data_key="birthDate")
-    alsoKnownAs = fields.Str(data_key="alsoKnownAs")
+    birthDate = fields.Str(data_key="birthDate",allow_none=True)
+    alsoKnownAs = fields.Str(data_key="alsoKnownAs",allow_none=True)
     
         
 class FOIRequestWrapperSchema(Schema):
