@@ -103,7 +103,9 @@ class requestservice:
             'receivedDate': _receivedDate.strftime('%Y %b, %d'),
             'receivedDateUF': request['receiveddate'],
             'deliverymodeid':request['deliverymode.deliverymodeid'],
+            'deliveryMode':request['deliverymode.name'],
             'receivedmodeid':request['receivedmode.receivedmodeid'],
+            'receivedMode':request['receivedmode.name'],
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'description': requestministry['description'],
@@ -112,7 +114,7 @@ class requestservice:
             'currentState':requestministry['requeststatus.name'],
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'startdate':requestministry['startdate'],
-            'duedate':requestministry['duedate'],
+            'dueDate':requestministry['duedate'],
             'programareaid':requestministry['programarea.programareaid'],
          }
 
@@ -123,22 +125,26 @@ class requestservice:
                 else:
                     baserequestInfo.update({contactinfo['dataformat']:contactinfo['contactinformation']})
 
-
+        additionalPersonalInfo ={}
         if requestapplicants is not None:
+           
             for applicant in requestapplicants:
                 if applicant['requestortype.requestortypeid'] == 1:
                     baserequestInfo.update(
                         {
                             'firstName':applicant['foirequestapplicant.firstname'],
                             'middleName': applicant['foirequestapplicant.middlename'],
-                            'lastName': applicant['foirequestapplicant.lastname'],
-                            'businessName': applicant['foirequestapplicant.businessname'],
-                            'birthDate' : applicant['foirequestapplicant.dob'],
-                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
+                            'lastName': applicant['foirequestapplicant.lastname']                                                  
                         }                    
                     )
+                    additionalPersonalInfo.update({
+                            'businessName': applicant['foirequestapplicant.businessname'],
+                            'birthDate' : applicant['foirequestapplicant.dob'],
+                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas']
+                    })
                 elif applicant['requestortype.requestortypeid'] == 2:
-                    baserequestInfo.update(
+                    
+                    additionalPersonalInfo.update(
                         {
                             'anotherFirstName':applicant['foirequestapplicant.firstname'],
                             'anotherMiddleName': applicant['foirequestapplicant.middlename'],
@@ -149,7 +155,7 @@ class requestservice:
                         }                    
                     )
                 elif applicant['requestortype.requestortypeid'] == 3:
-                    baserequestInfo.update(
+                    additionalPersonalInfo.update(
                         {
                         'childFirstName': applicant['foirequestapplicant.firstname'],
                         'childMiddleName': applicant['foirequestapplicant.firstname'],
@@ -157,8 +163,9 @@ class requestservice:
                         'childAlsoKnownAs': applicant['foirequestapplicant.firstname'],
                         'childBirthDate': applicant['foirequestapplicant.firstname'],                      
                         }                    
-                    ) 
+                    )
 
+        baserequestInfo['additionalPersonalInfo'] = additionalPersonalInfo
         if personalattributes is not None:
             for personalattribute in personalattributes:
                 if personalattribute['personalattributeid'] == 1:                   
