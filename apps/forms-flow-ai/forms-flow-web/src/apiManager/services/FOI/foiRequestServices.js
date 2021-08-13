@@ -198,7 +198,7 @@ export const fetchFOIRequestList = (...rest) => {
 export const fetchFOIRawRequestDetails = (requestId,...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const apiUrlgetRequestDetails = replaceUrl(
-    API.FOI_REQUEST_API,
+    API.FOI_RAW_REQUEST_API,
     "<requestid>",
     requestId
   );
@@ -228,7 +228,7 @@ export const fetchFOIRawRequestDetails = (requestId,...rest) => {
 export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
-    API.FOI_RAW_REQUEST_API,
+    API.FOI_REQUEST_API,
     "<requestid>",
     requestId
   ),"<ministryid>", ministryId);
@@ -261,7 +261,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...re
   const done = rest.length ? rest[0] : () => {};
   let id = urlIndexCreateRequest > -1? -1: requestId;  
   const apiUrl = replaceUrl(
-    API.FOI_REQUEST_API,
+    API.FOI_RAW_REQUEST_API,
     "<requestid>",
     id
   );

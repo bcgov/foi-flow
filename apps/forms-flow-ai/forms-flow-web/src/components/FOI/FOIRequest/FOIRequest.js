@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
 const FOIRequest = React.memo((props) => {
   const {requestId, ministryId} = useParams();
-  console.log(`requestId = ${requestId}, ministryId = ${ministryId}`);
+  
   const url = window.location.href;
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
@@ -52,10 +52,16 @@ const FOIRequest = React.memo((props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1)
+    console.log(`requestId = ${requestId}, ministryId = ${ministryId}`);
+    console.log(url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST));
+    if (ministryId) {
+      
+      dispatch(fetchFOIRequestDetails(requestId, ministryId));
+    }
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1) {
+      console.log(`requestId = ${requestId}, ministryId = ${ministryId}`);
       dispatch(fetchFOIRawRequestDetails(requestId));
-    if (ministryId)  
-      dispatch(fetchFOIRequestDetails(requestId));
+    }    
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIAssignedToList());

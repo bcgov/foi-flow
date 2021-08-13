@@ -47,8 +47,8 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);
     }
-    
-    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (!!requestDetails.fileNumber ? requestDetails.fileNumber : "Review Request");
+
+    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : "Review Request";//(!!requestDetails.idNumber ? requestDetails.idNumber : "Review Request");
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
     const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
