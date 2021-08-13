@@ -7,6 +7,7 @@ from request_api.models.RequestorType import RequestorType
 from request_api.models.ContactTypes import ContactType
 from request_api.models.DeliveryModes import DeliveryMode
 from request_api.models.ReceivedModes import ReceivedMode
+from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
@@ -136,6 +137,10 @@ class requestservice:
         if fOIRequestsSchema.get("receivedMode") is not None and fOIRequestsSchema.get("receivedMode") and fOIRequestsSchema.get("receivedMode") != "":    
             rmode = ReceivedMode().getreceivedmode(fOIRequestsSchema.get("receivedMode"))
             openfOIRequest.receivedmodeid = rmode["receivedmodeid"]
+        
+        if fOIRequestsSchema.get("category") is not None and fOIRequestsSchema.get("category") and fOIRequestsSchema.get("category") != "":    
+            applcategory = ApplicantCategory().getapplicantcategory(fOIRequestsSchema.get("category"))
+            openfOIRequest.applicantcategoryid = applcategory["applicantcategoryid"]
             
         openfOIRequest.personalAttributes = personalAttributeArr
         openfOIRequest.requestApplicants = requestApplicantArr
