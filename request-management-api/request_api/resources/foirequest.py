@@ -60,11 +60,10 @@ class FOIRawRequestsById(Resource):
     def post(foirequestid):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
-            request_json = request.get_json()    
-            requestdatajson = request_json['requestData']                       
-            result = requestservice.saverequest(requestdatajson, foirequestid)
+            request_json = request.get_json()                         
+            result = requestservice.saverequest(request_json, foirequestid)
             if result != {}:
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404
         except TypeError:

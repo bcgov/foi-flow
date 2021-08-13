@@ -16,6 +16,11 @@ class PersonalInformationAttribute(db.Model):
         query = db.session.query(PersonalInformationAttribute).filter_by(isactive=True).all()
         return requestortype_schema.dump(query)
 
+    @classmethod
+    def getpersonalattribute(cls,attribname):
+        deliverymode_schema = PersonalInformationAttributesSchema()
+        query = db.session.query(PersonalInformationAttribute).filter_by(name=attribname).first()
+        return deliverymode_schema.dump(query)
 
 class PersonalInformationAttributesSchema(ma.Schema):
     class Meta:
