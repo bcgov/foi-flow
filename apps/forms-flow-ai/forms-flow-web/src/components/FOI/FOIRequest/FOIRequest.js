@@ -294,6 +294,7 @@ const FOIRequest = React.memo((props) => {
   }
 
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
+    requestObject.id = requestId;
     if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       requestObject.assignedTo = value;
       requestObject.assignedToName = value2;      
@@ -347,7 +348,7 @@ const FOIRequest = React.memo((props) => {
       requestObject.country = value;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {     
-      requestObject.receivedDate = formatDate(value, 'YYYY MM, DD');
+      requestObject.receivedDate = formatDate(value, 'YYYY MMM, DD');
       const receivedDateUTC = new Date(value).toISOString();
       requestObject.receivedDateUF = receivedDateUTC;
     }

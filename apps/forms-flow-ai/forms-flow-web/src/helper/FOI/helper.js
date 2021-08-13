@@ -11,8 +11,8 @@ const replaceUrl = (URL, key, value) => {
 };
 const formatDate = (d, format='YYYY-MM-DD') => {
   if(d !== "") {
-	if (format === 'YYYY MM, DD') {
-		return dayjs(d).format( 'YYYY MM, DD');
+	if (format === 'YYYY MMM, DD') {
+		return dayjs(d).format( 'YYYY MMM, DD');
 	}
 	else {
 		return dayjs(d).format( 'YYYY-MM-DD');
