@@ -35,8 +35,14 @@ class FOIRequestApplicantMapping(db.Model):
     foirequestkey = relationship("FOIRequest",foreign_keys="[FOIRequestApplicantMapping.foirequest_id]")
     foirequestversion = relationship("FOIRequest",foreign_keys="[FOIRequestApplicantMapping.foirequestversion_id]")
     
+    @classmethod
+    def getrequestapplicants(cls,foirequest_id,foirequestversion):
+        requestapplicant_schema = FOIRequestApplicantMappingSchema(many=True)
+        _applicantinfos = db.session.query(FOIRequestApplicantMapping).filter(FOIRequestApplicantMapping.foirequest_id == foirequest_id , FOIRequestApplicantMapping.foirequestversion_id == foirequestversion).order_by(FOIRequestApplicantMapping.foirequestapplicantmappingid.asc()).all()
+        applicantinfos = requestapplicant_schema.dump(_applicantinfos)       
+        return applicantinfos
             
 class FOIRequestApplicantMappingSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantmappingid','foirequest.foirequestid','foirequest.version','requestortype.requestortypeid','requestortype.name','foirequestapplicant.foirequestapplicantid','foirequestapplicant.firstname','foirequestapplicant.lastname')
+        fields = ('foirequestapplicantmappingid','foirequest.foirequestid','foirequest.version','requestortype.requestortypeid','requestortype.name','foirequestapplicant.foirequestapplicantid','foirequestapplicant.firstname','foirequestapplicant.lastname','foirequestapplicant.middlename','foirequestapplicant.alsoknownas','foirequestapplicant.dob','foirequestapplicant.businessname')
     
