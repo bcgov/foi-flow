@@ -57,13 +57,16 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     //updates the default values from the request details    
     React.useEffect(() => {
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
-      receivedDate = calculateReceivedDate(receivedDate);      
+      receivedDate = calculateReceivedDate(receivedDate);
+      const startDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
+      const dueDate = dueDateCalculation(startDate);
       const requestDetailsObject = {
         requestType: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
         receivedDate: !!receivedDate ? receivedDate: "",
-        requestStartDate: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate),
+        requestStartDate: startDate,
+        dueDate: dueDate,
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);

@@ -226,6 +226,7 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
 };
 
 export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
+  console.log(`data = ${JSON.stringify(data)}`);
   const done = rest.length ? rest[0] : () => {};
   let id = urlIndexCreateRequest > -1? -1: requestId;  
   const apiUrl = replaceUrl(
@@ -251,6 +252,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...re
 };
 
 export const openRequestDetails = (data, ...rest) => {
+  // console.log(`data = ${JSON.stringify(data)}`);
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
     httpOpenPOSTRequest(API.FOI_POST_REQUEST_POST, data)

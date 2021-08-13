@@ -100,6 +100,7 @@ const FOIRequest = React.memo((props) => {
   const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
+  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
@@ -174,7 +175,7 @@ const FOIRequest = React.memo((props) => {
   }
   
   //Update required fields of request details box with latest value
-  const handleRequestDetailsValue = (value, name) => {
+  const handleRequestDetailsValue = (value, name) => {    
     const detailsData = {...requiredRequestDetailsValues};
     if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {      
       detailsData.requestType = value;
@@ -186,10 +187,10 @@ const FOIRequest = React.memo((props) => {
       detailsData.deliveryMode = value;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
-      detailsData.receivedDate = value;
+      detailsData.receivedDate = value;      
     }
     else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-      detailsData.requestStartDate = value;
+      detailsData.requestStartDate = value;     
     }
     setRequiredRequestDetailsValues(detailsData);
   }
@@ -233,7 +234,7 @@ const FOIRequest = React.memo((props) => {
     );
 
   const classes = useStyles();
-  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+ 
 
   const updateAdditionalInfo = (name, value, requestObject) => {
     if (requestObject.additionalPersonalInfo === undefined) {
@@ -295,6 +296,8 @@ const FOIRequest = React.memo((props) => {
 
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
     requestObject.id = requestId;
+    requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
+    requestObject.dueDate = requiredRequestDetailsValues.dueDate;   
     if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       requestObject.assignedTo = value;
       requestObject.assignedToName = value2;      

@@ -120,12 +120,16 @@ const BottomButtonGroup = React.memo(({
         console.log(`API call`);
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
-            console.log(res);
-            // const fileNumbers = res.ministryRequests.map(ministry => ministry.filenumber);
-            // const fileNumber = fileNumbers.sort()[0];
-            // console.log(fileNumber);
-
-            //handleOpenRequest("Open", res.);
+            const parentRequestId = res.id;           
+            res.ministryRequests.sort(function(a, b) {
+              var keyA = a.filenumber,
+                  keyB = b.filenumber;             
+              if (keyA < keyB) return -1;
+              if (keyA > keyB) return 1;
+              return 0;
+            });  
+            const firstMinistry = res.ministryRequests[0];
+            //handleOpenRequest("Open", parentRequestId, firstMinistry.id, firstMinistry.filenumber);
           }
         })); 
       }
