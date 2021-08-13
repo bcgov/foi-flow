@@ -47,10 +47,10 @@ class requestservice:
                 foiministryRequest.__dict__.update(ministry)
                 foiministryRequest.version = activeVersion
                 foiministryRequest.requeststatusid = 1
-                foiministryRequest.isactive = ministry["isSelected"]
+                foiministryRequest.isactive = True
                 range = 5
                 foiministryRequest.filenumber = ministry["code"] + "-"+ str(datetime.date.today().year)+"-"+ str(randint(10**(range-1), 10**(range-1)))
-                programArea = ProgramArea.getprogramarea(ministry["name"])
+                programArea = ProgramArea.getprogramarea(ministry["code"])
                 foiministryRequest.programareaid = programArea["programareaid"]
                 foiministryRequest.description = fOIRequestsSchema.get("description")
                 foiministryRequest.duedate = fOIRequestsSchema.get("dueDate")
@@ -115,8 +115,7 @@ class requestservice:
                                                             fOIRequestsSchema.get(contact["key"]),
                                                             contactTypes)
                     )
-                    
-
+                
         #Delivery and received modes
         dmode = DeliveryMode().getdeliverymode(fOIRequestsSchema.get("deliveryMode"))
         deliveryModeId = dmode["deliverymodeid"] if dmode != {} else None 

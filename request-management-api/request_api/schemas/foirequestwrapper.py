@@ -63,8 +63,7 @@ class FOIRequestWrapperSchema(Schema):
     dueDate = fields.Date(data_key="dueDate",allow_none=True)    
     deliveryMode = fields.Str(data_key="deliveryMode",allow_none=True)    
     receivedMode = fields.Str(data_key="receivedMode",allow_none=True)    
-    receivedDate = fields.Date(data_key="receivedDate",allow_none=True)    
-    isactive=fields.Bool(data_key="isactive",allow_none=True)    
+    receivedDate = fields.DateTime(data_key="receivedDateUF",allow_none=True)    
     
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True)    
     workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True)  
