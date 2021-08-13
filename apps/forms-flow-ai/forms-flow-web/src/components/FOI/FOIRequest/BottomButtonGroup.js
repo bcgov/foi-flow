@@ -3,7 +3,7 @@ import './bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
-import {saveRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
+import {saveRequestDetails, openRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
@@ -118,6 +118,16 @@ const BottomButtonGroup = React.memo(({
       handleOpenRequest(value);
       if (value) {
         console.log(`API call`);
+        dispatch(openRequestDetails(saveRequestObject, (err, res) => {
+          if(!err) {
+            console.log(res);
+            // const fileNumbers = res.ministryRequests.map(ministry => ministry.filenumber);
+            // const fileNumber = fileNumbers.sort()[0];
+            // console.log(fileNumber);
+
+            //handleOpenRequest("Open", res.);
+          }
+        })); 
       }
     }
   return (

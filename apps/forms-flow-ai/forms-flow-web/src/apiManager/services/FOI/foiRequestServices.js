@@ -249,3 +249,22 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...re
       });
   };
 };
+
+export const openRequestDetails = (data, ...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  return (dispatch) => {
+    httpOpenPOSTRequest(API.FOI_POST_REQUEST_POST, data)
+      .then((res) => {
+        if (res.data) {                   
+          done(null, res.data);
+        } else {         
+          dispatch(serviceActionError(res));
+          done("Error Posting data");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};

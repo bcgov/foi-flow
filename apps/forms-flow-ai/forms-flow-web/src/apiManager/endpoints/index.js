@@ -42,6 +42,7 @@ const API = {
   FOI_GET_ASSIGNEDTOLIST_API: `${FOI_BASE_API_URL}/api/foiflow/intake/teammembers`,
   FOI_GET_DELIVERY_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/deliverymodes`,
   FOI_GET_RECEIVED_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/receivedmodes`,
+  FOI_POST_REQUEST_POST: `${FOI_BASE_API_URL}/api/foirequests`,  
 };
 
 export default API;
