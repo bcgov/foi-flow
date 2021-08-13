@@ -1,0 +1,63 @@
+{
+  "id":"22",
+  "wfinstanceid":"ca62931b-fb08-11eb-ae3f-0242c0a87002",
+  "requestType":"general",
+  "firstName":"TestTest",
+  "middleName":null,
+  "lastName":"TT",
+  "businessName":null,
+  "currentState":"Unopened",
+  "receivedDate":"2021 Aug, 11",
+  "receivedDateUF":"2021-08-11T00:00:00.000Z",
+  "assignedTo":"dviswana@idir",
+  "xgov":"No",
+  "idNumber":"U-0022",
+  "email":"test@email.com",
+  "phonePrimary":null,
+  "phoneSecondary":null,
+  "address":null,
+  "city":null,
+  "postal":null,
+  "province":null,
+  "country":null,
+  "description":"test",
+  "fromDate":"2021-08-01T04:00:00.000Z",
+  "toDate":"2021-08-09T04:00:00.000Z",
+  "dueDate":"2021-08-09",
+  "correctionalServiceNumber":null,
+  "publicServiceEmployeeNumber":null,
+  "topic":"general request for 2 ministries",
+  "selectedMinistries":[
+     {
+        "code":"CITZ",
+        "name":"Citizens\u2019 Services",
+        "selected":true
+     },
+     {
+        "code":"EDUC",
+        "name":"Education",
+        "selected":true
+     }
+  ],
+  "additionalPersonalInfo":{
+     "alsoKnownAs":"",
+     "birthDate":"",
+     "childFirstName":"",
+     "childMiddleName":"",
+     "childLastName":"",
+     "childAlsoKnownAs":"",
+     "childBirthDate":"",
+     "anotherFirstName":"",
+     "anotherMiddleName":"",
+     "anotherLastName":"",
+     "anotherAlsoKnownAs":"",
+     "anotherBirthDate":"",
+     "adoptiveMotherFirstName":"",
+     "adoptiveMotherLastName":"",
+     "adoptiveFatherLastName":"",
+     "adoptiveFatherFirstName":""
+  },
+  "category":"Law Firm",
+  "receivedMode":"Fax",
+  "deliveryMode":"In Person Pick up"
+}

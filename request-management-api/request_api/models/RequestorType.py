@@ -16,6 +16,11 @@ class RequestorType(db.Model):
         query = db.session.query(RequestorType).filter_by(isactive=True).all()
         return requestortype_schema.dump(query)
 
+    @classmethod
+    def getrequestortype(cls,type):
+        programarea_schema = RequestorTypeSchema()
+        query = db.session.query(RequestorType).filter_by(name=type).first()
+        return programarea_schema.dump(query)
 
 class RequestorTypeSchema(ma.Schema):
     class Meta:

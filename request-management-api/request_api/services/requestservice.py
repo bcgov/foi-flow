@@ -3,7 +3,7 @@ from request_api import version
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.ProgramAreas import ProgramArea
-from request_api.models.ApplicantCategories import ApplicantCategory
+from request_api.models.RequestorType import RequestorType
 from request_api.models.ContactTypes import ContactType
 from request_api.models.DeliveryModes import DeliveryMode
 from request_api.models.ReceivedModes import ReceivedMode
@@ -155,7 +155,7 @@ class FOIRequestUtil:
               contactInformation.contacttypeid =contactType["contacttypeid"]              
         return contactInformation
     
-    def createApplicant(self,firstName, lastName, category, middleName = None,businessName = None, alsoknownas = None, dob = None):
+    def createApplicant(self,firstName, lastName, appltcategory, middleName = None,businessName = None, alsoknownas = None, dob = None):
         requestApplicant = FOIRequestApplicantMapping()
         applicant = FOIRequestApplicant()
         if firstName is not None and firstName != "":
@@ -170,15 +170,15 @@ class FOIRequestUtil:
             applicant.alsoknownas = alsoknownas
         if dob is not None and dob != "":
             applicant.dob = dob
-        _applicant = FOIRequestApplicant.getrequest(applicant)
+        _applicant = FOIRequestApplicant().getrequest(applicant)
         if _applicant == {} :
-            _applicant = FOIRequestApplicant.saverequest(applicant)
+            _applicant = FOIRequestApplicant().saverequest(applicant)
             requestApplicant.foirequestapplicantid = _applicant.identifier
         else:
             requestApplicant.foirequestapplicantid = _applicant["foirequestapplicantid"]
-        if category is not None:           
-            applicantCategory = ApplicantCategory.getapplicantcategory(category)   
-            requestApplicant.requestortypeid = applicantCategory["applicantcategoryid"]
+        if appltcategory is not None:           
+            requestertype = RequestorType().getrequestortype(appltcategory)  
+            requestApplicant.requestortypeid = requestertype["requestortypeid"]
         return requestApplicant
     
     def createPersonalAttribute(self, name, value,attributeTypes):
