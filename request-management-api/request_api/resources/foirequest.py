@@ -29,7 +29,24 @@ import json
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
 
-  
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>')
+class FOIRequest(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    def get(foirequestid,foiministryrequestid):
+        try :            
+            jsondata = {}
+            jsondata = requestservice.getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
+            return jsondata , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
                        
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirequests')

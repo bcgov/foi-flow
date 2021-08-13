@@ -12,6 +12,7 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from dateutil.parser import *
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.external.bpmservice import bpmservice
@@ -147,6 +148,104 @@ class requestservice:
     def postEventToWorkflow(workflowId, data):
         return bpmservice.complete(workflowId, data)
         
+
+    def getrequest(foirequestid,foiministryrequestid):
+        
+        request = FOIRequest.getrequest(foirequestid)
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)        
+        requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+        personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
+
+        _receivedDate = parse(request['receiveddate'])
+        baserequestInfo = {
+            'id': request['foirequestid'],
+            'requestType': request['requesttype'],
+            'receivedDate': _receivedDate.strftime('%Y %b, %d'),
+            'receivedDateUF': request['receiveddate'],
+            'deliverymodeid':request['deliverymode.deliverymodeid'],
+            'deliveryMode':request['deliverymode.name'],
+            'receivedmodeid':request['receivedmode.receivedmodeid'],
+            'receivedMode':request['receivedmode.name'],
+            'assignedTo': requestministry["assignedto"],
+            'idNumber':requestministry["filenumber"],
+            'description': requestministry['description'],
+            'fromDate': requestministry['recordsearchfromdate'],
+            'toDate': requestministry['recordsearchtodate'],
+            'currentState':requestministry['requeststatus.name'],
+            'requeststatusid':requestministry['requeststatus.requeststatusid'],
+            'requestProcessStart':requestministry['startdate'],
+            'dueDate':requestministry['duedate'],
+            'programareaid':requestministry['programarea.programareaid'],
+            'category':request['applicantcategory.name'],
+            'categoryid':request['applicantcategory.applicantcategoryid']
+         }
+
+        if(requestcontactinformation is not None):
+            for contactinfo in requestcontactinformation:
+                if contactinfo['contacttype.name'] == 'Email':
+                    baserequestInfo.update({'Email':contactinfo['contactinformation']})
+                else:
+                    baserequestInfo.update({contactinfo['dataformat']:contactinfo['contactinformation']})
+
+        additionalPersonalInfo ={}
+        if requestapplicants is not None:
+           
+            for applicant in requestapplicants:
+                if applicant['requestortype.requestortypeid'] == 1:
+                    baserequestInfo.update(
+                        {
+                            'firstName':applicant['foirequestapplicant.firstname'],
+                            'middleName': applicant['foirequestapplicant.middlename'],
+                            'lastName': applicant['foirequestapplicant.lastname'],
+                            'businessName': applicant['foirequestapplicant.businessname'],                                                
+                        }                    
+                    )
+                    additionalPersonalInfo.update({
+                            
+                            'birthDate' : applicant['foirequestapplicant.dob'],
+                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas']
+                    })
+                elif applicant['requestortype.requestortypeid'] == 2:
+                    
+                    additionalPersonalInfo.update(
+                        {
+                            'anotherFirstName':applicant['foirequestapplicant.firstname'],
+                            'anotherMiddleName': applicant['foirequestapplicant.middlename'],
+                            'anotherLastName': applicant['foirequestapplicant.lastname'],
+                            'businessName': applicant['foirequestapplicant.businessname'],
+                            'birthDate' : applicant['foirequestapplicant.dob'],  
+                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
+                        }                    
+                    )
+                elif applicant['requestortype.requestortypeid'] == 3:
+                    additionalPersonalInfo.update(
+                        {
+                        'childFirstName': applicant['foirequestapplicant.firstname'],
+                        'childMiddleName': applicant['foirequestapplicant.firstname'],
+                        'childLastName': applicant['foirequestapplicant.firstname'],
+                        'childAlsoKnownAs': applicant['foirequestapplicant.firstname'],
+                        'childBirthDate': applicant['foirequestapplicant.firstname'],                      
+                        }                    
+                    )
+
+        baserequestInfo['additionalPersonalInfo'] = additionalPersonalInfo
+        if personalattributes is not None:
+            for personalattribute in personalattributes:
+                if personalattribute['personalattributeid'] == 1:                   
+                    baserequestInfo.update({'publicServiceEmployeeNumber': personalattribute['attributevalue']})
+                elif  personalattribute['personalattributeid'] == 2 :    
+                    baserequestInfo.update({'correctionalServiceNumber': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 4:     
+                    baserequestInfo.update({'adoptiveMotherFirstName': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 5:     
+                    baserequestInfo.update({'adoptiveMotherLastName': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 6:     
+                    baserequestInfo.update({'adoptiveFatherFirstName': personalattribute['attributevalue']})
+                elif personalattribute['personalattributeid'] == 7:     
+                    baserequestInfo.update({'adoptiveFatherLastName': personalattribute['attributevalue']})        
+
+        return baserequestInfo
 
 class FOIRequestUtil:   
     

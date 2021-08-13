@@ -4,6 +4,7 @@ from .db import  db, ma
 from datetime import datetime
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
+from sqlalchemy.dialects.postgresql import JSON, UUID
 
 import json
 class FOIRequest(db.Model):
@@ -24,9 +25,13 @@ class FOIRequest(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
 
     #ForeignKey References
     
+    applicantcategoryid = db.Column(db.Integer,ForeignKey('ApplicantCategories.applicantcategoryid'))
+    applicantcategory =  relationship("ApplicantCategory",backref=backref("ApplicantCategories"),uselist=False)
+
     deliverymodeid = db.Column(db.Integer,ForeignKey('DeliveryModes.deliverymodeid'))
     deliverymode =  relationship("DeliveryMode",backref=backref("DeliveryModes"),uselist=False)
     
@@ -66,5 +71,5 @@ class FOIRequest(db.Model):
 
 class FOIRequestsSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestid','version','requesttype','receiveddate','initialdescription','initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid','deliverymode.deliverymodeid')
+        fields = ('foirequestid','version','requesttype','receiveddate','initialdescription','initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid','deliverymode.deliverymodeid','receivedmode.name','deliverymode.name','applicantcategory.applicantcategoryid','applicantcategory.name')
     
