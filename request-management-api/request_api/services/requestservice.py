@@ -172,6 +172,7 @@ class requestservice:
         personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
 
         _receivedDate = parse(request['receiveddate'])
+        
         baserequestInfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -192,7 +193,8 @@ class requestservice:
             'dueDate':requestministry['duedate'],
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
-            'categoryid':request['applicantcategory.applicantcategoryid']
+            'categoryid':request['applicantcategory.applicantcategoryid'],
+            'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
          }
 
         if(requestcontactinformation is not None):
@@ -226,20 +228,19 @@ class requestservice:
                         {
                             'anotherFirstName':applicant['foirequestapplicant.firstname'],
                             'anotherMiddleName': applicant['foirequestapplicant.middlename'],
-                            'anotherLastName': applicant['foirequestapplicant.lastname'],
-                            'businessName': applicant['foirequestapplicant.businessname'],
-                            'birthDate' : applicant['foirequestapplicant.dob'],  
-                            'alsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
+                            'anotherLastName': applicant['foirequestapplicant.lastname'],                            
+                            'anotherBirthDate' : applicant['foirequestapplicant.dob'],  
+                            'anotherAlsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
                         }                    
                     )
                 elif applicant['requestortype.requestortypeid'] == 3:
                     additionalPersonalInfo.update(
                         {
                         'childFirstName': applicant['foirequestapplicant.firstname'],
-                        'childMiddleName': applicant['foirequestapplicant.firstname'],
-                        'childLastName': applicant['foirequestapplicant.firstname'],
-                        'childAlsoKnownAs': applicant['foirequestapplicant.firstname'],
-                        'childBirthDate': applicant['foirequestapplicant.firstname'],                      
+                        'childMiddleName': applicant['foirequestapplicant.middlename'],
+                        'childLastName': applicant['foirequestapplicant.lastname'],
+                        'childAlsoKnownAs': applicant['foirequestapplicant.alsoknownas'],
+                        'childBirthDate': applicant['foirequestapplicant.dob'],                      
                         }                    
                     )
 
