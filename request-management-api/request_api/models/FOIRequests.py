@@ -60,7 +60,7 @@ class FOIRequest(db.Model):
         db.session.commit()
         ministryArr = [] 
         for ministry in foiRequest.ministryRequests:
-            ministryArr.append({'id': ministry.foiministryrequestid, 'filenumber': ministry.filenumber})    
+            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber})    
         return DefaultMethodResult(True,'Request added',foiRequest.foirequestid,ministryArr)
                           
 
