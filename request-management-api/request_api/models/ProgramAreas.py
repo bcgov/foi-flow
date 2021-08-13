@@ -19,9 +19,9 @@ class ProgramArea(db.Model):
         return programarea_schema.dump(query)
 
     @classmethod
-    def getprogramarea(cls,pgname):
+    def getprogramarea(cls,pgbcgovcode):
         programarea_schema = ProgramAreaSchema()
-        query = db.session.query(ProgramArea).filter_by(name=pgname).first()
+        query = db.session.query(ProgramArea).filter_by(bcgovcode=pgbcgovcode).first()
         return programarea_schema.dump(query)
 
 class ProgramAreaSchema(ma.Schema):
