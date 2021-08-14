@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
+from sqlalchemy.sql.expression import distinct
 
 import json
 class FOIRequest(db.Model):
@@ -52,6 +53,9 @@ class FOIRequest(db.Model):
     requestApplicants = relationship('FOIRequestApplicantMapping', primaryjoin="and_(FOIRequest.foirequestid==FOIRequestApplicantMapping.foirequest_id, "
                         "FOIRequest.version==FOIRequestApplicantMapping.foirequestversion_id)")
     
+
+
+   
     
     @classmethod
     def getrequest(cls,foirequestid):
