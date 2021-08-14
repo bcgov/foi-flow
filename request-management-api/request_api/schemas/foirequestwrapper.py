@@ -75,7 +75,10 @@ class FOIRequestWrapperSchema(Schema):
     province = fields.Str(data_key="province",allow_none=True)    
     postal = fields.Str(data_key="postal",allow_none=True)   
     country = fields.Str(data_key="country",allow_none=True)    
-
+    personalHealthNumber = fields.Str(data_key="personalHealthNumber",allow_none=True)   
+    correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True) 
+    publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True) 
+    identityVerified = fields.Str(data_key="identityVerified",allow_none=True) 
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)

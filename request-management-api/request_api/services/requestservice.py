@@ -67,14 +67,24 @@ class requestservice:
         
 
         #Prepare applicant record 
+        if  fOIRequestsSchema.get("additionalPersonalInfo") is not None:
+            applicantInfo = fOIRequestsSchema.get("additionalPersonalInfo")
+            if applicantInfo["birthDate"] is not None and applicantInfo["birthDate"] !="":
+                selfdob = applicantInfo["birthDate"]
+            else:
+                selfdob = None
+            if applicantInfo["alsoKnownAs"] is not None and applicantInfo["alsoKnownAs"] !="":
+                selfAlsoKnownAs = applicantInfo["alsoKnownAs"]
+            else:
+                selfAlsoKnownAs = None
         requestApplicantArr.append(
             fOIRequestUtil.createApplicant(fOIRequestsSchema.get("firstName"),
                                            fOIRequestsSchema.get("lastName"),
                                            "Self",
                                            fOIRequestsSchema.get("middleName"),                                            
                                            fOIRequestsSchema.get("businessName"),
-                                           fOIRequestsSchema.get("alsoknownas"),
-                                           fOIRequestsSchema.get("dob") )
+                                           selfAlsoKnownAs,
+                                           selfdob)
             )
                  
 
@@ -116,18 +126,22 @@ class requestservice:
                 
 
         #Personal Attributes
-        attributeTypes = PersonalInformationAttribute().getpersonalattributes()
-        for attrb in fOIRequestUtil.personalAttributeMapping():
-            if attrb["location"] == "main":
-                attrbvalue = fOIRequestsSchema.get(attrb["key"])
-            else:
-                attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
-            if attrbvalue is not None and attrbvalue and attrbvalue != "":
-                personalAttributeArr.append(
-                    fOIRequestUtil.createPersonalAttribute(attrb["name"],
+        if fOIRequestsSchema.get("requestType") == "personal":
+            attributeTypes = PersonalInformationAttribute().getpersonalattributes()
+            for attrb in fOIRequestUtil.personalAttributeMapping():
+                attrbvalue = None
+                if attrb["location"] == "main":
+                    attrbvalue = fOIRequestsSchema.get(attrb["key"])
+                else:    
+                    addlAttrb = fOIRequestsSchema.get(attrb["location"])
+                    attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
+            
+                if attrbvalue is not None and attrbvalue and attrbvalue != "":
+                    personalAttributeArr.append(
+                        fOIRequestUtil.createPersonalAttribute(attrb["name"],
                                                             attrbvalue,
                                                             attributeTypes)
-                    )
+                        )
         # FOI Request         
         openfOIRequest = FOIRequest()
         openfOIRequest.version = activeVersion 
