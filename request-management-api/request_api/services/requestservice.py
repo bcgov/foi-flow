@@ -214,7 +214,7 @@ class requestservice:
         if(requestcontactinformation is not None):
             for contactinfo in requestcontactinformation:
                 if contactinfo['contacttype.name'] == 'Email':
-                    baserequestInfo.update({'Email':contactinfo['contactinformation']})
+                    baserequestInfo.update({'email':contactinfo['contactinformation']})
                 else:
                     baserequestInfo.update({contactinfo['dataformat']:contactinfo['contactinformation']})
 

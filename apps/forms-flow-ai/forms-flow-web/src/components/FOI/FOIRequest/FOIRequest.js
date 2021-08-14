@@ -50,16 +50,12 @@ const FOIRequest = React.memo((props) => {
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
-
   useEffect(() => {
-    console.log(`requestId = ${requestId}, ministryId = ${ministryId}`);
-    console.log(url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST));
     if (ministryId) {
       
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1) {
-      console.log(`requestId = ${requestId}, ministryId = ${ministryId}`);
       dispatch(fetchFOIRawRequestDetails(requestId));
     }    
     dispatch(fetchFOICategoryList());
@@ -265,7 +261,11 @@ const FOIRequest = React.memo((props) => {
            adoptiveMotherFirstName:"",
            adoptiveMotherLastName:"",
            adoptiveFatherLastName:"",
-           adoptiveFatherFirstName:""
+           adoptiveFatherFirstName:"",
+           correctionalServiceNumber:"",
+           publicServiceEmployeeNumber:"",
+           personalHealthNumber:"",
+           identityVerified:"",
         };
     }
     else {
@@ -301,6 +301,18 @@ const FOIRequest = React.memo((props) => {
       }
       else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
         requestObject.additionalPersonalInfo.birthDate = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+        requestObject.additionalPersonalInfo.correctionalServiceNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
+        requestObject.additionalPersonalInfo.publicServiceEmployeeNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
+        requestObject.additionalPersonalInfo.personalHealthNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
+        requestObject.additionalPersonalInfo.identityVerified = value;
       }
     }
   }
@@ -379,18 +391,7 @@ const FOIRequest = React.memo((props) => {
     else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
       requestObject.deliveryMode = value;
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-      requestObject.correctionalServiceNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-      requestObject.publicServiceEmployeeNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
-      requestObject.personalHealthNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
-      requestObject.identityVerified = value;
-    }
+    
     else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {
       requestObject.description = value;
     }

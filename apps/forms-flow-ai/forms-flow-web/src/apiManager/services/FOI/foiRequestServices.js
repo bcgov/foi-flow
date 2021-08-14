@@ -285,8 +285,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...re
   };
 };
 
-export const openRequestDetails = (data, ...rest) => {
-  console.log(`data = ${JSON.stringify(data)}`);
+export const openRequestDetails = (data, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
     httpOpenPOSTRequest(API.FOI_POST_REQUEST_POST, data)

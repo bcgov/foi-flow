@@ -22,14 +22,13 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
           return !!request.identityVerified ? request.identityVerified : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-          return !!request.correctionsNumber ? request.correctionsNumber : "";
+          return !!request.correctionalServiceNumber ? request.correctionalServiceNumber : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-          return !!request.employeeNumber ? request.employeeNumber : "";
+          return !!request.publicServiceEmployeeNumber ? request.publicServiceEmployeeNumber : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
-          console.log(request.birthDate);
-          return !!request.birthDate ? request.birthDate : "";
+          return !!request.birthDate ? new Date(request.birthDate) : "";
         }
       }
       else {
@@ -86,7 +85,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
                   <TextField                
                             label="Date of Birth"
                             type="date" 
-                            value={birthDateText} 
+                            value={birthDateText || ''} 
                             onChange={handleBirthDate}
                             InputLabelProps={{
                             shrink: true,
