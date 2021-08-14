@@ -5,8 +5,9 @@ class dashboardservice:
 
     def getrequestqueue():
             
-            requests = FOIRawRequest.getrequests()        
-            unopenedrequests = []
+            requests = FOIRawRequest.getrequests()
+            openedrequests = FOIMinistryRequest.getrequests()        
+            requestqueue = []
             
             for request in requests:
 
@@ -33,10 +34,21 @@ class dashboardservice:
                                  'idNumber': 'U-00' + str(request.requestid),
                                  'version':request.version
                                  }
-                unopenedrequests.append(unopenrequest)
+                requestqueue.append(unopenrequest)
 
-                openedrequests = FOIMinistryRequest.getrequests()
-                unopenedrequests.append(openedrequests)
-
-
-            return unopenedrequests
+            for openrequest in openedrequests : 
+                    _openrequest = {'id': openrequest["id"],
+                                 'firstName':  openrequest["firstName"],
+                                 'lastName':  openrequest["lastName"],
+                                 'requestType':  openrequest["requestType"],
+                                 'currentState':  openrequest["currentState"],
+                                 'receivedDate':  openrequest["receivedDate"],
+                                 'receivedDateUF':  openrequest["receivedDateUF"],
+                                 'assignedTo':  openrequest["assignedTo"],
+                                 'xgov': 'No',
+                                 'idNumber':  openrequest["idNumber"],
+                                 'version': openrequest["version"]
+                                 }
+                    requestqueue.append(_openrequest)
+                        
+            return requestqueue

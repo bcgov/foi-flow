@@ -83,6 +83,8 @@ class FOIMinistryRequest(db.Model):
            _request["assignedTo"]=ministryrequest["assignedto"]
            _request["xgov"]='No'
            _request["version"] = ministryrequest['version']
+           _request["id"] = parentrequest.foirequestid
+           _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
            _requests.append(_request)
         
         return _requests
