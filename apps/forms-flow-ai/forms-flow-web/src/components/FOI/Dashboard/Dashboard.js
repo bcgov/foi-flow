@@ -11,7 +11,7 @@ const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
 
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList);  
+  const rows = useSelector(state=> state.foiRequests.foiRequestsList); 
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
@@ -29,7 +29,7 @@ const Dashboard = React.memo((props) => {
   }
 
   function getAssigneeFullName(params) {
-    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo');
+    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo') ? params.getValue(params.id, 'assignedTo') : "Unassigned";
   }
 
   function getReceivedDate(params) {
@@ -145,7 +145,8 @@ const createRequest = (e) => {
             </div>
             <div style={{ height: 450 }} className={classes.root}>
               <DataGrid 
-                className="foi-data-grid" 
+                className="foi-data-grid"
+                getRowId={(row) => row.idNumber}
                 rows={search(rows)} 
                 columns={columns}                
                 rowHeight={30}
