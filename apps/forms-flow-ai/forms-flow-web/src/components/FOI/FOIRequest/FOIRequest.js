@@ -84,6 +84,7 @@ const FOIRequest = React.memo((props) => {
     deliveryMode: "",
     receivedDate: "",
     requestStartDate: "",
+    dueDate: "",
   }
 
   const requiredApplicantDetailsValues = {
@@ -182,7 +183,7 @@ const FOIRequest = React.memo((props) => {
   }
   
   //Update required fields of request details box with latest value
-  const handleRequestDetailsValue = (value, name) => {    
+  const handleRequestDetailsValue = (value, name, value2) => {    
     const detailsData = {...requiredRequestDetailsValues};
     if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {      
       detailsData.requestType = value;
@@ -197,7 +198,8 @@ const FOIRequest = React.memo((props) => {
       detailsData.receivedDate = value;      
     }
     else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-      detailsData.requestStartDate = value;     
+      detailsData.requestStartDate = value;
+      detailsData.dueDate = value2;   
     }
     setRequiredRequestDetailsValues(detailsData);
   }
@@ -236,8 +238,8 @@ const FOIRequest = React.memo((props) => {
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
     || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
     || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
-    || requiredRequestDetailsValues.receivedDate === undefined
-    || requiredRequestDetailsValues.requestStartDate === undefined 
+    || (requiredRequestDetailsValues.receivedDate === undefined || requiredRequestDetailsValues.receivedDate === "")
+    || (requiredRequestDetailsValues.requestStartDate === undefined || requiredRequestDetailsValues.requestStartDate === "")
     );
 
   const classes = useStyles();
@@ -318,7 +320,6 @@ const FOIRequest = React.memo((props) => {
   }
 
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
-    console.log(`id = ${requestId}, dueDate = ${requiredRequestDetailsValues.dueDate}`)
     requestObject.id = requestId;
     requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
     requestObject.dueDate = requiredRequestDetailsValues.dueDate;   
@@ -430,9 +431,7 @@ const FOIRequest = React.memo((props) => {
     setHeader(value);
     setUnSavedRequest(value2);
   }  
-  const handleOpenRequest = (parendId, ministryId, unSaved) => {
-      //const daysRemaining = calculateDaysRemaining(saveRequestObject.dueDate);
-      //setHeader(`Open|${daysRemaining}|FileNumber`);
+  const handleOpenRequest = (parendId, ministryId, unSaved) => {      
       setSaveRequestObject(unSaved);
       if (!unSaved) {
         dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));

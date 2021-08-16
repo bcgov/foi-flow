@@ -20,3 +20,9 @@ def test_post_foirequest_personal(app, client):
     jsondata = json.loads(response.data)
     print(str(jsondata["id"]))
     assert response.status_code == 200
+
+
+def test_get_foirequestqueue(app, client):
+   response = client.get('/api/dashboard') 
+   jsondata = json.loads(response.data)
+   assert response.status_code == 200    
