@@ -28,5 +28,19 @@ from .ApplicantCategories import ApplicantCategory
 from .DeliveryModes import DeliveryMode
 from .ReceivedModes import ReceivedMode
 
+from .FOIRequests import FOIRequest
+from .FOIRequestStatus import FOIRequestStatus
+from .FOIMinistryRequests import FOIMinistryRequest
+
+from .ContactTypes import ContactType
+from .FOIRequestContactInformation import FOIRequestContactInformation
+
+from .RequestorType import RequestorType
+from .FOIRequestApplicants import FOIRequestApplicant
+from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
+
+from .PersonalInformationAttributes import PersonalInformationAttribute
+
+from .FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)

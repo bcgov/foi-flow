@@ -16,6 +16,11 @@ class DeliveryMode(db.Model):
         query = db.session.query(DeliveryMode).filter_by(isactive=True).all()
         return deliverymode_schema.dump(query)
 
+    @classmethod
+    def getdeliverymode(cls,deliveryModename):
+        deliverymode_schema = DeliveryModeSchema()
+        query = db.session.query(DeliveryMode).filter_by(name=deliveryModename).first()
+        return deliverymode_schema.dump(query)
 
 class DeliveryModeSchema(ma.Schema):
     class Meta:
