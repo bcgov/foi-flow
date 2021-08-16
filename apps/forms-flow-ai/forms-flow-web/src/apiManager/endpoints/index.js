@@ -34,14 +34,16 @@ const API = {
   GET_BPM_FORM_LIST:`${BPM_BASE_URL_EXT}/form`,
   UPDATE_ASSIGNEE_BPM_TASK:`${BPM_BASE_URL}/task/<task_id>/assignee`,
 
-  FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/foirawrequests` ,
+  FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard` ,
 
   FOI_GET_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/applicantcategories`,
   FOI_GET_PROGRAMAREAS_API: `${FOI_BASE_API_URL}/api/foiflow/programareas`,
-  FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>`,
+  FOI_RAW_REQUEST_API: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>`,
   FOI_GET_ASSIGNEDTOLIST_API: `${FOI_BASE_API_URL}/api/foiflow/intake/teammembers`,
   FOI_GET_DELIVERY_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/deliverymodes`,
   FOI_GET_RECEIVED_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/receivedmodes`,
+  FOI_POST_REQUEST_POST: `${FOI_BASE_API_URL}/api/foirequests`,
+  FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>`,  
 };
 
 export default API;

@@ -1,4 +1,5 @@
 
+from re import T
 from request_api import version
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
@@ -13,6 +14,7 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.schemas.foirequest import  FOIRequestSchema
 from dateutil.parser import *
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
@@ -35,10 +37,9 @@ class requestservice:
         personalAttributeArr = []
         requestApplicantArr = []
         fOIRequestUtil = FOIRequestUtil()
-        _fOIRequest = FOIRequest()
         #Identify version       
         if foirequestid is not None:
-            _foiRequest = FOIRequest.getrequest(foirequestid)
+            _foiRequest = FOIRequest().getrequest(foirequestid)
             if _foiRequest != {}:
                activeVersion = _foiRequest["version"] + 1
             else:
@@ -46,37 +47,30 @@ class requestservice:
         
         #Prepare ministry records
         if fOIRequestsSchema.get("selectedMinistries") is not None:
-            for  ministry in  fOIRequestsSchema.get("selectedMinistries"):
-                foiministryRequest = FOIMinistryRequest()
-                foiministryRequest.__dict__.update(ministry)
-                foiministryRequest.version = activeVersion
-                foiministryRequest.requeststatusid = 1
-                foiministryRequest.isactive = True 
-                foiministryRequest.filenumber = fOIRequestUtil.generateFileNumber(ministry["code"], fOIRequestsSchema.get("foirawrequestid"))
-                programArea = ProgramArea.getprogramarea(ministry["code"])
-                foiministryRequest.programareaid = programArea["programareaid"]
-                foiministryRequest.description = fOIRequestsSchema.get("description")
-                foiministryRequest.duedate = fOIRequestsSchema.get("dueDate")
-                foiministryRequest.assignedto = fOIRequestsSchema.get("assignedTo")
-                foiMinistryRequestArr.append(foiministryRequest)           
+            for ministry in fOIRequestsSchema.get("selectedMinistries"):
+                foiMinistryRequestArr.append(fOIRequestUtil.createMinistry(fOIRequestsSchema, ministry, activeVersion))           
         
 
         #Prepare applicant record 
+        if  fOIRequestsSchema.get("additionalPersonalInfo") is not None:
+            applicantInfo = fOIRequestsSchema.get("additionalPersonalInfo")
+            selfdob = applicantInfo["birthDate"] if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"birthDate","additionalPersonalInfo") else None
+            selfAlsoKnownAs = applicantInfo["alsoKnownAs"] if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"alsoKnownAs","additionalPersonalInfo") else None
         requestApplicantArr.append(
             fOIRequestUtil.createApplicant(fOIRequestsSchema.get("firstName"),
                                            fOIRequestsSchema.get("lastName"),
                                            "Self",
                                            fOIRequestsSchema.get("middleName"),                                            
                                            fOIRequestsSchema.get("businessName"),
-                                           fOIRequestsSchema.get("alsoknownas"),
-                                           fOIRequestsSchema.get("dob") )
+                                           selfAlsoKnownAs,
+                                           selfdob)
             )
                  
 
         #Prepare additional applicants
         if fOIRequestsSchema.get("additionalPersonalInfo") is not None:
             addlApplicantInfo = fOIRequestsSchema.get("additionalPersonalInfo")
-            if addlApplicantInfo["childFirstName"] is not None and addlApplicantInfo["childFirstName"] !="":
+            if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"childFirstName","additionalPersonalInfo"):
                 requestApplicantArr.append(
                     fOIRequestUtil.createApplicant(addlApplicantInfo["childFirstName"],
                                            addlApplicantInfo["childLastName"],
@@ -86,7 +80,7 @@ class requestservice:
                                            addlApplicantInfo["childAlsoKnownAs"],
                                            addlApplicantInfo["childBirthDate"] )
                     )
-            if addlApplicantInfo["anotherFirstName"] is not None and addlApplicantInfo["anotherFirstName"] != "":
+            if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"anotherFirstName","additionalPersonalInfo"):
                 requestApplicantArr.append(
                     fOIRequestUtil.createApplicant(addlApplicantInfo["anotherFirstName"],
                                            addlApplicantInfo["anotherLastName"],
@@ -98,8 +92,7 @@ class requestservice:
                     )  
            
         #Prepare contact information
-        contactTypes = ContactType().getcontacttypes()
-        
+        contactTypes = ContactType().getcontacttypes()        
         for contact in fOIRequestUtil.contactTypeMapping():
             if fOIRequestsSchema.get(contact["key"]) is not None:   
                 contactInformationArr.append(
@@ -111,40 +104,41 @@ class requestservice:
                 
 
         #Personal Attributes
-        attributeTypes = PersonalInformationAttribute().getpersonalattributes()
-        for attrb in fOIRequestUtil.personalAttributeMapping():
-            if attrb["location"] == "main":
-                attrbvalue = fOIRequestsSchema.get(attrb["key"])
-            else:
-                attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
-            if attrbvalue is not None and attrbvalue and attrbvalue != "":
-                personalAttributeArr.append(
-                    fOIRequestUtil.createPersonalAttribute(attrb["name"],
+        if fOIRequestsSchema.get("requestType") == "personal":
+            attributeTypes = PersonalInformationAttribute().getpersonalattributes()
+            for attrb in fOIRequestUtil.personalAttributeMapping():
+                attrbvalue = None
+                if attrb["location"] == "main":                    
+                    attrbvalue = fOIRequestsSchema.get(attrb["key"])
+                else:                        
+                    attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
+            
+                if attrbvalue is not None and attrbvalue and attrbvalue != "":
+                    personalAttributeArr.append(
+                        fOIRequestUtil.createPersonalAttribute(attrb["name"],
                                                             attrbvalue,
                                                             attributeTypes)
-                    )
+                        )
         # FOI Request         
         openfOIRequest = FOIRequest()
-        openfOIRequest.version = activeVersion 
+        openfOIRequest.foirawrequestid = fOIRequestsSchema.get("foirawrequestid") 
+        openfOIRequest.version = activeVersion
         openfOIRequest.requesttype = fOIRequestsSchema.get("requestType")
+        openfOIRequest.initialdescription = fOIRequestsSchema.get("description")
         openfOIRequest.ministryRequests = foiMinistryRequestArr
         openfOIRequest.contactInformations = contactInformationArr       
-        
-        if fOIRequestsSchema.get("deliveryMode") is not None and fOIRequestsSchema.get("deliveryMode") and fOIRequestsSchema.get("deliveryMode") != "":
-            dmode = DeliveryMode().getdeliverymode(fOIRequestsSchema.get("deliveryMode"))
-            openfOIRequest.deliverymodeid = dmode["deliverymodeid"]
-            
-        if fOIRequestsSchema.get("receivedMode") is not None and fOIRequestsSchema.get("receivedMode") and fOIRequestsSchema.get("receivedMode") != "":    
-            rmode = ReceivedMode().getreceivedmode(fOIRequestsSchema.get("receivedMode"))
-            openfOIRequest.receivedmodeid = rmode["receivedmodeid"]
-        
-        if fOIRequestsSchema.get("category") is not None and fOIRequestsSchema.get("category") and fOIRequestsSchema.get("category") != "":    
-            applcategory = ApplicantCategory().getapplicantcategory(fOIRequestsSchema.get("category"))
-            openfOIRequest.applicantcategoryid = applcategory["applicantcategoryid"]
-            
+        if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"fromDate","main") == True:
+            openfOIRequest.initialrecordsearchfromdate = fOIRequestsSchema.get("fromDate")
+        if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"toDate","main") == True:
+            openfOIRequest.initialrecordsearchtodate = fOIRequestsSchema.get("toDate")
+        if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"deliveryMode","main") == True:
+            openfOIRequest.deliverymodeid = fOIRequestUtil.getValueOf("deliveryMode",fOIRequestsSchema.get("deliveryMode"))            
+        if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"receivedMode","main") == True:    
+            openfOIRequest.receivedmodeid =  fOIRequestUtil.getValueOf("receivedMode",fOIRequestsSchema.get("receivedMode"))        
+        if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"category","main") == True:
+            openfOIRequest.applicantcategoryid = fOIRequestUtil.getValueOf("category",fOIRequestsSchema.get("category"))            
         openfOIRequest.personalAttributes = personalAttributeArr
-        openfOIRequest.requestApplicants = requestApplicantArr
-        
+        openfOIRequest.requestApplicants = requestApplicantArr        
         if foirequestid is not None:         
            openfOIRequest.foirequestid = foirequestid 
         
@@ -152,7 +146,8 @@ class requestservice:
     
     def postEventToWorkflow(workflowId, data):
         return bpmservice.complete(workflowId, data)
-        
+    
+       
 
     def getrequest(foirequestid,foiministryrequestid):
         
@@ -191,7 +186,7 @@ class requestservice:
         if(requestcontactinformation is not None):
             for contactinfo in requestcontactinformation:
                 if contactinfo['contacttype.name'] == 'Email':
-                    baserequestInfo.update({'Email':contactinfo['contactinformation']})
+                    baserequestInfo.update({'email':contactinfo['contactinformation']})
                 else:
                     baserequestInfo.update({contactinfo['dataformat']:contactinfo['contactinformation']})
 
@@ -255,6 +250,23 @@ class requestservice:
 
 class FOIRequestUtil:   
     
+    def createMinistry(self, requestSchema, ministry, activeVersion):
+        foiministryRequest = FOIMinistryRequest()
+        foiministryRequest.__dict__.update(ministry)
+        foiministryRequest.version = activeVersion
+        foiministryRequest.requeststatusid = 1
+        foiministryRequest.isactive = True
+        foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid"))
+        foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
+        foiministryRequest.description = requestSchema.get("description")
+        foiministryRequest.duedate = requestSchema.get("dueDate")
+        if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
+            foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
+        if self.isNotBlankorNone(requestSchema,"toDate","main") == True:
+            foiministryRequest.recordsearchtodate = requestSchema.get("toDate")
+        foiministryRequest.assignedto = requestSchema.get("assignedTo")
+        return foiministryRequest
+    
     def createContactInformation(self,dataformat, name, value, contactTypes):
         contactInformation = FOIRequestContactInformation()
         contactInformation.contactinformation = value
@@ -299,6 +311,21 @@ class FOIRequestUtil:
                     personalAttribute.attributevalue = value
         return personalAttribute
     
+    def getValueOf(self,name,key):
+        if name == "receivedMode":
+            rmode = ReceivedMode().getreceivedmode(key)
+            return rmode["receivedmodeid"]
+        elif name == "deliveryMode":
+            dmode = DeliveryMode().getdeliverymode(key)
+            return dmode["deliverymodeid"]
+        elif name == "category":
+            applcategory = ApplicantCategory().getapplicantcategory(key)
+            return applcategory["applicantcategoryid"]
+        elif name == "programArea":
+            pgArea = ProgramArea().getprogramarea(key)
+            return pgArea["programareaid"]
+        
+    
     def generateFileNumber(self, code, id):
         tmp = str(id)
         curSize = len(tmp)
@@ -306,9 +333,19 @@ class FOIRequestUtil:
         randomNum = random.randint(pow(10, N-1), pow(10, N) - 1)
         return code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomNum)
     
+    def isNotBlankorNone(self, dataSchema, key, location):
+        if location == "main":
+            if dataSchema.get(key) is not None and dataSchema.get(key)  and dataSchema.get(key)  != "":
+                return True
+        if location == "additionalPersonalInfo":
+            if dataSchema.get(location)[key] is not None and dataSchema.get(location)[key] !="":     
+                return True
+        return False          
+    
             
     def contactTypeMapping(self):
-        return [{"name": "Home Phone", "key" : "phonePrimary"},
+        return [{"name": "Email", "key" : "email"},
+            {"name": "Home Phone", "key" : "phonePrimary"},
             {"name": "Work Phone", "key" : "workPhonePrimary"},
             {"name": "Mobile Phone", "key" : "phoneSecondary"},
             {"name": "Work Phone 2", "key" : "workPhoneSecondary"},

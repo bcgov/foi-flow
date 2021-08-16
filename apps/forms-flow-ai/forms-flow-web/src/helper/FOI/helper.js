@@ -9,14 +9,19 @@ const hd = new DateHolidayjs('CA','BC');
 const replaceUrl = (URL, key, value) => {
   return URL.replace(key, value);
 };
-const formatDate = (d) => {
+const formatDate = (d, format='YYYY-MM-DD') => {
   if(d !== "") {
-    var _d= new Date(d)
-    let ye = new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(_d);
-    let mo = new Intl.DateTimeFormat('en-US', { month: '2-digit' }).format(_d);
-    let da = new Intl.DateTimeFormat('en-US', { day: '2-digit' }).format(_d);
-    return `${ye}-${mo}-${da}`;
+	if (format === 'YYYY MMM, DD') {
+		return dayjs(d).format( 'YYYY MMM, DD');
+	}
+	else {
+		return dayjs(d).format( 'YYYY-MM-DD');
+	}
   }
+}
+const businessDay = (date) => {
+	date = formatDate(date);
+	return dayjs(date).isBusinessDay();
 }
 const getPublicHoliDays = (startDate, endDate) => {
 	let publicHoliDays = 0;
@@ -53,4 +58,24 @@ const addBusinessDays = (dateText, days) => {
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
 
-export { replaceUrl, formatDate, addBusinessDays };
+const countWeekendDays = (startDate, endDate) =>
+{  
+  var ndays = 1 + Math.round((endDate.getTime()-startDate.getTime())/(24*3600*1000));
+  var nsaturdays = Math.floor( (startDate.getDay()+ndays) / 7 );
+  return 2*nsaturdays + (startDate.getDay()===0) - (endDate.getDay()===6);
+}
+
+const daysBetween = (startDate, endDate) => {
+    var millisecondsPerDay = 24 * 60 * 60 * 1000;
+    return (new Date(endDate) - new Date(startDate)) / millisecondsPerDay;
+}
+const calculateDaysRemaining = (endDate) => {
+	const startDate = new Date();
+    endDate = new Date(endDate);
+	const publicHoliDays = getPublicHoliDays(startDate, endDate);
+	const weekendDays = countWeekendDays(startDate, endDate);
+	const noOfDays = daysBetween(startDate, endDate);   
+	return Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays);
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
