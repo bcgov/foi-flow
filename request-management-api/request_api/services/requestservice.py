@@ -112,7 +112,6 @@ class requestservice:
                     attrbvalue = fOIRequestsSchema.get(attrb["key"])
                 else:                        
                     attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
-            
                 if attrbvalue is not None and attrbvalue and attrbvalue != "":
                     personalAttributeArr.append(
                         fOIRequestUtil.createPersonalAttribute(attrb["name"],
@@ -359,9 +358,9 @@ class FOIRequestUtil:
             {"name": "Street Address", "key" : "country"}]
         
     def personalAttributeMapping(self):
-        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"main"},
-            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"main"},
-            {"name": "BC Personal Health Care Number", "key" : "personalHealthNumber", "location":"main"},
+        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"additionalPersonalInfo"},
+            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"additionalPersonalInfo"},
+            {"name": "BC Personal Health Care Number", "key" : "personalHealthNumber", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother First Name", "key" : "adoptiveMotherFirstName", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother Last Name", "key" : "adoptiveMotherLastName", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Father First Name", "key" : "adoptiveFatherFirstName", "location":"additionalPersonalInfo"},
