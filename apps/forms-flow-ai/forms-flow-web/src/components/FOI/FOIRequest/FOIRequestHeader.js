@@ -92,4 +92,4 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
     );
   });
 
-export default ReviewRequestHeader;
+export default FOIRequestHeader;
