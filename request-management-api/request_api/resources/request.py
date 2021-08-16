@@ -110,8 +110,7 @@ class FOIRawRequests(Resource):
     def get(requestid=None):
         ## todo : This code will get re-furshibed with BPM WF validation to list
         try:                                       
-                #unopenedrequests = rawrequestservice.getrawrequests() 
-                unopenedrequests = dashboardservice.getrequestqueue()
+                unopenedrequests = rawrequestservice.getrawrequests()                 
                 jsondata = json.dumps(unopenedrequests)
                 return jsondata , 200            
         except BusinessException as exception:            
