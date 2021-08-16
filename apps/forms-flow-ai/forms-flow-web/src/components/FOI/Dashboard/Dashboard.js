@@ -113,8 +113,13 @@ const search = (rows) => {
 }
  
 
-const renderReviewRequest = (e) => {  
-  dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+const renderReviewRequest = (e) => {
+  if (ministryrequestid) {
+    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${ministryrequestid}`));
+  }
+  else {
+    dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+  }
 }
 const createRequest = (e) => {
   dispatch(push(`/foi/createrequest`));

@@ -318,6 +318,7 @@ const FOIRequest = React.memo((props) => {
   }
 
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
+    console.log(`id = ${requestId}, dueDate = ${requiredRequestDetailsValues.dueDate}`)
     requestObject.id = requestId;
     requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
     requestObject.dueDate = requiredRequestDetailsValues.dueDate;   
