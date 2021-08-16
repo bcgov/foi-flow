@@ -111,11 +111,12 @@ const BottomButtonGroup = React.memo(({
     const [openModal, setOpenModal] = useState(false);
    
     const openRequest = () => {
+      saveRequestObject.id = saveRequestObject.id ? saveRequestObject.id :requestId; 
       setOpenModal(true);     
     }
     const handleModal = (value) => {
       setOpenModal(false);
-      if (value) {        
+      if (value) {
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
             console.log(res);
