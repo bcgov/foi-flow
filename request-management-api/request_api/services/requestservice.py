@@ -14,6 +14,7 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.schemas.foirequest import  FOIRequestSchema
 from dateutil.parser import *
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
@@ -185,7 +186,7 @@ class requestservice:
         if(requestcontactinformation is not None):
             for contactinfo in requestcontactinformation:
                 if contactinfo['contacttype.name'] == 'Email':
-                    baserequestInfo.update({'Email':contactinfo['contactinformation']})
+                    baserequestInfo.update({'email':contactinfo['contactinformation']})
                 else:
                     baserequestInfo.update({contactinfo['dataformat']:contactinfo['contactinformation']})
 

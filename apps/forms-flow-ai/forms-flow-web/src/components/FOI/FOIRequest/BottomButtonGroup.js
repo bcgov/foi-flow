@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
-import {saveRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
+import {saveRequestDetails, openRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
+import { ConfirmationModal } from '../customComponents';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -34,12 +35,19 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest, saveRequestObject, unSavedRequest }) => {
+const BottomButtonGroup = React.memo(({
+  isValidationError, 
+  urlIndexCreateRequest, 
+  saveRequestObject, 
+  unSavedRequest,
+  handleSaveRequest,
+  handleOpenRequest 
+  }) => {
   /**
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
-    const {requestId} = useParams();  
+    const {requestId, ministryId} = useParams();  
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -61,7 +69,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
             draggable: true,
             progress: undefined,
             });
-            unSavedRequest = false;
+            handleSaveRequest("Intake in progress", false);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
@@ -72,7 +80,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
             draggable: true,
             progress: undefined,
             });
-            unSavedRequest = true;
+            handleSaveRequest("Unopened", true);
         }
       }));      
     }
@@ -84,7 +92,7 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
       }
     }
 
-    React.useEffect(() => { 
+    React.useEffect(() => {
       const handleOnHashChange = (e) => {       
         returnToQueue(e);
       };  
@@ -100,14 +108,42 @@ const BottomButtonGroup = React.memo(({isValidationError, urlIndexCreateRequest,
         
       }
     });
-
+    const [openModal, setOpenModal] = useState(false);
+   
+    const openRequest = () => {
+      setOpenModal(true);     
+    }
+    const handleModal = (value) => {
+      setOpenModal(false);
+      if (value) {        
+        dispatch(openRequestDetails(saveRequestObject, (err, res) => {
+          if(!err) {
+            console.log(res);
+            const parentRequestId = res.id;           
+            res.ministryRequests.sort(function(a, b) {
+              var keyA = a.filenumber,
+                  keyB = b.filenumber;             
+              if (keyA < keyB) return -1;
+              if (keyA > keyB) return 1;
+              return 0;
+            });
+            const firstMinistry = res.ministryRequests[0];
+            handleOpenRequest(parentRequestId, firstMinistry.id, false);
+          }
+          else {
+            handleOpenRequest("","",true);
+          }
+        })); 
+      }
+    }
   return (
     <div className={classes.root}>
+      <ConfirmationModal openModal={openModal} handleModal={handleModal}/>  
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Open Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError} onClick={openRequest}>Open Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>
