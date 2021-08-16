@@ -237,6 +237,8 @@ class requestservice:
                     baserequestInfo.update({'publicServiceEmployeeNumber': personalattribute['attributevalue']})
                 elif  personalattribute['personalattributeid'] == 2 :    
                     baserequestInfo.update({'correctionalServiceNumber': personalattribute['attributevalue']})
+                elif  personalattribute['personalattributeid'] == 3 :    
+                    baserequestInfo.update({'personalHealthNumber': personalattribute['attributevalue']})    
                 elif personalattribute['personalattributeid'] == 4:     
                     baserequestInfo.update({'adoptiveMotherFirstName': personalattribute['attributevalue']})
                 elif personalattribute['personalattributeid'] == 5:     
