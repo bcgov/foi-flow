@@ -203,7 +203,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             }}
                             variant="outlined" 
                             required
-                            error={receivedDateText === undefined}
+                            error={receivedDateText === undefined || receivedDateText === ""}
                             fullWidth
                         />
                         <TextField                
@@ -217,7 +217,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             InputProps={{inputProps: { min: receivedDateText} }}
                             variant="outlined" 
                             required
-                            error={startDateText === undefined}
+                            error={startDateText === undefined || startDateText === ""}
                             fullWidth
                         />
                         <TextField                
