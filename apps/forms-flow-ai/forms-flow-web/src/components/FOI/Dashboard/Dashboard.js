@@ -114,8 +114,9 @@ const search = (rows) => {
  
 
 const renderReviewRequest = (e) => {
-  if (ministryrequestid) {
-    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${ministryrequestid}`));
+  console.log(e.row.ministryRequestId);
+  if (e.row.ministryRequestId) {
+    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryRequestId}`));
   }
   else {
     dispatch(push(`/foi/reviewrequest/${e.row.id}`));
