@@ -29,8 +29,7 @@ class requestservice:
 
     """
 
-    def saverequest(foiRequest,foirequestid = None):
-        fOIRequestsSchema = FOIRequestWrapperSchema().load(foiRequest)
+    def saverequest(fOIRequestsSchema,foirequestid = None):      
         activeVersion = 1 
         foiMinistryRequestArr = []
         contactInformationArr = []
@@ -118,12 +117,13 @@ class requestservice:
                                                             attrbvalue,
                                                             attributeTypes)
                         )
-        # FOI Request         
+        # FOI Request      
         openfOIRequest = FOIRequest()
         openfOIRequest.foirawrequestid = fOIRequestsSchema.get("foirawrequestid") 
         openfOIRequest.version = activeVersion
         openfOIRequest.requesttype = fOIRequestsSchema.get("requestType")
         openfOIRequest.initialdescription = fOIRequestsSchema.get("description")
+        openfOIRequest.receiveddate = fOIRequestsSchema.get("receivedDate")
         openfOIRequest.ministryRequests = foiMinistryRequestArr
         openfOIRequest.contactInformations = contactInformationArr       
         if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"fromDate","main") == True:
@@ -261,6 +261,7 @@ class FOIRequestUtil:
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
         foiministryRequest.description = requestSchema.get("description")
         foiministryRequest.duedate = requestSchema.get("dueDate")
+        foiministryRequest.startdate = requestSchema.get("startDate")
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
         if self.isNotBlankorNone(requestSchema,"toDate","main") == True:
