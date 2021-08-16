@@ -58,12 +58,12 @@ class FOIRequestWrapperSchema(Schema):
     email = fields.Str(data_key="email",allow_none=True)      
     businessName = fields.Str(data_key="businessName",allow_none=True) 
     assignedTo = fields.Str(data_key="assignedTo",allow_none=True)    
-    fromDate = fields.DateTime(data_key="fromDate",allow_none=True)    
-    toDate = fields.DateTime(data_key="toDate",allow_none=True)    
-    dueDate = fields.Date(data_key="dueDate",allow_none=True)    
+    fromDate = fields.Str(data_key="fromDate",allow_none=True)
+    toDate = fields.Str(data_key="toDate",allow_none=True)
+    dueDate = fields.Str(data_key="dueDate",allow_none=True)
     deliveryMode = fields.Str(data_key="deliveryMode",allow_none=True)    
     receivedMode = fields.Str(data_key="receivedMode",allow_none=True)    
-    receivedDate = fields.DateTime(data_key="receivedDateUF",allow_none=True)    
+    receivedDate = fields.Str(data_key="receivedDateUF",allow_none=True)    
     
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True)    
     workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True)  
@@ -75,7 +75,10 @@ class FOIRequestWrapperSchema(Schema):
     province = fields.Str(data_key="province",allow_none=True)    
     postal = fields.Str(data_key="postal",allow_none=True)   
     country = fields.Str(data_key="country",allow_none=True)    
-
+    personalHealthNumber = fields.Str(data_key="personalHealthNumber",allow_none=True)   
+    correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True) 
+    publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True) 
+    identityVerified = fields.Str(data_key="identityVerified",allow_none=True) 
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)

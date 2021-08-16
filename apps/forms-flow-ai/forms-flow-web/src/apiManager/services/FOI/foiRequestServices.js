@@ -195,10 +195,10 @@ export const fetchFOIRequestList = (...rest) => {
   };
 };
 
-export const fetchFOIRequestDetails = (requestId,...rest) => {
+export const fetchFOIRawRequestDetails = (requestId,...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const apiUrlgetRequestDetails = replaceUrl(
-    API.FOI_REQUEST_API,
+    API.FOI_RAW_REQUEST_API,
     "<requestid>",
     requestId
   );
@@ -207,6 +207,40 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
+          dispatch(clearRequestDetails({}));
+          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));        
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+    API.FOI_REQUEST_API,
+    "<requestid>",
+    requestId
+  ),"<ministryid>", ministryId);
+  console.log(apiUrlgetRequestDetails);
+  return (dispatch) => {
+    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          console.log(foiRequest);
+          dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -226,15 +260,35 @@ export const fetchFOIRequestDetails = (requestId,...rest) => {
 };
 
 export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
+  console.log(`data = ${JSON.stringify(data)}`);
   const done = rest.length ? rest[0] : () => {};
   let id = urlIndexCreateRequest > -1? -1: requestId;  
   const apiUrl = replaceUrl(
-    API.FOI_REQUEST_API,
+    API.FOI_RAW_REQUEST_API,
     "<requestid>",
     id
   );
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {                   
+          done(null, res.data);
+        } else {         
+          dispatch(serviceActionError(res));
+          done("Error Posting data");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+export const openRequestDetails = (data, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  return (dispatch) => {
+    httpOpenPOSTRequest(API.FOI_POST_REQUEST_POST, data)
       .then((res) => {
         if (res.data) {                   
           done(null, res.data);

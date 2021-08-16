@@ -5,12 +5,13 @@ import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 
 const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
 
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList);  
+  const rows = useSelector(state=> state.foiRequests.foiRequestsList); 
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
@@ -27,8 +28,18 @@ const Dashboard = React.memo((props) => {
     }`;
   }
 
-  const getAssigneeFullName = (params) => {
-    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo');
+  function getAssigneeFullName(params) {
+    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo') ? params.getValue(params.id, 'assignedTo') : "Unassigned";
+  }
+
+  function getReceivedDate(params) {
+    let receivedDateString = params.getValue(params.id, 'receivedDateUF');
+    receivedDateString = receivedDateString ? new Date(receivedDateString): "";
+    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {        
+      receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
+    }    
+    return formatDate(receivedDateString, 'YYYY MMM, DD');
+    
   }
    const columns = [    
     {
@@ -61,6 +72,7 @@ const Dashboard = React.memo((props) => {
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
       width: 180,    
       headerAlign: 'left',
+      valueGetter: getReceivedDate,
     },    
     { field: 'xgov', headerName: 'XGOV', 
       width: 100,      
@@ -101,8 +113,13 @@ const search = (rows) => {
 }
  
 
-const renderReviewRequest = (e) => {  
-  dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+const renderReviewRequest = (e) => {
+  if (e.row.ministryrequestid) {
+    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`));
+  }
+  else {
+    dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+  }
 }
 const createRequest = (e) => {
   dispatch(push(`/foi/createrequest`));
@@ -133,7 +150,8 @@ const createRequest = (e) => {
             </div>
             <div style={{ height: 450 }} className={classes.root}>
               <DataGrid 
-                className="foi-data-grid" 
+                className="foi-data-grid"
+                getRowId={(row) => row.idNumber}
                 rows={search(rows)} 
                 columns={columns}                
                 rowHeight={30}

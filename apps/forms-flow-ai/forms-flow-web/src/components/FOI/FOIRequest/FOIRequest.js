@@ -12,7 +12,8 @@ import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
-import { 
+import {
+  fetchFOIRawRequestDetails,
   fetchFOIRequestDetails, 
   fetchFOICategoryList, 
   fetchFOIProgramAreaList, 
@@ -22,6 +23,8 @@ import {
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { formatDate } from "../../../helper/FOI/helper";
+import {push} from "connected-react-router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,16 +43,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FOIRequest = React.memo((props) => {
-  const {requestId} = useParams();  
+  const {requestId, ministryId} = useParams();
+  
   const url = window.location.href;
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
-
   useEffect(() => {
-    if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1)
-      dispatch(fetchFOIRequestDetails(requestId));   
+    if (ministryId) {
+      
+      dispatch(fetchFOIRequestDetails(requestId, ministryId));
+    }
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1) {
+      dispatch(fetchFOIRawRequestDetails(requestId));
+    }    
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIAssignedToList());
@@ -76,6 +84,7 @@ const FOIRequest = React.memo((props) => {
     deliveryMode: "",
     receivedDate: "",
     requestStartDate: "",
+    dueDate: "",
   }
 
   const requiredApplicantDetailsValues = {
@@ -99,6 +108,7 @@ const FOIRequest = React.memo((props) => {
   const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
+  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
@@ -173,7 +183,7 @@ const FOIRequest = React.memo((props) => {
   }
   
   //Update required fields of request details box with latest value
-  const handleRequestDetailsValue = (value, name) => {
+  const handleRequestDetailsValue = (value, name, value2) => {    
     const detailsData = {...requiredRequestDetailsValues};
     if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {      
       detailsData.requestType = value;
@@ -185,10 +195,11 @@ const FOIRequest = React.memo((props) => {
       detailsData.deliveryMode = value;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
-      detailsData.receivedDate = value;
+      detailsData.receivedDate = value;      
     }
     else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
       detailsData.requestStartDate = value;
+      detailsData.dueDate = value2;   
     }
     setRequiredRequestDetailsValues(detailsData);
   }
@@ -227,12 +238,12 @@ const FOIRequest = React.memo((props) => {
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
     || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
     || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
-    || requiredRequestDetailsValues.receivedDate === undefined
-    || requiredRequestDetailsValues.requestStartDate === undefined 
+    || (requiredRequestDetailsValues.receivedDate === undefined || requiredRequestDetailsValues.receivedDate === "")
+    || (requiredRequestDetailsValues.requestStartDate === undefined || requiredRequestDetailsValues.requestStartDate === "")
     );
 
   const classes = useStyles();
-  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+ 
 
   const updateAdditionalInfo = (name, value, requestObject) => {
     if (requestObject.additionalPersonalInfo === undefined) {
@@ -252,7 +263,11 @@ const FOIRequest = React.memo((props) => {
            adoptiveMotherFirstName:"",
            adoptiveMotherLastName:"",
            adoptiveFatherLastName:"",
-           adoptiveFatherFirstName:""
+           adoptiveFatherFirstName:"",
+           correctionalServiceNumber:"",
+           publicServiceEmployeeNumber:"",
+           personalHealthNumber:"",
+           identityVerified:"",
         };
     }
     else {
@@ -289,10 +304,25 @@ const FOIRequest = React.memo((props) => {
       else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
         requestObject.additionalPersonalInfo.birthDate = value;
       }
+      else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+        requestObject.additionalPersonalInfo.correctionalServiceNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
+        requestObject.additionalPersonalInfo.publicServiceEmployeeNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
+        requestObject.additionalPersonalInfo.personalHealthNumber = value;
+      }
+      else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
+        requestObject.additionalPersonalInfo.identityVerified = value;
+      }
     }
   }
 
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
+    requestObject.id = requestId;
+    requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
+    requestObject.dueDate = requiredRequestDetailsValues.dueDate;   
     if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       requestObject.assignedTo = value;
       requestObject.assignedToName = value2;      
@@ -345,8 +375,8 @@ const FOIRequest = React.memo((props) => {
     else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
       requestObject.country = value;
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
-      requestObject.receivedDate = value;
+    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {     
+      requestObject.receivedDate = formatDate(value, 'YYYY MMM, DD');
       const receivedDateUTC = new Date(value).toISOString();
       requestObject.receivedDateUF = receivedDateUTC;
     }
@@ -363,18 +393,7 @@ const FOIRequest = React.memo((props) => {
     else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
       requestObject.deliveryMode = value;
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-      requestObject.correctionalServiceNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-      requestObject.publicServiceEmployeeNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
-      requestObject.personalHealthNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
-      requestObject.identityVerified = value;
-    }
+    
     else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {
       requestObject.description = value;
     }
@@ -411,7 +430,14 @@ const FOIRequest = React.memo((props) => {
   const handleSaveRequest = (value, value2) => {
     setHeader(value);
     setUnSavedRequest(value2);
+  }  
+  const handleOpenRequest = (parendId, ministryId, unSaved) => {      
+      setSaveRequestObject(unSaved);
+      if (!unSaved) {
+        dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
+      }
   }
+
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST);
   return (
       <div className="container foi-review-request-container">
@@ -433,7 +459,7 @@ const FOIRequest = React.memo((props) => {
             <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
             <RequestNotes />
             
-            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest}/>
+            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest}/>
           </>
           ): null}
            </form>
