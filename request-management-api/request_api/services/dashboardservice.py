@@ -47,7 +47,8 @@ class dashboardservice:
                                  'assignedTo':  openrequest["assignedTo"],
                                  'xgov': 'No',
                                  'idNumber':  openrequest["idNumber"],
-                                 'version': openrequest["version"]
+                                 'version': openrequest["version"],
+                                 'ministryrequestid':openrequest['ministryrequestid']
                                  }
                     requestqueue.append(_openrequest)
                         
