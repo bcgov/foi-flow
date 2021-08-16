@@ -238,8 +238,8 @@ const FOIRequest = React.memo((props) => {
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
     || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
     || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
-    || requiredRequestDetailsValues.receivedDate === undefined
-    || requiredRequestDetailsValues.requestStartDate === undefined 
+    || (requiredRequestDetailsValues.receivedDate === undefined || requiredRequestDetailsValues.receivedDate === "")
+    || (requiredRequestDetailsValues.requestStartDate === undefined || requiredRequestDetailsValues.requestStartDate === "")
     );
 
   const classes = useStyles();
