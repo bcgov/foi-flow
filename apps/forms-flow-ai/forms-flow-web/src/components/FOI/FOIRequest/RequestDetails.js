@@ -74,9 +74,11 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     //local state management for received date and start date
     let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
-    receivedDate = formatDate(calculateReceivedDate(receivedDate));    
+    receivedDate = formatDate(calculateReceivedDate(receivedDate));
+    const processStartDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
+    console.log(`processStartDate = ${processStartDate}`);
     const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
-    const [startDateText, setStartDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate));
+    const [startDateText, setStartDate] = React.useState(processStartDate);
     
 
     //due date calculation
@@ -115,7 +117,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       const dueDate = dueDateCalculation(e.target.value);
       setDueDate(dueDate);
       //event bubble up - for required feild validation
-      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE);
+      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, dueDate);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, e.target.value, dueDate);
     }  
     const handleRequestTypeChange = (e) => {
