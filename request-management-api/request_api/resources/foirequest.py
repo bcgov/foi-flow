@@ -23,6 +23,8 @@ from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
+from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
+from marshmallow import Schema, fields, validate, ValidationError
 import json
 
 
@@ -62,11 +64,14 @@ class FOIRawRequests(Resource):
             request_json = request.get_json() 
             rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],request_json['assignedTo'],"Open In Progress")               
             if rawresult.success == True:
-                result = requestservice.saverequest(request_json)
+                fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)
+                result = requestservice.saverequest(fOIRequestsSchema)
                 if result.success == True:
                     metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                     requestservice.postEventToWorkflow(rawresult.args[0], json.loads(metadata))
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+        except ValidationError as err:
+                    return {'status': False, 'message':err.messages}, 400
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
@@ -83,12 +88,15 @@ class FOIRawRequestsById(Resource):
     def post(foirequestid):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
-            request_json = request.get_json()                         
-            result = requestservice.saverequest(request_json, foirequestid)
+            request_json = request.get_json()
+            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                        
+            result = requestservice.saverequest(fOIRequestsSchema, foirequestid)
             if result != {}:
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404
+        except ValidationError as err:
+            return {'status': False, 'message':err.messages}, 40
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            

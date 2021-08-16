@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
+import { convertToDate, formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import moment from "moment-business-days";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
@@ -33,10 +33,12 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {
+          console.log(`receivedDate = ${new Date(request.receivedDateUF)}`);
           return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          return !!request.requestProcessStart ? formatDate(request.requestProcessStart) : value ? value : "";
+          const startDate = formatDate(request.requestProcessStart);
+          return !!request.requestProcessStart && startDate > value  ? formatDate(request.requestProcessStart) : value ? value : "";
         }
       }
       else {
@@ -58,6 +60,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     React.useEffect(() => {
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
       receivedDate = calculateReceivedDate(receivedDate);
+      console.log(`receivedDate UE = ${receivedDate}`);
       const startDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
       const dueDate = dueDateCalculation(startDate);
       const requestDetailsObject = {
@@ -70,13 +73,15 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
   },[requestDetails, handleRequestDetailsInitialValue])
 
     //local state management for received date and start date
     let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
     receivedDate = formatDate(calculateReceivedDate(receivedDate));
+    console.log(`receivedDate Out = ${receivedDate}`);
     const processStartDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
-    console.log(`processStartDate = ${processStartDate}`);
+
     const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
     const [startDateText, setStartDate] = React.useState(processStartDate);
     

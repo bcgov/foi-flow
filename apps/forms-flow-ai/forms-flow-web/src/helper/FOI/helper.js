@@ -23,6 +23,9 @@ const businessDay = (date) => {
 	date = formatDate(date);
 	return dayjs(date).isBusinessDay();
 }
+const convertToDate = (date) => {
+	return dayjs(date);
+}
 const getPublicHoliDays = (startDate, endDate) => {
 	let publicHoliDays = 0;
 	let years = [];
@@ -53,7 +56,7 @@ const reconcilePublicHoliDays = (startDate, endDate) => {
 	return endDate;
 }
 const addBusinessDays = (dateText, days) => {
-	let startDate = dayjs(dateText);   
+	let startDate = dayjs(dateText);	
 	let endDate = startDate.businessDaysAdd(days);
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
@@ -78,4 +81,4 @@ const calculateDaysRemaining = (endDate) => {
 	return Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays);
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
+export { replaceUrl, convertToDate, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
