@@ -29,8 +29,7 @@ class requestservice:
 
     """
 
-    def saverequest(foiRequest,foirequestid = None):
-        fOIRequestsSchema = FOIRequestWrapperSchema().load(foiRequest)
+    def saverequest(fOIRequestsSchema,foirequestid = None):      
         activeVersion = 1 
         foiMinistryRequestArr = []
         contactInformationArr = []
@@ -112,19 +111,19 @@ class requestservice:
                     attrbvalue = fOIRequestsSchema.get(attrb["key"])
                 else:                        
                     attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
-            
                 if attrbvalue is not None and attrbvalue and attrbvalue != "":
                     personalAttributeArr.append(
                         fOIRequestUtil.createPersonalAttribute(attrb["name"],
                                                             attrbvalue,
                                                             attributeTypes)
                         )
-        # FOI Request         
+        # FOI Request      
         openfOIRequest = FOIRequest()
         openfOIRequest.foirawrequestid = fOIRequestsSchema.get("foirawrequestid") 
         openfOIRequest.version = activeVersion
         openfOIRequest.requesttype = fOIRequestsSchema.get("requestType")
         openfOIRequest.initialdescription = fOIRequestsSchema.get("description")
+        openfOIRequest.receiveddate = fOIRequestsSchema.get("receivedDate")
         openfOIRequest.ministryRequests = foiMinistryRequestArr
         openfOIRequest.contactInformations = contactInformationArr       
         if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"fromDate","main") == True:
@@ -262,6 +261,7 @@ class FOIRequestUtil:
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
         foiministryRequest.description = requestSchema.get("description")
         foiministryRequest.duedate = requestSchema.get("dueDate")
+        foiministryRequest.startdate = requestSchema.get("startDate")
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
         if self.isNotBlankorNone(requestSchema,"toDate","main") == True:
@@ -359,9 +359,9 @@ class FOIRequestUtil:
             {"name": "Street Address", "key" : "country"}]
         
     def personalAttributeMapping(self):
-        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"main"},
-            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"main"},
-            {"name": "BC Personal Health Care Number", "key" : "personalHealthNumber", "location":"main"},
+        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"additionalPersonalInfo"},
+            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"additionalPersonalInfo"},
+            {"name": "BC Personal Health Care Number", "key" : "personalHealthNumber", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother First Name", "key" : "adoptiveMotherFirstName", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother Last Name", "key" : "adoptiveMotherLastName", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Father First Name", "key" : "adoptiveFatherFirstName", "location":"additionalPersonalInfo"},
