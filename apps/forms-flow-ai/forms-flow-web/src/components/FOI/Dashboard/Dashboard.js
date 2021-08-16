@@ -34,10 +34,12 @@ const Dashboard = React.memo((props) => {
 
   function getReceivedDate(params) {
     let receivedDateString = params.getValue(params.id, 'receivedDateUF');
-    receivedDateString = receivedDateString ? new Date(receivedDateString): "";
+    console.log(`receivedDateStringD1 = ${receivedDateString}, lastName = ${params.getValue(params.id, 'lastName')}`);
+    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
     if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {        
       receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
-    }    
+    }
+    console.log(`receivedDateStringD2 = ${formatDate(receivedDateString, 'YYYY MMM, DD')}`);
     return formatDate(receivedDateString, 'YYYY MMM, DD');
     
   }

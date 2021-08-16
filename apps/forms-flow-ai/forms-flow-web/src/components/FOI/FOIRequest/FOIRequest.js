@@ -322,8 +322,15 @@ const FOIRequest = React.memo((props) => {
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
     requestObject.id = requestId;
     requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
-    requestObject.dueDate = requiredRequestDetailsValues.dueDate;   
-    if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
+    requestObject.dueDate = requiredRequestDetailsValues.dueDate;
+
+    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {     
+      requestObject.receivedDate = value.receivedDate;     
+      requestObject.receivedDateUF = new Date(value.receivedDate).toISOString();
+      requestObject.requestProcessStart = value.requestStartDate;
+      requestObject.dueDate = value.dueDate;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       requestObject.assignedTo = value;
       requestObject.assignedToName = value2;      
     }
@@ -419,8 +426,13 @@ const FOIRequest = React.memo((props) => {
 
   const createSaveRequestObject = (name, value, value2) => 
   {
-    setUnSavedRequest(true);
     const requestObject = {...saveRequestObject};      
+    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
+      setUnSavedRequest(false);      
+    }
+    else {
+      setUnSavedRequest(true);
+    }
     updateAdditionalInfo(name, value, requestObject);
     createRequestDetailsObject(requestObject, name, value, value2); 
     setSaveRequestObject(requestObject);    
