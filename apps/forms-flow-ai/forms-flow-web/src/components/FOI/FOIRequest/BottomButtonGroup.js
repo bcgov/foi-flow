@@ -119,7 +119,15 @@ const BottomButtonGroup = React.memo(({
       if (value) {
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
-            console.log(res);
+            toast.success('The request has been opened successfully.', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              });
             const parentRequestId = res.id;           
             res.ministryRequests.sort(function(a, b) {
               var keyA = a.filenumber,
@@ -132,6 +140,15 @@ const BottomButtonGroup = React.memo(({
             handleOpenRequest(parentRequestId, firstMinistry.id, false);
           }
           else {
+            toast.error('Temporarily unable to open your request. Please try again in a few minutes.', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              });
             handleOpenRequest("","",true);
           }
         })); 
