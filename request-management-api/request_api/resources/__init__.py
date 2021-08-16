@@ -33,7 +33,7 @@ from .ops import API as OPS_API
 from .request import API as REQUEST_API
 from .foirequest import API as FOIREQUEST_API
 from .foiflowmasterdata import API as FOIFLOWMASTERDATA_API
-
+from .dashboard import API as DASHBOARD_API
 
 __all__ = ('API_BLUEPRINT')
 
@@ -62,3 +62,4 @@ API.add_namespace(OPS_API ,path="/api")
 API.add_namespace(REQUEST_API ,path="/api")
 API.add_namespace(FOIREQUEST_API ,path="/api")
 API.add_namespace(FOIFLOWMASTERDATA_API ,path="/api")
+API.add_namespace(DASHBOARD_API,'/api')
