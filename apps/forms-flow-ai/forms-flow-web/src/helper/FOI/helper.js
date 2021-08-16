@@ -19,6 +19,10 @@ const formatDate = (d, format='YYYY-MM-DD') => {
 	}
   }
 }
+const businessDay = (date) => {
+	date = formatDate(date);
+	return dayjs(date).isBusinessDay();
+}
 const getPublicHoliDays = (startDate, endDate) => {
 	let publicHoliDays = 0;
 	let years = [];
@@ -74,4 +78,4 @@ const calculateDaysRemaining = (endDate) => {
 	return Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays);
 }
 
-export { replaceUrl, formatDate, addBusinessDays, calculateDaysRemaining };
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };

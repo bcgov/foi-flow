@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate, addBusinessDays } from "../../../helper/FOI/helper";
+import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import moment from "moment-business-days";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
@@ -49,9 +49,9 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
     const calculateReceivedDate = (receivedDateString) => {
-      if (receivedDateString !== "" && (receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30))) {
+      if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {        
         receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
-      }
+      }     
       return receivedDateString;
     }
     //updates the default values from the request details    

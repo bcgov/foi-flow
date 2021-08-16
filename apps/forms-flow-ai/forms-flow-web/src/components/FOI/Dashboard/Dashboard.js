@@ -5,6 +5,7 @@ import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 
 const Dashboard = React.memo((props) => {
 
@@ -27,8 +28,18 @@ const Dashboard = React.memo((props) => {
     }`;
   }
 
-  const getAssigneeFullName = (params) => {
+  function getAssigneeFullName(params) {
     return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo');
+  }
+
+  function getReceivedDate(params) {
+    let receivedDateString = params.getValue(params.id, 'receivedDateUF');
+    receivedDateString = receivedDateString ? new Date(receivedDateString): "";
+    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {        
+      receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
+    }    
+    return formatDate(receivedDateString, 'YYYY MMM, DD');
+    
   }
    const columns = [    
     {
@@ -61,6 +72,7 @@ const Dashboard = React.memo((props) => {
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
       width: 180,    
       headerAlign: 'left',
+      valueGetter: getReceivedDate,
     },    
     { field: 'xgov', headerName: 'XGOV', 
       width: 100,      
