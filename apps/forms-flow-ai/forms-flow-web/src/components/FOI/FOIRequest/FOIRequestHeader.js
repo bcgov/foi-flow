@@ -9,7 +9,7 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 
-const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
    
      /**
      *  Header of Review request in the UI
@@ -92,4 +92,4 @@ const ReviewRequestHeader = React.memo(({headerValue, requestDetails, handleAssi
     );
   });
 
-export default ReviewRequestHeader;
+export default FOIRequestHeader;
