@@ -37,8 +37,9 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          const startDate = formatDate(request.requestProcessStart);
-          return !!request.requestProcessStart && startDate > value  ? formatDate(request.requestProcessStart) : value ? value : "";
+          const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";
+          console.log(`startDate = ${startDate}`);
+          return startDate && startDate > value  ? startDate : value ? value : "";
         }
       }
       else {
