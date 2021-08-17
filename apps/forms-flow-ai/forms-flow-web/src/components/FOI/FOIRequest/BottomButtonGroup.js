@@ -159,9 +159,9 @@ const BottomButtonGroup = React.memo(({
       <ConfirmationModal openModal={openModal} handleModal={handleModal}/>  
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError} onClick={openRequest}>Open Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Split Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError}>Redirect in Full</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError || urlIndexCreateRequest > -1 || ministryId} onClick={openRequest}>Open Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError || urlIndexCreateRequest > -1 || ministryId}>Split Request</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError || urlIndexCreateRequest > -1 || ministryId}>Redirect in Full</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>
