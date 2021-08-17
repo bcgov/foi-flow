@@ -326,7 +326,7 @@ const FOIRequest = React.memo((props) => {
 
     if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {     
       requestObject.receivedDate = value.receivedDate;     
-      requestObject.receivedDateUF = new Date(value.receivedDate).toISOString();
+      requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
     }
