@@ -1,5 +1,6 @@
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from dateutil import parser
 
 class dashboardservice:
 
@@ -11,24 +12,26 @@ class dashboardservice:
             
             for request in requests:
 
-                firstName , lastName, requestType = '','',''            
+                firstName , lastName, requestType = '','',''
+                _receivedDate = request.created_at            
                 if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
                     firstName = request.requestrawdata['firstName']
                     lastName =  request.requestrawdata['lastName']
                     requestType =  request.requestrawdata['requestType']
+                    _receivedDate = parser.parse(request.requestrawdata['receivedDateUF'])
                 elif (request.sourceofsubmission!= "intake" and request.version == 1):               
                     firstName = request.requestrawdata['contactInfo']['firstName']
                     lastName = request.requestrawdata['contactInfo']['lastName']
                     requestType = request.requestrawdata['requestType']['requestType']    
 
-                _createdDate = request.created_at
+                
                 unopenrequest = {'id': request.requestid,
                                  'firstName': firstName,
                                  'lastName': lastName,
                                  'requestType': requestType,
                                  'currentState': request.status,
-                                 'receivedDate': _createdDate.strftime('%Y %b, %d'),
-                                 'receivedDateUF': str(_createdDate),
+                                 'receivedDate': _receivedDate.strftime('%Y %b, %d'),
+                                 'receivedDateUF': str(_receivedDate),
                                  'assignedTo': request.assignedto,
                                  'xgov': 'No',
                                  'idNumber': 'U-00' + str(request.requestid),
