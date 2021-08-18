@@ -2,6 +2,11 @@ import dayjs from 'dayjs';
 import DateHolidayjs from 'date-holidays';
 import dayjsBusinessDays from 'dayjs-business-days';
 var isBetween = require('dayjs/plugin/isBetween')
+var utc = require("dayjs/plugin/utc")
+var timezone = require("dayjs/plugin/timezone")
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
 const hd = new DateHolidayjs('CA','BC');
@@ -12,19 +17,16 @@ const replaceUrl = (URL, key, value) => {
 const formatDate = (d, format='YYYY-MM-DD') => {
   if(d !== "") {
 	if (format === 'YYYY MMM, DD') {
-		return dayjs(d).format( 'YYYY MMM, DD');
+		return dayjs(d).tz('America/Vancouver').format( 'YYYY MMM, DD');
 	}
 	else {
-		return dayjs(d).format( 'YYYY-MM-DD');
+		return dayjs(d).tz('America/Vancouver').format( 'YYYY-MM-DD');
 	}
   }
 }
 const businessDay = (date) => {
 	date = formatDate(date);
-	return dayjs(date).isBusinessDay();
-}
-const convertToDate = (date) => {
-	return dayjs(date);
+	return dayjs(date).tz('America/Vancouver').isBusinessDay();
 }
 const getPublicHoliDays = (startDate, endDate) => {
 	let publicHoliDays = 0;
@@ -81,4 +83,4 @@ const calculateDaysRemaining = (endDate) => {
 	return Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays);
 }
 
-export { replaceUrl, convertToDate, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
