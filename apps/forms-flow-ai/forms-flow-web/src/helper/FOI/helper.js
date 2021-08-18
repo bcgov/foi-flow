@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import DateHolidayjs from 'date-holidays';
 import dayjsBusinessDays from 'dayjs-business-days';
+import { parseISO } from 'date-fns';
+import { format, utcToZonedTime } from 'date-fns-tz';
 var isBetween = require('dayjs/plugin/isBetween')
 var utc = require("dayjs/plugin/utc")
 var timezone = require("dayjs/plugin/timezone")
@@ -14,7 +16,15 @@ const hd = new DateHolidayjs('CA','BC');
 const replaceUrl = (URL, key, value) => {
   return URL.replace(key, value);
 };
-const formatDate = (d, format='YYYY-MM-DD') => {
+const formatInTimeZone = (date, fmt, tz) =>
+	format(utcToZonedTime(date, tz), 
+			fmt, 
+			{ timeZone: tz });
+
+const formatDate = (d, formatString = 'yyyy-MM-dd') => {	
+	return formatInTimeZone(d, formatString, 'UTC');
+}
+const formatDateBackup = (d, format='YYYY-MM-DD') => {
   if(d !== "") {
 	if (format === 'YYYY MMM, DD') {
 		return dayjs(d).tz('America/Vancouver').format( 'YYYY MMM, DD');

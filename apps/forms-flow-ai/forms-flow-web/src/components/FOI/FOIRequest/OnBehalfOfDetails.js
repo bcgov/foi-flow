@@ -28,7 +28,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
             return !!request.anotherAlsoKnownAs ? request.anotherAlsoKnownAs : "";
           }
           else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_DOB) {
-            return !!request.anotherBirthDate ? new Date(request.anotherBirthDate) : "";
+            return !!request.anotherBirthDate ? formatDate(request.anotherBirthDate) : "";
           }
         }
         else {
@@ -42,7 +42,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
     const [anotherLastNameText, setAnotherLastName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME));
     const [anotherNickNameText, setAnotherNickName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME));
     const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_DOB);
-    const [anotherDOBText, setAnotherDOB] = React.useState(formatDate(dob));
+    const [anotherDOBText, setAnotherDOB] = React.useState(dob);
     
     const handleFirtNameChange = (e) => {
         setAnotherFirstName(e.target.value);
