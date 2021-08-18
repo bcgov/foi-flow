@@ -97,7 +97,7 @@ class rawrequestservice:
                                # request['created_at']
                                'currentState': 'Unopened',
                                'receivedDate': _createdDate.strftime('%Y %b, %d'),
-                               'receivedDateUF': request['created_at'],
+                               'receivedDateUF': _createdDate.strftime('%Y-%m-%d %H:%M:%S.%f'),
                                'assignedTo': "Unassigned",
                                'xgov': 'No',
                                'idNumber': 'U-00' + str(request['requestid']),

@@ -9,16 +9,14 @@ with open('tests/samplerequestjson/foirequest-general.json') as f:
   generalrequestjson = json.load(f)
 def test_post_foirequest_general(app, client):    
     response = client.post('/api/foirequests',data=json.dumps(generalrequestjson), content_type='application/json') 
-    jsondata = json.loads(response.data)
-    print(str(jsondata["id"]))
+    jsondata = json.loads(response.data)    
     assert response.status_code == 200
 
 with open('tests/samplerequestjson/foirequest-personal.json') as f:
   personalrequestjson = json.load(f)
 def test_post_foirequest_personal(app, client):    
     response = client.post('/api/foirequests',data=json.dumps(personalrequestjson), content_type='application/json') 
-    jsondata = json.loads(response.data)
-    print(str(jsondata["id"]))
+    jsondata = json.loads(response.data)    
     assert response.status_code == 200
 
 
