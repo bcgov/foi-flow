@@ -48,6 +48,7 @@ const FOIRequest = React.memo((props) => {
   const url = window.location.href;
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
+  console.log(`requestDetails = ${JSON.stringify(requestDetails)}`);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -383,7 +384,7 @@ const FOIRequest = React.memo((props) => {
       requestObject.country = value;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {     
-      requestObject.receivedDate = formatDate(value, 'YYYY MMM, DD');
+      requestObject.receivedDate = formatDate(value, 'yyyy MMM, dd');
       const receivedDateUTC = new Date(value).toISOString();
       requestObject.receivedDateUF = receivedDateUTC;
     }
