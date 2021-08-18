@@ -55,7 +55,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       console.log(`receivedDateString = ${receivedDateString}, receivedDateString subString = ${receivedDateString.substring(0,10)}`);
     const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
     receivedDateString = receivedDateString ? new Date(receivedDateString): "";
-    console.log(`new Date(receivedDateString) = ${receivedDateString}, format = ${formatDate(receivedDateString)}`);
+    console.log(`new Date(receivedDateString) = ${receivedDateString}`);
     if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {      
       if (dateString !== formatDate(receivedDateString)) {
         console.log(`inside = ${receivedDateString}, format = ${formatDate(receivedDateString)}`)
@@ -75,7 +75,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
         receivedDate: !!receivedDate ? formatDate(receivedDate, 'yyyy MM, dd'): "",
-        requestStartDate: formatDate(startDate),
+        requestStartDate: startDate ? formatDate(startDate): "",
         dueDate: dueDate,
       }
       //event bubble up - sets the initial value to validate the required fields      
@@ -85,11 +85,13 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     //local state management for received date and start date
     let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
-    receivedDate = calculateReceivedDate(receivedDate);   
-    const processStartDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
+    receivedDate = calculateReceivedDate(receivedDate);
+    receivedDate = receivedDate ? formatDate(receivedDate): "";
+    let processStartDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
+    processStartDate = processStartDate ? formatDate(processStartDate): "";
 
-    const [receivedDateText, setReceivedDate] = React.useState(formatDate(receivedDate));
-    const [startDateText, setStartDate] = React.useState(formatDate(processStartDate));
+    const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
+    const [startDateText, setStartDate] = React.useState(processStartDate);
     
 
     //due date calculation
