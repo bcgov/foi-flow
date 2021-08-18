@@ -34,13 +34,17 @@ const Dashboard = React.memo((props) => {
 
   function getReceivedDate(params) {
     let receivedDateString = params.getValue(params.id, 'receivedDateUF');
-    console.log(`receivedDateStringD1 = ${receivedDateString}, lastName = ${params.getValue(params.id, 'lastName')}`);
-    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
-    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {        
-      receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
-    }
-    console.log(`receivedDateStringD2 = ${formatDate(receivedDateString, 'YYYY MMM, DD')}`);
-    return formatDate(receivedDateString, 'YYYY MMM, DD');
+    console.log(`receivedDateString = ${receivedDateString}, receivedDate subString = ${receivedDateString.substring(0,10)}, lastName = ${params.getValue(params.id, 'lastName')}`);
+    const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
+    receivedDateString = receivedDateString ? new Date(receivedDateString): "";
+    console.log(`new Date(receivedDateString) = ${receivedDateString}, format = ${formatDate(receivedDateString)}, lastName = ${params.getValue(params.id, 'lastName')}`);
+    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {      
+      if (dateString !== formatDate(receivedDateString)) {
+        console.log(`inside = ${receivedDateString}, format = ${formatDate(receivedDateString)}, lastName = ${params.getValue(params.id, 'lastName')}`)
+        receivedDateString = addBusinessDays(dateString, 1);
+      }
+    }    
+    return formatDate(receivedDateString, 'yyyy MMM, dd');
     
   }
    const columns = [    

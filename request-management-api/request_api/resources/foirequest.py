@@ -52,14 +52,14 @@ class FOIRequest(Resource):
                        
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirequests')
-class FOIRawRequests(Resource):
-    """Resource for managing FOI Raw requests."""
+class FOIRequests(Resource):
+    """Resource for managing FOI requests."""
 
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
     def post():
-        """ POST Method for capturing RAW FOI requests before processing"""
+        """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json() 
             rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],request_json['assignedTo'],"Open In Progress")               
@@ -79,14 +79,14 @@ class FOIRawRequests(Resource):
         
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirequests/<int:foirequestid>')
-class FOIRawRequestsById(Resource):
-    """Resource for managing FOI Raw requests."""
+class FOIRequestsById(Resource):
+    """Resource for managing FOI requests."""
 
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
     def post(foirequestid):
-        """ POST Method for capturing RAW FOI requests before processing"""
+        """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
             fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                        
