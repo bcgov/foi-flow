@@ -1,4 +1,4 @@
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, validate
 
 """
 This class  consolidates schemas of bpm operations.
@@ -38,6 +38,11 @@ class FOIAdditionallPersonalInfoWrapperSchema(Schema):
     adoptiveFatherFirstName = fields.Str(data_key="adoptiveFatherFirstName",allow_none=True)
     adoptiveFatherLastName = fields.Str(data_key="adoptiveFatherLastName",allow_none=True)
     
+    personalHealthNumber = fields.Str(data_key="personalHealthNumber",allow_none=True)   
+    correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True) 
+    publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True) 
+    identityVerified = fields.Str(data_key="identityVerified",allow_none=True) 
+    
     birthDate = fields.Str(data_key="birthDate",allow_none=True)
     alsoKnownAs = fields.Str(data_key="alsoKnownAs",allow_none=True)
     
@@ -49,21 +54,22 @@ class FOIRequestWrapperSchema(Schema):
 
         unknown = EXCLUDE
     foirawrequestid = fields.Int(data_key="id")
-    description = fields.Str(data_key="description")
-    category = fields.Str(data_key="category")
-    requestType = fields.Str(data_key="requestType") 
-    firstName = fields.Str(data_key="firstName",allow_none=True)    
+    description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
+    category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
+    requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')]) 
+    firstName = fields.Str(data_key="firstName", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])    
     middleName = fields.Str(data_key="middleName",allow_none=True)    
-    lastName = fields.Str(data_key="lastName",allow_none=True)     
+    lastName = fields.Str(data_key="lastName", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])         
     email = fields.Str(data_key="email",allow_none=True)      
     businessName = fields.Str(data_key="businessName",allow_none=True) 
-    assignedTo = fields.Str(data_key="assignedTo",allow_none=True)    
+    assignedTo = fields.Str(data_key="assignedTo", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])    
     fromDate = fields.Str(data_key="fromDate",allow_none=True)
     toDate = fields.Str(data_key="toDate",allow_none=True)
-    dueDate = fields.Str(data_key="dueDate",allow_none=True)
-    deliveryMode = fields.Str(data_key="deliveryMode",allow_none=True)    
-    receivedMode = fields.Str(data_key="receivedMode",allow_none=True)    
-    receivedDate = fields.Str(data_key="receivedDateUF",allow_none=True)    
+    dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
+    deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
+    receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
+    receivedDate = fields.Str(data_key="receivedDateUF", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
+    startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])        
     
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True)    
     workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True)  
@@ -74,12 +80,8 @@ class FOIRequestWrapperSchema(Schema):
     city = fields.Str(data_key="city",allow_none=True)    
     province = fields.Str(data_key="province",allow_none=True)    
     postal = fields.Str(data_key="postal",allow_none=True)   
-    country = fields.Str(data_key="country",allow_none=True)    
-    personalHealthNumber = fields.Str(data_key="personalHealthNumber",allow_none=True)   
-    correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True) 
-    publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True) 
-    identityVerified = fields.Str(data_key="identityVerified",allow_none=True) 
-    
+    country = fields.Str(data_key="country",allow_none=True) 
+  
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)
 

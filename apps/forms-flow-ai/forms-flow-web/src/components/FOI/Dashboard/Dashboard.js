@@ -33,12 +33,15 @@ const Dashboard = React.memo((props) => {
   }
 
   function getReceivedDate(params) {
-    let receivedDateString = params.getValue(params.id, 'receivedDateUF');
-    receivedDateString = receivedDateString ? new Date(receivedDateString): "";
-    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {        
-      receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
+    let receivedDateString = params.getValue(params.id, 'receivedDateUF');    
+    const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
+    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
+    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {      
+      if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
+        receivedDateString = addBusinessDays(dateString, 1);
+      }
     }    
-    return formatDate(receivedDateString, 'YYYY MMM, DD');
+    return formatDate(receivedDateString, 'yyyy MMM, dd');
     
   }
    const columns = [    

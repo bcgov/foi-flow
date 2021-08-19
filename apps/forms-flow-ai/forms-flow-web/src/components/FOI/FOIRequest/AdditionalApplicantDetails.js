@@ -28,7 +28,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
           return !!request.publicServiceEmployeeNumber ? request.publicServiceEmployeeNumber : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
-          return !!request.birthDate ? new Date(request.birthDate) : "";
+          return !!request.birthDate ? formatDate(request.birthDate) : "";
         }
       }
       else {
@@ -41,7 +41,7 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
     const [correctionsNumberText, setCorrectionsNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER));
     const [employeeNumberText, setEmployeeNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER));
     const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.DOB);   
-    const [birthDateText, setDOB] = React.useState(formatDate(dob));
+    const [birthDateText, setDOB] = React.useState(dob);
 
   const handlePersonalHealthNumber = (e) => {
     setPersonalHealthNumber(e.target.value);

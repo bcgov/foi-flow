@@ -32,11 +32,12 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
           return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
         }
-        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {
-          return !!request.receivedDateUF ? new Date(request.receivedDateUF) : "";
+        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {          
+          return !!request.receivedDateUF ? request.receivedDateUF : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          return !!request.requestProcessStart ? formatDate(request.requestProcessStart) : value ? value : "";
+          const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";         
+          return startDate && startDate >= formatDate(value)  ? startDate : value ? value : "";
         }
       }
       else {
@@ -48,10 +49,14 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
-    const calculateReceivedDate = (receivedDateString) => {
-      if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {        
-        receivedDateString = addBusinessDays(formatDate(receivedDateString), 1);
-      }     
+    const calculateReceivedDate = (receivedDateString) => {      
+    const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
+    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
+    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {      
+      if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
+        receivedDateString = addBusinessDays(dateString, 1);        
+      }
+    }
       return receivedDateString;
     }
     //updates the default values from the request details    
@@ -64,19 +69,22 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
         requestType: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
-        receivedDate: !!receivedDate ? receivedDate: "",
-        requestStartDate: startDate,
+        receivedDate: !!receivedDate ? formatDate(receivedDate, 'yyyy MM, dd'): "",
+        requestStartDate: startDate ? formatDate(startDate): "",
         dueDate: dueDate,
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
   },[requestDetails, handleRequestDetailsInitialValue])
 
     //local state management for received date and start date
     let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
-    receivedDate = formatDate(calculateReceivedDate(receivedDate));
-    const processStartDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
-    console.log(`processStartDate = ${processStartDate}`);
+    receivedDate = calculateReceivedDate(receivedDate);
+    receivedDate = receivedDate ? formatDate(receivedDate): "";
+    let processStartDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
+    processStartDate = processStartDate ? formatDate(processStartDate): "";
+
     const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
     const [startDateText, setStartDate] = React.useState(processStartDate);
     

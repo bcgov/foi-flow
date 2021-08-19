@@ -47,7 +47,7 @@ const FOIRequest = React.memo((props) => {
   
   const url = window.location.href;
   //gets the request detail from the store
-  let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
+  let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);  
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -322,8 +322,15 @@ const FOIRequest = React.memo((props) => {
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
     requestObject.id = requestId;
     requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
-    requestObject.dueDate = requiredRequestDetailsValues.dueDate;   
-    if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
+    requestObject.dueDate = requiredRequestDetailsValues.dueDate;
+
+    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {     
+      requestObject.receivedDate = value.receivedDate;     
+      requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";
+      requestObject.requestProcessStart = value.requestStartDate;
+      requestObject.dueDate = value.dueDate;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       requestObject.assignedTo = value;
       requestObject.assignedToName = value2;      
     }
@@ -376,7 +383,7 @@ const FOIRequest = React.memo((props) => {
       requestObject.country = value;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {     
-      requestObject.receivedDate = formatDate(value, 'YYYY MMM, DD');
+      requestObject.receivedDate = formatDate(value, 'yyyy MMM, dd');
       const receivedDateUTC = new Date(value).toISOString();
       requestObject.receivedDateUF = receivedDateUTC;
     }
@@ -419,8 +426,13 @@ const FOIRequest = React.memo((props) => {
 
   const createSaveRequestObject = (name, value, value2) => 
   {
-    setUnSavedRequest(true);
     const requestObject = {...saveRequestObject};      
+    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
+      setUnSavedRequest(false);      
+    }
+    else {
+      setUnSavedRequest(true);
+    }
     updateAdditionalInfo(name, value, requestObject);
     createRequestDetailsObject(requestObject, name, value, value2); 
     setSaveRequestObject(requestObject);    

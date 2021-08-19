@@ -1,7 +1,14 @@
 import dayjs from 'dayjs';
 import DateHolidayjs from 'date-holidays';
 import dayjsBusinessDays from 'dayjs-business-days';
+import { parseISO } from 'date-fns';
+import { format, utcToZonedTime } from 'date-fns-tz';
 var isBetween = require('dayjs/plugin/isBetween')
+var utc = require("dayjs/plugin/utc")
+var timezone = require("dayjs/plugin/timezone")
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
 const hd = new DateHolidayjs('CA','BC');
@@ -9,18 +16,25 @@ const hd = new DateHolidayjs('CA','BC');
 const replaceUrl = (URL, key, value) => {
   return URL.replace(key, value);
 };
-const formatDate = (d, format='YYYY-MM-DD') => {
+const formatInTimeZone = (date, fmt, tz) =>
+	format(utcToZonedTime(date, tz), 
+			fmt, 
+			{ timeZone: tz });
+
+const formatDate = (d, formatString = 'yyyy-MM-dd') => {	
+	return formatInTimeZone(d, formatString, 'UTC');
+}
+const formatDateBackup = (d, format='YYYY-MM-DD') => {
   if(d !== "") {
 	if (format === 'YYYY MMM, DD') {
-		return dayjs(d).format( 'YYYY MMM, DD');
+		return dayjs(d).tz('America/Vancouver').format( 'YYYY MMM, DD');
 	}
 	else {
-		return dayjs(d).format( 'YYYY-MM-DD');
+		return dayjs(d).tz('America/Vancouver').format( 'YYYY-MM-DD');
 	}
   }
 }
-const businessDay = (date) => {
-	date = formatDate(date);
+const businessDay = (date) => {	
 	return dayjs(date).isBusinessDay();
 }
 const getPublicHoliDays = (startDate, endDate) => {
@@ -53,7 +67,7 @@ const reconcilePublicHoliDays = (startDate, endDate) => {
 	return endDate;
 }
 const addBusinessDays = (dateText, days) => {
-	let startDate = dayjs(dateText);   
+	let startDate = dayjs(dateText);	
 	let endDate = startDate.businessDaysAdd(days);
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
@@ -75,7 +89,7 @@ const calculateDaysRemaining = (endDate) => {
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);
 	const noOfDays = daysBetween(startDate, endDate);   
-	return Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays);
+	return (Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays)) + 1;
 }
 
 export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
