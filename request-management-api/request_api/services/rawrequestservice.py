@@ -85,7 +85,10 @@ class rawrequestservice:
             contactInfo = requestrawdata.get('contactInfo')
             decriptionTimeframe = requestrawdata.get('descriptionTimeframe')
             contactInfoOptions = requestrawdata.get('contactInfoOptions')
+
             _createdDate = parse(request['created_at'])
+            _fromdate = parse(decriptionTimeframe['fromDate'])
+            _todate = parse(decriptionTimeframe['toDate'])
 
             baserequestInfo = {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
@@ -110,8 +113,8 @@ class rawrequestservice:
                                'province': contactInfoOptions['province'],
                                'country': contactInfoOptions['country'],
                                'description': decriptionTimeframe['description'],
-                               'fromDate': decriptionTimeframe['fromDate'],
-                               'toDate': decriptionTimeframe['toDate'],
+                               'fromDate': _fromdate.strftime('%Y-%m-%d'),
+                               'toDate': _todate.strftime('%Y-%m-%d'),
                                'correctionalServiceNumber': decriptionTimeframe['correctionalServiceNumber'],
                                'publicServiceEmployeeNumber': decriptionTimeframe['publicServiceEmployeeNumber'],
                                'topic': decriptionTimeframe['topic'],

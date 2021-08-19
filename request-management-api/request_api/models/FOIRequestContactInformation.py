@@ -21,7 +21,7 @@ class FOIRequestContactInformation(db.Model):
     dataformat = db.Column(db.String(40), unique=False, nullable=True)
     
                 
-    created_at = db.Column(db.DateTime, default=datetime.now().isoformat())
+    created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
