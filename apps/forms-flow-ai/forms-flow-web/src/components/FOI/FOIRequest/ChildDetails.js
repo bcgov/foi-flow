@@ -29,7 +29,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
             return !!request.childAlsoKnownAs ? request.childAlsoKnownAs : "";
           }
           else if (name === FOI_COMPONENT_CONSTANTS.CHILD_DOB) {
-            return !!request.childBirthDate ? new Date(request.childBirthDate) : "";
+            return !!request.childBirthDate ? formatDate(request.childBirthDate) : "";
           }
         }
         else {
@@ -43,7 +43,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
     const [childLastNameText, setChildLastName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME));
     const [childNickNameText, setNickName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME));
     const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_DOB);
-    const [childDOBText, setDOB] = React.useState(formatDate(dob));
+    const [childDOBText, setDOB] = React.useState(dob);
  
     const handleFirtNameChange = (e) => {
         setChildFirstName(e.target.value);
