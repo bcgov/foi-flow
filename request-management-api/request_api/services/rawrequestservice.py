@@ -133,7 +133,7 @@ class rawrequestservice:
                 additionalpersonalInfo = {
                     'alsoKnownAs': contactInfo['alsoKnownAs'],
                     'requestFor': requestrawdata['selectAbout'],
-                    'birthDate': contactInfo['birthDate'],
+                    'birthDate': parse(contactInfo['birthDate']).strftime('%Y-%m-%d') if contactInfo['birthDate'] is not None else '',
 
                     'childFirstName': childInformation['firstName'] if haschildInfo else '',
                     'childMiddleName': childInformation['middleName'] if haschildInfo else '',
