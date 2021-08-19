@@ -34,9 +34,8 @@ const formatDateBackup = (d, format='YYYY-MM-DD') => {
 	}
   }
 }
-const businessDay = (date) => {
-	date = formatDate(date);
-	return dayjs(date).tz('America/Vancouver').isBusinessDay();
+const businessDay = (date) => {	
+	return dayjs(date).isBusinessDay();
 }
 const getPublicHoliDays = (startDate, endDate) => {
 	let publicHoliDays = 0;
@@ -90,7 +89,7 @@ const calculateDaysRemaining = (endDate) => {
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);
 	const noOfDays = daysBetween(startDate, endDate);   
-	return Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays);
+	return (Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays)) + 1;
 }
 
 export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
