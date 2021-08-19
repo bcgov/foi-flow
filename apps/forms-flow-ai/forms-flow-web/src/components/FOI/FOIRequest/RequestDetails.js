@@ -32,13 +32,11 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
           return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
         }
-        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {
-          console.log(`receivedDate = ${request.receivedDateUF}`);
+        else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {          
           return !!request.receivedDateUF ? request.receivedDateUF : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          let startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";          
-          console.log(`startDate = ${startDate}, PStartDate = ${request.requestProcessStart}, value = ${value}`);
+          const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";         
           return startDate && startDate >= formatDate(value)  ? startDate : value ? value : "";
         }
       }
@@ -51,15 +49,12 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
-    const calculateReceivedDate = (receivedDateString) => {
-      console.log(`receivedDateString = ${receivedDateString}, receivedDateString subString = ${receivedDateString.substring(0,10)}`);
+    const calculateReceivedDate = (receivedDateString) => {      
     const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
-    receivedDateString = receivedDateString ? new Date(receivedDateString): "";
-    console.log(`new Date(receivedDateString) = ${receivedDateString}`);
-    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(receivedDateString))) {      
-      if (dateString !== formatDate(receivedDateString)) {
-        console.log(`inside = ${receivedDateString}, format = ${formatDate(receivedDateString)}`)
-        receivedDateString = addBusinessDays(dateString, 1);
+    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
+    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {      
+      if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
+        receivedDateString = addBusinessDays(dateString, 1);        
       }
     }
       return receivedDateString;
