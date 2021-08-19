@@ -7,7 +7,7 @@ import { formatDate } from "../../../helper/FOI/helper";
 
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
+const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject}) => {
     /**
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
@@ -16,10 +16,10 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
     const validateFields = (request, name) => {
       if (request !== undefined) {
         if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
-          return !!request.personalHealthNumber ? request.personalHealthNumber : "";
+          return !!request.additionalPersonalInfo.personalHealthNumber ? request.additionalPersonalInfo.personalHealthNumber : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
-          return !!request.identityVerified ? request.identityVerified : "";
+          return !!request.additionalPersonalInfo.identityVerified ? request.additionalPersonalInfo.identityVerified : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
           return !!request.correctionalServiceNumber ? request.correctionalServiceNumber : "";
@@ -27,8 +27,8 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
         else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
           return !!request.publicServiceEmployeeNumber ? request.publicServiceEmployeeNumber : "";
         }
-        else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
-          return !!request.birthDate ? formatDate(request.birthDate) : "";
+        else if (name === FOI_COMPONENT_CONSTANTS.DOB) {          
+          return !!request.additionalPersonalInfo.birthDate ? formatDate(request.additionalPersonalInfo.birthDate) : "";
         }
       }
       else {
@@ -36,11 +36,11 @@ const AdditionalApplicantDetails = React.memo(({additionalInfo, createSaveReques
       }
     }
     //local state management for personalHealthNumber, identityVerified, correctionNumber, and birthDate
-    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER));
-    const [identityVerifiedText, setIdentityVerified] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED));  
-    const [correctionsNumberText, setCorrectionsNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER));
-    const [employeeNumberText, setEmployeeNumber] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER));
-    const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.DOB);   
+    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER));
+    const [identityVerifiedText, setIdentityVerified] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED));  
+    const [correctionsNumberText, setCorrectionsNumber] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER));
+    const [employeeNumberText, setEmployeeNumber] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER));
+    const dob = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DOB);   
     const [birthDateText, setDOB] = React.useState(dob);
 
   const handlePersonalHealthNumber = (e) => {
