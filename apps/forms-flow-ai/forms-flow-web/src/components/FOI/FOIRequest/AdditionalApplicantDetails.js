@@ -15,22 +15,25 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
 
     const validateFields = (request, name) => {
       if (request !== undefined) {
-        if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
-          return !!request.additionalPersonalInfo.personalHealthNumber ? request.additionalPersonalInfo.personalHealthNumber : "";
-        }
-        else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
-          return !!request.additionalPersonalInfo.identityVerified ? request.additionalPersonalInfo.identityVerified : "";
-        }
-        else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+        if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
           return !!request.correctionalServiceNumber ? request.correctionalServiceNumber : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
           return !!request.publicServiceEmployeeNumber ? request.publicServiceEmployeeNumber : "";
         }
-        else if (name === FOI_COMPONENT_CONSTANTS.DOB) {          
-          return !!request.additionalPersonalInfo.birthDate ? formatDate(request.additionalPersonalInfo.birthDate) : "";
+        if(request.additionalPersonalInfo !== undefined) {
+          if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
+            return !!request.additionalPersonalInfo.personalHealthNumber ? request.additionalPersonalInfo.personalHealthNumber : "";
+          }
+          else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
+            return !!request.additionalPersonalInfo.identityVerified ? request.additionalPersonalInfo.identityVerified : "";
+          }
+        
+          else if (name === FOI_COMPONENT_CONSTANTS.DOB) {          
+            return !!request.additionalPersonalInfo.birthDate ? formatDate(request.additionalPersonalInfo.birthDate) : "";
+          }
         }
-      }
+    }
       else {
         return "";
       }
