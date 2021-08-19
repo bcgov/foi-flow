@@ -264,8 +264,6 @@ const FOIRequest = React.memo((props) => {
            adoptiveMotherLastName:"",
            adoptiveFatherLastName:"",
            adoptiveFatherFirstName:"",
-           correctionalServiceNumber:"",
-           publicServiceEmployeeNumber:"",
            personalHealthNumber:"",
            identityVerified:"",
         };
@@ -303,12 +301,6 @@ const FOIRequest = React.memo((props) => {
       }
       else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
         requestObject.additionalPersonalInfo.birthDate = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-        requestObject.additionalPersonalInfo.correctionalServiceNumber = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-        requestObject.additionalPersonalInfo.publicServiceEmployeeNumber = value;
       }
       else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
         requestObject.additionalPersonalInfo.personalHealthNumber = value;
@@ -421,6 +413,12 @@ const FOIRequest = React.memo((props) => {
         }
       });
       requestObject.selectedMinistries = filteredData;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+      requestObject.correctionalServiceNumber = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
+      requestObject.publicServiceEmployeeNumber = value;
     }
   }
 
