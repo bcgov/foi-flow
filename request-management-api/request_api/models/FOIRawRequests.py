@@ -8,6 +8,7 @@ from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy import insert, and_
 
+
 class FOIRawRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequests' 
@@ -40,11 +41,12 @@ class FOIRawRequest(db.Model):
     def saverawrequestversion(cls,_requestrawdata,requestid,assignee,status)->DefaultMethodResult:        
         updatedat = datetime.now()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
-        if request is not None:        
+        if request is not None:
+                
             _version = request.version+1
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
