@@ -107,9 +107,9 @@ class requestservice:
             attributeTypes = PersonalInformationAttribute().getpersonalattributes()
             for attrb in fOIRequestUtil.personalAttributeMapping():
                 attrbvalue = None
-                if attrb["location"] == "main":                    
+                if attrb["location"] == "main" and fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,attrb["key"],"main") == True:
                     attrbvalue = fOIRequestsSchema.get(attrb["key"])
-                else:                        
+                if attrb["location"] == "additionalPersonalInfo" and fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema, attrb["key"],"additionalPersonalInfo") == True:
                     attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
                 if attrbvalue is not None and attrbvalue and attrbvalue != "":
                     personalAttributeArr.append(
@@ -337,10 +337,10 @@ class FOIRequestUtil:
     
     def isNotBlankorNone(self, dataSchema, key, location):
         if location == "main":
-            if dataSchema.get(key) is not None and dataSchema.get(key)  and dataSchema.get(key)  != "":
+            if key in dataSchema and  dataSchema.get(key) is not None and dataSchema.get(key)  and dataSchema.get(key)  != "":
                 return True
         if location == "additionalPersonalInfo":
-            if dataSchema.get(location)[key] is not None and dataSchema.get(location)[key] !="":     
+            if key in dataSchema.get(location) and dataSchema.get(location)[key] and dataSchema.get(location)[key] is not None and dataSchema.get(location)[key] !="":     
                 return True
         return False          
     
@@ -359,8 +359,8 @@ class FOIRequestUtil:
             {"name": "Street Address", "key" : "country"}]
         
     def personalAttributeMapping(self):
-        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"additionalPersonalInfo"},
-            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"additionalPersonalInfo"},
+        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"main"},
+            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"main"},
             {"name": "BC Personal Health Care Number", "key" : "personalHealthNumber", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother First Name", "key" : "adoptiveMotherFirstName", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother Last Name", "key" : "adoptiveMotherLastName", "location":"additionalPersonalInfo"},
