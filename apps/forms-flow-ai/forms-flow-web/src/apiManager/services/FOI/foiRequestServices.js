@@ -232,14 +232,12 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
     API.FOI_REQUEST_API,
     "<requestid>",
     requestId
-  ),"<ministryid>", ministryId);
-  console.log(apiUrlgetRequestDetails);
+  ),"<ministryid>", ministryId);  
   return (dispatch) => {
     httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          const foiRequest = res.data;
-          console.log(foiRequest);
+          const foiRequest = res.data;          
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(setFOILoader(false));
@@ -259,8 +257,7 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
   };
 };
 
-export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
-  console.log(`data = ${JSON.stringify(data)}`);
+export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};
   let id = urlIndexCreateRequest > -1? -1: requestId;  
   const apiUrl = replaceUrl(

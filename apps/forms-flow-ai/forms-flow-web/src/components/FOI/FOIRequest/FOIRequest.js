@@ -47,8 +47,7 @@ const FOIRequest = React.memo((props) => {
   
   const url = window.location.href;
   //gets the request detail from the store
-  let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
-  console.log(`requestDetails = ${JSON.stringify(requestDetails)}`);
+  let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);  
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
   useEffect(() => {
