@@ -139,13 +139,13 @@ class rawrequestservice:
                     'childMiddleName': childInformation['middleName'] if haschildInfo else '',
                     'childLastName': childInformation['lastName'] if haschildInfo else '',
                     'childAlsoKnownAs': childInformation['alsoKnownAs'] if haschildInfo else '',
-                    'childBirthDate': childInformation['dateOfBirth'] if haschildInfo else '',
+                    'childBirthDate': parse(childInformation['dateOfBirth']).strftime('%Y-%m-%d') if haschildInfo and childInformation['dateOfBirth'] is not None else '',
 
                     'anotherFirstName': anotherpersonInformation['firstName'] if hasanotherpersonInfo else '',
                     'anotherMiddleName': anotherpersonInformation['middleName'] if hasanotherpersonInfo else '',
                     'anotherLastName': anotherpersonInformation['lastName'] if hasanotherpersonInfo else '',
                     'anotherAlsoKnownAs': anotherpersonInformation['alsoKnownAs'] if hasanotherpersonInfo else '',
-                    'anotherBirthDate': anotherpersonInformation['dateOfBirth'] if hasanotherpersonInfo else '',
+                    'anotherBirthDate': parse(anotherpersonInformation['dateOfBirth']).strftime('%Y-%m-%d')  if hasanotherpersonInfo and anotherpersonInformation['dateOfBirth'] is not None else '',
 
                     'adoptiveMotherFirstName': adoptiveParents['motherFirstName'] if hasadoptiveParentInfo else '',
                     'adoptiveMotherLastName': adoptiveParents['motherLastName'] if hasadoptiveParentInfo else '',
