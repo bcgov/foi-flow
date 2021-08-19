@@ -46,12 +46,12 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const calculateReceivedDate = (receivedDateString) => {      
       const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
       receivedDateString = receivedDateString ? new Date(receivedDateString): "";
-      console.log(`dateString = ${dateString}, receivedDateString = ${receivedDateString}`);
+      console.log(`dateString = ${dateString}, receivedDateString = ${receivedDateString}, businessDay = ${businessDay(dateString)}`);
       if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {
-        console.log(`formatDate = ${formatDate(receivedDateString)}, businessDay = ${businessDay(dateString)}`);
-        if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
-          receivedDateString = addBusinessDays(dateString, 1);        
-        }
+        // console.log(`formatDate = ${formatDate(receivedDateString)}, businessDay = ${businessDay(dateString)}`);
+        // if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
+          receivedDateString = addBusinessDays(receivedDateString, 1);
+        // }
       }
         console.log(`FinalReceivedDateString = ${receivedDateString}`);
         return receivedDateString;
