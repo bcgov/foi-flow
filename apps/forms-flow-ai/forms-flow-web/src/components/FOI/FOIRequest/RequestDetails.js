@@ -43,7 +43,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
-    const calculateReceivedDate = (receivedDateString) => {      
+    const calculateReceivedDate = (receivedDateString) => {
+      console.log(`receivedDateStringUF = ${receivedDateString}`);
       const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
       receivedDateString = receivedDateString ? new Date(receivedDateString): "";
       console.log(`dateString = ${dateString}, receivedDateString = ${receivedDateString}, businessDay = ${businessDay(dateString)}`);
