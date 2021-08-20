@@ -264,8 +264,6 @@ const FOIRequest = React.memo((props) => {
            adoptiveMotherLastName:"",
            adoptiveFatherLastName:"",
            adoptiveFatherFirstName:"",
-           correctionalServiceNumber:"",
-           publicServiceEmployeeNumber:"",
            personalHealthNumber:"",
            identityVerified:"",
         };
@@ -303,12 +301,6 @@ const FOIRequest = React.memo((props) => {
       }
       else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
         requestObject.additionalPersonalInfo.birthDate = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-        requestObject.additionalPersonalInfo.correctionalServiceNumber = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-        requestObject.additionalPersonalInfo.publicServiceEmployeeNumber = value;
       }
       else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
         requestObject.additionalPersonalInfo.personalHealthNumber = value;
@@ -422,6 +414,12 @@ const FOIRequest = React.memo((props) => {
       });
       requestObject.selectedMinistries = filteredData;
     }
+    else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
+      requestObject.correctionalServiceNumber = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
+      requestObject.publicServiceEmployeeNumber = value;
+    }
   }
 
   const createSaveRequestObject = (name, value, value2) => 
@@ -468,7 +466,7 @@ const FOIRequest = React.memo((props) => {
             <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
             <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-            <AdditionalApplicantDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} />: null }
+            <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} />: null }
             <RequestNotes />
             
             <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest}/>

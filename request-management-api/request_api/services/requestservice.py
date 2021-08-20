@@ -22,6 +22,7 @@ from request_api.services.external.bpmservice import bpmservice
 from enum import Enum
 import datetime
 import random
+from dateutil.parser import *
 class requestservice:
     """ FOI Request management service
 
@@ -107,9 +108,9 @@ class requestservice:
             attributeTypes = PersonalInformationAttribute().getpersonalattributes()
             for attrb in fOIRequestUtil.personalAttributeMapping():
                 attrbvalue = None
-                if attrb["location"] == "main":                    
+                if attrb["location"] == "main" and fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,attrb["key"],"main") == True:
                     attrbvalue = fOIRequestsSchema.get(attrb["key"])
-                else:                        
+                if attrb["location"] == "additionalPersonalInfo" and fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema, attrb["key"],"additionalPersonalInfo") == True:
                     attrbvalue = fOIRequestsSchema.get(attrb["location"])[attrb["key"]]
                 if attrbvalue is not None and attrbvalue and attrbvalue != "":
                     personalAttributeArr.append(
@@ -162,7 +163,7 @@ class requestservice:
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
             'receivedDate': _receivedDate.strftime('%Y %b, %d'),
-            'receivedDateUF': request['receiveddate'],
+            'receivedDateUF': parse(request['receiveddate']).strftime('%Y-%m-%d %H:%M:%S.%f'),
             'deliverymodeid':request['deliverymode.deliverymodeid'],
             'deliveryMode':request['deliverymode.name'],
             'receivedmodeid':request['receivedmode.receivedmodeid'],
@@ -170,12 +171,12 @@ class requestservice:
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'description': requestministry['description'],
-            'fromDate': requestministry['recordsearchfromdate'],
-            'toDate': requestministry['recordsearchtodate'],
+            'fromDate': parse(requestministry['recordsearchfromdate']).strftime('%Y-%m-%d') if requestministry['recordsearchfromdate'] is not None else '',
+            'toDate': parse(requestministry['recordsearchtodate']).strftime('%Y-%m-%d') if requestministry['recordsearchtodate'] is not None else '',
             'currentState':requestministry['requeststatus.name'],
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart':requestministry['startdate'],
-            'dueDate':requestministry['duedate'],
+            'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
@@ -204,7 +205,7 @@ class requestservice:
                     )
                     additionalPersonalInfo.update({
                             
-                            'birthDate' : applicant['foirequestapplicant.dob'],
+                            'birthDate' : parse(applicant['foirequestapplicant.dob']).strftime('%Y-%m-%d') if applicant['foirequestapplicant.dob'] is not None else '',
                             'alsoKnownAs': applicant['foirequestapplicant.alsoknownas']
                     })
                 elif applicant['requestortype.requestortypeid'] == 2:
@@ -214,7 +215,7 @@ class requestservice:
                             'anotherFirstName':applicant['foirequestapplicant.firstname'],
                             'anotherMiddleName': applicant['foirequestapplicant.middlename'],
                             'anotherLastName': applicant['foirequestapplicant.lastname'],                            
-                            'anotherBirthDate' : applicant['foirequestapplicant.dob'],  
+                            'anotherBirthDate' : parse(applicant['foirequestapplicant.dob']).strftime('%Y-%m-%d') if applicant['foirequestapplicant.dob'] is not None else '' ,  
                             'anotherAlsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
                         }                    
                     )
@@ -225,7 +226,7 @@ class requestservice:
                         'childMiddleName': applicant['foirequestapplicant.middlename'],
                         'childLastName': applicant['foirequestapplicant.lastname'],
                         'childAlsoKnownAs': applicant['foirequestapplicant.alsoknownas'],
-                        'childBirthDate': applicant['foirequestapplicant.dob'],                      
+                        'childBirthDate': parse(applicant['foirequestapplicant.dob']).strftime('%Y-%m-%d') if applicant['foirequestapplicant.dob'] is not None else '',                      
                         }                    
                     )
 
@@ -337,10 +338,10 @@ class FOIRequestUtil:
     
     def isNotBlankorNone(self, dataSchema, key, location):
         if location == "main":
-            if dataSchema.get(key) is not None and dataSchema.get(key)  and dataSchema.get(key)  != "":
+            if key in dataSchema and  dataSchema.get(key) is not None and dataSchema.get(key)  and dataSchema.get(key)  != "":
                 return True
         if location == "additionalPersonalInfo":
-            if dataSchema.get(location)[key] is not None and dataSchema.get(location)[key] !="":     
+            if key in dataSchema.get(location) and dataSchema.get(location)[key] and dataSchema.get(location)[key] is not None and dataSchema.get(location)[key] !="":     
                 return True
         return False          
     
@@ -359,8 +360,8 @@ class FOIRequestUtil:
             {"name": "Street Address", "key" : "country"}]
         
     def personalAttributeMapping(self):
-        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"additionalPersonalInfo"},
-            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"additionalPersonalInfo"},
+        return [{"name": "BC Correctional Service Number", "key" : "correctionalServiceNumber", "location":"main"},
+            {"name": "BC Public Service Employee Number", "key" : "publicServiceEmployeeNumber", "location":"main"},
             {"name": "BC Personal Health Care Number", "key" : "personalHealthNumber", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother First Name", "key" : "adoptiveMotherFirstName", "location":"additionalPersonalInfo"},
             {"name": "Adoptive Mother Last Name", "key" : "adoptiveMotherLastName", "location":"additionalPersonalInfo"},
