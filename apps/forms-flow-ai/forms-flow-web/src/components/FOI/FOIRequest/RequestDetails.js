@@ -6,13 +6,7 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
-import moment from "moment-business-days";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-
-
-moment.updateLocale('en-ca', {
-  workingWeekdays: [1, 2, 3, 4, 5]
-});
 
 const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject}) => {
 
@@ -50,15 +44,18 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
     const calculateReceivedDate = (receivedDateString) => {      
-    const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
-    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
-    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {      
-      if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
-        receivedDateString = addBusinessDays(dateString, 1);        
+      const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
+      receivedDateString = receivedDateString ? new Date(receivedDateString): "";
+      console.log(`dateString = ${dateString}, receivedDateString = ${receivedDateString}, businessDay = ${businessDay(dateString)}`);
+      if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {
+        // console.log(`formatDate = ${formatDate(receivedDateString)}, businessDay = ${businessDay(dateString)}`);
+        // if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
+          receivedDateString = addBusinessDays(receivedDateString, 1);
+        // }
       }
-    }
-      return receivedDateString;
-    }
+        console.log(`FinalReceivedDateString = ${receivedDateString}`);
+        return receivedDateString;
+      }
     //updates the default values from the request details    
     React.useEffect(() => {
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
