@@ -8,6 +8,7 @@ from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy import insert, and_
 
+
 class FOIRawRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequests' 
@@ -19,15 +20,16 @@ class FOIRawRequest(db.Model):
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
     assignedto = db.Column(db.String(120), unique=False, nullable=True)    
-    created_at = db.Column(db.DateTime, default=datetime.now().isoformat())
+    created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     sourceofsubmission = db.Column(db.String(120),  nullable=True)
     
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:        
-        createdat = datetime.now().isoformat()
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:                
+        createdat = datetime.now()
+        print(createdat)
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedto=assignee)
         db.session.add(newrawrequest)
@@ -36,20 +38,23 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def saverawrequestversion(cls,_requestrawdata,requestid,assignee,status)->DefaultMethodResult:        
-        updatedat = datetime.now().isoformat()
-        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()        
-        _version = request.version+1
-        insertstmt =(
-            insert(FOIRawRequest).
-            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
-        )                 
-        db.session.execute(insertstmt)               
-        db.session.commit()                
-        return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
-
+        updatedat = datetime.now()
+        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        if request is not None:
+                
+            _version = request.version+1
+            insertstmt =(
+                insert(FOIRawRequest).
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
+            )                 
+            db.session.execute(insertstmt)               
+            db.session.commit()                
+            return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
+        else:
+            return DefaultMethodResult(True,'No request foound')
     @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid)->DefaultMethodResult:
-        updatedat = datetime.now().isoformat()
+        updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         requestraqw = dbquery.filter_by(requestid=requestid,version = 1)
         if(requestraqw.count() > 0) :
@@ -65,7 +70,7 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes)-> DefaultMethodResult:
-        updatedat = datetime.now().isoformat()
+        updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
