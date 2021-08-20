@@ -9,7 +9,7 @@ import json
 import asyncio
 import os
 from request_api.utils.redispublisher import RedisPublisherService
-
+import maya
 
 class rawrequestservice:
     """ FOI Request management service
@@ -86,10 +86,11 @@ class rawrequestservice:
             decriptionTimeframe = requestrawdata.get('descriptionTimeframe')
             contactInfoOptions = requestrawdata.get('contactInfoOptions')
 
-            _createdDate = parse(request['created_at'])
+            #_createdDate = parse(request['created_at'])
             _fromdate = parse(decriptionTimeframe['fromDate'])
             _todate = parse(decriptionTimeframe['toDate'])
-
+            dt = maya.parse(request['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
+            _createdDate = dt
             baserequestInfo = {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
                                'requestType': requestType,

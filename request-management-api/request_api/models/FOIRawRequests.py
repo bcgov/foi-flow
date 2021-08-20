@@ -27,8 +27,7 @@ class FOIRawRequest(db.Model):
     
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:
-                
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:                
         createdat = datetime.now()
         print(createdat)
         version = 1

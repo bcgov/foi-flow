@@ -1,8 +1,15 @@
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from dateutil import parser
+from dateutil import tz
+import datetime as dt
+from pytz import timezone
+import pytz
+import maya
 
 class dashboardservice:
+
+
 
     def getrequestqueue():
             
@@ -13,7 +20,13 @@ class dashboardservice:
             for request in requests:
 
                 firstName , lastName, requestType = '','',''
-                _receivedDate = request.created_at            
+               
+                _receivedDate = request.created_at
+                                
+                dt = maya.parse(_receivedDate).datetime(to_timezone='America/Vancouver', naive=False)
+                _receivedDate = dt
+                
+                                
                 if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
                     firstName = request.requestrawdata['firstName']
                     lastName =  request.requestrawdata['lastName']
@@ -22,7 +35,7 @@ class dashboardservice:
                 elif (request.sourceofsubmission!= "intake" and request.version == 1):               
                     firstName = request.requestrawdata['contactInfo']['firstName']
                     lastName = request.requestrawdata['contactInfo']['lastName']
-                    requestType = request.requestrawdata['requestType']['requestType']    
+                    requestType = request.requestrawdata['requestType']['requestType']
 
                 
                 unopenrequest = {'id': request.requestid,
@@ -31,7 +44,7 @@ class dashboardservice:
                                  'requestType': requestType,
                                  'currentState': request.status,
                                  'receivedDate': _receivedDate.strftime('%Y %b, %d'),
-                                 'receivedDateUF': str(_receivedDate),
+                                 'receivedDateUF': _receivedDate.strftime('%Y-%m-%d %H:%M:%S.%f'),
                                  'assignedTo': request.assignedto,
                                  'xgov': 'No',
                                  'idNumber': 'U-00' + str(request.requestid),
