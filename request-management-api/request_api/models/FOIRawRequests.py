@@ -18,6 +18,7 @@ class FOIRawRequest(db.Model):
     status = db.Column(db.String(25), unique=False, nullable=True)
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
+    assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
     assignedto = db.Column(db.String(120), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now().isoformat())
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -35,13 +36,13 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid,assignee,status)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid,assigneegroup,assignee,status)->DefaultMethodResult:     
         updatedat = datetime.now().isoformat()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()        
         _version = request.version+1
         insertstmt =(
             insert(FOIRawRequest).
-            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
+            values(requestid=request.requestid, requestrawdata=_requestrawdata,version=(request.version+1),updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
         )                 
         db.session.execute(insertstmt)               
         db.session.commit()                
@@ -97,4 +98,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedto','updatedby','sourceofsubmission')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission')
