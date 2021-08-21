@@ -61,6 +61,7 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()            
             if int(requestid) and str(requestid) != "-1" :
                 status = 'Assignment in progress'     
+                
                 rawRequest = rawrequestservice.getrawrequest(requestid)                                              
                 result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],status)                
                 if result.success == True:   

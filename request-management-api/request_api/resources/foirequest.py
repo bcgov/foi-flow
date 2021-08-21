@@ -62,9 +62,12 @@ class FOIRequests(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json() 
-            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],request_json['assignedTo'],"Open In Progress")               
+            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)       
+            assignedGroup = request_json['assignedGroup'] if 'assignedGroup' in fOIRequestsSchema  else None
+            assignedTo = request_json['assignedTo'] if 'assignedTo' in fOIRequestsSchema  else None
+            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open In Progress")               
             if rawresult.success == True:
-                fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)
+                
                 result = requestservice.saverequest(fOIRequestsSchema)
                 if result.success == True:
                     metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
