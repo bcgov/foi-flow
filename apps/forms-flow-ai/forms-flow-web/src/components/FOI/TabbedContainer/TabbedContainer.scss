@@ -29,9 +29,24 @@
     width: 100% !important;
   }
 
-  .MuiTabs-vertical {
-    
+  .foitabheadercollection {
     width: 25%;
+    background-color: teal;
+    
+  }
+
+  .foileftpanelheader
+  {
+      padding-left: 12%;
+      padding-top: 55%;
+  }
+
+  .foileftpanelheader h1 {
+        color: white;
+  }
+
+  .MuiTabs-vertical {    
+    width: auto;
     color: white;
 }
 
