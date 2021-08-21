@@ -14,14 +14,7 @@
       display: inline-block;
   }
 
-  .MuiBox-root {
-      padding: 0px!important;
-      
-  }
-  .MuiTabs-root {
-    
-    background-color: teal;
-}
+ 
 
   .foi-review-container {
     margin-left: 0px !important;
@@ -39,16 +32,14 @@
   {
       padding-left: 12%;
       padding-top: 55%;
+      padding-bottom: 30%;
   }
 
   .foileftpanelheader h1 {
         color: white;
   }
 
-  .MuiTabs-vertical {    
-    width: auto;
-    color: white;
-}
+  
 
 .tabcontent { 
     // This css class is temp. need to remove
@@ -56,4 +47,29 @@
     width: 600px ;
     height: auto !important;
     display: inline-block;
+}
+
+
+
+.MuiBox-root {
+    padding: 0px!important;
+    
+}
+
+.MuiTabs-vertical {    
+    width: auto;
+    color: white;
+    border-style: none!important;
+}
+
+.Mui-selected {
+    background-color: white!important;
+    color: teal!important;
+    margin-left: 10px!important;
+    border:0px!important;
+    border-style: none!important;
+}
+
+.MuiTabs-indicator {
+    background-color: transparent!important;
 }
