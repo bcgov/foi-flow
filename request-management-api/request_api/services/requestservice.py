@@ -167,6 +167,7 @@ class requestservice:
             'deliveryMode':request['deliverymode.name'],
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
+            'assignedGroup': requestministry["assignedgroup"],
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'description': requestministry['description'],
@@ -265,8 +266,10 @@ class FOIRequestUtil:
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
         if self.isNotBlankorNone(requestSchema,"toDate","main") == True:
-            foiministryRequest.recordsearchtodate = requestSchema.get("toDate")
-        foiministryRequest.assignedto = requestSchema.get("assignedTo")
+            foiministryRequest.recordsearchtodate = requestSchema.get("toDate")        
+        foiministryRequest.assignedgroup = requestSchema.get("assignedGroup")
+        if self.isNotBlankorNone(requestSchema,"assignedTo","main") == True:
+            foiministryRequest.assignedto = requestSchema.get("assignedTo")
         return foiministryRequest
     
     def createContactInformation(self,dataformat, name, value, contactTypes):
