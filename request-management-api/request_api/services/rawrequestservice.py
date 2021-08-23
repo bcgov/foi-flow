@@ -9,7 +9,7 @@ import json
 import asyncio
 import os
 from request_api.utils.redispublisher import RedisPublisherService
-
+import maya
 
 class rawrequestservice:
     """ FOI Request management service
@@ -88,8 +88,12 @@ class rawrequestservice:
             contactInfo = requestrawdata.get('contactInfo')
             decriptionTimeframe = requestrawdata.get('descriptionTimeframe')
             contactInfoOptions = requestrawdata.get('contactInfoOptions')
-            _createdDate = parse(request['created_at'])
 
+            #_createdDate = parse(request['created_at'])
+            _fromdate = parse(decriptionTimeframe['fromDate'])
+            _todate = parse(decriptionTimeframe['toDate'])
+            dt = maya.parse(request['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
+            _createdDate = dt
             baserequestInfo = {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
                                'requestType': requestType,
@@ -114,8 +118,8 @@ class rawrequestservice:
                                'province': contactInfoOptions['province'],
                                'country': contactInfoOptions['country'],
                                'description': decriptionTimeframe['description'],
-                               'fromDate': decriptionTimeframe['fromDate'],
-                               'toDate': decriptionTimeframe['toDate'],
+                               'fromDate': _fromdate.strftime('%Y-%m-%d'),
+                               'toDate': _todate.strftime('%Y-%m-%d'),
                                'correctionalServiceNumber': decriptionTimeframe['correctionalServiceNumber'],
                                'publicServiceEmployeeNumber': decriptionTimeframe['publicServiceEmployeeNumber'],
                                'topic': decriptionTimeframe['topic'],
@@ -134,19 +138,19 @@ class rawrequestservice:
                 additionalpersonalInfo = {
                     'alsoKnownAs': contactInfo['alsoKnownAs'],
                     'requestFor': requestrawdata['selectAbout'],
-                    'birthDate': contactInfo['birthDate'],
+                    'birthDate': parse(contactInfo['birthDate']).strftime('%Y-%m-%d') if contactInfo['birthDate'] is not None else '',
 
                     'childFirstName': childInformation['firstName'] if haschildInfo else '',
                     'childMiddleName': childInformation['middleName'] if haschildInfo else '',
                     'childLastName': childInformation['lastName'] if haschildInfo else '',
                     'childAlsoKnownAs': childInformation['alsoKnownAs'] if haschildInfo else '',
-                    'childBirthDate': childInformation['dateOfBirth'] if haschildInfo else '',
+                    'childBirthDate': parse(childInformation['dateOfBirth']).strftime('%Y-%m-%d') if haschildInfo and childInformation['dateOfBirth'] is not None else '',
 
                     'anotherFirstName': anotherpersonInformation['firstName'] if hasanotherpersonInfo else '',
                     'anotherMiddleName': anotherpersonInformation['middleName'] if hasanotherpersonInfo else '',
                     'anotherLastName': anotherpersonInformation['lastName'] if hasanotherpersonInfo else '',
                     'anotherAlsoKnownAs': anotherpersonInformation['alsoKnownAs'] if hasanotherpersonInfo else '',
-                    'anotherBirthDate': anotherpersonInformation['dateOfBirth'] if hasanotherpersonInfo else '',
+                    'anotherBirthDate': parse(anotherpersonInformation['dateOfBirth']).strftime('%Y-%m-%d')  if hasanotherpersonInfo and anotherpersonInformation['dateOfBirth'] is not None else '',
 
                     'adoptiveMotherFirstName': adoptiveParents['motherFirstName'] if hasadoptiveParentInfo else '',
                     'adoptiveMotherLastName': adoptiveParents['motherLastName'] if hasadoptiveParentInfo else '',

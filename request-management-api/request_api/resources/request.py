@@ -107,22 +107,7 @@ class FOIRawRequestBPMProcess(Resource):
 class FOIRawRequests(Resource):
     """Resource for managing FOI Raw requests."""
     
-    @staticmethod
-    @TRACER.trace()
-    @cors.crossdomain(origin='*')   
-    def get(requestid=None):
-        ## todo : This code will get re-furshibed with BPM WF validation to list
-        try:                                       
-                unopenedrequests = rawrequestservice.getrawrequests()                 
-                jsondata = json.dumps(unopenedrequests)
-                return jsondata , 200            
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500     
-
     
-
-    
-
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
