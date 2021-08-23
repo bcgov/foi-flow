@@ -9,6 +9,7 @@ from request_api.models.ContactTypes import ContactType
 from request_api.models.DeliveryModes import DeliveryMode
 from request_api.models.ReceivedModes import ReceivedMode
 from request_api.models.ApplicantCategories import ApplicantCategory
+from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
@@ -144,11 +145,25 @@ class requestservice:
         
         return FOIRequest.saverequest(openfOIRequest)
     
+        
+    def updaterequest(fOIRequestsSchema,foirequestid):
+        fOIRequestUtil = FOIRequestUtil()
+        if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"wfinstanceid","main") == True:
+            return FOIRequest.updateWFInstance(foirequestid, fOIRequestsSchema.get("wfinstanceid"))
+        if fOIRequestsSchema.get("selectedMinistries") is not None:
+            allStatus = FOIRequestStatus().getrequeststatuses()
+            updatedMinistries = []
+            for ministry in fOIRequestsSchema.get("selectedMinistries"):
+                for status in allStatus:
+                    if ministry["status"] == status["name"]:
+                        updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
+            return FOIRequest.updateStatus(foirequestid, updatedMinistries)
+    
+    
     def postEventToWorkflow(workflowId, data):
         return bpmservice.complete(workflowId, data)
     
        
-
     def getrequest(foirequestid,foiministryrequestid):
         
         request = FOIRequest.getrequest(foirequestid)

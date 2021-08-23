@@ -5,7 +5,7 @@
       <bpmn:incoming>Flow_19rxzls</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:subProcess id="Activity_1vkdaxq">
-      <bpmn:incoming>Flow_0cj6jqd</bpmn:incoming>
+      <bpmn:incoming>Flow_1rpjl44</bpmn:incoming>
       <bpmn:outgoing>Flow_19rxzls</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics camunda:collection="${S(datajson).prop(&#34;filenumbers&#34;).elements()}" camunda:elementVariable="filenumber" />
       <bpmn:startEvent id="Event_07v3ugi">
@@ -29,7 +29,7 @@ task.setName(defaultName);</camunda:script>
         <bpmn:outgoing>Flow_082w9lp</bpmn:outgoing>
       </bpmn:userTask>
     </bpmn:subProcess>
-    <bpmn:sequenceFlow id="Flow_0cj6jqd" name="apply Settings" sourceRef="StartEvent_1" targetRef="Activity_1vkdaxq">
+    <bpmn:sequenceFlow id="Flow_0cj6jqd" name="apply Settings" sourceRef="StartEvent_1" targetRef="Gateway_185rh0g">
       <bpmn:extensionElements>
         <camunda:executionListener event="take">
           <camunda:script scriptFormat="javascript">execution.setVariable("pid", execution.getProcessInstanceId());
@@ -52,36 +52,72 @@ execution.setVariable("datajson", JSON.stringify(mjson));</camunda:script>
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_0cj6jqd</bpmn:outgoing>
     </bpmn:startEvent>
+    <bpmn:parallelGateway id="Gateway_185rh0g">
+      <bpmn:incoming>Flow_0cj6jqd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rpjl44</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0n89qki</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1rpjl44" sourceRef="Gateway_185rh0g" targetRef="Activity_1vkdaxq" />
+    <bpmn:intermediateThrowEvent id="Event_1twjy3c" name="Send PID">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">var reqPayload = {
+"wfinstanceId": execution.getVariable("pid")
+};
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-update").setVariables(execution.variables).setVariable("reqPayload", JSON.stringify(reqPayload)).setVariable("category", "foi-request-update").correlateWithResult();</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0n89qki</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1pyvz5t" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_0n89qki" sourceRef="Gateway_185rh0g" targetRef="Event_1twjy3c" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="foi-request-processing">
-      <bpmndi:BPMNEdge id="Flow_0cj6jqd_di" bpmnElement="Flow_0cj6jqd">
-        <di:waypoint x="198" y="160" />
-        <di:waypoint x="400" y="160" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="261" y="143" width="70" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_19rxzls_di" bpmnElement="Flow_19rxzls">
         <di:waypoint x="840" y="177" />
         <di:waypoint x="892" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cj6jqd_di" bpmnElement="Flow_0cj6jqd">
+        <di:waypoint x="168" y="160" />
+        <di:waypoint x="265" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="175" y="143" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rpjl44_di" bpmnElement="Flow_1rpjl44">
+        <di:waypoint x="315" y="160" />
+        <di:waypoint x="400" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n89qki_di" bpmnElement="Flow_0n89qki">
+        <di:waypoint x="290" y="185" />
+        <di:waypoint x="290" y="222" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1om9kt6_di" bpmnElement="Event_1om9kt6">
         <dc:Bounds x="892" y="159" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1ylofsn_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="162" y="142" width="36" height="36" />
+        <dc:Bounds x="132" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1hkqx5r_di" bpmnElement="Gateway_185rh0g">
+        <dc:Bounds x="265" y="135" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0hjmckx_di" bpmnElement="Event_1twjy3c">
+        <dc:Bounds x="272" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="267" y="265" width="48" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vkdaxq_di" bpmnElement="Activity_1vkdaxq" isExpanded="true">
         <dc:Bounds x="400" y="82" width="440" height="190" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1ci0xi1_di" bpmnElement="Flow_1ci0xi1">
-        <di:waypoint x="476" y="172" />
-        <di:waypoint x="530" y="172" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_082w9lp_di" bpmnElement="Flow_082w9lp">
         <di:waypoint x="630" y="172" />
         <di:waypoint x="702" y="172" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ci0xi1_di" bpmnElement="Flow_1ci0xi1">
+        <di:waypoint x="476" y="172" />
+        <di:waypoint x="530" y="172" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_07v3ugi_di" bpmnElement="Event_07v3ugi">
         <dc:Bounds x="440" y="154" width="36" height="36" />
