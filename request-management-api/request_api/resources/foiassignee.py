@@ -44,3 +44,19 @@ class FOIAssigneesByTypeAndStatus(Resource):
             return json.dumps(assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status)), 200
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
+        
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiassignees/group/<groupName>')
+class FOIAssigneesByTypeAndStatus(Resource):
+    """Resource for managing FOI requests."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    def get(groupName):
+        """ POST Method for capturing FOI requests before processing"""
+        try:
+            return json.dumps(assigneeservice().getMembersByGroupName(groupName)), 200
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500    
