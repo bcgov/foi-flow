@@ -75,19 +75,24 @@ export const fetchFOIProgramAreaList = (...rest) => {
 };
 
 
-export const fetchFOIAssignedToList = (...rest) => {
+export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const unAssigned = {"id": 0, "username": "Unassigned", "firstname":"", "lastname":""};
+  const apiUrlGETAssignedToList = replaceUrl(replaceUrl(
+    API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
+    "<requesttype>",
+    requestType
+  ),"<curentstate>", status);  
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_ASSIGNEDTOLIST_API, {}, UserService.getToken())
+    httpOpenGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          const foiAssignedToList = res.data;          
+          const foiAssignedToList = res.data;
           let data = foiAssignedToList.map((assignedTo) => {
+            assignedTo.members.unshift(unAssigned);
             return { ...assignedTo};
-          });
-          data.unshift(unAssigned);
-          dispatch(setFOIAssignedToList(data));
+          });         
+          dispatch(setFOIAssignedToList(data));          
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -208,7 +213,8 @@ export const fetchFOIRawRequestDetails = (requestId,...rest) => {
         if (res.data) {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
-          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setFOIRequestDetail(foiRequest));         
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -257,7 +263,8 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
   };
 };
 
-export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {  
+export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
+  console.log(`${JSON.stringify(data)}`);
   const done = rest.length ? rest[0] : () => {};
   let id = urlIndexCreateRequest > -1? -1: requestId;  
   const apiUrl = replaceUrl(
