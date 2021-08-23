@@ -31,7 +31,8 @@ class FOIMinistryRequest(db.Model):
 
     startdate = db.Column(db.DateTime, nullable=False,default=datetime.now())
     duedate = db.Column(db.DateTime, nullable=False)
-    assignedto = db.Column(db.String(120), unique=False, nullable=False)
+    assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
+    assignedto = db.Column(db.String(120), unique=False, nullable=True)
                 
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -80,6 +81,7 @@ class FOIMinistryRequest(db.Model):
            _request["currentState"] = ministryrequest["requeststatus.name"]
            _request["receivedDate"] = _receivedDate.strftime('%Y %b, %d')
            _request["receivedDateUF"] =str(_receivedDate)
+           _request["assignedGroup"]=ministryrequest["assignedgroup"]
            _request["assignedTo"]=ministryrequest["assignedto"]
            _request["xgov"]='No'
            _request["version"] = ministryrequest['version']
@@ -97,5 +99,5 @@ class FOIMinistryRequest(db.Model):
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
-        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id')
+        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id')
     

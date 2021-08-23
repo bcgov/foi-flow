@@ -60,7 +60,8 @@ class FOIRequestWrapperSchema(Schema):
     lastName = fields.Str(data_key="lastName", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])         
     email = fields.Str(data_key="email",allow_none=True)      
     businessName = fields.Str(data_key="businessName",allow_none=True) 
-    assignedTo = fields.Str(data_key="assignedTo", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])    
+    assignedGroup = fields.Str(data_key="assignedGroup",allow_none=True)
+    assignedTo = fields.Str(data_key="assignedTo",allow_none=True)  
     fromDate = fields.Str(data_key="fromDate",allow_none=True)
     toDate = fields.Str(data_key="toDate",allow_none=True)
     dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
@@ -86,4 +87,14 @@ class FOIRequestWrapperSchema(Schema):
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)
 
-    
+class EditableFOIMinistryRequestWrapperSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    filenumber = fields.Str(data_key="filenumber")
+    status = fields.Str(data_key="status")
+
+class EditableFOIRequestWrapperSchema(Schema):
+    wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
+    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)  
