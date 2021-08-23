@@ -78,7 +78,7 @@ export const fetchFOIProgramAreaList = (...rest) => {
 export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};
-  let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTOLIST_API;
+  let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
   if (requestType && status) {
     apiUrlGETAssignedToList = replaceUrl(replaceUrl(
       API.FOI_GET_ASSIGNEDTOGROUPLIST_API,

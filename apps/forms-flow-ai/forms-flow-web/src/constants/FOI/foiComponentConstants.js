@@ -62,7 +62,8 @@ const FOI_COMPONENT_CONSTANTS = {
     PROGRAM_AREA_SELECTED: "selected",
     ADDITIONAL_PERSONAL_INFORMATION: "additionalPersonalInfo",
     CREATE_REQUEST: "createrequest",
-    RQUESTDETAILS_INITIALVALUES: "initialValues"
+    RQUESTDETAILS_INITIALVALUES: "initialValues",
+    ASSIGNEE_GROUPS: ["Intake Team", "Flex Team", "Processing Team"],
 
 
 

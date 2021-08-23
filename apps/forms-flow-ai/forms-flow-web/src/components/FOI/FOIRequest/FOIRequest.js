@@ -59,7 +59,7 @@ const FOIRequest = React.memo((props) => {
       dispatch(fetchFOIRawRequestDetails(requestId));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1) {
-      dispatch(fetchFOIAssignedToList("general", "unopened"));
+      dispatch(fetchFOIAssignedToList());
     }
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
@@ -331,10 +331,14 @@ const FOIRequest = React.memo((props) => {
         requestObject.assignedGroup = assignedToValue[0];
         requestObject.assignedTo = assignedToValue[1];
       }
+      else if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => groupName === assignedToValue[0])) {
+        requestObject.assignedGroup = assignedToValue[0];
+        requestObject.assignedTo = assignedToValue[0];
+      }
       else {
         requestObject.assignedGroup = "Unassigned";
         requestObject.assignedTo = assignedToValue[0];
-      }      
+      }   
       requestObject.assignedToName = value2;      
     }
     else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       

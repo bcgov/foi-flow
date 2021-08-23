@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: 3 * theme.spacing.unit,
     },
     group: {
-        fontWeight: theme.typography.fontWeightMedium,
+        fontWeight: theme.typography.fontWeightBold,
         opacity: 1,
     },
   }));
@@ -56,7 +56,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         var i = 1;
         if (assignedToList && assignedToList.length > 0) {
             for (var group of assignedToList) {
-                menuItems.push(<MenuItem className={classes.group} disabled key={group.id} value={group.name}>{group.name}</MenuItem>);
+                menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`}>{group.name}</MenuItem>);
                 for (var assignee of group.members) {
                     menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
                 }
@@ -67,13 +67,11 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
      //local state management for assignedTo
     const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : "|Unassigned";//"Intake Team|Unassigned";
    
-    console.log(assignedTo);
     const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
-    console.log(`selectedAssignedTo = ${selectedAssignedTo}`)
     const preventDefault = (event) => event.preventDefault();
     
     //handle onChange event for assigned To
-    const handleAssignedToOnChange = (event) => {  
+    const handleAssignedToOnChange = (event) => {
         setAssignedTo(event.target.value);
         //event bubble up - to validate required fields
         handleAssignedToValue(event.target.value);
