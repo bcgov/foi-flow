@@ -28,8 +28,8 @@ import json
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
 
-
 @cors_preflight('GET,OPTIONS')
+@API.route('/foiassignees', defaults={'requestype':None, 'status': None})
 @API.route('/foiassignees/<requestype>', defaults={'status': None})
 @API.route('/foiassignees/<requestype>/<status>')
 class FOIAssigneesByTypeAndStatus(Resource):
@@ -38,10 +38,9 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
-    def get(requestype, status=None):
+    def get(requestype=None, status=None):
         """ POST Method for capturing FOI requests before processing"""
         try:
             return json.dumps(assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status)), 200
         except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
-    
+            return {'status': exception.status_code, 'message':exception.message}, 500    
