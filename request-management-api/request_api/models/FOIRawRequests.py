@@ -36,7 +36,7 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid,assigneegroup,assignee,status)->DefaultMethodResult:     
+    def saverawrequestversion(cls, _requestrawdata, requestid, assigneegroup, assignee, status)->DefaultMethodResult:
         updatedat = datetime.now().isoformat()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()        
         _version = request.version+1
