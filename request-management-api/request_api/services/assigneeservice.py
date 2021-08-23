@@ -17,6 +17,11 @@ class assigneeservice:
                 return self.getGroupsAndMembersByType(requestType)
             else:
                 return KeycloakAdminService().getGroupsAndMembers(self._getGroups(requestType,status))
+            
+    def getMembersByGroupName(self, groupName):
+        for group in self._getGroupsByType():
+             if self._formatInput(group) == groupName: 
+                return KeycloakAdminService().getGroupsAndMembers([group]) 
     
     def getGroupsAndMembersByType(self, requestType):  
         groups = []
@@ -38,7 +43,7 @@ class assigneeservice:
             return self._getGroupsByType(requestType)
         else:
             for groupMapping in self._getGroupMappings(requestType):
-                if self._formatstatus(groupMapping.get("status")) == status: 
+                if self._formatInput(groupMapping.get("status")) == status: 
                     return groupMapping.get("groups")
                 
              
@@ -59,10 +64,10 @@ class assigneeservice:
             if requestType == "general":
                 return self.generalGroupMappings()
    
-    def _formatstatus(self, status):
-        status = status.lower()
-        status = status.replace(' ', '')
-        return status
+    def _formatInput(self, input):
+        input = input.lower()
+        input = input.replace(' ', '')
+        return input
         
     def generalGroupMappings(self):        
         return [{"status":"Unopened", "groups":["Intake Team"]},
