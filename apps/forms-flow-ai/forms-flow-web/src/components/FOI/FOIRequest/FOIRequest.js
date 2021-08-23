@@ -59,7 +59,7 @@ const FOIRequest = React.memo((props) => {
       dispatch(fetchFOIRawRequestDetails(requestId));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1) {
-      dispatch(fetchFOIAssignedToList("general","unopened"));
+      dispatch(fetchFOIAssignedToList("general", "unopened"));
     }
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
