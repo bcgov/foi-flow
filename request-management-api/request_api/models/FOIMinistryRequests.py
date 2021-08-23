@@ -29,12 +29,12 @@ class FOIMinistryRequest(db.Model):
     recordsearchfromdate = db.Column(db.DateTime, nullable=True)
     recordsearchtodate = db.Column(db.DateTime, nullable=True)
 
-    startdate = db.Column(db.DateTime, nullable=False,default=datetime.now().isoformat())
+    startdate = db.Column(db.DateTime, nullable=False,default=datetime.now())
     duedate = db.Column(db.DateTime, nullable=False)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
     assignedto = db.Column(db.String(120), unique=False, nullable=True)
                 
-    created_at = db.Column(db.DateTime, default=datetime.now().isoformat())
+    created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)

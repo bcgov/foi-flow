@@ -37,9 +37,9 @@ const Dashboard = React.memo((props) => {
     const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
     receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
     if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {      
-      if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
-        receivedDateString = addBusinessDays(dateString, 1);
-      }
+      // if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
+        receivedDateString = addBusinessDays(receivedDateString, 1);
+      // }
     }    
     return formatDate(receivedDateString, 'yyyy MMM, dd');
     

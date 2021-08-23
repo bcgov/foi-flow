@@ -23,6 +23,7 @@ from request_api.services.external.bpmservice import bpmservice
 from enum import Enum
 import datetime
 import random
+from dateutil.parser import *
 class requestservice:
     """ FOI Request management service
 
@@ -177,7 +178,7 @@ class requestservice:
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
             'receivedDate': _receivedDate.strftime('%Y %b, %d'),
-            'receivedDateUF': request['receiveddate'],
+            'receivedDateUF': parse(request['receiveddate']).strftime('%Y-%m-%d %H:%M:%S.%f'),
             'deliverymodeid':request['deliverymode.deliverymodeid'],
             'deliveryMode':request['deliverymode.name'],
             'receivedmodeid':request['receivedmode.receivedmodeid'],
@@ -186,12 +187,12 @@ class requestservice:
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'description': requestministry['description'],
-            'fromDate': requestministry['recordsearchfromdate'],
-            'toDate': requestministry['recordsearchtodate'],
+            'fromDate': parse(requestministry['recordsearchfromdate']).strftime('%Y-%m-%d') if requestministry['recordsearchfromdate'] is not None else '',
+            'toDate': parse(requestministry['recordsearchtodate']).strftime('%Y-%m-%d') if requestministry['recordsearchtodate'] is not None else '',
             'currentState':requestministry['requeststatus.name'],
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart':requestministry['startdate'],
-            'dueDate':requestministry['duedate'],
+            'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
@@ -220,7 +221,7 @@ class requestservice:
                     )
                     additionalPersonalInfo.update({
                             
-                            'birthDate' : applicant['foirequestapplicant.dob'],
+                            'birthDate' : parse(applicant['foirequestapplicant.dob']).strftime('%Y-%m-%d') if applicant['foirequestapplicant.dob'] is not None else '',
                             'alsoKnownAs': applicant['foirequestapplicant.alsoknownas']
                     })
                 elif applicant['requestortype.requestortypeid'] == 2:
@@ -230,7 +231,7 @@ class requestservice:
                             'anotherFirstName':applicant['foirequestapplicant.firstname'],
                             'anotherMiddleName': applicant['foirequestapplicant.middlename'],
                             'anotherLastName': applicant['foirequestapplicant.lastname'],                            
-                            'anotherBirthDate' : applicant['foirequestapplicant.dob'],  
+                            'anotherBirthDate' : parse(applicant['foirequestapplicant.dob']).strftime('%Y-%m-%d') if applicant['foirequestapplicant.dob'] is not None else '' ,  
                             'anotherAlsoKnownAs': applicant['foirequestapplicant.alsoknownas'],                      
                         }                    
                     )
@@ -241,7 +242,7 @@ class requestservice:
                         'childMiddleName': applicant['foirequestapplicant.middlename'],
                         'childLastName': applicant['foirequestapplicant.lastname'],
                         'childAlsoKnownAs': applicant['foirequestapplicant.alsoknownas'],
-                        'childBirthDate': applicant['foirequestapplicant.dob'],                      
+                        'childBirthDate': parse(applicant['foirequestapplicant.dob']).strftime('%Y-%m-%d') if applicant['foirequestapplicant.dob'] is not None else '',                      
                         }                    
                     )
 
