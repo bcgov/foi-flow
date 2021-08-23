@@ -39,8 +39,6 @@ class KeycloakAdminService:
             for group in globalGroups:
                 if allowedGroups is not None:
                     for allowedGroup in allowedGroups:
-                        print(group["name"])
-                        print(allowedGroup)
                         if group["name"] == allowedGroup:   
                             groups.append({'id': group['id'],'name':group['name']})
                 else:
@@ -50,7 +48,6 @@ class KeycloakAdminService:
  
     def getGroupsAndMembers(self, allowedGroups = None):
         allowedGroups = self.getGroups(allowedGroups)
-        print(allowedGroups)
         for group in allowedGroups:
             group["members"] = self.getGroupMembersById(group["id"])
         return allowedGroups  

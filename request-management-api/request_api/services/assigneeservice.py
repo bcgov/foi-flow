@@ -9,11 +9,14 @@ class assigneeservice:
 
     """
     
-    def getGroupsAndMembersByTypeAndStatus(self, requestType, status):  
-        if status is None:
-            return self.getGroupsAndMembersByType(requestType)
+    def getGroupsAndMembersByTypeAndStatus(self, requestType=None, status=None):
+        if requestType is None and status is None:
+           return KeycloakAdminService().getGroupsAndMembers(self._getGroupsByType()) 
         else:
-            return KeycloakAdminService().getGroupsAndMembers(self._getGroups(requestType,status))
+            if status is None:
+                return self.getGroupsAndMembersByType(requestType)
+            else:
+                return KeycloakAdminService().getGroupsAndMembers(self._getGroups(requestType,status))
     
     def getGroupsAndMembersByType(self, requestType):  
         groups = []
@@ -30,14 +33,15 @@ class assigneeservice:
             groups.append(groupEntry)    
         return groups    
 
-    def _getGroups(self,requestType,status=None):
+    def _getGroups(self,requestType=None,status=None):
         if status is None:
             return self._getGroupsByType(requestType)
         else:
             for groupMapping in self._getGroupMappings(requestType):
                 if self._formatstatus(groupMapping.get("status")) == status: 
                     return groupMapping.get("groups")
-                        
+                
+             
     def _getGroupsByType(self,requestType=None):
         groups = []
         for groupMapping in self._getGroupMappings():
