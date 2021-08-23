@@ -98,16 +98,57 @@ const TabbedContainer = React.memo((props) => {
             <FOIRequest />
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <div className="tabcontent"></div>
+            
+            <div className="container foi-review-request-container">
+              <div className="foi-review-container">
+                <form className="makeStyles-root-52 foi-request-form">
+                  <div className="tabcontent">
+                  </div>
+                </form>
+
+
+              </div>
+
+            </div>
           </TabPanel>
           <TabPanel value={value} index={2}>
-            <div className="tabcontent"></div>
+          <div className="container foi-review-request-container">
+              <div className="foi-review-container">
+                <form className="makeStyles-root-52 foi-request-form">
+                  <div className="tabcontent">
+                  </div>
+                </form>
+
+
+              </div>
+
+            </div>
           </TabPanel>
           <TabPanel value={value} index={3}>
-            <div className="tabcontent"></div>
+          <div className="container foi-review-request-container">
+              <div className="foi-review-container">
+                <form className="makeStyles-root-52 foi-request-form">
+                  <div className="tabcontent">
+                  </div>
+                </form>
+
+
+              </div>
+
+            </div>
           </TabPanel>
           <TabPanel value={value} index={4}>
-            <div className="tabcontent"></div>
+          <div className="container foi-review-request-container">
+              <div className="foi-review-container">
+                <form className="makeStyles-root-52 foi-request-form">
+                  <div className="tabcontent">
+                  </div>
+                </form>
+
+
+              </div>
+
+            </div>
           </TabPanel>
         
         </div>
