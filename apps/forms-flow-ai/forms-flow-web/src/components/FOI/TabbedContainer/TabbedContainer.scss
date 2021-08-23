@@ -8,8 +8,10 @@
   }
   .foitabbedContainer{
     display: inline-flex;  
+    background-color: white;
+}
 
-  }
+  
   .leftpanelheader{
       display: inline-block;
   }
@@ -25,7 +27,10 @@
   .foitabheadercollection {
     width: 25%;
     background-color: teal;
-    
+    height: auto;
+    border-radius: 0px 30px 30px 0px!important;
+    margin-bottom: auto;
+    padding-bottom: 7%;
   }
 
   .foileftpanelheader

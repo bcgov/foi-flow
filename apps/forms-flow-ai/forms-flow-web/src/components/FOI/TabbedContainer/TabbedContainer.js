@@ -90,8 +90,7 @@ const TabbedContainer = React.memo((props) => {
             <Tab label="Option 3" {...a11yProps(2)} />
             <Tab label="Option 4" {...a11yProps(3)} />
             <Tab label="Option 5" {...a11yProps(4)} />
-            <Tab label="Option 6" {...a11yProps(5)} />
-            <Tab label="Option 7" {...a11yProps(6)} />
+            
           </Tabs>
         </div>
         <div className="foitabpanelcollection">
@@ -110,12 +109,7 @@ const TabbedContainer = React.memo((props) => {
           <TabPanel value={value} index={4}>
             <div className="tabcontent"></div>
           </TabPanel>
-          <TabPanel value={value} index={5}>
-            <div className="tabcontent"></div>
-          </TabPanel>
-          <TabPanel value={value} index={6}>
-            <div className="tabcontent"></div>
-          </TabPanel>
+        
         </div>
       </div>
     </div>
