@@ -19,20 +19,21 @@ class rawrequestservice:
     """
 
     def saverawrequest(requestdatajson,sourceofsubmission):
+        assigneeGroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
         result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,assignee)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
             data['id'] = result.identifier
+            data['assignedGroup'] = assigneeGroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
 
-    def saverawrequestversion(_requestdatajson, _requestid, _assignee,status):
-        result = FOIRawRequest.saverawrequestversion(
-            _requestrawdata=_requestdatajson, requestid=_requestid, assignee=_assignee,status=status)
+    def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee,status):
+        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status)
         return result
 
     def updateworkflowinstance(wfinstanceid, requestid):
@@ -56,7 +57,8 @@ class rawrequestservice:
             elif (request.sourceofsubmission!= "intake" and request.version == 1):               
                 firstName = request.requestrawdata['contactInfo']['firstName']
                 lastName = request.requestrawdata['contactInfo']['lastName']
-                requestType = request.requestrawdata['requestType']['requestType']    
+                requestType = request.requestrawdata['requestType']['requestType']   
+            assignedgroupvalue = request.assignedgroup if request.assignedgroup else "Unassigned" 
             assignedtovalue = request.assignedto if request.assignedto else "Unassigned"
             _createdDate = request.created_at
             unopenrequest = {'id': request.requestid,
@@ -66,6 +68,7 @@ class rawrequestservice:
                              'currentState': request.status,
                              'receivedDate': _createdDate.strftime('%Y %b, %d'),
                              'receivedDateUF': str(_createdDate),
+                             'assignedGroup': assignedgroupvalue,
                              'assignedTo': assignedtovalue,
                              'xgov': 'No',
                              'idNumber': 'U-00' + str(request.requestid),
@@ -102,6 +105,7 @@ class rawrequestservice:
                                'currentState': 'Unopened',
                                'receivedDate': _createdDate.strftime('%Y %b, %d'),
                                'receivedDateUF': _createdDate.strftime('%Y-%m-%d %H:%M:%S.%f'),
+                               'assignedGroup': "Unassigned",
                                'assignedTo': "Unassigned",
                                'xgov': 'No',
                                'idNumber': 'U-00' + str(request['requestid']),

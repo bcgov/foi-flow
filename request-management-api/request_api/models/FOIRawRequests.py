@@ -19,6 +19,7 @@ class FOIRawRequest(db.Model):
     status = db.Column(db.String(25), unique=False, nullable=True)
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
+    assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
     assignedto = db.Column(db.String(120), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -102,4 +103,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedto','updatedby','sourceofsubmission')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission')

@@ -60,6 +60,7 @@ class dashboardservice:
                                  'currentState':  openrequest["currentState"],
                                  'receivedDate':  openrequest["receivedDate"],
                                  'receivedDateUF':  openrequest["receivedDateUF"],
+                                 'assignedGroup':  openrequest["assignedTo"],
                                  'assignedTo':  openrequest["assignedTo"],
                                  'xgov': 'No',
                                  'idNumber':  openrequest["idNumber"],
