@@ -54,17 +54,19 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const getMenuItems = () => {
         var menuItems = [];
         var i = 1;
-        for (var group of assignedToList) {
-            menuItems.push(<MenuItem className={classes.group} disabled key={i++} value={group.name}>{group.name}</MenuItem>);
-            for (var assignee of group.members) {
-                menuItems.push(<MenuItem key={assignee.id} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
+        if (assignedToList && assignedToList.length > 0) {
+            for (var group of assignedToList) {
+                menuItems.push(<MenuItem className={classes.group} disabled key={group.id} value={group.name}>{group.name}</MenuItem>);
+                for (var assignee of group.members) {
+                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
+                }
             }
         }
         return menuItems;
     }
      //local state management for assignedTo
-    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "Intake Team|Unassigned") : "Intake Team|Unassigned";
-    console.log(assignedToList);
+    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : "|Unassigned";//"Intake Team|Unassigned";
+   
     console.log(assignedTo);
     const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
     console.log(`selectedAssignedTo = ${selectedAssignedTo}`)

@@ -77,7 +77,7 @@ export const fetchFOIProgramAreaList = (...rest) => {
 
 export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  const unAssigned = {"id": 0, "username": "Unassigned", "firstname":"", "lastname":""};
+  const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};
   const apiUrlGETAssignedToList = replaceUrl(replaceUrl(
     API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
     "<requesttype>",
@@ -89,9 +89,9 @@ export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
         if (res.data) {
           const foiAssignedToList = res.data;
           let data = foiAssignedToList.map((assignedTo) => {
-            assignedTo.members.unshift(unAssigned);
             return { ...assignedTo};
-          });         
+          });
+          data.unshift(unAssignedGroup);
           dispatch(setFOIAssignedToList(data));          
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -246,6 +246,7 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
           const foiRequest = res.data;          
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -264,7 +265,6 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
 };
 
 export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
-  console.log(`${JSON.stringify(data)}`);
   const done = rest.length ? rest[0] : () => {};
   let id = urlIndexCreateRequest > -1? -1: requestId;  
   const apiUrl = replaceUrl(

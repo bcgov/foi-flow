@@ -57,7 +57,10 @@ const FOIRequest = React.memo((props) => {
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1) {
       dispatch(fetchFOIRawRequestDetails(requestId));
-    }    
+    }
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1) {
+      dispatch(fetchFOIAssignedToList("general","unopened"));
+    }
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     // dispatch(fetchFOIAssignedToList());
@@ -329,7 +332,7 @@ const FOIRequest = React.memo((props) => {
         requestObject.assignedTo = assignedToValue[1];
       }
       else {
-        requestObject.assignedGroup = "Unassigned Group";
+        requestObject.assignedGroup = "Unassigned";
         requestObject.assignedTo = assignedToValue[0];
       }      
       requestObject.assignedToName = value2;      
