@@ -87,4 +87,14 @@ class FOIRequestWrapperSchema(Schema):
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)
 
-    
+class EditableFOIMinistryRequestWrapperSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    filenumber = fields.Str(data_key="filenumber")
+    status = fields.Str(data_key="status")
+
+class EditableFOIRequestWrapperSchema(Schema):
+    wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
+    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)  
