@@ -74,7 +74,7 @@ const TabbedContainer = React.memo((props) => {
 
         <div className="foitabheadercollection">
           <div className="foileftpanelheader">
-            <h1>FOI</h1>
+            <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <Tabs
             orientation="vertical"

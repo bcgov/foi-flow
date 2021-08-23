@@ -3,9 +3,11 @@
     padding-top: 65px;
     position: relative;
  
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 19%;
+    margin-right: 19%;
   }
+
+
   .foitabbedContainer{
     display: inline-flex;  
     background-color: white;
@@ -45,6 +47,11 @@
   .foileftpanelheader h1 {
         color: white;
   }
+
+.foileftpanelheader h1 > a {
+    text-decoration: none!important;
+    color: white;
+}
 
   .foileftpanelstatus
   {
