@@ -38,7 +38,7 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid,assignee,status)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status)->DefaultMethodResult:        
         updatedat = datetime.now()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
@@ -46,7 +46,7 @@ class FOIRawRequest(db.Model):
             _version = request.version+1
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
