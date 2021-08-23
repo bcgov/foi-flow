@@ -53,6 +53,7 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
         else:
             return DefaultMethodResult(True,'No request foound')
+            
     @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid)->DefaultMethodResult:
         updatedat = datetime.now()
