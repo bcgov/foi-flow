@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import "./ministrieslist.scss";
 import { makeStyles } from '@material-ui/core/styles';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({  
   headingError: {
@@ -13,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterProgramAreaList}) => { 
     const classes = useStyles();
-
+    const {ministryId} = useParams(); 
     const [programAreaList, setProgramAreaListItems] = React.useState(masterProgramAreaList);
     //required field validation error object
     const [isError, setError] = React.useState(false);
@@ -43,13 +44,14 @@ const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterPr
               
               <label key={index} className="check-item">                  
               <input
-                type={"checkbox"}
+                type="checkbox"
                 className="checkmark"
                 key={programArea.iaocode}
                 data-programareaid={programArea.programareaid}
                 onChange={handleOnChangeProgramArea}
                 checked={programArea.isChecked}
                 required
+                disabled={!!ministryId}
               />
               <span key={index+1} className="checkmark"></span>
             {programArea.iaocode}</label>
