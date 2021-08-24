@@ -59,6 +59,8 @@ const TabbedContainer = React.memo((props) => {
   }));
 
   const classes = useStyles();
+  const [headerBG, setheaderBG] = React.useState("foitabheaderdefaultBG");
+  const [_requestStatus, setRequestStatus] = React.useState("Unopened");
 
   const [value, setValue] = React.useState(0);
 
@@ -66,13 +68,27 @@ const TabbedContainer = React.memo((props) => {
     setValue(newValue);
   };
 
+  const foitabheaderBG = "foitabheadercollection "+ headerBG
+  const handlestatusudpate = (_daysRemaining,_status)=>{  
+    if(_status == "Open")
+    {      
+      setheaderBG("foitabheaderOpenBG");
+      setRequestStatus(_daysRemaining +" Days Remaining")            
+    }
+    else{
+      setRequestStatus(_status)
+    }
+        
+  }
+
+  
 
   return (
 
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
-        <div className="foitabheadercollection">
+        <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
@@ -92,11 +108,11 @@ const TabbedContainer = React.memo((props) => {
             <Tab label="Option 5" {...a11yProps(4)} />
             
           </Tabs>
-          <h4 className="foileftpanelstatus">Create Request</h4>
+          <h4 className="foileftpanelstatus">{_requestStatus}</h4>
         </div>
         <div className="foitabpanelcollection">
           <TabPanel value={value} index={0}>
-            <FOIRequest />
+            <FOIRequest handlestatusudpate={handlestatusudpate}/>
           </TabPanel>
           <TabPanel value={value} index={1}>
             
