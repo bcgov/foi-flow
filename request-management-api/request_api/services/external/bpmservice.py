@@ -2,7 +2,7 @@ import requests
 import os
 import json
 from enum import Enum
-from request_api.schemas.external.bpmschema import MessageSchema, ProcessVariableSchema 
+from request_api.schemas.external.bpmschema import MessageSchema, VariableSchema 
 
 """
 This class is reserved for workflow services integration.
@@ -20,14 +20,29 @@ class bpmservice:
     bpmGrantType =  os.getenv("BPM_GRANT_TYPE")
     
     @classmethod
-    def claim(self,processInstanceId, userId, token=None):    
+    def unopenedClaim(self,processInstanceId, userId, token=None):    
         messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId, 
-                                              "messageName": MessageType.claim.value, 
+                                              "messageName": MessageType.unopenedClaim.value, 
                                               "processVariables":{
-                                                  "assignedTo": ProcessVariableSchema().dump({"type" : VariableType.String.value, "value": userId})
+                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userId})
                                                   }
                                               })
-        return requests.post(self._getUrl_(self,MessageType.claim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+        return requests.post(self._getUrl_(self,MessageType.unopenedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+
+    @classmethod
+    def openedclaim(self,fileNumber, groupName, userId, token=None):    
+        messageSchema = MessageSchema().dump({"messageName": MessageType.openedClaim.value, 
+                                              "localCorrelationKeys":{
+                                                  "id": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber})
+                                                  },
+                                              "processVariables":{
+                                                  "filenumber": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber}),
+                                                  "assignedGroup": VariableSchema().dump({"type" : VariableType.String.value, "value": groupName}),
+                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userId})
+                                                  }
+                                              })
+        return requests.post(self._getUrl_(self,MessageType.openedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+
 
     @classmethod
     def complete(self,processInstanceId, data, token=None): 
@@ -35,14 +50,14 @@ class bpmservice:
         messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId, 
                                               "messageName": MessageType.openrequest.value, 
                                               "processVariables":{
-                                                  "foiRequestMetaData": ProcessVariableSchema().dump({"data" : VariableType.String.value, "value": data})
+                                                  "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
                                                   }
                                               })
-        return requests.post(self._getUrl_(self,MessageType.claim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+        return requests.post(self._getUrl_(self,MessageType.openrequest.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
         
 
     def _getUrl_(self, messageType):
-        if(MessageType.claim.value == messageType or MessageType.openrequest.value == messageType):
+        if(MessageType.unopenedClaim.value == messageType or MessageType.openrequest.value == messageType or MessageType.openedClaim.value == messageType):
             return self.bpmEngineRestUrl+"/message"
         return self.bpmEngineRestUrl
     
@@ -63,7 +78,8 @@ class bpmservice:
         }
         
 class MessageType(Enum):
-    claim = "foi-unopened-assignment"
+    unopenedClaim = "foi-unopened-assignment"
+    openedClaim = "foi-opened-assignment"
     openrequest = "foi-open-request"
     
 class VariableType(Enum):
