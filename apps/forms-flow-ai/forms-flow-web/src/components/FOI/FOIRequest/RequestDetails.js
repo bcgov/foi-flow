@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { useSelector } from "react-redux";
@@ -13,7 +14,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     /**
      *  Request details box in the UI
      *  All fields are mandatory here
-     */ 
+     */
+     const {ministryId} = useParams();  
     const ADD_DAYS = 30;
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
@@ -205,6 +207,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={receivedDateText === undefined || receivedDateText === ""}
                             fullWidth
+                            disabled={!!ministryId}
                         />
                         <TextField                
                             label="Start Date"
@@ -219,6 +222,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={startDateText === undefined || startDateText === ""}
                             fullWidth
+                            disabled={!!ministryId}
                         />
                         <TextField                
                             label="Due Date"

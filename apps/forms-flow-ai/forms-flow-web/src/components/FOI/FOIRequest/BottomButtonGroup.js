@@ -58,7 +58,7 @@ const BottomButtonGroup = React.memo(({
       }
     }
     const saveRequest = async () => {      
-      dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, (err, res) => {
+      dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, ministryId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
             position: "top-right",

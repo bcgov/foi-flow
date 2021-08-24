@@ -78,11 +78,14 @@ export const fetchFOIProgramAreaList = (...rest) => {
 export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};
-  const apiUrlGETAssignedToList = replaceUrl(replaceUrl(
-    API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
-    "<requesttype>",
-    requestType
-  ),"<curentstate>", status);  
+  let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
+  if (requestType && status) {
+    apiUrlGETAssignedToList = replaceUrl(replaceUrl(
+      API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
+      "<requesttype>",
+      requestType
+    ),"<curentstate>", status); 
+  }  
   return (dispatch) => {
     httpOpenGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
       .then((res) => {
@@ -243,7 +246,7 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
     httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          const foiRequest = res.data;          
+          const foiRequest = res.data;         
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
@@ -264,14 +267,24 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
   };
 };
 
-export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
+export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  let id = urlIndexCreateRequest > -1? -1: requestId;  
-  const apiUrl = replaceUrl(
-    API.FOI_RAW_REQUEST_API,
-    "<requestid>",
-    id
-  );
+  let id = urlIndexCreateRequest > -1? -1: requestId;
+  let apiUrl = "";
+  if (ministryId) {
+    apiUrl = replaceUrl(replaceUrl(
+      API.FOI_REQUEST_API,
+      "<requestid>",
+      requestId
+    ),"<ministryid>", ministryId);  
+    }
+  else {
+    apiUrl = replaceUrl(
+      API.FOI_RAW_REQUEST_API,
+      "<requestid>",
+      id
+    );
+  }  
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
       .then((res) => {
