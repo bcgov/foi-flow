@@ -64,13 +64,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     <Link href="#" onClick={preventDefault}>
                         <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
-                </div>
-            <div className="foi-request-status">
-                {status}
-            </div>
-            <div className="foi-request-daysremaining" hidden={hideDaysRemaining}>
-                {`${daysRemaining} Days Remaining`}
-            </div>
+                </div>           
             </div>
             
             <div className="foi-assigned-to-container">
