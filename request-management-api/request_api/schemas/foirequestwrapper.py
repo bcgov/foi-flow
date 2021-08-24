@@ -86,6 +86,8 @@ class FOIRequestWrapperSchema(Schema):
   
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)
+    
+    idNumber = fields.Str(data_key="idNumber",allow_none=True) 
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

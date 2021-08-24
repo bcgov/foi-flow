@@ -66,12 +66,11 @@ class FOIRequests(Resource):
             assignedGroup = request_json['assignedGroup'] if 'assignedGroup' in fOIRequestsSchema  else None
             assignedTo = request_json['assignedTo'] if 'assignedTo' in fOIRequestsSchema  else None
             rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open In Progress")               
-            if rawresult.success == True:
-                
+            if rawresult.success == True:                
                 result = requestservice.saverequest(fOIRequestsSchema)
                 if result.success == True:
                     metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                    requestservice.postEventToWorkflow(rawresult.args[0], json.loads(metadata))
+                    requestservice.postEventToWorkflow(rawresult.args[0],json.loads(metadata))
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
@@ -81,20 +80,22 @@ class FOIRequests(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
         
 @cors_preflight('GET,POST,PUT,OPTIONS')
-@API.route('/foirequests/<int:foirequestid>')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>')
 class FOIRequestsById(Resource):
     """Resource for managing FOI requests."""
 
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
-    def post(foirequestid):
+    def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                        
-            result = requestservice.saverequest(fOIRequestsSchema, foirequestid)
-            if result != {}:
+            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                  
+            result = requestservice.saverequest(fOIRequestsSchema, foirequestid, foiministryrequestid)
+            if result.success == True:
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})                
+                requestservice.updateEventToWorkflow(fOIRequestsSchema,json.loads(metadata))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404

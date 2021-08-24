@@ -3,7 +3,7 @@
   <bpmn:collaboration id="Collaboration_1gduz3b">
     <bpmn:participant id="Participant_0c2mqj5" name="FOI Raw Request Processing" processRef="foi-request" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-request" name="FOI Raw Request Processing" isExecutable="true" camunda:versionTag="4">
+  <bpmn:process id="foi-request" name="FOI Raw Request Processing" isExecutable="true" camunda:versionTag="5">
     <bpmn:laneSet id="LaneSet_1j1sa3c">
       <bpmn:lane id="Lane_1u899ed" name="Intake Team">
         <bpmn:flowNodeRef>Event_043z2u1</bpmn:flowNodeRef>

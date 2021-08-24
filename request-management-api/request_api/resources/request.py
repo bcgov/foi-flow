@@ -67,7 +67,7 @@ class FOIRawRequest(Resource):
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
                 result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneeGroup, assignee,status)                
                 if result.success == True:   
-                    bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
+                    bpmservice.unopenedClaim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice.saverawrequest(updaterequest,"intake")               
