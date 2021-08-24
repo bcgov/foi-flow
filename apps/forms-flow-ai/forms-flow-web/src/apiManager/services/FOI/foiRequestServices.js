@@ -246,7 +246,7 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
     httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          const foiRequest = res.data;          
+          const foiRequest = res.data;         
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
@@ -267,14 +267,24 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
   };
 };
 
-export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ...rest) => {
+export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  let id = urlIndexCreateRequest > -1? -1: requestId;  
-  const apiUrl = replaceUrl(
-    API.FOI_RAW_REQUEST_API,
-    "<requestid>",
-    id
-  );
+  let id = urlIndexCreateRequest > -1? -1: requestId;
+  let apiUrl = "";
+  if (ministryId) {
+    apiUrl = replaceUrl(
+      API.FOI_POST_REQUEST_API,
+      "<requestid>",
+      id
+    );
+    }
+  else {
+    apiUrl = replaceUrl(
+      API.FOI_RAW_REQUEST_API,
+      "<requestid>",
+      id
+    );
+  }  
   return (dispatch) => {
     httpOpenPOSTRequest(apiUrl, data)
       .then((res) => {
