@@ -272,11 +272,11 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
   let id = urlIndexCreateRequest > -1? -1: requestId;
   let apiUrl = "";
   if (ministryId) {
-    apiUrl = replaceUrl(
-      API.FOI_POST_REQUEST_API,
+    apiUrl = replaceUrl(replaceUrl(
+      API.FOI_REQUEST_API,
       "<requestid>",
-      id
-    );
+      requestId
+    ),"<ministryid>", ministryId);  
     }
   else {
     apiUrl = replaceUrl(
