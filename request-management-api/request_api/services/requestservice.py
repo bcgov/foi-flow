@@ -31,7 +31,7 @@ class requestservice:
 
     """
 
-    def saverequest(fOIRequestsSchema,foirequestid = None):      
+    def saverequest(fOIRequestsSchema,foirequestid = None, ministryId = None):      
         activeVersion = 1 
         foiMinistryRequestArr = []
         contactInformationArr = []
@@ -47,9 +47,10 @@ class requestservice:
                 return _foiRequest
         
         #Prepare ministry records
+        fileNumber =fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             for ministry in fOIRequestsSchema.get("selectedMinistries"):
-                foiMinistryRequestArr.append(fOIRequestUtil.createMinistry(fOIRequestsSchema, ministry, activeVersion))           
+                foiMinistryRequestArr.append(fOIRequestUtil.createMinistry(fOIRequestsSchema, ministry, activeVersion,fileNumber,ministryId))           
         
 
         #Prepare applicant record 
@@ -143,8 +144,8 @@ class requestservice:
         if foirequestid is not None:         
            openfOIRequest.foirequestid = foirequestid 
         
-        return FOIRequest.saverequest(openfOIRequest)
-    
+        return FOIRequest.saverequest(openfOIRequest) 
+
         
     def updaterequest(fOIRequestsSchema,foirequestid):
         fOIRequestUtil = FOIRequestUtil()
@@ -159,13 +160,21 @@ class requestservice:
                         updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
             return FOIRequest.updateStatus(foirequestid, updatedMinistries)
     
-    
     def postEventToWorkflow(workflowId, data):
-        return bpmservice.complete(workflowId, data)
+         return bpmservice.complete(workflowId, data)
     
+    def updateEventToWorkflow(fOIRequestsSchema, data):
+        fileNumber = fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
+        assignedGroup = fOIRequestsSchema.get("assignedGroup") if 'assignedGroup' in fOIRequestsSchema  else None  
+        assignedTo = fOIRequestsSchema.get("assignedTo") if 'assignedTo' in fOIRequestsSchema  else None   
+        if data.get("ministries") is not None:
+            for ministry in data.get("ministries"):    
+                if ministry["filenumber"] == fileNumber and ministry["status"] == "Open":
+                        bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
        
-    def getrequest(foirequestid,foiministryrequestid):
-        
+
+       
+    def getrequest(foirequestid,foiministryrequestid):        
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)        
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
@@ -268,13 +277,15 @@ class requestservice:
 
 class FOIRequestUtil:   
     
-    def createMinistry(self, requestSchema, ministry, activeVersion):
+    def createMinistry(self, requestSchema, ministry, activeVersion, fileNumber=None, ministryId=None):
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
         foiministryRequest.version = activeVersion
         foiministryRequest.requeststatusid = 1
-        foiministryRequest.isactive = True
-        foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid"))
+        if ministryId is not None:
+            foiministryRequest.foiministryrequestid = ministryId
+        foiministryRequest.isactive = True if fileNumber is None else False
+        foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid")) if fileNumber is None else fileNumber
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
         foiministryRequest.description = requestSchema.get("description")
         foiministryRequest.duedate = requestSchema.get("dueDate")
