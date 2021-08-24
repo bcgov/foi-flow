@@ -75,7 +75,7 @@ const TabbedContainer = React.memo((props) => {
       setheaderBG("foitabheaderOpenBG");
       setRequestStatus(_daysRemaining +" Days Remaining")            
     }
-    else{
+    else{      
       setRequestStatus(_status)
     }
         

@@ -33,7 +33,11 @@
     margin-bottom: auto;
     padding-bottom: 2%;
     min-width: 200px;
-       
+    position: fixed;
+    z-index: 10;
+  }
+  .foitabpanelcollection{
+    margin-left:18%;
   }
 
   .foitabheaderdefaultBG {
