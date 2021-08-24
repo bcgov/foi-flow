@@ -28,13 +28,20 @@
 
   .foitabheadercollection {
     width: fit-content;
-    background-color: teal;
     height: auto;
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;
     min-width: 200px;
        
+  }
+
+  .foitabheaderdefaultBG {
+    background-color: teal;
+  }
+
+  .foitabheaderOpenBG {
+    background-color: green;
   }
 
   .foileftpanelheader
