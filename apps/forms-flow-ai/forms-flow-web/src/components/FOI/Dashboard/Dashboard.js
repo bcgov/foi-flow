@@ -23,13 +23,13 @@ const Dashboard = React.memo((props) => {
   },[dispatch], [requestType]);
 
   function getFullName(params) {    
-    return `${params.getValue(params.id, 'lastName') || ''}, ${
-      params.getValue(params.id, 'firstName') || ''
+    return `${params.row.lastName || ''}, ${
+      params.row.firstName || ''
     }`;
   }
 
   function getAssigneeValue(params) {
-    return params.getValue(params.id, 'assignedTo') ? params.getValue(params.id, 'assignedTo'): params.getValue(params.id, 'assignedGroup') ? params.getValue(params.id, 'assignedGroup') : "Unassigned";
+    return params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
   }
 
   function getReceivedDate(params) {
@@ -158,6 +158,7 @@ const createRequest = (e) => {
                 rowHeight={30}
                 headerHeight={50}                
                 pageSize={10}
+                rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
                 sortingOrder={['desc', 'asc']}
                 sortModel={sortModel}
