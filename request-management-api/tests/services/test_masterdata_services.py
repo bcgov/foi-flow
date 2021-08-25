@@ -2,7 +2,7 @@ from request_api.services.programareaservice import programareaservice
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
-from request_api.services.keycloakadminservice import KeycloakAdminService
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 def test_get_programareas(session):
     response = programareaservice.getprogramareas()
