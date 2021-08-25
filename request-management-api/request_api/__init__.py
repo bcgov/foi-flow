@@ -31,7 +31,7 @@ from request_api.config import _Config
 
 from request_api.models import db, ma
 from request_api.utils.util_logging import setup_logging, setup_filelogging
-
+from request_api.auth import jwt
 
 # Disable more logging.  
 # TODO - Put this behind an env var.
@@ -67,8 +67,9 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     # if os.getenv('FLASK_ENV', 'production') in ['development', 'testing']:
     #     app.register_blueprint(TEST_BLUEPRINT)
 
-    # if os.getenv('FLASK_ENV', 'production') != 'testing':
-    #     setup_jwt_manager(app, jwt)
+    if os.getenv('FLASK_ENV', 'production') != 'testing':
+        print("JWTSET DONE!!!!!!!!!!!!!!!!")
+        setup_jwt_manager(app, jwt)
 
     ExceptionHandler(app)
 
@@ -98,15 +99,15 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     return app
 
 
-# def setup_jwt_manager(app, jwt_manager):
-#     """Use flask app to configure the JWTManager to work for a particular Realm."""
+def setup_jwt_manager(app, jwt_manager):
+    """Use flask app to configure the JWTManager to work for a particular Realm."""
 
-#     def get_roles(a_dict):
-#         return a_dict['realm_access']['roles']  # pragma: no cover
+    def get_roles(a_dict):
+        return a_dict['realm_access']['roles']  # pragma: no cover
 
-#     app.config['JWT_ROLE_CALLBACK'] = get_roles
+    app.config['JWT_ROLE_CALLBACK'] = get_roles
 
-#     jwt_manager.init_app(app)
+    jwt_manager.init_app(app)
 
 
 def register_shellcontext(app):
