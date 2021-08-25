@@ -37,8 +37,7 @@
     border: 1px solid;
   }
     
-  .check-item:hover input[type=checkbox]:not([disabled]) ~ .checkmark{
-    background-color:#ccc;
+  .check-item:hover input[type=checkbox]:not([disabled]) ~ .checkmark{    
     cursor: pointer;
   }
     
