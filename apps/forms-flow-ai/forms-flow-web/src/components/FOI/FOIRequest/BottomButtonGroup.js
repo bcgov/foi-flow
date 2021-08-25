@@ -54,7 +54,8 @@ const BottomButtonGroup = React.memo(({
     const returnToQueue = (e) => {
       e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
-        dispatch(push(`/foi/dashboard`));
+        //dispatch(push(`/foi/dashboard`));
+        window.location.href = '/foi/dashboard';
       }
     }
     const saveRequest = async () => {      
