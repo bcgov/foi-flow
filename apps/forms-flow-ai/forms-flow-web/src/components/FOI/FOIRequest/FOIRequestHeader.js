@@ -36,8 +36,8 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
-        let assignedTo = requestDetails.assignedTo;
-        assignedTo = assignedTo ? assignedTo: "Unassigned";
+        let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+        assignedTo = assignedTo;
         handleAssignedToInitialValue(assignedTo);
     },[requestDetails, handleAssignedToInitialValue])
 
@@ -45,12 +45,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
     }
     
-    //creates the menu items for assignedTo combobox
-    // const menuItems = 
-    // assignedToList.map((item) => {    
-    //     return ( <MenuItem key={item.id} value={item.username} name={getFullName(item.lastname,item.firstname,item.username)} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
-    //  });
-    
+    //creates the grouped menu items for assignedTo combobox    
     const getMenuItems = () => {
         var menuItems = [];
         var i = 1;
@@ -65,7 +60,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         return menuItems;
     }
      //local state management for assignedTo
-    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : "|Unassigned";//"Intake Team|Unassigned";
+    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
    
     const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
     const preventDefault = (event) => event.preventDefault();
