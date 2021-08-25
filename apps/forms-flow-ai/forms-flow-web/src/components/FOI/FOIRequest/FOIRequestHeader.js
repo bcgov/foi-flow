@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
       minWidth: 120,
     },
     item: {
-        paddingLeft: 3 * theme.spacing.unit,
+        paddingLeft: theme.spacing(3),
     },
     group: {
         fontWeight: theme.typography.fontWeightBold,
