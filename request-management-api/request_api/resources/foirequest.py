@@ -69,7 +69,7 @@ class FOIRequests(Resource):
             if rawresult.success == True:                
                 result = requestservice().saverequest(fOIRequestsSchema)
                 if result.success == True:
-                    metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                    metadata = json.dumps({"id": result.identifier, "ministries": result.args[0], "assignedGroup": assignedGroup, "assignedTo": assignedTo})
                     requestservice().postEventToWorkflow(rawresult.args[0],json.loads(metadata))
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
