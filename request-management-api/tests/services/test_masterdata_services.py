@@ -35,7 +35,7 @@ def test_get_deliverymodes(session):
 
 def test_get_intaketeam(session):
     keycloakadminservice = KeycloakAdminService()
-    response = keycloakadminservice.getusers()    
+    response = keycloakadminservice.getusers()
     assert len(response) > 0     
     for item in response:
         assert item['id'] and item['username']
