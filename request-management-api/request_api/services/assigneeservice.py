@@ -16,12 +16,16 @@ class assigneeservice:
             if status is None:
                 return self.getGroupsAndMembersByType(requestType)
             else:
-                return KeycloakAdminService().getGroupsAndMembers(self._getGroups(requestType,status))
+                filteredGroups = self._getGroups(requestType,status)
+                if filteredGroups is not None:
+                    return KeycloakAdminService().getGroupsAndMembers(filteredGroups)
+            return None
             
     def getMembersByGroupName(self, groupName):
         for group in self._getGroupsByType():
              if self._formatInput(group) == groupName: 
-                return KeycloakAdminService().getGroupsAndMembers([group]) 
+                return KeycloakAdminService().getGroupsAndMembers([group])
+        return None 
     
     def getGroupsAndMembersByType(self, requestType):  
         groups = []
