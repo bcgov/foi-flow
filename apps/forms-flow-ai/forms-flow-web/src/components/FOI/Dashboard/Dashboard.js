@@ -28,8 +28,8 @@ const Dashboard = React.memo((props) => {
     }`;
   }
 
-  function getAssigneeFullName(params) {
-    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo') ? params.getValue(params.id, 'assignedTo') : "Unassigned";
+  function getAssigneeValue(params) {
+    return params.getValue(params.id, 'assignedTo') ? params.getValue(params.id, 'assignedTo'): params.getValue(params.id, 'assignedGroup') ? params.getValue(params.id, 'assignedGroup') : "Unassigned";
   }
 
   function getReceivedDate(params) {
@@ -62,11 +62,11 @@ const Dashboard = React.memo((props) => {
      
     },
     {      
-      field: 'assignedToFullName',
+      field: 'assignedToValue',
       headerName: 'ASSIGNED TO',
       width: 180,
       headerAlign: 'left',
-      valueGetter: getAssigneeFullName,
+      valueGetter: getAssigneeValue,
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 

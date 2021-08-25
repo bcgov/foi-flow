@@ -327,13 +327,13 @@ const FOIRequest = React.memo((props) => {
     }
     else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       const assignedToValue = value.split("|");
-      if (assignedToValue.length > 1) {
+      if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => (groupName === assignedToValue[0] && groupName === assignedToValue[1]))) {
+        requestObject.assignedGroup = assignedToValue[0];
+        requestObject.assignedTo = "";
+      }
+      else if (assignedToValue.length > 1) {
         requestObject.assignedGroup = assignedToValue[0];
         requestObject.assignedTo = assignedToValue[1];
-      }
-      else if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => groupName === assignedToValue[0])) {
-        requestObject.assignedGroup = assignedToValue[0];
-        requestObject.assignedTo = assignedToValue[0];
       }
       else {
         requestObject.assignedGroup = "Unassigned";
