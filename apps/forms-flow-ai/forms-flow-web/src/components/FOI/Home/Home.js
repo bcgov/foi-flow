@@ -12,14 +12,14 @@ const Home = React.memo(() => {
     dispatch(push(`/foi/dashboard`));
 }
     return (      
-        <div className="home-page">         
-          <div className="card rounded-rectangle foiroundedrectangle">     
-            <div className="card-body login-container">
-            {isAuthenticated?<h1 className="card-title">Welcome {user.name || user.preferred_username || ""}</h1> : <div> <h1 className="card-title">Welcome, Sign In</h1> <button type="button" className="btn btn-primary foi-btn foibtn" onClick={login}>Log In</button> </div>}
-              
-            </div>
-          </div>     
+      <div className="home-page">
+        <div className="card rounded-rectangle foiroundedrectangle">
+          <div className="card-body login-container">
+            {isAuthenticated ? <div><h1 className="card-title">Welcome {user.name || user.preferred_username || ""}</h1> <div><button type="button" className="btn btn-primary foibtn foi-dashboardbtn" onClick={login}>Go to Dashboard</button></div></div>: <div> <h1 className="card-title">Welcome, Sign In</h1> <button type="button" className="btn btn-primary foi-btn foibtn" onClick={login}>Log In</button> </div>}
+
+          </div>
         </div>
+      </div>
     );
   });
 

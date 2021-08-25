@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FOIRequest = React.memo((props) => {
+const FOIRequest = React.memo(({handlestatusudpate}) => {
   const {requestId, ministryId} = useParams();
   
   const url = window.location.href;
@@ -211,6 +211,8 @@ const FOIRequest = React.memo((props) => {
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   }
+
+  
  
 
   //handle email validation
@@ -470,7 +472,7 @@ const FOIRequest = React.memo((props) => {
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
         { (urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
           <>
-            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject}/>
+            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate}/>
             <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information for the applicant, either EMAIL or MAILING ADDRESS.</div>
             <ApplicantDetails requestDetails={requestDetails} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
