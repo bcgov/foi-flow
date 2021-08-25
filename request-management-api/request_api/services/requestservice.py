@@ -31,23 +31,17 @@ class requestservice:
 
     """
 
-    def saverequest(fOIRequestsSchema,foirequestid = None, ministryId = None):      
-        activeVersion = 1 
+    def saverequest(self,fOIRequestsSchema, foirequestid=None, ministryId=None, fileNumber=None, version=None, rawRequestId=None, wfinstanceid=None):      
+        activeVersion = 1 if version is None else version
         foiMinistryRequestArr = []
         contactInformationArr = []
         personalAttributeArr = []
         requestApplicantArr = []
         fOIRequestUtil = FOIRequestUtil()
-        #Identify version       
-        if foirequestid is not None:
-            _foiRequest = FOIRequest().getrequest(foirequestid)
-            if _foiRequest != {}:
-               activeVersion = _foiRequest["version"] + 1
-            else:
-                return _foiRequest
+
         
-        #Prepare ministry records
-        fileNumber =fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
+        #Prepare ministry records  
+               
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             for ministry in fOIRequestsSchema.get("selectedMinistries"):
                 foiMinistryRequestArr.append(fOIRequestUtil.createMinistry(fOIRequestsSchema, ministry, activeVersion,fileNumber,ministryId))           
@@ -122,7 +116,7 @@ class requestservice:
                         )
         # FOI Request      
         openfOIRequest = FOIRequest()
-        openfOIRequest.foirawrequestid = fOIRequestsSchema.get("foirawrequestid") 
+        openfOIRequest.foirawrequestid = fOIRequestsSchema.get("foirawrequestid") if rawRequestId is None else rawRequestId
         openfOIRequest.version = activeVersion
         openfOIRequest.requesttype = fOIRequestsSchema.get("requestType")
         openfOIRequest.initialdescription = fOIRequestsSchema.get("description")
@@ -142,12 +136,27 @@ class requestservice:
         openfOIRequest.personalAttributes = personalAttributeArr
         openfOIRequest.requestApplicants = requestApplicantArr        
         if foirequestid is not None:         
-           openfOIRequest.foirequestid = foirequestid 
+           openfOIRequest.foirequestid = foirequestid
+        if wfinstanceid is not None:         
+           openfOIRequest.wfinstanceid = wfinstanceid 
         
         return FOIRequest.saverequest(openfOIRequest) 
 
+    def saveRequestVersion(self,fOIRequestsSchema, foirequestid , ministryId):
+        activeVersion = 1        
+        fileNumber =fOIRequestsSchema.get("idNumber") 
+        #Identify version       
+        if foirequestid is not None:
+            _foiRequest = FOIRequest().getrequest(foirequestid)
+            if _foiRequest != {}:               
+               activeVersion = _foiRequest["version"] + 1
+            else:
+                return _foiRequest  
+            FOIMinistryRequest.deActivateFileNumberVersion(ministryId, fileNumber, activeVersion)
+            return self.saverequest(fOIRequestsSchema,foirequestid,ministryId,fileNumber,activeVersion,_foiRequest["foirawrequestid"],_foiRequest["wfinstanceid"])    
+          
         
-    def updaterequest(fOIRequestsSchema,foirequestid):
+    def updaterequest(self,fOIRequestsSchema,foirequestid):
         fOIRequestUtil = FOIRequestUtil()
         if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"wfinstanceid","main") == True:
             return FOIRequest.updateWFInstance(foirequestid, fOIRequestsSchema.get("wfinstanceid"))
@@ -160,10 +169,10 @@ class requestservice:
                         updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
             return FOIRequest.updateStatus(foirequestid, updatedMinistries)
     
-    def postEventToWorkflow(workflowId, data):
+    def postEventToWorkflow(self,workflowId, data):
          return bpmservice.complete(workflowId, data)
     
-    def updateEventToWorkflow(fOIRequestsSchema, data):
+    def updateEventToWorkflow(self,fOIRequestsSchema, data):
         fileNumber = fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
         assignedGroup = fOIRequestsSchema.get("assignedGroup") if 'assignedGroup' in fOIRequestsSchema  else None  
         assignedTo = fOIRequestsSchema.get("assignedTo") if 'assignedTo' in fOIRequestsSchema  else None   
@@ -174,7 +183,7 @@ class requestservice:
        
 
        
-    def getrequest(foirequestid,foiministryrequestid):        
+    def getrequest(self,foirequestid,foiministryrequestid):        
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)        
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
@@ -284,7 +293,7 @@ class FOIRequestUtil:
         foiministryRequest.requeststatusid = 1
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
-        foiministryRequest.isactive = True if fileNumber is None else False
+        foiministryRequest.isactive = True
         foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid")) if fileNumber is None else fileNumber
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
         foiministryRequest.description = requestSchema.get("description")

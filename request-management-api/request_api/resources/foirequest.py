@@ -42,7 +42,7 @@ class FOIRequest(Resource):
     def get(foirequestid,foiministryrequestid):
         try :            
             jsondata = {}
-            jsondata = requestservice.getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
+            jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
             return jsondata , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -67,10 +67,10 @@ class FOIRequests(Resource):
             assignedTo = request_json['assignedTo'] if 'assignedTo' in fOIRequestsSchema  else None
             rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open In Progress")               
             if rawresult.success == True:                
-                result = requestservice.saverequest(fOIRequestsSchema)
+                result = requestservice().saverequest(fOIRequestsSchema)
                 if result.success == True:
                     metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                    requestservice.postEventToWorkflow(rawresult.args[0],json.loads(metadata))
+                    requestservice().postEventToWorkflow(rawresult.args[0],json.loads(metadata))
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
@@ -91,11 +91,11 @@ class FOIRequestsById(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                  
-            result = requestservice.saverequest(fOIRequestsSchema, foirequestid, foiministryrequestid)
+            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                    
+            result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid)
             if result.success == True:
-                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})                
-                requestservice.updateEventToWorkflow(fOIRequestsSchema,json.loads(metadata))
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
+                requestservice().updateEventToWorkflow(fOIRequestsSchema,json.loads(metadata))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404
@@ -106,7 +106,12 @@ class FOIRequestsById(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
- 
+
+
+@cors_preflight('GET,POST,PUT,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>')
+class FOIRequestUpdateById(Resource): 
+    
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
@@ -114,9 +119,8 @@ class FOIRequestsById(Resource):
         """ PUT Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            print(request_json)
             fOIRequestsSchema = EditableFOIRequestWrapperSchema().load(request_json)
-            result = requestservice.updaterequest(fOIRequestsSchema, foirequestid)
+            result = requestservice().updaterequest(fOIRequestsSchema, foirequestid)
             if result != {}:
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
             else:
