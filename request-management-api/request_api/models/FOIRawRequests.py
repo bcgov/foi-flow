@@ -28,11 +28,11 @@ class FOIRawRequest(db.Model):
     
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:                
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assigneegroup= None,assignee= None)->DefaultMethodResult:                
         createdat = datetime.now()
         print(createdat)
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedto=assignee)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
