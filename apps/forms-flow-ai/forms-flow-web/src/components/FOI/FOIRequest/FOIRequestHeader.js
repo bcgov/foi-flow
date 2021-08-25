@@ -9,7 +9,7 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject,handlestatusudpate}) => {
    
      /**
      *  Header of Review request in the UI
@@ -24,7 +24,11 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         let assignedTo = requestDetails.assignedTo;
         assignedTo = assignedTo ? assignedTo: "Unassigned";
         handleAssignedToInitialValue(assignedTo);
-    },[requestDetails, handleAssignedToInitialValue])
+        let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
+        let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
+        handlestatusudpate(_daysRemaining,_status)
+
+    },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
 
     const getFullName = (lastName, firstName, username) => {
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
@@ -60,13 +64,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     <Link href="#" onClick={preventDefault}>
                         <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
-                </div>
-            <div className="foi-request-status">
-                {status}
-            </div>
-            <div className="foi-request-daysremaining" hidden={hideDaysRemaining}>
-                {`${daysRemaining} Days Remaining`}
-            </div>
+                </div>           
             </div>
             
             <div className="foi-assigned-to-container">
