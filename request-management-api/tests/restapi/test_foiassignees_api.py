@@ -38,11 +38,9 @@ def test_get_foiassigneesforpersonalinvalidstatus(app, client):
     assert response.status_code == 404
 
 def test_get_foiassigneesforgroup(app, client):
-    response = client.get('/api/foiassignees/intaketeam')
-    jsondata = json.loads(response.data)    
-    assert response.status_code == 200 and len(jsondata) >=1
+    response = client.get('/api/foiassignees/intaketeam')  #invalid condition    
+    assert response.status_code == 400
     
 def test_get_foiassigneesforinvalidgroup(app, client):
-    response = client.get('/api/foiassignees/test')
-    jsondata = json.loads(response.data)    
-    assert response.status_code == 404
+    response = client.get('/api/foiassignees/test') #invalid condition          
+    assert response.status_code == 400
