@@ -10,16 +10,16 @@ with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplereq
   rawrequestjson = json.load(x)
 def test_post_foirequest_general(app, client):
     rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), content_type='application/json')
-    jsondata = json.loads(rawresponse.data)
+    jsondata = json.loads(rawresponse.data)    
     getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), content_type='application/json')
-    getrawjsondata = json.loads(getrawresponse.data)
+    getrawjsondata = json.loads(getrawresponse.data)    
     #assert rawresponse.status_code == 200
     foirequest = generalrequestjson
     foirequest["id"] = str(jsondata["id"])
     foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), content_type='application/json')
-    foijsondata = json.loads(foiresponse.data)
+    foijsondata = json.loads(foiresponse.data)    
     wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
-    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(foijsondata["id"]),data=json.dumps(wfinstanceid), content_type='application/json')
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), content_type='application/json')
     assert foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
 
 with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-personal.json') as y:
@@ -36,7 +36,7 @@ def test_post_foirequest_personal(app, client):
     foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), content_type='application/json')
     foijsondata = json.loads(foiresponse.data)
     wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
-    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(foijsondata["id"]),data=json.dumps(wfinstanceid), content_type='application/json')
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), content_type='application/json')
     assert foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
 
 
