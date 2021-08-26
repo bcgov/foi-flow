@@ -20,9 +20,13 @@ A simple decorator to add the options method to a Request Class.
 import base64
 import re
 import urllib
+from functools import wraps
 
 from humps.main import camelize, decamelize
-
+from flask import request, g
+from sqlalchemy.sql.expression import false
+from request_api.auth import jwt as _authjwt
+import jwt,json
 
 def cors_preflight(methods):
     """Render an option method on the class."""
@@ -40,6 +44,18 @@ def cors_preflight(methods):
 
     return wrapper
 
+def hasrole(role):
+    def role_check(function):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            tokenjson = jwt.decode(_authjwt.get_token_auth_header(),options={"verify_signature": False})            
+            exists =  role in tokenjson['groups']
+            retval = "Unauthorized" , 401
+            if exists == True:            
+                return function()
+            return retval
+        return wrapper
+    return role_check
 
 def camelback2snake(camel_dict: dict):
     """Convert the passed dictionary's keys from camelBack case to snake_case."""
