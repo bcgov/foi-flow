@@ -61,9 +61,14 @@ class FOIMinistryRequest(db.Model):
         return request_schema.dump(query)
 
     @classmethod
-    def getrequests(cls):
+    def getrequests(cls, group = None):
         _session = db.session
-        _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
+        _ministryrequestids = []        
+        if group is None:
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
+        else:            
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , FOIMinistryRequest.assignedgroup == group).all()    
+
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
         request_schema = FOIRequestsSchema()

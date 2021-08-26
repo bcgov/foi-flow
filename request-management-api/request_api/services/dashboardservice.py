@@ -11,10 +11,17 @@ class dashboardservice:
 
 
 
-    def getrequestqueue():
+    def getrequestqueue(groups):
             
-            requests = FOIRawRequest.getrequests()
-            openedrequests = FOIMinistryRequest.getrequests()        
+            requests = []
+            openedrequests = []
+            if "Intake Team" in groups:                
+                requests = FOIRawRequest.getrequests()
+                openedrequests = FOIMinistryRequest.getrequests()
+            elif "Flex Team" in groups:               
+                openedrequests = FOIMinistryRequest.getrequests("Flex Team")
+            
+
             requestqueue = []
             
             for request in requests:

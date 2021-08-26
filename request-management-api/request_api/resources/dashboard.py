@@ -3,7 +3,7 @@ import flask
 from flask_restx import Namespace, Resource, cors
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight,hasrole
+from request_api.utils.util import  cors_preflight,ismemberofgroups, getgroupsfromtoken
 from request_api.exceptions import BusinessException, Error
 from request_api.services.dashboardservice import dashboardservice
 from request_api.auth import jwt as _authjwt
@@ -21,13 +21,12 @@ class Dashboard(Resource):
     @TRACER.trace()    
     @cors.crossdomain(origin='*')
     @cors_preflight('GET,POST,OPTIONS') 
-    @hasrole('/Intake Team')  
-    def get():
-        ## todo : This code will get re-furshibed with BPM WF validation to list
+    @ismemberofgroups('Intake Team,Flex Team')  
+    def get():        
         try:    
-                                                                   
-                unopenedrequests = dashboardservice.getrequestqueue()
-                jsondata = json.dumps(unopenedrequests)
+                groups = getgroupsfromtoken()                
+                requests = dashboardservice.getrequestqueue(groups)                
+                jsondata = json.dumps(requests)
                 return jsondata , 200            
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

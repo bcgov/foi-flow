@@ -44,18 +44,33 @@ def cors_preflight(methods):
 
     return wrapper
 
-def hasrole(role):
+def ismemberofgroups(group):
     def role_check(function):
         @wraps(function)
         def wrapper(*args, **kwargs):
-            tokenjson = jwt.decode(_authjwt.get_token_auth_header(),options={"verify_signature": False})            
-            exists =  role in tokenjson['groups']
+            groups = group.split(',')            
+            groups = ["/" + group for group in groups]            
+            #TODO:ABIN : REMOVE verify signature to false - new logic should come here 
+            tokenjson = jwt.decode(_authjwt.get_token_auth_header(),options={"verify_signature": False})             
+            exists = False                             
+            for _group in groups:
+                if _group in tokenjson['groups']:
+                    exists = True
+                    exit
             retval = "Unauthorized" , 401
             if exists == True:            
                 return function()
             return retval
         return wrapper
     return role_check
+
+
+def getgroupsfromtoken():
+    tokenjson = jwt.decode(_authjwt.get_token_auth_header(),options={"verify_signature": False})
+    groups = tokenjson['groups']
+    groups = [group.replace('/','',1) if group.startswith('/') else group for group in groups]
+    return groups
+
 
 def camelback2snake(camel_dict: dict):
     """Convert the passed dictionary's keys from camelBack case to snake_case."""
