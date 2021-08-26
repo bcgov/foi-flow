@@ -83,7 +83,6 @@ class bpmservice:
         }
 
     def _isEnabled(self):
-        print(self.bpmEngineRestUrl)
         if self.bpmEngineRestUrl is not None:
             return True
         else:
