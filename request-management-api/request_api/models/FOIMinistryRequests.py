@@ -59,7 +59,12 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
-
+    
+    @classmethod
+    def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion)->DefaultMethodResult:
+        db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryId, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentVersion).update({"isactive": False, "updated_at": datetime.now()}, synchronize_session=False)
+        return DefaultMethodResult(True,'Request Updated',idnumber)
+    
     @classmethod
     def getrequests(cls, group = None):
         _session = db.session

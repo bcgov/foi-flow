@@ -23,13 +23,13 @@ const Dashboard = React.memo((props) => {
   },[dispatch], [requestType]);
 
   function getFullName(params) {    
-    return `${params.getValue(params.id, 'lastName') || ''}, ${
-      params.getValue(params.id, 'firstName') || ''
+    return `${params.row.lastName || ''}, ${
+      params.row.firstName || ''
     }`;
   }
 
-  function getAssigneeFullName(params) {
-    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo') ? params.getValue(params.id, 'assignedTo') : "Unassigned";
+  function getAssigneeValue(params) {
+    return params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
   }
 
   function getReceivedDate(params) {
@@ -62,11 +62,11 @@ const Dashboard = React.memo((props) => {
      
     },
     {      
-      field: 'assignedToFullName',
+      field: 'assignedToValue',
       headerName: 'ASSIGNED TO',
       width: 180,
       headerAlign: 'left',
-      valueGetter: getAssigneeFullName,
+      valueGetter: getAssigneeValue,
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
@@ -158,6 +158,7 @@ const createRequest = (e) => {
                 rowHeight={30}
                 headerHeight={50}                
                 pageSize={10}
+                rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
                 sortingOrder={['desc', 'asc']}
                 sortModel={sortModel}

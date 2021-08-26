@@ -40,8 +40,15 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
     def get(requestype=None, status=None):
         """ POST Method for capturing FOI requests before processing"""
+        if requestype is not None:
+            if requestype != "personal" and requestype != "general":
+                return {'status': False, 'message':'Bad Request'}, 400   
         try:
-            return json.dumps(assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status)), 200
+            result = assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status)
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':'Not Found'}, 404   
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
         
@@ -57,6 +64,10 @@ class FOIAssigneesByTypeAndStatus(Resource):
     def get(groupName):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            return json.dumps(assigneeservice().getMembersByGroupName(groupName)), 200
+            result = assigneeservice().getMembersByGroupName(groupName)
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':'Not Found'}, 404 
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
