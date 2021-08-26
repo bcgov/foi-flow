@@ -4,7 +4,13 @@ import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObject, handleContactDetailsInitialValue, handleContanctDetailsValue}) => {
+const AddressContactDetails = React.memo(({
+  requestDetails,
+  contactDetailsNotGiven,
+  createSaveRequestObject, 
+  handleContactDetailsInitialValue, 
+  handleContanctDetailsValue
+}) => {
 
     /**
      *  Address and Contact box in the UI
@@ -126,8 +132,75 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
             <label className="foi-details-label">ADDRESS AND CONTACT INFORMATION</label>
             <CardContent>         
                 <div className="row foi-details-row">
-                    <div className="col-lg-6 foi-details-col">                       
+                    <div className="col-lg-6 foi-details-col">
                         <TextField 
+                            id="outlined-streetAddress" 
+                            label="Street Address" 
+                            InputLabelProps={{ shrink: true, }}                            
+                            variant="outlined" 
+                            value={streetAddressText}
+                            onChange={handleStreetAddressChange}
+                            fullWidth
+                            required={true}
+                            error={streetAddressText === "" && contactDetailsNotGiven}
+                        />
+                        <TextField 
+                            id="outlined-scondaryStreetAddress" 
+                            label="Secondary Street Address" 
+                            InputLabelProps={{ shrink: true, }}                            
+                            variant="outlined" 
+                            value={secondaryStreetAddressText}
+                            onChange={handleScondaryStreetAddressChange}
+                            fullWidth
+                        />  
+                        <TextField 
+                            id="outlined-city" 
+                            label="City" 
+                            InputLabelProps={{ shrink: true, }}                             
+                            variant="outlined" 
+                            value={CityText}
+                            onChange={handleCityChange}
+                            fullWidth
+                            required={true}
+                            error={CityText === "" && contactDetailsNotGiven}
+                        />
+                        <TextField 
+                            id="outlined-province" 
+                            label="Province" 
+                            InputLabelProps={{ shrink: true, }}                             
+                            variant="outlined" 
+                            value={ProvinceText}
+                            onChange={handleProvinceChange}
+                            fullWidth
+                            required={true}
+                            error={ProvinceText === "" && contactDetailsNotGiven}
+                        />
+                        <TextField 
+                            id="outlined-country" 
+                            label="Country" 
+                            InputLabelProps={{ shrink: true, }}                             
+                            variant="outlined" 
+                            value={CountryText}
+                            onChange={handleCountryChange}
+                            fullWidth
+                            required={true}
+                            error={CountryText === "" && contactDetailsNotGiven}
+                        />
+                        <TextField 
+                            id="outlined-postalCode" 
+                            label="Postal Code" 
+                            InputLabelProps={{ shrink: true, }}                         
+                            variant="outlined" 
+                            value={PostalText}
+                            onChange={handlePostalChange}
+                            inputProps={{ maxLength: 6 }}
+                            fullWidth
+                            required={true}
+                            error={PostalText === "" && contactDetailsNotGiven}
+                        />                                     
+                    </div>
+                    <div className="col-lg-6 foi-details-col">
+                    <TextField 
                             id="outlined-homePhone" 
                             label="Home Phone" 
                             InputLabelProps={{ shrink: true, }} 
@@ -144,37 +217,7 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
                             value={mobilePhoneText}
                             onChange={handleMobilePhoneChange}
                             fullWidth
-                        />
-                        <TextField 
-                            id="outlined-streetAddress" 
-                            label="Street Address" 
-                            InputLabelProps={{ shrink: true, }}                            
-                            variant="outlined" 
-                            value={streetAddressText}
-                            onChange={handleStreetAddressChange}
-                            fullWidth
-                        />
-                        <TextField 
-                            id="outlined-city" 
-                            label="City" 
-                            InputLabelProps={{ shrink: true, }}                             
-                            variant="outlined" 
-                            value={CityText}
-                            onChange={handleCityChange}
-                            fullWidth
-                        />
-                        <TextField 
-                            id="outlined-postalCode" 
-                            label="Postal Code" 
-                            InputLabelProps={{ shrink: true, }}                         
-                            variant="outlined" 
-                            value={PostalText}
-                            onChange={handlePostalChange}
-                            inputProps={{ maxLength: 6 }}
-                            fullWidth
-                        />                                                
-                    </div>
-                    <div className="col-lg-6 foi-details-col">                       
+                        />                      
                     <TextField 
                             id="outlined-workPhone1" 
                             label="Work Phone" 
@@ -193,33 +236,7 @@ const AddressContactDetails = React.memo(({requestDetails, createSaveRequestObje
                             onChange={handleWorkPhoneSecondarChange}
                             fullWidth
                         />
-                        <TextField 
-                            id="outlined-scondaryStreetAddress" 
-                            label="Secondary Street Address" 
-                            InputLabelProps={{ shrink: true, }}                            
-                            variant="outlined" 
-                            value={secondaryStreetAddressText}
-                            onChange={handleScondaryStreetAddressChange}
-                            fullWidth
-                        />  
-                        <TextField 
-                            id="outlined-province" 
-                            label="Province" 
-                            InputLabelProps={{ shrink: true, }}                             
-                            variant="outlined" 
-                            value={ProvinceText}
-                            onChange={handleProvinceChange}
-                            fullWidth
-                        />
-                        <TextField 
-                            id="outlined-country" 
-                            label="Country" 
-                            InputLabelProps={{ shrink: true, }}                             
-                            variant="outlined" 
-                            value={CountryText}
-                            onChange={handleCountryChange}
-                            fullWidth
-                        /> 
+                        
                     </div>
                 </div>               
             </CardContent>

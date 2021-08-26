@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "BCSans-Regular";
+  src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+
 .foiformcontent {
     display: inline-flex;  
     padding-top: 65px;
@@ -88,6 +93,7 @@
     color: white;
     font-size: 15px;
     font-weight: bolder;
+    font-family: "BCSans-Regular";
   }
 
 .tabcontent { 
@@ -119,6 +125,9 @@
     width: auto;
     color: white;
     border-style: none!important;
+}
+.MuiTab-root {
+  font-family: "BCSans-Regular" !important;
 }
 
 .foitabbedContainer .Mui-selected {

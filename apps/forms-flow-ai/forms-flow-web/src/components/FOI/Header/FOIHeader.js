@@ -28,7 +28,7 @@ const user = useSelector((state) => state.user.userDetail);
         <Nav className="ml-auto">  
         <div className="col-md-12 col-sm-12">
           <div className="col-md-3 col-sm-4 foiheaderLogosection">
-          <a href="/" alt="British Columbia">
+          <a href="/foi/dashboard" alt="British Columbia">
               <img src={logo} alt="Go to the Government of British Columbia website" />
             </a>
           </div>

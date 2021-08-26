@@ -77,7 +77,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);
     }
 
-    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : "Review Request");
+    const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
     const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");

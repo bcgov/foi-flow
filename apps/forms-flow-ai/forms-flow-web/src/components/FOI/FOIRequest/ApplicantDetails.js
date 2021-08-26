@@ -7,7 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const ApplicantDetails = React.memo(({requestDetails, handleApplicantDetailsInitialValue, 
+const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, handleApplicantDetailsInitialValue, 
     handleApplicantDetailsValue, handleEmailValidation, createSaveRequestObject}) => {
     /**
      *  Applicant Details box in the UI
@@ -187,8 +187,9 @@ const ApplicantDetails = React.memo(({requestDetails, handleApplicantDetailsInit
                             value={emailText}
                             variant="outlined" 
                             fullWidth
+                            required={true}
                             onChange={handleEmailChange}
-                            error={validation.helperTextValue !== undefined && validation.helperTextValue !== ""}
+                            error={(validation.helperTextValue !== undefined && validation.helperTextValue !== "") || (emailText == "" && contactDetailsNotGiven)}
                             helperText={validation.helperTextValue}
                         /> 
                     </div>
