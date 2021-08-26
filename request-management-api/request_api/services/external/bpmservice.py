@@ -20,18 +20,21 @@ class bpmservice:
     bpmGrantType =  os.getenv("BPM_GRANT_TYPE")
     
     @classmethod
-    def unopenedClaim(self,processInstanceId, userId, token=None):    
-        messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId, 
+    def unopenedClaim(self,processInstanceId, userId, token=None):
+        if self._isEnabled == True:
+            messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId,
                                               "messageName": MessageType.unopenedClaim.value, 
                                               "processVariables":{
                                                   "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userId})
                                                   }
                                               })
-        return requests.post(self._getUrl_(self,MessageType.unopenedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
-
+            return requests.post(self._getUrl_(self,MessageType.unopenedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+        else:
+            return
     @classmethod
-    def openedclaim(self,fileNumber, groupName, userId, token=None):    
-        messageSchema = MessageSchema().dump({"messageName": MessageType.openedClaim.value, 
+    def openedclaim(self,fileNumber, groupName, userId, token=None):
+        if self._isEnabled == True:
+            messageSchema = MessageSchema().dump({"messageName": MessageType.openedClaim.value,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber})
                                                   },
@@ -41,20 +44,22 @@ class bpmservice:
                                                   "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userId})
                                                   }
                                               })
-        return requests.post(self._getUrl_(self,MessageType.openedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
-
+            return requests.post(self._getUrl_(self,MessageType.openedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+        else:
+            return
 
     @classmethod
     def complete(self,processInstanceId, data, token=None): 
-           
-        messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId, 
+        if self._isEnabled == True:
+            messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId,
                                               "messageName": MessageType.openrequest.value, 
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
                                                   }
                                               })
-        return requests.post(self._getUrl_(self,MessageType.openrequest.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
-        
+            return requests.post(self._getUrl_(self,MessageType.openrequest.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+        else:
+            return
 
     def _getUrl_(self, messageType):
         if(MessageType.unopenedClaim.value == messageType or MessageType.openrequest.value == messageType or MessageType.openedClaim.value == messageType):
@@ -76,7 +81,14 @@ class bpmservice:
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json",
         }
-        
+
+    def _isEnabled(self):
+        print(self.bpmEngineRestUrl)
+        if self.bpmEngineRestUrl is not None:
+            return True
+        else:
+            return False
+
 class MessageType(Enum):
     unopenedClaim = "foi-unopened-assignment"
     openedClaim = "foi-opened-assignment"
