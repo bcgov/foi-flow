@@ -56,7 +56,7 @@ const RequestDescription = React.memo(({
         });      
         }
         else {
-            //if it is create request then keep all check boxes unchecked
+            //if it is add request then keep all check boxes unchecked
             masterProgramAreaList.map(programArea => {
                 return programArea.isChecked = false;
             });

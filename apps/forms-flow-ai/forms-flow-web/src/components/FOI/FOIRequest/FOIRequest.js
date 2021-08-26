@@ -46,6 +46,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const {requestId, ministryId} = useParams();
   
   const url = window.location.href;
+  const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);  
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
@@ -55,10 +56,10 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
       
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
     }
-    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1) {
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {
       dispatch(fetchFOIRawRequestDetails(requestId));
     }
-    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1) {
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
       dispatch(fetchFOIAssignedToList());
     }
     dispatch(fetchFOICategoryList());
@@ -70,7 +71,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
 
   
   useEffect(() => {    
-    requestDetails = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1 ? {} : requestDetails;
+    requestDetails = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetails);
   },[requestDetails]);
   
@@ -464,22 +465,21 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
         dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
       }
   }
-
-  const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST);
+  console.log(requestDetails);
+  
   return (
       <div className="container foi-review-request-container">
         <div className="foi-review-container">
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
         { (urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
           <>
-            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate}/>
-            <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information for the applicant, either EMAIL or MAILING ADDRESS.</div>
-            <ApplicantDetails requestDetails={requestDetails} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
+            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate}/>            
+            <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
             <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject}/> : null }          
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
             <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
-            <AddressContactDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
+            <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
             <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
             <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?

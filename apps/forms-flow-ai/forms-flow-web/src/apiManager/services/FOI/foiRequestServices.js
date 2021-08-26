@@ -1,4 +1,4 @@
-import { httpOpenPOSTRequest, httpOpenGETRequest } from "../../httpRequestHandler";
+import { httpOpenPOSTRequest, httpOpenGETRequest, httpGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -177,7 +177,7 @@ export const fetchFOIReceivedModeList = (...rest) => {
 export const fetchFOIRequestList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequests = res.data;         

@@ -96,12 +96,12 @@ class rawrequestservice:
             _createdDate = dt
             baserequestInfo = {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
+                               'sourceOfSubmission': request['sourceofsubmission'],
                                'requestType': requestType,
                                'firstName': contactInfo['firstName'],
                                'middleName': requestrawdata['contactInfo']['middleName'],
                                'lastName': contactInfo['lastName'],
-                               'businessName': contactInfo['businessName'],
-                               # request['created_at']
+                               'businessName': contactInfo['businessName'],                               
                                'currentState': 'Unopened',
                                'receivedDate': _createdDate.strftime('%Y %b, %d'),
                                'receivedDateUF': _createdDate.strftime('%Y-%m-%d %H:%M:%S.%f'),

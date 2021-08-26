@@ -23,7 +23,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.requestType ? request.requestType : "Select Request Type";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
-          return !!request.receivedMode ? request.receivedMode : "Select Received Mode";
+          const source = requestDetails.sourceOfSubmission ? requestDetails.sourceOfSubmission : "";
+          return !!request.receivedMode ? request.receivedMode : source === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.replace(/\s/g, '').toLowerCase() ? FOI_COMPONENT_CONSTANTS.ONLINE_FORM : "Select Received Mode";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
           return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
@@ -100,7 +101,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
     });
     const receivedModes = receivedMode.map((item) => {    
-      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select") || (item.name === FOI_COMPONENT_CONSTANTS.ONLINE_FORM && window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1)}>{item.name}</MenuItem> )
     });
     const deliveryModes = deliveryMode.map((item) => {    
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const Dashboard = React.memo((props) => {
 
@@ -122,8 +123,8 @@ const renderReviewRequest = (e) => {
     dispatch(push(`/foi/reviewrequest/${e.row.id}`));
   }
 }
-const createRequest = (e) => {
-  dispatch(push(`/foi/createrequest`));
+const addRequest = (e) => {
+  dispatch(push(`/foi/addrequest`));
 }
 
      return (  
@@ -133,7 +134,7 @@ const createRequest = (e) => {
           <div className="col-sm-12 col-md-12 foi-grid-container">
             <div className="foi-dashboard-row2">
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
-              <button type="button" className="btn foi-btn-create" onClick={createRequest} >Create Request</button>
+              <button type="button" className="btn foi-btn-create" onClick={addRequest} >{FOI_COMPONENT_CONSTANTS.ADD_REQUEST}</button>
             </div>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
