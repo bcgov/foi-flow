@@ -26,7 +26,8 @@ from humps.main import camelize, decamelize
 from flask import request, g
 from sqlalchemy.sql.expression import false
 from request_api.auth import jwt as _authjwt
-import jwt,json
+import jwt
+import os
 
 def cors_preflight(methods):
     """Render an option method on the class."""
@@ -48,10 +49,12 @@ def ismemberofgroups(group):
     def role_check(function):
         @wraps(function)
         def wrapper(*args, **kwargs):
-            groups = group.split(',')            
-            groups = ["/" + group for group in groups]            
+            groups = group.split(',')                        
+            groups = ["/" + group for group in groups]
+            #print(_authjwt.get_token_auth_header())            
             #TODO:ABIN : REMOVE verify signature to false - new logic should come here 
-            tokenjson = jwt.decode(_authjwt.get_token_auth_header(),options={"verify_signature": False})             
+            tokenjson = jwt.decode(_authjwt.get_token_auth_header(), audience=os.getenv('JWT_OIDC_AUDIENCE'),options={"verify_signature": False})
+            print(tokenjson)             
             exists = False                             
             for _group in groups:
                 if _group in tokenjson['groups']:
@@ -66,7 +69,7 @@ def ismemberofgroups(group):
 
 
 def getgroupsfromtoken():
-    tokenjson = jwt.decode(_authjwt.get_token_auth_header(),options={"verify_signature": False})
+    tokenjson = jwt.decode(_authjwt.get_token_auth_header(),audience=os.getenv('JWT_OIDC_AUDIENCE'), options={"verify_signature": False})
     groups = tokenjson['groups']
     groups = [group.replace('/','',1) if group.startswith('/') else group for group in groups]
     return groups

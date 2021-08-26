@@ -21,7 +21,7 @@ class Dashboard(Resource):
     @TRACER.trace()    
     @cors.crossdomain(origin='*')
     @cors_preflight('GET,POST,OPTIONS') 
-    @ismemberofgroups('Intake Team,Flex Team')  
+    @ismemberofgroups('Intake Team,Flex Team')     
     def get():        
         try:    
                 groups = getgroupsfromtoken()                
