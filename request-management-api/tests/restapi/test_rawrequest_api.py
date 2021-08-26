@@ -15,11 +15,6 @@ def test_post_foirawrequests(app, client):
     wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), content_type='application/json')   
     assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
 
-def test_get_foidashboard(app, client):
-    response = client.get('/api/dashboard')
-    jsondata = json.loads(response.data)    
-    assert response.status_code == 200 and len(jsondata) >=1
-
 def test_get_programareas(client):    
     response = client.get('api/foiflow/programareas')    
     jsondata = json.loads(response.data)    

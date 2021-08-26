@@ -44,4 +44,4 @@ def test_post_foirequest_personal(app, client):
 def test_get_foirequestqueue(app, client):
    response = client.get('/api/dashboard') 
    jsondata = json.loads(response.data)
-   assert response.status_code == 200    
+   assert response.status_code == 401    
