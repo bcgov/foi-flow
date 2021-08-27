@@ -17,11 +17,11 @@ class dashboardservice:
             openedrequests = []
             if "Intake Team" in groups or groups is None:                
                 requests = FOIRawRequest.getrequests()
-                openedrequests = FOIMinistryRequest.getrequests("Intake Team")
-            elif "Flex Team" in groups:               
-                openedrequests = FOIMinistryRequest.getrequests("Flex Team")
-            
 
+            for group in groups:
+                _teamrequests = FOIMinistryRequest.getrequests(group)
+                openedrequests+=_teamrequests
+                        
             requestqueue = []
             
             for request in requests:
