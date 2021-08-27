@@ -17,7 +17,7 @@ class dashboardservice:
             openedrequests = []
             if "Intake Team" in groups or groups is None:                
                 requests = FOIRawRequest.getrequests()
-                openedrequests = FOIMinistryRequest.getrequests()
+                openedrequests = FOIMinistryRequest.getrequests("Intake Team")
             elif "Flex Team" in groups:               
                 openedrequests = FOIMinistryRequest.getrequests("Flex Team")
             
