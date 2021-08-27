@@ -69,11 +69,30 @@ class FOIRequest(db.Model):
         db.session.commit()
         ministryArr = [] 
         for ministry in foiRequest.ministryRequests:
-            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber})    
+            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name})    
         return DefaultMethodResult(True,'Request added',foiRequest.foirequestid,ministryArr)
                           
-
+    @classmethod
+    def updateWFInstance(cls, foirequestid, wfinstanceid)->DefaultMethodResult:
+        curRequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+        setattr(curRequest,'wfinstanceid',wfinstanceid)
+        setattr(curRequest,'updated_at',datetime.now().isoformat())
+        db.session.commit()  
+        return DefaultMethodResult(True,'Request updated',foirequestid)
+    
+    @classmethod
+    def updateStatus(cls, foirequestid, updatedMinistries)->DefaultMethodResult:
+        curRequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+        for ministry in curRequest.ministryRequests:
+            for data in updatedMinistries:
+                if ministry.filenumber == data["filenumber"]:
+                    ministry.requeststatusid = data["requeststatusid"]
+                    ministry.updated_at = datetime.now().isoformat()
+        curRequest.updated_at = datetime.now().isoformat()
+        db.session.commit()  
+        return DefaultMethodResult(True,'Request updated',foirequestid)
+    
 class FOIRequestsSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestid','version','requesttype','receiveddate','initialdescription','initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid','deliverymode.deliverymodeid','receivedmode.name','deliverymode.name','applicantcategory.applicantcategoryid','applicantcategory.name')
+        fields = ('foirequestid','version','foirawrequestid','requesttype','receiveddate','initialdescription','initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid','deliverymode.deliverymodeid','receivedmode.name','deliverymode.name','applicantcategory.applicantcategoryid','applicantcategory.name','wfinstanceid','ministryRequests')
     

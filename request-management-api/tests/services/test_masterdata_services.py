@@ -2,7 +2,6 @@ from request_api.services.programareaservice import programareaservice
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
-from request_api.services.keycloakadminservice import KeycloakAdminService
 
 def test_get_programareas(session):
     response = programareaservice.getprogramareas()
@@ -33,9 +32,4 @@ def test_get_deliverymodes(session):
     for item in response:
         assert item['name'] and item['description'] 
 
-def test_get_intaketeam(session):
-    keycloakadminservice = KeycloakAdminService()
-    response = keycloakadminservice.getusers()    
-    assert len(response) > 0     
-    for item in response:
-        assert item['id'] and item['username']
+

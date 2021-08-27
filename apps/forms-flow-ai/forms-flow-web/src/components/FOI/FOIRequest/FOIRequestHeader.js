@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
 import { useSelector } from "react-redux";
+import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -9,20 +10,34 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 
+const useStyles = makeStyles((theme) => ({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
+    item: {
+        paddingLeft: theme.spacing(3),
+    },
+    group: {
+        fontWeight: theme.typography.fontWeightBold,
+        opacity: 1,
+    },
+  }));
 const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject,handlestatusudpate}) => {
    
      /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
+    const classes = useStyles();
     const {ministryId} = useParams();  
      //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
-        let assignedTo = requestDetails.assignedTo;
-        assignedTo = assignedTo ? assignedTo: "Unassigned";
+        let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+        assignedTo = assignedTo;
         handleAssignedToInitialValue(assignedTo);
         let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
         let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
@@ -33,15 +48,25 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const getFullName = (lastName, firstName, username) => {
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
     }
-
-    //creates the menu items for assignedTo combobox
-    const menuItems = assignedToList.map((item) => {    
-        return ( <MenuItem key={item.id} value={item.username} name={getFullName(item.lastname,item.firstname,item.username)} disabled={item.username.toLowerCase().includes("unassigned")}>{getFullName(item.lastname,item.firstname,item.username)}</MenuItem> )
-     });
     
+    //creates the grouped menu items for assignedTo combobox    
+    const getMenuItems = () => {
+        var menuItems = [];
+        var i = 1;
+        if (assignedToList && assignedToList.length > 0) {
+            for (var group of assignedToList) {
+                menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`}>{group.name}</MenuItem>);
+                for (var assignee of group.members) {
+                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
+                }
+            }
+        }
+        return menuItems;
+    }
      //local state management for assignedTo
-    const [selectedAssignedTo, setAssignedTo] = React.useState(requestDetails.assignedTo ? requestDetails.assignedTo : "Unassigned");
-
+    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+   
+    const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
     const preventDefault = (event) => event.preventDefault();
     
     //handle onChange event for assigned To
@@ -52,7 +77,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);
     }
 
-    const hearderText = window.location.href.indexOf("createrequest") > -1 ? "Create Request" : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : "Review Request");
+    const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
     const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
@@ -82,7 +107,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     required
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
-                    {menuItems}
+                    {getMenuItems()}
                 </TextField> 
                 </div>
             </div>

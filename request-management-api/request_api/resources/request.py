@@ -61,10 +61,13 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()            
             if int(requestid) and str(requestid) != "-1" :
                 status = 'Assignment in progress'     
-                rawRequest = rawrequestservice.getrawrequest(requestid)                                              
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,updaterequest['assignedTo'],status)                
+                
+                rawRequest = rawrequestservice.getrawrequest(requestid)     
+                assigneeGroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
+                assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneeGroup, assignee,status)                
                 if result.success == True:   
-                    bpmservice.claim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
+                    bpmservice.unopenedClaim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice.saverawrequest(updaterequest,"intake")               

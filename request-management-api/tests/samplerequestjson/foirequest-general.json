@@ -1,5 +1,4 @@
 {
-    "id": "2",
     "additionalPersonalInfo": {
         "alsoKnownAs": "",
         "birthDate": "",
@@ -41,5 +40,6 @@
     "receivedDateUF": "2021-08-01T00:00:00.000Z",
     "requestProcessStart": "2021-08-09",
     "dueDate": "2021-09-21",
+    "assignedGroup": "Flex Team",
     "assignedTo": "aandrews@idir"
 }

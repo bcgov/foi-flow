@@ -36,6 +36,11 @@ $dark: $gray-800;
 @import "~font-awesome/scss/font-awesome";
 @import "~formiojs/dist/formio.full.min.css";
 
+@font-face {
+  font-family: "BCSans-Regular";
+  src: url("./assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+
 .container,
 .container-sm,
 .container-md,
@@ -68,7 +73,7 @@ h4 {
 }
 body {
   font-size: 16px;
-  font-family: Nunito Sans, SemiBold;
+  font-family: 'BCSans-Regular' !important;
 }
 
 .loader {

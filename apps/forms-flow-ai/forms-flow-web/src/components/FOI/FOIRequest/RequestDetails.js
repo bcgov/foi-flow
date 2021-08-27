@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { useSelector } from "react-redux";
@@ -6,20 +7,15 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
-import moment from "moment-business-days";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-
-
-moment.updateLocale('en-ca', {
-  workingWeekdays: [1, 2, 3, 4, 5]
-});
 
 const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject}) => {
 
     /**
      *  Request details box in the UI
      *  All fields are mandatory here
-     */ 
+     */
+     const {ministryId} = useParams();  
     const ADD_DAYS = 30;
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
@@ -27,7 +23,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.requestType ? request.requestType : "Select Request Type";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
-          return !!request.receivedMode ? request.receivedMode : "Select Received Mode";
+          const source = requestDetails.sourceOfSubmission ? requestDetails.sourceOfSubmission : "";
+          return !!request.receivedMode ? request.receivedMode : source === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.replace(/\s/g, '').toLowerCase() ? FOI_COMPONENT_CONSTANTS.ONLINE_FORM : "Select Received Mode";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
           return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
@@ -49,16 +46,14 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
-    const calculateReceivedDate = (receivedDateString) => {      
-    const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
-    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
-    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {      
-      if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
-        receivedDateString = addBusinessDays(dateString, 1);        
+    const calculateReceivedDate = (receivedDateString) => {
+      const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
+      receivedDateString = receivedDateString ? new Date(receivedDateString): "";
+      if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {        
+          receivedDateString = addBusinessDays(receivedDateString, 1);
       }
-    }
-      return receivedDateString;
-    }
+        return receivedDateString;
+      }
     //updates the default values from the request details    
     React.useEffect(() => {
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
@@ -106,7 +101,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
     });
     const receivedModes = receivedMode.map((item) => {    
-      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select") || (item.name === FOI_COMPONENT_CONSTANTS.ONLINE_FORM && window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1)}>{item.name}</MenuItem> )
     });
     const deliveryModes = deliveryMode.map((item) => {    
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
@@ -213,6 +208,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={receivedDateText === undefined || receivedDateText === ""}
                             fullWidth
+                            disabled={!!ministryId}
                         />
                         <TextField                
                             label="Start Date"
@@ -227,6 +223,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={startDateText === undefined || startDateText === ""}
                             fullWidth
+                            disabled={!!ministryId}
                         />
                         <TextField                
                             label="Due Date"

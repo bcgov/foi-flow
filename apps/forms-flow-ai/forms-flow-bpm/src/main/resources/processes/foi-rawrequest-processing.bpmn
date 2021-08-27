@@ -3,7 +3,7 @@
   <bpmn:collaboration id="Collaboration_1gduz3b">
     <bpmn:participant id="Participant_0c2mqj5" name="FOI Raw Request Processing" processRef="foi-request" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-request" name="FOI Raw Request Processing" isExecutable="true" camunda:versionTag="4">
+  <bpmn:process id="foi-request" name="FOI Raw Request Processing" isExecutable="true" camunda:versionTag="5">
     <bpmn:laneSet id="LaneSet_1j1sa3c">
       <bpmn:lane id="Lane_1u899ed" name="Intake Team">
         <bpmn:flowNodeRef>Event_043z2u1</bpmn:flowNodeRef>
@@ -28,7 +28,7 @@
 "status" : "Intake in Progress",
 "notes":"Status update"
 };
-task.execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-rawrequest-update").setVariables(task.execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).correlateWithResult();</camunda:script>
+task.execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-update").setVariables(task.execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).setVariable("category", "foi-rawrequest-update").correlateWithResult();</camunda:script>
         </camunda:taskListener>
         <camunda:taskListener event="complete">
           <camunda:script scriptFormat="javascript">var rawReqPayload = {
@@ -36,7 +36,7 @@ task.execution.getProcessEngineServices().getRuntimeService().createMessageCorre
 "status" : "Archived",
 "notes":"Status update"
 };
-task.execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-rawrequest-update").setVariables(task.execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).correlateWithResult();</camunda:script>
+task.execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-update").setVariables(task.execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).setVariable("category", "foi-rawrequest-update").correlateWithResult();</camunda:script>
         </camunda:taskListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0ssq8la</bpmn:incoming>
@@ -56,7 +56,7 @@ task.execution.getProcessEngineServices().getRuntimeService().createMessageCorre
 "wfinstanceid": execution.getVariable("pid"),
 "notes":"Workflow ID update"
 };
-execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-rawrequest-update").setVariables(execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).correlateWithResult();</camunda:script>
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-update").setVariables(execution.variables).setVariable("rawReqPayload", JSON.stringify(rawReqPayload)).setVariable("category", "foi-rawrequest-update").correlateWithResult();</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0b66n80</bpmn:incoming>
@@ -129,9 +129,18 @@ execution.getProcessEngineServices().getTaskService().claim(execution.getVariabl
       <bpmndi:BPMNShape id="Lane_1u899ed_di" bpmnElement="Lane_1u899ed" isHorizontal="true">
         <dc:Bounds x="190" y="70" width="980" height="250" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0b66n80_di" bpmnElement="Flow_0b66n80">
-        <di:waypoint x="530" y="195" />
+      <bpmndi:BPMNEdge id="Flow_07yrcjx_di" bpmnElement="Flow_07yrcjx">
+        <di:waypoint x="740" y="170" />
+        <di:waypoint x="820" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01rwp9s_di" bpmnElement="Flow_01rwp9s">
+        <di:waypoint x="920" y="170" />
+        <di:waypoint x="1052" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ssq8la_di" bpmnElement="Flow_0ssq8la">
         <di:waypoint x="530" y="222" />
+        <di:waypoint x="530" y="170" />
+        <di:waypoint x="640" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1hzo78o_di" bpmnElement="Flow_1hzo78o">
         <di:waypoint x="388" y="170" />
@@ -140,18 +149,9 @@ execution.getProcessEngineServices().getTaskService().claim(execution.getVariabl
           <dc:Bounds x="407" y="153" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ssq8la_di" bpmnElement="Flow_0ssq8la">
+      <bpmndi:BPMNEdge id="Flow_0b66n80_di" bpmnElement="Flow_0b66n80">
+        <di:waypoint x="530" y="195" />
         <di:waypoint x="530" y="222" />
-        <di:waypoint x="530" y="170" />
-        <di:waypoint x="640" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_01rwp9s_di" bpmnElement="Flow_01rwp9s">
-        <di:waypoint x="920" y="170" />
-        <di:waypoint x="1052" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_07yrcjx_di" bpmnElement="Flow_07yrcjx">
-        <di:waypoint x="740" y="170" />
-        <di:waypoint x="820" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_043z2u1_di" bpmnElement="Event_043z2u1">
         <dc:Bounds x="1052" y="152" width="36" height="36" />
@@ -174,16 +174,16 @@ execution.getProcessEngineServices().getTaskService().claim(execution.getVariabl
       <bpmndi:BPMNShape id="Activity_04uaqbg_di" bpmnElement="Activity_10c1tix">
         <dc:Bounds x="820" y="130" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1y3jxky_di" bpmnElement="Event_0ks1wzs">
-        <dc:Bounds x="692" y="192" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="688" y="235" width="48" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0a2tut9_di" bpmnElement="Event_1bb8y9d">
         <dc:Bounds x="652" y="192" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="657" y="235" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1y3jxky_di" bpmnElement="Event_0ks1wzs">
+        <dc:Bounds x="692" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="688" y="235" width="48" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

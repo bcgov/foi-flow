@@ -21,7 +21,9 @@ def test_save_rawrequest(session):
 
 def test_save_rawrequestversion(session):
     request = rawrequestservice.getrawrequests().pop()
-    response = rawrequestservice.saverawrequestversion(requestjson,request['id'],"testuser@idir",'intake in progress')
+    print("Raw Request id {0}".format(request['id']))
+    #_assigneeGroup, _assignee,status
+    response = rawrequestservice.saverawrequestversion(requestjson,request['id'],"testuser@idir",_assignee="testassigne",status='intake in progress')
     requestid = response.identifier    
     assert response.success == True  
 

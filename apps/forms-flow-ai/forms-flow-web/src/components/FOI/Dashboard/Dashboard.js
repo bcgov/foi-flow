@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const Dashboard = React.memo((props) => {
 
@@ -23,26 +24,23 @@ const Dashboard = React.memo((props) => {
   },[dispatch], [requestType]);
 
   function getFullName(params) {    
-    return `${params.getValue(params.id, 'lastName') || ''}, ${
-      params.getValue(params.id, 'firstName') || ''
+    return `${params.row.lastName || ''}, ${
+      params.row.firstName || ''
     }`;
   }
 
-  function getAssigneeFullName(params) {
-    return params.getValue(params.id, 'assignedToName') ? params.getValue(params.id, 'assignedToName'): params.getValue(params.id, 'assignedTo') ? params.getValue(params.id, 'assignedTo') : "Unassigned";
+  function getAssigneeValue(params) {
+    return params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
   }
 
   function getReceivedDate(params) {
     let receivedDateString = params.getValue(params.id, 'receivedDateUF');    
     const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
     receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
-    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {      
-      if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
-        receivedDateString = addBusinessDays(dateString, 1);
-      }
+    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {    
+        receivedDateString = addBusinessDays(receivedDateString, 1);     
     }    
-    return formatDate(receivedDateString, 'yyyy MMM, dd');
-    
+    return formatDate(receivedDateString, 'yyyy MMM, dd');    
   }
    const columns = [    
     {
@@ -65,11 +63,11 @@ const Dashboard = React.memo((props) => {
      
     },
     {      
-      field: 'assignedToFullName',
+      field: 'assignedToValue',
       headerName: 'ASSIGNED TO',
       width: 180,
       headerAlign: 'left',
-      valueGetter: getAssigneeFullName,
+      valueGetter: getAssigneeValue,
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
@@ -105,12 +103,13 @@ const setSearch = (e) => {
 }
 
 const search = (rows) => {   
-  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;
-  
+  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;  
   return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
+  (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
   ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
 
 }
@@ -124,8 +123,8 @@ const renderReviewRequest = (e) => {
     dispatch(push(`/foi/reviewrequest/${e.row.id}`));
   }
 }
-const createRequest = (e) => {
-  dispatch(push(`/foi/createrequest`));
+const addRequest = (e) => {
+  dispatch(push(`/foi/addrequest`));
 }
 
      return (  
@@ -135,7 +134,7 @@ const createRequest = (e) => {
           <div className="col-sm-12 col-md-12 foi-grid-container">
             <div className="foi-dashboard-row2">
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
-              <button type="button" className="btn foi-btn-create" onClick={createRequest} >Create Request</button>
+              <button type="button" className="btn foi-btn-create" onClick={addRequest} >{FOI_COMPONENT_CONSTANTS.ADD_REQUEST}</button>
             </div>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
@@ -160,6 +159,7 @@ const createRequest = (e) => {
                 rowHeight={30}
                 headerHeight={50}                
                 pageSize={10}
+                rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
                 sortingOrder={['desc', 'asc']}
                 sortModel={sortModel}

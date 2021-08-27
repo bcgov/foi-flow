@@ -11,14 +11,18 @@
 
 .foi-ministries-container {
   margin-top: 50px;
+ 
+}
+
+h4 {
+  font-family: "BCSans-Regular" !important; 
 }
 .foi-ministries-checkboxes {
   margin-top: 20px;
   display: block;
 }
   .check-item{       
-    position:relative;  
-    cursor:pointer;
+    position:relative;
     font-family: "BCSans-Regular";   
     margin: 0.5%;
     padding: 2px;
@@ -26,13 +30,6 @@
     padding-left: 2.5%;
 
   }
-    
-  .check-item input{
-    position:absolute;
-    opacity:0;
-    cursor:pointer;    
-  }
-    
   .checkmark{
     position:absolute;
     top:0;
@@ -45,8 +42,8 @@
     border: 1px solid;
   }
     
-  .check-item:hover input ~ .checkmark{
-    background-color:#ccc;
+  .check-item:hover input[type=checkbox]:not([disabled]) ~ .checkmark{    
+    cursor: pointer;
   }
     
   .check-item input:checked ~ .checkmark{
