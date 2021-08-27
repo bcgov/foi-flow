@@ -88,10 +88,11 @@ class FOIRawRequest(db.Model):
     def getrequests(cls):
         request_schema = FOIRawRequestSchema(many=True)
         _session = db.session
-        _requestids = _session.query(distinct(FOIRawRequest.requestid)).all()
+        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status =="Archived").all()
+        _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedRequestids)).all()
         requests = []
         for _requestid in _requestids:
-           request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid, FOIRawRequest.status !="Archived").order_by(FOIRawRequest.version.desc()).first()           
+           request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid).order_by(FOIRawRequest.version.desc()).first()           
            requests.append(request)
 
         return requests
