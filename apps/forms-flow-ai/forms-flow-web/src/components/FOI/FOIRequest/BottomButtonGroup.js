@@ -58,7 +58,7 @@ const BottomButtonGroup = React.memo(({
         window.location.href = '/foi/dashboard';
       }
     }
-    const saveRequest = async () => {      
+    const saveRequest = async () => {
       dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, ministryId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {

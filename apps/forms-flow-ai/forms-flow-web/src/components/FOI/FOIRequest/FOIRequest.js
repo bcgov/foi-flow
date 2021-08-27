@@ -64,15 +64,14 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     }
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
-    // dispatch(fetchFOIAssignedToList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
   },[requestId, dispatch]);
-
+ 
   
   useEffect(() => {    
-    requestDetails = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
-    setSaveRequestObject(requestDetails);
+    const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
+    setSaveRequestObject(requestDetailsValue); 
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
@@ -113,12 +112,13 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [headerValue, setHeader] = useState("");
 
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
     setRequiredRequestDescriptionValues(requestDescriptionObject);
   },[])
-  const handleRequestDetailsInitialValue = React.useCallback((value) => {    
+  const handleRequestDetailsInitialValue = React.useCallback((value) => {
     setRequiredRequestDetailsValues(value);
   },[])
   const handleAssignedToInitialValue = React.useCallback((value) => {    
@@ -212,9 +212,6 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   }
-
-  
- 
 
   //handle email validation
   const [validation, setValidation] = React.useState({});
@@ -321,12 +318,15 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     requestObject.id = requestId;
     requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
     requestObject.dueDate = requiredRequestDetailsValues.dueDate;
-
-    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {     
+    requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
+    requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
+    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
       requestObject.receivedDate = value.receivedDate;     
       requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
+      requestObject.receivedMode = value.receivedMode;
+      requestObject.deliveryMode = value.deliveryMode;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
       const assignedToValue = value.split("|");
@@ -442,7 +442,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
 
   const createSaveRequestObject = (name, value, value2) => 
   {
-    const requestObject = {...saveRequestObject};      
+    const requestObject = {...saveRequestObject};  
     if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
       setUnSavedRequest(false);      
     }
@@ -450,23 +450,21 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
       setUnSavedRequest(true);
     }
     updateAdditionalInfo(name, value, requestObject);
-    createRequestDetailsObject(requestObject, name, value, value2); 
-    setSaveRequestObject(requestObject);    
+    createRequestDetailsObject(requestObject, name, value, value2);    
+    setSaveRequestObject(requestObject);
   }
 
-  const [headerValue, setHeader] = useState("");
   const handleSaveRequest = (value, value2) => {
     setHeader(value);
     setUnSavedRequest(value2);
-  }  
+  }
+
   const handleOpenRequest = (parendId, ministryId, unSaved) => {      
-      setSaveRequestObject(unSaved);
+    setUnSavedRequest(unSaved);
       if (!unSaved) {
         dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
       }
   }
-  console.log(requestDetails);
-  
   return (
       <div className="container foi-review-request-container">
         <div className="foi-review-container">
