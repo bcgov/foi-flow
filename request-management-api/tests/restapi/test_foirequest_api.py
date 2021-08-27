@@ -1,5 +1,37 @@
 import json
 import uuid
+import jwt, os
+
+TEST_JWT_HEADER = {
+    "alg": "RS256",
+    "typ": "JWT",
+    "kid": "foiunittest"
+}
+
+TEST_JWT_CLAIMS = {
+    "iss": os.getenv('JWT_OIDC_ISSUER'),
+    "sub": "3559e79c-7115-41c1-bb26-1a3dc54bbf5e",
+    "typ": "Bearer",
+    "aud": [os.getenv('JWT_OIDC_AUDIENCE')],
+    "firstname": "Test",
+    "lastname": "User",
+    "preferred_username": "test@idir",
+    "given_name": "TEST",
+    "family_name": "TEST",
+    "realm_access": {
+        "roles": [
+            "approver_role"
+        ]
+    },
+    "groups": [   
+    "/Flex Team"    
+  ],
+    "preferred_username": "user"
+}
+
+def factory_auth_header(jwt, claims):
+    """Produce JWT tokens for use in tests."""
+    return {'Authorization': 'Bearer ' + jwt.encode(payload=TEST_JWT_CLAIMS,key="secret",headers=TEST_JWT_HEADER)}
 
 def test_ping(app, client):
     response = client.get('/api/healthz')
@@ -40,8 +72,13 @@ def test_post_foirequest_personal(app, client):
     assert foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
 
 
-
 def test_get_foirequestqueue(app, client):
-   response = client.get('/api/dashboard') 
-   jsondata = json.loads(response.data)
-   assert response.status_code == 401    
+  headers = factory_auth_header(jwt=jwt, claims=TEST_JWT_CLAIMS)  
+  response = client.get('/api/dashboard', headers=headers)    
+  jsondata = json.loads(response.data)
+  assert response.status_code == 200    
+
+def test_get_foirequestqueuewithoutheader(app, client):    
+  response = client.get('/api/dashboard')    
+  jsondata = json.loads(response.data)
+  assert response.status_code == 401 # expecting Unauthorized - 401 status
