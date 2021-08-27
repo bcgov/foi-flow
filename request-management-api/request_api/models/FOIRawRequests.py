@@ -91,7 +91,7 @@ class FOIRawRequest(db.Model):
         _requestids = _session.query(distinct(FOIRawRequest.requestid)).all()
         requests = []
         for _requestid in _requestids:
-           request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid).order_by(FOIRawRequest.version.desc()).first()           
+           request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid, FOIRawRequest.status !="Archived").order_by(FOIRawRequest.version.desc()).first()           
            requests.append(request)
 
         return requests
