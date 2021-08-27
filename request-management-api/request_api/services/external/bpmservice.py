@@ -21,7 +21,7 @@ class bpmservice:
     
     @classmethod
     def unopenedClaim(self,processInstanceId, userId, token=None):
-        if self._isEnabled == True:
+        if self.bpmEngineRestUrl is not None:
             messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId,
                                               "messageName": MessageType.unopenedClaim.value, 
                                               "processVariables":{
@@ -33,7 +33,7 @@ class bpmservice:
             return
     @classmethod
     def openedclaim(self,fileNumber, groupName, userId, token=None):
-        if self._isEnabled == True:
+        if self.bpmEngineRestUrl is not None:
             messageSchema = MessageSchema().dump({"messageName": MessageType.openedClaim.value,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber})
@@ -50,7 +50,7 @@ class bpmservice:
 
     @classmethod
     def complete(self,processInstanceId, data, token=None): 
-        if self._isEnabled == True:
+        if self.bpmEngineRestUrl is not None:
             messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId,
                                               "messageName": MessageType.openrequest.value, 
                                               "processVariables":{
@@ -82,11 +82,7 @@ class bpmservice:
             "Content-Type": "application/json",
         }
 
-    def _isEnabled(self):
-        if self.bpmEngineRestUrl is not None:
-            return True
-        else:
-            return False
+
 
 class MessageType(Enum):
     unopenedClaim = "foi-unopened-assignment"
