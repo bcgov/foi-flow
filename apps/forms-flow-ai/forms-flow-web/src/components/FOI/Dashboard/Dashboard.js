@@ -37,6 +37,7 @@ const Dashboard = React.memo((props) => {
     let receivedDateString = params.getValue(params.id, 'receivedDateUF');    
     const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
     receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
+
     if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {    
         receivedDateString = addBusinessDays(receivedDateString, 1);     
     }    
