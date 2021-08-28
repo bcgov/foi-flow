@@ -6,7 +6,7 @@ This class  consolidates schemas of bpm operations.
 __author__      = "sumathi.thirumani@aot-technologies.com"
 
 """
-class ProcessVariableSchema(Schema):
+class VariableSchema(Schema):
     type = fields.Str()
     value = fields.Str()
     
@@ -20,5 +20,6 @@ class MessageSchema(Schema):
 
     messageName = fields.Str(data_key="messageName")
     processInstanceId = fields.Str(data_key="processInstanceId")
-    processVariables = fields.Dict(keys=fields.String(),values=fields.Nested(ProcessVariableSchema))
+    processVariables = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
+    localCorrelationKeys = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
     

@@ -11,10 +11,17 @@ class dashboardservice:
 
 
 
-    def getrequestqueue():
+    def getrequestqueue(groups=None):
             
-            requests = FOIRawRequest.getrequests()
-            openedrequests = FOIMinistryRequest.getrequests()        
+            requests = []
+            openedrequests = []
+            if "Intake Team" in groups or groups is None:                
+                requests = FOIRawRequest.getrequests()
+
+            for group in groups:
+                _teamrequests = FOIMinistryRequest.getrequests(group)
+                openedrequests+=_teamrequests
+                        
             requestqueue = []
             
             for request in requests:
@@ -45,6 +52,7 @@ class dashboardservice:
                                  'currentState': request.status,
                                  'receivedDate': _receivedDate.strftime('%Y %b, %d'),
                                  'receivedDateUF': _receivedDate.strftime('%Y-%m-%d %H:%M:%S.%f'),
+                                 'assignedGroup': request.assignedgroup,
                                  'assignedTo': request.assignedto,
                                  'xgov': 'No',
                                  'idNumber': 'U-00' + str(request.requestid),
@@ -60,6 +68,7 @@ class dashboardservice:
                                  'currentState':  openrequest["currentState"],
                                  'receivedDate':  openrequest["receivedDate"],
                                  'receivedDateUF':  openrequest["receivedDateUF"],
+                                 'assignedGroup':  openrequest["assignedGroup"],
                                  'assignedTo':  openrequest["assignedTo"],
                                  'xgov': 'No',
                                  'idNumber':  openrequest["idNumber"],

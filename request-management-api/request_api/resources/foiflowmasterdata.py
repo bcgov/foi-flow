@@ -24,7 +24,7 @@ from request_api.services.applicantcategoryservice import applicantcategoryservi
 from request_api.services.programareaservice import programareaservice
 from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
-from request_api.services.keycloakadminservice import KeycloakAdminService
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 import json
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')

@@ -19,6 +19,7 @@ class FOIRawRequest(db.Model):
     status = db.Column(db.String(25), unique=False, nullable=True)
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
+    assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
     assignedto = db.Column(db.String(120), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -27,17 +28,17 @@ class FOIRawRequest(db.Model):
     
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assignee= None)->DefaultMethodResult:                
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assigneegroup= None,assignee= None)->DefaultMethodResult:                
         createdat = datetime.now()
         print(createdat)
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedto=assignee)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid,assignee,status)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status)->DefaultMethodResult:        
         updatedat = datetime.now()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
@@ -45,13 +46,14 @@ class FOIRawRequest(db.Model):
             _version = request.version+1
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
         else:
             return DefaultMethodResult(True,'No request foound')
+            
     @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid)->DefaultMethodResult:
         updatedat = datetime.now()
@@ -86,7 +88,8 @@ class FOIRawRequest(db.Model):
     def getrequests(cls):
         request_schema = FOIRawRequestSchema(many=True)
         _session = db.session
-        _requestids = _session.query(distinct(FOIRawRequest.requestid)).all()
+        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status =="Archived").all()
+        _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedRequestids)).all()
         requests = []
         for _requestid in _requestids:
            request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid).order_by(FOIRawRequest.version.desc()).first()           
@@ -102,4 +105,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedto','updatedby','sourceofsubmission')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission')

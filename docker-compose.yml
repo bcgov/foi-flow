@@ -41,6 +41,10 @@ services:
       - BPM_TOKEN_URL=${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_URL_REALM}/protocol/openid-connect/token
       - BPM_CLIENT_ID=forms-flow-bpm
       - BPM_CLIENT_SECRET=${KEYCLOAK_BPM_CLIENT_SECRET}
+      - JWT_OIDC_WELL_KNOWN_CONFIG=${JWT_OIDC_WELL_KNOWN_CONFIG}
+      - JWT_OIDC_AUDIENCE=${JWT_OIDC_AUDIENCE}
+      - JWT_OIDC_ISSUER=${JWT_OIDC_ISSUER}
+      - JWT_OIDC_ALGORITHMS=${JWT_OIDC_ALGORITHMS}
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg

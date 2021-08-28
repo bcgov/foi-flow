@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { useSelector } from "react-redux";
@@ -13,7 +14,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     /**
      *  Request details box in the UI
      *  All fields are mandatory here
-     */ 
+     */
+     const {ministryId} = useParams();  
     const ADD_DAYS = 30;
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
@@ -21,7 +23,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.requestType ? request.requestType : "Select Request Type";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
-          return !!request.receivedMode ? request.receivedMode : "Select Received Mode";
+          const source = requestDetails.sourceOfSubmission ? requestDetails.sourceOfSubmission : "";
+          return !!request.receivedMode ? request.receivedMode : source === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.replace(/\s/g, '').toLowerCase() ? FOI_COMPONENT_CONSTANTS.ONLINE_FORM : "Select Received Mode";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
           return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
@@ -44,17 +47,11 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
 
     const calculateReceivedDate = (receivedDateString) => {
-      console.log(`receivedDateStringUF = ${receivedDateString}`);
       const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
       receivedDateString = receivedDateString ? new Date(receivedDateString): "";
-      console.log(`dateString = ${dateString}, receivedDateString = ${receivedDateString}, businessDay = ${businessDay(dateString)}`);
-      if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {
-        // console.log(`formatDate = ${formatDate(receivedDateString)}, businessDay = ${businessDay(dateString)}`);
-        // if (dateString !== formatDate(receivedDateString) || (dateString === formatDate(receivedDateString) && !businessDay(dateString))) {        
+      if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {        
           receivedDateString = addBusinessDays(receivedDateString, 1);
-        // }
       }
-        console.log(`FinalReceivedDateString = ${receivedDateString}`);
         return receivedDateString;
       }
     //updates the default values from the request details    
@@ -104,7 +101,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
     });
     const receivedModes = receivedMode.map((item) => {    
-      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select") || (item.name === FOI_COMPONENT_CONSTANTS.ONLINE_FORM && window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1)}>{item.name}</MenuItem> )
     });
     const deliveryModes = deliveryMode.map((item) => {    
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
@@ -211,6 +208,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={receivedDateText === undefined || receivedDateText === ""}
                             fullWidth
+                            disabled={!!ministryId}
                         />
                         <TextField                
                             label="Start Date"
@@ -225,6 +223,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={startDateText === undefined || startDateText === ""}
                             fullWidth
+                            disabled={!!ministryId}
                         />
                         <TextField                
                             label="Due Date"

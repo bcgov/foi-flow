@@ -25,7 +25,7 @@ const TabbedContainer = React.memo((props) => {
       >
         {value === index && (
           <Box p={3}>
-            <Typography>{children}</Typography>
+            <Typography component={'span'}>{children}</Typography>
           </Box>
         )}
       </div>
@@ -94,7 +94,6 @@ const TabbedContainer = React.memo((props) => {
           </div>
           <Tabs
             orientation="vertical"
-            variant=""
             value={value}
             onChange={handleChange}
             aria-label="Vertical tabs example"

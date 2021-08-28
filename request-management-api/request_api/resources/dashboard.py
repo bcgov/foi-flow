@@ -1,11 +1,13 @@
 from flask import g, request
+import flask
 from flask_restx import Namespace, Resource, cors
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight
+from request_api.utils.util import  cors_preflight,ismemberofgroups, getgroupsfromtoken
 from request_api.exceptions import BusinessException, Error
 from request_api.services.dashboardservice import dashboardservice
-
+from request_api.auth import jwt as _authjwt
+import jwt
 import json
 
 API = Namespace('FOI Flow Dashboard', description='Endpoints for Dashboard')
@@ -13,15 +15,18 @@ TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/dashboard')
+
 class Dashboard(Resource):
     @staticmethod
-    @TRACER.trace()
-    @cors.crossdomain(origin='*')   
-    def get():
-        ## todo : This code will get re-furshibed with BPM WF validation to list
-        try:                                                       
-                unopenedrequests = dashboardservice.getrequestqueue()
-                jsondata = json.dumps(unopenedrequests)
+    @TRACER.trace()    
+    @cors.crossdomain(origin='*')
+    @cors_preflight('GET,POST,OPTIONS') 
+    @ismemberofgroups('Intake Team,Flex Team')     
+    def get():        
+        try:    
+                groups = getgroupsfromtoken()                
+                requests = dashboardservice.getrequestqueue(groups)                
+                jsondata = json.dumps(requests)
                 return jsondata , 200            
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

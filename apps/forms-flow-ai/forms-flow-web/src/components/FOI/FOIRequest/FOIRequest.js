@@ -46,6 +46,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const {requestId, ministryId} = useParams();
   
   const url = window.location.href;
+  const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);  
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
@@ -55,20 +56,22 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
       
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
     }
-    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) === -1) {
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {
       dispatch(fetchFOIRawRequestDetails(requestId));
-    }    
+    }
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
+      dispatch(fetchFOIAssignedToList());
+    }
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
-    dispatch(fetchFOIAssignedToList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
   },[requestId, dispatch]);
-
+ 
   
   useEffect(() => {    
-    requestDetails = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST) > -1 ? {} : requestDetails;
-    setSaveRequestObject(requestDetails);
+    const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
+    setSaveRequestObject(requestDetailsValue); 
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
@@ -109,12 +112,13 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [headerValue, setHeader] = useState("");
 
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
     setRequiredRequestDescriptionValues(requestDescriptionObject);
   },[])
-  const handleRequestDetailsInitialValue = React.useCallback((value) => {    
+  const handleRequestDetailsInitialValue = React.useCallback((value) => {
     setRequiredRequestDetailsValues(value);
   },[])
   const handleAssignedToInitialValue = React.useCallback((value) => {    
@@ -208,9 +212,6 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   }
-
-  
- 
 
   //handle email validation
   const [validation, setValidation] = React.useState({});
@@ -317,15 +318,30 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     requestObject.id = requestId;
     requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
     requestObject.dueDate = requiredRequestDetailsValues.dueDate;
-
-    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {     
+    requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
+    requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
+    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
       requestObject.receivedDate = value.receivedDate;     
       requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
+      requestObject.receivedMode = value.receivedMode;
+      requestObject.deliveryMode = value.deliveryMode;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
-      requestObject.assignedTo = value;
+      const assignedToValue = value.split("|");
+      if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => (groupName === assignedToValue[0] && groupName === assignedToValue[1]))) {
+        requestObject.assignedGroup = assignedToValue[0];
+        requestObject.assignedTo = "";
+      }
+      else if (assignedToValue.length > 1) {
+        requestObject.assignedGroup = assignedToValue[0];
+        requestObject.assignedTo = assignedToValue[1];
+      }
+      else {
+        requestObject.assignedGroup = "Unassigned";
+        requestObject.assignedTo = assignedToValue[0];
+      }   
       requestObject.assignedToName = value2;      
     }
     else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
@@ -426,7 +442,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
 
   const createSaveRequestObject = (name, value, value2) => 
   {
-    const requestObject = {...saveRequestObject};      
+    const requestObject = {...saveRequestObject};  
     if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
       setUnSavedRequest(false);      
     }
@@ -434,37 +450,34 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
       setUnSavedRequest(true);
     }
     updateAdditionalInfo(name, value, requestObject);
-    createRequestDetailsObject(requestObject, name, value, value2); 
-    setSaveRequestObject(requestObject);    
+    createRequestDetailsObject(requestObject, name, value, value2);    
+    setSaveRequestObject(requestObject);
   }
 
-  const [headerValue, setHeader] = useState("");
   const handleSaveRequest = (value, value2) => {
     setHeader(value);
     setUnSavedRequest(value2);
-  }  
+  }
+
   const handleOpenRequest = (parendId, ministryId, unSaved) => {      
-      setSaveRequestObject(unSaved);
+    setUnSavedRequest(unSaved);
       if (!unSaved) {
         dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
       }
   }
-
-  const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.CREATE_REQUEST);
   return (
       <div className="container foi-review-request-container">
         <div className="foi-review-container">
         <form className={`${classes.root} foi-request-form`} autoComplete="off">        
         { (urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
           <>
-            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate}/>
-            <div className={`${contactDetailsNotGiven  ? classes.validationErrorMessage : classes.validationMessage}`}>* Please enter AT LEAST ONE form of contact information for the applicant, either EMAIL or MAILING ADDRESS.</div>
-            <ApplicantDetails requestDetails={requestDetails} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
+            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate}/>            
+            <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
             <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject}/> : null }          
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
             <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
-            <AddressContactDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
+            <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
             <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
             <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
             {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
