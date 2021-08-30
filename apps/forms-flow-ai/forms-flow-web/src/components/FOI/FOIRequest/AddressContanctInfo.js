@@ -229,7 +229,7 @@ const AddressContactDetails = React.memo(({
                         />
                         <TextField 
                             id="outlined-workPhone2" 
-                            label="Work Phone" 
+                            label="Alternative Phone" 
                             InputLabelProps={{ shrink: true, }}                            
                             variant="outlined" 
                             value={workPhoneSecondaryText}
