@@ -209,7 +209,7 @@ class requestservice:
             'toDate': parse(requestministry['recordsearchtodate']).strftime('%Y-%m-%d') if requestministry['recordsearchtodate'] is not None else '',
             'currentState':requestministry['requeststatus.name'],
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
-            'requestProcessStart':requestministry['startdate'],
+            'requestProcessStart': parse(requestministry['startdate']).strftime('%Y-%m-%d') if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
