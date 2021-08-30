@@ -19,6 +19,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     const ADD_DAYS = 30;
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
+        const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";  
         if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
           return !!request.requestType ? request.requestType : "Select Request Type";
         }
@@ -33,8 +34,11 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.receivedDateUF ? request.receivedDateUF : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-          const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";         
+                 
           return startDate && startDate >= formatDate(value)  ? startDate : value ? value : "";
+        }
+        else if (name === FOI_COMPONENT_CONSTANTS.DUE_DATE) {
+          return request.dueDate ?  request.dueDate : value ? dueDateCalculation(value) : "";
         }
       }
       else {
@@ -58,15 +62,14 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
     React.useEffect(() => {
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
       receivedDate = calculateReceivedDate(receivedDate);
-      const startDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
-      const dueDate = dueDateCalculation(startDate);
+      const startDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);     
       const requestDetailsObject = {
         requestType: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
         receivedDate: !!receivedDate ? formatDate(receivedDate, 'yyyy MM, dd'): "",
         requestStartDate: startDate ? formatDate(startDate): "",
-        dueDate: dueDate,
+        dueDate:  validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, startDate ? formatDate(startDate): ""),
       }
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
@@ -89,7 +92,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       return dateText? addBusinessDays(dateText,ADD_DAYS) : "";
     }    
 
-    const [dueDateText, setDueDate] = React.useState(dueDateCalculation(startDateText));
+    const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, processStartDate));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
     const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
@@ -141,7 +144,6 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
-	
      return (
         
         <Card className="foi-details-card">            

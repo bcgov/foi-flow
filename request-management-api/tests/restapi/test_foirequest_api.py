@@ -37,22 +37,25 @@ def test_ping(app, client):
     response = client.get('/api/healthz')
     assert response.status_code == 200
 
-with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y:
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
   generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
   rawrequestjson = json.load(x)
 def test_post_foirequest_general(app, client):
     rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), content_type='application/json')
     jsondata = json.loads(rawresponse.data)    
-    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), content_type='application/json')
-    getrawjsondata = json.loads(getrawresponse.data)    
-    #assert rawresponse.status_code == 200
+    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), content_type='application/json')   
     foirequest = generalrequestjson
     foirequest["id"] = str(jsondata["id"])
     foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), content_type='application/json')
     foijsondata = json.loads(foiresponse.data)    
     wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
     wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), content_type='application/json')
-    assert foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
+    foiupdaterequest = generalupdaterequestjson
+    foiupdaterequest["id"] = str(foijsondata["id"])
+    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
+    foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), content_type='application/json')
+    assert foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200
 
 with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-personal.json') as y:
   personalrequestjson = json.load(y)
