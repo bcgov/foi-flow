@@ -39,6 +39,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
         assignedTo = assignedTo;
         handleAssignedToInitialValue(assignedTo);
+        console.log(`dueDate = ${requestDetails.dueDate}`);
         let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
         let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
         handlestatusudpate(_daysRemaining,_status)

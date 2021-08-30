@@ -71,11 +71,12 @@ const countWeekendDays = (startDate, endDate) =>
 
 const daysBetween = (startDate, endDate) => {
     var millisecondsPerDay = 24 * 60 * 60 * 1000;
-    return (new Date(endDate) - new Date(startDate)) / millisecondsPerDay;
+    return (endDate - startDate) / millisecondsPerDay;
 }
 const calculateDaysRemaining = (endDate) => {
 	const startDate = new Date();
     endDate = new Date(endDate);
+	console.log(`startDate = ${startDate}, endDate = ${endDate}`);
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);
 	const noOfDays = daysBetween(startDate, endDate);   
