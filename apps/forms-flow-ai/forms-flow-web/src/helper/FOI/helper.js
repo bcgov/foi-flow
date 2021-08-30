@@ -76,11 +76,10 @@ const daysBetween = (startDate, endDate) => {
 const calculateDaysRemaining = (endDate) => {
 	const startDate = new Date();
     endDate = new Date(endDate);
-	console.log(`startDate = ${startDate}, endDate = ${endDate}`);
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);
 	const noOfDays = daysBetween(startDate, endDate);   
-	return (Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays)) + 1;
+	return (Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays));
 }
 
 export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
