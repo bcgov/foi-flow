@@ -14,11 +14,12 @@
 """API endpoints for managing a FOI Requests resource."""
 
 from flask import g, request
-from flask_restx import Namespace, Resource, cors
-
+from flask_restx import Namespace, Resource
+from flask_expects_json import expects_json
+from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.programareaservice import programareaservice
@@ -36,7 +37,7 @@ class FOIFlowApplicantCategories(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cross_origin(origins=allowedOrigins())      
     def get():
         try:
             data = applicantcategoryservice.getapplicantcategories()
@@ -52,7 +53,7 @@ class FOIFlowProgramAreas(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cross_origin(origins=allowedOrigins())      
     def get():
         try:
             data = programareaservice.getprogramareas()
@@ -67,7 +68,7 @@ class FOIFlowDeliveryModes(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cross_origin(origins=allowedOrigins())       
     def get():
         try:
             data = deliverymodeservice.getdeliverymodes()
@@ -82,7 +83,7 @@ class FOIFlowReceivedModes(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cross_origin(origins=allowedOrigins())       
     def get():
         try:
             data = receivedmodeservice.getreceivedmodes()
@@ -97,7 +98,7 @@ class IntakeTeamMembers(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cross_origin(origins=allowedOrigins())    
     def get():
         try:
             keycloakadminservice = KeycloakAdminService()
