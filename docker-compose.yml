@@ -45,6 +45,7 @@ services:
       - JWT_OIDC_AUDIENCE=${JWT_OIDC_AUDIENCE}
       - JWT_OIDC_ISSUER=${JWT_OIDC_ISSUER}
       - JWT_OIDC_ALGORITHMS=${JWT_OIDC_ALGORITHMS}
+      - CORS_ORIGIN=${CORS_ORIGIN}
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg
