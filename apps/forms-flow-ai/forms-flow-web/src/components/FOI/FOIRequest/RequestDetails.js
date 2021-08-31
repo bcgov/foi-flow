@@ -177,7 +177,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined"
                             fullWidth
                             required
-                            error={selectedReceivedMode.toLowerCase().includes("select")}                            
+                            error={selectedReceivedMode.toLowerCase().includes("select")}
+                            disabled={requestDetails.currentState && requestDetails.currentState.toLowerCase() === FOI_COMPONENT_CONSTANTS.UNOPENED}                         
                         >            
                         {receivedModes}
                         </TextField> 
