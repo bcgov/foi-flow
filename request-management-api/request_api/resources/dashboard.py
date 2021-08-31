@@ -1,9 +1,10 @@
 from flask import g, request
 import flask
-from flask_restx import Namespace, Resource, cors
+from flask_restx import Namespace, Resource
+from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight,ismemberofgroups, getgroupsfromtoken
+from request_api.utils.util import  cors_preflight,ismemberofgroups, getgroupsfromtoken, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.dashboardservice import dashboardservice
 from request_api.auth import jwt as _authjwt
@@ -13,14 +14,13 @@ import json
 API = Namespace('FOI Flow Dashboard', description='Endpoints for Dashboard')
 TRACER = Tracer.get_instance()
 
-@cors_preflight('GET,POST,OPTIONS')
+@cors_preflight('GET,OPTIONS')
 @API.route('/dashboard')
 
 class Dashboard(Resource):
     @staticmethod
     @TRACER.trace()    
-    @cors.crossdomain(origin='*')
-    @cors_preflight('GET,POST,OPTIONS') 
+    @cross_origin(origins=allowedOrigins())
     @ismemberofgroups('Intake Team,Flex Team')     
     def get():        
         try:    
