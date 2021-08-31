@@ -29,13 +29,15 @@ from request_api.auth import jwt as _authjwt
 import jwt
 import os
 
+
 def cors_preflight(methods):
-    """Render an option method on the class."""
+   #Render an option method on the class.
 
     def wrapper(f):
         def options(self, *args, **kwargs):  # pylint: disable=unused-argument
             return {'Allow': 'GET'}, 200, \
-                   {'Access-Control-Allow-Origin': '*',
+                   {
+                    #'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': methods,
                     'Access-Control-Allow-Headers': 'Authorization, Content-Type, registries-trace-id, '
                                                     'invitation_token'}
@@ -44,6 +46,7 @@ def cors_preflight(methods):
         return f
 
     return wrapper
+
 
 def ismemberofgroups(group):
     def role_check(function):
@@ -85,6 +88,14 @@ def snake2camelback(snake_dict: dict):
     return camelize(snake_dict)
 
 
+def allowedOrigins():
+    _allowedCORS = os.getenv('CORS_ORIGIN')
+    allowedCors = []
+    if ',' in _allowedCORS:
+        for entry in re.split(",",_allowedCORS):
+            allowedCors.append(entry)
+    return allowedCors
+
 class Singleton(type):
     """Singleton meta."""
 
@@ -107,3 +118,5 @@ def escape_wam_friendly_url(param):
     base64_org_name = base64.b64encode(bytes(param, encoding='utf-8')).decode('utf-8')
     encode_org_name = urllib.parse.quote(base64_org_name, safe='')
     return encode_org_name
+
+
