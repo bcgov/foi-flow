@@ -19,14 +19,16 @@ from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.assigneeservice import assigneeservice
 import json
+from flask_cors import cross_origin
 
 
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
+
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiassignees', defaults={'requestype':None, 'status': None})
@@ -37,7 +39,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    @cross_origin(origins=allowedOrigins())
     def get(requestype=None, status=None):
         """ POST Method for capturing FOI requests before processing"""
         if requestype is not None:
@@ -60,7 +62,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    @cross_origin(origins=allowedOrigins())
     def get(groupName):
         """ POST Method for capturing FOI requests before processing"""
         try:
