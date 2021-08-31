@@ -44,16 +44,12 @@ const getPublicHoliDays = (startDate, endDate) => {
 	}
 	return publicHoliDays;
 }
-const reconcilePublicHoliDays = (startDate, endDate) => {	
-	while(true) {		
-		let publicHoliDays = getPublicHoliDays(startDate,endDate);		
-		if(publicHoliDays === 0) {
-			break;
+const reconcilePublicHoliDays = (startDate, endDate) => {
+		const publicHoliDays = getPublicHoliDays(startDate,endDate);
+		if(publicHoliDays > 0) {
+			startDate = endDate;
+			endDate = endDate.businessDaysAdd(publicHoliDays);			
 		}
-		startDate = endDate;
-		endDate = endDate.businessDaysAdd(publicHoliDays);
-		
-	}
 	return endDate;
 }
 const addBusinessDays = (dateText, days) => {
