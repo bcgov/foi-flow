@@ -15,11 +15,12 @@
 
 
 from flask import g, request
-from flask_restx import Namespace, Resource, cors
+from flask_restx import Namespace, Resource
 from flask_expects_json import expects_json
+from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.dashboardservice import dashboardservice
@@ -39,7 +40,7 @@ class FOIRawRequest(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cross_origin(origins=allowedOrigins())       
     def get(requestid=None):
         try :            
             jsondata = {}
@@ -55,7 +56,7 @@ class FOIRawRequest(Resource):
 
     @staticmethod
     #@Tracer.trace()
-    @cors.crossdomain(origin='*')
+    @cross_origin(origins=allowedOrigins())
     def post(requestid=None):
         try :                        
             updaterequest = request.get_json()            
@@ -83,7 +84,7 @@ class FOIRawRequestBPMProcess(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    @cross_origin(origins=allowedOrigins())
     def put(_requestid=None):
             request_json = request.get_json()
             try:
@@ -110,7 +111,7 @@ class FOIRawRequests(Resource):
     
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    @cross_origin(origins=allowedOrigins())
     @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
