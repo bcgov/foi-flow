@@ -4,7 +4,6 @@ import { Provider } from "react-redux";
 import { ConnectedRouter } from "connected-react-router";
 import "../assets/styles/layouts.scss";
 import "../assets/styles/user-styles.css";
-import BaseRouting from "./BaseRouting";
 import {Helmet} from "react-helmet";
 import {KEYCLOAK_URL} from "../constants/constants";
 import {APPLICATION_NAME} from "../constants/constants";
@@ -22,13 +21,8 @@ const App = React.memo((props) => {
           {KEYCLOAK_URL?<link rel="preconnect" href={KEYCLOAK_URL} />:null}
         </Helmet>
         <Provider store={store}>
-          <ConnectedRouter history={history}>
-            {appName === 'foi-flow'?
-            <FOIBaseRouting  store={store}/>
-            :
-            <BaseRouting store={store}/>
-            }
-            
+          <ConnectedRouter history={history}>            
+            <FOIBaseRouting  store={store}/>                        
           </ConnectedRouter>
         </Provider>
       </div>
