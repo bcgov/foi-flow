@@ -1,0 +1,39 @@
+// .unopened {
+//     background-color: #048ba8;
+//     width: 20px;
+//     display: inline-block;
+// }
+
+// #demo-simple-select-outlined {
+//     border-radius: 5px;
+//     border: 1px solid;
+//     margin-right: 6px;
+// }
+.foi-state-menuitem  { //.MuiListItem-gutters
+    padding-left: 0px !important;
+}
+.foi-menuitem-span {
+    width: 10px;
+    height: 30px;
+    display: inline-block;
+    margin-right: 6px;
+}
+.intakeinprogress {
+    background-color: #048ba8;
+}
+
+.open {
+    background-color: #008000;
+}
+
+.cfr {
+    background-color: #ec7d10;
+}
+
+.redirect {
+    background-color: #dd1155;
+}
+
+.closed {
+    background-color: #4b296b;
+}

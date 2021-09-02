@@ -6,6 +6,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import FOIRequest from "../FOIRequest";
+import { StateDropDown } from '../customComponents';
 
 
 import "./TabbedContainer.scss"
@@ -91,6 +92,9 @@ const TabbedContainer = React.memo((props) => {
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
             <h1><a href="/foi/dashboard">FOI</a></h1>
+          </div>
+          <div className="foileftpaneldropdown">
+            <StateDropDown />
           </div>
           <Tabs
             orientation="vertical"
