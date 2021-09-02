@@ -1,28 +1,12 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
+import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Input from '@material-ui/core/Input';
 import './statedropdown.scss';
 
-const useStyles = makeStyles((theme) => ({
-    formControl: {
-    //   margin: theme.spacing(1),
-      minWidth: 120,
-    },
-    selectEmpty: {
-      marginTop: theme.spacing(2),
-    },
-    unopened: {
-        backgroundColor: '#048ba8',
-        width: '20px',
-        display: 'inline-block'
-    }
-  }));
+
 export default function StateDropDown({}) {
-    const classes = useStyles();
+
     const [status, setStatus] = React.useState('Unopened');
 
     const handleChange = (event) => {
@@ -38,20 +22,21 @@ export default function StateDropDown({}) {
         )
      });
     return (
-        // <FormControl variant="outlined" className={classes.formControl}>            
-            <Select
+        // <FormControl variant="outlined" className={classes.formControl}>
+            <TextField
+                id="foi-status-dropdown"
                 className="foi-state-dropdown"
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
+                InputLabelProps={{ shrink: false, }}          
+                select
                 value={status}
                 onChange={handleChange}
-                label="Age" 
+                input={<Input />} 
                 variant="outlined"
                 fullWidth
-                InputLabelProps={{shrink: false}}           
-                >
+            >                
+            
                 {menuItems}
-            </Select>
+            </TextField>
         // </FormControl>
     );
   }
