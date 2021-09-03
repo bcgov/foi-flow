@@ -4,19 +4,16 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './statedropdown.scss';
 
-
 export default function StateDropDown({}) {
-
     const [status, setStatus] = React.useState('Unopened');
-
     const handleChange = (event) => {
-        setStatus(event.target.value);
+        setStatus(event.target.value);       
     };
     const stateList = ["Unopened","Intake in progress", "Open", "CFR", "Closed", "Redirect"];
     const menuItems = stateList.map((item) => {
         return (        
         <MenuItem className="foi-state-menuitem" key={item} value={item} disabled={item.toLowerCase().includes("unopened")}>
-            <span className={`foi-menuitem-span ${item.toLowerCase().replace(/\s/g, '')}`}></span>
+            <span className={`foi-menuitem-span ${item.toLowerCase().replace(/\s/g, '')}`} ></span>
             {item}
         </MenuItem> 
         )
