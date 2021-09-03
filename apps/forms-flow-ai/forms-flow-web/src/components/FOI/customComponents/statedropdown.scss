@@ -1,10 +1,19 @@
 #foi-status-dropdown {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
-.foi-state-menuitem  { //.MuiListItem-gutters
-    padding-left: 0px !important;
 
+.foi-state-dropdown .MuiOutlinedInput-root {
+    color: white;
+} 
+
+.foi-state-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
+    color: white;
+} 
+.foi-state-menuitem  {
+    padding-left: 0px !important;
 }
 .foi-menuitem-span {
     width: 10px;
