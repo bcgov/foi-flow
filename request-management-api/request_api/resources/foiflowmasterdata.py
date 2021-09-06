@@ -15,7 +15,7 @@
 
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
-
+from request_api.auth import auth
 
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
@@ -36,7 +36,8 @@ class FOIFlowApplicantCategories(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cors.crossdomain(origin='*')
+    @auth.require
     def get():
         try:
             data = applicantcategoryservice.getapplicantcategories()
@@ -52,7 +53,8 @@ class FOIFlowProgramAreas(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cors.crossdomain(origin='*')
+    @auth.require
     def get():
         try:
             data = programareaservice.getprogramareas()
@@ -67,7 +69,8 @@ class FOIFlowDeliveryModes(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cors.crossdomain(origin='*')
+    @auth.require
     def get():
         try:
             data = deliverymodeservice.getdeliverymodes()
@@ -82,7 +85,8 @@ class FOIFlowReceivedModes(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cors.crossdomain(origin='*')
+    @auth.require
     def get():
         try:
             data = receivedmodeservice.getreceivedmodes()
@@ -97,7 +101,8 @@ class IntakeTeamMembers(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cors.crossdomain(origin='*')
+    @auth.require
     def get():
         try:
             keycloakadminservice = KeycloakAdminService()
