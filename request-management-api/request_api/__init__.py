@@ -33,6 +33,7 @@ from request_api.models import db, ma
 from request_api.utils.util_logging import setup_logging, setup_filelogging
 from request_api.auth import jwt
 
+
 # Disable more logging.  
 # TODO - Put this behind an env var.
 # setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
@@ -58,6 +59,8 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     db.init_app(app)
     ma.init_app(app)
     #mail.init_app(app)
+    
+
 
     app.register_blueprint(API_BLUEPRINT)
     #app.register_blueprint(DEFAULT_API_BLUEPRINT)
@@ -106,7 +109,10 @@ def setup_jwt_manager(app, jwt_manager):
         return a_dict['groups']  # pragma: no cover
 
     app.config['JWT_ROLE_CALLBACK'] = get_roles
+    
     jwt_manager.init_app(app)
+    
+    return
 
 
 def register_shellcontext(app):
