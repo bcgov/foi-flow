@@ -1,6 +1,4 @@
 import {
-  ROLES,
-  USER_RESOURCE_FORM_ID,
   Keycloak_Client,
   ANONYMOUS_USER,
   ANONYMOUS_ID,
@@ -44,13 +42,7 @@ const initKeycloak = (store, ...rest) => {
           //Set Cammunda/Formio Base URL
           setApiBaseUrlToLocalStorage();
 
-          let roles = [];
-          for (let i = 0; i < UserRoles.length; i++) {
-            const roleData = ROLES.find((x) => x.title === UserRoles[i]);
-            if (roleData) {
-              roles = roles.concat(roleData.id);
-            }
-          }
+          
           KeycloakData.loadUserInfo().then((res) => store.dispatch(setUserDetails(res)));
           const email = KeycloakData.tokenParsed.email || "external";
           
