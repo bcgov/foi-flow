@@ -7,7 +7,7 @@ import { Container } from "@material-ui/core";
 import UserService from "../../../services/UserService";
 import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
-import HomeMenu from "./HomeMenu";
+
 
 const FOIHeader = React.memo(() => { 
 
