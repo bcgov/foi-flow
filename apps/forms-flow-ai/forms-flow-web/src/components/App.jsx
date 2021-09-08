@@ -10,7 +10,6 @@ import {APPLICATION_NAME} from "../constants/constants";
 
 import FOIBaseRouting from "./FOI/FOIBaseRouting"
 
-require("typeface-nunito-sans");
 
 const App = React.memo((props) => {
   const appName = APPLICATION_NAME;
