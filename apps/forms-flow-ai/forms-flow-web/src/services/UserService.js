@@ -93,7 +93,6 @@ const setApiBaseUrlToLocalStorage = ()=> {
 
 const authenticateAnonymousUser = (store) => {
   const user = ANONYMOUS_USER;
-  const roles = [ANONYMOUS_ID];
   store.dispatch(setUserRole([user]));  
 };
 
