@@ -75,17 +75,17 @@ export const fetchFOIProgramAreaList = (...rest) => {
 };
 
 
-export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
+export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};
-  let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
+  const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
+  let apiUrlGETAssignedToList = urlIndexCreateRequest > -1 ? API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API : API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API;
   if (requestType && status) {
     apiUrlGETAssignedToList = replaceUrl(replaceUrl(
       API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
       "<requesttype>",
       requestType
     ),"<curentstate>", status); 
-  }  
+  }
   return (dispatch) => {
     httpOpenGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
       .then((res) => {
@@ -95,6 +95,7 @@ export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
             return { ...assignedTo};
           });
           data.unshift(unAssignedGroup);
+          dispatch(setFOIAssignedToList([]));
           dispatch(setFOIAssignedToList(data));          
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -185,6 +186,8 @@ export const fetchFOIRequestList = (...rest) => {
             return { ...foiRequest};
           });
           dispatch(clearRequestDetails({}));
+          dispatch(setFOIAssignedToList([]));
+          dispatch(fetchFOIAssignedToList(-1,"",""));
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -216,8 +219,9 @@ export const fetchFOIRawRequestDetails = (requestId,...rest) => {
         if (res.data) {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
-          dispatch(setFOIRequestDetail(foiRequest));         
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setFOIAssignedToList([]));      
+          dispatch(fetchFOIAssignedToList(-1,foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -249,7 +253,8 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
           const foiRequest = res.data;         
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          dispatch(setFOIAssignedToList([]));
+          dispatch(fetchFOIAssignedToList(-1,foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {

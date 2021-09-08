@@ -60,7 +60,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
       dispatch(fetchFOIRawRequestDetails(requestId));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
-      dispatch(fetchFOIAssignedToList());
+      dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
     }
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
