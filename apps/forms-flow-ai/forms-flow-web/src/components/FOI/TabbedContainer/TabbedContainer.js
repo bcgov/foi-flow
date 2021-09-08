@@ -81,9 +81,7 @@ const TabbedContainer = React.memo((props) => {
     }
         
   }
-
   
-
   return (
 
     <div className="foiformcontent">
@@ -94,7 +92,7 @@ const TabbedContainer = React.memo((props) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown />
+            <StateDropDown requestStatus={_requestStatus}/>
           </div>
           <Tabs
             orientation="vertical"
