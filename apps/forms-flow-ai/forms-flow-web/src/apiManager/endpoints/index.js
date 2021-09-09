@@ -1,5 +1,5 @@
 
-import { INSIGHTS_BASE_API, INSIGHTS_API_KEY, WEB_BASE_URL, BPM_BASE_URL, BPM_BASE_URL_EXT,FOI_BASE_API_URL } from "./config";
+import { FOI_BASE_API_URL } from "./config";
 
 const API = {
   FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard` ,
