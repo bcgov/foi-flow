@@ -12,7 +12,7 @@ import Loading from "../../../containers/Loading";
 const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
-  const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+  // const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiRequestsList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading); 
   const [filteredData, setFilteredData] = useState(rows);
@@ -32,21 +32,21 @@ const Dashboard = React.memo((props) => {
   }
 
   function getAssigneeValue(params) {
-    const groupName = params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    const assignedTo = params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    if (assignedToList.length > 0) {
-      const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
-      if (groupName === assignedTo) {
-        return assignedTo;
-      }
-      else {
-        return `${assignee.lastname}, ${assignee.firstname}`;
-      }
-    }
-    else {
+    // const groupName = params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
+    // const assignedTo = params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
+    // if (assignedToList.length > 0) {
+    //   const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
+    //   const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
+    //   if (groupName === assignedTo) {
+    //     return assignedTo;
+    //   }
+    //   else {
+    //     return `${assignee.lastname}, ${assignee.firstname}`;
+    //   }
+    // }
+    // else {
       return params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    }
+    // }
   }
 
   function getReceivedDate(params) {
@@ -153,7 +153,7 @@ const addRequest = (e) => {
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
               <button type="button" className="btn foi-btn-create" onClick={addRequest} >{FOI_COMPONENT_CONSTANTS.ADD_REQUEST}</button>
             </div>
-            <> { !isLoading && assignedToList.length > 0? (<>
+            <> { !isLoading ? (<>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
