@@ -109,7 +109,7 @@ const TabbedContainer = React.memo((props) => {
             <Tab label="Option 5" {...a11yProps(4)} />
             
           </Tabs>
-          <h4 className="foileftpanelstatus">{_requestStatus}</h4>
+          <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days")? _requestStatus: ""}</h4>
         </div>
         <div className="foitabpanelcollection">
           <TabPanel value={value} index={0}>

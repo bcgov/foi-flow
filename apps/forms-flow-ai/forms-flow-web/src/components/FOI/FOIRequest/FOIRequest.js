@@ -454,9 +454,13 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     setSaveRequestObject(requestObject);
   }
 
-  const handleSaveRequest = (value, value2) => {
+  const handleSaveRequest = (value, value2,id) => {
     setHeader(value);
     setUnSavedRequest(value2);
+    if (!value2) {      
+      //setTimeout(() => { ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}` : dispatch(push(`/foi/reviewrequest/${id}`)) }, 2000);      
+      setTimeout(() => { requestId ? window.location.reload()  : dispatch(push(`/foi/reviewrequest/${id}`)) }, 2000);
+    }
   }
 
   const handleOpenRequest = (parendId, ministryId, unSaved) => {      

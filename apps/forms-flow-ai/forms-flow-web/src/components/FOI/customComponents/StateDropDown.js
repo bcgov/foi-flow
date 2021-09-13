@@ -12,13 +12,20 @@ export default function StateDropDown({requestStatus}) {
     useEffect (() => {
         setStatus(requestStatus.toLowerCase().includes("days")? "Open": requestStatus);
     },[requestStatus])
+    // const status = (requestStatus.toLowerCase().includes("days")? "Open": requestStatus);
+
     const handleChange = (event) => {
-        setStatus(event.target.value);       
+         setStatus(event.target.value);
+        //  handleStateChange(event.target.value); 
     };
 
-    const getStatusList = (_status) => {        
-        _status = _status.toLowerCase().includes("days")? "Open": _status;
-        switch(_status) {
+    const getStatusList = (_status) => {
+        // let  _state = requestStatus.toLowerCase() === "unopened" ? requestStatus : _status.toLowerCase().includes("days") ? "Open": _status;
+        let  _state =  requestStatus.toLowerCase().includes("days")? "Open": requestStatus;
+        // if (window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
+        //     _state = FOI_COMPONENT_CONSTANTS.UNOPENED;
+        // }
+        switch(_state) {
             case FOI_COMPONENT_CONSTANTS.UNOPENED: 
                 return stateList.unopened;
             case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS:
