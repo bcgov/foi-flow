@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight,ismemberofgroups, getgroupsfromtoken, allowedOrigins
+from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedOrigins
 
 
 from request_api.auth import auth
