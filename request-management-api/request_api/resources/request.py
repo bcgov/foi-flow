@@ -115,7 +115,6 @@ class FOIRawRequests(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
     @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
