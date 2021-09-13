@@ -459,11 +459,11 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     setUnSavedRequest(value2);
     if (!value2) {      
       //setTimeout(() => { ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}` : dispatch(push(`/foi/reviewrequest/${id}`)) }, 2000);      
-      setTimeout(() => { requestId ? window.location.reload()  : dispatch(push(`/foi/reviewrequest/${id}`)) }, 2000);
+      setTimeout(() => { requestId ? window.location.reload()  : window.location.href = `/foi/reviewrequest/${id}` }, 1000);
     }
   }
 
-  const handleOpenRequest = (parendId, ministryId, unSaved) => {      
+  const handleOpenRequest = (parendId, ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
       if (!unSaved) {
         dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
