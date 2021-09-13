@@ -17,7 +17,7 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-
+from request_api.auth import auth
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight
 from request_api.exceptions import BusinessException, Error
@@ -39,7 +39,8 @@ class FOIRawRequest(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')       
+    @cors.crossdomain(origin='*')
+    @auth.require
     def get(requestid=None):
         try :            
             jsondata = {}
@@ -56,6 +57,7 @@ class FOIRawRequest(Resource):
     @staticmethod
     #@Tracer.trace()
     @cors.crossdomain(origin='*')
+    @auth.require
     def post(requestid=None):
         try :                        
             updaterequest = request.get_json()            
@@ -84,6 +86,7 @@ class FOIRawRequestBPMProcess(Resource):
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    @auth.require
     def put(_requestid=None):
             request_json = request.get_json()
             try:
@@ -111,6 +114,7 @@ class FOIRawRequests(Resource):
     @staticmethod
     @TRACER.trace()
     @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    @auth.require
     @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""

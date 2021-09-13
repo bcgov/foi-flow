@@ -1,4 +1,4 @@
-import { httpOpenPOSTRequest, httpOpenGETRequest, httpGETRequest } from "../../httpRequestHandler";
+import { httpPOSTRequest, httpGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -20,7 +20,7 @@ export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const firstCategory = {"applicantcategoryid": 0, "name": "Select Category"};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_CATEGORIES_API, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_CATEGORIES_API, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequestCategoryList = res.data;         
@@ -49,7 +49,7 @@ export const fetchFOICategoryList = (...rest) => {
 export const fetchFOIProgramAreaList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiProgramAreaList = res.data;         
@@ -87,7 +87,7 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
     ),"<curentstate>", status); 
   }
   return (dispatch) => {
-    httpOpenGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
+    httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiAssignedToList = res.data;
@@ -118,7 +118,7 @@ export const fetchFOIDeliveryModeList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const firstDeliveryMode = {"deliverymodeid": 0, "name": "Select Delivery Mode"};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_DELIVERY_MODELIST, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_DELIVERY_MODELIST, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiDeliveryModeList = res.data;                 
@@ -148,7 +148,7 @@ export const fetchFOIReceivedModeList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const firstReceivedMode = {"receivedmodeid": 0, "name": "Select Received Mode"};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_RECEIVED_MODELIST, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_RECEIVED_MODELIST, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiReceivedModeList = res.data;
@@ -214,7 +214,7 @@ export const fetchFOIRawRequestDetails = (requestId,...rest) => {
     requestId
   );
   return (dispatch) => {
-    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
@@ -247,7 +247,7 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
     requestId
   ),"<ministryid>", ministryId);  
   return (dispatch) => {
-    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;         
@@ -291,7 +291,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
     );
   }  
   return (dispatch) => {
-    httpOpenPOSTRequest(apiUrl, data)
+    httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {                   
           done(null, res.data);
@@ -310,7 +310,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
 export const openRequestDetails = (data, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
-    httpOpenPOSTRequest(API.FOI_POST_REQUEST_POST, data)
+    httpPOSTRequest(API.FOI_POST_REQUEST_POST, data)
       .then((res) => {
         if (res.data) {                   
           done(null, res.data);

@@ -45,29 +45,6 @@ def cors_preflight(methods):
 
     return wrapper
 
-def ismemberofgroups(group):
-    def role_check(function):
-        @wraps(function)
-        def wrapper(*args, **kwargs):
-            groups = group.split(',')                        
-            groups = ["/" + group for group in groups]
-            #print(_authjwt.get_token_auth_header())            
-            #TODO:ABIN : REMOVE verify signature to false - new logic should come here 
-            tokenjson = jwt.decode(_authjwt.get_token_auth_header(), audience=os.getenv('JWT_OIDC_AUDIENCE'),options={"verify_signature": False})
-            print(tokenjson)             
-            exists = False                             
-            for _group in groups:
-                if _group in tokenjson['groups']:
-                    exists = True
-                    exit
-            retval = "Unauthorized" , 401
-            if exists == True:            
-                return function()
-            return retval
-        return wrapper
-    return role_check
-
-
 def getgroupsfromtoken():
     tokenjson = jwt.decode(_authjwt.get_token_auth_header(),audience=os.getenv('JWT_OIDC_AUDIENCE'), options={"verify_signature": False})
     groups = tokenjson['groups']
