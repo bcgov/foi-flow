@@ -17,7 +17,7 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-
+from request_api.auth import auth
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
@@ -40,8 +40,8 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
+    @auth.require
     def get(requestype=None, status=None):
-        """ POST Method for capturing FOI requests before processing"""
         if requestype is not None:
             if requestype != "personal" and requestype != "general":
                 return {'status': False, 'message':'Bad Request'}, 400   
@@ -63,6 +63,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
+    @auth.require
     def get(groupName):
         """ POST Method for capturing FOI requests before processing"""
         try:

@@ -104,7 +104,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
     });
     const receivedModes = receivedMode.map((item) => {    
-      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select") || (item.name === FOI_COMPONENT_CONSTANTS.ONLINE_FORM && window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1)}>{item.name}</MenuItem> )
+      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select") || (item.name === FOI_COMPONENT_CONSTANTS.ONLINE_FORM && ((!requestDetails.receivedMode) || (requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() !== FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase())))}>{item.name}</MenuItem> )
     });
     const deliveryModes = deliveryMode.map((item) => {    
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
@@ -177,7 +177,8 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined"
                             fullWidth
                             required
-                            error={selectedReceivedMode.toLowerCase().includes("select")}                            
+                            error={selectedReceivedMode.toLowerCase().includes("select")}
+                            disabled={requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || requestDetails.currentState && requestDetails.currentState.toLowerCase() === FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase() }                         
                         >            
                         {receivedModes}
                         </TextField> 

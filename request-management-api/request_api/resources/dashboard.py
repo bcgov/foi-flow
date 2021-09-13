@@ -5,6 +5,10 @@ from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight,ismemberofgroups, getgroupsfromtoken, allowedOrigins
+
+
+from request_api.auth import auth
+from request_api.tracer import Tracer
 from request_api.exceptions import BusinessException, Error
 from request_api.services.dashboardservice import dashboardservice
 from request_api.auth import jwt as _authjwt
@@ -21,7 +25,9 @@ class Dashboard(Resource):
     @staticmethod
     @TRACER.trace()    
     @cross_origin(origins=allowedOrigins())
-    @ismemberofgroups('Intake Team,Flex Team')     
+    @auth.require
+    @cors_preflight('GET,POST,OPTIONS') 
+    @auth.ismemberofgroups('Intake Team,Flex Team')
     def get():        
         try:    
                 groups = getgroupsfromtoken()                

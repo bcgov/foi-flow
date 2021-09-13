@@ -67,6 +67,12 @@ const FOI_COMPONENT_CONSTANTS = {
     ONLINE_FORM: "Online Form",
     ADD_REQUEST: "Add Request",
     REVIEW_REQUEST: "Review Request",
+    UNOPENED: "Unopened",
+    INTAKEINPROGRESS: "Intake in Progress",
+    OPEN: "Open",
+    CLOSED: "Closed",
+    REDIRECT: "Redirect"
+
 
 
 

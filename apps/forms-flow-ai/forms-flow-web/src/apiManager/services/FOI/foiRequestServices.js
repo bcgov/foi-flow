@@ -1,4 +1,4 @@
-import { httpOpenPOSTRequest, httpOpenGETRequest, httpGETRequest } from "../../httpRequestHandler";
+import { httpPOSTRequest, httpGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -20,7 +20,7 @@ export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const firstCategory = {"applicantcategoryid": 0, "name": "Select Category"};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_CATEGORIES_API, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_CATEGORIES_API, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequestCategoryList = res.data;         
@@ -49,7 +49,7 @@ export const fetchFOICategoryList = (...rest) => {
 export const fetchFOIProgramAreaList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiProgramAreaList = res.data;         
@@ -75,19 +75,19 @@ export const fetchFOIProgramAreaList = (...rest) => {
 };
 
 
-export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
+export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};
-  let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
+  const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
+  let apiUrlGETAssignedToList = urlIndexCreateRequest > -1 ? API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API : API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API;
   if (requestType && status) {
     apiUrlGETAssignedToList = replaceUrl(replaceUrl(
       API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
       "<requesttype>",
       requestType
     ),"<curentstate>", status); 
-  }  
+  }
   return (dispatch) => {
-    httpOpenGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
+    httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiAssignedToList = res.data;
@@ -95,6 +95,7 @@ export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
             return { ...assignedTo};
           });
           data.unshift(unAssignedGroup);
+          dispatch(setFOIAssignedToList([]));
           dispatch(setFOIAssignedToList(data));          
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -117,7 +118,7 @@ export const fetchFOIDeliveryModeList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const firstDeliveryMode = {"deliverymodeid": 0, "name": "Select Delivery Mode"};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_DELIVERY_MODELIST, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_DELIVERY_MODELIST, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiDeliveryModeList = res.data;                 
@@ -147,7 +148,7 @@ export const fetchFOIReceivedModeList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   const firstReceivedMode = {"receivedmodeid": 0, "name": "Select Received Mode"};
   return (dispatch) => {
-    httpOpenGETRequest(API.FOI_GET_RECEIVED_MODELIST, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_RECEIVED_MODELIST, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiReceivedModeList = res.data;
@@ -185,6 +186,8 @@ export const fetchFOIRequestList = (...rest) => {
             return { ...foiRequest};
           });
           dispatch(clearRequestDetails({}));
+          dispatch(setFOIAssignedToList([]));
+          dispatch(fetchFOIAssignedToList(-1,"",""));
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -211,13 +214,14 @@ export const fetchFOIRawRequestDetails = (requestId,...rest) => {
     requestId
   );
   return (dispatch) => {
-    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
-          dispatch(setFOIRequestDetail(foiRequest));         
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setFOIAssignedToList([]));      
+          dispatch(fetchFOIAssignedToList(-1,foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -243,13 +247,14 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
     requestId
   ),"<ministryid>", ministryId);  
   return (dispatch) => {
-    httpOpenGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;         
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          dispatch(setFOIAssignedToList([]));
+          dispatch(fetchFOIAssignedToList(-1,foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -286,7 +291,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
     );
   }  
   return (dispatch) => {
-    httpOpenPOSTRequest(apiUrl, data)
+    httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {                   
           done(null, res.data);
@@ -305,7 +310,7 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
 export const openRequestDetails = (data, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};
   return (dispatch) => {
-    httpOpenPOSTRequest(API.FOI_POST_REQUEST_POST, data)
+    httpPOSTRequest(API.FOI_POST_REQUEST_POST, data)
       .then((res) => {
         if (res.data) {                   
           done(null, res.data);

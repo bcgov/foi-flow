@@ -18,7 +18,7 @@ from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
-
+from request_api.auth import auth
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
@@ -40,6 +40,7 @@ class FOIRequest(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
+    @auth.require
     def get(foirequestid,foiministryrequestid):
         try :            
             jsondata = {}
@@ -59,6 +60,7 @@ class FOIRequests(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
+    @auth.require
     def post():
         """ POST Method for capturing FOI requests before processing"""
         try:
@@ -88,6 +90,7 @@ class FOIRequestsById(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
+    @auth.require
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
@@ -116,6 +119,7 @@ class FOIRequestUpdateById(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
+    @auth.require
     def put(foirequestid):
         """ PUT Method for capturing FOI requests before processing"""
         try:
