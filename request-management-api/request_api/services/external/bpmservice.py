@@ -2,7 +2,9 @@ import requests
 import os
 import json
 from enum import Enum
+
 from request_api.schemas.external.bpmschema import MessageSchema, VariableSchema 
+from request_api.services.external.camundaservice import camundaservice, VariableType 
 
 """
 This class is reserved for workflow services integration.
@@ -11,14 +13,9 @@ Supported operations: claim
 __author__      = "sumathi.thirumani@aot-technologies.com"
 
 """
-class bpmservice:
+class bpmservice(camundaservice):
     
-    bpmEngineRestUrl = os.getenv('BPM_ENGINE_REST_URL')
-    bpmTokenUrl =  os.getenv("BPM_TOKEN_URL")
-    bpmClientId =  os.getenv("BPM_CLIENT_ID")
-    bpmClientSecret =  os.getenv("BPM_CLIENT_SECRET")
-    bpmGrantType =  os.getenv("BPM_GRANT_TYPE")
-    
+     
     @classmethod
     def unopenedClaim(self,processInstanceId, userId, token=None):
         if self.bpmEngineRestUrl is not None:
@@ -89,7 +86,6 @@ class MessageType(Enum):
     openedClaim = "foi-opened-assignment"
     openrequest = "foi-open-request"
     
-class VariableType(Enum):
-    String = "String"
+
              
      

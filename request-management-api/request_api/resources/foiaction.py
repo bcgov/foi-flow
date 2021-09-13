@@ -17,60 +17,42 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
+from flask_cors import cross_origin
 from request_api.auth import auth
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
-from request_api.services.assigneeservice import assigneeservice
+from request_api.services.actionservice import actionservice
 import json
-from flask_cors import cross_origin
 
 
-API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
+API = Namespace('FOIAction', description='Endpoints for FOI state management')
 TRACER = Tracer.get_instance()
 
-
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiassignees', defaults={'requestype':None, 'status': None})
-@API.route('/foiassignees/<requestype>', defaults={'status': None})
-@API.route('/foiassignees/<requestype>/<status>')
-class FOIAssigneesByTypeAndStatus(Resource):
+@API.route('/foiaction/<requestype>/<status>')
+class FOIActionByTypeAndStatus(Resource):
     """Resource for managing FOI requests."""
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def get(requestype=None, status=None):
+    def get(requestype, status):
+        """ GET Method for capturing FOI request possible states"""
+        if requestype is None or status is None:
+                return {'status': False, 'message':'Bad Request'}, 400
         if requestype is not None:
             if requestype != "personal" and requestype != "general":
-                return {'status': False, 'message':'Bad Request'}, 400   
+                return {'status': False, 'message':'Bad Request'}, 400  
+         
         try:
-            result = assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status)
+            result = actionservice().getActionByTypeAndStatus(requestype, status)
             if result is not None:
-                return json.dumps(result), 200
+                return json.loads(result), 200
             else:
                 return {'status': False, 'message':'Not Found'}, 404   
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
         
         
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiassignees/group/<groupName>')
-class FOIAssigneesByTypeAndStatus(Resource):
-    """Resource for managing FOI requests."""
-
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
-    @auth.require
-    def get(groupName):
-        """ POST Method for capturing FOI requests before processing"""
-        try:
-            result = assigneeservice().getMembersByGroupName(groupName)
-            if result is not None:
-                return json.dumps(result), 200
-            else:
-                return {'status': False, 'message':'Not Found'}, 404 
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500    

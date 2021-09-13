@@ -60,7 +60,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
       dispatch(fetchFOIRawRequestDetails(requestId));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
-      dispatch(fetchFOIAssignedToList());
+      dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
     }
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
@@ -454,12 +454,16 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     setSaveRequestObject(requestObject);
   }
 
-  const handleSaveRequest = (value, value2) => {
+  const handleSaveRequest = (value, value2,id) => {
     setHeader(value);
     setUnSavedRequest(value2);
+    if (!value2) {      
+      //setTimeout(() => { ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}` : dispatch(push(`/foi/reviewrequest/${id}`)) }, 2000);      
+      setTimeout(() => { requestId ? window.location.reload()  : window.location.href = `/foi/reviewrequest/${id}` }, 1000);
+    }
   }
 
-  const handleOpenRequest = (parendId, ministryId, unSaved) => {      
+  const handleOpenRequest = (parendId, ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
       if (!unSaved) {
         dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));

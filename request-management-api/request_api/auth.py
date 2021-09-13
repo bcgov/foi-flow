@@ -12,8 +12,64 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Bring in the common JWT Manager."""
+from functools import wraps
+from http import HTTPStatus
+
+from flask import g, request
 from flask_jwt_oidc import JwtManager
+from jose import jwt as josejwt
+
+jwt = (
+    JwtManager()
+)  # pylint: disable=invalid-name; lower case name as used by convention in most Flask apps
 
 
-# lower case name as used by convention in most Flask apps
-jwt = JwtManager()  # pylint: disable=invalid-name
+class Auth:
+    """Extending JwtManager to include additional functionalities."""
+
+    @classmethod
+    def require(cls, f):
+        """Validate the Bearer Token."""
+
+        @jwt.requires_auth
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            g.authorization_header = request.headers.get("Authorization", None)
+            g.token_info = g.jwt_oidc_token_info
+            return f(*args, **kwargs)
+
+        return decorated
+    
+    @classmethod
+    def ismemberofgroups(cls, groups):
+        """Check that at least one of the realm groups are in the token.
+        Args:
+            groups [str,]: Comma separated list of valid roles
+        """
+
+        def decorated(f):
+            # Token verification is commented here with an expectation to use this decorator in conjuction with require.
+            #@Auth.require
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                _groups = groups.split(',')
+                token = jwt.get_token_auth_header()
+                unverified_claims = josejwt.get_unverified_claims(token)
+                userGroups = unverified_claims['groups']
+                userGroups = [userGroup.replace('/','',1) if userGroup.startswith('/') else userGroup for userGroup in userGroups]
+                exists = False
+                for group in _groups:
+                    if group in userGroups: 
+                       exists = True
+                retval = "Unauthorized" , 401
+                if exists == True:            
+                    return f(*args, **kwargs)
+                return retval
+
+            return wrapper
+
+        return decorated
+
+auth = (
+    Auth()
+)
