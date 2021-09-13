@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Group" name="Group Mapping" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.8.1">
+  <decision id="group-mapping" name="Group Mapping" camunda:versionTag="1">
+    <decisionTable id="DecisionTable_1ic2kn4">
+      <input id="Input_1" label="Category" camunda:inputVariable="category">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>category</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0j8yg1c" label="Status" camunda:inputVariable="status">
+        <inputExpression id="LiteralExpression_1gmuv5u" typeRef="string" expressionLanguage="feel">
+          <text>status</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_0vkywve" label="Groups" name="groups" typeRef="string" biodi:width="245" />
+      <rule id="DecisionRule_17l25gc">
+        <inputEntry id="UnaryTests_1wfvxmz">
+          <text>"general"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0eohb2o" expressionLanguage="feel">
+          <text>"ALL"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1nn02n9">
+          <text>["Intake Team","Flex Team"]</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_01biwid">
+        <inputEntry id="UnaryTests_1epu5nw">
+          <text>"personal"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1s04tga" expressionLanguage="feel">
+          <text>"ALL"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1fl55on">
+          <text>["Intake Team","Processing Team"]</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1pp7v12">
+        <inputEntry id="UnaryTests_0udpmdm">
+          <text>"general","personal"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_09wmuur" expressionLanguage="feel">
+          <text>"Unopened"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1hipcsi">
+          <text>"Intake Team"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1gzofgn">
+        <inputEntry id="UnaryTests_1jw6zn1">
+          <text>"general","personal"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ywc9vc" expressionLanguage="feel">
+          <text>"Intake in Progress"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0pcl2y1">
+          <text>"Intake Team"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0m80eiu">
+        <inputEntry id="UnaryTests_15i1i9a">
+          <text>"general"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0t8uiku" expressionLanguage="feel">
+          <text>"Open"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0hu464j">
+          <text>["Intake Team","Flex Team"]</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0k8td4s">
+        <inputEntry id="UnaryTests_0n1bzpm">
+          <text>"personal"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0orrlql" expressionLanguage="feel">
+          <text>"Open"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0xz54ld">
+          <text>["Intake Team","Processing Team"]</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="group-mapping">
+        <dc:Bounds height="80" width="180" x="190" y="150" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

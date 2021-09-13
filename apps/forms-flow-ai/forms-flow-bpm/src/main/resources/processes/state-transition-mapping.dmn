@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="state-transition-mapping-rules" name="State Transition Mapping Rules" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.8.1">
+  <decision id="state-transition-mapping" name="state-transition-mapping" camunda:versionTag="1">
+    <decisionTable id="DecisionTable_1kzrd82">
+      <input id="Input_1" label="Category" camunda:inputVariable="category">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>category</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0tpi9nw" label="Status" biodi:width="261" camunda:inputVariable="status">
+        <inputExpression id="LiteralExpression_0stok7n" typeRef="string">
+          <text>status</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_14ipce2" label="Possible Actions" name="output" typeRef="string" biodi:width="340" />
+      <rule id="DecisionRule_0dvw2wa">
+        <inputEntry id="UnaryTests_1ts1e9u">
+          <text>"general","personal"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0atdfui" expressionLanguage="feel">
+          <text>"unopened"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_09ngatq" expressionLanguage="juel">
+          <text>"{'states':[
+{'name':'Unopened','activity': 'ongoing'},
+{'name':'Intake in Progress','activity': 'doable'}
+]
+}"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_04j89eb">
+        <inputEntry id="UnaryTests_0d3s2fc">
+          <text>"general","personal"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0x5qa0g" expressionLanguage="feel">
+          <text>"intakeinprogress"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0sgcw2x" expressionLanguage="juel">
+          <text>"{'states':[
+{'name':'Unopened','activity': 'completed'},
+{'name':'Intake in Progress','activity': 'ongoing'},
+{'name':'Open','activity': 'doable'},
+{'name':'Closed','activity': 'doable'},
+{'name':'Redirect','activity': 'doable'}
+]
+}"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="state-transition-mapping">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
