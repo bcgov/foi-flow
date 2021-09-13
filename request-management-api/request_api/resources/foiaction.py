@@ -17,9 +17,10 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-
+from flask_cors import cross_origin
+from request_api.auth import auth
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.actionservice import actionservice
 import json
@@ -35,7 +36,8 @@ class FOIActionByTypeAndStatus(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cors.crossdomain(origin='*')  ##todo: This will get replaced with Allowed Origins
+    @cross_origin(origins=allowedOrigins())
+    @auth.require
     def get(requestype, status):
         """ GET Method for capturing FOI request possible states"""
         if requestype is None or status is None:
