@@ -132,7 +132,20 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
                                         ))
     
     print('SQLAlchemy URL (Test): {}'.format(SQLALCHEMY_DATABASE_URI))
-
+    
+    # JWT_OIDC Settings
+    JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
+    JWT_OIDC_ALGORITHMS = os.getenv('JWT_OIDC_ALGORITHMS')
+    JWT_OIDC_JWKS_URI = os.getenv('JWT_OIDC_JWKS_URI')
+    JWT_OIDC_ISSUER = os.getenv('JWT_OIDC_ISSUER')
+    JWT_OIDC_AUDIENCE = os.getenv('JWT_OIDC_AUDIENCE')
+    JWT_OIDC_CLIENT_SECRET = os.getenv('JWT_OIDC_CLIENT_SECRET')
+    JWT_OIDC_CACHING_ENABLED = os.getenv('JWT_OIDC_CACHING_ENABLED')
+    try:
+        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT'))
+    except:  # pylint:disable=bare-except # noqa: B901, E722
+        JWT_OIDC_JWKS_CACHE_TIMEOUT = 300
+    
 class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
     """Production environment configuration."""
 
