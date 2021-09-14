@@ -70,7 +70,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            handleSaveRequest("Intake in progress", false);
+            handleSaveRequest("Intake in progress", false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
@@ -81,7 +81,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            handleSaveRequest("Unopened", true);
+            handleSaveRequest("Unopened", true, res.id);
         }
       }));      
     }

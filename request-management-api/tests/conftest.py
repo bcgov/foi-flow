@@ -9,7 +9,7 @@ from request_api import db as _db
 
 from request_api import create_app 
 from sqlalchemy import event, text
-
+from request_api.auth import jwt as _jwt
 
 @pytest.fixture(scope='session')
 def app():
@@ -29,6 +29,12 @@ def app_request():
 def client(app):  # pylint: disable=redefined-outer-name
     """Return a session-wide Flask test client."""
     return app.test_client()
+
+@pytest.fixture(scope='session')
+def jwt():
+    """Return a session-wide jwt manager."""
+    _jwt.init_app(app)
+    return _jwt
 
 @pytest.fixture(scope='session')
 def client_ctx(app):  # pylint: disable=redefined-outer-name

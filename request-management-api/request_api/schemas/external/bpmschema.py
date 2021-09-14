@@ -23,3 +23,12 @@ class MessageSchema(Schema):
     processVariables = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
     localCorrelationKeys = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
     
+class VariableMessageSchema(Schema):
+    
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+
+    variables = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
+    

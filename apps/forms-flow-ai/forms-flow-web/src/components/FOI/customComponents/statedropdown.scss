@@ -1,0 +1,49 @@
+#foi-status-dropdown {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.foi-state-dropdown .MuiOutlinedInput-root {
+    color: white;
+} 
+
+.foi-state-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
+    color: white;
+} 
+.foi-state-menuitem  {
+    padding-left: 0px !important;
+}
+.foi-menuitem-span {
+    width: 10px;
+    height: 30px;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+#foi-status-dropdown .foi-menuitem-span {
+    display: none !important;
+}
+// .foi-state-dropdown {
+
+// }
+.intakeinprogress {
+    background-color: #048ba8;
+}
+
+.open {
+    background-color: #008000;
+}
+
+.callforrecords {
+    background-color: #ec7d10;
+}
+
+.redirect {
+    background-color: #dd1155;
+}
+
+.closed {
+    background-color: #4b296b;
+}

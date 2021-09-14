@@ -6,6 +6,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import FOIRequest from "../FOIRequest";
+import { StateDropDown } from '../customComponents';
 
 
 import "./TabbedContainer.scss"
@@ -80,9 +81,7 @@ const TabbedContainer = React.memo((props) => {
     }
         
   }
-
   
-
   return (
 
     <div className="foiformcontent">
@@ -91,6 +90,9 @@ const TabbedContainer = React.memo((props) => {
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
             <h1><a href="/foi/dashboard">FOI</a></h1>
+          </div>
+          <div className="foileftpaneldropdown">
+            <StateDropDown requestStatus={_requestStatus}/>
           </div>
           <Tabs
             orientation="vertical"
@@ -107,7 +109,7 @@ const TabbedContainer = React.memo((props) => {
             <Tab label="Option 5" {...a11yProps(4)} />
             
           </Tabs>
-          <h4 className="foileftpanelstatus">{_requestStatus}</h4>
+          <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days")? _requestStatus: ""}</h4>
         </div>
         <div className="foitabpanelcollection">
           <TabPanel value={value} index={0}>
