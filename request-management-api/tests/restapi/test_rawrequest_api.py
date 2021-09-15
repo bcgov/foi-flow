@@ -30,6 +30,18 @@ def test_post_foirawrequests(app, client):
     wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_auth_header(app, client), content_type='application/json')
     assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
 
+with open('tests/samplerequestjson/rawrequest.json') as f:
+  requestjson = json.load(f)
+def test_post_foirawrequestspii(app, client):    
+    response = client.post('/api/foirawrequests',data=json.dumps(requestjson), content_type='application/json')
+    jsondata = json.loads(response.data)
+    print(str(jsondata["id"]))
+    updatejson = jsondata
+    updatejson['ispiiredacted'] = True
+    updatejson['assignedTo'] = "Intake Team"
+    wfupdateresponse = client.post('/api/foirawrequest/'+str(jsondata["id"]),data=json.dumps(updatejson), headers=factory_auth_header(app, client), content_type='application/json')
+    assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
+
 def test_get_programareas(app,client):    
     response = client.get('api/foiflow/programareas', headers=factory_auth_header(app, client), content_type='application/json')    
     jsondata = json.loads(response.data)    

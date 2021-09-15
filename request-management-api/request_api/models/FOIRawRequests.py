@@ -25,7 +25,7 @@ class FOIRawRequest(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     sourceofsubmission = db.Column(db.String(120),  nullable=True)
-    
+    ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)    
     
     @classmethod
     def saverawrequest(cls,_requestrawdata,sourceofsubmission,assigneegroup= None,assignee= None)->DefaultMethodResult:                
@@ -38,7 +38,7 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status,ispiiredacted)->DefaultMethodResult:        
         updatedat = datetime.now()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
@@ -46,7 +46,7 @@ class FOIRawRequest(db.Model):
             _version = request.version+1
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
@@ -105,4 +105,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission','ispiiredacted')
