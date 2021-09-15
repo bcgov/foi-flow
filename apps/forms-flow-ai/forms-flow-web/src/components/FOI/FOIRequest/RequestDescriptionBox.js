@@ -8,6 +8,7 @@ import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
+import RequestDescriptionHistory from "../RequestDescriptionHistory"
 
 const useStyles = makeStyles((theme) => ({
       headingError: {
@@ -15,6 +16,9 @@ const useStyles = makeStyles((theme) => ({
       },
       headingNormal: {
         color: "000000"
+      },
+      btndisabled: { 
+        color: "#808080"
       }
   }));
 
@@ -27,7 +31,7 @@ const RequestDescription = React.memo(({
      createSaveRequestObject
     }) => {
     
-
+    
     /* All fields in this component are mandatory */
     
     const classes = useStyles();
@@ -103,15 +107,56 @@ const RequestDescription = React.memo(({
         handleUpdatedProgramAreaList(programAreaList);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, programAreaList);
     }
+
+    const [openModal, setOpenModal] = React.useState(false);
+    const handleDescriptionHistoryClick = () => {
+        setOpenModal(true);
+    }
+    const handleModalClose = () => {
+        setOpenModal(false);
+    }
+    const requestDescriptionHistoryList = 
+    [{
+        "type": "original",
+        "description": "Original description",
+        "startDate": "2021-08-01",
+        "endDate": "2021-08-15",
+        "createdDate": "2021-08-16",
+        "createdBy": "dviswana@idir"
+        },
+        {
+        "type": "v2",
+        "description": "updated description v2",
+        "startDate": "2021-08-01",
+        "endDate": "2021-08-15",
+        "createdDate": "2021-08-31",
+        "createdBy": "Intake Team"
+        },
+        {
+        "type": "v3",
+        "description": "updated description v3",
+        "startDate": "2021-08-01",
+        "endDate": "2021-08-30",
+        "createdDate": "2021-09-01",
+        "createdBy": "dviswana@idir"
+        }];
+
+    console.log(requestDescriptionHistoryList.length);
      return (
         
         <Card className="foi-details-card">            
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
+                <RequestDescriptionHistory requestDescriptionHistoryList={requestDescriptionHistoryList} openModal={openModal} handleModalClose={handleModalClose}/>
                 <div className="row foi-details-row">
+                <div className="foi-request-description-history">
+                    <button type="button" className={`btn btn-link btn-description-history ${!(requestDescriptionHistoryList.length > 0)? classes.btndisabled : ""}`} disabled={!(requestDescriptionHistoryList.length > 0)}  onClick={handleDescriptionHistoryClick}>
+                       Description History
+                    </button>
+                </div>
                     <div className="col-lg-12 foi-request-description-row">
                         <div className="col-lg-6">
-                        <h3 className="foi-date-range-h3">Date Range for Record Search</h3>
+                            <h3 className="foi-date-range-h3">Date Range for Record Search</h3>
                         </div>
                         <div className="col-lg-6 foi-request-dates">
                         <TextField                

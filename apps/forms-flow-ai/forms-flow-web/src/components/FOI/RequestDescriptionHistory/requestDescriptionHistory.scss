@@ -1,0 +1,18 @@
+@font-face {
+    font-family: "BCSans-Regular";
+    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+
+.MuiAccordion-root {
+    background-color: #eceaea !important;
+    font-family: "BCSans-Regular" !important;
+}
+
+#request-history-dialog-title {
+    font-family: "BCSans-Bold";
+    color: #036 ;
+}
