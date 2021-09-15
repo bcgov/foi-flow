@@ -35,24 +35,30 @@ const getPublicHoliDays = (startDate, endDate) => {
 		years.push(dayjs(endDate).year());
 	}
 	for(const year of years) {
-		const holidays = hd.getHolidays(year);
-		for (const entry of holidays) {			
-			if(entry.type === "public" && dayjs(entry.date).isBetween(startDate, endDate, null, '[]')) {
+		let holidays = hd.getHolidays(year);
+		for (const entry of holidays) {
+			let day = dayjs(entry.date).day();			
+			if(entry.type === "public" && dayjs(entry.date).isBetween(startDate, endDate, null, '[]') && (day >= 1 && day <= 5)) {
 				publicHoliDays++;
-			}		
+			}
+			//Handle Easter Monday
+			if(entry.name === "Good Friday" && dayjs(entry.date).add(3,'day').isBetween(startDate, endDate, null, '[]')) {
+				publicHoliDays++;
+			}	
+			//Handle Boxing Day weekends
+			if(entry.name === "Boxing Day" && (day === 6 || day === 0) && dayjs(entry.date).isBetween(startDate, endDate, null, '[]')) {
+				publicHoliDays++;
+			}			
 		}
 	}
 	return publicHoliDays;
 }
 const reconcilePublicHoliDays = (startDate, endDate) => {
-	while(true) {		
-		let publicHoliDays = getPublicHoliDays(startDate,endDate);		
-		if(publicHoliDays === 0) {
-			break;
-		}
-		endDate = endDate.businessDaysAdd(publicHoliDays);
-		startDate = endDate;
-		
+	let publicHoliDays = getPublicHoliDays(startDate,endDate);
+	endDate = endDate.businessDaysAdd(publicHoliDays);
+	startDate = endDate;
+	if(publicHoliDays != 0) {			
+		reconcilePublicHoliDays(startDate, endDate)
 	}
 	return endDate;
 }
