@@ -2,15 +2,16 @@ import {render, screen, cleanup} from '@testing-library/react';
 import renderer from 'react-test-renderer';
 import { Provider } from "react-redux";
 import configureStore from 'redux-mock-store'
-import Home from '../Home';
+import FOIHeader from './FOIHeader';
 import { useSelector } from "react-redux";
+import { shallow } from 'enzyme';
 
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
     useSelector: jest.fn()
   }));
 
-describe('Home component', () => {
+describe('FOI Header component', () => {
   
     beforeEach(() => {
         useSelector.mockImplementation(callback => {
@@ -25,8 +26,22 @@ describe('Home component', () => {
     const mockStore = configureStore()
     let store,wrapper
    
+    it("FOI Header Rendering Unit test - shallow check", () => {
+        store = mockStore(initialState)
+        const localState = {
+            isAuthenticated: true,
+            user: {
+                name: 'John',
+                preferred_username: 'John Smith'
+            }
+        }
+        useSelector.mockImplementation(callback => {
+            return callback(localState);
+          });    
+        shallow(<Provider store={store}><FOIHeader/></Provider>)
+      });
 
-    it('matches Home snapshot', () => {
+    it('FOI header snapshot check', () => {
         store = mockStore(initialState)
         const localState = {
             isAuthenticated: true,
@@ -38,7 +53,7 @@ describe('Home component', () => {
         useSelector.mockImplementation(callback => {
             return callback(localState);
           });
-        const tree = renderer.create(<Provider store={store}><Home/></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><FOIHeader/></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })
