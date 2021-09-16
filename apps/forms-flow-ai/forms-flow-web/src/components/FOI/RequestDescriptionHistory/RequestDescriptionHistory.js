@@ -1,14 +1,10 @@
 import React from 'react';
 import './requestDescriptionHistory.scss';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { makeStyles } from '@material-ui/core/styles';
+import AccordionItem from './AccordionItem';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -20,10 +16,21 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: theme.typography.fontWeightRegular,
     },
   }));
-const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, openModal, handleModalClose}) => {    
+const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, openModal, handleModalClose}) => {  
+
+    const [expanded, setExpanded] = React.useState('panel1');
+    const handleChange = (panel) => (event, newExpanded) => {
+        console.log(panel);
+        console.log(newExpanded);
+        setExpanded(newExpanded ? panel : false);
+    };
+
+    const sortedList = requestDescriptionHistoryList.sort((a, b) => {
+        return new Date(a.createdDate) - new Date(b.createdDate);
+    });
 
     const classes = useStyles();
-    //<h3 className="foi-review-request-text">Request History</h3>
+   
      return (
     <div className={classes.root}>
         <Dialog
@@ -31,24 +38,14 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
           onClose={handleModalClose}
           aria-labelledby="request-history-dialog-title"
           aria-describedby="request-history-dialog-description"
+          fullWidth
+          maxWidth={'md'}
         >
             <DialogTitle id="request-history-dialog-title">Request History</DialogTitle>
             <DialogContent>
-                <Accordion>
-                    <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                    >
-                    <Typography className={classes.heading}>REQUEST DESCRIPTION</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                    <Typography>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                        sit amet blandit leo lobortis eget.
-                    </Typography>
-                    </AccordionDetails>
-                </Accordion>
+                {sortedList.map((details, index) => 
+                     <AccordionItem details={details} index={index} key={details.type} expanded={expanded} handleChange={handleChange} />                    
+            )}                
             </DialogContent>
       </Dialog>
     </div>
