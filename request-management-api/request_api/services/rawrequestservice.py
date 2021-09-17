@@ -33,7 +33,8 @@ class rawrequestservice:
         return result
 
     def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee,status):
-        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status)
+        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
+        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status,ispiiredacted)
         return result
 
     def updateworkflowinstance(wfinstanceid, requestid):
@@ -96,6 +97,7 @@ class rawrequestservice:
             _createdDate = dt
             baserequestInfo = {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
+                               'ispiiredacted': request['ispiiredacted'],
                                'sourceOfSubmission': request['sourceofsubmission'],
                                'requestType': requestType,
                                'firstName': contactInfo['firstName'],
