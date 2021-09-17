@@ -78,7 +78,8 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     startDate: "",
     endDate: "",
     description: "",
-    isProgramAreaSelected: false
+    isProgramAreaSelected: false,
+    isPiiRedacted: false
   }  
 
   const requiredRequestDetailsInitialValues = {
@@ -183,6 +184,10 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     else if (name === FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED) {
       descriptionData.isProgramAreaSelected = value;      
     }
+    else if (name === FOI_COMPONENT_CONSTANTS.ISPIIREDACTED) {
+      descriptionData.isPiiRedacted = value;
+    }
+    
     setRequiredRequestDescriptionValues(descriptionData);
   }
   
@@ -229,13 +234,15 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
 
   const contactDetailsNotGiven = ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
 
+  console.log(requiredRequestDescriptionValues);
   //Variable to find if all required fields are filled or not
   const isValidationError = (
     requiredApplicantDetails.firstName === "" || requiredApplicantDetails.lastName === "" 
     || requiredApplicantDetails.category.toLowerCase().includes("select")
     || contactDetailsNotGiven
     || requiredRequestDescriptionValues.description === ""
-    || !requiredRequestDescriptionValues.isProgramAreaSelected   
+    || !requiredRequestDescriptionValues.isProgramAreaSelected
+    || !requiredRequestDescriptionValues.isPiiRedacted
     || (validation.helperTextValue !== undefined && validation.helperTextValue !== "")
     || assignedToValue.toLowerCase().includes("unassigned")
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
@@ -437,6 +444,9 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     }
     else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
       requestObject.publicServiceEmployeeNumber = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.ISPIIREDACTED) {
+      requestObject.ispiiredacted = value;
     }
   }
 

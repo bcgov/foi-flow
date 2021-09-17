@@ -45,7 +45,8 @@ const RequestDescription = React.memo(({
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
-            isProgramAreaSelected: !!requestDetails.selectedMinistries
+            isProgramAreaSelected: !!requestDetails.selectedMinistries,
+            isPiiRedacted: requestDetails.ispiiredacted
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
@@ -75,7 +76,13 @@ const RequestDescription = React.memo(({
     const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
+    const [isPIIRedacted, setPIIRedacted] = React.useState(requestDetails.ispiiredacted);
 
+    const handlePIIRedacted = (event) => {
+        setPIIRedacted(event.target.checked);
+        handleOnChangeRequiredRequestDescriptionValues(event.target.checked, FOI_COMPONENT_CONSTANTS.ISPIIREDACTED)
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ISPIIREDACTED, event.target.checked);
+    }
     //handle onchange of start date and set state with latest value
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
@@ -116,41 +123,71 @@ const RequestDescription = React.memo(({
         setOpenModal(false);
     }
     const requestDescriptionHistoryList = 
-    [{
-        "type": "original",
-        "description": "Original description",
-        "startDate": "2021-08-01",
-        "endDate": "2021-08-15",
-        "createdDate": "2021-08-16",
-        "createdBy": "dviswana@idir"
+    [
+        {
+            "type": "original",
+            "description": "Original description",
+            "startDate": "2021-08-01",
+            "endDate": "2021-08-15",
+            "createdDate": "2021-08-16",
+            "createdBy": "dviswana@idir"
         },
         {
-        "type": "v2",
-        "description": "updated description v2",
-        "startDate": "2021-08-01",
-        "endDate": "2021-08-15",
-        "createdDate": "2021-08-31",
-        "createdBy": "Intake Team"
+            "type": "v3",
+            "description": "updated description v2",
+            "startDate": "2021-08-01",
+            "endDate": "2021-08-15",
+            "createdDate": "2021-09-01",
+            "createdBy": "Intake Team"
         },
         {
-        "type": "v3",
-        "description": "updated description v3",
-        "startDate": "2021-08-01",
-        "endDate": "2021-08-30",
-        "createdDate": "2021-09-01",
-        "createdBy": "dviswana@idir"
-        }];
-
-    console.log(requestDescriptionHistoryList.length);
+            "type": "v1",
+            "description": "updated description v3",
+            "startDate": "2021-08-01",
+            "endDate": "2021-08-31",
+            "createdDate": "2021-08-31",
+            "createdBy": "dviswana@idir"
+        },
+        {
+            "type": "v1",
+            "description": "updated description v3",
+            "startDate": "2021-08-01",
+            "endDate": "2021-08-30",
+            "createdDate": "2021-08-31",
+            "createdBy": "dviswana@idir"
+        },
+        {
+            "type": "v1",
+            "description": "updated description v3",
+            "startDate": "2021-08-01",
+            "endDate": "2021-08-30",
+            "createdDate": "2021-08-31",
+            "createdBy": "dviswana@idir"
+        },
+        {
+            "type": "v1",
+            "description": "updated description v1",
+            "startDate": "2021-08-01",
+            "endDate": "2021-08-30",
+            "createdDate": "2021-08-31",
+            "createdBy": "dviswana@idir"
+        }
+    ];
+        const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
+        index === self.findIndex((copyRequest) => (
+            copyRequest.description === request.description && copyRequest.startDate === request.startDate && copyRequest.endDate === request.endDate// && copyRequest.name === request.name
+        ))
+      );
+    
      return (
         
         <Card className="foi-details-card">            
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
-                <RequestDescriptionHistory requestDescriptionHistoryList={requestDescriptionHistoryList} openModal={openModal} handleModalClose={handleModalClose}/>
+                <RequestDescriptionHistory requestDescriptionHistoryList={filteredList} openModal={openModal} handleModalClose={handleModalClose}/>
                 <div className="row foi-details-row">
                 <div className="foi-request-description-history">
-                    <button type="button" className={`btn btn-link btn-description-history ${!(requestDescriptionHistoryList.length > 0)? classes.btndisabled : ""}`} disabled={!(requestDescriptionHistoryList.length > 0)}  onClick={handleDescriptionHistoryClick}>
+                    <button type="button" className={`btn btn-link btn-description-history ${!(filteredList.length > 0)? classes.btndisabled : ""}`} disabled={!(filteredList.length > 0)}  onClick={handleDescriptionHistoryClick}>
                        Description History
                     </button>
                 </div>
@@ -201,7 +238,18 @@ const RequestDescription = React.memo(({
                         onChange={handleRequestDescriptionChange}
                         error={requestDescriptionText===""}
                         fullWidth
-                     />        
+                    />
+                    <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
+                    <input
+                        type="checkbox"
+                        className="checkmark"
+                        checked={isPIIRedacted}
+                        onChange={handlePIIRedacted}
+                        disabled={isPIIRedacted && requestDetails.currentState.toLowerCase() !== 'unopened'}
+                    />
+                    <span className="checkmark"></span>
+                        Description contains NO Personal Information
+                    </label>      
                     </div>
                     { Object.entries(masterProgramAreaList).length !== 0 ?
                     <MinistriesList masterProgramAreaList={masterProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} />
