@@ -102,7 +102,8 @@ class FOIRawRequest(db.Model):
         sql = """select CASE WHEN status <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
                     CASE WHEN status <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromDate, 
                     CASE WHEN status <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as toDate, 
-                    to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, assignedto as createdby, ispiiredacted from "FOIRawRequests" fr 
+                    to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,  
+                    CASE WHEN status <> 'unopened' then assignedto else 'Online Form' END  as createdby from "FOIRawRequests" fr 
                     where requestid = :requestid order by version ;"""
         rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []

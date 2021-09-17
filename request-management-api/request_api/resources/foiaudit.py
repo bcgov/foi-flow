@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.auditservice import auditservice
 import json
@@ -51,7 +51,7 @@ class FOIAuditByField(Resource):
                 return {'status': False, 'message':'Bad Request'}, 400  
          
         try:
-            result = auditservice().getAuditforField(type, id, field)
+            result = auditservice().getAuditforField(type, id, field, getgroupsfromtoken())
             if result is not None:
                 return {"audit": result}, 200
             else:
