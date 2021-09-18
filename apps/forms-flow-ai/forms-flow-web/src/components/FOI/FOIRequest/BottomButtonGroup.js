@@ -41,7 +41,8 @@ const BottomButtonGroup = React.memo(({
   saveRequestObject, 
   unSavedRequest,
   handleSaveRequest,
-  handleOpenRequest 
+  handleOpenRequest,
+  currentSelectedStatus
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -50,7 +51,7 @@ const BottomButtonGroup = React.memo(({
     const {requestId, ministryId} = useParams();  
     const classes = useStyles();
     const dispatch = useDispatch();
-
+    console.log(`Current Selected status from bottom ${currentSelectedStatus}`);
     const returnToQueue = (e) => {
       e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {

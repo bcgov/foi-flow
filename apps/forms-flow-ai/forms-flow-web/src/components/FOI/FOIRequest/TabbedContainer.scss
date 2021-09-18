@@ -1,0 +1,208 @@
+@font-face {
+  font-family: "BCSans-Regular";
+  src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+
+.foiformcontent {
+    display: inline-flex;  
+    padding-top: 65px;
+    position: relative;
+ 
+    margin-left: 12%;
+    margin-right: 12%;
+    margin-bottom: 5%;
+  }
+
+
+  .foitabbedContainer{
+    display: inline-flex;  
+    background-color: white;
+}
+
+  
+  .leftpanelheader{
+      display: inline-block;
+  }
+
+  .foitabheadercollection  span.MuiTouchRipple-root {
+    height: 10px;
+    width: 10px;
+    background-color:white;
+    border-color: teal;
+    border-radius: 50%!important;    
+    border-color: teal;
+    border-width: 1px;
+    border-style: solid;
+    
+    left: 5% !important;;
+    top: unset !important;
+    right: unset!important;
+    bottom: unset!important;
+
+  }
+ 
+
+  .foi-review-container {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    width: 100% !important;
+  }
+
+  .foitabheadercollection {
+    width: fit-content;
+    height: auto;
+    border-radius: 0px 30px 30px 0px!important;
+    margin-bottom: auto;
+    padding-bottom: 2%;
+    min-width: 200px;
+    position: fixed;
+    z-index: 10;
+  }
+  .foitabpanelcollection{
+    margin-left:18%;
+  }
+
+  .foitabheaderdefaultBG {
+    background-color: teal;
+  }
+
+  .foitabheaderOpenBG {
+    background-color: green;
+  }
+
+  .foileftpanelheader
+  {
+      padding-left: 12%;
+      padding-top: 20%;
+      padding-bottom: 20%;
+  }
+
+  .foileftpanelheader h1 {
+        color: white;
+  }
+
+.foileftpanelheader h1 > a {
+    text-decoration: none!important;
+    color: white;
+}
+
+.foileftpaneldropdown {
+  padding-left: 6%;
+  padding-top: 5%;
+  padding-bottom: 10%;
+  padding-right: 6%;
+}
+
+  .foileftpanelstatus
+  {
+    padding-bottom: 1%;
+    padding-top: 30%;
+    padding-left: 10%;
+    color: white;
+    font-size: 15px;
+    font-weight: bolder;
+    font-family: "BCSans-Regular";
+  }
+
+.tabcontent { 
+     
+    display: inline-block;
+}
+
+
+
+.MuiBox-root {
+    padding: 0px!important;
+    
+}
+.foitabheadercollection .MuiButtonBase-root{
+    padding-right: 0px!important;
+}
+.MuiTab-wrapper{
+    padding-right: 10px!important;
+    text-transform: none;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+    align-items: unset!important;
+    padding-left: 15px;
+}
+.MuiTabs-vertical {    
+    width: auto;
+    color: white;
+    border-style: none!important;
+}
+.MuiTab-root {
+  font-family: "BCSans-Regular" !important;
+}
+
+.foitabbedContainer .Mui-selected {
+    background-color: white!important;
+    color: teal!important;
+    margin-left: 10px!important;
+    border:0px!important;
+    border-style: none!important;
+}
+
+.MuiTabs-indicator {
+    background-color: transparent!important;
+}
+
+
+
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+ 
+}
+
+/* Style the buttons inside the tab */
+.tab div.tablinks {
+  background-color: inherit;
+  color:lightgray;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  
+  transition: 0.3s;
+  font-size: 17px;
+  height: 48px;
+  padding:5px;
+  align-items: center;
+  vertical-align: middle;
+  text-align: left;
+  margin-left:10px;
+}
+
+/* Create an active/current tablink class */
+.tab div.active {
+  background-color: #fff;
+  color:teal;
+}
+
+span.circle
+{
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: white;  
+  display: inline-block;
+}
+
+.tab div.active span.circle{
+  background: teal;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  // padding: 6px 12px;
+  // border: 1px solid #ccc;
+  // border-top: none;
+}
+
+.foitabpanelcollection .active {
+  display: inline-block;
+}
+

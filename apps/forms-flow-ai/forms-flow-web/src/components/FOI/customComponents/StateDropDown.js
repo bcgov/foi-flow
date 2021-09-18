@@ -6,7 +6,7 @@ import './statedropdown.scss';
 import { stateList } from '../../../helper/FOI/statusEnum';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-export default function StateDropDown({requestStatus}) {
+export default function StateDropDown({requestStatus, handleStateChange}) {
 
     const [status, setStatus] = React.useState(requestStatus);
     useEffect (() => {
@@ -16,7 +16,7 @@ export default function StateDropDown({requestStatus}) {
 
     const handleChange = (event) => {
          setStatus(event.target.value);
-        //  handleStateChange(event.target.value); 
+        handleStateChange(event.target.value); 
     };
 
     const getStatusList = (_status) => {
