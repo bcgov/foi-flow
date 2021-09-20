@@ -67,9 +67,9 @@ class KeycloakAdminService:
                 _user =  {
                        'id':user['id'],
                        'username':user['username'],                       
-                       'email':user['email'],
+                       'email': user['email'] if 'email' in user is None else None,
                        'firstname':user['firstName'],
-                       'lastname':user['lastName']                       
+                       'lastname': user['lastName'] if 'lastName' in user is None else None                        
                    } 
                 users.append(_user)
 
