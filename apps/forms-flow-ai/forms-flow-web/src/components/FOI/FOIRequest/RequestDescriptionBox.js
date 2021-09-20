@@ -38,7 +38,7 @@ const RequestDescription = React.memo(({
 
     //gets the program area list master data
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
-    
+    var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);    
     //updates the default values from the request description box    
     React.useEffect(() => {        
         const descriptionObject = {
@@ -77,7 +77,8 @@ const RequestDescription = React.memo(({
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const [isPIIRedacted, setPIIRedacted] = React.useState(requestDetails.ispiiredacted);
-
+    console.log(`ispiiredacted = ${requestDetails.ispiiredacted}`);
+    console.log(requestDetails);
     const handlePIIRedacted = (event) => {
         setPIIRedacted(event.target.checked);
         handleOnChangeRequiredRequestDescriptionValues(event.target.checked, FOI_COMPONENT_CONSTANTS.ISPIIREDACTED)
@@ -122,57 +123,57 @@ const RequestDescription = React.memo(({
     const handleModalClose = () => {
         setOpenModal(false);
     }
-    const requestDescriptionHistoryList = 
-    [
-        {
-            "type": "original",
-            "description": "Original description",
-            "startDate": "2021-08-01",
-            "endDate": "2021-08-15",
-            "createdDate": "2021-08-16",
-            "createdBy": "dviswana@idir"
-        },
-        {
-            "type": "v3",
-            "description": "updated description v2",
-            "startDate": "2021-08-01",
-            "endDate": "2021-08-15",
-            "createdDate": "2021-09-01",
-            "createdBy": "Intake Team"
-        },
-        {
-            "type": "v1",
-            "description": "updated description v3",
-            "startDate": "2021-08-01",
-            "endDate": "2021-08-31",
-            "createdDate": "2021-08-31",
-            "createdBy": "dviswana@idir"
-        },
-        {
-            "type": "v1",
-            "description": "updated description v3",
-            "startDate": "2021-08-01",
-            "endDate": "2021-08-30",
-            "createdDate": "2021-08-31",
-            "createdBy": "dviswana@idir"
-        },
-        {
-            "type": "v1",
-            "description": "updated description v3",
-            "startDate": "2021-08-01",
-            "endDate": "2021-08-30",
-            "createdDate": "2021-08-31",
-            "createdBy": "dviswana@idir"
-        },
-        {
-            "type": "v1",
-            "description": "updated description v1",
-            "startDate": "2021-08-01",
-            "endDate": "2021-08-30",
-            "createdDate": "2021-08-31",
-            "createdBy": "dviswana@idir"
-        }
-    ];
+    // const requestDescriptionHistoryList = 
+    // [
+    //     {
+    //         "type": "original",
+    //         "description": "Original description",
+    //         "startDate": "2021-08-01",
+    //         "endDate": "2021-08-15",
+    //         "createdDate": "2021-08-16",
+    //         "createdBy": "dviswana@idir"
+    //     },
+    //     {
+    //         "type": "v3",
+    //         "description": "updated description v2",
+    //         "startDate": "2021-08-01",
+    //         "endDate": "2021-08-15",
+    //         "createdDate": "2021-09-01",
+    //         "createdBy": "Intake Team"
+    //     },
+    //     {
+    //         "type": "v1",
+    //         "description": "updated description v3",
+    //         "startDate": "2021-08-01",
+    //         "endDate": "2021-08-31",
+    //         "createdDate": "2021-08-31",
+    //         "createdBy": "dviswana@idir"
+    //     },
+    //     {
+    //         "type": "v1",
+    //         "description": "updated description v3",
+    //         "startDate": "2021-08-01",
+    //         "endDate": "2021-08-30",
+    //         "createdDate": "2021-08-31",
+    //         "createdBy": "dviswana@idir"
+    //     },
+    //     {
+    //         "type": "v1",
+    //         "description": "updated description v3",
+    //         "startDate": "2021-08-01",
+    //         "endDate": "2021-08-30",
+    //         "createdDate": "2021-08-31",
+    //         "createdBy": "dviswana@idir"
+    //     },
+    //     {
+    //         "type": "v1",
+    //         "description": "updated description v1",
+    //         "startDate": "2021-08-01",
+    //         "endDate": "2021-08-30",
+    //         "createdDate": "2021-08-31",
+    //         "createdBy": "dviswana@idir"
+    //     }
+    // ];
         const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
             copyRequest.description === request.description && copyRequest.startDate === request.startDate && copyRequest.endDate === request.endDate// && copyRequest.name === request.name

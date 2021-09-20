@@ -20,13 +20,10 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
 
     const [expanded, setExpanded] = React.useState('panel1');
     const handleChange = (panel) => (event, newExpanded) => {
-        console.log(panel);
-        console.log(newExpanded);
         setExpanded(newExpanded ? panel : false);
     };
-
     const sortedList = requestDescriptionHistoryList.sort((a, b) => {
-        return new Date(a.createdDate) - new Date(b.createdDate);
+        return new Date(a.createdAt) - new Date(b.createdAt);
     });
 
     const classes = useStyles();

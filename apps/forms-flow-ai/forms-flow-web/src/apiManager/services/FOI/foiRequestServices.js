@@ -12,6 +12,7 @@ import {
   setFOIAssignedToList,
   setFOIDeliveryModeList,
   setFOIReceivedModeList,
+  setFOIRequestDescriptionHistory,
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -321,6 +322,45 @@ export const openRequestDetails = (data, ...rest) => {
       })
       .catch((error) => {
         dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  console.log(`requestid = ${requestId}, ministryid = ${ministryId}`);
+  let apiUrl = "";
+  if (ministryId) {
+    apiUrl = replaceUrl(replaceUrl(
+      API.FOI_MINISTRY_REQUEST_DESCRIPTION,     
+    ),"<ministryid>", ministryId);  
+    }
+  else {
+    apiUrl = replaceUrl(
+      API.FOI_RAW_REQUEST_DESCRIPTION,
+      "<requestid>",
+      requestId
+    );
+  }  
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {      
+          console.log(`service = ${JSON.stringify(res.data.audit)}`);
+          dispatch(setFOIRequestDescriptionHistory(res.data.audit));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
         done(error);
       });
   };

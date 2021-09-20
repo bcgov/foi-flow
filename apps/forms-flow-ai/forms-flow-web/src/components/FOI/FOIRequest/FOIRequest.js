@@ -19,7 +19,8 @@ import {
   fetchFOIProgramAreaList, 
   fetchFOIAssignedToList, 
   fetchFOIDeliveryModeList, 
-  fetchFOIReceivedModeList 
+  fetchFOIReceivedModeList,
+  fetchFOIRequestDescriptionList
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -66,6 +67,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
+    dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
   },[requestId, dispatch]);
  
   
@@ -234,7 +236,6 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
 
   const contactDetailsNotGiven = ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
 
-  console.log(requiredRequestDescriptionValues);
   //Variable to find if all required fields are filled or not
   const isValidationError = (
     requiredApplicantDetails.firstName === "" || requiredApplicantDetails.lastName === "" 
