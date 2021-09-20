@@ -42,7 +42,8 @@ const BottomButtonGroup = React.memo(({
   unSavedRequest,
   handleSaveRequest,
   handleOpenRequest,
-  currentSelectedStatus
+  currentSelectedStatus,
+  hasStatusRequestSaved
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -51,7 +52,8 @@ const BottomButtonGroup = React.memo(({
     const {requestId, ministryId} = useParams();  
     const classes = useStyles();
     const dispatch = useDispatch();
-    console.log(`Current Selected status from bottom ${currentSelectedStatus}`);
+    
+
     const returnToQueue = (e) => {
       e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
@@ -98,6 +100,21 @@ const BottomButtonGroup = React.memo(({
       const handleOnHashChange = (e) => {       
         returnToQueue(e);
       };  
+
+      if(currentSelectedStatus == "Open" && !isValidationError)
+      {
+        openRequest();
+        hasStatusRequestSaved(true)
+      }
+      
+      if(currentSelectedStatus == "Closed" && !isValidationError)
+      {
+        saveRequestObject.requeststatusid = 3 // Need to take from ENUM
+        saveRequest();
+        hasStatusRequestSaved(true)
+      }
+      
+
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
       window.addEventListener('beforeunload', alertUser);
@@ -156,6 +173,8 @@ const BottomButtonGroup = React.memo(({
         })); 
       }
     }
+
+  console.log(`is validation bottom ${isValidationError}`);  
   return (
     <div className={classes.root}>
       <ConfirmationModal openModal={openModal} handleModal={handleModal}/>  

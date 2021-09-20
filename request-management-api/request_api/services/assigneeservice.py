@@ -77,11 +77,13 @@ class assigneeservice:
         return [{"status":"Unopened", "groups":["Intake Team"]},
                 {"status":"Intake In Progress","groups":["Intake Team"]},
                 {"status":"Open","groups":["Intake Team","Flex Team"]},
+                {"status":"Closed","groups":["Intake Team","Flex Team"]},
             ]
         
     def personalGroupMappings(self):        
         return [{"status":"Unopened", "groups":["Intake Team"]},
                 {"status":"Intake In Progress","groups":["Intake Team"]},
                 {"status":"Open","groups":["Intake Team","Processing Team"]},
+                {"status":"Closed","groups":["Intake Team","Flex Team"]},
             ]
                   

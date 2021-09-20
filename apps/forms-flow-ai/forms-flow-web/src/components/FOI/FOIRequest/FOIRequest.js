@@ -91,7 +91,8 @@ const FOIRequest = React.memo(({}) => {
   useEffect(() => {    
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue); 
-    
+    let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+    setAssignedToValue(assignedTo)
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
@@ -128,6 +129,8 @@ const FOIRequest = React.memo(({}) => {
   //below states are used to find if required fields are set or not
   const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
   const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);  
+    
+ 
   const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
@@ -229,7 +232,7 @@ const FOIRequest = React.memo(({}) => {
   }
 
   //gets the latest assigned to value
-  const handleAssignedToValue = (value) => {
+  const handleAssignedToValue = (value) => {   
     setAssignedToValue(value);
   }
 
@@ -490,8 +493,7 @@ const FOIRequest = React.memo(({}) => {
       }
   }
 
-  const handleStateChange =(currentStatus)=>{
-    console.log(currentStatus)
+  const handleStateChange =(currentStatus)=>{    
     setcurrentrequestStatus(currentStatus);
   }
 
@@ -507,12 +509,20 @@ const FOIRequest = React.memo(({}) => {
         
   }
 
+  const hasStatusRequestSaved =(issavecompleted)=>{
+    if(issavecompleted)
+      {
+        setcurrentrequestStatus("")
+      }
+  }
+
   
   if(requestDetails.currentState == "Open")
   {
     foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
   }
 
+  
   return (
 
     <div className="foiformcontent">
@@ -541,7 +551,7 @@ const FOIRequest = React.memo(({}) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
                     <>
-                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} />
+                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails}  handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} />
                       <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
                        {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
                         <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null}
@@ -554,7 +564,7 @@ const FOIRequest = React.memo(({}) => {
                         <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} /> : null} 
                       <RequestNotes />
 
-                      <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} />
+                      <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                     </>
                   ) : null}
                 </form>

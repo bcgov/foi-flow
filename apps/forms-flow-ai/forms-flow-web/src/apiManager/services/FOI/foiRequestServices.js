@@ -182,7 +182,7 @@ export const fetchFOIRequestList = (...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequests = res.data;         
-          let data = foiRequests.map((foiRequest) => {
+          let data = foiRequests.map((foiRequest) => {            
             return { ...foiRequest};
           });
           dispatch(clearRequestDetails({}));
@@ -272,7 +272,7 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
   };
 };
 
-export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {
+export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};
   let id = urlIndexCreateRequest > -1? -1: requestId;
   let apiUrl = "";

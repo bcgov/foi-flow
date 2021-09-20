@@ -32,6 +32,8 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
                 return stateList.intakeinprogress;
             case FOI_COMPONENT_CONSTANTS.OPEN:
                 return stateList.open;
+                case FOI_COMPONENT_CONSTANTS.CLOSED:
+                    return stateList.closed;    
             default:
                 return [];
         }
