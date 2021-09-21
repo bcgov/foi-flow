@@ -95,3 +95,9 @@ export const clearRequestDetails = (data) => dispatch => {
         payload:data      
     })
 }
+export const setFOIRequestDescriptionHistory = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY,
+        payload:data      
+    })
+}
