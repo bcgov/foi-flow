@@ -31,6 +31,7 @@ TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiaudit/<type>/<id>/<field>')
+@API.route('/foiaudit/<type>/<id>/<field>/summary')
 class FOIAuditByField(Resource):
     """Resource for managing FOI requests."""
 
@@ -51,7 +52,8 @@ class FOIAuditByField(Resource):
                 return {'status': False, 'message':'Bad Request'}, 400  
          
         try:
-            result = auditservice().getAuditforField(type, id, field, getgroupsfromtoken())
+            isAll = False if request.url.endswith('summary') else True      
+            result = auditservice().getAuditforField(type, id, field, getgroupsfromtoken(),isAll)
             if result is not None:
                 return {"audit": result}, 200
             else:
@@ -59,4 +61,5 @@ class FOIAuditByField(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
         
+
         
