@@ -54,11 +54,12 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (ministryId) {
-      
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
     }
-    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {      
       dispatch(fetchFOIRawRequestDetails(requestId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ""));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
       dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
@@ -67,7 +68,6 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
-    dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
   },[requestId, dispatch]);
  
   

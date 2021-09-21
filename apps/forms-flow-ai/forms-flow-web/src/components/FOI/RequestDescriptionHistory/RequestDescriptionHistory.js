@@ -22,7 +22,14 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
     const handleChange = (panel) => (event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
     };
-    const sortedList = requestDescriptionHistoryList.sort((a, b) => {
+    
+
+    const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
+        index === self.findIndex((copyRequest) => (
+            copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
+        ))
+    );
+    const sortedList = filteredList.sort((a, b) => {
         return new Date(a.createdAt) - new Date(b.createdAt);
     });
 

@@ -8,7 +8,8 @@ import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
-import RequestDescriptionHistory from "../RequestDescriptionHistory"
+import RequestDescriptionHistory from "../RequestDescriptionHistory";
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
       headingError: {
@@ -35,7 +36,7 @@ const RequestDescription = React.memo(({
     /* All fields in this component are mandatory */
     
     const classes = useStyles();
-
+    const {ministryId} = useParams();
     //gets the program area list master data
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
     var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);    
@@ -76,9 +77,8 @@ const RequestDescription = React.memo(({
     const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
-    const [isPIIRedacted, setPIIRedacted] = React.useState(requestDetails.ispiiredacted);
-    console.log(`ispiiredacted = ${requestDetails.ispiiredacted}`);
-    console.log(requestDetails);
+    const [isPIIRedacted, setPIIRedacted] = React.useState(ministryId ? true : requestDetails.ispiiredacted ? requestDetails.ispiiredacted : false);
+
     const handlePIIRedacted = (event) => {
         setPIIRedacted(event.target.checked);
         handleOnChangeRequiredRequestDescriptionValues(event.target.checked, FOI_COMPONENT_CONSTANTS.ISPIIREDACTED)
@@ -179,7 +179,7 @@ const RequestDescription = React.memo(({
             copyRequest.description === request.description && copyRequest.startDate === request.startDate && copyRequest.endDate === request.endDate// && copyRequest.name === request.name
         ))
       );
-    
+
      return (
         
         <Card className="foi-details-card">            
@@ -188,7 +188,7 @@ const RequestDescription = React.memo(({
                 <RequestDescriptionHistory requestDescriptionHistoryList={filteredList} openModal={openModal} handleModalClose={handleModalClose}/>
                 <div className="row foi-details-row">
                 <div className="foi-request-description-history">
-                    <button type="button" className={`btn btn-link btn-description-history ${!(filteredList.length > 0)? classes.btndisabled : ""}`} disabled={!(filteredList.length > 0)}  onClick={handleDescriptionHistoryClick}>
+                    <button type="button" className={`btn btn-link btn-description-history ${!(filteredList.length > 1)? classes.btndisabled : ""}`} disabled={!(filteredList.length > 0)}  onClick={handleDescriptionHistoryClick}>
                        Description History
                     </button>
                 </div>
@@ -246,7 +246,7 @@ const RequestDescription = React.memo(({
                         className="checkmark"
                         checked={isPIIRedacted}
                         onChange={handlePIIRedacted}
-                        disabled={isPIIRedacted && requestDetails.currentState.toLowerCase() !== 'unopened'}
+                        disabled={isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== 'unopened')}
                     />
                     <span className="checkmark"></span>
                         Description contains NO Personal Information
