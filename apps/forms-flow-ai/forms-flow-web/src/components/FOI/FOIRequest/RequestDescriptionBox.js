@@ -47,7 +47,7 @@ const RequestDescription = React.memo(({
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
             isProgramAreaSelected: !!requestDetails.selectedMinistries,
-            isPiiRedacted: requestDetails.ispiiredacted
+            isPiiRedacted: ministryId ? true : requestDetails.ispiiredacted ? requestDetails.ispiiredacted : false
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
@@ -123,72 +123,27 @@ const RequestDescription = React.memo(({
     const handleModalClose = () => {
         setOpenModal(false);
     }
-    // const requestDescriptionHistoryList = 
-    // [
-    //     {
-    //         "type": "original",
-    //         "description": "Original description",
-    //         "startDate": "2021-08-01",
-    //         "endDate": "2021-08-15",
-    //         "createdDate": "2021-08-16",
-    //         "createdBy": "dviswana@idir"
-    //     },
-    //     {
-    //         "type": "v3",
-    //         "description": "updated description v2",
-    //         "startDate": "2021-08-01",
-    //         "endDate": "2021-08-15",
-    //         "createdDate": "2021-09-01",
-    //         "createdBy": "Intake Team"
-    //     },
-    //     {
-    //         "type": "v1",
-    //         "description": "updated description v3",
-    //         "startDate": "2021-08-01",
-    //         "endDate": "2021-08-31",
-    //         "createdDate": "2021-08-31",
-    //         "createdBy": "dviswana@idir"
-    //     },
-    //     {
-    //         "type": "v1",
-    //         "description": "updated description v3",
-    //         "startDate": "2021-08-01",
-    //         "endDate": "2021-08-30",
-    //         "createdDate": "2021-08-31",
-    //         "createdBy": "dviswana@idir"
-    //     },
-    //     {
-    //         "type": "v1",
-    //         "description": "updated description v3",
-    //         "startDate": "2021-08-01",
-    //         "endDate": "2021-08-30",
-    //         "createdDate": "2021-08-31",
-    //         "createdBy": "dviswana@idir"
-    //     },
-    //     {
-    //         "type": "v1",
-    //         "description": "updated description v1",
-    //         "startDate": "2021-08-01",
-    //         "endDate": "2021-08-30",
-    //         "createdDate": "2021-08-31",
-    //         "createdBy": "dviswana@idir"
-    //     }
-    // ];
-        const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
+    
+    const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
-            copyRequest.description === request.description && copyRequest.startDate === request.startDate && copyRequest.endDate === request.endDate// && copyRequest.name === request.name
+            copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate// && copyRequest.name === request.name
         ))
-      );
+    )
+    const sortedList = filteredList.sort((a, b) => {       
+        return new Date(a.createdAt) - new Date(b.createdAt);
+    });
+
+    console.log(sortedList);
 
      return (
         
         <Card className="foi-details-card">            
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
-                <RequestDescriptionHistory requestDescriptionHistoryList={filteredList} openModal={openModal} handleModalClose={handleModalClose}/>
+                <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose}/>
                 <div className="row foi-details-row">
                 <div className="foi-request-description-history">
-                    <button type="button" className={`btn btn-link btn-description-history ${!(filteredList.length > 1)? classes.btndisabled : ""}`} disabled={!(filteredList.length > 0)}  onClick={handleDescriptionHistoryClick}>
+                    <button type="button" className={`btn btn-link btn-description-history ${!(sortedList.length > 1)? classes.btndisabled : ""}`} disabled={!(sortedList.length > 1)}  onClick={handleDescriptionHistoryClick}>
                        Description History
                     </button>
                 </div>

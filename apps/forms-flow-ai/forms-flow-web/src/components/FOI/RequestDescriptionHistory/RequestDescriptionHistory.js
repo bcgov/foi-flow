@@ -22,17 +22,7 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
     const handleChange = (panel) => (event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
     };
-    
-
-    const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
-        index === self.findIndex((copyRequest) => (
-            copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
-        ))
-    );
-    const sortedList = filteredList.sort((a, b) => {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-    });
-
+    console.log(`requestDescriptionHistoryList = ${JSON.stringify(requestDescriptionHistoryList)}`);
     const classes = useStyles();
    
      return (
@@ -47,7 +37,7 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
         >
             <DialogTitle id="request-history-dialog-title">Request History</DialogTitle>
             <DialogContent>
-                {sortedList.map((details, index) => 
+                {requestDescriptionHistoryList.map((details, index) => 
                      <AccordionItem details={details} index={index} key={details.type} expanded={expanded} handleChange={handleChange} />                    
             )}                
             </DialogContent>
