@@ -21,7 +21,7 @@ from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.external.bpmservice import bpmservice
 from enum import Enum
-import datetime
+from datetime import datetime
 import random
 from dateutil.parser import *
 class requestservice:
@@ -299,6 +299,7 @@ class FOIRequestUtil:
         foiministryRequest.description = requestSchema.get("description")
         foiministryRequest.duedate = requestSchema.get("dueDate")
         foiministryRequest.startdate = requestSchema.get("startDate")
+        foiministryRequest.created_at = datetime.now().isoformat()
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
         if self.isNotBlankorNone(requestSchema,"toDate","main") == True:

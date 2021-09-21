@@ -45,7 +45,7 @@ class auditservice:
         foirequestid = 0 
         for entry in ministryrecords:
             foirequestid = entry['foirequest_id']
-            createdat = datetime.fromisoformat(entry['updated_at']).strftime("%Y-%m-%d %H:%M:%S") if entry['updated_at'] is not None else datetime.fromisoformat(entry['created_at']).strftime("%Y-%m-%d %H:%M:%S") 
+            createdat = datetime.fromisoformat(entry['created_at']).strftime("%Y-%m-%d %H:%M:%S") 
             fromdate = datetime.fromisoformat(entry['recordsearchfromdate']).strftime("%Y-%m-%d") if entry['recordsearchfromdate'] is not None else None 
             todate = datetime.fromisoformat(entry['recordsearchtodate']).strftime("%Y-%m-%d") if entry['recordsearchtodate'] is not None else None
             _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['assignedto'], "status": entry['requeststatus.name']})
