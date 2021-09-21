@@ -22,7 +22,7 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
     const handleChange = (panel) => (event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
     };
-    console.log(`requestDescriptionHistoryList = ${JSON.stringify(requestDescriptionHistoryList)}`);
+    
     const classes = useStyles();
    
      return (

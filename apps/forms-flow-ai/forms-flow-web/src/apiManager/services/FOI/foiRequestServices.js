@@ -328,8 +328,7 @@ export const openRequestDetails = (data, ...rest) => {
 };
 
 export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) => {
-  const done = rest.length ? rest[0] : () => {};
-  console.log(`requestid = ${requestId}, ministryid = ${ministryId}`);
+  const done = rest.length ? rest[0] : () => {};  
   let apiUrl = "";
   if (ministryId) {
     apiUrl = replaceUrl(replaceUrl(
@@ -346,8 +345,7 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) =>
   return (dispatch) => {
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
-        if (res.data) {      
-          console.log(`service = ${JSON.stringify(res.data.audit)}`);
+        if (res.data) {
           dispatch(setFOIRequestDescriptionHistory(res.data.audit));
           dispatch(setFOILoader(false));
           done(null, res.data);
