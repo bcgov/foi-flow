@@ -6,8 +6,8 @@ from .db import  db, ma
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
-from sqlalchemy import insert, and_
-
+from sqlalchemy import insert, and_, text
+from flask import jsonify
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -25,7 +25,7 @@ class FOIRawRequest(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     sourceofsubmission = db.Column(db.String(120),  nullable=True)
-    
+    ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)    
     
     @classmethod
     def saverawrequest(cls,_requestrawdata,sourceofsubmission,assigneegroup= None,assignee= None)->DefaultMethodResult:                
@@ -38,7 +38,7 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status,ispiiredacted)->DefaultMethodResult:        
         updatedat = datetime.now()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
@@ -46,7 +46,7 @@ class FOIRawRequest(db.Model):
             _version = request.version+1
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
@@ -96,6 +96,20 @@ class FOIRawRequest(db.Model):
            requests.append(request)
 
         return requests
+    
+    @classmethod
+    def getDescriptionSummaryById(cls, requestid):
+        sql = """select CASE WHEN status <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
+                    CASE WHEN status <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromDate, 
+                    CASE WHEN status <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as toDate, 
+                    to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted, 
+                    CASE WHEN status <> 'unopened' then assignedto else 'Online Form' END  as createdby from "FOIRawRequests" fr 
+                    where requestid = :requestid order by version ;"""
+        rs = db.session.execute(text(sql), {'requestid': requestid})
+        requests = []
+        for row in rs:
+            requests.append(dict(row))
+        return requests
 
     @classmethod
     def get_request(cls,requestid):   
@@ -105,4 +119,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission','ispiiredacted')

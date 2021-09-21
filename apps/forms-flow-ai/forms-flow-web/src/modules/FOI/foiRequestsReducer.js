@@ -11,7 +11,8 @@ const initialState = {
   foiReceivedModeList:[],
   foiDeliveryModeList:[],
   foiAssignedToList: [],
-  foiProgramAreaList:[], 
+  foiProgramAreaList:[],
+  foiRequestDescriptionHistoryList: [], 
 }
 
 
@@ -66,7 +67,9 @@ const foiRequests = (state = initialState, action)=> {
     case FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST:
         return {...state, foiAssignedToList: action.payload};
     case FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS:
-      return {...state, foiRequestDetail: action.payload};         
+      return {...state, foiRequestDetail: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY:
+      return {...state, foiRequestDescriptionHistoryList: action.payload};
     default:
       return state;
   }
