@@ -24,8 +24,8 @@ const AccordionItem = React.memo(({details, index, expanded, handleChange}) => {
                     <div className="acc-request-description-row">
                         <Typography className="acc-daterange-heading"><b>Date Range for Record Search</b></Typography>
                         <div className="acc-request-dates">
-                            <Typography className="acc-start-date"><b>Start Date: </b>{formatDate(details.fromDate, 'yyyy MMM dd')}</Typography>
-                            <Typography><b>End Date: </b>{formatDate(details.toDate, 'yyyy MMM dd')}</Typography>
+                            <Typography className="acc-start-date"><b>Start Date: </b>{details.fromDate ? formatDate(details.fromDate, 'yyyy MMM dd') : ""}</Typography>
+                            <Typography><b>End Date: </b>{details.toDate ? formatDate(details.toDate, 'yyyy MMM dd') : ""}</Typography>
                         </div>                                                              
                     </div>
                     <Typography className="acc-bottom-request-description-header"><b>Request Description</b></Typography>
