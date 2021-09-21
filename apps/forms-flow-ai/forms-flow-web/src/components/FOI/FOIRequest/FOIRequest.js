@@ -522,6 +522,23 @@ const FOIRequest = React.memo(({}) => {
     foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
   }
 
+  const tabclick =(evt,param)=>{
+   
+    var i, tabcontent, tablinks;
+    
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+   
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(param).style.display = "block";
+    evt.currentTarget.className += " active";
+
+  }
   
   return (
 
@@ -537,14 +554,14 @@ const FOIRequest = React.memo(({}) => {
           </div>
           
         <div className="tab">
-          <div className="tablinks active"><span className="circle"></span> Request</div>
-          <div className="tablinks"><span className="circle"></span> Correspondence Log</div>
-          <div className="tablinks"><span className="circle"></span> Option 3</div>
+          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}><span className="circle"></span> Request</div>
+          <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}><span className="circle"></span> Correspondence Log</div>
+          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}><span className="circle"></span> Option 3</div>
         </div>
           <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days")? _requestStatus: ""}</h4>
         </div>
         <div className="foitabpanelcollection"> 
-          <div id="Request" className="tabcontent active">                      
+          <div id="Request" className="tabcontent active">                                
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -570,7 +587,13 @@ const FOIRequest = React.memo(({}) => {
                 </form>
               </div>
             </div>                            
-          </div>             
+          </div> 
+          <div id="CorrespondenceLog" className="tabcontent">
+              
+              </div> 
+          <div id="Option3" className="tabcontent">
+           <h3>Option 3</h3>
+          </div>        
         </div>
       </div>
     </div>

@@ -103,6 +103,7 @@ const BottomButtonGroup = React.memo(({
 
       if(currentSelectedStatus == "Open" && !isValidationError)
       {
+        saveRequestObject.requeststatusid = 1 // Need to take from ENUM
         openRequest();
         hasStatusRequestSaved(true)
       }
