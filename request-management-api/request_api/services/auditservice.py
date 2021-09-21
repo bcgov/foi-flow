@@ -3,6 +3,7 @@ from os import stat
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
+from datetime import datetime
 
 class auditservice:
     """ FOI audit management service
@@ -42,7 +43,7 @@ class auditservice:
         foirequestid = 0 
         for entry in ministryrecords:
             foirequestid = entry['foirequest_id']
-            _ministrydescriptions.append({"description": entry['description'], "fromdate": entry['recordsearchfromdate'], "todate": entry['recordsearchtodate'], "createdat": entry['created_at'], "createdby": entry['assignedto'], "status": entry['requeststatus.name']})
+            _ministrydescriptions.append({"description": entry['description'], "fromdate": entry['recordsearchfromdate'], "todate": entry['recordsearchtodate'], "createdat": datetime.fromisoformat(entry['created_at']).strftime("%Y-%m-%d %H:%M:%S"), "createdby": entry['assignedto'], "status": entry['requeststatus.name']})
         return {"foirequestid" :foirequestid  , "audit":_ministrydescriptions}
     
     def _getAuditFromRawRequest(self, type, id, groups):
@@ -54,7 +55,7 @@ class auditservice:
             rawRequestId= id
         rawrecords = FOIRawRequest().getDescriptionSummaryById(rawRequestId) 
         
-        if 'Intake Team' in groups:
+        if 'Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups:
            _rawdescriptions =  rawrecords 
         else:
             for entry in rawrecords:
