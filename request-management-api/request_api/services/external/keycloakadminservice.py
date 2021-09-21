@@ -63,13 +63,13 @@ class KeycloakAdminService:
         groupResponse = requests.get(groupUrl, headers=self._getHeaders_())
         users = []
         if groupResponse.status_code == 200 and groupResponse.content != '': 
-            for user in groupResponse.json():                
+            for user in groupResponse.json():           
                 _user =  {
                        'id':user['id'],
                        'username':user['username'],                       
-                       'email': user['email'] if 'email' in user is None else None,
+                       'email': user['email'] if 'email' in user is not None else None,
                        'firstname':user['firstName'],
-                       'lastname': user['lastName'] if 'lastName' in user is None else None                        
+                       'lastname': user['lastName'] if 'lastName' in user is not None else None                        
                    } 
                 users.append(_user)
 
