@@ -1,5 +1,5 @@
 import React from 'react';
-import './requestDescriptionHistory.scss';
+import './accordionitem.scss';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -10,14 +10,14 @@ import { formatDate } from '../../../helper/FOI/helper';
 const AccordionItem = React.memo(({details, index, expanded, handleChange}) => {
     
      return (
-        <Accordion expanded={expanded === `panel${index+1}`} onChange={handleChange(`panel${index+1}`)}>
+        <Accordion id="acc-request-history" expanded={expanded === `panel${index+1}`} onChange={handleChange(`panel${index+1}`)}>
             <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"
             id="acc-header"            
             >
                 <Typography className="acc-request-description">{`${index === 0 ? "ORIGINAL ": ""}REQUEST DESCRIPTION`}</Typography>
-                <Typography>{details.createdBy} - {formatDate(details.createdAt, 'yyyy MMM dd')}</Typography>
+                <Typography className="acc-username-date">{details.createdBy} - {formatDate(details.createdAt, 'yyyy MMM dd')}</Typography>
             </AccordionSummary>
             <AccordionDetails className="acc-details">
                 <div className="acc-details-1">
