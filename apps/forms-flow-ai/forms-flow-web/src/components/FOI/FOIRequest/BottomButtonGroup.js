@@ -133,6 +133,7 @@ const BottomButtonGroup = React.memo(({
    
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id ? saveRequestObject.id :requestId; 
+      saveRequestObject.requeststatusid = 1
       setOpenModal(true);     
     }
 
@@ -190,17 +191,21 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true)
         }
-  
-        if(currentSelectedStatus == "Call For Records" && !isValidationError)
+        else if(currentSelectedStatus == "Call For Records" && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 2 // Need to take from ENUM
           saveRequest();
           hasStatusRequestSaved(true)
-        }
-  
-        if(currentSelectedStatus == "Redirect" && !isValidationError)
+        }  
+        else if(currentSelectedStatus == "Redirect" && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 4 // Need to take from ENUM
+          saveRequest();
+          hasStatusRequestSaved(true)
+        }
+        else if(currentSelectedStatus == "Open" && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = 1 // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
           saveRequest();
           hasStatusRequestSaved(true)
         }
@@ -214,9 +219,6 @@ const BottomButtonGroup = React.memo(({
       <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus}/>
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError || urlIndexCreateRequest > -1 || ministryId} onClick={openRequest}>Open Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError || urlIndexCreateRequest > -1 || ministryId}>Split Request</button>
-      <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError || urlIndexCreateRequest > -1 || ministryId}>Redirect in Full</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>
