@@ -71,10 +71,8 @@ const FOI_COMPONENT_CONSTANTS = {
     INTAKEINPROGRESS: "Intake in Progress",
     OPEN: "Open",
     CLOSED: "Closed",
-    REDIRECT: "Redirect"
-
-
-
+    REDIRECT: "Redirect",
+    CallFORRECORDS: "Call for Records"
 
   };
   
