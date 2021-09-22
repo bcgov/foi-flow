@@ -18,7 +18,7 @@ from flask import g, request
 from flask_restx import Namespace, Resource
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
-from request_api.auth import auth
+from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
@@ -27,7 +27,7 @@ from request_api.services.dashboardservice import dashboardservice
 from request_api.services.external.bpmservice import bpmservice
 import json
 import uuid
-
+from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -43,7 +43,7 @@ class FOIRawRequest(Resource):
     @cross_origin(origins=allowedOrigins())       
     @auth.require
     def get(requestid=None):
-        try :            
+        try : 
             jsondata = {}
             requestidisInteger = int(requestid)
             if requestidisInteger :                
@@ -68,12 +68,12 @@ class FOIRawRequest(Resource):
                 rawRequest = rawrequestservice.getrawrequest(requestid)     
                 assigneeGroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneeGroup, assignee,status)                
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneeGroup, assignee,status,AuthHelper.getUserId())                
                 if result.success == True:   
                     bpmservice.unopenedClaim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice.saverawrequest(updaterequest,"intake")               
+                result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getUserId())               
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -96,7 +96,7 @@ class FOIRawRequestBPMProcess(Resource):
                 status = request_json['status'] if request_json.get('status') is not None else 'unopened'
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
-                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes)
+                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getUserId())
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200
                 else:
@@ -121,7 +121,7 @@ class FOIRawRequests(Resource):
         try:
             request_json = request.get_json()
             requestdatajson = request_json['requestData']           
-            result = rawrequestservice.saverawrequest(requestdatajson,"onlineform")
+            result = rawrequestservice.saverawrequest(requestdatajson,"onlineform",None)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
