@@ -95,7 +95,7 @@ class FOIRequestsById(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                    
+            fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                               
             result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid)
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
