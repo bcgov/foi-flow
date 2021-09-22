@@ -73,10 +73,11 @@ const FOI_COMPONENT_CONSTANTS = {
     CLOSED: "Closed",
     REDIRECT: "Redirect",
 
-    ISPIIREDACTED:"ispiiredacted"
+    ISPIIREDACTED:"ispiiredacted",
 
 
 
+    CallFORRECORDS: "Call for Records"
 
   };
   

@@ -36,9 +36,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
-        let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
-        assignedTo = assignedTo;
-        handleAssignedToInitialValue(assignedTo);
+                
         let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
         let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
         handlestatusudpate(_daysRemaining,_status)
@@ -75,6 +73,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         //event bubble up - to validate required fields
         handleAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);
+        console.log(`handleAssignedToOnChange HEader ${event.target.value}`)
     }
 
     const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);

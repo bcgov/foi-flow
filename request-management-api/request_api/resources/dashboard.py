@@ -30,7 +30,7 @@ class Dashboard(Resource):
     @auth.ismemberofgroups('Intake Team,Flex Team')
     def get():        
         try:    
-                groups = getgroupsfromtoken()                
+                groups = getgroupsfromtoken()                               
                 requests = dashboardservice.getrequestqueue(groups)                
                 jsondata = json.dumps(requests)
                 return jsondata , 200            
