@@ -7,56 +7,28 @@
     src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
 }
 
-
-.MuiAccordion-root {    
-    font-family: "BCSans-Regular" !important;
-    border: #c9c7c7 1px solid;
-}
-
-.MuiAccordionSummary-root.Mui-expanded {
-    min-height: 48px !important;
-}
-#acc-header {
-    background-color: #eceaea !important;    
-}
-.acc-details {
-    background-color: #ffffff !important;
-}
 #request-history-dialog-title {
     font-family: "BCSans-Bold";
     color: #036 ;
+    padding: 30px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.acc-request-description {
-    margin-right: auto !important;
+.request-history-header {
+    margin-left: 30px;
+    font-size: xx-large;
+    font-weight: bold;
+    font-family: "BCSans-Bold" !important;
 }
 
-.acc-request-dates {
-    display: inline-flex;
-    margin-left: 100px;
+#request-history-dialog-title .MuiIconButton-root {
+    background-color: #036 ;
+    color: white;
+    border-radius: unset;
+}
+#request-history-content {
+    padding: 15px 50px 50px 50px;
 }
 
-.acc-start-date {
-    margin-right: 50px !important;
-}
-
-// .acc-daterange-heading {
-//     margin-left: 50px !important;
-// }
-
-.acc-details-1 {
-    margin-left: 50px !important;
-}
-
-.acc-request-description-row {
-    display: inline-flex;
-    margin-bottom: 20px;
-}
-
-.acc-bottom-request-description-header {
-    margin-bottom: 10px !important;
-}
-
-p {
-    font-family: "BCSans-Regular" !important;
-}
