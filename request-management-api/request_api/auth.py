@@ -69,7 +69,15 @@ class Auth:
             return wrapper
 
         return decorated
-
+    
 auth = (
     Auth()
 )
+
+
+class AuthHelper:
+    
+    def getUserId():
+        token = request.headers.get("Authorization", None)
+        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        return unverified_claims['preferred_username']

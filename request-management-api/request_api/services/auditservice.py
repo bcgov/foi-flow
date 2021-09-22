@@ -48,7 +48,7 @@ class auditservice:
             createdat = datetime.fromisoformat(entry['created_at']).strftime("%Y-%m-%d %H:%M:%S") 
             fromdate = datetime.fromisoformat(entry['recordsearchfromdate']).strftime("%Y-%m-%d") if entry['recordsearchfromdate'] is not None else None 
             todate = datetime.fromisoformat(entry['recordsearchtodate']).strftime("%Y-%m-%d") if entry['recordsearchtodate'] is not None else None
-            _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['assignedto'], "status": entry['requeststatus.name']})
+            _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['createdby'], "status": entry['requeststatus.name']})
         return {"foirequestid" :foirequestid  , "audit":_ministrydescriptions}
     
     def _getAuditFromRawRequest(self, type, id, groups):
