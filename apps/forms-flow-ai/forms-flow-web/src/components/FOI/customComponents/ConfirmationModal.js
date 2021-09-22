@@ -6,10 +6,11 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import './confirmationmodal.scss';
 
-export default function ConfirmationModal({openModal, handleModal}) {    
+export default function ConfirmationModal({openModal, handleModal,state}) {    
     
     const handleClose = () => {
-      handleModal(false);
+      //handleModal(false);
+      window.location.reload()
     };
 
     const handleYes = () => {
@@ -24,10 +25,10 @@ export default function ConfirmationModal({openModal, handleModal}) {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"Open Request"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{state}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Are you sure you want to open the request?
+              Are you sure you want to save the request?
             </DialogContentText>
           </DialogContent>
           <DialogActions>

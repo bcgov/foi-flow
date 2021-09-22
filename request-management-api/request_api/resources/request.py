@@ -61,9 +61,20 @@ class FOIRawRequest(Resource):
     @auth.require
     def post(requestid=None):
         try :                        
-            updaterequest = request.get_json()            
+            updaterequest = request.get_json()
+                        
             if int(requestid) and str(requestid) != "-1" :
-                status = 'Assignment in progress'     
+                status = 'Assignment in progress' 
+                
+                try:
+                    #TODO:Need to refine this logic from ENUM
+                    if(updaterequest["requeststatusid"] is not None and updaterequest["requeststatusid"] == 4):                    
+                        status = 'Redirect'
+
+                    if(updaterequest["requeststatusid"] is not None and updaterequest["requeststatusid"] == 3):                    
+                        status = 'Closed'    
+                except  KeyError:
+                    print("Key Error on requeststatusid, ignore will be intake in progress")    
                 
                 rawRequest = rawrequestservice.getrawrequest(requestid)     
                 assigneeGroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None

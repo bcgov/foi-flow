@@ -44,7 +44,7 @@ class FOIRawRequest(db.Model):
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
                 
-            _version = request.version+1
+            _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
                 values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updatedby=None,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted,createdby=userId)
@@ -76,9 +76,14 @@ class FOIRawRequest(db.Model):
         updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
-        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
-        if(requestraqw.count() > 0) :
-            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)        
+        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)        
+        if(requestraqw.count() > 0) :            
+            request_schema = FOIRawRequestSchema()
+            request = request_schema.dump(_requestraqw)            
+            if(request is not None and (request["status"] == "Redirect" or request["status"] == "Closed")):
+                status = request["status"]
+                                
+            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)                    
             requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userId}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Request updated',requestid)       

@@ -27,11 +27,17 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { formatDate } from "../../../helper/FOI/helper";
 import {push} from "connected-react-router";
 
+import PropTypes from 'prop-types';
+
+import Typography from '@material-ui/core/Typography';
+import { StateDropDown } from '../customComponents';
+import "./TabbedContainer.scss"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),  
-    },
+    },    
   },
   validationErrorMessage: {
     marginTop:'30px',
@@ -41,9 +47,22 @@ const useStyles = makeStyles((theme) => ({
     marginTop:'30px',
     color: "#000000",
   },
+ 
 }));
 
-const FOIRequest = React.memo(({handlestatusudpate}) => {
+const FOIRequest = React.memo(({}) => {
+
+  
+  const [_requestStatus, setRequestStatus] = React.useState("Unopened");
+  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
+  
+
+  var foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
+
+  
+
+  // Tab panel ends here
+
   const {requestId, ministryId} = useParams();
   
   const url = window.location.href;
@@ -74,6 +93,8 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   useEffect(() => {    
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue); 
+    let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+    setAssignedToValue(assignedTo)
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
@@ -111,6 +132,8 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   //below states are used to find if required fields are set or not
   const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
   const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);  
+    
+ 
   const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
@@ -216,7 +239,7 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   }
 
   //gets the latest assigned to value
-  const handleAssignedToValue = (value) => {
+  const handleAssignedToValue = (value) => {   
     setAssignedToValue(value);
   }
 
@@ -480,33 +503,126 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
         dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
       }
   }
+
+  const handleStateChange =(currentStatus)=>{    
+    setcurrentrequestStatus(currentStatus);
+  }
+
+  const handlestatusudpate = (_daysRemaining,_status)=>{  
+    if(_status == "Open")
+    {      
+      //setheaderBG("foitabheaderOpenBG");
+      setRequestStatus(_daysRemaining +" Days Remaining")            
+    }
+    else{      
+      setRequestStatus(_status)
+    }
+        
+  }
+
+  const hasStatusRequestSaved =(issavecompleted)=>{
+    if(issavecompleted)
+      {
+        setcurrentrequestStatus("")
+      }
+  }
+
+  switch (requestDetails.currentState){
+    case "Open":
+      foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
+      break;
+    case "Closed": 
+      foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
+      break;
+    case "Call For Records": 
+      foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+      break;
+    case "Redirect": 
+      foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
+      break;
+    default:
+      break;      
+  }
+
+  const tabclick =(evt,param)=>{
+   
+    var i, tabcontent, tablinks;
+    
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+   
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(param).style.display = "block";
+    evt.currentTarget.className += " active";
+
+  }
+  
   return (
-      <div className="container foi-review-request-container">
-        <div className="foi-review-container">
-        <form className={`${classes.root} foi-request-form`} autoComplete="off">        
-        { (urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
-          <>
-            <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToInitialValue={handleAssignedToInitialValue} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate}/>            
-            <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
-            {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?          
-            <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject}/> : null }          
-            {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-            <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null }          
-            <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
-            <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails = {requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
-            <RequestDetails  requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
-            {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-            <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} />: null }
-            <RequestNotes />
-            
-            <BottomButtonGroup isValidationError = {isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest}/>
-          </>
-          ): null}
-           </form>
+
+    <div className="foiformcontent">
+      <div className="foitabbedContainer">
+
+        <div className={foitabheaderBG}>
+          <div className="foileftpanelheader">
+            <h1><a href="/foi/dashboard">FOI</a></h1>
+          </div>
+          <div className="foileftpaneldropdown">
+            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange}/>
+          </div>
+          
+        <div className="tab">
+          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}><span className="circle"></span> Request</div>
+          <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}><span className="circle"></span> Correspondence Log</div>
+          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}><span className="circle"></span> Option 3</div>
+        </div>
+          <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days")? _requestStatus: ""}</h4>
+        </div>
+        <div className="foitabpanelcollection"> 
+          <div id="Request" className="tabcontent active">                                
+            <div className="container foi-review-request-container">
+
+              <div className="foi-review-container">
+                <form className={`${classes.root} foi-request-form`} autoComplete="off">
+                  {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
+                    <>
+                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails}  handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} />
+                      <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
+                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
+                        <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null}
+                      {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
+                        <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null}
+                       <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
+                      <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails={requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
+                      <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
+                      {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
+                        <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} /> : null} 
+                      <RequestNotes />
+
+                      <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
+                    </>
+                  ) : null}
+                </form>
+              </div>
+            </div>                            
+          </div> 
+          <div id="CorrespondenceLog" className="tabcontent">
+              
+              </div> 
+          <div id="Option3" className="tabcontent">
+           <h3>Option 3</h3>
+          </div>        
         </div>
       </div>
-    
-    );
+    </div>
+
+  );
+
+
   });
 
 export default FOIRequest;

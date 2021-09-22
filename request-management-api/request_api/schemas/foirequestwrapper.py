@@ -80,6 +80,7 @@ class FOIRequestWrapperSchema(Schema):
     province = fields.Str(data_key="province",allow_none=True)    
     postal = fields.Str(data_key="postal",allow_none=True)   
     country = fields.Str(data_key="country",allow_none=True) 
+    requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
     
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True) 
