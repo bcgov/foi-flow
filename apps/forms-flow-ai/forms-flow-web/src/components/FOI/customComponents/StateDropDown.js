@@ -25,24 +25,25 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
         // if (window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
         //     _state = FOI_COMPONENT_CONSTANTS.UNOPENED;
         // }
-        switch(_state) {
-            case FOI_COMPONENT_CONSTANTS.UNOPENED: 
+        
+        switch(_state.toLowerCase()) {
+            case FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase(): 
                 return stateList.unopened;
-            case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS:
+            case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase():
                 return stateList.intakeinprogress;
-            case FOI_COMPONENT_CONSTANTS.OPEN:
+            case FOI_COMPONENT_CONSTANTS.OPEN.toLowerCase():
                 return stateList.open;
-            case FOI_COMPONENT_CONSTANTS.CLOSED:
+            case FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase():
                     return stateList.closed; 
-            case FOI_COMPONENT_CONSTANTS.REDIRECT:
+            case FOI_COMPONENT_CONSTANTS.REDIRECT.toLowerCase():
                     return stateList.redirect; 
-            case FOI_COMPONENT_CONSTANTS.CallFORRECORDS:
+            case FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase():
                     return stateList.callforrecords;                    
             default:
                 return [];
         }
     }
-
+    
     const statusList = getStatusList(status);
     const menuItems = statusList.length > 0 && statusList.map((item) => {
         return (        
