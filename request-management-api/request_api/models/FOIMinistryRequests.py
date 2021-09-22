@@ -61,8 +61,8 @@ class FOIMinistryRequest(db.Model):
         return request_schema.dump(query)
     
     @classmethod
-    def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion)->DefaultMethodResult:
-        db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryId, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentVersion).update({"isactive": False, "updated_at": datetime.now()}, synchronize_session=False)
+    def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion, userId)->DefaultMethodResult:
+        db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryId, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentVersion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userId}, synchronize_session=False)
         return DefaultMethodResult(True,'Request Updated',idnumber)
     
     @classmethod
@@ -106,8 +106,14 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema()
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)    
+    
+    @classmethod
+    def getrequestById(cls,ministryrequestid):
+        request_schema = FOIMinistryRequestSchema(many=True)
+        query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.asc())
+        return request_schema.dump(query)   
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
-        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id')
+        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby')
     

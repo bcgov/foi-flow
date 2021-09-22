@@ -8,6 +8,8 @@ import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
+import RequestDescriptionHistory from "../RequestDescriptionHistory";
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
       headingError: {
@@ -15,6 +17,9 @@ const useStyles = makeStyles((theme) => ({
       },
       headingNormal: {
         color: "000000"
+      },
+      btndisabled: { 
+        color: "#808080"
       }
   }));
 
@@ -27,21 +32,22 @@ const RequestDescription = React.memo(({
      createSaveRequestObject
     }) => {
     
-
+    
     /* All fields in this component are mandatory */
     
     const classes = useStyles();
-
+    const {ministryId} = useParams();
     //gets the program area list master data
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
-    
+    var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);    
     //updates the default values from the request description box    
     React.useEffect(() => {        
         const descriptionObject = {
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
-            isProgramAreaSelected: !!requestDetails.selectedMinistries
+            isProgramAreaSelected: !!requestDetails.selectedMinistries,
+            isPiiRedacted: ministryId ? true : requestDetails.ispiiredacted ? requestDetails.ispiiredacted : false
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
@@ -71,7 +77,13 @@ const RequestDescription = React.memo(({
     const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
+    const [isPIIRedacted, setPIIRedacted] = React.useState(ministryId ? true : requestDetails.ispiiredacted ? requestDetails.ispiiredacted : false);
 
+    const handlePIIRedacted = (event) => {
+        setPIIRedacted(event.target.checked);
+        handleOnChangeRequiredRequestDescriptionValues(event.target.checked, FOI_COMPONENT_CONSTANTS.ISPIIREDACTED)
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ISPIIREDACTED, event.target.checked);
+    }
     //handle onchange of start date and set state with latest value
     const handleStartDateChange = (event) => {
         setStartDate(event.target.value);
@@ -103,15 +115,39 @@ const RequestDescription = React.memo(({
         handleUpdatedProgramAreaList(programAreaList);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, programAreaList);
     }
+
+    const [openModal, setOpenModal] = React.useState(false);
+    const handleDescriptionHistoryClick = () => {
+        setOpenModal(true);
+    }
+    const handleModalClose = () => {
+        setOpenModal(false);
+    }
+    
+    const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
+        index === self.findIndex((copyRequest) => (
+            copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
+        ))
+    )
+    const sortedList = filteredList.sort((a, b) => {       
+        return new Date(a.createdAt) - new Date(b.createdAt);
+    });
+
      return (
         
         <Card className="foi-details-card">            
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
+                <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose}/>
                 <div className="row foi-details-row">
+                <div className="foi-request-description-history">
+                    <button type="button" className={`btn btn-link btn-description-history ${!(sortedList.length > 1)? classes.btndisabled : ""}`} disabled={!(sortedList.length > 1)}  onClick={handleDescriptionHistoryClick}>
+                       Description History
+                    </button>
+                </div>
                     <div className="col-lg-12 foi-request-description-row">
                         <div className="col-lg-6">
-                        <h3 className="foi-date-range-h3">Date Range for Record Search</h3>
+                            <h3 className="foi-date-range-h3">Date Range for Record Search</h3>
                         </div>
                         <div className="col-lg-6 foi-request-dates">
                         <TextField                
@@ -156,7 +192,18 @@ const RequestDescription = React.memo(({
                         onChange={handleRequestDescriptionChange}
                         error={requestDescriptionText===""}
                         fullWidth
-                     />        
+                    />
+                    <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
+                    <input
+                        type="checkbox"
+                        className="checkmark"
+                        checked={isPIIRedacted}
+                        onChange={handlePIIRedacted}
+                        disabled={isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== 'unopened')}
+                    />
+                    <span className="checkmark"></span>
+                        Description contains NO Personal Information
+                    </label>      
                     </div>
                     { Object.entries(masterProgramAreaList).length !== 0 ?
                     <MinistriesList masterProgramAreaList={masterProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} />

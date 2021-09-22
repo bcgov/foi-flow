@@ -1,5 +1,5 @@
 
-import { INSIGHTS_BASE_API, INSIGHTS_API_KEY, WEB_BASE_URL, BPM_BASE_URL, BPM_BASE_URL_EXT,FOI_BASE_API_URL } from "./config";
+import { FOI_BASE_API_URL } from "./config";
 
 const API = {
   FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard` ,
@@ -14,7 +14,9 @@ const API = {
   FOI_GET_DELIVERY_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/deliverymodes`,
   FOI_GET_RECEIVED_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/receivedmodes`,
   FOI_POST_REQUEST_POST: `${FOI_BASE_API_URL}/api/foirequests`,
-  FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>`,  
+  FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>`,
+  FOI_RAW_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/rawrequest/<requestid>/description`,
+  FOI_MINISTRY_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/ministryrequest/<ministryid>/description` 
 };
 
 export default API;

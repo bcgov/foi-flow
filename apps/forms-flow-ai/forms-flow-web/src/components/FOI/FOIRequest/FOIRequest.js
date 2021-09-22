@@ -19,7 +19,8 @@ import {
   fetchFOIProgramAreaList, 
   fetchFOIAssignedToList, 
   fetchFOIDeliveryModeList, 
-  fetchFOIReceivedModeList 
+  fetchFOIReceivedModeList,
+  fetchFOIRequestDescriptionList
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -53,11 +54,12 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (ministryId) {
-      
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
     }
-    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {
+    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {      
       dispatch(fetchFOIRawRequestDetails(requestId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ""));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
       dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
@@ -78,7 +80,8 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     startDate: "",
     endDate: "",
     description: "",
-    isProgramAreaSelected: false
+    isProgramAreaSelected: false,
+    isPiiRedacted: false
   }  
 
   const requiredRequestDetailsInitialValues = {
@@ -183,6 +186,10 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     else if (name === FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED) {
       descriptionData.isProgramAreaSelected = value;      
     }
+    else if (name === FOI_COMPONENT_CONSTANTS.ISPIIREDACTED) {
+      descriptionData.isPiiRedacted = value;
+    }
+    
     setRequiredRequestDescriptionValues(descriptionData);
   }
   
@@ -235,7 +242,8 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     || requiredApplicantDetails.category.toLowerCase().includes("select")
     || contactDetailsNotGiven
     || requiredRequestDescriptionValues.description === ""
-    || !requiredRequestDescriptionValues.isProgramAreaSelected   
+    || !requiredRequestDescriptionValues.isProgramAreaSelected
+    || !requiredRequestDescriptionValues.isPiiRedacted
     || (validation.helperTextValue !== undefined && validation.helperTextValue !== "")
     || assignedToValue.toLowerCase().includes("unassigned")
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
@@ -437,6 +445,9 @@ const FOIRequest = React.memo(({handlestatusudpate}) => {
     }
     else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
       requestObject.publicServiceEmployeeNumber = value;
+    }
+    else if (name === FOI_COMPONENT_CONSTANTS.ISPIIREDACTED) {
+      requestObject.ispiiredacted = value;
     }
   }
 
