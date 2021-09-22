@@ -516,10 +516,21 @@ const FOIRequest = React.memo(({}) => {
       }
   }
 
-  
-  if(requestDetails.currentState == "Open")
-  {
-    foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
+  switch (requestDetails.currentState){
+    case "Open":
+      foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
+      break;
+    case "Closed": 
+      foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
+      break;
+    case "Call For Records": 
+      foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+      break;
+    case "Redirect": 
+      foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
+      break;
+    default:
+      break;      
   }
 
   const tabclick =(evt,param)=>{
