@@ -294,7 +294,7 @@ class FOIRequestUtil:
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
         foiministryRequest.version = activeVersion
-        foiministryRequest.requeststatusid = 1
+        foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
         foiministryRequest.isactive = True

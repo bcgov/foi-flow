@@ -9,12 +9,12 @@ import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import Dashboard from "./Dashboard";
+import FOIRequest  from "./FOIRequest";
 
-import TabbedContainer from "./TabbedContainer/TabbedContainer";
+//import TabbedContainer from "./TabbedContainer/TabbedContainer";
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated);
-
 
   useEffect(()=>{
     console.log('authenticate')
@@ -25,23 +25,24 @@ const FOIAuthenticateRouting = React.memo((props) => {
     }
   },[props.store, dispatch]);
 
+
   return (
       <>
         {isAuth ? (
           <>
           <FOIHeader /> 
           
-            <Route exact path="/foi/dashboard">                
-                <Dashboard />                
+            <Route exact path="/foi/dashboard">
+              <Dashboard />
             </Route>
-            <Route path="/foi/reviewrequest/:requestId">                                  
-                <TabbedContainer/>
+            <Route path="/foi/reviewrequest/:requestId">
+              <FOIRequest  />
             </Route>
-            <Route path="/foi/addrequest">               
-                <TabbedContainer/>
+            <Route path="/foi/addrequest">
+              <FOIRequest  />
             </Route>
-            <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId">               
-                <TabbedContainer/>
+            <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId">
+              <FOIRequest  />
             </Route>
            
             <FOIFooter />

@@ -6,38 +6,39 @@ import './statedropdown.scss';
 import { stateList } from '../../../helper/FOI/statusEnum';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-export default function StateDropDown({requestStatus}) {
+export default function StateDropDown({requestStatus, handleStateChange}) {
 
     const [status, setStatus] = React.useState(requestStatus);
     useEffect (() => {
         setStatus(requestStatus.toLowerCase().includes("days")? "Open": requestStatus);
     },[requestStatus])
-    // const status = (requestStatus.toLowerCase().includes("days")? "Open": requestStatus);
-
+    
     const handleChange = (event) => {
          setStatus(event.target.value);
-        //  handleStateChange(event.target.value); 
+        handleStateChange(event.target.value); 
     };
 
-    const getStatusList = (_status) => {
-        // let  _state = requestStatus.toLowerCase() === "unopened" ? requestStatus : _status.toLowerCase().includes("days") ? "Open": _status;
-        let  _state =  requestStatus.toLowerCase().includes("days")? "Open": requestStatus;
-        // if (window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
-        //     _state = FOI_COMPONENT_CONSTANTS.UNOPENED;
-        // }
-        switch(_state) {
-            case FOI_COMPONENT_CONSTANTS.UNOPENED: 
+    const getStatusList = (_status) => {        
+        let  _state =  requestStatus.toLowerCase().includes("days")? "Open": requestStatus;              
+        switch(_state.toLowerCase()) {
+            case FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase(): 
                 return stateList.unopened;
-            case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS:
+            case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase():
                 return stateList.intakeinprogress;
-            case FOI_COMPONENT_CONSTANTS.OPEN:
+            case FOI_COMPONENT_CONSTANTS.OPEN.toLowerCase():
                 return stateList.open;
+            case FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase():
+                    return stateList.closed; 
+            case FOI_COMPONENT_CONSTANTS.REDIRECT.toLowerCase():
+                    return stateList.redirect; 
+            case FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase():
+                    return stateList.callforrecords;                    
             default:
                 return [];
         }
     }
-
-    const statusList = getStatusList(status);
+    
+    const statusList = getStatusList(status);    
     const menuItems = statusList.length > 0 && statusList.map((item) => {
         return (        
         <MenuItem className="foi-state-menuitem" key={item.status} value={item.status} disabled={item.status.toLowerCase().includes("unopened")}>
@@ -46,8 +47,7 @@ export default function StateDropDown({requestStatus}) {
         </MenuItem> 
         )
      });
-    return (
-        // <FormControl variant="outlined" className={classes.formControl}>
+    return (       
             <TextField
                 id="foi-status-dropdown"
                 className="foi-state-dropdown"
@@ -61,7 +61,6 @@ export default function StateDropDown({requestStatus}) {
             >                
             
                 {menuItems}
-            </TextField>
-        // </FormControl>
+            </TextField>        
     );
   }
