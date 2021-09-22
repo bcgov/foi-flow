@@ -191,7 +191,7 @@ const BottomButtonGroup = React.memo(({
           hasStatusRequestSaved(true)
         }
   
-        if(currentSelectedStatus == "Call for Records" && !isValidationError)
+        if(currentSelectedStatus == "Call For Records" && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 2 // Need to take from ENUM
           saveRequest();
