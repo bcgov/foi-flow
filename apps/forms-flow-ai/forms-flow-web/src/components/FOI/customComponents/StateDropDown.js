@@ -24,8 +24,7 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
         let  _state =  requestStatus.toLowerCase().includes("days")? "Open": requestStatus;
         // if (window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
         //     _state = FOI_COMPONENT_CONSTANTS.UNOPENED;
-        // }
-        
+        // }        
         switch(_state.toLowerCase()) {
             case FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase(): 
                 return stateList.unopened;
@@ -44,7 +43,7 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
         }
     }
     
-    const statusList = getStatusList(status);
+    const statusList = getStatusList(status);    
     const menuItems = statusList.length > 0 && statusList.map((item) => {
         return (        
         <MenuItem className="foi-state-menuitem" key={item.status} value={item.status} disabled={item.status.toLowerCase().includes("unopened")}>
