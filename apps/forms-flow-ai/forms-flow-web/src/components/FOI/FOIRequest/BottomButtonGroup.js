@@ -53,8 +53,6 @@ const BottomButtonGroup = React.memo(({
     const classes = useStyles();
     const dispatch = useDispatch();
     
-    const [openModal, setOpenModal] = useState(false);
-    const [opensaveModal, setsaveModal] = useState(false);
 
     const returnToQueue = (e) => {
       e.preventDefault();
@@ -64,7 +62,6 @@ const BottomButtonGroup = React.memo(({
       }
     }
     const saveRequest = async () => {
-     
       dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, ministryId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
@@ -110,11 +107,27 @@ const BottomButtonGroup = React.memo(({
         openRequest();
         hasStatusRequestSaved(true)
       }
-      else if (currentSelectedStatus !="" && !isValidationError){
-        saveRequestModal();
+      
+      if(currentSelectedStatus == "Closed" && !isValidationError)
+      {
+        saveRequestObject.requeststatusid = 3 // Need to take from ENUM
+        saveRequest();
+        hasStatusRequestSaved(true)
       }
-      
-      
+
+      if(currentSelectedStatus == "Call for Records" && !isValidationError)
+      {        
+        saveRequestObject.requeststatusid = 2 // Need to take from ENUM
+        saveRequest();
+        hasStatusRequestSaved(true)
+      }
+
+      if(currentSelectedStatus == "Redirect" && !isValidationError)
+      {        
+        saveRequestObject.requeststatusid = 4 // Need to take from ENUM
+        saveRequest();
+        hasStatusRequestSaved(true)
+      }
       
 
       window.history.pushState(null, null, window.location.pathname);
@@ -129,17 +142,12 @@ const BottomButtonGroup = React.memo(({
         
       }
     });
-    
+    const [openModal, setOpenModal] = useState(false);
    
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id ? saveRequestObject.id :requestId; 
       setOpenModal(true);     
     }
-
-    const saveRequestModal =()=>{
-      setsaveModal(true);
-    }
-
     const handleModal = (value) => {
       setOpenModal(false);
       if (value) {
@@ -181,37 +189,10 @@ const BottomButtonGroup = React.memo(({
       }
     }
 
-    const handleSaveModal = (value) => {
-      setsaveModal(false);
-      if (value) {
-        if(currentSelectedStatus == "Closed" && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = 3 // Need to take from ENUM
-          saveRequest();
-          hasStatusRequestSaved(true)
-        }
-  
-        if(currentSelectedStatus == "Call for Records" && !isValidationError)
-        {        
-          saveRequestObject.requeststatusid = 2 // Need to take from ENUM
-          saveRequest();
-          hasStatusRequestSaved(true)
-        }
-  
-        if(currentSelectedStatus == "Redirect" && !isValidationError)
-        {        
-          saveRequestObject.requeststatusid = 4 // Need to take from ENUM
-          saveRequest();
-          hasStatusRequestSaved(true)
-        }
-      }
-    }
-
   console.log(`is validation bottom ${isValidationError}`);  
   return (
     <div className={classes.root}>
-      <ConfirmationModal openModal={openModal} handleModal={handleModal} state={"open"}/>  
-      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus}/>
+      <ConfirmationModal openModal={openModal} handleModal={handleModal}/>  
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
       <button type="button" className={`btn btn-bottom ${isValidationError || urlIndexCreateRequest > -1 || ministryId ? classes.btndisabled : classes.btnsecondaryenabled}`} disabled={isValidationError || urlIndexCreateRequest > -1 || ministryId} onClick={openRequest}>Open Request</button>

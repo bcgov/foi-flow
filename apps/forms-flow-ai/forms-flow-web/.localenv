@@ -4,28 +4,48 @@
 #  Uncomment the variables if any changes from the default values             #
 ###############################################################################
 
+
+
 #To define project level configuration  possible values development,test,production
 
 #NODE_ENV=development
 
+##Mapping of application roles from keycloak
+#CLIENT_ROLE=formsflow-client
+#DESIGNER_ROLE=formsflow-designer
+#REVIEWER_ROLE=formsflow-reviewer
+
+##Mapping of application roles from FORMIO server
+CLIENT_ROLE_ID=60c2a2be92a29b0417cbfd3d
+DESIGNER_ROLE_ID=60c2a2be92a29b42f3cbfd39
+REVIEWER_ROLE_ID=60c2a2be92a29b0ee1cbfd3c
+ANONYMOUS_ID=60c2a2be92a29bd9f5cbfd3b
+USER_RESOURCE_ID=60c2a2be92a29b2662cbfd3e
+
+#URL of forms-flow-forms
+FORMIO_DEFAULT_PROJECT_URL=http://10.0.0.143:3001
+
+##Keycloak-client-name for web
+#KEYCLOAK_WEB_CLIENTID=forms-flow-web
+
+##Keycloak-Realm-name
+#KEYCLOAK_URL_REALM=forms-flow-ai
+
 ##Keycloak base URL
-KEYCLOAK_URL=https://dev.oidc.gov.bc.ca
-KEYCLOAK_URL_REALM=5k8dbl4h
-REACT_APP_FOI_BASE_API_URL=http://localhost:15000
+KEYCLOAK_URL=http://10.0.0.143:8080
 
-REACT_APP_API_SERVER_URL=REACT_APP_API_SERVER_URL
-REACT_APP_API_PROJECT_URL=REACT_APP_API_PROJECT_URL
-REACT_APP_KEYCLOAK_CLIENT=REACT_APP_KEYCLOAK_CLIENT
-REACT_APP_ANONYMOUS_ID=REACT_APP_ANONYMOUS_ID
-
-REACT_APP_WEB_BASE_URL=REACT_APP_WEB_BASE_URL
-
-REACT_APP_KEYCLOAK_URL_REALM=5k8dbl4h
-REACT_APP_KEYCLOAK_URL=https://dev.oidc.gov.bc.ca
-REACT_APP_APPLICATION_NAME=foi-flow
+##Insight Api End point
+INSIGHT_API_URL=http://10.0.0.143:7000
+INSIGHT_API_KEY={API Key from Redash}
 
 #formsflow web Api End point
-FORMSFLOW_API_URL=http://10.0.0.197:5000
+FORMSFLOW_API_URL=http://10.0.0.143:5000
+
+##camunda Api End point
+CAMUNDA_API_URL=http://10.0.0.143:8000/camunda
+
+##for socket implementation
+WEBSOCKET_ENCRYPT_KEY={Secret phrase from camunda websocket implementation}
 
 #application name
-APPLICATION_NAME=foi-flow
+APPLICATION_NAME=formsflow.ai
