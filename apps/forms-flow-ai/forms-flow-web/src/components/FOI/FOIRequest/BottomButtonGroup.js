@@ -100,7 +100,7 @@ const BottomButtonGroup = React.memo(({
       const handleOnHashChange = (e) => {       
         returnToQueue(e);
       };  
-
+            
       if(currentSelectedStatus == "Open" && !isValidationError)
       {
         saveRequestObject.requeststatusid = 1 // Need to take from ENUM
@@ -111,6 +111,20 @@ const BottomButtonGroup = React.memo(({
       if(currentSelectedStatus == "Closed" && !isValidationError)
       {
         saveRequestObject.requeststatusid = 3 // Need to take from ENUM
+        saveRequest();
+        hasStatusRequestSaved(true)
+      }
+
+      if(currentSelectedStatus == "Call for Records" && !isValidationError)
+      {        
+        saveRequestObject.requeststatusid = 2 // Need to take from ENUM
+        saveRequest();
+        hasStatusRequestSaved(true)
+      }
+
+      if(currentSelectedStatus == "Redirect" && !isValidationError)
+      {        
+        saveRequestObject.requeststatusid = 4 // Need to take from ENUM
         saveRequest();
         hasStatusRequestSaved(true)
       }
