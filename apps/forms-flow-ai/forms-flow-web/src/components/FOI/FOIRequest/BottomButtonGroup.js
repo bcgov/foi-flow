@@ -182,7 +182,7 @@ const BottomButtonGroup = React.memo(({
       }
     }
 
-    const handleSaveModal = (value) => {
+    const handleSaveModal = (value) => {      
       setsaveModal(false);
       if (value) {
         if(currentSelectedStatus == "Closed" && !isValidationError)
@@ -206,6 +206,11 @@ const BottomButtonGroup = React.memo(({
         else if(currentSelectedStatus == "Open" && !isValidationError)
         {
           saveRequestObject.requeststatusid = 1 // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
+          saveRequest();
+          hasStatusRequestSaved(true)
+        }
+        else if(currentSelectedStatus == "Intake in Progress" && !isValidationError)
+        {
           saveRequest();
           hasStatusRequestSaved(true)
         }
