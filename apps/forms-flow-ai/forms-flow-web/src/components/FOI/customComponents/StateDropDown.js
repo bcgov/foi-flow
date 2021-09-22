@@ -12,19 +12,14 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
     useEffect (() => {
         setStatus(requestStatus.toLowerCase().includes("days")? "Open": requestStatus);
     },[requestStatus])
-    // const status = (requestStatus.toLowerCase().includes("days")? "Open": requestStatus);
-
+    
     const handleChange = (event) => {
          setStatus(event.target.value);
         handleStateChange(event.target.value); 
     };
 
-    const getStatusList = (_status) => {
-        // let  _state = requestStatus.toLowerCase() === "unopened" ? requestStatus : _status.toLowerCase().includes("days") ? "Open": _status;
-        let  _state =  requestStatus.toLowerCase().includes("days")? "Open": requestStatus;
-        // if (window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
-        //     _state = FOI_COMPONENT_CONSTANTS.UNOPENED;
-        // }        
+    const getStatusList = (_status) => {        
+        let  _state =  requestStatus.toLowerCase().includes("days")? "Open": requestStatus;              
         switch(_state.toLowerCase()) {
             case FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase(): 
                 return stateList.unopened;
@@ -52,8 +47,7 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
         </MenuItem> 
         )
      });
-    return (
-        // <FormControl variant="outlined" className={classes.formControl}>
+    return (       
             <TextField
                 id="foi-status-dropdown"
                 className="foi-state-dropdown"
@@ -67,7 +61,6 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
             >                
             
                 {menuItems}
-            </TextField>
-        // </FormControl>
+            </TextField>        
     );
   }
