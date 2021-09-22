@@ -9,7 +9,8 @@ import './confirmationmodal.scss';
 export default function ConfirmationModal({openModal, handleModal,state}) {    
     
     const handleClose = () => {
-      handleModal(false);
+      //handleModal(false);
+      window.location.reload()
     };
 
     const handleYes = () => {

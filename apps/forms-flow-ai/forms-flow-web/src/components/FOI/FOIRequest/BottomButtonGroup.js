@@ -182,7 +182,7 @@ const BottomButtonGroup = React.memo(({
       }
     }
 
-    const handleSaveModal = (value) => {
+    const handleSaveModal = (value) => {      
       setsaveModal(false);
       if (value) {
         if(currentSelectedStatus == "Closed" && !isValidationError)
@@ -209,13 +209,18 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true)
         }
+        else if(currentSelectedStatus == "Intake in Progress" && !isValidationError)
+        {
+          saveRequest();
+          hasStatusRequestSaved(true)
+        }
       }
     }
 
   console.log(`is validation bottom ${isValidationError}`);  
   return (
     <div className={classes.root}>
-      <ConfirmationModal openModal={openModal} handleModal={handleModal} state={"open"}/>  
+      <ConfirmationModal openModal={openModal} handleModal={handleModal} state={"Open"}/>  
       <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus}/>
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
