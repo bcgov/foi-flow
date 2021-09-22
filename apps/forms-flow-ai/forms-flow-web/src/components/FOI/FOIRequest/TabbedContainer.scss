@@ -77,6 +77,9 @@
   .foitabheaderCFRG{
     background-color: #ec7d10;
   }
+
+  
+
   .foitabheaderRedirectBG{
     background-color: #d15;
   }
@@ -178,7 +181,7 @@
   transition: 0.3s;
   font-size: 17px;
   height: 48px;
-  padding:5px;
+  padding:8px;
   align-items: center;
   vertical-align: middle;
   text-align: left;
@@ -188,7 +191,7 @@
 /* Create an active/current tablink class */
 .tab div.active {
   background-color: #fff;
-  color:teal;
+  color:black;
 }
 
 span.circle
@@ -202,6 +205,22 @@ span.circle
 
 .tab div.active span.circle{
   background: teal;
+}
+
+.foitabheaderCFRG .tab div.active span.circle {
+  background-color: #ec7d10;
+}
+
+.foitabheaderOpenBG .tab div.active span.circle{
+  background-color: green;
+}
+
+.foitabheaderClosedBG .tab div.active span.circle{
+  background-color: #4b296b;
+}
+
+.foitabheaderRedirectBG .tab div.active span.circle{
+  background-color: #d15;
 }
 
 /* Style the tab content */
