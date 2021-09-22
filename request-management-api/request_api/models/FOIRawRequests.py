@@ -29,8 +29,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def saverawrequest(cls,_requestrawdata,sourceofsubmission,assigneegroup= None,assignee= None)->DefaultMethodResult:                
-        createdat = datetime.now()
-        print(createdat)
+        createdat = datetime.now()        
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee)
         db.session.add(newrawrequest)
@@ -43,7 +42,7 @@ class FOIRawRequest(db.Model):
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
                 
-            _version = request.version+1
+            _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
                 values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission)
@@ -76,8 +75,12 @@ class FOIRawRequest(db.Model):
         dbquery = db.session.query(FOIRawRequest)
         _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
+        request_schema = FOIRawRequestSchema()
+        request = request_schema.dump(requestraqw)
+        if(request["status"] == "Redirect" or request["status"] == "Closed"):
+            status = request["status"]
         if(requestraqw.count() > 0) :
-            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)        
+            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)                    
             requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Request updated',requestid)       
