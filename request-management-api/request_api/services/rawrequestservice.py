@@ -18,10 +18,11 @@ class rawrequestservice:
 
     """
 
-    def saverawrequest(requestdatajson,sourceofsubmission):
+    def saverawrequest(requestdatajson,sourceofsubmission, userId):
         assigneeGroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
-        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,assigneeGroup,assignee)
+        ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
+        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,ispiiredacted,userId,assigneeGroup,assignee)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
@@ -32,17 +33,17 @@ class rawrequestservice:
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
 
-    def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee,status):
+    def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee,status, userId):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
-        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status,ispiiredacted)
+        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status,ispiiredacted, userId)
         return result
 
-    def updateworkflowinstance(wfinstanceid, requestid):
-        result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid)
+    def updateworkflowinstance(wfinstanceid, requestid, userId):
+        result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userId)
         return result
 
-    def updateworkflowinstancewithstatus(wfinstanceid, requestid,status,notes):
-        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes)
+    def updateworkflowinstancewithstatus(wfinstanceid, requestid,status,notes, userId):
+        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userId)
         return result    
 
     def getrawrequests():

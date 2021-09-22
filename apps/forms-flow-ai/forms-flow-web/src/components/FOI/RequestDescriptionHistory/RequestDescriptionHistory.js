@@ -3,6 +3,8 @@ import './requestDescriptionHistory.scss';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles } from '@material-ui/core/styles';
 import AccordionItem from './AccordionItem';
 
@@ -35,8 +37,13 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
           fullWidth
           maxWidth={'md'}
         >
-            <DialogTitle id="request-history-dialog-title">Request History</DialogTitle>
-            <DialogContent>
+            <DialogTitle disableTypography id="request-history-dialog-title">
+              <h2 className="request-history-header">Request History            </h2>
+              <IconButton onClick={handleModalClose}>
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent id="request-history-content">
                 {requestDescriptionHistoryList.map((details, index) => 
                      <AccordionItem details={details} index={index} key={details.type} expanded={expanded} handleChange={handleChange} />                    
             )}                

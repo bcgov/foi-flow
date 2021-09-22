@@ -32,7 +32,7 @@ class requestservice:
 
     """
 
-    def saverequest(self,fOIRequestsSchema, foirequestid=None, ministryId=None, fileNumber=None, version=None, rawRequestId=None, wfinstanceid=None):      
+    def saverequest(self,fOIRequestsSchema, userId, foirequestid=None, ministryId=None, fileNumber=None, version=None, rawRequestId=None, wfinstanceid=None):      
         activeVersion = 1 if version is None else version
         foiMinistryRequestArr = []
         contactInformationArr = []
@@ -45,7 +45,7 @@ class requestservice:
                
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             for ministry in fOIRequestsSchema.get("selectedMinistries"):
-                foiMinistryRequestArr.append(fOIRequestUtil.createMinistry(fOIRequestsSchema, ministry, activeVersion,fileNumber,ministryId))           
+                foiMinistryRequestArr.append(fOIRequestUtil.createMinistry(fOIRequestsSchema, ministry, activeVersion, userId, fileNumber,ministryId))           
         
 
         #Prepare applicant record 
@@ -57,6 +57,7 @@ class requestservice:
             fOIRequestUtil.createApplicant(fOIRequestsSchema.get("firstName"),
                                            fOIRequestsSchema.get("lastName"),
                                            "Self",
+                                           userId,
                                            fOIRequestsSchema.get("middleName"),                                            
                                            fOIRequestsSchema.get("businessName"),
                                            selfAlsoKnownAs,
@@ -72,6 +73,7 @@ class requestservice:
                     fOIRequestUtil.createApplicant(addlApplicantInfo["childFirstName"],
                                            addlApplicantInfo["childLastName"],
                                            "Applying for a child under 12",
+                                           userId,
                                            addlApplicantInfo["childMiddleName"],                                            
                                            None,
                                            addlApplicantInfo["childAlsoKnownAs"],
@@ -82,6 +84,7 @@ class requestservice:
                     fOIRequestUtil.createApplicant(addlApplicantInfo["anotherFirstName"],
                                            addlApplicantInfo["anotherLastName"],
                                            "Applying for other person",
+                                           userId,
                                            addlApplicantInfo["anotherMiddleName"],                                            
                                            None,
                                            addlApplicantInfo["anotherAlsoKnownAs"],
@@ -96,7 +99,7 @@ class requestservice:
                     fOIRequestUtil.createContactInformation(contact["key"],
                                                             contact["name"],
                                                             fOIRequestsSchema.get(contact["key"]),
-                                                            contactTypes)
+                                                            contactTypes, userId)
                     )
                 
 
@@ -113,7 +116,7 @@ class requestservice:
                     personalAttributeArr.append(
                         fOIRequestUtil.createPersonalAttribute(attrb["name"],
                                                             attrbvalue,
-                                                            attributeTypes)
+                                                            attributeTypes, userId)
                         )
         # FOI Request      
         openfOIRequest = FOIRequest()
@@ -140,10 +143,10 @@ class requestservice:
            openfOIRequest.foirequestid = foirequestid
         if wfinstanceid is not None:         
            openfOIRequest.wfinstanceid = wfinstanceid 
-        
+        openfOIRequest.createdby = userId
         return FOIRequest.saverequest(openfOIRequest) 
 
-    def saveRequestVersion(self,fOIRequestsSchema, foirequestid , ministryId):
+    def saveRequestVersion(self,fOIRequestsSchema, foirequestid , ministryId, userId):
         activeVersion = 1        
         fileNumber =fOIRequestsSchema.get("idNumber") 
         #Identify version       
@@ -153,14 +156,14 @@ class requestservice:
                activeVersion = _foiRequest["version"] + 1
             else:
                 return _foiRequest  
-            FOIMinistryRequest.deActivateFileNumberVersion(ministryId, fileNumber, activeVersion)
-            return self.saverequest(fOIRequestsSchema,foirequestid,ministryId,fileNumber,activeVersion,_foiRequest["foirawrequestid"],_foiRequest["wfinstanceid"])    
+            FOIMinistryRequest.deActivateFileNumberVersion(ministryId, fileNumber, activeVersion, userId)
+            return self.saverequest(fOIRequestsSchema, userId, foirequestid,ministryId,fileNumber,activeVersion,_foiRequest["foirawrequestid"],_foiRequest["wfinstanceid"])    
           
         
-    def updaterequest(self,fOIRequestsSchema,foirequestid):
+    def updaterequest(self,fOIRequestsSchema,foirequestid,userId):
         fOIRequestUtil = FOIRequestUtil()
         if fOIRequestUtil.isNotBlankorNone(fOIRequestsSchema,"wfinstanceid","main") == True:
-            return FOIRequest.updateWFInstance(foirequestid, fOIRequestsSchema.get("wfinstanceid"))
+            return FOIRequest.updateWFInstance(foirequestid, fOIRequestsSchema.get("wfinstanceid"), userId)
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             allStatus = FOIRequestStatus().getrequeststatuses()
             updatedMinistries = []
@@ -168,7 +171,7 @@ class requestservice:
                 for status in allStatus:
                     if ministry["status"] == status["name"]:
                         updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
-            return FOIRequest.updateStatus(foirequestid, updatedMinistries)
+            return FOIRequest.updateStatus(foirequestid, updatedMinistries, userId)
     
     def postEventToWorkflow(self,workflowId, data):
          return bpmservice.complete(workflowId, data)
@@ -287,7 +290,7 @@ class requestservice:
 
 class FOIRequestUtil:   
     
-    def createMinistry(self, requestSchema, ministry, activeVersion, fileNumber=None, ministryId=None):
+    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
         foiministryRequest.version = activeVersion
@@ -301,6 +304,7 @@ class FOIRequestUtil:
         foiministryRequest.duedate = requestSchema.get("dueDate")
         foiministryRequest.startdate = requestSchema.get("startDate")
         foiministryRequest.created_at = datetime2.now().isoformat()
+        foiministryRequest.createdby = userId
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
         if self.isNotBlankorNone(requestSchema,"toDate","main") == True:
@@ -310,18 +314,20 @@ class FOIRequestUtil:
             foiministryRequest.assignedto = requestSchema.get("assignedTo")
         return foiministryRequest
     
-    def createContactInformation(self,dataformat, name, value, contactTypes):
+    def createContactInformation(self,dataformat, name, value, contactTypes, userId):
         contactInformation = FOIRequestContactInformation()
         contactInformation.contactinformation = value
         contactInformation.dataformat = dataformat
+        contactInformation.createdby = userId
         for contactType in contactTypes:
             if contactType["name"] == name:
               contactInformation.contacttypeid =contactType["contacttypeid"]              
         return contactInformation
     
-    def createApplicant(self,firstName, lastName, appltcategory, middleName = None,businessName = None, alsoknownas = None, dob = None):
+    def createApplicant(self,firstName, lastName, appltcategory, userId, middleName = None,businessName = None, alsoknownas = None, dob = None):
         requestApplicant = FOIRequestApplicantMapping()
         applicant = FOIRequestApplicant()
+        applicant.createdby = userId
         if firstName is not None and firstName != "":
             applicant.firstname = firstName
         if lastName is not None and lastName != "":
@@ -345,8 +351,9 @@ class FOIRequestUtil:
             requestApplicant.requestortypeid = requestertype["requestortypeid"]
         return requestApplicant
     
-    def createPersonalAttribute(self, name, value,attributeTypes):
+    def createPersonalAttribute(self, name, value,attributeTypes, userId):
         personalAttribute = FOIRequestPersonalAttribute()
+        personalAttribute.createdby = userId
         if value is not None and value !="" and value:
             for attributeType in attributeTypes:
                 if attributeType["name"] == name:

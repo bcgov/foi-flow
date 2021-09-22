@@ -4,7 +4,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 from datetime import datetime
-
+import dateutil.parser
 class auditservice:
     """ FOI audit management service
 
@@ -48,7 +48,7 @@ class auditservice:
             createdat = datetime.fromisoformat(entry['created_at']).strftime("%Y-%m-%d %H:%M:%S") 
             fromdate = datetime.fromisoformat(entry['recordsearchfromdate']).strftime("%Y-%m-%d") if entry['recordsearchfromdate'] is not None else None 
             todate = datetime.fromisoformat(entry['recordsearchtodate']).strftime("%Y-%m-%d") if entry['recordsearchtodate'] is not None else None
-            _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['assignedto'], "status": entry['requeststatus.name']})
+            _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['createdby'], "status": entry['requeststatus.name']})
         return {"foirequestid" :foirequestid  , "audit":_ministrydescriptions}
     
     def _getAuditFromRawRequest(self, type, id, groups):
@@ -60,12 +60,15 @@ class auditservice:
             rawRequestId= id
         rawrecords = FOIRawRequest().getDescriptionSummaryById(rawRequestId) 
         
-        if 'Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups:
-           _rawdescriptions =  rawrecords 
-        else:
-            for entry in rawrecords:
+        
+        for entry in rawrecords:
+            fromdate =dateutil.parser.parse(entry['fromdate']).strftime('%Y-%m-%d') if entry['fromdate'] is not None else None 
+            todate = dateutil.parser.parse(entry['todate']).strftime('%Y-%m-%d') if entry['todate'] is not None else None
+            if 'Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups:
+                _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": entry['createdat'] , "createdby": entry['createdby'], "status": entry['status']})        
+            else:
                 if entry['ispiiredacted'] == True:
-                    _rawdescriptions.append(entry)
+                    _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": entry['createdat'] , "createdby": entry['createdby'], "status": entry['status']})            
         return _rawdescriptions
         
             

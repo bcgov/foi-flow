@@ -23,22 +23,23 @@ class FOIRawRequest(db.Model):
     assignedto = db.Column(db.String(120), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
+    createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     sourceofsubmission = db.Column(db.String(120),  nullable=True)
     ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)    
     
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission,assigneegroup= None,assignee= None)->DefaultMethodResult:                
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, assigneegroup= None,assignee= None)->DefaultMethodResult:                
         createdat = datetime.now()
         print(createdat)
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='unopened' if sourceofsubmission != "intake" else 'Assignment in progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status,ispiiredacted)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status,ispiiredacted, userId)->DefaultMethodResult:        
         updatedat = datetime.now()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
@@ -46,7 +47,7 @@ class FOIRawRequest(db.Model):
             _version = request.version+1
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updated_at=updatedat,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updatedby=None,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted,createdby=userId)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
@@ -55,14 +56,14 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'No request foound')
             
     @classmethod
-    def updateworkflowinstance(cls,wfinstanceid,requestid)->DefaultMethodResult:
+    def updateworkflowinstance(cls,wfinstanceid,requestid, userId)->DefaultMethodResult:
         updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         requestraqw = dbquery.filter_by(requestid=requestid,version = 1)
         if(requestraqw.count() > 0) :
             existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
             if(existingrequestswithWFid.count() == 0) :
-                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:"WF Instance created"}, synchronize_session = False)
+                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.updatedby:userId, FOIRawRequest.notes:"WF Instance created"}, synchronize_session = False)
                 db.session.commit()
                 return DefaultMethodResult(True,'Request updated with WF Instance Id',requestid)
             else:
@@ -71,14 +72,14 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(False,'Requestid not exists',-1)              
 
     @classmethod
-    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes)-> DefaultMethodResult:
+    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes,userId)-> DefaultMethodResult:
         updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
         if(requestraqw.count() > 0) :
             existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)        
-            requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status}, synchronize_session = False)
+            requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userId}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Request updated',requestid)       
         else:
@@ -100,10 +101,10 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
         sql = """select CASE WHEN status <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
-                    CASE WHEN status <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromDate, 
-                    CASE WHEN status <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as toDate, 
+                    CASE WHEN status <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
+                    CASE WHEN status <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
                     to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted, 
-                    CASE WHEN status <> 'unopened' then assignedto else 'Online Form' END  as createdby from "FOIRawRequests" fr 
+                    CASE WHEN status <> 'unopened' then createdby else 'Online Form' END  as createdby from "FOIRawRequests" fr 
                     where requestid = :requestid order by version ;"""
         rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []
@@ -119,4 +120,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','sourceofsubmission','ispiiredacted')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted')
