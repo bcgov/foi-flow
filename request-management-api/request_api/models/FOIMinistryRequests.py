@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_
+from sqlalchemy import or_,and_
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 
@@ -73,7 +73,7 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
         else:            
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,FOIMinistryRequest.assignedministrygroup == group)).all()    
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,FOIMinistryRequest.requeststatusid == 2))).all()    
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
