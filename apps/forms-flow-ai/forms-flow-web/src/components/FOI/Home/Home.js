@@ -1,6 +1,7 @@
 import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {push} from "connected-react-router";
+import {Redirect} from "react-router-dom";
 
 import "./home.scss";
 const Home = React.memo(() => {
@@ -15,7 +16,7 @@ const Home = React.memo(() => {
       <div className="home-page">
         <div className="card rounded-rectangle foiroundedrectangle">
           <div className="card-body login-container">
-            {isAuthenticated ? <div></div>: <div> <h1 className="card-title">Welcome, Sign In</h1> <button type="button" className="btn btn-primary foi-btn foibtn" onClick={login}>Log In</button> </div>}
+            {isAuthenticated ? <Redirect to='/foi/dashboard' /> : <div> <h1 className="card-title">Welcome, Sign In</h1> <button type="button" className="btn btn-primary foi-btn foibtn" onClick={login}>Log In</button> </div>}
 
           </div>
         </div>
