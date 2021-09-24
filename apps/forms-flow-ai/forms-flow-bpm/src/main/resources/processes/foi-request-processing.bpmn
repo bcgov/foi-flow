@@ -123,6 +123,8 @@ foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
 var obj = JSON.parse(foiRequestMetaData);
 taskIdName = obj.id+"_taskId";
 execution.setVariable("status",obj.status);
+execution.setVariable("defaultMinistryAssignedGroup",obj.assignedministrygroup);
+execution.setVariable("minTaskName", obj.id+" Ministry Coordinator");
 execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(taskIdName));</camunda:script>
           </camunda:executionListener>
         </bpmn:extensionElements>
@@ -136,7 +138,10 @@ execution.getProcessEngineServices().getTaskService().complete(execution.getVari
       <bpmn:sequenceFlow id="Flow_13qe7ga" name="Closed" sourceRef="Gateway_1o607ym" targetRef="Event_14r192k">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${status == 'Closed'}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
-      <bpmn:userTask id="Activity_085uygz" name="Ministry Coordinator">
+      <bpmn:userTask id="Activity_085uygz" name="Ministry Coordinator" camunda:candidateGroups="${defaultMinistryAssignedGroup}">
+        <bpmn:extensionElements>
+          <camunda:taskListener expression="${task.setName(minTaskName)}" event="create" />
+        </bpmn:extensionElements>
         <bpmn:incoming>Flow_09yh561</bpmn:incoming>
       </bpmn:userTask>
       <bpmn:sequenceFlow id="Flow_09yh561" name="Call For Records" sourceRef="Gateway_1o607ym" targetRef="Activity_085uygz">
@@ -209,31 +214,18 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
           <dc:Bounds x="230" y="140" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1ylofsn_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="152" y="139" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0yvpnso_di" bpmnElement="Gateway_04irril">
-        <dc:Bounds x="305" y="132" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1f00lwq_di" bpmnElement="Event_1i4lvgo">
-        <dc:Bounds x="312" y="222" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="307" y="265" width="48" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1om9kt6_di" bpmnElement="Event_1om9kt6">
         <dc:Bounds x="1192" y="152" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vkdaxq_di" bpmnElement="Activity_1vkdaxq" isExpanded="true">
         <dc:Bounds x="480" y="80" width="590" height="270" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_03t8yfd_di" bpmnElement="Flow_03t8yfd">
-        <di:waypoint x="548" y="152" />
-        <di:waypoint x="600" y="152" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_082w9lp_di" bpmnElement="Flow_082w9lp">
-        <di:waypoint x="700" y="160" />
-        <di:waypoint x="785" y="160" />
+      <bpmndi:BPMNEdge id="Flow_09yh561_di" bpmnElement="Flow_09yh561">
+        <di:waypoint x="835" y="160" />
+        <di:waypoint x="950" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="844" y="143" width="83" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13qe7ga_di" bpmnElement="Flow_13qe7ga">
         <di:waypoint x="810" y="185" />
@@ -243,15 +235,19 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
           <dc:Bounds x="864" y="265" width="35" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_09yh561_di" bpmnElement="Flow_09yh561">
-        <di:waypoint x="835" y="160" />
-        <di:waypoint x="950" y="160" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="844" y="143" width="83" height="14" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNEdge id="Flow_03t8yfd_di" bpmnElement="Flow_03t8yfd">
+        <di:waypoint x="548" y="152" />
+        <di:waypoint x="600" y="152" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_082w9lp_di" bpmnElement="Flow_082w9lp">
+        <di:waypoint x="700" y="160" />
+        <di:waypoint x="785" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_07v3ugi_di" bpmnElement="Event_07v3ugi">
         <dc:Bounds x="512" y="134" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_14r192k_di" bpmnElement="Event_14r192k">
+        <dc:Bounds x="992" y="262" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_103rgzd_di" bpmnElement="Activity_0jdrlcz">
         <dc:Bounds x="600" y="112" width="100" height="80" />
@@ -262,8 +258,11 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
       <bpmndi:BPMNShape id="Activity_0zjmpsd_di" bpmnElement="Activity_085uygz">
         <dc:Bounds x="950" y="120" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_14r192k_di" bpmnElement="Event_14r192k">
-        <dc:Bounds x="992" y="262" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_1gtcxiv_di" bpmnElement="Event_1tvpamu">
+        <dc:Bounds x="652" y="174" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="646" y="217" width="48" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0gz2in9_di" bpmnElement="Event_1qgwj93">
         <dc:Bounds x="602" y="174" width="36" height="36" />
@@ -271,10 +270,16 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
           <dc:Bounds x="606" y="217" width="29" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1gtcxiv_di" bpmnElement="Event_1tvpamu">
-        <dc:Bounds x="652" y="174" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_1ylofsn_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="139" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0yvpnso_di" bpmnElement="Gateway_04irril">
+        <dc:Bounds x="305" y="132" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f00lwq_di" bpmnElement="Event_1i4lvgo">
+        <dc:Bounds x="312" y="222" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="646" y="217" width="48" height="14" />
+          <dc:Bounds x="307" y="265" width="48" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

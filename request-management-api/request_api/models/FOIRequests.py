@@ -69,8 +69,8 @@ class FOIRequest(db.Model):
         db.session.commit()
         ministryArr = [] 
         for ministry in foiRequest.ministryRequests:
-            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name})    
-        print(foiRequest.wfinstanceid)
+            assignedministrygroup = ministry.assignedministrygroup if ministry.assignedministrygroup is not None else ""                                
+            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup})    
         return DefaultMethodResult(True,'Request added',foiRequest.foirequestid,ministryArr,foiRequest.wfinstanceid)
                           
     @classmethod

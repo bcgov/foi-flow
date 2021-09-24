@@ -64,7 +64,7 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()
                         
             if int(requestid) and str(requestid) != "-1" :
-                status = 'Assignment in progress' 
+                status = 'Intake in progress' 
                 
                 try:
                     #TODO:Need to refine this logic from ENUM
