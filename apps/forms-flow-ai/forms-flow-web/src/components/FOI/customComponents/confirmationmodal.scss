@@ -1,11 +1,76 @@
-.btn-yes {
+@font-face {
+    font-family: "BCSans-Regular";
+    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+
+
+.btn-save {
     border: none;
     background-color: #38598A;
     color: #FFFFFF;
+    border-radius: 3px;
+    font-size: small;
+    height: 30px;
 }
 
-.btn-no {
+.btn-cancel {
     border: 1px solid #38598A;
     background-color: #FFFFFF;
     color: #38598A;
+    border-radius: 3px;
+    font-size: small;
+    height: 30px;
+}
+
+#state-change-dialog-title {
+    font-family: "BCSans-Bold";
+    color: #036 ;
+    padding: 30px 26px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.state-change-header {
+    margin-left: 30px;
+    font-size: xx-large;
+    font-weight: bold;
+    font-family: "BCSans-Bold" !important;
+}
+
+#state-change-dialog-title .MuiIconButton-root {
+    background-color: #036 ;
+    color: white;
+    border-radius: unset;
+}
+#state-change-content {
+    padding: 15px 50px 50px 50px;
+}
+
+#state-change-description {
+    padding-left: 50px;
+    color: black;
+}
+
+.table-assignedto {
+    width: 80% !important;
+    margin-left: 70px;
+    margin-top: 1rem;
+}
+
+.table-assignedto th {
+    width: 30%;
+}
+
+.MuiDialogActions-root {
+    padding: 20px 20px 30px !important;
+    justify-content: center !important;
+}
+
+.table th, .table td {
+    padding: 0.4rem 0.4rem 0.4rem 0.75rem !important;
 }
