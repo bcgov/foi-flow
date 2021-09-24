@@ -184,13 +184,13 @@ class requestservice:
                 bpmservice.complete(wkinstanceid, data, MessageType.openrequest.value)
             elif event == "Update":
                 fileNumber = fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
-                if status == "Closed" or status == "Call For Records":
-                    metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo})
-                    bpmservice.openedcomplete(fileNumber, metadata, MessageType.openedcomplete.value)
-                else:
-                    if data.get("ministries") is not None:
-                        for ministry in data.get("ministries"):    
-                            if ministry["filenumber"] == fileNumber:
+                if data.get("ministries") is not None:
+                    for ministry in data.get("ministries"):    
+                        if ministry["filenumber"] == fileNumber:
+                            if status == "Closed" or status == "Call For Records":
+                                metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo, "assignedministrygroup":ministry["assignedministrygroup"]})
+                                bpmservice.openedcomplete(fileNumber, metadata, MessageType.openedcomplete.value)
+                            else:
                                 bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
        
 
@@ -312,8 +312,12 @@ class FOIRequestUtil:
         foiministryRequest.duedate = requestSchema.get("dueDate")
         foiministryRequest.startdate = requestSchema.get("startDate")
         foiministryRequest.created_at = datetime2.now().isoformat()
-        foiministryRequest.createdby = userId        
-        foiministryRequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
+        foiministryRequest.createdby = userId
+        requeststatusid =  requestSchema.get("requeststatusid") if 'requeststatusid' in requestSchema  else None
+        if requeststatusid is not None:
+            status = FOIRequestUtil().getStatusName(requeststatusid)       
+            if status == "Call For Records":
+                foiministryRequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
         if self.isNotBlankorNone(requestSchema,"toDate","main") == True:
