@@ -25,6 +25,7 @@ import datetime
 from datetime import datetime as datetime2
 import random
 from dateutil.parser import *
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
 class requestservice:
     """ FOI Request management service
@@ -311,7 +312,8 @@ class FOIRequestUtil:
         foiministryRequest.duedate = requestSchema.get("dueDate")
         foiministryRequest.startdate = requestSchema.get("startDate")
         foiministryRequest.created_at = datetime2.now().isoformat()
-        foiministryRequest.createdby = userId
+        foiministryRequest.createdby = userId        
+        foiministryRequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
         if self.isNotBlankorNone(requestSchema,"toDate","main") == True:

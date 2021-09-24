@@ -7,6 +7,7 @@ import {saveRequestDetails, openRequestDetails} from "../../../apiManager/servic
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -110,7 +111,7 @@ const BottomButtonGroup = React.memo(({
         openRequest();
         hasStatusRequestSaved(true)
       }
-      else if (currentSelectedStatus !="" && !isValidationError){
+      else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase() && !isValidationError){
         saveRequestModal();
       }
       
@@ -217,11 +218,10 @@ const BottomButtonGroup = React.memo(({
       }
     }
 
-  console.log(`is validation bottom ${isValidationError}`);  
   return (
     <div className={classes.root}>
-      <ConfirmationModal openModal={openModal} handleModal={handleModal} state={"Open"}/>  
-      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus}/>
+      <ConfirmationModal openModal={openModal} handleModal={handleModal} state={"Open"} saveRequestObject={saveRequestObject} />  
+      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject}/>
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
