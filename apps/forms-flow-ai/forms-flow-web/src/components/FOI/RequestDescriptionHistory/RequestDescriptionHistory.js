@@ -45,7 +45,7 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
             </DialogTitle>
             <DialogContent id="request-history-content">
                 {requestDescriptionHistoryList.map((details, index) => 
-                     <AccordionItem details={details} index={index} key={details.type} expanded={expanded} handleChange={handleChange} />                    
+                     <AccordionItem key={index} details={details} index={index} expanded={expanded} handleChange={handleChange} />                    
             )}                
             </DialogContent>
       </Dialog>
