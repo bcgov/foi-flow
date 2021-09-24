@@ -13,10 +13,10 @@ def pytest_namespace():
     return {'requestidtoupdate': 0}
 
 def test_save_rawrequest(session):
-    response = rawrequestservice.saverawrequest(requestjson,'onlineform')
+    response = rawrequestservice.saverawrequest(requestjson,'onlineform',None)
     requestid = response.identifier
     pytest.approxrequestidtoupdate = requestid
-    wfupdateresponse = rawrequestservice.updateworkflowinstance(str(uuid.uuid4()),requestid)
+    wfupdateresponse = rawrequestservice.updateworkflowinstance(str(uuid.uuid4()),requestid,'service-account-forms-flow-bpm')
     assert response.success == True and wfupdateresponse.success == True
 
 def test_save_rawrequestversion(session):
