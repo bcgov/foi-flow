@@ -69,11 +69,11 @@ class FOIRequests(Resource):
             assignedGroup = request_json['assignedGroup'] if 'assignedGroup' in fOIRequestsSchema  else None
             assignedTo = request_json['assignedTo'] if 'assignedTo' in fOIRequestsSchema  else None
             rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open In Progress",AuthHelper.getUserId())               
-            if rawresult.success == True:                
+            if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
-                    metadata = json.dumps({"id": result.identifier, "ministries": result.args[0], "assignedGroup": assignedGroup, "assignedTo": assignedTo})
-                    requestservice().postEventToWorkflow(rawresult.args[0],json.loads(metadata))
+                    metadata = json.dumps({"id": result.identifier, "status": "Open", "ministries": result.args[0], "assignedGroup": assignedGroup, "assignedTo": assignedTo})
+                    requestservice().postEventToWorkflow("Open", fOIRequestsSchema,json.loads(metadata),rawresult.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
@@ -99,7 +99,7 @@ class FOIRequestsById(Resource):
             result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid,AuthHelper.getUserId())
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
-                requestservice().updateEventToWorkflow(fOIRequestsSchema,json.loads(metadata))
+                requestservice().postEventToWorkflow("Update", fOIRequestsSchema,json.loads(metadata), result.args[1])
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404

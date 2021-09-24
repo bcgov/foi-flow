@@ -43,23 +43,39 @@ class bpmservice(camundaservice):
                                               })
             return requests.post(self._getUrl_(self,MessageType.openedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
         else:
-            return
-
+            return     
+        
     @classmethod
-    def complete(self,processInstanceId, data, token=None): 
+    def openedcomplete(self,fileNumber, data, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
+            messageSchema = MessageSchema().dump({"messageName": messagetype,
+                                              "localCorrelationKeys":{
+                                                  "id": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber})
+                                                  },
+                                              "processVariables":{
+                                                  "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
+                                              })
+            return requests.post(self._getUrl_(self,messagetype), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+        else:
+            return    
+ 
+    @classmethod
+    def complete(self,processInstanceId, data, messagetype, token=None): 
+        print(messagetype)
+        if self.bpmEngineRestUrl is not None:
+            print('before post')
             messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId,
-                                              "messageName": MessageType.openrequest.value, 
+                                              "messageName": messagetype, 
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
                                                   }
                                               })
-            return requests.post(self._getUrl_(self,MessageType.openrequest.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+            return requests.post(self._getUrl_(self,messagetype), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
         else:
             return
 
     def _getUrl_(self, messageType):
-        if(MessageType.unopenedClaim.value == messageType or MessageType.openrequest.value == messageType or MessageType.openedClaim.value == messageType):
+        if(MessageType.unopenedClaim.value == messageType or MessageType.openrequest.value == messageType or MessageType.openedClaim.value == messageType or MessageType.openedcomplete.value == messageType):
             return self.bpmEngineRestUrl+"/message"
         return self.bpmEngineRestUrl
     
@@ -85,6 +101,7 @@ class MessageType(Enum):
     unopenedClaim = "foi-unopened-assignment"
     openedClaim = "foi-opened-assignment"
     openrequest = "foi-open-request"
+    openedcomplete = "foi-opened-complete"
     
 
              

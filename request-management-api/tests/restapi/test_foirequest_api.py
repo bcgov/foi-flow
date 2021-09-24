@@ -61,6 +61,7 @@ def test_post_foirequest_general(app, client):
     getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_user_auth_header(app, client), content_type='application/json') 
     foirequest = generalrequestjson
     foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
     foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foijsondata = json.loads(foiresponse.data)    
     wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
@@ -82,6 +83,7 @@ def test_post_foirequest_personal(app, client):
     #assert rawresponse.status_code == 200
     foirequest = personalrequestjson
     foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
     foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foijsondata = json.loads(foiresponse.data)
     wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
@@ -89,8 +91,53 @@ def test_post_foirequest_personal(app, client):
     assert foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
 
 
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_post_foirequest_general_closed(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_user_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_user_auth_header(app, client), content_type='application/json') 
+    foirequest = generalrequestjson
+    foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
+    foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foijsondata = json.loads(foiresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiupdaterequest = generalupdaterequestjson
+    foiupdaterequest["id"] = str(foijsondata["id"])
+    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
+    foiupdaterequest["requeststatusid"] = 3
+    foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    assert foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200
+
+
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_post_foirequest_general_cfr(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_user_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_user_auth_header(app, client), content_type='application/json') 
+    foirequest = generalrequestjson
+    foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
+    foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foijsondata = json.loads(foiresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiupdaterequest = generalupdaterequestjson
+    foiupdaterequest["id"] = str(foijsondata["id"])
+    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
+    foiupdaterequest["requeststatusid"] = 2
+    foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    assert foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200
+
+
 def test_get_foirequestqueue(app, client):
-  headers = factory_auth_header(jwt=jwt, claims=TEST_JWT_CLAIMS)  
   response = client.get('/api/dashboard', headers=factory_user_auth_header(app, client), content_type='application/json')
   jsondata = json.loads(response.data)
   assert response.status_code == 200    
