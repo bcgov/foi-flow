@@ -7,6 +7,7 @@ import {saveRequestDetails, openRequestDetails} from "../../../apiManager/servic
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -110,7 +111,7 @@ const BottomButtonGroup = React.memo(({
         openRequest();
         hasStatusRequestSaved(true)
       }
-      else if (currentSelectedStatus !="" && !isValidationError){
+      else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase() && !isValidationError){
         saveRequestModal();
       }
       
