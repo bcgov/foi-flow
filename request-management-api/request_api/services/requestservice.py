@@ -19,12 +19,13 @@ from request_api.schemas.foirequest import  FOIRequestSchema
 from dateutil.parser import *
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
-from request_api.services.external.bpmservice import bpmservice
+from request_api.services.external.bpmservice import bpmservice, MessageType
 from enum import Enum
 import datetime 
 from datetime import datetime as datetime2
 import random
 from dateutil.parser import *
+import json
 class requestservice:
     """ FOI Request management service
 
@@ -141,8 +142,7 @@ class requestservice:
         openfOIRequest.requestApplicants = requestApplicantArr        
         if foirequestid is not None:         
            openfOIRequest.foirequestid = foirequestid
-        if wfinstanceid is not None:         
-           openfOIRequest.wfinstanceid = wfinstanceid 
+        openfOIRequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
         openfOIRequest.createdby = userId
         return FOIRequest.saverequest(openfOIRequest) 
 
@@ -173,17 +173,24 @@ class requestservice:
                         updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
             return FOIRequest.updateStatus(foirequestid, updatedMinistries, userId)
     
-    def postEventToWorkflow(self,workflowId, data):
-         return bpmservice.complete(workflowId, data)
-    
-    def updateEventToWorkflow(self,fOIRequestsSchema, data):
-        fileNumber = fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
+    def postEventToWorkflow(self,event, fOIRequestsSchema, data, wkinstanceid=None):        
         assignedGroup = fOIRequestsSchema.get("assignedGroup") if 'assignedGroup' in fOIRequestsSchema  else None  
         assignedTo = fOIRequestsSchema.get("assignedTo") if 'assignedTo' in fOIRequestsSchema  else None   
-        if data.get("ministries") is not None:
-            for ministry in data.get("ministries"):    
-                if ministry["filenumber"] == fileNumber and ministry["status"] == "Open":
-                        bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
+        requeststatusid =  fOIRequestsSchema.get("requeststatusid") if 'requeststatusid' in fOIRequestsSchema  else None 
+        if requeststatusid is not None:
+            status = FOIRequestUtil().getStatusName(requeststatusid)
+            if event == "Open":
+                bpmservice.complete(wkinstanceid, data, MessageType.openrequest.value)
+            elif event == "Update":
+                fileNumber = fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
+                if status == "Closed" or status == "Call For Records":
+                    metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo})
+                    bpmservice.openedcomplete(fileNumber, metadata, MessageType.openedcomplete.value)
+                else:
+                    if data.get("ministries") is not None:
+                        for ministry in data.get("ministries"):    
+                            if ministry["filenumber"] == fileNumber:
+                                bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
        
 
        
@@ -360,6 +367,13 @@ class FOIRequestUtil:
                     personalAttribute.personalattributeid = attributeType["attributeid"]
                     personalAttribute.attributevalue = value
         return personalAttribute
+    
+    def getStatusName(self,requeststatusid):
+        allStatus = FOIRequestStatus().getrequeststatuses()
+        for status in allStatus:
+            if status["requeststatusid"] == requeststatusid:
+                return status["name"]
+        return None;
     
     def getValueOf(self,name,key):
         if name == "receivedMode":
