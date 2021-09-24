@@ -57,7 +57,7 @@ const FOIRequest = React.memo(({}) => {
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   
 
-  var foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
+  var foitabheaderBG;
 
   
 
@@ -541,6 +541,7 @@ const FOIRequest = React.memo(({}) => {
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
     default:
+      foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;      
   }
 
