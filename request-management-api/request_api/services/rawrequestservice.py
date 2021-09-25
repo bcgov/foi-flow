@@ -51,7 +51,7 @@ class rawrequestservice:
         if status == "Closed" or status == "Redirect":            
             metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo})
             return bpmservice.complete(wfinstanceid, metadata, MessageType.openrequest.value) 
-        elif status == "Assignment in progress":
+        elif status == "Intake in progress":
             return bpmservice.unopenedClaim(wfinstanceid, assignedTo) 
         else:
             return {"status": "Unknown status"}
