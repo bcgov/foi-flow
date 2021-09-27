@@ -105,11 +105,11 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
-        sql = """select CASE WHEN status <> 'Unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
-                    CASE WHEN status <> 'Unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
-                    CASE WHEN status <> 'Unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
+        sql = """select CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
+                    CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
+                    CASE WHEN lower(status) <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
                     to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted, 
-                    CASE WHEN status <> 'Unopened' then createdby else 'Online Form' END  as createdby from "FOIRawRequests" fr 
+                    CASE WHEN lower(status) <> 'unopened' then createdby else 'Online Form' END  as createdby from "FOIRawRequests" fr 
                     where requestid = :requestid order by version ;"""
         rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []
