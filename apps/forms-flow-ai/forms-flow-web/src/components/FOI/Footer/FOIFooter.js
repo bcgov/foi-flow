@@ -19,17 +19,19 @@ const FOIFooter = React.memo(() => {
                 <li><a href="#">Help</a></li>
                 <li><a href="#">Contact</a></li>
               </ul>
-            </div>
-            
+            </div>            
             <div className="col-md-3">
               <ul>
                   <li><a href="#">Disclaimer</a></li>
                   <li><a href="#">Privacy</a></li>
+              </ul>
+            </div>
+			<div className="col-md-3">
+              <ul>
                   <li><a href="#">Accessibility</a></li>
                   <li><a href="#">Copyright</a></li>
               </ul>
             </div>
-
           </Nav>
         </Container>
       </Navbar>

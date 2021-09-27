@@ -34,7 +34,7 @@ class rawrequestservice:
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
 
-    def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee,status, userId):
+    def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status, userId):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status,ispiiredacted, userId)
         return result
@@ -51,7 +51,7 @@ class rawrequestservice:
         if status == "Closed" or status == "Redirect":            
             metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo})
             return bpmservice.complete(wfinstanceid, metadata, MessageType.openrequest.value) 
-        elif status == "Assignment in progress":
+        elif status == "Intake in Progress":
             return bpmservice.unopenedClaim(wfinstanceid, assignedTo) 
         else:
             return {"status": "Unknown status"}
@@ -92,7 +92,6 @@ class rawrequestservice:
 
     def getrawrequest(requestid):
         request = FOIRawRequest.get_request(requestid)
-        
         if request != {} and request['version'] == 1 and  request['sourceofsubmission'] != "intake":
             requestrawdata = request['requestrawdata']
             requestType = requestrawdata['requestType']['requestType']
@@ -115,7 +114,7 @@ class rawrequestservice:
                                'middleName': requestrawdata['contactInfo']['middleName'],
                                'lastName': contactInfo['lastName'],
                                'businessName': contactInfo['businessName'],                               
-                               'currentState': 'Unopened',
+                               'currentState': request['status'],
                                'receivedDate': _createdDate.strftime('%Y %b, %d'),
                                'receivedDateUF': _createdDate.strftime('%Y-%m-%d %H:%M:%S.%f'),
                                'assignedGroup': "Unassigned",
