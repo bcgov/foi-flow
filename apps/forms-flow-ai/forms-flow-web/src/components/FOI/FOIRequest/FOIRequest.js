@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
  
 }));
 
-const FOIRequest = React.memo(({}) => {
+const FOIRequest = React.memo((props) => {
 
   
   const [_requestStatus, setRequestStatus] = React.useState("Unopened");
