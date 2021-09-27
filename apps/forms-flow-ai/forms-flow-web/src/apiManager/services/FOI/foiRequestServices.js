@@ -97,6 +97,7 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
             return { ...assignedTo};
           });
           data.unshift(unAssignedGroup);
+          // dispatch(setFOIAssignedToList([]));
           dispatch(setFOIAssignedToList(data));          
           dispatch(setFOILoader(false));
           done(null, res.data);
