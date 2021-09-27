@@ -10,6 +10,7 @@ import {
   setFOIProgramAreaList,
   clearRequestDetails,
   setFOIAssignedToList,
+  setFOIFullAssignedToList,
   setFOIDeliveryModeList,
   setFOIReceivedModeList,
   setFOIRequestDescriptionHistory,
@@ -96,8 +97,39 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
             return { ...assignedTo};
           });
           data.unshift(unAssignedGroup);
-          dispatch(setFOIAssignedToList([]));
+          // dispatch(setFOIAssignedToList([]));
           dispatch(setFOIAssignedToList(data));          
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIFullAssignedToList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  // const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
+
+  return (dispatch) => {
+    httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiFullAssignedToList = res.data;
+          let data = foiFullAssignedToList.map((assignedTo) => {
+            return { ...assignedTo};
+          });
+          // data.unshift(unAssignedGroup);
+          dispatch(setFOIFullAssignedToList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -187,7 +219,7 @@ export const fetchFOIRequestList = (...rest) => {
             return { ...foiRequest};
           });
           dispatch(clearRequestDetails({}));
-          dispatch(setFOIAssignedToList([]));
+          // dispatch(setFOIAssignedToList([]));
           dispatch(fetchFOIAssignedToList(-1,"",""));
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false));
