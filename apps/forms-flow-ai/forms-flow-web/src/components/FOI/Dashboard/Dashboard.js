@@ -18,8 +18,7 @@ const Dashboard = React.memo((props) => {
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const classes = useStyles(); 
-
+  const classes = useStyles();
   useEffect(()=>{
     dispatch(fetchFOIRequestList());    
     setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
@@ -182,7 +181,7 @@ const addRequest = (e) => {
                 sortModel={sortModel}
                 sortingMode={'client'}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'currentState').replace(/ +/g, "")}`
+                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}`
                 } 
                 onRowClick={renderReviewRequest}
                 />

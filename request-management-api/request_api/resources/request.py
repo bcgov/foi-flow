@@ -64,7 +64,7 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()
                         
             if int(requestid) and str(requestid) != "-1" :
-                status = 'Assignment in progress' 
+                status = 'Intake in Progress' 
                 
                 try:
                     #TODO:Need to refine this logic from ENUM
@@ -74,14 +74,14 @@ class FOIRawRequest(Resource):
                     if(updaterequest["requeststatusid"] is not None and updaterequest["requeststatusid"] == 3):                    
                         status = 'Closed'    
                 except  KeyError:
-                    print("Key Error on requeststatusid, ignore will be intake in progress")    
+                    print("Key Error on requeststatusid, ignore will be intake in Progress")    
                 
                 rawRequest = rawrequestservice.getrawrequest(requestid)     
                 assigneeGroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
                 result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneeGroup, assignee,status,AuthHelper.getUserId())                
                 if result.success == True:   
-                    bpmservice.unopenedClaim(rawRequest['wfinstanceid'], updaterequest['assignedTo']); 
+                    rawrequestservice.postEventToWorkflow(result.identifier , rawRequest['wfinstanceid'], assigneeGroup, assignee, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getUserId())               
@@ -104,7 +104,7 @@ class FOIRawRequestBPMProcess(Resource):
             try:
 
                 _wfinstanceid = request_json['wfinstanceid']
-                status = request_json['status'] if request_json.get('status') is not None else 'unopened'
+                status = request_json['status'] if request_json.get('status') is not None else 'Unopened'
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
                 result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getUserId())

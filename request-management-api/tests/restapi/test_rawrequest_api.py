@@ -14,7 +14,7 @@ TEST_USER_PAYLOAD = {
 def factory_auth_header(app, client):
     url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(os.getenv('KEYCLOAK_ADMIN_HOST'),os.getenv('KEYCLOAK_ADMIN_REALM'))        
     x = requests.post(url, TEST_USER_PAYLOAD, verify=True).content.decode('utf-8')       
-    return {'Authorization': 'Bearer ' + str(ast.literal_eval(x)['access_token'])}  
+    return {'Authorization': 'Bearer ' + str(ast.literal_eval(x)['access_token'])} 
 
 def test_ping(app, client):
     response = client.get('/api/healthz')
@@ -30,17 +30,51 @@ def test_post_foirawrequests(app, client):
     wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_auth_header(app, client), content_type='application/json')
     assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
 
-with open('tests/samplerequestjson/rawrequest.json') as f:
-  requestjson = json.load(f)
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
 def test_post_foirawrequestspii(app, client):    
-    response = client.post('/api/foirawrequests',data=json.dumps(requestjson), content_type='application/json')
-    jsondata = json.loads(response.data)
-    print(str(jsondata["id"]))
-    updatejson = jsondata
+    response = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), content_type='application/json')
+    jsondata = json.loads(response.data)    
+    updatejson = generalupdaterequestjson
+    updatejson["id"] = str(jsondata["id"])
+    print(str(jsondata["id"]))    
     updatejson['ispiiredacted'] = True
     updatejson['assignedTo'] = "Intake Team"
     wfupdateresponse = client.post('/api/foirawrequest/'+str(jsondata["id"]),data=json.dumps(updatejson), headers=factory_auth_header(app, client), content_type='application/json')
     assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
+    
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_post_foirawrequestscancel(app, client):    
+    response = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), content_type='application/json')
+    jsondata = json.loads(response.data)
+    updatejson = generalupdaterequestjson
+    updatejson["id"] = str(jsondata["id"])
+    print(str(jsondata["id"]))    
+    updatejson['ispiiredacted'] = True
+    updatejson['requeststatusid'] = 3
+    wfupdateresponse = client.post('/api/foirawrequest/'+str(jsondata["id"]),data=json.dumps(updatejson), headers=factory_auth_header(app, client), content_type='application/json')
+    assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1 
+    
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_post_foirawrequestsredirect(app, client):    
+    response = client.post('/api/foirawrequests',data=json.dumps(requestjson), content_type='application/json')
+    jsondata = json.loads(response.data)
+    print(str(jsondata["id"]))
+    updatejson = generalupdaterequestjson
+    updatejson['ispiiredacted'] = True
+    updatejson['assignedTo'] = "Intake Team"
+    updatejson['requeststatusid'] = 4
+    wfupdateresponse = client.post('/api/foirawrequest/'+str(jsondata["id"]),data=json.dumps(updatejson), headers=factory_auth_header(app, client), content_type='application/json')
+    assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
+   
 
 def test_get_programareas(app,client):    
     response = client.get('api/foiflow/programareas', headers=factory_auth_header(app, client), content_type='application/json')    

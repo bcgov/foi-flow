@@ -28,6 +28,7 @@ from sqlalchemy.sql.expression import false
 from request_api.auth import jwt as _authjwt
 import jwt
 import os
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 
 
 def cors_preflight(methods):
@@ -64,6 +65,13 @@ def snake2camelback(snake_dict: dict):
     """Convert the passed dictionary's keys from snake_case to camelBack case."""
     return camelize(snake_dict)
 
+def getdashboardmemberships():
+    membership =''
+    for group in MinistryTeamWithKeycloackGroup:
+        membership+='{0},'.format(group.value)
+
+    membership+='Intake Team,Flex Team'    
+    return membership
 
 def allowedOrigins():
     _allowedCORS = os.getenv('CORS_ORIGIN')

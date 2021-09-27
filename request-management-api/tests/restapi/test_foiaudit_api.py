@@ -50,6 +50,7 @@ def test_get_foiauditfordesccase2(app, client):
     jsondata = json.loads(rawresponse.data)    
     foirequest = generalrequestjson
     foirequest["id"] = str(jsondata["id"])
+    foirequest['requeststatusid'] = 1
     foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
     foijsondata = json.loads(foiresponse.data)    
     foiupdaterequest = generalupdaterequestjson

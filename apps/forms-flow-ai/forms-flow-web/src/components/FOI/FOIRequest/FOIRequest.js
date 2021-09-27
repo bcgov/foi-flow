@@ -50,14 +50,14 @@ const useStyles = makeStyles((theme) => ({
  
 }));
 
-const FOIRequest = React.memo(({}) => {
+const FOIRequest = React.memo((props) => {
 
   
   const [_requestStatus, setRequestStatus] = React.useState("Unopened");
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   
 
-  var foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
+  var foitabheaderBG;
 
   
 
@@ -541,6 +541,7 @@ const FOIRequest = React.memo(({}) => {
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
     default:
+      foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;      
   }
 

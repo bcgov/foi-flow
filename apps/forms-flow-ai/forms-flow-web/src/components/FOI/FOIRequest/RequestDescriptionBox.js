@@ -23,14 +23,14 @@ const useStyles = makeStyles((theme) => ({
       }
   }));
 
-const RequestDescription = React.memo(({      
+const RequestDescription = React.memo(({     
     programAreaList, 
     requestDetails,       
-     handleOnChangeRequiredRequestDescriptionValues,
-     handleInitialRequiredRequestDescriptionValues,
-     handleUpdatedProgramAreaList,
-     createSaveRequestObject
-    }) => {
+    handleOnChangeRequiredRequestDescriptionValues,
+    handleInitialRequiredRequestDescriptionValues,
+    handleUpdatedProgramAreaList,
+    createSaveRequestObject
+}) => {
     
     
     /* All fields in this component are mandatory */
