@@ -50,7 +50,7 @@ const BottomButtonGroup = React.memo(({
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
-    const {requestId, ministryId} = useParams();  
+    const {requestId, ministryId, requestState} = useParams();  
     const classes = useStyles();
     const dispatch = useDispatch();
     
@@ -60,12 +60,10 @@ const BottomButtonGroup = React.memo(({
     const returnToQueue = (e) => {
       e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
-        //dispatch(push(`/foi/dashboard`));
         window.location.href = '/foi/dashboard';
       }
     }
     const saveRequest = async () => {
-     
       dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, ministryId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
@@ -77,7 +75,8 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            handleSaveRequest("Intake in progress", false, res.id);
+            const _state = currentSelectedStatus ? currentSelectedStatus : (requestState ? requestState : (urlIndexCreateRequest > -1 ? "Intake in Progress" : ""));
+            handleSaveRequest(_state, false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
@@ -88,7 +87,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            handleSaveRequest("Unopened", true, res.id);
+            handleSaveRequest(currentSelectedStatus, true, res.id);
         }
       }));      
     }
@@ -143,7 +142,6 @@ const BottomButtonGroup = React.memo(({
     }
 
     const handleModal = (value) => {
-      setOpenModal(false);
       if (value) {
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
@@ -181,6 +179,7 @@ const BottomButtonGroup = React.memo(({
           }
         })); 
       }
+      setOpenModal(false);
     }
 
     const handleSaveModal = (value) => {      

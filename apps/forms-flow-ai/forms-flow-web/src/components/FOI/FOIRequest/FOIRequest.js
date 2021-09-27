@@ -63,7 +63,7 @@ const FOIRequest = React.memo((props) => {
 
   // Tab panel ends here
 
-  const {requestId, ministryId} = useParams();
+  const {requestId, ministryId, requestState} = useParams();
   
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
@@ -488,19 +488,23 @@ const FOIRequest = React.memo((props) => {
     setSaveRequestObject(requestObject);
   }
 
-  const handleSaveRequest = (value, value2,id) => {
-    setHeader(value);
-    setUnSavedRequest(value2);
-    if (!value2) {      
-      //setTimeout(() => { ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}` : dispatch(push(`/foi/reviewrequest/${id}`)) }, 2000);      
-      setTimeout(() => { requestId ? window.location.reload()  : window.location.href = `/foi/reviewrequest/${id}` }, 1000);
+  const handleSaveRequest = (_state, _unSaved, id) => {    
+    setHeader(_state);
+    setUnSavedRequest(_unSaved);
+    if (!_unSaved) {      
+      setTimeout(() => 
+      { 
+        ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}/${_state}` : dispatch(push(`/foi/reviewrequest/${id}/${_state}`)) 
+      }
+      , 1000);
+      // setTimeout(() => { requestId ? window.location.reload()  : window.location.href = `/foi/reviewrequest/${id}/${value}` }, 1000);
     }
   }
 
   const handleOpenRequest = (parendId, ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
       if (!unSaved) {
-        dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}`));
+        dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}/Open`));
       }
   }
 
@@ -527,7 +531,7 @@ const FOIRequest = React.memo((props) => {
       }
   }
 
-  switch (requestDetails.currentState){
+  switch (requestState){
     case "Open":
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
