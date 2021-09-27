@@ -108,7 +108,7 @@ const BottomButtonGroup = React.memo(({
       {
         saveRequestObject.requeststatusid = 1 // Need to take from ENUM
         openRequest();
-        hasStatusRequestSaved(true)
+        hasStatusRequestSaved(true,"Open")
       }
       else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase() && !isValidationError){
         saveRequestModal();
@@ -189,30 +189,30 @@ const BottomButtonGroup = React.memo(({
         {
           saveRequestObject.requeststatusid = 3 // Need to take from ENUM
           saveRequest();
-          hasStatusRequestSaved(true)
+          hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == "Call For Records" && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 2 // Need to take from ENUM
           saveRequest();
-          hasStatusRequestSaved(true)
+          hasStatusRequestSaved(true,currentSelectedStatus)
         }  
         else if(currentSelectedStatus == "Redirect" && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 4 // Need to take from ENUM
           saveRequest();
-          hasStatusRequestSaved(true)
+          hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == "Open" && !isValidationError)
         {
           saveRequestObject.requeststatusid = 1 // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
           saveRequest();
-          hasStatusRequestSaved(true)
+          hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == "Intake in Progress" && !isValidationError)
         {
           saveRequest();
-          hasStatusRequestSaved(true)
+          hasStatusRequestSaved(true,currentSelectedStatus)
         }
       }
     }

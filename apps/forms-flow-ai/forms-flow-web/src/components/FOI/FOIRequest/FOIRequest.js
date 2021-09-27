@@ -64,6 +64,8 @@ const FOIRequest = React.memo((props) => {
   // Tab panel ends here
 
   const {requestId, ministryId, requestState} = useParams();
+
+  const [_tabStatus, settabStatus] = React.useState(requestState);
   
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
@@ -524,14 +526,15 @@ const FOIRequest = React.memo((props) => {
         
   }
 
-  const hasStatusRequestSaved =(issavecompleted)=>{
+  const hasStatusRequestSaved =(issavecompleted,state)=>{
     if(issavecompleted)
       {
+        settabStatus(state)
         setcurrentrequestStatus("")
       }
   }
 
-  switch (requestState){
+  switch (_tabStatus){
     case "Open":
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
