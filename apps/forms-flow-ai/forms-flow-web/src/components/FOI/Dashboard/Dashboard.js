@@ -12,7 +12,7 @@ import Loading from "../../../containers/Loading";
 const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
-  // const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+  const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiRequestsList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading); 
   const [filteredData, setFilteredData] = useState(rows);
@@ -31,21 +31,21 @@ const Dashboard = React.memo((props) => {
   }
 
   function getAssigneeValue(params) {
-    // const groupName = params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    // const assignedTo = params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    // if (assignedToList.length > 0) {
-    //   const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-    //   const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
-    //   if (groupName === assignedTo) {
-    //     return assignedTo;
-    //   }
-    //   else {
-    //     return `${assignee.lastname}, ${assignee.firstname}`;
-    //   }
-    // }
-    // else {
-      return params.row.assignedTo ? params.row.assignedTo : params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    // }
+    const groupName = params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
+    const assignedTo = params.row.assignedTo ? params.row.assignedTo : groupName;
+    if (assignedToList.length > 0) {
+      const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
+      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
+      if (groupName === assignedTo) {
+        return assignedTo;
+      }
+      else {
+        return `${assignee.lastname}, ${assignee.firstname}`;
+      }
+    }
+    else {
+      return groupName;
+    }
   }
 
   function getReceivedDate(params) {
