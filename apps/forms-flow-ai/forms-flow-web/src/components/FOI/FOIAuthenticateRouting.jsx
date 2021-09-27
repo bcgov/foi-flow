@@ -35,13 +35,13 @@ const FOIAuthenticateRouting = React.memo((props) => {
             <Route exact path="/foi/dashboard">
               <Dashboard />
             </Route>
-            <Route path="/foi/reviewrequest/:requestId">
+            <Route path="/foi/reviewrequest/:requestId/:requestState">
               <FOIRequest  />
             </Route>
             <Route path="/foi/addrequest">
               <FOIRequest  />
             </Route>
-            <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId">
+            <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/:requestState">
               <FOIRequest  />
             </Route>
            
