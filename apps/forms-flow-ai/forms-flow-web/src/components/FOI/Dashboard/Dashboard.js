@@ -4,7 +4,7 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIRequestList, fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
@@ -13,17 +13,15 @@ const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
   // const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
-  console.log("dashboard:");
-  const assignedToList = props.fullAssignedToList;
-  console.log(assignedToList);
+  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiRequestsList);
-  console.log(rows)
   const isLoading = useSelector(state=> state.foiRequests.isLoading); 
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
   const classes = useStyles();
   useEffect(()=>{
+    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOIRequestList());
     setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
   },[dispatch], [requestType]);

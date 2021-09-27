@@ -10,13 +10,11 @@ import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import Dashboard from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
-import { fetchFOIFullAssignedToList } from "../../apiManager/services/FOI/foiRequestServices";
 
 //import TabbedContainer from "./TabbedContainer/TabbedContainer";
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated);
-  const fullAssignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
 
   useEffect(()=>{
     console.log('authenticate')
@@ -25,7 +23,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
         dispatch(setUserAuth(res.authenticated));
       });
     }
-    dispatch(fetchFOIFullAssignedToList());
   },[props.store, dispatch]);
 
 
@@ -36,7 +33,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
           <FOIHeader /> 
           
             <Route exact path="/foi/dashboard">
-              <Dashboard fullAssignedToList = {fullAssignedToList}/>
+              <Dashboard />
             </Route>
             <Route path="/foi/reviewrequest/:requestId">
               <FOIRequest  />

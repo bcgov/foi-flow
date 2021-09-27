@@ -119,20 +119,17 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
 export const fetchFOIFullAssignedToList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
   // const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
-  const apiUrlGETFullAssignedToList = API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API;
 
   return (dispatch) => {
-    httpGETRequest(apiUrlGETFullAssignedToList, {}, UserService.getToken())
+    httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          console.log('service fetchFOIFullAssignedToList:')
           const foiFullAssignedToList = res.data;
           let data = foiFullAssignedToList.map((assignedTo) => {
             return { ...assignedTo};
           });
           // data.unshift(unAssignedGroup);
           dispatch(setFOIFullAssignedToList(data));
-          console.log(data);          
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
@@ -216,7 +213,6 @@ export const fetchFOIRequestList = (...rest) => {
   return (dispatch) => {
     httpGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
       .then((res) => {
-        console.log("service fetchFOIRequestList");
         if (res.data) {
           const foiRequests = res.data;         
           let data = foiRequests.map((foiRequest) => {            
@@ -226,7 +222,6 @@ export const fetchFOIRequestList = (...rest) => {
           // dispatch(setFOIAssignedToList([]));
           dispatch(fetchFOIAssignedToList(-1,"",""));
           dispatch(setFOIRequestList(data));
-          console.log(data);
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
