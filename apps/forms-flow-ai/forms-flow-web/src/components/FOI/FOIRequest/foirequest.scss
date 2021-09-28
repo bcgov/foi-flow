@@ -49,7 +49,7 @@
     border-radius: 2px;
 }
 .foi-details-label {
-    font-family: "BCSans-Regular";
+    font-family: "BCSans-Regular", sans-serif;
     color: grey;
     padding-left: 15px;
 
@@ -72,22 +72,22 @@
     border-color: #f44336 !important;
 }
 .MuiInputBase-root {
-    font-family: "BCSans-Regular" !important;
+    font-family: "BCSans-Regular", sans-serif !important;
 }
 
 .MuiFormLabel-root {
-    font-family: "BCSans-Bold" !important;
+    font-family: "BCSans-Bold", sans-serif !important;
     color: black !important;   
 }
 
 .MuiFormLabel-root.Mui-error {
-    font-family: "BCSans-Bold" !important;
+    font-family: "BCSans-Bold", sans-serif !important;
     color: #f44336 !important;
 
 }
 
 .MuiMenuItem-root {
-    font-family: "BCSans-Regular" !important;
+    font-family: "BCSans-Regular", sans-serif !important;
 }
 .PrivateNotchedOutline-legendLabelled-4 {
     font-size: 0.80rem !important;

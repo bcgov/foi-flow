@@ -5,13 +5,16 @@ import Input from '@material-ui/core/Input';
 import './statedropdown.scss';
 import { stateList } from '../../../helper/FOI/statusEnum';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { useParams } from 'react-router-dom';
 
 export default function StateDropDown({requestStatus, handleStateChange}) {
 
-    const [status, setStatus] = React.useState(requestStatus);
+    const {requestState} = useParams();
+
+    const [status, setStatus] = React.useState(requestState ? requestState : "Unopened");
     useEffect (() => {
-        setStatus(requestStatus.toLowerCase().includes("days")? "Open": requestStatus);
-    },[requestStatus])
+        setStatus(requestState ? requestState : "Unopened");
+    },[requestState])
     
     const handleChange = (event) => {
          setStatus(event.target.value);
@@ -19,7 +22,7 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
     };
 
     const getStatusList = (_status) => {        
-        let  _state =  requestStatus.toLowerCase().includes("days")? "Open": requestStatus;              
+        let  _state =  requestState ? requestState : requestStatus.toLowerCase().includes("days")? "Open": requestStatus;              
         switch(_state.toLowerCase()) {
             case FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase(): 
                 return stateList.unopened;
