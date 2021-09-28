@@ -154,7 +154,7 @@ const addRequest = (e) => {
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
               <button type="button" className="btn foi-btn-create" onClick={addRequest} >{FOI_COMPONENT_CONSTANTS.ADD_REQUEST}</button>
             </div>
-            <> { !isLoading && assignedToList.length > 0 ? (<>
+            <> { !isLoading && assignedToList.length > 0 && rows.length > 0 ? (<>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
