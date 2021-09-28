@@ -8,7 +8,7 @@
 }
 
 #request-history-dialog-title {
-    font-family: "BCSans-Bold";
+    font-family: "BCSans-Bold", sans-serif;
     color: #036 ;
     padding: 30px 26px 0;
     display: flex;
@@ -20,7 +20,7 @@
     margin-left: 30px;
     font-size: xx-large;
     font-weight: bold;
-    font-family: "BCSans-Bold" !important;
+    font-family: "BCSans-Bold", sans-serif !important;
 }
 
 #request-history-dialog-title .MuiIconButton-root {

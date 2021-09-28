@@ -135,10 +135,10 @@ const search = (rows) => {
 
 const renderReviewRequest = (e) => {
   if (e.row.ministryrequestid) {
-    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`));
+    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
   }
   else {
-    dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+    dispatch(push(`/foi/reviewrequest/${e.row.id}/${e.row.currentState}`));
   }
 }
 const addRequest = (e) => {
