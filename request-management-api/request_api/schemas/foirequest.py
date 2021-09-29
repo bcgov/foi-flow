@@ -17,6 +17,7 @@ class FOIMinistryRequestSchema(Schema):
     recordSearchToDate = fields.Date(data_key="recordSearchToDate")
     startdate = fields.Date(data_key="startDate")
     duedate = fields.Date(data_key="dueDate")
+    cfrduedate = fields.Date(data_key="cfrDueDate")
     assignedto = fields.Str(data_key="assignedTo")
     programareaid = fields.Int(data_key="programAreaId")
 
