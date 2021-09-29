@@ -39,7 +39,8 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 
         let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
         let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
-        handlestatusudpate(_daysRemaining,_status)
+        const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';        
+        handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
 
     },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
 

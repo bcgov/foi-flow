@@ -85,7 +85,7 @@ const calculateDaysRemaining = (endDate) => {
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);
 	const noOfDays = daysBetween(startDate, endDate);   
-	return (Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays));
+	return ((Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays)) + 1);
 }
 
 export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };

@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { addBusinessDays } from "../../../helper/FOI/helper";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -63,6 +64,9 @@ const BottomButtonGroup = React.memo(({
         window.location.href = '/foi/dashboard';
       }
     }
+    const dueDateCalculation = (dateText, noOfBusinessDays) => {
+      return dateText? addBusinessDays(dateText, noOfBusinessDays) : "";
+    }
     const saveRequest = async () => {
       dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, ministryId, (err, res) => {
         if (!err) {
@@ -75,7 +79,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            const _state = currentSelectedStatus ? currentSelectedStatus : (requestState ? requestState : (urlIndexCreateRequest > -1 ? "Intake in Progress" : ""));
+            const _state = currentSelectedStatus ? currentSelectedStatus : ((requestState && requestState === 'Unopened' && saveRequestObject.sourceOfSubmission === 'onlineform') || urlIndexCreateRequest > -1 ? "Intake in Progress" : requestState);
             handleSaveRequest(_state, false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
@@ -194,6 +198,8 @@ const BottomButtonGroup = React.memo(({
         else if(currentSelectedStatus == "Call For Records" && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 2 // Need to take from ENUM
+          const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
+          saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }  
