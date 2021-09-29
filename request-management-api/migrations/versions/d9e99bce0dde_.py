@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('FOIMinistryRequests', sa.Column('CFRDueDate', sa.DateTime, nullable=True))
+    op.add_column('FOIMinistryRequests', sa.Column('cfrduedate', sa.DateTime, nullable=True))
 
 
 def downgrade():
-    op.drop_column('FOIMinistryRequests', 'CFRDueDate')
+    op.drop_column('FOIMinistryRequests', 'cfrduedate')
