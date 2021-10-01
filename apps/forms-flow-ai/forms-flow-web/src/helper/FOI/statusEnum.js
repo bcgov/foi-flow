@@ -4,7 +4,10 @@ const stateList = Object.freeze({
     open: [{status: "Open", isSelected: false}, {status: "Closed", isSelected: false}, {status: "Call For Records", isSelected: false}],
     closed: [{status: "Closed", isSelected: false},{status: "Open", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false},{status: "Closed", isSelected: false}],
-    callforrecords: [{status: "Call For Records", isSelected: false},{status: "Redirect", isSelected: false},{status: "Closed", isSelected: false}],
+    callforrecords: [{status: "Call For Records", isSelected: false},{status: "Review", isSelected: false},{status: "Fee Assessed", isSelected: false},{status: "Open", isSelected: false},{status: "Closed", isSelected: false}],
+    review: [{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Sign Off", isSelected: false}],
+    consult: [{status: "Consult", isSelected: false},{status: "Closed", isSelected: false}],
+    signoff: [{status: "Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
 });
 
 export { stateList };
