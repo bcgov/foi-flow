@@ -104,10 +104,17 @@ const BottomButtonGroup = React.memo(({
         returnToQueue(e);
       };  
             
-      if(currentSelectedStatus == "Open" && !isValidationError)
+      if(currentSelectedStatus == "Open" && !isValidationError && (ministryId == undefined || ministryId == null || ministryId == ''))
       {
         saveRequestObject.requeststatusid = 1 // Need to take from ENUM
         openRequest();
+        hasStatusRequestSaved(true,"Open")
+      }
+      else if(currentSelectedStatus == "Open" && !isValidationError && (ministryId != undefined || ministryId != null || ministryId != ''))
+      {
+        console.log("Entered Open!")
+        saveRequestObject.requeststatusid = 1 // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
+        saveRequest();
         hasStatusRequestSaved(true,"Open")
       }
       else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase() && !isValidationError){
