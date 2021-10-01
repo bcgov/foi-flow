@@ -29,6 +29,7 @@ from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 import json
+import request_api
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
 TRACER = Tracer.get_instance()
@@ -41,6 +42,7 @@ class FOIFlowApplicantCategories(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
     @auth.require
+    @request_api.cache.cached(key_prefix="applicantcategories")
     def get():
         try:
             data = applicantcategoryservice.getapplicantcategories()
@@ -58,6 +60,7 @@ class FOIFlowProgramAreas(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
     @auth.require
+    @request_api.cache.cached(key_prefix="programareas")
     def get():
         try:
             data = programareaservice.getprogramareas()
@@ -74,6 +77,7 @@ class FOIFlowDeliveryModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
     @auth.require
+    @request_api.cache.cached(key_prefix="deliverymodes")
     def get():
         try:
             data = deliverymodeservice.getdeliverymodes()
@@ -90,6 +94,7 @@ class FOIFlowReceivedModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
     @auth.require
+    @request_api.cache.cached(key_prefix="receivedmodes")
     def get():
         try:
             data = receivedmodeservice.getreceivedmodes()

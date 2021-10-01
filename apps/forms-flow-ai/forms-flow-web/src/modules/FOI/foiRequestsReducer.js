@@ -2,6 +2,7 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 
 const initialState = {
   isLoading:true,
+  isAssignedToListLoading:true,
   foiRequestsList:[],
   foiRequestsCount:0,
   foiRequestDetail: {},
@@ -21,6 +22,8 @@ const foiRequests = (state = initialState, action)=> {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return {...state, isLoading: action.payload};
+    case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
+      return {...state, isAssignedToListLoading: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return {...state, foiRequestsList: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_REQUESTS_COUNT:
