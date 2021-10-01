@@ -88,4 +88,26 @@ const calculateDaysRemaining = (endDate) => {
 	return (Math.round(noOfDays) - Math.round(publicHoliDays) - Math.round(weekendDays));
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining };
+const isMinistryCoordinator = (userdetail, ministryteam) => 
+{
+
+	if(userdetail === undefined || userdetail === null || userdetail === '' || userdetail.groups === undefined || userdetail.groups.length === 0 || ministryteam === undefined || ministryteam === '')
+	{
+		return false
+	}
+
+	if(userdetail.groups.indexOf("/Intake Team") != -1 || userdetail.groups.indexOf("/Flex Team") != -1)
+	{
+		return false
+	}
+	else if(userdetail.groups.indexOf("/"+ministryteam) != -1)
+	{
+		return true
+	}
+	else{
+		return false
+	}
+
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining,isMinistryCoordinator };
