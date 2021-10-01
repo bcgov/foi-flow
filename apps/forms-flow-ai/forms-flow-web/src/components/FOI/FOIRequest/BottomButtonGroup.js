@@ -113,9 +113,9 @@ const BottomButtonGroup = React.memo(({
       else if(currentSelectedStatus == "Open" && !isValidationError && (ministryId != undefined || ministryId != null || ministryId != ''))
       {
         console.log("Entered Open!")
-        saveRequestObject.requeststatusid = 1 // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
-        saveRequest();
-        hasStatusRequestSaved(true,"Open")
+        saveRequestObject.requeststatusid = 1
+        saveRequestObject.cfrDueDate = '2020-09-09' //TEMP:NEED TO REMOVE, once CFR Due Date is incorporated
+        saveRequestModal();
       }
       else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase() && !isValidationError){
         saveRequestModal();
@@ -191,6 +191,7 @@ const BottomButtonGroup = React.memo(({
 
     const handleSaveModal = (value) => {      
       setsaveModal(false);
+      saveRequestObject.cfrDueDate = '2020-09-09' //TEMP:NEED TO REMOVE, once CFR Due Date is incorporated
       if (value) {
         if(currentSelectedStatus == "Closed" && !isValidationError)
         {
