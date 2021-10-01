@@ -31,7 +31,8 @@ import PropTypes from 'prop-types';
 
 import Typography from '@material-ui/core/Typography';
 import { StateDropDown } from '../customComponents';
-import "./TabbedContainer.scss"
+import "./TabbedContainer.scss";
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 const FOIRequest = React.memo((props) => {
 
 
-  const [_requestStatus, setRequestStatus] = React.useState("Unopened");
+  const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   
 
@@ -515,12 +516,12 @@ const FOIRequest = React.memo((props) => {
   }
 
   const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{    
-    if (_status === "Call For Records" && _cfrDaysRemaining < 0) {      
-      settabStatus("Call For Records Overdue")
+    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {      
+      settabStatus(StateEnum.callforrecordsoverdue.name)
     }
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-    const bottomText = _status === "Open" ? _daysRemainingText : _status === "Call For Records" ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
+    const bottomText = _status === StateEnum.open.name ? _daysRemainingText : _status === StateEnum.callforrecords.name ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
     setRequestStatus(bottomText);       
   }
 
@@ -533,19 +534,19 @@ const FOIRequest = React.memo((props) => {
   }
 
   switch (_tabStatus){
-    case "Open":
+    case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
-    case "Closed": 
+    case StateEnum.closed.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
-    case "Call For Records": 
+    case StateEnum.callforrecords.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
       break;
-    case "Call For Records Overdue":
+    case StateEnum.callforrecordsoverdue.name:
       foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
       break;
-    case "Redirect": 
+    case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
     default:

@@ -3,7 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './statedropdown.scss';
-import { stateList } from '../../../helper/FOI/statusEnum';
+import { StateList } from '../../../constants/FOI/statusEnum';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { useParams } from 'react-router-dom';
 
@@ -25,17 +25,17 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
         let  _state =  requestState ? requestState : requestStatus.toLowerCase().includes("days")? "Open": requestStatus;              
         switch(_state.toLowerCase()) {
             case FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase(): 
-                return stateList.unopened;
+                return StateList.unopened;
             case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase():
-                return stateList.intakeinprogress;
+                return StateList.intakeinprogress;
             case FOI_COMPONENT_CONSTANTS.OPEN.toLowerCase():
-                return stateList.open;
+                return StateList.open;
             case FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase():
-                    return stateList.closed; 
+                    return StateList.closed; 
             case FOI_COMPONENT_CONSTANTS.REDIRECT.toLowerCase():
-                    return stateList.redirect; 
+                    return StateList.redirect; 
             case FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase():
-                    return stateList.callforrecords;                    
+                    return StateList.callforrecords;                    
             default:
                 return [];
         }

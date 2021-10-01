@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { addBusinessDays } from "../../../helper/FOI/helper";
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -79,7 +80,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            const _state = currentSelectedStatus ? currentSelectedStatus : ((requestState && requestState === 'Unopened' && saveRequestObject.sourceOfSubmission === 'onlineform') || urlIndexCreateRequest > -1 ? "Intake in Progress" : requestState);
+            const _state = currentSelectedStatus ? currentSelectedStatus : ((requestState && requestState === StateEnum.unopened.name && saveRequestObject.sourceOfSubmission === 'onlineform') || urlIndexCreateRequest > -1 ? StateEnum.intakeinprogress.name : requestState);
             handleSaveRequest(_state, false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
@@ -91,7 +92,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            handleSaveRequest(currentSelectedStatus, true, res.id);
+            handleSaveRequest(currentSelectedStatus, true, "");
         }
       }));      
     }
@@ -108,11 +109,11 @@ const BottomButtonGroup = React.memo(({
         returnToQueue(e);
       };  
             
-      if(currentSelectedStatus == "Open" && !isValidationError)
+      if(currentSelectedStatus == StateEnum.open.name && !isValidationError)
       {
         saveRequestObject.requeststatusid = 1 // Need to take from ENUM
         openRequest();
-        hasStatusRequestSaved(true,"Open")
+        hasStatusRequestSaved(true, StateEnum.open.name)
       }
       else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase() && !isValidationError){
         saveRequestModal();
@@ -189,35 +190,36 @@ const BottomButtonGroup = React.memo(({
     const handleSaveModal = (value) => {      
       setsaveModal(false);
       if (value) {
-        if(currentSelectedStatus == "Closed" && !isValidationError)
+        if(currentSelectedStatus == StateEnum.closed.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = 3 // Need to take from ENUM
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          hasStatusRequestSaved(true, currentSelectedStatus)
         }
-        else if(currentSelectedStatus == "Call For Records" && !isValidationError)
+        else if(currentSelectedStatus == StateEnum.callforrecords.name && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 2 // Need to take from ENUM
-          if (!saveRequestObject.has('cfrDueDate')) {
+          if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
+            console.log(saveRequestObject);
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           }         
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }  
-        else if(currentSelectedStatus == "Redirect" && !isValidationError)
+        else if(currentSelectedStatus == StateEnum.redirect.name && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 4 // Need to take from ENUM
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
-        else if(currentSelectedStatus == "Open" && !isValidationError)
+        else if(currentSelectedStatus == StateEnum.open.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = 1 // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
-        else if(currentSelectedStatus == "Intake in Progress" && !isValidationError)
+        else if(currentSelectedStatus == StateEnum.intakeinprogress.name && !isValidationError)
         {
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
@@ -227,7 +229,7 @@ const BottomButtonGroup = React.memo(({
 
   return (
     <div className={classes.root}>
-      <ConfirmationModal openModal={openModal} handleModal={handleModal} state={"Open"} saveRequestObject={saveRequestObject} />  
+      <ConfirmationModal openModal={openModal} handleModal={handleModal} state={StateEnum.open.name} saveRequestObject={saveRequestObject} />  
       <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject}/>
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
