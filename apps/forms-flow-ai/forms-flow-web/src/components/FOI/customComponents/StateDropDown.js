@@ -4,20 +4,36 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './statedropdown.scss';
 import { stateList } from '../../../helper/FOI/statusEnum';
+import { isMinistryCoordinator } from '../../../helper/FOI/helper';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { useParams } from 'react-router-dom';
+import { useSelector } from "react-redux";
 
-export default function StateDropDown({requestStatus, handleStateChange}) {
+export default function StateDropDown({requestStatus, handleStateChange,requestDetail}) {
 
     const {requestState} = useParams();
 
+    let userDetail = useSelector(state=> state.user.userDetail);
+   
+    let _isMinistryCoordinator =''
+
+    if(requestDetail.selectedMinistries!=undefined && userDetail!=undefined)
+    {
+        var ministrycode = requestDetail.selectedMinistries[0]
+        console.log(ministrycode.code)
+        console.log(MINISTRYGROUPS[ministrycode.code])
+        console.log(isMinistryCoordinator(userDetail,MINISTRYGROUPS[ministrycode.code]))
+        _isMinistryCoordinator = isMinistryCoordinator(userDetail,MINISTRYGROUPS[ministrycode.code])
+    }
+        
     const [status, setStatus] = React.useState(requestState ? requestState : "Unopened");
     useEffect (() => {
         setStatus(requestState ? requestState : "Unopened");
     },[requestState])
     
     const handleChange = (event) => {
-         setStatus(event.target.value);
+        setStatus(event.target.value);
         handleStateChange(event.target.value); 
     };
 
@@ -31,26 +47,34 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
             case FOI_COMPONENT_CONSTANTS.OPEN.toLowerCase():
                 return stateList.open;
             case FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase():
-                    return stateList.closed; 
+                return stateList.closed; 
             case FOI_COMPONENT_CONSTANTS.REDIRECT.toLowerCase():
-                    return stateList.redirect; 
+                return stateList.redirect; 
             case FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase():
-                    return stateList.callforrecords;                    
+                return stateList.callforrecords; 
+            case FOI_COMPONENT_CONSTANTS.REVIEW.toLowerCase():
+                return stateList.review;
+            case FOI_COMPONENT_CONSTANTS.CONSULT.toLowerCase():
+                return stateList.consult;
+            case FOI_COMPONENT_CONSTANTS.SIGNOFF.toLowerCase():
+                return stateList.signoff;                                        
             default:
                 return [];
         }
     }
     
+    console.log(`_isMinistryCoordinator ${_isMinistryCoordinator}`);
     const statusList = getStatusList(status);    
     const menuItems = statusList.length > 0 && statusList.map((item) => {
         return (        
-        <MenuItem className="foi-state-menuitem" key={item.status} value={item.status} disabled={item.status.toLowerCase().includes("unopened")}>
+        <MenuItem disabled={(_isMinistryCoordinator && (item.status.toLowerCase().includes("open") || item.status.toLowerCase().includes("closed") ||  item.status.toLowerCase().includes("fee assessed") ||  item.status.toLowerCase().includes("review"))) || item.status.toLowerCase().includes("unopened")} className="foi-state-menuitem" key={item.status} value={item.status} >
             <span className={`foi-menuitem-span ${item.status.toLowerCase().replace(/\s/g, '')}`} ></span>
             {item.status}
         </MenuItem> 
         )
      });
-    return (       
+    return (  
+        
             <TextField
                 id="foi-status-dropdown"
                 className="foi-state-dropdown"
@@ -61,9 +85,11 @@ export default function StateDropDown({requestStatus, handleStateChange}) {
                 input={<Input />} 
                 variant="outlined"
                 fullWidth
+                
             >                
             
                 {menuItems}
-            </TextField>        
+            </TextField>  
+           
     );
   }
