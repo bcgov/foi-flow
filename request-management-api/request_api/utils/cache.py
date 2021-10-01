@@ -11,9 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Bring in the common cache."""
-from flask_caching import Cache
+import os
 
+class Config(object):
+    CACHE_TYPE ='redis'
+    CACHE_REDIS_HOST = os.getenv('FOI_REQUESTQUEUE_REDISHOST')
+    CACHE_REDIS_PORT = os.getenv('FOI_REQUESTQUEUE_REDISPORT')
+    CACHE_REDIS_DB = 0
+    CACHE_REDIS_URL = 'redis://'+os.getenv('FOI_REQUESTQUEUE_REDISPASSWORD')+'@'+os.getenv('FOI_REQUESTQUEUE_REDISHOST')+':'+os.getenv('FOI_REQUESTQUEUE_REDISPORT')+'/'+str(CACHE_REDIS_DB)
+    CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_TIMEOUT')
+    CACHE_KEY_PPREFIX = 'foi'
 
-# lower case name as used by convention in most Flask apps
-cache = Cache(config={'CACHE_TYPE': 'simple'})  # pylint: disable=invalid-name
