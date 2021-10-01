@@ -33,17 +33,21 @@ from request_api.utils.util_logging import setup_logging, setup_filelogging
 from request_api.auth import jwt
 from flask_cors import CORS
 import re
-
+from flask_caching import Cache
 
 
 # Disable more logging.  
 # TODO - Put this behind an env var.
 # setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
 
+#Cache Initialization
+app = Flask(__name__)
+    
+app.config.from_object('request_api.utils.cache.Config') 
+cache = Cache(app) 
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   
-    app = Flask(__name__)
     #Routing specific CORS setup
     
     app.config.from_object(config.CONFIGURATION[run_mode])

@@ -15,7 +15,8 @@ const Dashboard = React.memo((props) => {
   // const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiRequestsList);
-  const isLoading = useSelector(state=> state.foiRequests.isLoading); 
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
+  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
   const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
@@ -154,7 +155,7 @@ const addRequest = (e) => {
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
               <button type="button" className="btn foi-btn-create" onClick={addRequest} >{FOI_COMPONENT_CONSTANTS.ADD_REQUEST}</button>
             </div>
-            <> { !isLoading && assignedToList.length > 0 && rows.length > 0 ? (<>
+            <> { !isLoading && !isAssignedToListLoading ? (<>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>

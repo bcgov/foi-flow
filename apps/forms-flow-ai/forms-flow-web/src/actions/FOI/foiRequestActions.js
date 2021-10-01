@@ -7,6 +7,13 @@ export const setFOILoader = (data) => dispatch =>{
     })
 }
 
+export const setFOIAssignedToListLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING,
+        payload:data
+    })
+}
+
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,

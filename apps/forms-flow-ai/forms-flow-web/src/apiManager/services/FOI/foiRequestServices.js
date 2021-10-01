@@ -5,6 +5,7 @@ import {
   serviceActionError,
   setFOIUpdateLoader,
   setFOILoader,
+  setFOIAssignedToListLoader,
   setFOIRequestDetail,
   setFOICategoryList,
   setFOIProgramAreaList,
@@ -130,18 +131,18 @@ export const fetchFOIFullAssignedToList = (...rest) => {
           });
           // data.unshift(unAssignedGroup);
           dispatch(setFOIFullAssignedToList(data));
-          dispatch(setFOILoader(false));
+          dispatch(setFOIAssignedToListLoader(false));
           done(null, res.data);
         } else {
           console.log("Error", res);
           dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
+          dispatch(setFOIAssignedToListLoader(false));
         }
       })
       .catch((error) => {
         console.log("Error", error);
         dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
+        dispatch(setFOIAssignedToListLoader(false));
         done(error);
       });
   };
