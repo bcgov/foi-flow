@@ -198,8 +198,10 @@ const BottomButtonGroup = React.memo(({
         else if(currentSelectedStatus == "Call For Records" && !isValidationError)
         {        
           saveRequestObject.requeststatusid = 2 // Need to take from ENUM
-          const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
-          saveRequestObject.cfrDueDate = calculatedCFRDueDate;
+          if (!saveRequestObject.has('cfrDueDate')) {
+            const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
+            saveRequestObject.cfrDueDate = calculatedCFRDueDate;
+          }         
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }  

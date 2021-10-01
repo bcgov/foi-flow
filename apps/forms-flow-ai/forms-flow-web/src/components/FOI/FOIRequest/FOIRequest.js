@@ -514,11 +514,14 @@ const FOIRequest = React.memo((props) => {
     setcurrentrequestStatus(currentStatus);
   }
 
-  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{
+  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{    
+    if (_status === "Call For Records" && _cfrDaysRemaining < 0) {      
+      settabStatus("Call For Records Overdue")
+    }
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
     const bottomText = _status === "Open" ? _daysRemainingText : _status === "Call For Records" ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
-    setRequestStatus(bottomText);        
+    setRequestStatus(bottomText);       
   }
 
   const hasStatusRequestSaved =(issavecompleted,state)=>{
@@ -538,6 +541,9 @@ const FOIRequest = React.memo((props) => {
       break;
     case "Call For Records": 
       foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+      break;
+    case "Call For Records Overdue":
+      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
       break;
     case "Redirect": 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"

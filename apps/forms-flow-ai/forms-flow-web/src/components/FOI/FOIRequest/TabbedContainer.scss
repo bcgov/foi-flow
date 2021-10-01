@@ -78,6 +78,9 @@
     background-color: #ec7d10;
   }
 
+  .foitabheaderCFROverdueBG{
+    background-color: #ff0000;
+  }
   
 
   .foitabheaderRedirectBG{
@@ -215,6 +218,10 @@ span.circle
 
 .foitabheaderCFRG .tab div.active span.circle {
   background-color: #ec7d10;
+}
+
+.foitabheaderCFROverdueBG .tab div.active span.circle {
+  background-color: #ff0000;
 }
 
 .foitabheaderOpenBG .tab div.active span.circle{
