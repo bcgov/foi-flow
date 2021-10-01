@@ -72,6 +72,10 @@ const FOI_COMPONENT_CONSTANTS = {
     OPEN: "Open",
     CLOSED: "Closed",
     REDIRECT: "Redirect",
+    REVIEW:"Review",
+    FEEASSESSED:"Fee Assessed",
+    CONSULT:"Consult",
+    SIGNOFF:"Sign Off",
 
     ISPIIREDACTED:"ispiiredacted",
 
