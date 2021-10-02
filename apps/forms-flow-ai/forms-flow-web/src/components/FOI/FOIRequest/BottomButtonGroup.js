@@ -7,7 +7,6 @@ import {saveRequestDetails, openRequestDetails} from "../../../apiManager/servic
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { addBusinessDays } from "../../../helper/FOI/helper";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
@@ -111,18 +110,17 @@ const BottomButtonGroup = React.memo(({
             
       if(currentSelectedStatus == StateEnum.open.name && !isValidationError && (ministryId == undefined || ministryId == null || ministryId == ''))
       {
-        saveRequestObject.requeststatusid = 1 // Need to take from ENUM
+        saveRequestObject.requeststatusid = StateEnum.open.id;
         openRequest();
         hasStatusRequestSaved(true, StateEnum.open.name)
       }
       else if(currentSelectedStatus == StateEnum.open.name && !isValidationError && (ministryId != undefined || ministryId != null || ministryId != ''))
       {
         console.log("Entered Open!")
-        saveRequestObject.requeststatusid = 1
-        saveRequestObject.cfrDueDate = '2020-09-09' //TEMP:NEED TO REMOVE, once CFR Due Date is incorporated
+        saveRequestObject.requeststatusid = StateEnum.open.id;        
         saveRequestModal();
       }
-      else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase() && !isValidationError){
+      else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && !isValidationError){
         saveRequestModal();
       }
       
@@ -195,18 +193,17 @@ const BottomButtonGroup = React.memo(({
     }
 
     const handleSaveModal = (value) => {      
-      setsaveModal(false);
-      saveRequestObject.cfrDueDate = '2020-09-09' //TEMP:NEED TO REMOVE, once CFR Due Date is incorporated
+      setsaveModal(false);      
       if (value) {
         if(currentSelectedStatus == StateEnum.closed.name && !isValidationError)
         {
-          saveRequestObject.requeststatusid = 3 // Need to take from ENUM
+          saveRequestObject.requeststatusid = StateEnum.closed.id;
           saveRequest();
           hasStatusRequestSaved(true, currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.callforrecords.name && !isValidationError)
         {        
-          saveRequestObject.requeststatusid = 2 // Need to take from ENUM
+          saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
             console.log(saveRequestObject);
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
@@ -217,13 +214,13 @@ const BottomButtonGroup = React.memo(({
         }  
         else if(currentSelectedStatus == StateEnum.redirect.name && !isValidationError)
         {        
-          saveRequestObject.requeststatusid = 4 // Need to take from ENUM
+          saveRequestObject.requeststatusid = StateEnum.redirect.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.open.name && !isValidationError)
         {
-          saveRequestObject.requeststatusid = 1 // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
+          saveRequestObject.requeststatusid = StateEnum.open.id; // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
