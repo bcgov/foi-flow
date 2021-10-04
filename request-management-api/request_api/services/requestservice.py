@@ -222,13 +222,15 @@ class requestservice:
             'currentState':requestministry['requeststatus.name'],
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart': parse(requestministry['startdate']).strftime('%Y-%m-%d') if requestministry['startdate'] is not None else '',
-            'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),
-            'cfrDueDate':parse(requestministry['cfrduedate']).strftime('%Y-%m-%d') if requestministry['cfrduedate'] is not None else '',
+            'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),            
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
          }
+
+        if requestministry['cfrduedate'] is not None:
+            baserequestInfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime('%Y-%m-%d')})
 
         if(requestcontactinformation is not None):
             for contactinfo in requestcontactinformation:
@@ -311,7 +313,8 @@ class FOIRequestUtil:
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
         foiministryRequest.description = requestSchema.get("description")
         foiministryRequest.duedate = requestSchema.get("dueDate")
-        foiministryRequest.cfrduedate = requestSchema.get("cfrDueDate")        
+        if requestSchema.get("cfrDueDate") is not None and requestSchema.get("cfrDueDate")  != "":
+            foiministryRequest.cfrduedate = requestSchema.get("cfrDueDate")        
         foiministryRequest.startdate = requestSchema.get("startDate")
         foiministryRequest.created_at = datetime2.now().isoformat()
         foiministryRequest.createdby = userId
