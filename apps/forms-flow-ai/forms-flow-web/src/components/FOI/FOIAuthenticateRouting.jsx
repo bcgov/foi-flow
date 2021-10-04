@@ -8,13 +8,14 @@ import { setUserAuth } from "../../actions/bpmActions";
 import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
-import Dashboard from "./Dashboard";
+import { Dashboard, MinistryDashboard } from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
+import { isMinistryLogin } from '../../helper/FOI/helper';
 
 //import TabbedContainer from "./TabbedContainer/TabbedContainer";
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
-  const isAuth = useSelector((state) => state.user.isAuthenticated);
+  const isAuth = useSelector((state) => state.user.isAuthenticated); 
 
   useEffect(()=>{
     console.log('authenticate')
@@ -24,8 +25,12 @@ const FOIAuthenticateRouting = React.memo((props) => {
       });
     }
   },[props.store, dispatch]);
-
-
+  const userDetail = useSelector(state=> state.user.userDetail); 
+  let isMinistry = false;
+  if (Object.entries(userDetail).length !== 0) {
+    const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
+    isMinistry = isMinistryLogin(userGroups);
+}
   return (
       <>
         {isAuth ? (
@@ -33,7 +38,11 @@ const FOIAuthenticateRouting = React.memo((props) => {
           <FOIHeader /> 
           
             <Route exact path="/foi/dashboard">
-              <Dashboard />
+              {isMinistry ? 
+              <MinistryDashboard />
+              : <Dashboard />
+              }
+              
             </Route>
             <Route path="/foi/reviewrequest/:requestId/:requestState">
               <FOIRequest  />
