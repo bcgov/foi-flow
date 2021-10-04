@@ -206,7 +206,7 @@ const BottomButtonGroup = React.memo(({
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
             console.log(saveRequestObject);
-            const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
+            const calculatedCFRDueDate = dueDateCalculation(new Date(), 11);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           }         
           saveRequest();
