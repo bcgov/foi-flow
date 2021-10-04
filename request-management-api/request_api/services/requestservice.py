@@ -223,6 +223,7 @@ class requestservice:
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart': parse(requestministry['startdate']).strftime('%Y-%m-%d') if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),
+            'cfrDueDate':parse(requestministry['cfrduedate']).strftime('%Y-%m-%d') if requestministry['cfrduedate'] is not None else '',
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
@@ -298,7 +299,7 @@ class requestservice:
 
 class FOIRequestUtil:   
     
-    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):
+    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
         foiministryRequest.version = activeVersion
@@ -310,6 +311,7 @@ class FOIRequestUtil:
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
         foiministryRequest.description = requestSchema.get("description")
         foiministryRequest.duedate = requestSchema.get("dueDate")
+        foiministryRequest.cfrduedate = requestSchema.get("cfrDueDate")        
         foiministryRequest.startdate = requestSchema.get("startDate")
         foiministryRequest.created_at = datetime2.now().isoformat()
         foiministryRequest.createdby = userId

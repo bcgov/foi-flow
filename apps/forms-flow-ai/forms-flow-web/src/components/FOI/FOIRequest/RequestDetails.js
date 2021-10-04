@@ -8,6 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject}) => {
 
@@ -15,8 +16,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
      *  Request details box in the UI
      *  All fields are mandatory here
      */
-     const {ministryId} = useParams();  
-    const ADD_DAYS = 30;
+    const {ministryId} = useParams();    
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
         const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";  
@@ -89,7 +89,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     //due date calculation
     const dueDateCalculation = (dateText) => {
-      return dateText? addBusinessDays(dateText,ADD_DAYS) : "";
+      return dateText? addBusinessDays(dateText, 30) : "";
     }    
 
     const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, processStartDate));
@@ -178,7 +178,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             fullWidth
                             required
                             error={selectedReceivedMode.toLowerCase().includes("select")}
-                            disabled={requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || requestDetails.currentState && requestDetails.currentState.toLowerCase() === FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase() }                         
+                            disabled={requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || requestDetails.currentState && requestDetails.currentState.toLowerCase() === StateEnum.unopened.name.toLowerCase() }                         
                         >            
                         {receivedModes}
                         </TextField> 

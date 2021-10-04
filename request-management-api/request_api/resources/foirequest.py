@@ -47,7 +47,9 @@ class FOIRequest(Resource):
             jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
             return jsondata , 200 
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -77,6 +79,8 @@ class FOIRequests(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400                    
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
@@ -94,7 +98,7 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            request_json = request.get_json()
+            request_json = request.get_json()            
             fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                    
             result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid,AuthHelper.getUserId())
             if result.success == True:
@@ -104,7 +108,9 @@ class FOIRequestsById(Resource):
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404
         except ValidationError as err:
-            return {'status': False, 'message':err.messages}, 40
+            return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400    
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            

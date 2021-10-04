@@ -69,6 +69,7 @@ def test_post_foirequest_general(app, client):
     foiupdaterequest = generalupdaterequestjson
     foiupdaterequest["id"] = str(foijsondata["id"])
     foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
+    foiupdaterequest["cfrDueDate"] = '2020-01-02'
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     assert foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200
 
