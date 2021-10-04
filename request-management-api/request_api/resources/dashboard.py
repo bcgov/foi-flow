@@ -19,8 +19,8 @@ API = Namespace('FOI Flow Dashboard', description='Endpoints for Dashboard')
 TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/dashboard')
-
+@API.route('/dashboard', defaults={'ministry':None})
+@API.route('/dashboard/<ministry>')
 class Dashboard(Resource):
     @staticmethod
     @TRACER.trace()    
@@ -28,11 +28,18 @@ class Dashboard(Resource):
     @auth.require
     @cors_preflight('GET,POST,OPTIONS') 
     @auth.ismemberofgroups(getdashboardmemberships())
-    def get():        
-        try:                    
-                groups = getgroupsfromtoken()                               
+    def get(ministry = None):        
+        try:
+            groups = getgroupsfromtoken()
+            ministrygroups = groups   
+            if ministry is None and ['Intake Team','Flex Team'] in groups:                                                               
                 requests = dashboardservice.getrequestqueue(groups)                
                 jsondata = json.dumps(requests)
-                return jsondata , 200            
+                return jsondata , 200
+            elif ministry is not None:
+                 
+                requests = dashboardservice.getrequestqueue(groups)                
+                jsondata = json.dumps(requests)
+                return jsondata , 200                
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
