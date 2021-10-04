@@ -3,9 +3,8 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './statedropdown.scss';
-import { stateList } from '../../../helper/FOI/statusEnum';
+import { StateList, StateEnum } from '../../../constants/FOI/statusEnum';
 import { isMinistryCoordinator } from '../../../helper/FOI/helper';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
@@ -27,9 +26,9 @@ export default function StateDropDown({requestStatus, handleStateChange,requestD
         _isMinistryCoordinator = isMinistryCoordinator(userDetail,MINISTRYGROUPS[ministrycode.code])
     }
         
-    const [status, setStatus] = React.useState(requestState ? requestState : "Unopened");
+    const [status, setStatus] = React.useState(requestState ? requestState : StateEnum.unopened.name);
     useEffect (() => {
-        setStatus(requestState ? requestState : "Unopened");
+        setStatus(requestState ? requestState : StateEnum.unopened.name);
     },[requestState])
     
     const handleChange = (event) => {
@@ -40,24 +39,24 @@ export default function StateDropDown({requestStatus, handleStateChange,requestD
     const getStatusList = (_status) => {        
         let  _state =  requestState ? requestState : requestStatus.toLowerCase().includes("days")? "Open": requestStatus;              
         switch(_state.toLowerCase()) {
-            case FOI_COMPONENT_CONSTANTS.UNOPENED.toLowerCase(): 
-                return stateList.unopened;
-            case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase():
-                return stateList.intakeinprogress;
-            case FOI_COMPONENT_CONSTANTS.OPEN.toLowerCase():
-                return stateList.open;
-            case FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase():
-                return stateList.closed; 
-            case FOI_COMPONENT_CONSTANTS.REDIRECT.toLowerCase():
-                return stateList.redirect; 
-            case FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase():
-                return stateList.callforrecords; 
-            case FOI_COMPONENT_CONSTANTS.REVIEW.toLowerCase():
-                return stateList.review;
-            case FOI_COMPONENT_CONSTANTS.CONSULT.toLowerCase():
-                return stateList.consult;
-            case FOI_COMPONENT_CONSTANTS.SIGNOFF.toLowerCase():
-                return stateList.signoff;                                        
+            case StateEnum.unopened.name.toLowerCase(): 
+                return StateList.unopened;
+            case StateEnum.intakeinprogress.name.toLowerCase():
+                return StateList.intakeinprogress;
+            case StateEnum.open.name.toLowerCase():
+                return StateList.open;
+            case StateEnum.closed.name.toLowerCase():
+                return StateList.closed; 
+            case StateEnum.redirect.name.toLowerCase():
+                return StateList.redirect; 
+            case StateEnum.callforrecords.name.toLowerCase():
+                return StateList.callforrecords; 
+            case StateEnum.review.name.toLowerCase():
+                return StateList.review;
+            case StateEnum.consult.name.toLowerCase():
+                return StateList.consult;
+            case StateEnum.signoff.name.toLowerCase():
+                return StateList.signoff;                                        
             default:
                 return [];
         }
@@ -67,7 +66,7 @@ export default function StateDropDown({requestStatus, handleStateChange,requestD
     const statusList = getStatusList(status);    
     const menuItems = statusList.length > 0 && statusList.map((item) => {
         return (        
-        <MenuItem disabled={(_isMinistryCoordinator && (item.status.toLowerCase().includes("open") || item.status.toLowerCase().includes("closed") ||  item.status.toLowerCase().includes("fee assessed") ||  item.status.toLowerCase().includes("review"))) || item.status.toLowerCase().includes("unopened")} className="foi-state-menuitem" key={item.status} value={item.status} >
+        <MenuItem disabled={(_isMinistryCoordinator && (item.status.toLowerCase().includes(StateEnum.open.name.toLowerCase()) || item.status.toLowerCase().includes(StateEnum.closed.name.toLowerCase()) ||  item.status.toLowerCase().includes(StateEnum.feeassessed.name.toLowerCase()) ||  item.status.toLowerCase().includes(StateEnum.review.name.toLowerCase()))) || item.status.toLowerCase().includes(StateEnum.unopened.name.toLowerCase())} className="foi-state-menuitem" key={item.status} value={item.status} >
             <span className={`foi-menuitem-span ${item.status.toLowerCase().replace(/\s/g, '')}`} ></span>
             {item.status}
         </MenuItem> 
