@@ -9,9 +9,8 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining } from "../../../helper/FOI/helper";
+import { calculateDaysRemaining, isMinistryCoordinator } from "../../../helper/FOI/helper";
 import MinistryAssignToDropdown from './MinistryAssignToDropdown';
-import { isMinistryCoordinator } from '../../../helper/FOI/helper';
 import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 
 const useStyles = makeStyles((theme) => ({
