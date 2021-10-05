@@ -120,7 +120,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 </TextField> 
                 </div>
 
-                {(status===FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase() || status===FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase()) ? (
+                {(status===StateEnum.callforrecords.name.toLowerCase() || status===StateEnum.closed.name.toLowerCase()) ? (
                     <>
                       <MinistryAssignToDropdown requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} />
                     </>

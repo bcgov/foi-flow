@@ -5,8 +5,7 @@ import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
-import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 
 const MinistryDashboard = React.memo((props) => {
@@ -60,32 +59,26 @@ const MinistryDashboard = React.memo((props) => {
       headerAlign: 'left',      
     },
     { 
-      field: 'currentState', 
+      field: 'applicantcategory', 
       headerName: 'APPLICANT TYPE',  
       width: 150, 
-      headerAlign: 'left',//width: 150,  
+      headerAlign: 'left',
       sortable: false 
     },
     { 
       field: 'requestType', 
       headerName: 'REQUEST TYPE',  
       width: 150, 
-      headerAlign: 'left',//width: 150,  
+      headerAlign: 'left',
       sortable: false 
     },
     
     { field: 'cfrstatus', 
       headerName: 'CFR STATUS',  
       width: 150, 
-      headerAlign: 'left',//width: 150,  
+      headerAlign: 'left',
       sortable: false 
-    },
-    // { field: 'assignedministrygroup', 
-    //   headerName: 'ASSIGNEE',  
-    //   width: 150, 
-    //   headerAlign: 'left',//width: 150,  
-    //   sortable: false 
-    // },
+    },    
     {      
       field: 'assignedToValue',
       headerName: 'ASSIGNEE',
@@ -149,9 +142,6 @@ const search = (rows) => {
 const renderReviewRequest = (e) => {
   if (e.row.ministryrequestid) {
     dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
-  }
-  else {
-    dispatch(push(`/foi/reviewrequest/${e.row.id}/${e.row.currentState}`));
   }
 }
 

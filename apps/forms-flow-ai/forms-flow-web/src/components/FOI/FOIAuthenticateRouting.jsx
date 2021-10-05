@@ -33,7 +33,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
 }
   return (
       <>
-        {isAuth ? (
+        {isAuth && Object.entries(userDetail).length !== 0 ? (
           <>
           <FOIHeader /> 
           
