@@ -11,6 +11,8 @@ import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 import MinistryAssignToDropdown from './MinistryAssignToDropdown';
+import { isMinistryCoordinator } from '../../../helper/FOI/helper';
+import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -34,7 +36,13 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const classes = useStyles();
     const {ministryId} = useParams();
     const user = useSelector((state) => state.user.userDetail);
-    const readonly = !(user && user.groups && (user.groups.includes('/Intake Team') || user.groups.includes('/Flex Team')));
+
+    let _isMinistryCoordinator = false;
+    if(requestDetails.selectedMinistries && requestDetails.selectedMinistries[0] && user)
+    {
+        var ministrycode = requestDetails.selectedMinistries[0]
+        _isMinistryCoordinator = isMinistryCoordinator(user,MINISTRYGROUPS[ministrycode.code])
+    }
 
      //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
@@ -86,8 +94,6 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
     const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
-    console.log("status (header): ");
-    console.log(status);
     
      return (
         <div className="foi-request-review-header-row1">
@@ -103,7 +109,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 <div className="foi-assigned-to-inner-container">
                 <TextField
                     id="assignedTo"
-                    label="Assigned To"
+                    label="IAO Assigned To"
                     InputLabelProps={{ shrink: true, }}          
                     select
                     value={selectedAssignedTo}
@@ -112,10 +118,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     variant="outlined"
                     fullWidth
                     required
-                    // inputProps={
-                    //     { readOnly: readonly, }
-                    // }
-                    disabled = {readonly}
+                    disabled = {_isMinistryCoordinator}
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
@@ -127,7 +130,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                          || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
                          || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase() ) ? (
                     <>
-                      <MinistryAssignToDropdown requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} />
+                      <MinistryAssignToDropdown requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={_isMinistryCoordinator} />
                     </>
                 ) : null}
             </div>
