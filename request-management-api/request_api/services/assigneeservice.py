@@ -76,7 +76,7 @@ class assigneeservice:
                 {"status":"Intake In Progress","groups":["Intake Team"]},
                 {"status":"Open","groups":["Intake Team","Flex Team"]},
                 {"status":"Closed","groups":["Intake Team","Flex Team"]},
-                {"status":"Call For Records","groups":["Flex Team", "@bcgovcode Ministry Team"]},
+                {"status":"Call For Records","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
                 {"status":"Redirect","groups":["Intake Team","Flex Team"]},
             ]
         
@@ -92,7 +92,7 @@ class assigneeservice:
                 {"status":"Intake In Progress","groups":["Intake Team"]},
                 {"status":"Open","groups":["Intake Team","Processing Team"]},
                 {"status":"Closed","groups":["Intake Team","Flex Team"]},
-                {"status":"Call For Records","groups":["Processing Team", "@bcgovcode Ministry Team"]},
+                {"status":"Call For Records","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
                 {"status":"Redirect","groups":["Intake Team","Flex Team"]},
             ]
         for entry in allgroups:
