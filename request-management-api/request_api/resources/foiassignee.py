@@ -34,6 +34,7 @@ TRACER = Tracer.get_instance()
 @API.route('/foiassignees', defaults={'requestype':None, 'status': None})
 @API.route('/foiassignees/<requestype>', defaults={'status': None})
 @API.route('/foiassignees/<requestype>/<status>')
+@API.route('/foiassignees/<requestype>/<status>/<bcgovcode>')
 class FOIAssigneesByTypeAndStatus(Resource):
     """Resource for managing FOI requests."""
 
@@ -41,12 +42,11 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def get(requestype=None, status=None):
-        if requestype is not None:
-            if requestype != "personal" and requestype != "general":
-                return {'status': False, 'message':'Bad Request'}, 400   
+    def get(requestype=None, status=None, bcgovcode=None):
+        if requestype is not None and (requestype != "personal" and requestype != "general"):
+            return {'status': False, 'message':'Bad Request'}, 400   
         try:
-            result = assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status)
+            result = assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status, bcgovcode)
             if result is not None:
                 return json.dumps(result), 200
             else:
@@ -56,7 +56,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
         
         
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiassignees/group/<groupName>')
+@API.route('/foiassignees/group/<groupname>')
 class FOIAssigneesByTypeAndStatus(Resource):
     """Resource for managing FOI requests."""
 
@@ -64,10 +64,10 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def get(groupName):
+    def get(groupname):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            result = assigneeservice().getMembersByGroupName(groupName)
+            result = assigneeservice().getMembersByGroupName(groupname)
             if result is not None:
                 return json.dumps(result), 200
             else:

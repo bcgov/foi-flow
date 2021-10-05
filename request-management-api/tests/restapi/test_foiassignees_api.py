@@ -41,6 +41,11 @@ def test_get_foiassigneesforgeneralopen(app, client):
     response = client.get('/api/foiassignees/general/open', headers=factory_auth_header(app, client), content_type='application/json')
     jsondata = json.loads(response.data)    
     assert response.status_code == 200 and len(jsondata) >=1
+    
+def test_get_foiassigneesforgeneralcfr(app, client):
+    response = client.get('/api/foiassignees/general/callforrecords/aest', headers=factory_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(response.data)    
+    assert response.status_code == 200 and len(jsondata) >=1
 
 def test_get_foiassigneesforpersonalopen(app, client):
     response = client.get('/api/foiassignees/personal/open', headers=factory_auth_header(app, client), content_type='application/json')
