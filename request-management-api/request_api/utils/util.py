@@ -65,7 +65,7 @@ def snake2camelback(snake_dict: dict):
     """Convert the passed dictionary's keys from snake_case to camelBack case."""
     return camelize(snake_dict)
 
-def getdashboardmemberships():
+def getrequiredmemberships():
     membership =''
     for group in MinistryTeamWithKeycloackGroup:
         membership+='{0},'.format(group.value)

@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
@@ -34,14 +34,16 @@ TRACER = Tracer.get_instance()
 
 
 @cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIRequest(Resource):
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def get(foirequestid,foiministryrequestid):
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def get(foirequestid,foiministryrequestid,usertype = None):
         try :            
             jsondata = {}
             jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)

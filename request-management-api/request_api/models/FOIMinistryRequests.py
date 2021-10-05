@@ -103,6 +103,7 @@ class FOIMinistryRequest(db.Model):
            _request["version"] = ministryrequest['version']
            _request["id"] = parentrequest.foirequestid
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
+           _request["applicantcategory"]=parentrequest["applicantcategory.name"]
            _requests.append(_request)
         
         return _requests
