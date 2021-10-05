@@ -137,6 +137,7 @@ const FOIRequest = React.memo((props) => {
     
  
   const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
+  const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
@@ -243,6 +244,11 @@ const FOIRequest = React.memo((props) => {
   //gets the latest assigned to value
   const handleAssignedToValue = (value) => {   
     setAssignedToValue(value);
+  }
+
+  //gets the latest assigned to value
+  const handleMinistryAssignedToValue = (value) => {   
+    setMinistryAssignedToValue(value);
   }
 
   //handle email validation
@@ -598,7 +604,7 @@ const FOIRequest = React.memo((props) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
                     <>
-                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails}  handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} />
+                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails}  handleAssignedToValue={handleAssignedToValue} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} />
                       <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
                        {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
                         <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null}
