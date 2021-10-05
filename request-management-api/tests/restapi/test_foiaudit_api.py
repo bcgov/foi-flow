@@ -50,12 +50,12 @@ def test_get_foiauditfordesccase2(app, client):
     jsondata = json.loads(rawresponse.data)    
     foirequest = generalrequestjson
     foirequest["id"] = str(jsondata["id"])
-    foirequest['requeststatusid'] = 1
+    foirequest['requeststatusid'] = 1    
     foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
-    foijsondata = json.loads(foiresponse.data)    
+    foijsondata = json.loads(foiresponse.data)      
     foiupdaterequest = generalupdaterequestjson
     foiupdaterequest["id"] = str(foijsondata["id"])
-    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])  
+    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])   
     response = client.get('/api/foiaudit/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/description', headers=factory_flex_auth_header(app, client), content_type='application/json')
     jsondata = json.loads(response.data)    
     assert response.status_code == 200 and len(jsondata['audit']) >=1

@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { formatDate } from "../../../helper/FOI/helper";
 import RequestDescriptionHistory from "../RequestDescriptionHistory";
 import { useParams } from 'react-router-dom';
@@ -199,7 +200,7 @@ const RequestDescription = React.memo(({
                         className="checkmark"
                         checked={isPIIRedacted}
                         onChange={handlePIIRedacted}
-                        disabled={isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== 'unopened')}
+                        disabled={isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase())}
                     />
                     <span className="checkmark"></span>
                         Description contains NO Personal Information

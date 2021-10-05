@@ -75,7 +75,7 @@ class bpmservice(camundaservice):
             return
 
     def _getUrl_(self, messageType):
-        if(MessageType.unopenedClaim.value == messageType or MessageType.openrequest.value == messageType or MessageType.openedClaim.value == messageType or MessageType.openedcomplete.value == messageType):
+        if messageType is not None:
             return self.bpmEngineRestUrl+"/message"
         return self.bpmEngineRestUrl
     
@@ -101,8 +101,8 @@ class MessageType(Enum):
     unopenedClaim = "foi-unopened-assignment"
     openedClaim = "foi-opened-assignment"
     openrequest = "foi-open-request"
-    openedcomplete = "foi-opened-complete"
-    
-
+    openedcomplete = "foi-opened-complete"    
+    ministryclaim = "foi-ministry-assignment"
+    ministrycomplete = "foi-ministry-complete"
              
      

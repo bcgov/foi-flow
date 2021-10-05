@@ -7,8 +7,10 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../helper/FOI/helper";
+import MinistryAssignToDropdown from './MinistryAssignToDropdown';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -23,14 +25,17 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject,handlestatusudpate}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, handleMinistryAssignedToValue, createSaveRequestObject, handlestatusudpate}) => {
    
      /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {ministryId} = useParams();  
+    const {ministryId} = useParams();
+    const user = useSelector((state) => state.user.userDetail);
+    const readonly = !(user && user.groups && (user.groups.includes('/Intake Team') || user.groups.includes('/Flex Team')));
+
      //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
     
@@ -38,8 +43,9 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     React.useEffect(() => {
                 
         let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
-        let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
-        handlestatusudpate(_daysRemaining,_status)
+        let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
+        const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';        
+        handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
 
     },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
 
@@ -79,7 +85,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
-    const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
+    const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
     
      return (
         <div className="foi-request-review-header-row1">
@@ -104,11 +110,21 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     variant="outlined"
                     fullWidth
                     required
+                    // inputProps={
+                    //     { readOnly: readonly, }
+                    // }
+                    disabled = {readonly}
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
                 </TextField> 
                 </div>
+
+                {(status===FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase() || status===FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase()) ? (
+                    <>
+                      <MinistryAssignToDropdown requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} />
+                    </>
+                ) : null}
             </div>
         </div>
     );

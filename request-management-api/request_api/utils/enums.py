@@ -48,7 +48,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     HLTH = "HLTH Ministry Team"
     IIO = "IIO Ministry Team"
     IRR = "IRR Ministry Team"
-    JERI = "JERI Ministry Team"
+    JERI = "IRR Ministry Team"
     LBR = "LBR Ministry Team"
     LDB = "LDB Ministry Team"
     AG = "AG Ministry Team"

@@ -97,6 +97,14 @@ export const setFOIFullAssignedToList = (data) => dispatch =>{
         payload:data
     })
 }
+
+export const setFOIMinistryAssignedToList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_ASSIGNED_TOLIST,
+        payload:data
+    })
+}
+
 export const setFOIProgramAreaList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREALIST,
