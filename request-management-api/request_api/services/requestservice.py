@@ -187,9 +187,15 @@ class requestservice:
                 if data.get("ministries") is not None:
                     for ministry in data.get("ministries"):    
                         if ministry["filenumber"] == fileNumber:
+                            activity = FOIRequestUtil().geteventtype(fileNumber, ministry["version"],status)
+                            metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo, "assignedministrygroup":ministry["assignedministrygroup"]})
                             if status == "Closed" or status == "Call For Records":
-                                metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo, "assignedministrygroup":ministry["assignedministrygroup"]})
                                 bpmservice.openedcomplete(fileNumber, metadata, MessageType.openedcomplete.value)
+                            elif status == "Open":
+                                if activity == "complete":
+                                    bpmservice.openedcomplete(fileNumber, metadata, MessageType.ministrycomplete.value)
+                                else:
+                                    bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
                             else:
                                 bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
        
@@ -385,6 +391,13 @@ class FOIRequestUtil:
             if status["requeststatusid"] == requeststatusid:
                 return status["name"]
         return None;
+    
+    def geteventtype(self,filenumber, version, status):
+        ministryreq = FOIMinistryRequest.getrequestbyfilenumberandversion(filenumber,version-1)
+        prevstatus = ministryreq["requeststatus.name"]
+        event = "save" if prevstatus == status else "complete"
+        return event
+    
     
     def getValueOf(self,name,key):
         if name == "receivedMode":
