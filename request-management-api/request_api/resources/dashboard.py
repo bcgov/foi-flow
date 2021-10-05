@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedOrigins,getdashboardmemberships
+from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedOrigins,getrequiredmemberships
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.auth import auth
 from request_api.tracer import Tracer
@@ -26,7 +26,7 @@ class Dashboard(Resource):
     @cross_origin(origins=allowedOrigins())
     @auth.require
     @cors_preflight('GET,POST,OPTIONS') 
-    @auth.ismemberofgroups(getdashboardmemberships())
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(queuetype = None):        
         try:
             requestqueue = []
