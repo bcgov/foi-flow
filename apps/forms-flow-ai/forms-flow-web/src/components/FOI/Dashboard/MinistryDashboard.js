@@ -35,7 +35,7 @@ const MinistryDashboard = React.memo((props) => {
         return assignedTo;
       }
       else {
-        return `${assignee.lastname}, ${assignee.firstname}`;
+        return  assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
       }
     }
     else {
