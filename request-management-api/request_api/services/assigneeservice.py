@@ -9,85 +9,105 @@ class assigneeservice:
 
     """
     
-    def getGroupsAndMembersByTypeAndStatus(self, requestType=None, status=None):
-        if requestType is None and status is None:
-           return KeycloakAdminService().getGroupsAndMembers(self._getGroupsByType()) 
+    def getGroupsAndMembersByTypeAndStatus(self, requesttype, status, bcgovcode=None):
+        if requesttype is None and status is None:
+           return KeycloakAdminService().getgroupsandmembers(self.getgroupsbytype(requesttype, bcgovcode)) 
         else:
             if status is None:
-                return self.getGroupsAndMembersByType(requestType)
+                return self.getgroupsandmembersbytype(requesttype,bcgovcode)
             else:
-                filteredGroups = self._getGroups(requestType,status)
-                if filteredGroups is not None:
-                    return KeycloakAdminService().getGroupsAndMembers(filteredGroups)
+                filteredgroups = self.getgroups(requesttype, status, bcgovcode)
+                if filteredgroups is not None:
+                    return KeycloakAdminService().getgroupsandmembers(filteredgroups)
             return None
             
-    def getMembersByGroupName(self, groupName):
-        for group in self._getGroupsByType():
-             if self._formatInput(group) == groupName: 
-                return KeycloakAdminService().getGroupsAndMembers([group])
-        return None 
+    def getMembersByGroupName(self, groupname):
+        return KeycloakAdminService().getgroupsandmembers([groupname]) 
     
-    def getGroupsAndMembersByType(self, requestType):  
+    def getgroupsandmembersbytype(self, requesttype,bcgovcode):  
         groups = []
-        groupMappings = self._getGroupMappings(requestType)
-        groupMembers = KeycloakAdminService().getGroupsAndMembers(self._getGroups(requestType))   
-        for groupMapping in groupMappings:
-            groupEntry = {}
-            groupEntry["status"] = groupMapping["status"]
-            groupEntry["groups"] =[]
-            for group in groupMapping["groups"]:
-                for groupMember in groupMembers:
-                    if group == groupMember["name"]:
-                        groupEntry["groups"].append(groupMember)
-            groups.append(groupEntry)    
+        groupmappings = self.getgroupmappings(requesttype,bcgovcode)
+        groupmembers = KeycloakAdminService().getgroupsandmembers(self.getgroups(requesttype, bcgovcode))   
+        for groupmapping in groupmappings:
+            groupentry = {}
+            groupentry["status"] = groupmapping["status"]
+            groupentry["groups"] =[]
+            for group in groupmapping["groups"]:
+                for groupmember in groupmembers:
+                    if group == groupmember["name"]:
+                        groupentry["groups"].append(groupmember)
+            groups.append(groupentry)    
         return groups    
 
-    def _getGroups(self,requestType=None,status=None):
+    def getgroups(self,requesttype, status=None, bcgovcode=None):
         if status is None:
-            return self._getGroupsByType(requestType)
+            return self.getgroupsbytype(requesttype, bcgovcode)
         else:
-            for groupMapping in self._getGroupMappings(requestType):
-                if self._formatInput(groupMapping.get("status")) == status: 
-                    return groupMapping.get("groups")
+            for groupmapping in self.getgroupmappings(requesttype, bcgovcode):
+                if self.formatinput(groupmapping.get("status")) == status: 
+                    return groupmapping.get("groups")
                 
              
-    def _getGroupsByType(self,requestType=None):
+    def getgroupsbytype(self, requesttype=None, bcgovcode=None):
         groups = []
-        for groupMapping in self._getGroupMappings():
-            for group in groupMapping["groups"]:
+        for groupmapping in self.getgroupmappings(requesttype, bcgovcode):
+            for group in groupmapping["groups"]:
                     if group not in groups :
                         groups.append(group)
         return groups
             
-    def _getGroupMappings(self, requestType=None):
-        if requestType is None:
-            return self.generalGroupMappings() + self.personalGroupMappings()
+    def getgroupmappings(self, requesttype, bcgovcode=None):
+        if requesttype is None:
+            return self.personalgroupmappings(bcgovcode) + self.generalgroupmappings(bcgovcode)
         else:
-            if requestType == "personal":
-                return self.personalGroupMappings()
-            if requestType == "general":
-                return self.generalGroupMappings()
+            if requesttype == "personal":
+                return self.personalgroupmappings(bcgovcode)
+            else:
+                return self.generalgroupmappings(bcgovcode)
    
-    def _formatInput(self, input):
+    def formatinput(self, input):
         input = input.lower()
         input = input.replace(' ', '')
         return input
         
-    def generalGroupMappings(self):        
-        return [{"status":"Unopened", "groups":["Intake Team"]},
+    def generalgroupmappings(self, bcgovcode=None):  
+        groups = []      
+        allgroups = [{"status":"Unopened", "groups":["Intake Team"]},
                 {"status":"Intake In Progress","groups":["Intake Team"]},
                 {"status":"Open","groups":["Intake Team","Flex Team"]},
                 {"status":"Closed","groups":["Intake Team","Flex Team"]},
-                {"status":"Call For Records","groups":["Intake Team","Flex Team"]},
+                {"status":"Call For Records","groups":["Flex Team", "@bcgovcode Ministry Team"]},
                 {"status":"Redirect","groups":["Intake Team","Flex Team"]},
             ]
         
-    def personalGroupMappings(self):        
-        return [{"status":"Unopened", "groups":["Intake Team"]},
+        for entry in allgroups:
+            groups.append({"status": entry["status"], "groups": self.formatgroups(entry["groups"], bcgovcode)})
+        
+        return groups
+      
+       
+    def personalgroupmappings(self, bcgovcode=None):        
+        groups = []      
+        allgroups =  [{"status":"Unopened", "groups":["Intake Team"]},
                 {"status":"Intake In Progress","groups":["Intake Team"]},
                 {"status":"Open","groups":["Intake Team","Processing Team"]},
                 {"status":"Closed","groups":["Intake Team","Flex Team"]},
-                {"status":"Call For Records","groups":["Intake Team","Flex Team"]},
+                {"status":"Call For Records","groups":["Processing Team", "@bcgovcode Ministry Team"]},
                 {"status":"Redirect","groups":["Intake Team","Flex Team"]},
             ]
+        for entry in allgroups:
+            groups.append({"status": entry["status"], "groups": self.formatgroups(entry["groups"], bcgovcode)})
+        
+        return groups
+        
+    def formatgroups(self, groups, bcgovcode):
+        formattedgroups = []
+        for group in groups:
+            formattedgroup = group if group.find('@bcgovcode') == -1 else self.getministrygroupname(group, bcgovcode)
+            if formattedgroup is not None:
+                formattedgroups.append(formattedgroup)    
+        return formattedgroups
+    
+    def getministrygroupname(self, group, bcgovcode):
+        return group.replace('@bcgovcode', bcgovcode) if bcgovcode is not None else None
                   

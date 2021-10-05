@@ -103,7 +103,7 @@ class FOIMinistryRequest(db.Model):
            _request["version"] = ministryrequest['version']
            _request["id"] = parentrequest.foirequestid
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
-           _request["applicantcategory"]=parentrequest["applicantcategory.name"]
+           _request["applicantcategory"]=parentrequest.applicantcategory.name
            _requests.append(_request)
         
         return _requests
@@ -112,7 +112,13 @@ class FOIMinistryRequest(db.Model):
     def getrequestbyministryrequestid(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema()
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
-        return request_schema.dump(query)    
+        return request_schema.dump(query) 
+    
+    @classmethod
+    def getrequestbyfilenumberandversion(cls,filenumber, version):
+        request_schema = FOIMinistryRequestSchema()
+        query = db.session.query(FOIMinistryRequest).filter_by(filenumber=filenumber, version = version).order_by(FOIMinistryRequest.version.desc()).first()
+        return request_schema.dump(query)   
     
     @classmethod
     def getrequestById(cls,ministryrequestid):

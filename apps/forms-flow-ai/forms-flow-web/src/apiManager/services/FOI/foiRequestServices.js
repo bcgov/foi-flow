@@ -12,6 +12,7 @@ import {
   clearRequestDetails,
   setFOIAssignedToList,
   setFOIFullAssignedToList,
+  setFOIMinistryAssignedToList,
   setFOIDeliveryModeList,
   setFOIReceivedModeList,
   setFOIRequestDescriptionHistory,
@@ -144,6 +145,41 @@ export const fetchFOIFullAssignedToList = (...rest) => {
         console.log("Error", error);
         dispatch(serviceActionError(error));
         dispatch(setFOIAssignedToListLoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIMinistryAssignedToList = (govCode, ...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+
+  const apiUrlGETAssignedToList = replaceUrl(
+    API.FOI_GET_ASSIGNEDTO_MINISTRYGROUP_LIST_API,
+    "<govcode>",
+    govCode
+  );
+
+  return (dispatch) => {
+    httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiAssignedToList = res.data;
+          let data = foiAssignedToList.map((assignedTo) => {
+            return { ...assignedTo};
+          });
+          dispatch(setFOIMinistryAssignedToList(data));          
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
         done(error);
       });
   };
@@ -317,8 +353,9 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
           const foiRequest = res.data;         
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(setFOIAssignedToList([]));
+          //dispatch(setFOIAssignedToList([]));
           dispatch(fetchFOIAssignedToList(-1,foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {

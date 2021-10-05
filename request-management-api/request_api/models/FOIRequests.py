@@ -70,7 +70,7 @@ class FOIRequest(db.Model):
         ministryArr = [] 
         for ministry in foiRequest.ministryRequests:
             assignedministrygroup = ministry.assignedministrygroup if ministry.assignedministrygroup is not None else ""                                
-            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup})    
+            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "version":ministry.version})    
         return DefaultMethodResult(True,'Request added',foiRequest.foirequestid,ministryArr,foiRequest.wfinstanceid)
                           
     @classmethod
