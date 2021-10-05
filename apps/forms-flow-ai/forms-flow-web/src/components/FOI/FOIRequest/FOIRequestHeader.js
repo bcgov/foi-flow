@@ -93,6 +93,10 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
     const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
+    const showMinistryAssignedTo = status.toLowerCase()===StateEnum.callforrecords.name.toLowerCase() || status.toLowerCase()===StateEnum.closed.name.toLowerCase()
+                                        || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
+                                        || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
+                                        || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase();
     
      return (
         <div className="foi-request-review-header-row1">
@@ -108,7 +112,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 <div className="foi-assigned-to-inner-container">
                 <TextField
                     id="assignedTo"
-                    label="IAO Assigned To"
+                    label={showMinistryAssignedTo?"IAO Assigned To":"Assigned To"}
                     InputLabelProps={{ shrink: true, }}          
                     select
                     value={selectedAssignedTo}
@@ -124,10 +128,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 </TextField> 
                 </div>
 
-                {(status.toLowerCase()===StateEnum.callforrecords.name.toLowerCase() || status.toLowerCase()===StateEnum.closed.name.toLowerCase()
-                         || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
-                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
-                         || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase() ) ? (
+                {showMinistryAssignedTo ? (
                     <>
                       <MinistryAssignToDropdown requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={_isMinistryCoordinator} />
                     </>
