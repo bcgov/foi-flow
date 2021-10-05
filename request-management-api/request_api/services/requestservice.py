@@ -187,9 +187,15 @@ class requestservice:
                 if data.get("ministries") is not None:
                     for ministry in data.get("ministries"):    
                         if ministry["filenumber"] == fileNumber:
+                            activity = FOIRequestUtil().geteventtype(fileNumber, ministry["version"],status)
+                            metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo, "assignedministrygroup":ministry["assignedministrygroup"]})
                             if status == "Closed" or status == "Call For Records":
-                                metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo, "assignedministrygroup":ministry["assignedministrygroup"]})
                                 bpmservice.openedcomplete(fileNumber, metadata, MessageType.openedcomplete.value)
+                            elif status == "Open":
+                                if activity == "complete":
+                                    bpmservice.openedcomplete(fileNumber, metadata, MessageType.ministrycomplete.value)
+                                else:
+                                    bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
                             else:
                                 bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
        
@@ -222,12 +228,15 @@ class requestservice:
             'currentState':requestministry['requeststatus.name'],
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart': parse(requestministry['startdate']).strftime('%Y-%m-%d') if requestministry['startdate'] is not None else '',
-            'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),
+            'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),            
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
          }
+
+        if requestministry['cfrduedate'] is not None:
+            baserequestInfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime('%Y-%m-%d')})
 
         if(requestcontactinformation is not None):
             for contactinfo in requestcontactinformation:
@@ -298,7 +307,7 @@ class requestservice:
 
 class FOIRequestUtil:   
     
-    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):
+    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
         foiministryRequest.version = activeVersion
@@ -310,6 +319,8 @@ class FOIRequestUtil:
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
         foiministryRequest.description = requestSchema.get("description")
         foiministryRequest.duedate = requestSchema.get("dueDate")
+        if requestSchema.get("cfrDueDate") is not None and requestSchema.get("cfrDueDate")  != "":
+            foiministryRequest.cfrduedate = requestSchema.get("cfrDueDate")        
         foiministryRequest.startdate = requestSchema.get("startDate")
         foiministryRequest.created_at = datetime2.now().isoformat()
         foiministryRequest.createdby = userId
@@ -380,6 +391,13 @@ class FOIRequestUtil:
             if status["requeststatusid"] == requeststatusid:
                 return status["name"]
         return None;
+    
+    def geteventtype(self,filenumber, version, status):
+        ministryreq = FOIMinistryRequest.getrequestbyfilenumberandversion(filenumber,version-1)
+        prevstatus = ministryreq["requeststatus.name"]
+        event = "save" if prevstatus == status else "complete"
+        return event
+    
     
     def getValueOf(self,name,key):
         if name == "receivedMode":

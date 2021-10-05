@@ -31,7 +31,8 @@ import PropTypes from 'prop-types';
 
 import Typography from '@material-ui/core/Typography';
 import { StateDropDown } from '../customComponents';
-import "./TabbedContainer.scss"
+import "./TabbedContainer.scss";
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,8 +53,8 @@ const useStyles = makeStyles((theme) => ({
 
 const FOIRequest = React.memo((props) => {
 
-  
-  const [_requestStatus, setRequestStatus] = React.useState("Unopened");
+
+  const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   
 
@@ -70,7 +71,7 @@ const FOIRequest = React.memo((props) => {
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   //gets the request detail from the store
-  let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);  
+  let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -91,12 +92,12 @@ const FOIRequest = React.memo((props) => {
     dispatch(fetchFOIDeliveryModeList());
   },[requestId, dispatch]);
  
-  
+
   useEffect(() => {    
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue); 
     let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
-    setAssignedToValue(assignedTo)
+    setAssignedToValue(assignedTo);
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
@@ -496,7 +497,7 @@ const FOIRequest = React.memo((props) => {
     setSaveRequestObject(requestObject);
   }
 
-  const handleSaveRequest = (_state, _unSaved, id) => {    
+  const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
     if (!_unSaved) {      
@@ -520,16 +521,14 @@ const FOIRequest = React.memo((props) => {
     setcurrentrequestStatus(currentStatus);
   }
 
-  const handlestatusudpate = (_daysRemaining,_status)=>{  
-    if(_status == "Open")
-    {      
-      //setheaderBG("foitabheaderOpenBG");
-      setRequestStatus(_daysRemaining +" Days Remaining")            
+  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{    
+    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {      
+      settabStatus(StateEnum.callforrecordsoverdue.name)
     }
-    else{      
-      setRequestStatus(_status)
-    }
-        
+    const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
+    const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+    const bottomText = _status === StateEnum.open.name ? _daysRemainingText : _status === StateEnum.callforrecords.name ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
+    setRequestStatus(bottomText);       
   }
 
   const hasStatusRequestSaved =(issavecompleted,state)=>{
@@ -541,16 +540,19 @@ const FOIRequest = React.memo((props) => {
   }
 
   switch (_tabStatus){
-    case "Open":
+    case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
-    case "Closed": 
+    case StateEnum.closed.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
-    case "Call For Records": 
+    case StateEnum.callforrecords.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
       break;
-    case "Redirect": 
+    case StateEnum.callforrecordsoverdue.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
+      break;
+    case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
     default:
@@ -575,7 +577,7 @@ const FOIRequest = React.memo((props) => {
     evt.currentTarget.className += " active";
 
   }
-  
+  const bottomTextArray = _requestStatus.split('|');
   return (
 
     <div className="foiformcontent">
@@ -586,7 +588,7 @@ const FOIRequest = React.memo((props) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange}/>
+            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} requestDetail={requestDetails}/>
           </div>
           
         <div className="tab">
@@ -594,7 +596,15 @@ const FOIRequest = React.memo((props) => {
           <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}><span className="circle"></span> Correspondence Log</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}><span className="circle"></span> Option 3</div>
         </div>
-          <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days")? _requestStatus: ""}</h4>
+        {_requestStatus.toLowerCase().includes("days") &&  bottomTextArray.length > 1  ?
+        <div className="foileftpanelstatus"> 
+          <h4>{bottomTextArray[0]}</h4>
+          <h4>{bottomTextArray[1]}</h4>
+        </div>
+        : 
+        <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days") ? _requestStatus : ""}</h4>
+        }
+
         </div>
         <div className="foitabpanelcollection"> 
           <div id="Request" className="tabcontent active">                                

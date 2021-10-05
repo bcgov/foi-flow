@@ -32,6 +32,7 @@ class FOIMinistryRequest(db.Model):
 
     startdate = db.Column(db.DateTime, nullable=False,default=datetime.now())
     duedate = db.Column(db.DateTime, nullable=False)
+    cfrduedate = db.Column(db.DateTime, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
     assignedto = db.Column(db.String(120), unique=False, nullable=True)
                 
@@ -106,7 +107,13 @@ class FOIMinistryRequest(db.Model):
     def getrequestbyministryrequestid(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema()
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
-        return request_schema.dump(query)    
+        return request_schema.dump(query) 
+    
+    @classmethod
+    def getrequestbyfilenumberandversion(cls,filenumber, version):
+        request_schema = FOIMinistryRequestSchema()
+        query = db.session.query(FOIMinistryRequest).filter_by(filenumber=filenumber, version = version).order_by(FOIMinistryRequest.version.desc()).first()
+        return request_schema.dump(query)   
     
     @classmethod
     def getrequestById(cls,ministryrequestid):
@@ -116,5 +123,5 @@ class FOIMinistryRequest(db.Model):
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
-        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson','assignedministrygroup')
+        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson','assignedministrygroup','cfrduedate')
     

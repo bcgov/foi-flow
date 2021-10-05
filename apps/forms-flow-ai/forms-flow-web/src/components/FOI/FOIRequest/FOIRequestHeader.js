@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 import MinistryAssignToDropdown from './MinistryAssignToDropdown';
@@ -42,8 +43,9 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     React.useEffect(() => {
                 
         let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
-        let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened");
-        handlestatusudpate(_daysRemaining,_status)
+        let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
+        const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';        
+        handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
 
     },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
 
@@ -83,7 +85,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
-    const status = (headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: "Unopened")).toLowerCase();
+    const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
     
      return (
         <div className="foi-request-review-header-row1">
