@@ -42,8 +42,8 @@ const Dashboard = React.memo((props) => {
       if (groupName === assignedTo) {
         return assignedTo;
       }
-      else {
-        return `${assignee.lastname}, ${assignee.firstname}`;
+      else {        
+        return  assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
       }
     }
     else {
