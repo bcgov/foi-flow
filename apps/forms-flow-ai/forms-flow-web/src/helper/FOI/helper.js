@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import DateHolidayjs from 'date-holidays';
 import dayjsBusinessDays from 'dayjs-business-days';
 import { format, utcToZonedTime } from 'date-fns-tz';
+import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
 var isBetween = require('dayjs/plugin/isBetween')
 var utc = require("dayjs/plugin/utc")
 var timezone = require("dayjs/plugin/timezone")
@@ -110,4 +111,13 @@ const isMinistryCoordinator = (userdetail, ministryteam) =>
 
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining,isMinistryCoordinator };
+const isMinistryLogin = (userGroups) => {
+	return Object.values(MINISTRYGROUPS).some(group => userGroups.includes(group));
+}
+
+const getMinistryByValue = (userGroups) => {
+	const ministryGroup = Object.values(MINISTRYGROUPS).filter(element => userGroups.includes(element));
+	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue };

@@ -3,7 +3,7 @@ import ACTION_CONSTANTS from "../actions/actionConstants";
 const initialState = {
   bearerToken: '',
   roles: '',
-  userDetail:[],
+  userDetail:{},
   isAuthenticated:false,
   currentPage:'',
 }

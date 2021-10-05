@@ -4,6 +4,7 @@ const initialState = {
   isLoading:true,
   isAssignedToListLoading:true,
   foiRequestsList:[],
+  foiMinistryRequestsList:[],
   foiRequestsCount:0,
   foiRequestDetail: {},
   foiIsRequestUpdated:false,
@@ -27,6 +28,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, isAssignedToListLoading: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return {...state, foiRequestsList: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
+      return {...state, foiMinistryRequestsList: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_REQUESTS_COUNT:
       return {...state, foiRequestsCount: action.payload.count};
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_DETAIL:      
