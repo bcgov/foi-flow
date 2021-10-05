@@ -59,7 +59,6 @@ export default function StateDropDown({requestStatus, handleStateChange,requestD
         }
     }
     
-    //console.log(`_isMinistryCoordinator ${_isMinistryCoordinator}`);
     const statusList = getStatusList(status);    
     const menuItems = statusList.length > 0 && statusList.map((item) => {
         return (        
