@@ -33,7 +33,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const classes = useStyles();
     const {ministryId} = useParams();
     const user = useSelector((state) => state.user.userDetail);
-    const readonly = !(user && (user.groups.includes('/Intake Team') || user.groups.includes('/Flex Team')));
+    const readonly = !(user && user.groups && (user.groups.includes('/Intake Team') || user.groups.includes('/Flex Team')));
 
      //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);

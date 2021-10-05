@@ -57,7 +57,7 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
     const ministryAssignedToGroup = requestDetails.selectedMinistries && requestDetails.selectedMinistries[0].code ? requestDetails.selectedMinistries[0].code.toUpperCase()+" Ministry Team" : "Unassigned";
     //------- update this later when $567 is ready
     const ministryAssignedTo = requestDetails.selectedMinistries && requestDetails.selectedMinistries[0].code ? requestDetails.selectedMinistries[0].code.toUpperCase()+" Ministry Team" : "Unassigned";
-    const ministryReadonly = !(user && user.groups.includes(`/${ministryAssignedToGroup}`));
+    const ministryReadonly = !(user && user.groups && user.groups.includes(`/${ministryAssignedToGroup}`));
 
     const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
    
