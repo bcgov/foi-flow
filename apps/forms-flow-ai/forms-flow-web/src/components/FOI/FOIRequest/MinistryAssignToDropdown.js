@@ -7,6 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { useParams } from 'react-router-dom';
+import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAssignedToValue, createSaveRequestObject}) => {
+const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
    
      /**
      *  Header of Review request in the UI
@@ -30,6 +31,12 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
     const classes = useStyles();
     const {ministryId} = useParams();
     const user = useSelector((state) => state.user.userDetail);
+
+    //local state management for assignedTo
+    //------- update this later when $567 is ready
+    const minsitryAssignedToGroup = requestDetails.selectedMinistries && requestDetails.selectedMinistries[0].code ? MINISTRYGROUPS[requestDetails.selectedMinistries[0].code] : "";
+    const ministryAssignedTo = requestDetails.ministryAssignedTo ? `${minsitryAssignedToGroup}|${requestDetails.ministryAssignedTo}` : `${minsitryAssignedToGroup}|Unassigned`;
+    const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
 
      //get the assignedTo master data
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
@@ -42,6 +49,11 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
     const getMenuItems = () => {
         var menuItems = [];
         var i = 1;
+
+        //add default value (unassigned)
+        menuItems.push(<MenuItem className={classes.group} key={0} value={'|'}>{}</MenuItem>);
+        menuItems.push(<MenuItem key={0} className={classes.item} value={ministryAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
+
         if (ministryAssignedToList && ministryAssignedToList.length > 0) {
             for (var group of ministryAssignedToList) {
                 menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`}>{group.name}</MenuItem>);
@@ -53,14 +65,6 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
         return menuItems;
     }
 
-    //local state management for assignedTo
-    const ministryAssignedToGroup = requestDetails.selectedMinistries && requestDetails.selectedMinistries[0].code ? requestDetails.selectedMinistries[0].code.toUpperCase()+" Ministry Team" : "Unassigned";
-    //------- update this later when $567 is ready
-    const ministryAssignedTo = requestDetails.selectedMinistries && requestDetails.selectedMinistries[0].code ? requestDetails.selectedMinistries[0].code.toUpperCase()+" Ministry Team" : "Unassigned";
-    const ministryReadonly = !(user && user.groups && user.groups.includes(`/${ministryAssignedToGroup}`));
-
-    const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
-   
     //handle onChange event for assigned To
     const handleMinistryAssignedToOnChange = (event) => {
         setMinistryAssignedTo(event.target.value);
@@ -83,12 +87,12 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
                     input={<Input />} 
                     variant="outlined"
                     fullWidth
-                    required
+                    required = {isMinistryCoordinator}
                     // inputProps={
                     //     { readOnly: ministryReadonly, }
                     // }
-                    disabled = {ministryReadonly}
-                    error={ministryAssignedTo.toLowerCase().includes("unassigned")}                    
+                    disabled = {!isMinistryCoordinator}
+                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
                 </TextField> 

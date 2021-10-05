@@ -20,9 +20,6 @@ export default function StateDropDown({requestStatus, handleStateChange,requestD
     if(requestDetail.selectedMinistries!=undefined && userDetail!=undefined)
     {
         var ministrycode = requestDetail.selectedMinistries[0]
-        console.log(ministrycode.code)
-        console.log(MINISTRYGROUPS[ministrycode.code])
-        console.log(isMinistryCoordinator(userDetail,MINISTRYGROUPS[ministrycode.code]))
         _isMinistryCoordinator = isMinistryCoordinator(userDetail,MINISTRYGROUPS[ministrycode.code])
     }
         
@@ -62,7 +59,6 @@ export default function StateDropDown({requestStatus, handleStateChange,requestD
         }
     }
     
-    console.log(`_isMinistryCoordinator ${_isMinistryCoordinator}`);
     const statusList = getStatusList(status);    
     const menuItems = statusList.length > 0 && statusList.map((item) => {
         return (        
