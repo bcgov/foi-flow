@@ -26,11 +26,17 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.open.name.toLowerCase():
             return "Are you sure you want to Open this request?";
         case StateEnum.closed.name.toLowerCase():
-                return "Are you sure you want to Close this request?"; 
+            return "Are you sure you want to Close this request?"; 
         case StateEnum.redirect.name.toLowerCase():
-                return "Are you sure you want to Redirect this request?";  
+            return "Are you sure you want to Redirect this request?";  
         case StateEnum.callforrecords.name.toLowerCase():
-                return `Are you sure you want to change Request #${_requestNumber} to Call for Records?`;
+            return `Are you sure you want to change Request #${_requestNumber} to Call for Records?`;
+        case StateEnum.review.name.toLowerCase():
+            return `Are you sure you want to change Request #${_requestNumber} to Review?`;
+        case StateEnum.consult.name.toLowerCase():
+            return `Are you sure you want to change Request #${_requestNumber} to Consult?`;
+        case StateEnum.signoff.name.toLowerCase():
+            return `Are you sure you want to change Request #${_requestNumber} to Ministry Signoff?`;
         default:
             return [];
     }
