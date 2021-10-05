@@ -44,7 +44,7 @@ class KeycloakAdminService:
     
     
     def getallgroups(self):
-        if request_api.cache.get("kcgroups") is not None:
+        if self.iscacheenabled() == True and request_api.cache.get("kcgroups") is not None:
             return request_api.cache.get("kcgroups")
         url ='{0}/auth/admin/realms/{1}/groups'.format(self.keycloakhost,self.keycloakrealm)
         groupsresponse = requests.get(url, headers=self.getheaders())
@@ -53,7 +53,8 @@ class KeycloakAdminService:
             globalgroups =  groupsresponse.json()         
             for group in globalgroups:
                 groups.append({'id': group['id'],'name':group['name']})
-        request_api.cache.set("kcgroups", groups, os.getenv('CACHE_TIMEOUT'))
+        if self.iscacheenabled() == True:
+            request_api.cache.set("kcgroups", groups, os.getenv('CACHE_TIMEOUT'))
         return groups      
     
  
@@ -66,7 +67,7 @@ class KeycloakAdminService:
 
     def getgroupmembersbyid(self, groupid, groupname):
         cachename=self.getcachename(groupname)
-        if request_api.cache.get(cachename) is not None:
+        if self.iscacheenabled() == True and request_api.cache.get(cachename) is not None:
             return request_api.cache.get(cachename)
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
@@ -81,7 +82,8 @@ class KeycloakAdminService:
                        'lastname': user['lastName'] if 'lastName' in user is not None else None                        
                    } 
                 users.append(_user)
-        request_api.cache.set(cachename, users, os.getenv('CACHE_TIMEOUT'))
+        if self.iscacheenabled() == True:
+            request_api.cache.set(cachename, users, os.getenv('CACHE_TIMEOUT'))
         return users 
         
     def getheaders(self):
@@ -97,4 +99,8 @@ class KeycloakAdminService:
         
     def getcachename(self,groupname):
         return "kc_"+groupname.replace(' ','').lower()+"_cache"
+
+    def iscacheenabled(self):
+        return True if os.getenv('CACHE_ENABLED') == 'Y' else False
+    
     
