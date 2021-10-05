@@ -87,12 +87,12 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
                     input={<Input />} 
                     variant="outlined"
                     fullWidth
-                    required
+                    required = {isMinistryCoordinator}
                     // inputProps={
                     //     { readOnly: ministryReadonly, }
                     // }
                     disabled = {!isMinistryCoordinator}
-                    error={ministryAssignedTo.toLowerCase().includes("unassigned")}                    
+                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
                 </TextField> 
