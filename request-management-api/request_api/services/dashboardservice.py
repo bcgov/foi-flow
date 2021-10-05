@@ -104,6 +104,7 @@ class dashboardservice:
                                  'idNumber':  openrequest["idNumber"],
                                  'version': openrequest["version"],
                                  'ministryrequestid':openrequest['ministryrequestid'],
+                                 'applicantcategory':openrequest['applicantcategory'],
                                  'watchers':[]
                                  }
                     requestqueue.append(_openrequest)
