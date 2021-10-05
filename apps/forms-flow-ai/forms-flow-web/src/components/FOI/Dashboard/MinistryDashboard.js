@@ -4,38 +4,31 @@ import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-import { fetchFOIRequestList, fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
 
 const MinistryDashboard = React.memo((props) => {
 
-  const dispatch = useDispatch();
-  // const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+  const dispatch = useDispatch();  
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList);
+  const rows = useSelector(state=> state.foiRequests.foiMinistryRequestsList);  
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
-  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
-  const [filteredData, setFilteredData] = useState(rows);
-  const [requestType, setRequestType] = useState("All");
+  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);  
+  const [requestFilter, setRequestFilter] = useState("All");
   const [searchText, setSearchText] = useState("");
   const classes = useStyles();
   useEffect(()=>{
     dispatch(fetchFOIFullAssignedToList());
-    dispatch(fetchFOIRequestList());
-    setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
-  },[dispatch], [requestType]);
+    dispatch(fetchFOIMinistryRequestList());
+    
+  },[dispatch]);
 
-  function getFullName(params) {    
-    return `${params.row.lastName || ''}, ${
-      params.row.firstName || ''
-    }`;
-  }
 
   function getAssigneeValue(params) {
-    const groupName = params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    const assignedTo = params.row.assignedTo ? params.row.assignedTo : groupName;
+    const groupName = params.row.assignedministrygroup ? params.row.assignedministrygroup : "Unassigned";
+    const assignedTo = params.row.assignedministryperson ? params.row.assignedministryperson : groupName;
     if (assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
       const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
@@ -51,69 +44,86 @@ const MinistryDashboard = React.memo((props) => {
     }
   }
 
-  function getReceivedDate(params) {
-    let receivedDateString = params.getValue(params.id, 'receivedDateUF');    
-    const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
-    receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
-
-    if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {    
-        receivedDateString = addBusinessDays(receivedDateString, 1);     
-    }    
+  function getRecordsDue(params) {
+    let receivedDateString = params.getValue(params.id, 'cfrduedate'); 
     return formatDate(receivedDateString, 'yyyy MMM, dd');    
   }
-   const columns = [    
-    {
-      field: 'applicantName',
-      headerName: 'APPLICANT NAME',
-      width: 170,      
-      headerAlign: 'left',
-      valueGetter: getFullName,     
+  function getLDD(params) {
+    let receivedDateString = params.getValue(params.id, 'duedate'); 
+    return formatDate(receivedDateString, 'yyyy MMM, dd');    
+  }
+   const columns = [
+    { 
+      field: 'idNumber', 
+      headerName: 'ID NUMBER',
+      width: 150, 
+      headerAlign: 'left',      
     },
-     { field: 'requestType', headerName: 'REQUEST TYPE',  width: 150, headerAlign: 'left',//width: 150,  
-      sortable: false },
-    { field: 'idNumber', headerName: 'ID NUMBER',
-       width: 150, 
-       headerAlign: 'left',      
+    { 
+      field: 'currentState', 
+      headerName: 'APPLICANT TYPE',  
+      width: 150, 
+      headerAlign: 'left',//width: 150,  
+      sortable: false 
     },
-    { field: 'currentState', headerName: 'CURRENT STATUS', 
-      
-       headerAlign: 'left',
-       width: 180 
-     
+    { 
+      field: 'requestType', 
+      headerName: 'REQUEST TYPE',  
+      width: 150, 
+      headerAlign: 'left',//width: 150,  
+      sortable: false 
     },
+    
+    { field: 'cfrstatus', 
+      headerName: 'CFR STATUS',  
+      width: 150, 
+      headerAlign: 'left',//width: 150,  
+      sortable: false 
+    },
+    // { field: 'assignedministrygroup', 
+    //   headerName: 'ASSIGNEE',  
+    //   width: 150, 
+    //   headerAlign: 'left',//width: 150,  
+    //   sortable: false 
+    // },
     {      
       field: 'assignedToValue',
-      headerName: 'ASSIGNED TO',
+      headerName: 'ASSIGNEE',
       width: 180,
       headerAlign: 'left',
-      valueGetter: getAssigneeValue,
-      
+      valueGetter: getAssigneeValue,      
     },
-    { field: 'receivedDate', headerName: 'RECEIVED DATE', 
+    { 
+      field: 'CFRDueDateValue', 
+      headerName: 'RECORDS DUE', 
       width: 180,    
       headerAlign: 'left',
-      valueGetter: getReceivedDate,
+      valueGetter: getRecordsDue,
     },    
-    { field: 'xgov', headerName: 'XGOV', 
-      width: 100,      
+    { 
+      field: 'DueDateValue', 
+      headerName: 'LDD', 
+      width: 180,    
       headerAlign: 'left',
+      valueGetter: getLDD,
     },
-    { field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
+    { field: 'cfrduedate', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
     ];  
     
     const sortModel=[
       {
-        field: 'currentState',
+        field: 'cfrduedate',
         sort: 'desc',
-      },
-      {
-        field: 'receivedDateUF',
-        sort: 'desc',
-      }      
+      }
+      // ,
+      // {
+      //   field: 'receivedDateUF',
+      //   sort: 'desc',
+      // }      
     ];
 
-const requestTypeChange = (e) => { 
-  setRequestType(e.target.value);
+const requestFilterChange = (e) => { 
+  setRequestFilter(e.target.value);
   
 }
 
@@ -122,14 +132,16 @@ const setSearch = (e) => {
 }
 
 const search = (rows) => {   
-  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;  
-  return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
-  (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
+  // var _rt =  (requestFilter === "myRequests" || requestFilter === "watchingRequests") ? requestFilter : null ;  
+  return rows.filter(row => (
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
+  row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
+  row.cfrstatus.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
+  (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
+  ) 
+  // && (_rt !== null ? row.requestType === _rt : (row.requestType === "myRequests" || row.requestType === "watchingRequests") ) 
+  );
 
 }
  
@@ -142,9 +154,7 @@ const renderReviewRequest = (e) => {
     dispatch(push(`/foi/reviewrequest/${e.row.id}/${e.row.currentState}`));
   }
 }
-const addRequest = (e) => {
-  dispatch(push(`/foi/addrequest`));
-}
+
 
      return (  
             
@@ -153,7 +163,6 @@ const addRequest = (e) => {
           <div className="col-sm-12 col-md-12 foi-grid-container">
             <div className="foi-dashboard-row2">
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
-              <button type="button" className="btn foi-btn-create" onClick={addRequest} >{FOI_COMPONENT_CONSTANTS.ADD_REQUEST}</button>
             </div>
             <> { !isLoading && !isAssignedToListLoading ? (<>
             <div className="foi-dashboard-row2">             
@@ -163,9 +172,9 @@ const addRequest = (e) => {
               </div>
              
               <div className="foi-request-type">
-                <input className="foi-general-radio" type="radio" value="myRequests" name="requestType" onChange={requestTypeChange} /> My Requests
-                <input className="foi-personal-radio" type="radio" value="watchingRequests" name="requestType" onChange={requestTypeChange} /> Watching Requests
-                <input className="foi-all-radio" type="radio" value="allRequests" name="requestType" onChange={requestTypeChange} defaultChecked  /> All Requests            
+                <input className="foi-general-radio" type="radio" value="myRequests" name="requestFilter" onChange={requestFilterChange} /> My Requests
+                <input className="foi-personal-radio" type="radio" value="watchingRequests" name="requestFilter" onChange={requestFilterChange} /> Watching Requests
+                <input className="foi-all-radio" type="radio" value="All" name="requestFilter" onChange={requestFilterChange} defaultChecked  /> My Team Requests            
               </div>            
               
             </div>

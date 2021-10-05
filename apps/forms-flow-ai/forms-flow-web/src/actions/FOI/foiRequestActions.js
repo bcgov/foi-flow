@@ -27,6 +27,14 @@ export const setFOIRequestList = (data) => dispatch =>{
         payload:data
     })
 }
+
+export const setFOIMinistryRequestList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST,
+        payload:data
+    })
+}
+
 export const setFOIRequestCount = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUESTS_COUNT,

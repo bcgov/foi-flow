@@ -15,6 +15,7 @@ import {
   setFOIDeliveryModeList,
   setFOIReceivedModeList,
   setFOIRequestDescriptionHistory,
+  setFOIMinistryRequestList,
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -223,6 +224,35 @@ export const fetchFOIRequestList = (...rest) => {
           // dispatch(setFOIAssignedToList([]));
           dispatch(fetchFOIAssignedToList(-1,"",""));
           dispatch(setFOIRequestList(data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIMinistryRequestList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  return (dispatch) => {
+    httpGETRequest(API.FOI_GET_MINISTRY_REQUESTS_API, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequests = res.data;         
+          let data = foiRequests.map((foiRequest) => {            
+            return { ...foiRequest};
+          });          
+          dispatch(clearRequestDetails({}));         
+          dispatch(setFOIMinistryRequestList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
