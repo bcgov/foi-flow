@@ -5,11 +5,17 @@ import configureStore from 'redux-mock-store'
 import StateDropDown from './StateDropDown';
 import { useSelector } from "react-redux";
 import { shallow } from 'enzyme';
+import Router, { useParams } from "react-router-dom";
 
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
     useSelector: jest.fn()
   }));
+
+jest.mock("react-router-dom", () => ({
+    ...jest.requireActual("react-router-dom"),
+    useParams: jest.fn(),
+}));
 
 describe('FOI StateDropDown component', () => {
   
@@ -17,9 +23,13 @@ describe('FOI StateDropDown component', () => {
         useSelector.mockImplementation(callback => {
           return callback(mockAppState);
         });
+        useParams.mockImplementation(() => {
+          return mockAppState;
+        });
       });
       afterEach(() => {
         useSelector.mockClear();
+        useParams.mockClear();
       });
 
     const initialState = {output:10}
@@ -30,24 +40,38 @@ describe('FOI StateDropDown component', () => {
         store = mockStore(initialState)
         const localState = {            
             requestStatus: 'Open',
-            handleStateChange:  jest.fn()
+            handleStateChange:  jest.fn(),
+            requestDetail: {
+              selectedMinistries: ["AEST"]
+            },
+            user: {"userDetail": {}}
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
-          });    
-        shallow(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange} /></Provider>)
+          });
+          useParams.mockImplementation(() => {
+            return {requestState: "Open"};
+        }); 
+        shallow(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange} requestDetail={localState.requestDetail} /></Provider>)
       });
 
       it('FOI StateDropDown snapshot check', () => {
         store = mockStore(initialState)
         const localState = {
             requestStatus: 'Open',
-            handleStateChange:  jest.fn()
+            handleStateChange:  jest.fn(),
+            requestDetail: {
+              selectedMinistries: ["AEST"]
+            },
+            user: {"userDetail": {}}
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
           });
-        const tree = renderer.create(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange}  /></Provider>).toJSON();  
+          useParams.mockImplementation(() => {
+            return {requestState: "Open"};
+        });
+        const tree = renderer.create(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange} requestDetail={localState.requestDetail} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })

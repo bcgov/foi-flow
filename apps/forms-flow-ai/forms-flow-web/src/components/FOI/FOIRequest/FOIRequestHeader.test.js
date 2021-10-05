@@ -49,7 +49,8 @@ describe('FOI FOIRequestHeader component', () => {
             },
             foiRequests: { 
                 foiAssignedToList: []
-            }
+            },
+            user: {"userDetail": {}}
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
@@ -74,7 +75,8 @@ describe('FOI FOIRequestHeader component', () => {
             },
             foiRequests: { 
                 foiAssignedToList: []
-            }
+            },
+            user: {"userDetail": {}}
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
