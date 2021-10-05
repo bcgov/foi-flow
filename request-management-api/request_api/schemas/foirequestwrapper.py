@@ -65,6 +65,7 @@ class FOIRequestWrapperSchema(Schema):
     fromDate = fields.Str(data_key="fromDate",allow_none=True)
     toDate = fields.Str(data_key="toDate",allow_none=True)
     dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
+    cfrDueDate = fields.Date(data_key="cfrDueDate", required=False,allow_none=True)
     deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
     receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
     receivedDate = fields.Str(data_key="receivedDateUF", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])

@@ -78,6 +78,9 @@
     background-color: #ec7d10;
   }
 
+  .foitabheaderCFROverdueBG{
+    background-color: #ff0000;
+  }
   
 
   .foitabheaderRedirectBG{
@@ -104,6 +107,12 @@
   padding-top: 5%;
   padding-bottom: 10%;
   padding-right: 6%;
+}
+.foileftpanelstatus h4{
+  font-size: 15px;
+  font-weight: bolder;
+  font-family: "BCSans-Regular", sans-serif;
+  padding-bottom: 1rem;
 }
 
   .foileftpanelstatus
@@ -209,6 +218,10 @@ span.circle
 
 .foitabheaderCFRG .tab div.active span.circle {
   background-color: #ec7d10;
+}
+
+.foitabheaderCFROverdueBG .tab div.active span.circle {
+  background-color: #ff0000;
 }
 
 .foitabheaderOpenBG .tab div.active span.circle{
