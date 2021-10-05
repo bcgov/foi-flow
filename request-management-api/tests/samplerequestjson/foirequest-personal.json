@@ -75,5 +75,6 @@
   "receivedMode":"Fax",
   "deliveryMode":"In Person Pick up",
   "requestProcessStart":"2021-08-10",
-  "dueDate":"2021-09-22"
+  "dueDate":"2021-09-22",
+  "cfrDueDate":"2021-09-29"
 }

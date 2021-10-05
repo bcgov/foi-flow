@@ -7,7 +7,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import './confirmationmodal.scss';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject }) {    
     
@@ -21,15 +21,15 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     }   
     const getMessage = (_state, _requestNumber) => {
       switch(_state.toLowerCase()) {     
-        case FOI_COMPONENT_CONSTANTS.INTAKEINPROGRESS.toLowerCase():
+        case StateEnum.intakeinprogress.name.toLowerCase():
             return "Are you sure you want Save the request?";
-        case FOI_COMPONENT_CONSTANTS.OPEN.toLowerCase():
+        case StateEnum.open.name.toLowerCase():
             return "Are you sure you want to Open this request?";
-        case FOI_COMPONENT_CONSTANTS.CLOSED.toLowerCase():
+        case StateEnum.closed.name.toLowerCase():
                 return "Are you sure you want to Close this request?"; 
-        case FOI_COMPONENT_CONSTANTS.REDIRECT.toLowerCase():
+        case StateEnum.redirect.name.toLowerCase():
                 return "Are you sure you want to Redirect this request?";  
-        case FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase():
+        case StateEnum.callforrecords.name.toLowerCase():
                 return `Are you sure you want to change Request #${_requestNumber} to Call for Records?`;
         default:
             return [];
@@ -67,7 +67,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   </tr>
                 </tbody>
               </table>
-              {state.toLowerCase() === FOI_COMPONENT_CONSTANTS.CallFORRECORDS.toLowerCase() ? 
+              {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ? 
               <table className="table table-bordered table-assignedto">
                 <tbody>
                   <tr>
