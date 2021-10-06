@@ -6,7 +6,7 @@ const StateList = Object.freeze({
     redirect: [{status: "Redirect", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false},{status: "Review", isSelected: false},{status: "Fee Assessed", isSelected: false},{status: "Open", isSelected: false},{status: "Closed", isSelected: false}],
     review: [{status: "Review", isSelected: false},{status: "Call For Records", isSelected: false},{status: "Consult", isSelected: false},{status: "Ministry Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
-    consult: [{status: "Consult", isSelected: false},{status: "Closed", isSelected: false}],
+    consult: [{status: "Consult", isSelected: false},{status: "Review", isSelected: false},{status: "Closed", isSelected: false}],
     signoff: [{status: "Ministry Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Assessed", isSelected: false},{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Ministry Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
 });
