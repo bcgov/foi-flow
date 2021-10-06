@@ -231,26 +231,31 @@ const BottomButtonGroup = React.memo(({
         }
         else if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
         {
+          saveRequestObject.requeststatusid = StateEnum.review.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
         {
+          saveRequestObject.requeststatusid = StateEnum.signoff.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
         {
+          saveRequestObject.requeststatusid = StateEnum.feeassessed.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.consult.name && !isValidationError)
         {
+          saveRequestObject.requeststatusid = StateEnum.consult.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.callforrecordsoverdue.name && !isValidationError)
         {
+          saveRequestObject.requeststatusid = StateEnum.callforrecordsoverdue.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
