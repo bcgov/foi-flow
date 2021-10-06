@@ -30,13 +30,17 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.redirect.name.toLowerCase():
             return "Are you sure you want to Redirect this request?";  
         case StateEnum.callforrecords.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to Call for Records?`;
+            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`;
         case StateEnum.review.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to Review?`;
+            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`;
         case StateEnum.consult.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to Consult?`;
+            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`;
         case StateEnum.signoff.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to Ministry Signoff?`;
+            return `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`;
+        case StateEnum.feeassessed.name.toLowerCase():
+            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`;
+        case StateEnum.callforrecordsoverdue.name.toLowerCase():
+            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecordsoverdue.name}?`;
         default:
             return [];
     }
