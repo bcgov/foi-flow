@@ -27,7 +27,6 @@ from request_api.services.applicantcategoryservice import applicantcategoryservi
 from request_api.services.programareaservice import programareaservice
 from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
-from request_api.services.external.keycloakadminservice import KeycloakAdminService
 import json
 import request_api
 
@@ -103,18 +102,4 @@ class FOIFlowReceivedModes(Resource):
         except:
             return "Error happened while accessing received modes" , 500
 
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/intake/teammembers')
-class IntakeTeamMembers(Resource):
-
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())    
-    @auth.require
-    def get():
-        try:
-            keycloakadminservice = KeycloakAdminService()
-            data = keycloakadminservice.getusers()              
-            return json.dumps(data) , 200
-        except:
-            return "Error happened while accessing intake teammembers from keycloak" , 500          
+      

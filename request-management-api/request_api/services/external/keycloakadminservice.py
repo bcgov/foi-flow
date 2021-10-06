@@ -1,6 +1,8 @@
 import requests
 import os
 import ast
+import request_api
+
 
 class KeycloakAdminService:
 
@@ -27,56 +29,78 @@ class KeycloakAdminService:
         x = requests.post(url, params, verify=True).content.decode('utf-8')       
         return str(ast.literal_eval(x)['access_token'])        
 
-    def getusers(self):
-        return self.getGroupMembersById(self.keycloakadminintakegroupid)
-    
-    def getGroups(self, allowedGroups = None):
-        url ='{0}/auth/admin/realms/{1}/groups'.format(self.keycloakhost,self.keycloakrealm)
-        groupsResponse = requests.get(url, headers=self._getHeaders_())
+   
+    def getgroups(self, allowedgroups = None):
         groups = []
-        if groupsResponse.status_code == 200 and groupsResponse.content != '': 
-            globalGroups =  groupsResponse.json()         
-            for group in globalGroups:
-                if allowedGroups is not None:
-                    for allowedGroup in allowedGroups:
-                        if group["name"] == allowedGroup:   
-                            groups.append({'id': group['id'],'name':group['name']})
-                else:
-                    groups.append({'id': group['id'],'name':group['name']})
+        globalgroups = self.getallgroups()         
+        for group in globalgroups:
+            if allowedgroups is not None:
+                for allowedgroup in allowedgroups:
+                    if self.formatgroupname(group["name"]) == self.formatgroupname(allowedgroup):   
+                        groups.append({'id': group['id'],'name':group['name']})
+            else:
+                groups.append({'id': group['id'],'name':group['name']})
         return groups  
     
- 
-    def getGroupsAndMembers(self, allowedGroups = None):
-        allowedGroups = self.getGroups(allowedGroups)
-        for group in allowedGroups:
-            group["members"] = self.getGroupMembersById(group["id"])
-        return allowedGroups  
     
-    def getGroupMembersByName(self, groupName):
-        groups = self.getGroups()
-        for group in groups:
-            if group["name"] == groupName:
-                return self.getGroupMembersById(group["id"])
+    def getallgroups(self):
+        if self.iscacheenabled() == True and request_api.cache.get("kcgroups") is not None:
+            return request_api.cache.get("kcgroups")
+        url ='{0}/auth/admin/realms/{1}/groups'.format(self.keycloakhost,self.keycloakrealm)
+        groupsresponse = requests.get(url, headers=self.getheaders())
+        groups = []
+        if groupsresponse.status_code == 200 and groupsresponse.content != '': 
+            globalgroups =  groupsresponse.json()         
+            for group in globalgroups:
+                groups.append({'id': group['id'],'name':group['name']})
+        if self.iscacheenabled() == True:
+            request_api.cache.set("kcgroups", groups, os.getenv('CACHE_TIMEOUT'))
+        return groups      
+    
+ 
+    def getgroupsandmembers(self, allowedgroups = None):
+        allowedgroups = self.getgroups(allowedgroups)
+        for group in allowedgroups:
+            group["members"] = self.getgroupmembersbyid(group["id"], group["name"])
+        return allowedgroups  
+    
 
-    def getGroupMembersById(self, groupId):
-        groupUrl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupId)
-        groupResponse = requests.get(groupUrl, headers=self._getHeaders_())
+    def getgroupmembersbyid(self, groupid, groupname):
+        cachename=self.getcachename(groupname)
+        if self.iscacheenabled() == True and request_api.cache.get(cachename) is not None:
+            return request_api.cache.get(cachename)
+        groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
+        groupresponse = requests.get(groupurl, headers=self.getheaders())
         users = []
-        if groupResponse.status_code == 200 and groupResponse.content != '': 
-            for user in groupResponse.json():           
+        if groupresponse.status_code == 200 and groupresponse.content != '': 
+            for user in groupresponse.json():           
                 _user =  {
                        'id':user['id'],
                        'username':user['username'],                       
                        'email': user['email'] if 'email' in user is not None else None,
-                       'firstname':user['firstName'],
+                       'firstname':user['firstName'] if 'firstName' in user is not None else None,
                        'lastname': user['lastName'] if 'lastName' in user is not None else None                        
                    } 
                 users.append(_user)
-
+        if self.iscacheenabled() == True:
+            request_api.cache.set(cachename, users, os.getenv('CACHE_TIMEOUT'))
         return users 
         
-    def _getHeaders_(self):
+    def getheaders(self):
         return {
             "Authorization": "Bearer " + self.get_token(),
             "Content-Type": "application/json",
-        }    
+        }  
+    
+    def formatgroupname(self,input):
+        input = input.lower()
+        input = input.replace(' ', '')
+        return input  
+        
+    def getcachename(self,groupname):
+        return "kc_"+groupname.replace(' ','').lower()+"_cache"
+
+    def iscacheenabled(self):
+        return True if os.getenv('CACHE_ENABLED') == 'Y' else False
+    
+    

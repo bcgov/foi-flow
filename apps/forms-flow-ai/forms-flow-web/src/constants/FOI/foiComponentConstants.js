@@ -1,5 +1,6 @@
 const FOI_COMPONENT_CONSTANTS = {
     ASSIGNED_TO: "assignedTo",
+    MINISTRY_ASSIGNED_TO: "ministryAssignedTo",
     APPLICANT_FIRST_NAME: "firstName",
     APPLICANT_LAST_NAME: "lastName",
     APPLICANT_MIDDLE_NAME: "middleName",
