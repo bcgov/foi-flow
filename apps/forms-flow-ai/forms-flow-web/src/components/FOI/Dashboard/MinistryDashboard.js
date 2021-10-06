@@ -102,7 +102,7 @@ const MinistryDashboard = React.memo((props) => {
     const [sortModel, setSortModel]= useState([
       {
         field: 'cfrduedate',
-        sort: 'desc',
+        sort: 'asc',
       },        
     ]);
     
@@ -175,7 +175,7 @@ const renderReviewRequest = (e) => {
                 sortingMode={'client'}
                 onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}`
+                  `super-app-theme--${params.getValue(params.id, 'cfrstatus').toLowerCase().replace(/ +/g, "")}`
                 } 
                 onRowClick={renderReviewRequest}
                 />
