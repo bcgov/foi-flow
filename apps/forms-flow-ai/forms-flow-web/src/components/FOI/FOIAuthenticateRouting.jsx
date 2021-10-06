@@ -10,6 +10,7 @@ import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import { Dashboard, MinistryDashboard } from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
+import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
 import { isMinistryLogin } from '../../helper/FOI/helper';
 
 //import TabbedContainer from "./TabbedContainer/TabbedContainer";
@@ -53,7 +54,9 @@ const FOIAuthenticateRouting = React.memo((props) => {
             <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/:requestState">
               <FOIRequest  />
             </Route>
-           
+            <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId/:requestState">
+              <MinistryReview/>
+            </Route>
             <FOIFooter />
             </>
          ) : (
