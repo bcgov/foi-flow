@@ -12,7 +12,6 @@ import Loading from "../../../containers/Loading";
 const Dashboard = React.memo((props) => {
 
   const dispatch = useDispatch();
-  // const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiRequestsList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
@@ -38,16 +37,16 @@ const Dashboard = React.memo((props) => {
     const assignedTo = params.row.assignedTo ? params.row.assignedTo : groupName;
     if (assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
+      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
       if (groupName === assignedTo) {
         return assignedTo;
       }
-      else {
-        return `${assignee.lastname}, ${assignee.firstname}`;
+      else {        
+        return  assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
       }
     }
     else {
-      return groupName;
+      return assignedTo;
     }
   }
 
@@ -61,7 +60,7 @@ const Dashboard = React.memo((props) => {
     }    
     return formatDate(receivedDateString, 'yyyy MMM, dd');    
   }
-   const columns = [    
+   const columns = React.useRef([    
     {
       field: 'applicantName',
       headerName: 'APPLICANT NAME',
@@ -69,17 +68,22 @@ const Dashboard = React.memo((props) => {
       headerAlign: 'left',
       valueGetter: getFullName,     
     },
-     { field: 'requestType', headerName: 'REQUEST TYPE',  width: 150, headerAlign: 'left',//width: 150,  
-      sortable: false },
-    { field: 'idNumber', headerName: 'ID NUMBER',
-       width: 150, 
-       headerAlign: 'left',      
+    { 
+      field: 'requestType', 
+      headerName: 'REQUEST TYPE',  
+      width: 150, 
+      headerAlign: 'left' 
     },
-    { field: 'currentState', headerName: 'CURRENT STATUS', 
-      
-       headerAlign: 'left',
-       width: 180 
-     
+    { field: 'idNumber', 
+      headerName: 'ID NUMBER',
+      width: 150,
+      headerAlign: 'left',
+    },
+    { 
+      field: 'currentState', 
+      headerName: 'CURRENT STATUS',      
+      headerAlign: 'left',
+      width: 180
     },
     {      
       field: 'assignedToValue',
@@ -98,10 +102,11 @@ const Dashboard = React.memo((props) => {
       width: 100,      
       headerAlign: 'left',
     },
-    { field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
-    ];  
+    { 
+      field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
+    ]);  
     
-    const sortModel=[
+    const [sortModel, setSortModel]= useState([
       {
         field: 'currentState',
         sort: 'desc',
@@ -109,8 +114,8 @@ const Dashboard = React.memo((props) => {
       {
         field: 'receivedDateUF',
         sort: 'desc',
-      }      
-    ];
+      },   
+    ]);
 
 const requestTypeChange = (e) => { 
   setRequestType(e.target.value);
@@ -121,12 +126,13 @@ const setSearch = (e) => {
   setSearchText(e.target.value);
 }
 
-const search = (rows) => {   
+const search = (data) => {   
   var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;  
-  return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+  return data.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
   ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
@@ -174,15 +180,16 @@ const addRequest = (e) => {
                 className="foi-data-grid"
                 getRowId={(row) => row.idNumber}
                 rows={search(rows)} 
-                columns={columns}                
+                columns={columns.current}                
                 rowHeight={30}
-                headerHeight={50}                
+                headerHeight={50}
                 pageSize={10}
                 rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
                 sortingOrder={['desc', 'asc']}
                 sortModel={sortModel}
                 sortingMode={'client'}
+                onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
                   `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}`
                 } 

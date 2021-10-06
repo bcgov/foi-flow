@@ -11,10 +11,23 @@ TEST_USER_PAYLOAD = {
     'password': os.getenv('TEST_INTAKE_PASSWORD')
 }
 
+TEST_MINISTRYUSER_PAYLOAD = {
+    'client_id': 'forms-flow-web',
+    'grant_type': 'password',
+    'username' : os.getenv('TEST_MINISTRY_USERID'),
+    'password': os.getenv('TEST_MINISTRY_PASSWORD')
+}
+
 def factory_user_auth_header(app, client):
     url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(os.getenv('KEYCLOAK_ADMIN_HOST'),os.getenv('KEYCLOAK_ADMIN_REALM'))        
     x = requests.post(url, TEST_USER_PAYLOAD, verify=True).content.decode('utf-8')       
-    return {'Authorization': 'Bearer ' + str(ast.literal_eval(x)['access_token'])}  
+    return {'Authorization': 'Bearer ' + str(ast.literal_eval(x)['access_token'])} 
+
+def factory_ministryuser_auth_header(app, client):
+    url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(os.getenv('KEYCLOAK_ADMIN_HOST'),os.getenv('KEYCLOAK_ADMIN_REALM'))        
+    x = requests.post(url, TEST_MINISTRYUSER_PAYLOAD, verify=True).content.decode('utf-8')
+    print(x)       
+    return {'Authorization': 'Bearer ' + str(ast.literal_eval(x)['access_token'])}     
 
 TEST_JWT_HEADER = {
     "alg": "RS256",
@@ -165,7 +178,11 @@ def test_post_foirequest_general_cfrtoopen(app, client):
 def test_get_foirequestqueue(app, client):
   response = client.get('/api/dashboard', headers=factory_user_auth_header(app, client), content_type='application/json')
   jsondata = json.loads(response.data)
-  assert response.status_code == 200    
+  assert response.status_code == 200  
+
+def test_get_foiministryrequestqueue(app, client):
+  response = client.get('/api/dashboard/ministry', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
+  assert response.status_code == 401    
 
 def test_get_foirequestqueuewithoutheader(app, client):    
   response = client.get('/api/dashboard', content_type='application/json')    

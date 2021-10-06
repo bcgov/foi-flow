@@ -1,3 +1,4 @@
 
 import Dashboard from "./Dashboard";
-export default Dashboard;
+import MinistryDashboard from "./MinistryDashboard";
+export { Dashboard, MinistryDashboard };
