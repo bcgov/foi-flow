@@ -5,10 +5,10 @@ const StateList = Object.freeze({
     closed: [{status: "Closed", isSelected: false},{status: "Open", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false},{status: "Review", isSelected: false},{status: "Fee Assessed", isSelected: false},{status: "Open", isSelected: false},{status: "Closed", isSelected: false}],
-    review: [{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Sign Off", isSelected: false}],
+    review: [{status: "Review", isSelected: false},{status: "Call For Records", isSelected: false},{status: "Consult", isSelected: false},{status: "Ministry Signoff", isSelected: false},{status: "Closed", isSelected: false}],
     consult: [{status: "Consult", isSelected: false},{status: "Closed", isSelected: false}],
     signoff: [{status: "Ministry Signoff", isSelected: false},{status: "Closed", isSelected: false}],
-    feeassessed: [{status: "Fee Assessed", isSelected: false},{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
+    feeassessed: [{status: "Fee Assessed", isSelected: false},{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Ministry Signoff", isSelected: false},{status: "Closed", isSelected: false}],
 });
 
 const StateEnum = Object.freeze({
