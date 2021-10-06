@@ -8,6 +8,7 @@ const StateList = Object.freeze({
     review: [{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Sign Off", isSelected: false}],
     consult: [{status: "Consult", isSelected: false},{status: "Closed", isSelected: false}],
     signoff: [{status: "Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
+    feeassessed: [{status: "Fee Assessed", isSelected: false},{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
 });
 
 const StateEnum = Object.freeze({
