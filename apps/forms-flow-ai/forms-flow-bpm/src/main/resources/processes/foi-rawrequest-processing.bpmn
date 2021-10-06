@@ -140,7 +140,7 @@ execution.setVariable("pid", execution.getProcessInstanceId());</camunda:script>
   </bpmn:process>
   <bpmn:error id="Error_0m1kxx7" name="FOI-WF-UPDATE-ERR" camunda:errorMessage="FOI Request update failed." />
   <bpmn:message id="Message_0x03q45" name="foi-api-request-failure" />
-  <bpmn:message id="Message_0wv0zhq" name="foi-unopened-assignment" />
+  <bpmn:message id="Message_0wv0zhq" name="foi-intake-assignment" />
   <bpmn:message id="Message_04h3gdv" name="foi-opened-assignment" />
   <bpmn:message id="Message_0ga77d5" />
   <bpmn:message id="Message_0rfplzh" name="foi-message" />
@@ -150,7 +150,7 @@ execution.setVariable("pid", execution.getProcessInstanceId());</camunda:script>
   <bpmn:error id="Error_00wtllh" name="FOI-WF-UPDATE-ERR" camunda:errorMessage="FOI Request update failed." />
   <bpmn:message id="Message_1fj0um4" name="foi-api-request-failure" />
   <bpmn:message id="Message_0dvsne5" name="foi-rawrequest-update" />
-  <bpmn:message id="Message_1arga75" name="foi-open-request" />
+  <bpmn:message id="Message_1arga75" name="foi-intake-complete" />
   <bpmn:message id="Message_1mb7ise" name="foi-redirect" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1gduz3b">
@@ -160,35 +160,12 @@ execution.setVariable("pid", execution.getProcessInstanceId());</camunda:script>
       <bpmndi:BPMNShape id="Lane_1u899ed_di" bpmnElement="Lane_1u899ed" isHorizontal="true">
         <dc:Bounds x="190" y="80" width="980" height="350" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_07yrcjx_di" bpmnElement="Flow_07yrcjx">
-        <di:waypoint x="620" y="250" />
-        <di:waypoint x="685" y="250" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_01rwp9s_di" bpmnElement="Flow_01rwp9s">
-        <di:waypoint x="920" y="250" />
-        <di:waypoint x="1052" y="250" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ssq8la_di" bpmnElement="Flow_0ssq8la">
-        <di:waypoint x="440" y="302" />
-        <di:waypoint x="440" y="250" />
-        <di:waypoint x="520" y="250" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1hzo78o_di" bpmnElement="Flow_1hzo78o">
-        <di:waypoint x="308" y="250" />
-        <di:waypoint x="415" y="250" />
+      <bpmndi:BPMNEdge id="Flow_0b0r35w_di" bpmnElement="Flow_0b0r35w">
+        <di:waypoint x="710" y="275" />
+        <di:waypoint x="710" y="370" />
+        <di:waypoint x="820" y="370" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="322" y="233" width="70" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0b66n80_di" bpmnElement="Flow_0b66n80">
-        <di:waypoint x="440" y="275" />
-        <di:waypoint x="440" y="302" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_15htqmv_di" bpmnElement="Flow_15htqmv">
-        <di:waypoint x="735" y="250" />
-        <di:waypoint x="820" y="250" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="764" y="233" width="28" height="14" />
+          <dc:Bounds x="749" y="348" width="42" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1l0fhln_di" bpmnElement="Flow_1l0fhln">
@@ -200,13 +177,36 @@ execution.setVariable("pid", execution.getProcessInstanceId());</camunda:script>
           <dc:Bounds x="760" y="143" width="35" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0b0r35w_di" bpmnElement="Flow_0b0r35w">
-        <di:waypoint x="710" y="275" />
-        <di:waypoint x="710" y="370" />
-        <di:waypoint x="820" y="370" />
+      <bpmndi:BPMNEdge id="Flow_15htqmv_di" bpmnElement="Flow_15htqmv">
+        <di:waypoint x="735" y="250" />
+        <di:waypoint x="820" y="250" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="749" y="348" width="42" height="14" />
+          <dc:Bounds x="764" y="233" width="28" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b66n80_di" bpmnElement="Flow_0b66n80">
+        <di:waypoint x="440" y="275" />
+        <di:waypoint x="440" y="302" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hzo78o_di" bpmnElement="Flow_1hzo78o">
+        <di:waypoint x="308" y="250" />
+        <di:waypoint x="415" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="322" y="233" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ssq8la_di" bpmnElement="Flow_0ssq8la">
+        <di:waypoint x="440" y="302" />
+        <di:waypoint x="440" y="250" />
+        <di:waypoint x="520" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01rwp9s_di" bpmnElement="Flow_01rwp9s">
+        <di:waypoint x="920" y="250" />
+        <di:waypoint x="1052" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07yrcjx_di" bpmnElement="Flow_07yrcjx">
+        <di:waypoint x="620" y="250" />
+        <di:waypoint x="685" y="250" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_043z2u1_di" bpmnElement="Event_043z2u1">
         <dc:Bounds x="1052" y="232" width="36" height="36" />
@@ -235,16 +235,16 @@ execution.setVariable("pid", execution.getProcessInstanceId());</camunda:script>
       <bpmndi:BPMNShape id="Activity_1cry0yu_di" bpmnElement="Activity_0k23e8m">
         <dc:Bounds x="820" y="330" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0a2tut9_di" bpmnElement="Event_1bb8y9d">
-        <dc:Bounds x="532" y="272" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="537" y="315" width="27" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1y3jxky_di" bpmnElement="Event_0ks1wzs">
         <dc:Bounds x="572" y="272" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="568" y="315" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0a2tut9_di" bpmnElement="Event_1bb8y9d">
+        <dc:Bounds x="532" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="537" y="315" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

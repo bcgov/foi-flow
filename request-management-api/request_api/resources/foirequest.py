@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
@@ -34,14 +34,16 @@ TRACER = Tracer.get_instance()
 
 
 @cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIRequest(Resource):
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def get(foirequestid,foiministryrequestid):
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def get(foirequestid,foiministryrequestid,usertype = None):
         try :            
             jsondata = {}
             jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
@@ -74,8 +76,7 @@ class FOIRequests(Resource):
             if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
-                    metadata = json.dumps({"id": result.identifier, "status": "Open", "ministries": result.args[0], "assignedGroup": assignedGroup, "assignedTo": assignedTo})
-                    requestservice().postEventToWorkflow("Open", fOIRequestsSchema,json.loads(metadata),rawresult.args[0])
+                    requestservice().postOpeneventtoworkflow(result.identifier, rawresult.args[0],request_json,result.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
@@ -103,7 +104,7 @@ class FOIRequestsById(Resource):
             result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid,AuthHelper.getUserId())
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
-                requestservice().postEventToWorkflow("Update", fOIRequestsSchema,json.loads(metadata), result.args[1])
+                requestservice().postEventToWorkflow(fOIRequestsSchema, json.loads(metadata))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404

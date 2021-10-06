@@ -66,3 +66,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     TIC = "TIC Ministry Team"
     TRAN = "TRAN Ministry Team"
 
+    @staticmethod
+    def list():
+        return list(map(lambda c: c.value, MinistryTeamWithKeycloackGroup))
+

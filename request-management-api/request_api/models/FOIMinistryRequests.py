@@ -91,14 +91,19 @@ class FOIMinistryRequest(db.Model):
            _request["requestType"] = parentrequest.requesttype
            _request["idNumber"] = ministryrequest['filenumber']
            _request["currentState"] = ministryrequest["requeststatus.name"]
+           _request["dueDate"] = ministryrequest["duedate"]
+           _request["cfrDueDate"] = ministryrequest["cfrduedate"]
            _request["receivedDate"] = _receivedDate.strftime('%Y %b, %d')
            _request["receivedDateUF"] =str(_receivedDate)
            _request["assignedGroup"]=ministryrequest["assignedgroup"]
            _request["assignedTo"]=ministryrequest["assignedto"]
+           _request["assignedministrygroup"]=ministryrequest["assignedministrygroup"]
+           _request["assignedministryperson"]=ministryrequest["assignedministryperson"]
            _request["xgov"]='No'
            _request["version"] = ministryrequest['version']
            _request["id"] = parentrequest.foirequestid
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
+           _request["applicantcategory"]=parentrequest.applicantcategory.name
            _requests.append(_request)
         
         return _requests

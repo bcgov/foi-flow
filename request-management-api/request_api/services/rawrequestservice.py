@@ -10,7 +10,7 @@ import asyncio
 import os
 from request_api.utils.redispublisher import RedisPublisherService
 import maya
-from request_api.services.external.bpmservice import bpmservice, MessageType
+from request_api.services.workflowservice import workflowservice
 
 class rawrequestservice:
     """ FOI Request management service
@@ -47,14 +47,8 @@ class rawrequestservice:
         result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userId)
         return result    
     
-    def postEventToWorkflow(id, wfinstanceid, assignedGroup, assignedTo, status):
-        if status == "Closed" or status == "Redirect":            
-            metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo})
-            return bpmservice.complete(wfinstanceid, metadata, MessageType.openrequest.value) 
-        elif status == "Intake in Progress":
-            return bpmservice.unopenedClaim(wfinstanceid, assignedTo) 
-        else:
-            return {"status": "Unknown status"}
+    def postEventToWorkflow(self, id, wfinstanceid, requestsschema, status):
+        return workflowservice().postintakeevent(id, wfinstanceid, requestsschema, status)
 
     def getrawrequests():
         requests = FOIRawRequest.getrequests()        

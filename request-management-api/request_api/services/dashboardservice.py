@@ -78,3 +78,35 @@ class dashboardservice:
                     requestqueue.append(_openrequest)
                         
             return requestqueue
+
+    def getministryrequestqueue (groups=None):
+            openedrequests = []
+            
+            for group in groups:
+                _teamrequests = FOIMinistryRequest.getrequests(group)
+                openedrequests+=_teamrequests
+                        
+            requestqueue = []
+            
+            for openrequest in openedrequests : 
+                    _openrequest = {'id': openrequest["id"],                                 
+                                 'requestType':  openrequest["requestType"],
+                                 'currentState':  openrequest["currentState"],
+                                 'receivedDate':  openrequest["receivedDate"],
+                                 'receivedDateUF':  openrequest["receivedDateUF"],
+                                 'assignedGroup':  openrequest["assignedGroup"],
+                                 'assignedTo':  openrequest["assignedTo"],
+                                 'assignedministrygroup':  openrequest["assignedministrygroup"],
+                                 'assignedministryperson':  openrequest["assignedministryperson"],
+                                 'cfrstatus': 'Select Division',
+                                 'cfrduedate': openrequest["cfrDueDate"],
+                                 'duedate': openrequest["dueDate"],
+                                 'idNumber':  openrequest["idNumber"],
+                                 'version': openrequest["version"],
+                                 'ministryrequestid':openrequest['ministryrequestid'],
+                                 'applicantcategory':openrequest['applicantcategory'],
+                                 'watchers':[]
+                                 }
+                    requestqueue.append(_openrequest)
+                        
+            return requestqueue          
