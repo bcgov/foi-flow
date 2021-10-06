@@ -1,0 +1,111 @@
+@font-face {
+    font-family: "BCSans-Regular";
+    src: url("../../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("../../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+.scrollable-page {
+    position: relative !important;  
+    height: 100% !important;;  
+}
+
+#app {
+    background-color: #f1f1f1 !important;
+}
+
+.foi-request-form {
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 10px;
+}
+.foi-review-request-container {
+    
+    width: 100%!important;
+    height: auto!important;
+    display: inline-block;
+}
+
+.foi-review-container {
+    padding-top: 1px;    
+    width: 75%!important;
+    position: relative;
+    margin-left: auto!important;
+    margin-right: auto!important;
+    right: 0px;
+    left: 0px;
+    background-color: white;
+    
+}
+
+.foi-details-card {
+    margin-top: 50px;
+    box-shadow: none !important;
+    border: 1px solid #dfdede !important;
+    border-radius: 2px;
+}
+.foi-details-label {
+    font-family: "BCSans-Regular", sans-serif;
+    color: grey;
+    padding-left: 15px;
+
+}
+.foi-details-row {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+.foi-details-col {
+    display: block;    
+    align-items: flex-start; 
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border: 1px solid !important;     
+}
+
+
+.MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+    border-color: #f44336 !important;
+}
+.MuiInputBase-root {
+    font-family: "BCSans-Regular", sans-serif !important;
+}
+
+.MuiFormLabel-root {
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: black !important;   
+}
+
+.MuiFormLabel-root.Mui-error {
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: #f44336 !important;
+
+}
+
+.MuiMenuItem-root {
+    font-family: "BCSans-Regular", sans-serif !important;
+}
+.PrivateNotchedOutline-legendLabelled-4 {
+    font-size: 0.80rem !important;
+}
+
+.foi-bottom-button-group {
+    display: flex;
+    margin-top:25px;
+    margin-bottom: 100px;
+}
+
+.btn-bottom {
+    margin-right: 20px;
+    margin-top: 10px;
+    position: relative;
+    width: 30%;
+    font-family: "BCSans-Bold", sans-serif;
+    background-color: #38598A!important;
+    color: #FFFFFF!important
+}
