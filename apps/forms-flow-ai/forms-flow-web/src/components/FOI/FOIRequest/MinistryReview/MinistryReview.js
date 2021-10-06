@@ -1,12 +1,17 @@
 import React, { useEffect, useState }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import '../foirequest.scss'
+import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
 import FOIRequestHeader from '../FOIRequestHeader';
-import "../TabbedContainer.scss";
+import "./MinistryReviewTabbedContainer.scss";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+
+import ApplicantDetails from './ApplicantDetails';
+import RequestDetails from './RequestDetails';
+import RequestDescription from './RequestDescription';
+import RequestHeader from './RequestHeader';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,6 +27,22 @@ const useStyles = makeStyles((theme) => ({
     marginTop:'30px',
     color: "#000000",
   },
+  btndisabled: {
+    border: 'none',
+    backgroundColor: '#eceaea',
+    color: '#FFFFFF'
+  },
+  btnenabled: {
+    border: 'none',
+    backgroundColor: '#38598A',
+    color: '#FFFFFF',
+    backgroundColor: '#38598A'
+  },
+  btnsecondaryenabled: {
+    border: '1px solid #38598A',
+    backgroundColor: '#FFFFFF',
+    color: '#38598A'
+  }
  
 }));
 
@@ -93,6 +114,11 @@ const MinistryReview = React.memo((props) => {
 
   }
 
+  const returnToQueue = (e) => {
+    e.preventDefault();
+    window.location.href = '/foi/dashboard';
+}
+
   const tabclick =(evt,param)=>{
    
     var i, tabcontent, tablinks;
@@ -147,10 +173,17 @@ const MinistryReview = React.memo((props) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  
-                
-                     
-                
+                  <>
+                    <RequestHeader requestDetails={requestDetails} />
+                    <ApplicantDetails />
+                    <RequestDescription />
+                    <RequestDetails />
+                    <div className="foi-bottom-button-group">
+                      <button type="button" className="btn btn-bottom btnenabled">Save</button>
+                      
+                    </div>
+                  </>
+
                 </form>
               </div>
             </div>                            
