@@ -37,7 +37,7 @@ const Dashboard = React.memo((props) => {
     const assignedTo = params.row.assignedTo ? params.row.assignedTo : groupName;
     if (assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
+      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
       if (groupName === assignedTo) {
         return assignedTo;
       }
@@ -126,9 +126,9 @@ const setSearch = (e) => {
   setSearchText(e.target.value);
 }
 
-const search = (rows) => {   
+const search = (data) => {   
   var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;  
-  return rows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+  return data.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||

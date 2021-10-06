@@ -29,7 +29,7 @@ const MinistryDashboard = React.memo((props) => {
     const assignedTo = params.row.assignedministryperson ? params.row.assignedministryperson : groupName;
     if (assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
+      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
       if (groupName === assignedTo) {
         return assignedTo;
       }
@@ -116,17 +116,15 @@ const setSearch = (e) => {
   setSearchText(e.target.value);
 }
 
-const search = (rows) => {   
-  // var _rt =  (requestFilter === "myRequests" || requestFilter === "watchingRequests") ? requestFilter : null ;  
-  return rows.filter(row => (
+const search = (data) => { 
+  return data.filter(row => (
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.cfrstatus.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  ) 
-  // && (_rt !== null ? row.requestType === _rt : (row.requestType === "myRequests" || row.requestType === "watchingRequests") ) 
+  )  
   );
 
 }
