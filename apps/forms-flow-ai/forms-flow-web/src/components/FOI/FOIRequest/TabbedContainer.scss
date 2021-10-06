@@ -232,7 +232,7 @@ span.circle
 }
 
 .tab div.active span.circle{
-  background: teal;
+  background: #048ba8;
 }
 
 .foitabheaderCFRG .tab div.active span.circle {
@@ -244,15 +244,35 @@ span.circle
 }
 
 .foitabheaderOpenBG .tab div.active span.circle{
-  background-color: green;
+  background-color: #008000;
 }
 
 .foitabheaderClosedBG .tab div.active span.circle{
   background-color: #4b296b;
 }
 
+.foitabheaderCFROverdueBG .tab div.active span.circle{
+  background-color: #ff0000;
+}
+
 .foitabheaderRedirectBG .tab div.active span.circle{
-  background-color: #d15;
+  background-color: #dd1155;
+}
+
+.foitabheaderReviewBG .tab div.active span.circle{
+  background-color: #40E0D0;
+}
+
+.foitabheaderFeeBG .tab div.active span.circle{
+  background-color: maroon;
+}
+
+.foitabheaderConsultBG .tab div.active span.circle{
+  background-color: grey;
+}
+
+.foitabheaderSignoffBG .tab div.active span.circle{
+  background-color: skyblue;
 }
 
 /* Style the tab content */
