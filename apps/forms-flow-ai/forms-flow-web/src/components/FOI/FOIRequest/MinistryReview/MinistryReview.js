@@ -7,7 +7,10 @@ import "./MinistryReviewTabbedContainer.scss";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-
+import {
+  fetchFOIMinistryViewRequestDetails,
+  fetchFOIRequestDescriptionList
+} from "../../../../apiManager/services/FOI/foiRequestServices";
 import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
 import RequestDescription from './RequestDescription';
@@ -54,38 +57,21 @@ const MinistryReview = React.memo((props) => {
   const [_tabStatus, settabStatus] = React.useState(requestState);
    //gets the request detail from the store
  
+   const dispatch = useDispatch();
+   useEffect(() => {
+     if (ministryId) {
+       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+     }     
+   },[requestId, dispatch]); 
 
-  let requestDetails = {
-    "assignedGroup": "Intake Team",
-    "assignedTo": "dviswana@idir",
-    "category": "Interest Group",
-    "categoryid": 3,
-    "cfrDueDate": "2021-10-21",
-    "currentState": "Call For Records",
-    "deliveryMode": "Secure File Transfer",
-    "deliverymodeid": 1,
-    "description": "TEST",
-    "dueDate": "2021-11-18",
-    "fromDate": "",
-    "id": 1,
-    "idNumber": "AEST-2021-16057",
-    "programareaid": 1,
-    "receivedDate": "2021 Oct, 05",
-    "receivedDateUF": "2021-10-05 00:00:00.000000",
-    "receivedMode": "Fax",
-    "receivedmodeid": 2,
-    "requestProcessStart": "2021-10-05",
-    "requestType": "general",
-    "requeststatusid": 2,
-    "selectedMinistries": [
-      {
-        "code": "AEST",
-        "name": "Ministry of Advanced Education and Skills Training",
-        "selected": "true"
-      }
-    ],
-    "toDate": ""
-  }
+  
+  let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
+
+  console.log("Ministry view Request details")
+  console.log(requestDetails)
+
+  
   var foitabheaderBG;
   const classes = useStyles();
  

@@ -7,6 +7,7 @@ const initialState = {
   foiMinistryRequestsList:[],
   foiRequestsCount:0,
   foiRequestDetail: {},
+  foiMinistryViewRequestDetail:{},
   foiIsRequestUpdated:false,
   foiCategoryList: [], 
   foiRequestTypeList:[{"requesttypeid":0, "name": "Select Request Type"}, {"requesttypeid":1, "name": "general"}, {"requesttypeid":2, "name": "personal"}],
@@ -34,6 +35,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, foiRequestsCount: action.payload.count};
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_DETAIL:      
       return {...state, foiRequestDetail: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_MINISTRYVIEW_REQUEST_DETAIL:      
+      return {...state, foiMinistryViewRequestDetail: action.payload};  
     case FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED:
       return {...state, foiIsRequestUpdated: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_CATEGORYLIST:
@@ -80,6 +83,8 @@ const foiRequests = (state = initialState, action)=> {
         return {...state, foiMinistryAssignedToList: action.payload};
     case FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS:
       return {...state, foiRequestDetail: action.payload};
+    case FOI_ACTION_CONSTANTS.CLEAR_MINISTRYVIEWREQUEST_DETAILS:
+      return {...state, foiMinistryViewRequestDetail: action.payload};  
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY:
       return {...state, foiRequestDescriptionHistoryList: action.payload};
     default:
