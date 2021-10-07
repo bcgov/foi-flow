@@ -43,3 +43,14 @@ test('Unit test for api description history', () => {
   );
   return httpOpenGETRequest(apiUrl).then(response => expect(response.data).toEqual(requestDescriptionHistoryList));
 });
+
+test('Unit test for api ministry request list', () => {
+  const ministryRequestList = 
+  [{"id":1,"requestType":"general","currentState":"Call For Records","receivedDate":"2021 Oct, 06","receivedDateUF":"2021-10-06 00:00:00","assignedGroup":"Intake Team","assignedTo":"jharriet@idir","assignedministrygroup":"AEST Ministry Team","assignedministryperson":null,"cfrstatus":"Select Division","cfrduedate":"2021-10-22T00:00:00+00:00","duedate":"2021-11-19T00:00:00+00:00","idNumber":"AEST-2021-18963","version":3,"ministryrequestid":1,"applicantcategory":"Interest Group","watchers":[]},{"id":2,"requestType":"general","currentState":"Call For Records","receivedDate":"2021 Oct, 06","receivedDateUF":"2021-10-06 07:52:13.394140","assignedGroup":"Intake Team","assignedTo":"aantony@idir","assignedministrygroup":"AEST Ministry Team","assignedministryperson":null,"cfrstatus":"Select Division","cfrduedate":"2021-10-22T00:00:00+00:00","duedate":"2021-11-19T00:00:00+00:00","idNumber":"AEST-2021-32294","version":3,"ministryrequestid":2,"applicantcategory":"Media","watchers":[]}];
+  const resp = {data: ministryRequestList};
+  axios.get.mockResolvedValue(resp);
+  const apiUrl = API.FOI_GET_MINISTRY_REQUESTS_API;
+    
+  
+  return httpOpenGETRequest(apiUrl).then(response => expect(response.data).toEqual(ministryRequestList));
+});

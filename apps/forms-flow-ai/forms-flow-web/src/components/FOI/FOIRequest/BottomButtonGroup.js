@@ -206,7 +206,7 @@ const BottomButtonGroup = React.memo(({
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
             console.log(saveRequestObject);
-            const calculatedCFRDueDate = dueDateCalculation(new Date(), 11);
+            const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           }         
           saveRequest();
@@ -226,6 +226,36 @@ const BottomButtonGroup = React.memo(({
         }
         else if(currentSelectedStatus == StateEnum.intakeinprogress.name && !isValidationError)
         {
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.review.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.signoff.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.feeassessed.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.consult.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.consult.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.callforrecordsoverdue.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.callforrecordsoverdue.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
