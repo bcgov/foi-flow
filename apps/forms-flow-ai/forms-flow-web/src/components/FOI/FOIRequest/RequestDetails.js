@@ -89,7 +89,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
 
     //due date calculation
     const dueDateCalculation = (dateText) => {
-      return dateText? addBusinessDays(dateText, 30) : "";
+      return dateText? addBusinessDays(dateText, 31) : "";
     }    
 
     const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, processStartDate));
