@@ -8,7 +8,7 @@ import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../.
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 
-const MinistryDashboard = React.memo((props) => {
+const MinistryDashboard = (props) => {
 
   const dispatch = useDispatch();  
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
@@ -24,9 +24,9 @@ const MinistryDashboard = React.memo((props) => {
     
   },[dispatch]);
 
-  function getAssigneeValue(params) {
-    const groupName = params.row.assignedministrygroup ? params.row.assignedministrygroup : "Unassigned";
-    const assignedTo = params.row.assignedministryperson ? params.row.assignedministryperson : groupName;
+  function getAssigneeValue(row) {
+    const groupName = row.assignedministrygroup ? row.assignedministrygroup : "Unassigned";
+    const assignedTo = row.assignedministryperson ? row.assignedministryperson : groupName;
     if (assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
       const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
@@ -76,11 +76,10 @@ const MinistryDashboard = React.memo((props) => {
       headerAlign: 'left'      
     },    
     {      
-      field: 'assignedToValue',
+      field: 'assignedToName',
       headerName: 'ASSIGNEE',
       width: 180,
       headerAlign: 'left',
-      valueGetter: getAssigneeValue,      
     },
     { 
       field: 'CFRDueDateValue', 
@@ -116,12 +115,14 @@ const setSearch = (e) => {
   setSearchText(e.target.value);
 }
 
-const search = (data) => { 
-  return data.filter(row => (
+const search = (data) => {
+  const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
+  return updatedRows.filter(row => (
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.cfrstatus.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
   )  
@@ -185,6 +186,6 @@ const renderReviewRequest = (e) => {
         </div> 
       
     );
-  });
+  };
 
 export default MinistryDashboard;

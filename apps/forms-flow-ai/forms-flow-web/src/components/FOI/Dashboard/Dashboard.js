@@ -9,22 +9,22 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
 
-const Dashboard = React.memo((props) => {
+const Dashboard = () => {
+
 
   const dispatch = useDispatch();
-  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiRequestsList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
-  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
-  const [filteredData, setFilteredData] = useState(rows);
   const [requestType, setRequestType] = useState("All");
   const [searchText, setSearchText] = useState("");
   const classes = useStyles();
   useEffect(()=>{
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOIRequestList());
-    setFilteredData( requestType === 'All'? rows:rows.filter(row => row.requestType === requestType))
-  },[dispatch], [requestType]);
+  },[dispatch]);
+
+  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
+  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
 
   function getFullName(params) {    
     return `${params.row.lastName || ''}, ${
@@ -32,9 +32,9 @@ const Dashboard = React.memo((props) => {
     }`;
   }
 
-  function getAssigneeValue(params) {
-    const groupName = params.row.assignedGroup ? params.row.assignedGroup : "Unassigned";
-    const assignedTo = params.row.assignedTo ? params.row.assignedTo : groupName;
+  function getAssigneeValue(row) {
+    const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";
+    const assignedTo = row.assignedTo ? row.assignedTo : groupName;
     if (assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
       const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
@@ -86,11 +86,10 @@ const Dashboard = React.memo((props) => {
       width: 180
     },
     {      
-      field: 'assignedToValue',
+      field: 'assignedToName',
       headerName: 'ASSIGNED TO',
       width: 180,
       headerAlign: 'left',
-      valueGetter: getAssigneeValue,
       
     },
     { field: 'receivedDate', headerName: 'RECEIVED DATE', 
@@ -127,12 +126,14 @@ const setSearch = (e) => {
 }
 
 const search = (data) => {   
-  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;  
-  return data.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;
+  const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
+  return updatedRows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
   ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
@@ -201,6 +202,6 @@ const addRequest = (e) => {
         </div> 
       
     );
-  });
+};
 
 export default Dashboard;
