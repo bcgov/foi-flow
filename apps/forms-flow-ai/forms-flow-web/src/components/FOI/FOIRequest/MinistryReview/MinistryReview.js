@@ -2,7 +2,7 @@ import React, { useEffect, useState }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
-import FOIRequestHeader from '../FOIRequestHeader';
+import '../foirequestheader.scss'
 import "./MinistryReviewTabbedContainer.scss";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
