@@ -8,7 +8,6 @@ import { formatDate } from "../../../../helper/FOI/helper";
 
 const RequestDetails = React.memo((requestDetails) => {
 
-
     const _requestDetails = requestDetails.requestDetails
 
     return (
