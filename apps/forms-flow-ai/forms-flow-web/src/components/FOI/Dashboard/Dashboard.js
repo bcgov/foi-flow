@@ -9,7 +9,7 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
 
-const Dashboard = React.memo(() => {
+const Dashboard = () => {
 
 
   const dispatch = useDispatch();
@@ -133,6 +133,7 @@ const search = (data) => {
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
   ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
@@ -201,6 +202,6 @@ const addRequest = (e) => {
         </div> 
       
     );
-  });
+};
 
 export default Dashboard;

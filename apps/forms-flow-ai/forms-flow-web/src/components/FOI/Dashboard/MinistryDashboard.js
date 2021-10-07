@@ -8,7 +8,7 @@ import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../.
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 
-const MinistryDashboard = React.memo((props) => {
+const MinistryDashboard = (props) => {
 
   const dispatch = useDispatch();  
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
@@ -122,6 +122,7 @@ const search = (data) => {
   row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.cfrstatus.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
   )  
@@ -185,6 +186,6 @@ const renderReviewRequest = (e) => {
         </div> 
       
     );
-  });
+  };
 
 export default MinistryDashboard;
