@@ -11,6 +11,9 @@ import {
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
+
+import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
+
 import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
 import RequestDescription from './RequestDescription';
@@ -53,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
 const MinistryReview = React.memo((props) => {
 
   const {requestId, ministryId, requestState} = useParams();
-  const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
+  const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_tabStatus, settabStatus] = React.useState(requestState);
    //gets the request detail from the store
  
@@ -65,12 +68,18 @@ const MinistryReview = React.memo((props) => {
      }     
    },[requestId, dispatch]); 
 
+
+
   
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
 
-  console.log("Ministry view Request details")
-  console.log(requestDetails)
-
+  let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate); 
+  const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';
+  const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
+  const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+  const bottomText =  `${_cfrDaysRemainingText}|${_daysRemainingText}`;
+  const bottomTextArray = bottomText.split('|'); 
+ 
   
   var foitabheaderBG;
   const classes = useStyles();
@@ -100,10 +109,7 @@ const MinistryReview = React.memo((props) => {
 
   }
 
-  const returnToQueue = (e) => {
-    e.preventDefault();
-    window.location.href = '/foi/dashboard';
-}
+
 
   const tabclick =(evt,param)=>{
    
@@ -123,7 +129,7 @@ const MinistryReview = React.memo((props) => {
 
   }
 
-  const bottomTextArray = _requestStatus.split('|');
+  
 
   return (
 
@@ -143,15 +149,11 @@ const MinistryReview = React.memo((props) => {
           <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}><span className="circle"></span> Correspondence Log</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}><span className="circle"></span> Option 3</div>
         </div>
-        {_requestStatus.toLowerCase().includes("days") &&  bottomTextArray.length > 1  ?
+        
         <div className="foileftpanelstatus"> 
           <h4>{bottomTextArray[0]}</h4>
           <h4>{bottomTextArray[1]}</h4>
-        </div>
-        : 
-        <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days") ? _requestStatus : ""}</h4>
-        }
-
+        </div>        
         </div>
         <div className="foitabpanelcollection"> 
           <div id="Request" className="tabcontent active">                                
