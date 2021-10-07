@@ -57,7 +57,10 @@ const RequestHeader = React.memo((requestDetails) => {
                     <Link href="#" onClick={preventDefault}>
                         <h1 className="foi-review-request-text">{headerText}</h1>
                     </Link>
-                </div>           
+                </div>
+                <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
+                    <img src="/assets/Images/wacher.PNG" alt="wacher" style={{width:200+'px',height:50+'px'}} />
+                </div>
             </div>
             
             <div className="foi-assigned-to-container">
