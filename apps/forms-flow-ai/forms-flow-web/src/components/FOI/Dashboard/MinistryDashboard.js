@@ -8,7 +8,7 @@ import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../.
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 
-const MinistryDashboard = React.memo((props) => {
+const MinistryDashboard = (props) => {
 
   const dispatch = useDispatch();  
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
@@ -24,22 +24,21 @@ const MinistryDashboard = React.memo((props) => {
     
   },[dispatch]);
 
-
-  function getAssigneeValue(params) {
-    const groupName = params.row.assignedministrygroup ? params.row.assignedministrygroup : "Unassigned";
-    const assignedTo = params.row.assignedministryperson ? params.row.assignedministryperson : groupName;
+  function getAssigneeValue(row) {
+    const groupName = row.assignedministrygroup ? row.assignedministrygroup : "Unassigned";
+    const assignedTo = row.assignedministryperson ? row.assignedministryperson : groupName;
     if (assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(assignee => assignee.username === assignedTo);
+      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
       if (groupName === assignedTo) {
         return assignedTo;
       }
       else {
-        return `${assignee.lastname}, ${assignee.firstname}`;
+        return  assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
       }
     }
     else {
-      return groupName;
+      return assignedTo;
     }
   }
 
@@ -51,7 +50,7 @@ const MinistryDashboard = React.memo((props) => {
     let receivedDateString = params.getValue(params.id, 'duedate'); 
     return formatDate(receivedDateString, 'yyyy MMM, dd');    
   }
-   const columns = [
+   const columns = React.useRef([
     { 
       field: 'idNumber', 
       headerName: 'ID NUMBER',
@@ -61,59 +60,51 @@ const MinistryDashboard = React.memo((props) => {
     { 
       field: 'applicantcategory', 
       headerName: 'APPLICANT TYPE',  
-      width: 150, 
-      headerAlign: 'left',
-      sortable: false 
+      width: 180, 
+      headerAlign: 'left'    
     },
     { 
       field: 'requestType', 
       headerName: 'REQUEST TYPE',  
       width: 150, 
-      headerAlign: 'left',
-      sortable: false 
+      headerAlign: 'left'       
     },
     
     { field: 'cfrstatus', 
       headerName: 'CFR STATUS',  
       width: 150, 
-      headerAlign: 'left',
-      sortable: false 
+      headerAlign: 'left'      
     },    
     {      
-      field: 'assignedToValue',
+      field: 'assignedToName',
       headerName: 'ASSIGNEE',
       width: 180,
       headerAlign: 'left',
-      valueGetter: getAssigneeValue,      
     },
     { 
       field: 'CFRDueDateValue', 
       headerName: 'RECORDS DUE', 
-      width: 180,    
+      width: 150,    
       headerAlign: 'left',
       valueGetter: getRecordsDue,
     },    
     { 
       field: 'DueDateValue', 
       headerName: 'LDD', 
-      width: 180,    
+      width: 150,    
       headerAlign: 'left',
       valueGetter: getLDD,
     },
     { field: 'cfrduedate', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
-    ];  
-    
-    const sortModel=[
+    ]);
+
+    const [sortModel, setSortModel]= useState([
       {
         field: 'cfrduedate',
-        sort: 'desc',
-      }
-      // ,
-      // {
-      //   field: 'receivedDateUF',
-      //   sort: 'desc',
-      // }      
-    ];
+        sort: 'asc',
+      },        
+    ]);
+    
 
 const requestFilterChange = (e) => { 
   setRequestFilter(e.target.value);
@@ -124,16 +115,17 @@ const setSearch = (e) => {
   setSearchText(e.target.value);
 }
 
-const search = (rows) => {   
-  // var _rt =  (requestFilter === "myRequests" || requestFilter === "watchingRequests") ? requestFilter : null ;  
-  return rows.filter(row => (
+const search = (data) => {
+  const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
+  return updatedRows.filter(row => (
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
+  row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.cfrstatus.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  ) 
-  // && (_rt !== null ? row.requestType === _rt : (row.requestType === "myRequests" || row.requestType === "watchingRequests") ) 
+  )  
   );
 
 }
@@ -154,7 +146,7 @@ const renderReviewRequest = (e) => {
             <div className="foi-dashboard-row2">
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
             </div>
-            <> { !isLoading && !isAssignedToListLoading ? (<>
+            <> { !isLoading  && !isAssignedToListLoading  ? (<>
             <div className="foi-dashboard-row2">             
               <div className="form-group has-search">
                 <span className="fa fa-search form-control-search"></span>
@@ -173,7 +165,7 @@ const renderReviewRequest = (e) => {
                 className="foi-data-grid"
                 getRowId={(row) => row.idNumber}
                 rows={search(rows)} 
-                columns={columns}                
+                columns={columns.current}                
                 rowHeight={30}
                 headerHeight={50}                
                 pageSize={10}
@@ -182,8 +174,9 @@ const renderReviewRequest = (e) => {
                 sortingOrder={['desc', 'asc']}
                 sortModel={sortModel}
                 sortingMode={'client'}
+                onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}`
+                  `super-app-theme--${params.getValue(params.id, 'cfrstatus').toLowerCase().replace(/ +/g, "")}`
                 } 
                 onRowClick={renderReviewRequest}
                 />
@@ -193,6 +186,6 @@ const renderReviewRequest = (e) => {
         </div> 
       
     );
-  });
+  };
 
 export default MinistryDashboard;

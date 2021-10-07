@@ -87,8 +87,7 @@ class FOIRequests(Resource):
             if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
-                    metadata = json.dumps({"id": result.identifier, "status": "Open", "ministries": result.args[0], "assignedGroup": assignedGroup, "assignedTo": assignedTo})
-                    requestservice().postEventToWorkflow("Open", fOIRequestsSchema,json.loads(metadata),rawresult.args[0])
+                    requestservice().postOpeneventtoworkflow(result.identifier, rawresult.args[0],request_json,result.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
@@ -116,7 +115,7 @@ class FOIRequestsById(Resource):
             result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid,AuthHelper.getUserId())
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
-                requestservice().postEventToWorkflow("Update", fOIRequestsSchema,json.loads(metadata), result.args[1])
+                requestservice().postEventToWorkflow(fOIRequestsSchema, json.loads(metadata))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404

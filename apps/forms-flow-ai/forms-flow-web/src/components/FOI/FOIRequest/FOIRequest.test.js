@@ -45,7 +45,8 @@ describe('FOI FOIRequest component', () => {
             },
             foiRequests: { 
                 foiRequestDetail: {}
-            }         
+            },
+            user: {"userDetail": {}}        
         }        
         useSelector.mockImplementation(callback => {
             return callback(localState);
@@ -66,7 +67,8 @@ describe('FOI FOIRequest component', () => {
             },
             foiRequests: { 
                 foiRequestDetail: {}
-            }   
+            },
+            user: {"userDetail": {}}
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);

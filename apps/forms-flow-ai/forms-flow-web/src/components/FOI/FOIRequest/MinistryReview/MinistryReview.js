@@ -162,19 +162,18 @@ const MinistryReview = React.memo((props) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
+                  { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
                   <>
                     <RequestHeader requestDetails={requestDetails} />
                     { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <ApplicantDetails requestDetails={requestDetails}/> </> : null}
-                    <RequestDescription />
+                    <RequestDescription requestDetails={requestDetails} />
                    { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <RequestDetails requestDetails={requestDetails}/> </> : null}
-                    <RequestTracking/>
-                    
+                    <RequestTracking/>                                                           
                     <div className="foi-bottom-button-group">
-                      <button type="button" className="btn btn-bottom btnenabled">Save</button>
-                      
+                      <button type="button" className="btn btn-bottom btnenabled">Save</button>                      
                     </div>
                   </>
-
+                : null }
                 </form>
               </div>
             </div>                            

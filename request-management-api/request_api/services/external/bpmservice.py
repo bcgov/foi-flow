@@ -17,92 +17,88 @@ class bpmservice(camundaservice):
     
      
     @classmethod
-    def unopenedClaim(self,processInstanceId, userId, token=None):
+    def unopenedClaim(self,processinstanceid, userid, token=None):
         if self.bpmEngineRestUrl is not None:
-            messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId,
-                                              "messageName": MessageType.unopenedClaim.value, 
+            messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
+                                              "messageName": MessageType.intakeclaim.value, 
                                               "processVariables":{
-                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userId})
+                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userid})
                                                   }
                                               })
-            return requests.post(self._getUrl_(self,MessageType.unopenedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+            return requests.post(self._getUrl_(MessageType.intakeclaim.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return
     @classmethod
-    def openedclaim(self,fileNumber, groupName, userId, token=None):
+    def openedclaim(self, filenumber, groupname, userid, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
-            messageSchema = MessageSchema().dump({"messageName": MessageType.openedClaim.value,
+            messageschema = MessageSchema().dump({"messageName": messagetype,
                                               "localCorrelationKeys":{
-                                                  "id": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber})
+                                                  "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
                                                   },
                                               "processVariables":{
-                                                  "filenumber": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber}),
-                                                  "assignedGroup": VariableSchema().dump({"type" : VariableType.String.value, "value": groupName}),
-                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userId})
+                                                  "filenumber": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber}),
+                                                  "assignedGroup": VariableSchema().dump({"type" : VariableType.String.value, "value": groupname}),
+                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userid})
                                                   }
                                               })
-            return requests.post(self._getUrl_(self,MessageType.openedClaim.value), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return     
         
     @classmethod
-    def openedcomplete(self,fileNumber, data, messagetype, token=None):
+    def openedcomplete(self,filenumber, data, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
-            messageSchema = MessageSchema().dump({"messageName": messagetype,
+            messageschema = MessageSchema().dump({"messageName": messagetype,
                                               "localCorrelationKeys":{
-                                                  "id": VariableSchema().dump({"type" : VariableType.String.value, "value": fileNumber})
+                                                  "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
                                                   },
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            return requests.post(self._getUrl_(self,messagetype), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return    
  
     @classmethod
-    def complete(self,processInstanceId, data, messagetype, token=None): 
-        print(messagetype)
+    def complete(self,processinstanceid, data, messagetype, token=None): 
         if self.bpmEngineRestUrl is not None:
-            print('before post')
-            messageSchema = MessageSchema().dump({"processInstanceId": processInstanceId,
+            messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
                                               "messageName": messagetype, 
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
                                                   }
                                               })
-            return requests.post(self._getUrl_(self,messagetype), data=json.dumps(messageSchema), headers = self._getHeaders_(self,token))
+            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return
 
-    def _getUrl_(self, messageType):
-        if messageType is not None:
+    @classmethod
+    def _getUrl_(self, messagetype):
+        if messagetype is not None:
             return self.bpmEngineRestUrl+"/message"
         return self.bpmEngineRestUrl
     
-    
-    def _getServiceAccountToken_(self):
+    @classmethod
+    def _getserviceaccounttoken_(self):
         auth_response = requests.post(self.bpmTokenUrl, auth=(self.bpmClientId, self.bpmClientSecret), headers={
             'Content-Type': 'application/x-www-form-urlencoded'}, data='grant_type=client_credentials')
         return auth_response.json().get('access_token')
     
-    
+    @classmethod
     def _getHeaders_(self, token):
         """Generate headers."""
         if token is None:
-            token = self._getServiceAccountToken_(self);
+            token = self._getserviceaccounttoken_();
         return {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json",
         }
 
-
-
 class MessageType(Enum):
-    unopenedClaim = "foi-unopened-assignment"
-    openedClaim = "foi-opened-assignment"
-    openrequest = "foi-open-request"
-    openedcomplete = "foi-opened-complete"    
+    intakeclaim = "foi-intake-assignment"    
+    intakecomplete = "foi-intake-complete"
+    iaoclaim = "foi-iao-assignment"
+    iaocomplete = "foi-iao-complete"    
     ministryclaim = "foi-ministry-assignment"
-    ministrycomplete = "foi-ministry-complete"
-             
+    ministrycomplete = "foi-ministry-complete"             
      

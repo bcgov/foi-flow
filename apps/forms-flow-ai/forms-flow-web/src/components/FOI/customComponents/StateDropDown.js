@@ -53,7 +53,9 @@ export default function StateDropDown({requestStatus, handleStateChange,requestD
             case StateEnum.consult.name.toLowerCase():
                 return StateList.consult;
             case StateEnum.signoff.name.toLowerCase():
-                return StateList.signoff;                                        
+                return StateList.signoff;
+            case StateEnum.feeassessed.name.toLowerCase():
+                return StateList.feeassessed;                                        
             default:
                 return [];
         }

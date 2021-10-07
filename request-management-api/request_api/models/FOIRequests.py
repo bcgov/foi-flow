@@ -26,7 +26,7 @@ class FOIRequest(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
+    wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)   
 
     #ForeignKey References
     
