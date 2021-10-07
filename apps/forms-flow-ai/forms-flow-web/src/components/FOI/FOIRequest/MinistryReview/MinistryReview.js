@@ -163,9 +163,9 @@ const MinistryReview = React.memo((props) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   <>
                     <RequestHeader requestDetails={requestDetails} />
-                    <ApplicantDetails />
-                    <RequestDescription />
-                    <RequestDetails />
+                    <ApplicantDetails requestDetails={requestDetails} />
+                    <RequestDescription requestDetails={requestDetails} />
+                    <RequestDetails requestDetails={requestDetails} />
                     <div className="foi-bottom-button-group">
                       <button type="button" className="btn btn-bottom btnenabled">Save</button>
                       

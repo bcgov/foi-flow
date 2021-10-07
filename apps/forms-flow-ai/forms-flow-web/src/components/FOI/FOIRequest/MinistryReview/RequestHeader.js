@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 const RequestHeader = React.memo((requestDetails) => {
-    const requestDetailsValue = requestDetails.requestDetails;
+    const _requestDetails = requestDetails.requestDetails;
 
     const preventDefault = (event) => event.preventDefault();
 
@@ -28,9 +28,9 @@ const RequestHeader = React.memo((requestDetails) => {
     },[dispatch]); 
 
     const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
-    function getFullName(assignedToList, requestDetailsValue) {
-        const groupName = requestDetailsValue.assignedGroup ? requestDetailsValue.assignedGroup : "Unassigned";
-        const assignedTo = requestDetailsValue.assignedTo ? requestDetailsValue.assignedTo : groupName;
+    function getFullName(assignedToList, requestDetails) {
+        const groupName = requestDetails.assignedGroup ? requestDetails.assignedGroup : "Unassigned";
+        const assignedTo = requestDetails.assignedTo ? requestDetails.assignedTo : groupName;
         if (assignedToList.length > 0) {
             const assigneeGroup = assignedToList.find(_assigneeGroup => _assigneeGroup.name === groupName);
             const assignee = assigneeGroup && assigneeGroup.members && assigneeGroup.members.find(_assignee => _assignee.username === assignedTo);
@@ -46,8 +46,8 @@ const RequestHeader = React.memo((requestDetails) => {
         }
     }
 
-    const headerText = requestDetailsValue.idNumber ? `Request #${requestDetailsValue.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
-    const assignedToValue = getFullName(assignedToList, requestDetailsValue);
+    const headerText = _requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    const assignedToValue = getFullName(assignedToList, _requestDetails);
 
     return (
 
@@ -80,7 +80,7 @@ const RequestHeader = React.memo((requestDetails) => {
 
             
                     <>
-                      <MinistryAssignToDropdown requestDetails={requestDetailsValue} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestDetails={_requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={true} />
                     </>
                 
             </div>
