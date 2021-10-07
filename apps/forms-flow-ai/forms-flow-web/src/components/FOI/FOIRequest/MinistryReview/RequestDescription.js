@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
 
 const RequestDescription = React.memo((requestDetails) => {
     const classes = useStyles();
+    const _requestDetails = requestDetails.requestDetails;
     var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);
     const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
@@ -60,13 +61,13 @@ const RequestDescription = React.memo((requestDetails) => {
                     <div className="acc-request-description-row">
                         <Typography className="acc-daterange-heading"><b>Date Range for Record Search</b></Typography>
                         <div className="acc-request-dates">
-                            <Typography className="acc-start-date"><b>Start Date: </b>{requestDetails.requestDetails.fromDate ? formatDate(requestDetails.requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
-                            <Typography><b>End Date: </b>{requestDetails.requestDetails.toDate ? formatDate(requestDetails.requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
+                            <Typography className="acc-start-date"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
+                            <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
                         </div>                                                              
                     </div>
                     <Typography className="acc-bottom-request-description-header"><b>Request Description</b></Typography>
                     <Typography>
-                    {requestDetails.requestDetails.description}
+                    {_requestDetails.description}
                     </Typography>
                   </div>
               </div>               

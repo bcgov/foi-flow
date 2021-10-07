@@ -2,7 +2,7 @@ import React, { useEffect, useState }  from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
-import FOIRequestHeader from '../FOIRequestHeader';
+import '../foirequestheader.scss'
 import "./MinistryReviewTabbedContainer.scss";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
@@ -164,9 +164,9 @@ const MinistryReview = React.memo((props) => {
                   { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
                   <>
                     <RequestHeader requestDetails={requestDetails} />
-                    <ApplicantDetails />
+                    <ApplicantDetails requestDetails={requestDetails}/> 
                     <RequestDescription requestDetails={requestDetails} />
-                    <RequestDetails requestDetails={requestDetails}/>
+                    <RequestDetails requestDetails={requestDetails}/>                    
                     <div className="foi-bottom-button-group">
                       <button type="button" className="btn btn-bottom btnenabled">Save</button>                      
                     </div>
