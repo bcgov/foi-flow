@@ -23,7 +23,7 @@ const RequestDetails = React.memo((requestDetails) => {
                 <div className="row foi-details-row foi-justifyleft">
                   
                     <div className="col-lg-10 foi-details-col ">                     
-                        <b>Selected Ministry: {_requestDetails.selectedMinistries[0].name}</b> 
+                        <b>Selected Ministry: {_requestDetails.selectedMinistries && _requestDetails.selectedMinistries[0].name }</b> 
                     </div>
                     
                 </div>
