@@ -161,17 +161,17 @@ const MinistryReview = React.memo((props) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
+                  { Object.entries(requestDetails).length !== 0 ? 
                   <>
                     <RequestHeader requestDetails={requestDetails} />
                     <ApplicantDetails />
-                    <RequestDescription />
+                    <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails />
                     <div className="foi-bottom-button-group">
-                      <button type="button" className="btn btn-bottom btnenabled">Save</button>
-                      
+                      <button type="button" className="btn btn-bottom btnenabled">Save</button>                      
                     </div>
                   </>
-
+                : null }
                 </form>
               </div>
             </div>                            
