@@ -132,7 +132,7 @@ const MinistryReview = React.memo((props) => {
   
 
   return (
-
+    
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -165,7 +165,7 @@ const MinistryReview = React.memo((props) => {
                     <RequestHeader requestDetails={requestDetails} />
                     <ApplicantDetails />
                     <RequestDescription />
-                    <RequestDetails />
+                   { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <RequestDetails requestDetails={requestDetails}/> </> : null}
                     <div className="foi-bottom-button-group">
                       <button type="button" className="btn btn-bottom btnenabled">Save</button>
                       
