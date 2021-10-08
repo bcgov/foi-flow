@@ -1,6 +1,6 @@
 @font-face {
   font-family: "BCSans-Regular";
-  src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+  src: url("../../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
 }
 
 .foiformcontent {
@@ -29,8 +29,7 @@
     width: 10px;
     background-color:white;
     border-color: teal;
-    border-radius: 50%!important;    
-    border-color: teal;
+    border-radius: 50%!important;
     border-width: 1px;
     border-style: solid;
     
@@ -59,15 +58,16 @@
     z-index: 10;
   }
   .foitabpanelcollection{
-    margin-left:18%;
+    margin-left:20%;
+    min-width: 1000px;
   }
 
   .foitabheaderdefaultBG {
-    background-color: #048ba8;
+    background-color: teal;
   }
 
   .foitabheaderOpenBG {
-    background-color: #008000;
+    background-color: green;
   }
 
   .foitabheaderClosedBG{
@@ -82,29 +82,10 @@
     background-color: #ff0000;
   }
   
+
   .foitabheaderRedirectBG{
-    background-color: #dd1155;
+    background-color: #d15;
   }
-  
-  .foitabheaderReviewBG{
-    background-color: #40E0D0;
-  }
-  
-  .foitabheaderFeeBG{
-    background-color: maroon;
-  }
-
-  .foitabheaderConsultBG{
-    background-color: grey;
-  }
-
-  .foitabheaderSignoffBG{
-    background-color: skyblue;
-  }
-
-
-
-
   .foileftpanelheader
   {
       padding-left: 12%;
@@ -234,7 +215,7 @@ span.circle
 }
 
 .tab div.active span.circle{
-  background: #048ba8;
+  background: teal;
 }
 
 .foitabheaderCFRG .tab div.active span.circle {
@@ -246,7 +227,7 @@ span.circle
 }
 
 .foitabheaderOpenBG .tab div.active span.circle{
-  background-color: #008000;
+  background-color: green;
 }
 
 .foitabheaderClosedBG .tab div.active span.circle{
@@ -254,23 +235,7 @@ span.circle
 }
 
 .foitabheaderRedirectBG .tab div.active span.circle{
-  background-color: #dd1155;
-}
-
-.foitabheaderReviewBG .tab div.active span.circle{
-  background-color: #40E0D0;
-}
-
-.foitabheaderFeeBG .tab div.active span.circle{
-  background-color: maroon;
-}
-
-.foitabheaderConsultBG .tab div.active span.circle{
-  background-color: grey;
-}
-
-.foitabheaderSignoffBG .tab div.active span.circle{
-  background-color: skyblue;
+  background-color: #d15;
 }
 
 /* Style the tab content */
@@ -283,5 +248,17 @@ span.circle
 
 .foitabpanelcollection .active {
   display: inline-block;
+  width: 100%;
 }
 
+@media only screen and (max-width:1920px){
+  .foitabpanelcollection{
+      min-width: 1000px;
+  }
+}
+
+@media screen and (max-width: 6000px) and (min-width: 1920px), (min-width: 1920px) {
+  .foitabpanelcollection{
+    min-width: 1150px;
+  }
+}

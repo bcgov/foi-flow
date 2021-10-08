@@ -48,6 +48,13 @@ export const setFOIRequestDetail = (data) => dispatch =>{
     })
 }
 
+export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRYVIEW_REQUEST_DETAIL,
+        payload:data
+    })
+}
+
 export const serviceActionError = (data) => dispatch => {
    //TODO update to a common file
     dispatch({
@@ -125,6 +132,15 @@ export const clearRequestDetails = (data) => dispatch => {
         payload:data      
     })
 }
+
+
+export const clearMinistryViewRequestDetails = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.CLEAR_MINISTRYVIEWREQUEST_DETAILS,
+        payload:data      
+    })
+}
+
 export const setFOIRequestDescriptionHistory = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY,
