@@ -23,13 +23,11 @@ const RequestNotes = React.memo(() => {
       notesArray.push(<Note key={i} note={notes[i]} />);
     }
 
-
     return (
              
         <Card className="foi-details-card">            
             <label className="foi-details-label">REQUEST NOTES</label>
             <CardContent>          
-                {/* <Note note={note} /> */}
                 {notesArray}
 
                 <input type="note" className="form-control" id="note" placeholder="Add a new note" name="note" />
