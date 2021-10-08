@@ -55,7 +55,7 @@ const RequestHeader = React.memo((requestDetails) => {
             <div className="foi-request-review-header-col1">
                 <div className="foi-request-review-header-col1-row">
                     <Link href="#" onClick={preventDefault}>
-                        <h1 className="foi-review-request-text">{headerText}</h1>
+                        <h1 className="foi-review-request-text foi-ministry-requestheadertext">{headerText}</h1>
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
