@@ -62,13 +62,13 @@ const RequestDescription = React.memo((requestDetails) => {
                 <div className="row foi-details-row">
                     <div className="col-lg-10 foi-details-col">
                         <div className="ministry-request-description-row">
-                            <Typography className="ministry-daterange-heading"><b>Date Range for Record Search</b></Typography>
+                            <Typography className="ministry-heading"><b>Date Range for Record Search</b></Typography>
                             <div className="ministry-request-dates">
-                                <Typography className="ministry-start-date"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
+                                <Typography className="ministry-start-date ministry-heading"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
                                 <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
                             </div>
                         </div>
-                        <Typography className="ministry-bottom-request-description-header"><b>Request Description</b></Typography>
+                        <Typography className="ministry-bottom-request-description-header ministry-heading"><b>Request Description</b></Typography>
                         <Typography>
                             {_requestDetails.description}
                         </Typography>
