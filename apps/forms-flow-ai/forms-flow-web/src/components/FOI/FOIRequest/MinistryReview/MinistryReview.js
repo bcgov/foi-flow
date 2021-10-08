@@ -43,8 +43,7 @@ const useStyles = makeStyles((theme) => ({
   btnenabled: {
     border: 'none',
     backgroundColor: '#38598A',
-    color: '#FFFFFF',
-    backgroundColor: '#38598A'
+    color: '#FFFFFF'
   },
   btnsecondaryenabled: {
     border: '1px solid #38598A',
