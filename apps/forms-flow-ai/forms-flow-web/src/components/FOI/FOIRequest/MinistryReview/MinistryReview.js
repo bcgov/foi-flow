@@ -18,6 +18,7 @@ import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
 import RequestDescription from './RequestDescription';
 import RequestHeader from './RequestHeader';
+import RequestNotes from './RequestNotes';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -166,6 +167,7 @@ const MinistryReview = React.memo((props) => {
                     { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <ApplicantDetails requestDetails={requestDetails}/> </> : null}
                     <RequestDescription />
                     { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <RequestDetails requestDetails={requestDetails}/> </> : null}
+                    <RequestNotes />
                     <div className="foi-bottom-button-group">
                       <button type="button" className="btn btn-bottom btnenabled">Save</button>
                       
