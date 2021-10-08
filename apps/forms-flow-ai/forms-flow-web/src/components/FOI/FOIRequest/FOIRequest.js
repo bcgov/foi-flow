@@ -555,6 +555,21 @@ const FOIRequest = React.memo((props) => {
     case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
+    case StateEnum.callforrecordsoverdue.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
+      break;
+    case StateEnum.review.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"
+      break;
+    case StateEnum.feeassessed.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderFeeBG"
+      break;
+    case StateEnum.consult.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderConsultBG"
+      break;
+    case StateEnum.signoff.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
+      break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;      

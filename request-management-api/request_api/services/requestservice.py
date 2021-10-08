@@ -19,7 +19,7 @@ from request_api.schemas.foirequest import  FOIRequestSchema
 from dateutil.parser import *
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
-from request_api.services.external.bpmservice import bpmservice, MessageType
+from request_api.services.workflowservice import workflowservice
 from enum import Enum
 import datetime 
 from datetime import datetime as datetime2
@@ -174,30 +174,14 @@ class requestservice:
                         updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
             return FOIRequest.updateStatus(foirequestid, updatedMinistries, userId)
     
-    def postEventToWorkflow(self,event, fOIRequestsSchema, data, wkinstanceid=None):        
-        assignedGroup = fOIRequestsSchema.get("assignedGroup") if 'assignedGroup' in fOIRequestsSchema  else None  
-        assignedTo = fOIRequestsSchema.get("assignedTo") if 'assignedTo' in fOIRequestsSchema  else None   
-        requeststatusid =  fOIRequestsSchema.get("requeststatusid") if 'requeststatusid' in fOIRequestsSchema  else None 
+    def postEventToWorkflow(self, requestschema, data):        
+        requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
         if requeststatusid is not None:
             status = FOIRequestUtil().getStatusName(requeststatusid)
-            if event == "Open":
-                bpmservice.complete(wkinstanceid, data, MessageType.openrequest.value)
-            elif event == "Update":
-                fileNumber = fOIRequestsSchema.get("idNumber") if 'idNumber' in fOIRequestsSchema  else None 
-                if data.get("ministries") is not None:
-                    for ministry in data.get("ministries"):    
-                        if ministry["filenumber"] == fileNumber:
-                            activity = FOIRequestUtil().geteventtype(fileNumber, ministry["version"],status)
-                            metadata = json.dumps({"id": fileNumber, "status": status, "assignedGroup": assignedGroup, "assignedTo": assignedTo, "assignedministrygroup":ministry["assignedministrygroup"]})
-                            if status == "Closed" or status == "Call For Records":
-                                bpmservice.openedcomplete(fileNumber, metadata, MessageType.openedcomplete.value)
-                            elif status == "Open":
-                                if activity == "complete":
-                                    bpmservice.openedcomplete(fileNumber, metadata, MessageType.ministrycomplete.value)
-                                else:
-                                    bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
-                            else:
-                                bpmservice.openedclaim(fileNumber, assignedGroup, assignedTo)
+            workflowservice.postministryevent(requestschema, data, status)
+            
+    def postOpeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
+        workflowservice.postintakeevent(id, wfinstanceid, requestschema, "Open", ministries)
        
 
        

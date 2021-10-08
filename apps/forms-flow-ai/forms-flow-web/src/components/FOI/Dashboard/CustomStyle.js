@@ -33,10 +33,10 @@ const useStyles = makeStyles(
             backgroundColor: '#f1f1f1',
           },
         },
-        '& .super-app-theme--PartiallyFilled': {
-          backgroundColor: getBackgroundColor(theme.palette.warning.main),
+        '& .super-app-theme--selectdivision': {
+          backgroundColor: '#cfd7e3', 
           '&:hover': {
-            backgroundColor: getHoverBackgroundColor(theme.palette.warning.main),
+            backgroundColor: getHoverBackgroundColor(theme.palette.info.main),
           },
         },
         '& .super-app-theme--Rejected': {

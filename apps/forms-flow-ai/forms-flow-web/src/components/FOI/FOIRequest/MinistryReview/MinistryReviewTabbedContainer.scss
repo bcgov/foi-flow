@@ -59,8 +59,8 @@
     z-index: 10;
   }
   .foitabpanelcollection{
-    margin-left:18%;
-    min-width: 1090px;
+    margin-left:20%;
+    min-width: 1000px;
   }
 
   .foitabheaderdefaultBG {
@@ -250,3 +250,14 @@ span.circle
   width: 100%;
 }
 
+@media only screen and (max-width:1920px){
+  .foitabpanelcollection{
+      min-width: 1000px;
+  }
+}
+
+@media screen and (max-width: 6000px) and (min-width: 1920px), (min-width: 1920px) {
+  .foitabpanelcollection{
+    min-width: 1150px;
+  }
+}

@@ -19,6 +19,7 @@ import RequestDetails from './RequestDetails';
 import RequestDescription from './RequestDescription';
 import RequestHeader from './RequestHeader';
 import RequestNotes from './RequestNotes';
+import RequestTracking from './RequestTracking';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -162,18 +163,20 @@ const MinistryReview = React.memo((props) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
+                  { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
                   <>
                     <RequestHeader requestDetails={requestDetails} />
                     { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <ApplicantDetails requestDetails={requestDetails}/> </> : null}
-                    <RequestDescription />
-                    { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <RequestDetails requestDetails={requestDetails}/> </> : null}
+                    <RequestDescription requestDetails={requestDetails} />
+                   { Object.entries(requestDetails).length >0 && requestDetails!=undefined ?<> <RequestDetails requestDetails={requestDetails}/> </> : null}
+                    <RequestTracking/>
                     <RequestNotes />
+
                     <div className="foi-bottom-button-group">
-                      <button type="button" className="btn btn-bottom btnenabled">Save</button>
-                      
+                      <button type="button" className="btn btn-bottom btnenabled">Save</button>                      
                     </div>
                   </>
-
+                : null }
                 </form>
               </div>
             </div>                            
