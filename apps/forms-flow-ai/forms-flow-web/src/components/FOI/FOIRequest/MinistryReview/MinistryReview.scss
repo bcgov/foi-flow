@@ -19,8 +19,8 @@
     background-color: white;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 5%;
+    padding-right: 5%;
     padding-bottom: 10px;
 }
 .foi-review-request-container {
@@ -43,10 +43,11 @@
 }
 
 .foi-details-card {
-    margin-top: 50px;
+    margin-top: 30px;
     box-shadow: none !important;
     border: 1px solid #dfdede !important;
     border-radius: 2px;
+    padding-top: 10px;
 }
 .foi-details-label {
     font-family: "BCSans-Regular", sans-serif;
@@ -121,4 +122,20 @@
 
 .foi-rowtoppadding{
     padding-top: 10px;
+}
+
+.foi-justify-spacyaround {
+    justify-content: space-around;
+}
+
+.foi-ministry-requestheadertext {
+    font-size: 25px;
+}
+
+.foi-floatright{
+    float: right;
+}
+
+.foi-link{
+    text-decoration: none;
 }

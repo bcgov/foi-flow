@@ -8,16 +8,16 @@ import { formatDate } from "../../../../helper/FOI/helper";
 
 const RequestDetails = React.memo((requestDetails) => {
 
-    const _requestDetails = requestDetails.requestDetails;
-   
+    const _requestDetails = requestDetails.requestDetails
+
     return (
         Object.entries(_requestDetails).length >0 && _requestDetails!=undefined  ?
       <>
         <Card className="foi-details-card">
-        <div className="row foi-details-row foi-justifyleft"> 
-        <div className="col-lg-8 foi-details-col ">           
-            <label className="foi-details-label">REQUEST DETAILS</label></div>
-            <div className="col-lg-4 foi-details-col "><a href='#'>Ministries Canvassed</a></div>
+            <div className="row foi-details-row">
+              <div className="col-lg-8 foi-details-col ">
+                <label className="foi-details-label">REQUEST DETAILS</label></div>
+              <div className="col-lg-4 foi-details-col "><a href='#' className="foi-floatright foi-link">Ministries Canvassed</a></div>
             </div>
             <CardContent>          
                 <div className="row foi-details-row foi-justifyleft">
@@ -29,19 +29,19 @@ const RequestDetails = React.memo((requestDetails) => {
                 </div>
                 <div className="row foi-details-row foi-justifyleft">
                 </div>
-                <div className="row foi-details-row foi-rowtoppadding">
+                <div className="row foi-details-row foi-rowtoppadding foi-justify-spacyaround">
                   
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                     <span><b>Request Opened</b></span>                      
-                    <span>{formatDate(_requestDetails.requestProcessStart,'yyyy MMM, dd')}</span>
+                    <span className="foi-rowtoppadding">{formatDate(_requestDetails.requestProcessStart,'yyyy MMM, dd')}</span>
                   </div>
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                   <span><b>Records Due Date</b></span>                      
-                  <span>{formatDate(_requestDetails.cfrDueDate,'yyyy MMM, dd')}</span>
+                  <span className="foi-rowtoppadding">{formatDate(_requestDetails.cfrDueDate,'yyyy MMM, dd')}</span>
                   </div>
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                   <span><b>Legislated Due Date</b></span>                      
-                  <span>{formatDate(_requestDetails.dueDate,'yyyy MMM, dd')}</span>
+                  <span className="foi-rowtoppadding">{formatDate(_requestDetails.dueDate,'yyyy MMM, dd')}</span>
                   </div>
               </div>               
             </CardContent>

@@ -2,7 +2,7 @@ import React, { useEffect, useState }  from 'react';
 import CFRStatus from './CFRStatus';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-
+import DivisionalStages from './Divisions/DivisionalStages';
 const RequestTracking = React.memo((props) => {
 
 
@@ -18,7 +18,13 @@ const RequestTracking = React.memo((props) => {
                    <CFRStatus/>
                 </div>
             </div>
-                <hr/>     
+                <hr/>   
+                <div className="row foi-details-row">
+              
+                <div className="col-lg-12 foi-details-col">                      
+                  <DivisionalStages />
+                </div>
+            </div>  
         </CardContent>
     </Card>    
     )

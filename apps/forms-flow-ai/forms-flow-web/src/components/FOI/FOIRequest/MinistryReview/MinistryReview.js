@@ -168,7 +168,7 @@ const MinistryReview = React.memo((props) => {
                     <ApplicantDetails requestDetails={requestDetails}/> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
-                    <RequestTracking/>
+                    <RequestTracking/>                                                                             
                     <div className="foi-bottom-button-group">
                       <button type="button" className="btn btn-bottom btnenabled">Save</button>                      
                     </div>
