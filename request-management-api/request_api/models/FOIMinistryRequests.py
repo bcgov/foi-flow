@@ -125,6 +125,10 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.asc())
         return request_schema.dump(query)   
+    
+    @classmethod
+    def getversionforrequest(cls,ministryrequestid):   
+       return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
