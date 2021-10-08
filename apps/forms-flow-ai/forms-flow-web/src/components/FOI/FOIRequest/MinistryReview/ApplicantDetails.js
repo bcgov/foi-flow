@@ -16,7 +16,7 @@ const ApplicantDetails = React.memo((requestDetails) => {
         <Card className="foi-details-card">            
             <label className="foi-details-label">APPLICANT DETAILS</label>
             <CardContent>          
-                <div className="row foi-details-row foi-justify-spacyaround">
+                <div className="row foi-details-row ">
                     <div className="col-lg-3 foi-details-col">
                         <div><b>Application Type</b></div>
                         <div><span>{_requestDetails.category}</span></div>

@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { formatDate } from '../../../../helper/FOI/helper';
 import RequestDescriptionHistory from "../../RequestDescriptionHistory";
+import './RequestDescription.scss'
 
 const useStyles = makeStyles((theme) => ({
     headingError: {
@@ -60,14 +61,14 @@ const RequestDescription = React.memo((requestDetails) => {
             <CardContent>
                 <div className="row foi-details-row">
                     <div className="col-lg-10 foi-details-col">
-                        <div className="acc-request-description-row">
-                            <Typography className="acc-daterange-heading"><b>Date Range for Record Search</b></Typography>
-                            <div className="acc-request-dates">
-                                <Typography className="acc-start-date"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
+                        <div className="ministry-request-description-row">
+                            <Typography className="ministry-daterange-heading"><b>Date Range for Record Search</b></Typography>
+                            <div className="ministry-request-dates">
+                                <Typography className="ministry-start-date"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
                                 <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
                             </div>
                         </div>
-                        <Typography className="acc-bottom-request-description-header"><b>Request Description</b></Typography>
+                        <Typography className="ministry-bottom-request-description-header"><b>Request Description</b></Typography>
                         <Typography>
                             {_requestDetails.description}
                         </Typography>
