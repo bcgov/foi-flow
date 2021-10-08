@@ -1,7 +1,4 @@
-@font-face {
-  font-family: "BCSans-Bold";
-  src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
+
 
 nav {
   background-color: #036 !important;
@@ -28,11 +25,11 @@ nav h2 {
 .banner-right {
   display: flex;
   
-  font-family: 'BCSans-Bold', sans-serif;
+  font-family: 'BCSans-Bold', sans-serif!important;
   color: #fff;
 }
 .navbar-text {
-  font-family: 'BCSans-Bold', sans-serif;  
+  font-family: 'BCSans-Bold', sans-serif!important;  
   color: #fff !important;
   margin-right: 40px;
   
@@ -49,7 +46,7 @@ nav h2 {
   background-color:  #036 !important;
   width: 100%;
   height: 100%;   
-  font-family: 'BCSans-Bold', sans-serif;
+  font-family: 'BCSans-Bold', sans-serif!important;
   color: #FFFF;
   border-color: #FFFF !important;
   position: relative;
