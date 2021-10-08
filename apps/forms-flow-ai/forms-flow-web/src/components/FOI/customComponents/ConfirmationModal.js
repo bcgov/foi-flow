@@ -77,7 +77,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   </tr>
                 </tbody>
               </table>
-              {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ? 
+              {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.signoff.name.toLowerCase() ? 
               <table className="table table-bordered table-assignedto">
                 <tbody>
                   <tr>
