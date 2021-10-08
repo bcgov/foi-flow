@@ -28,30 +28,34 @@ const Note = React.memo((note) => {
   const _note = note.note;
 
   return (
-    <div className="row foi-details-row">
+    <div className="container-fluid">
       <div className="row foi-details-row">
-        <div className="col-lg-12 foi-details-col">
-          <div style={{display:'block'}}>
-            <div style={{display:'inline-block',paddingRight:15+'px'}}>                      
-              <b>{_note.username}</b>
+        <div className="row foi-details-row">
+          <div className="col-lg-12 foi-details-col">
+            <div className="col-lg-4" style={{display:'inline-block'}}>
+              <div style={{display:'inline',paddingRight:15+'px'}}>                      
+                <b>{_note.username}</b>
+              </div>
+              <div style={{display:'inline'}}>                      
+                {_note.time}
+              </div>
             </div>
-            <div style={{display:'inline-block'}}>                      
-              {_note.time}
+            <div className="col-lg-8" style={{display:'inline-block'}}>
+              <div className="col-lg-1" style={{marginLeft:'auto'}}>
+                ...
+              </div>                      
             </div>
           </div>
-          <div style={{marginLeft:'auto',display:'inline-block'}}>                      
-            ...
+        </div>
+        <div className="row foi-details-row" style={{paddingTop:15+'px',paddingBottom:15+'px'}}>
+          <div className="col-lg-12 foi-details-col">                      
+            {_note.content}
           </div>
         </div>
-      </div>
-      <div className="row foi-details-row" style={{paddingTop:15+'px',paddingBottom:15+'px'}}>
-        <div className="col-lg-12 foi-details-col">                      
-          {_note.content}
-        </div>
-      </div>
-      <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
-        <div className="col-lg-12 foi-details-col">                      
-          <hr class="solid" />
+        <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
+          <div className="col-lg-12 foi-details-col">                      
+            <hr class="solid" />
+          </div>
         </div>
       </div>
     </div>
