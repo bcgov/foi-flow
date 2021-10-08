@@ -132,8 +132,8 @@ const search = (data) => {
  
 
 const renderReviewRequest = (e) => {
-  if (e.row.ministryrequestid) {
-    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
+  if (e.row.ministryrequestid) {    
+    dispatch(push(`/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
   }
 }
 

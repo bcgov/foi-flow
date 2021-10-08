@@ -85,8 +85,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         setAssignedTo(event.target.value);
         //event bubble up - to validate required fields
         handleAssignedToValue(event.target.value);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);
-        console.log(`handleAssignedToOnChange HEader ${event.target.value}`)
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);        
     }
 
     const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
