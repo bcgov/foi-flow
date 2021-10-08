@@ -11,26 +11,26 @@ import RequestDescriptionHistory from "../../RequestDescriptionHistory";
 
 const useStyles = makeStyles((theme) => ({
     headingError: {
-      color: "#ff0000"    
+        color: "#ff0000"
     },
     headingNormal: {
-      color: "000000"
+        color: "000000"
     },
-    btndisabled: { 
-      color: "#808080"
+    btndisabled: {
+        color: "#808080"
     }
 }));
 
 const RequestDescription = React.memo((requestDetails) => {
     const classes = useStyles();
     const _requestDetails = requestDetails.requestDetails;
-    var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);
+    var requestDescriptionHistoryList = useSelector(state => state.foiRequests.foiRequestDescriptionHistoryList);
     const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
             copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
         ))
     )
-    const sortedList = filteredList.sort((a, b) => {       
+    const sortedList = filteredList.sort((a, b) => {
         return new Date(a.createdAt) - new Date(b.createdAt);
     });
 
@@ -42,37 +42,39 @@ const RequestDescription = React.memo((requestDetails) => {
         setOpenModal(false);
     }
     return (
-        
-        <Card className="foi-details-card">            
-            <label className="foi-details-label">REQUEST DESCRIPTION</label>
-            <CardContent>
-            <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose}/>
-                <div className="row foi-details-row">
-                  
+
+        <Card className="foi-details-card">
+            <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose} />
+            <div className="row foi-details-row">
+                <div className="col-lg-8 foi-details-col">
+                    <label className="foi-details-label">REQUEST DESCRIPTION</label>
+                </div>
+                <div className="col-lg-4 foi-details-col">
                     <div className="foi-request-description-history">
-                        <button type="button" className={`btn btn-link btn-description-history ${!(sortedList.length > 1)? classes.btndisabled : ""}`} disabled={!(sortedList.length > 1)}  onClick={handleDescriptionHistoryClick}>
+                        <button type="button" className={`btn btn-link btn-description-history ${!(sortedList.length > 1) ? classes.btndisabled : ""}`} disabled={!(sortedList.length > 1)} onClick={handleDescriptionHistoryClick}>
                             Description History
                         </button>
-                    </div> 
-                </div>
-                <div className="row foi-details-row">
-                  
-                  <div className="col-lg-10 foi-details-col">
-                    <div className="acc-request-description-row">
-                        <Typography className="acc-daterange-heading"><b>Date Range for Record Search</b></Typography>
-                        <div className="acc-request-dates">
-                            <Typography className="acc-start-date"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
-                            <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
-                        </div>                                                              
                     </div>
-                    <Typography className="acc-bottom-request-description-header"><b>Request Description</b></Typography>
-                    <Typography>
-                    {_requestDetails.description}
-                    </Typography>
-                  </div>
-              </div>               
+                </div>
+            </div>
+            <CardContent>
+                <div className="row foi-details-row">
+                    <div className="col-lg-10 foi-details-col">
+                        <div className="acc-request-description-row">
+                            <Typography className="acc-daterange-heading"><b>Date Range for Record Search</b></Typography>
+                            <div className="acc-request-dates">
+                                <Typography className="acc-start-date"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
+                                <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
+                            </div>
+                        </div>
+                        <Typography className="acc-bottom-request-description-header"><b>Request Description</b></Typography>
+                        <Typography>
+                            {_requestDetails.description}
+                        </Typography>
+                    </div>
+                </div>
             </CardContent>
-        </Card>       
+        </Card>
     );
 
 

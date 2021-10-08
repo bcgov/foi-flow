@@ -43,10 +43,11 @@
 }
 
 .foi-details-card {
-    margin-top: 50px;
+    margin-top: 30px;
     box-shadow: none !important;
     border: 1px solid #dfdede !important;
     border-radius: 2px;
+    padding-top: 10px;
 }
 .foi-details-label {
     font-family: "BCSans-Regular", sans-serif;
@@ -123,3 +124,18 @@
     padding-top: 10px;
 }
 
+.foi-justify-spacyaround {
+    justify-content: space-around;
+}
+
+.foi-ministry-requestheadertext {
+    font-size: 25px;
+}
+
+.foi-floatright{
+    float: right;
+}
+
+.foi-link{
+    text-decoration: none;
+}
