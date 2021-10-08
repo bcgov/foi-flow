@@ -18,8 +18,8 @@ import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
 import RequestDescription from './RequestDescription';
 import RequestHeader from './RequestHeader';
-import RequestTracking from './RequestTracking';
 import RequestNotes from './RequestNotes';
+import RequestTracking from './RequestTracking';
 
 const useStyles = makeStyles((theme) => ({
   root: {
