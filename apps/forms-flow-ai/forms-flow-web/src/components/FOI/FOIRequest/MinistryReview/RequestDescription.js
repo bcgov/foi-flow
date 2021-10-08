@@ -60,7 +60,7 @@ const RequestDescription = React.memo((requestDetails) => {
             </div>
             <CardContent>
                 <div className="row foi-details-row">
-                    <div className="col-lg-10 foi-details-col">
+                    <div className="col-lg-12 foi-details-col">
                         <div className="ministry-request-description-row">
                             <Typography className="ministry-heading"><b>Date Range for Record Search</b></Typography>
                             <div className="ministry-request-dates">
