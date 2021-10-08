@@ -48,9 +48,9 @@ class FOIRequestWatcher(db.Model):
         if(requestraqw.count() > 0) :             
             requestraqw.update({FOIRequestWatcher.isactive:False, FOIRequestWatcher.updatedby:userid, FOIRequestWatcher.updated_at:datetime.now()}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Watchers disabled for Id',ministryrequestid)
+            return DefaultMethodResult(True,'Watchers disabled',ministryrequestid)
         else:
-            return DefaultMethodResult(True,'No Watchers found for Id',ministryrequestid)
+            return DefaultMethodResult(True,'No Watchers found',ministryrequestid)
             
 class FOIRequestWatcherSchema(ma.Schema):
     class Meta:
