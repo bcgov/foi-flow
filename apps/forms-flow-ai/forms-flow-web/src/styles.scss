@@ -41,6 +41,11 @@ $dark: $gray-800;
   src: url("./assets/FOI/fonts/BCSans-Regular.woff") format('woff');
 }
 
+@font-face {
+    font-family: "BCSans-Bold";
+    src: url("./assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+
 .container,
 .container-sm,
 .container-md,
@@ -74,6 +79,24 @@ h4 {
 body {
   font-size: 16px;
   font-family: 'BCSans-Regular', sans-serif !important;
+}
+
+div {
+  font-family: 'BCSans-Regular', sans-serif !important;
+}
+
+.MuiInputBase-input {
+  font-family: 'BCSans-Regular', sans-serif !important;
+}
+
+[class^="Mui"]
+{
+  font-family: 'BCSans-Regular', sans-serif;
+}
+
+[class^="Mui"] > *
+{
+  font-family: 'BCSans-Regular', sans-serif;
 }
 
 .loader {

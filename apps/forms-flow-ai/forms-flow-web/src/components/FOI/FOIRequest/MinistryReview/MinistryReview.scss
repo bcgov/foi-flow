@@ -1,11 +1,4 @@
-@font-face {
-    font-family: "BCSans-Regular";
-    src: url("../../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
+
 .scrollable-page {
     position: relative !important;  
     height: 100% !important;;  
@@ -50,7 +43,7 @@
     padding-top: 10px;
 }
 .foi-details-label {
-    font-family: "BCSans-Regular", sans-serif;
+  // font-family: "BCSans-Regular", sans-serif;
     color: grey;
     padding-left: 15px;
 
@@ -74,7 +67,7 @@
     border-color: #f44336 !important;
 }
 .MuiInputBase-root {
-    font-family: "BCSans-Regular", sans-serif !important;
+  // font-family: "BCSans-Regular", sans-serif !important;
 }
 
 .MuiFormLabel-root {
@@ -89,7 +82,7 @@
 }
 
 .MuiMenuItem-root {
-    font-family: "BCSans-Regular", sans-serif !important;
+  // font-family: "BCSans-Regular", sans-serif !important;
 }
 .PrivateNotchedOutline-legendLabelled-4 {
     font-size: 0.80rem !important;
@@ -106,7 +99,7 @@
     margin-top: 10px;
     position: relative;
     width: 30%;
-    font-family: "BCSans-Bold", sans-serif;
+    font-family: "BCSans-Bold", sans-serif!important;
     background-color: #38598A!important;
     color: #FFFFFF!important
 }

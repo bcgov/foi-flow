@@ -1,11 +1,4 @@
-@font-face {
-    font-family: "BCSans-Regular";
-    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
+
 
 .foi-request-review-header-row1 {
     display: flex;
@@ -16,7 +9,7 @@
     
 }
 .foi-request-status {
-    font-family: "BCSans-Regular", sans-serif;
+   //font-family: "BCSans-Regular", sans-serif;
     background-color: black;
     color: white;
     width: fit-content;
@@ -26,7 +19,7 @@
 }
 
 .foi-request-daysremaining {
-    font-family: "BCSans-Regular", sans-serif;   
+    //font-family: "BCSans-Regular", sans-serif;   
     width: fit-content;
     background-color: #008000;
     color: #FFFFFF;
@@ -43,19 +36,19 @@
 }
 
 .foi-review-request-text {
-    font-family: "BCSans-Bold", sans-serif;
+   font-family: "BCSans-Bold", sans-serif!important;
     color: #036 ;
 }
 
 .foi-period-text {
-    font-family: "BCSans-Bold", sans-serif;
+   font-family: "BCSans-Bold", sans-serif!important;
     color: #036 ;
     padding-left: 10px;
     padding-right: 10px;
 
 }
 .foi-correspondence-text {
-    font-family: "BCSans-Bold", sans-serif;
+   font-family: "BCSans-Bold", sans-serif!important;
     color: #49648d;
 }
 
