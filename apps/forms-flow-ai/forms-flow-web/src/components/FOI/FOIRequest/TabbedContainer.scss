@@ -63,7 +63,8 @@
   }
 
   .foitabheaderdefaultBG {
-    background-color: #048ba8;
+    // background-color: #048ba8;
+    background-color: teal;
   }
 
   .foitabheaderOpenBG {
@@ -201,7 +202,8 @@
 /* Style the buttons inside the tab */
 .tab div.tablinks {
   background-color: inherit;
-  color:lightgray;
+  //color:lightgray;
+  color: white !important;
   border: none;
   outline: none;
   cursor: pointer;
@@ -221,7 +223,7 @@
 /* Create an active/current tablink class */
 .tab div.active {
   background-color: #fff;
-  color:black;
+  color:black !important;
 }
 
 span.circle
