@@ -8,6 +8,7 @@ import { openRequestDetails } from '../../../../apiManager/services/FOI/foiReque
 import RequestDetails from './RequestDetails';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { Watcher } from '../../customComponents';
 
 const RequestHeader = React.memo((requestDetails) => {
     const _requestDetails = requestDetails.requestDetails;
@@ -59,6 +60,7 @@ const RequestHeader = React.memo((requestDetails) => {
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
+                    <Watcher />
                     <img src="/assets/Images/wacher.PNG" alt="wacher" style={{width:200+'px',height:50+'px'}} />
                 </div>
             </div>
