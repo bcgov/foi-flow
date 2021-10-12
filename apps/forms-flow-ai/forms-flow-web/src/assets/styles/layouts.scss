@@ -32,4 +32,25 @@
 
 #app {
   background: $white;
+  font-family: 'BCSans-Regular', sans-serif !important;
+}
+
+
+body {
+  font-size: 16px;
+  font-family: 'BCSans-Regular', sans-serif !important;
+}
+
+div , a, p, input, span, h1,h2,h3,h4 {
+  font-family: 'BCSans-Regular', sans-serif;
+}
+
+[class^="Mui"]
+{
+  font-family: 'BCSans-Regular', sans-serif!important;
+}
+
+[class^="Mui"] > *
+{
+  font-family: 'BCSans-Regular', sans-serif!important;
 }

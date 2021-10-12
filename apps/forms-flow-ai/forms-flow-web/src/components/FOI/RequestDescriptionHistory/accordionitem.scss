@@ -1,15 +1,7 @@
-@font-face {
-    font-family: "BCSans-Regular";
-    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
 
 
-.MuiAccordion-root {    
-    font-family: "BCSans-Regular", sans-serif !important;
+
+.MuiAccordion-root {       
     border: #c9c7c7 1px solid;
 }
 
@@ -57,8 +49,4 @@
 
 .acc-bottom-request-description-header {
     margin-bottom: 10px !important;
-}
-
-p {
-    font-family: "BCSans-Regular", sans-serif !important;
 }

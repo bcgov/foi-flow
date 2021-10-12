@@ -1,29 +1,16 @@
 
-@font-face {
-  font-family: "BCSans-Regular";
-  src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
-
-@font-face {
-  font-family: "BCSans-Bold";
-  src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
-
 .foi-ministries-container {
   margin-top: 50px;
  
 }
 
-h4 {
-  font-family: "BCSans-Regular", sans-serif !important; 
-}
+
 .foi-ministries-checkboxes {
   margin-top: 20px;
   display: block;
 }
   .check-item{       
-    position:relative;
-    font-family: "BCSans-Regular", sans-serif;   
+    position:relative;     
     margin: 0.5%;
     padding: 2px;
     width: 10%;

@@ -1,7 +1,4 @@
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-  }
+
   
 div .home-page {
     background-image: url('../../../assets/FOI/images/BC.bmp');
@@ -13,7 +10,7 @@ div .home-page {
 }
 
 div .rounded-rectangle {
-    font-family: 'BCSans-Bold', sans-serif;
+    font-family: 'BCSans-Bold', sans-serif!important;
     border-radius: 12px;
     background: #FFFF;
     margin: auto;
@@ -26,7 +23,7 @@ div .login-container {
   
 }
 div h1 {
-    font-family: 'BCSans-Bold', sans-serif;    
+    font-family: 'BCSans-Bold', sans-serif!important;    
     color: #494949;
     position: relative;
 }
@@ -34,7 +31,7 @@ div h1 {
 .foi-btn {
     border: none;   
     background-color: #38598A !important;   
-    font-family: 'BCSans-Bold', sans-serif;
+    font-family: 'BCSans-Bold', sans-serif!important;
     color: #FFFF !important; 
     margin-top: 10px;
     position: relative;
@@ -43,7 +40,7 @@ div h1 {
 .foi-dashboardbtn {
     border: none;   
     background-color: #38598A !important;   
-    font-family: 'BCSans-Bold', sans-serif;
+    font-family: 'BCSans-Bold', sans-serif!important;
     color: #FFFF !important; 
     margin-top: 10px;
     position: relative;
