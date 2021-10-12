@@ -349,7 +349,7 @@ class FOIRequestUtil:
         requeststatusid =  requestSchema.get("requeststatusid") if 'requeststatusid' in requestSchema  else None
         if requeststatusid is not None:
             status = FOIRequestUtil().getStatusName(requeststatusid)       
-            if status == "Call For Records":
+            if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed":
                 foiministryRequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
