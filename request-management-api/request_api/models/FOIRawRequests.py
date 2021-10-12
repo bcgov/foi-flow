@@ -31,7 +31,6 @@ class FOIRawRequest(db.Model):
     @classmethod
     def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, assigneegroup= None,assignee= None)->DefaultMethodResult:                
         createdat = datetime.now()
-        print(createdat)
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted)
         db.session.add(newrawrequest)
@@ -122,6 +121,10 @@ class FOIRawRequest(db.Model):
        request_schema = FOIRawRequestSchema()
        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
        return request_schema.dump(request)
+
+    @classmethod
+    def getversionforrequest(cls,requestid):   
+       return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
