@@ -30,10 +30,18 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, assigneegroup= None,assignee= None)->DefaultMethodResult:                
-        createdat = datetime.now()
-        print(createdat)
+        createdat = datetime.now()        
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted)
+        db.session.add(newrawrequest)
+        db.session.commit()               
+        return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
+
+    @classmethod
+    def saverawrequest_foipayment(cls,_requestrawdata,notes)->DefaultMethodResult:                
+        createdat = datetime.now()        
+        version = 1
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',created_at=createdat,createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=False,notes=notes)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)

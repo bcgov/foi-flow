@@ -131,8 +131,9 @@ class FOIRawRequests(Resource):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestData']           
-            result = rawrequestservice.saverawrequest(requestdatajson,"onlineform",None)
+            requestdatajson = request_json['requestData'] 
+            notes = 'Request added with FOI Payment Integration release'          
+            result = rawrequestservice.saverawrequest_foipayment(requestdatajson,notes)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
