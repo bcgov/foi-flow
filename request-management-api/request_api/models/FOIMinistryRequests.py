@@ -74,7 +74,7 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
         else:            
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid == 2,FOIMinistryRequest.requeststatusid == 7, FOIMinistryRequest.requeststatusid == 9, FOIMinistryRequest.requeststatusid == 8)))).all()    
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid == 2,FOIMinistryRequest.requeststatusid == 7, FOIMinistryRequest.requeststatusid == 9, FOIMinistryRequest.requeststatusid == 8,FOIMinistryRequest.requeststatusid == 10)))).all()    
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
