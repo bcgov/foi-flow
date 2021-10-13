@@ -1,11 +1,4 @@
-@font-face {
-    font-family: "BCSans-Regular";
-    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
+
 .foi-request-description-row {
     display: inline-flex;
 }
@@ -45,7 +38,7 @@
     margin-top: 10px;
     position: relative;
     width: 30%;
-    font-family: "BCSans-Bold", sans-serif;
+    font-family: "BCSans-Bold", sans-serif!important;
 }
 
 .bottombtn-saverequestdetails {
@@ -56,7 +49,7 @@
     margin-top: 10px;
     position: relative;
     width: 30%;
-    font-family: "BCSans-Bold", sans-serif;
+    font-family: "BCSans-Bold", sans-serif!important;
 }
 
 

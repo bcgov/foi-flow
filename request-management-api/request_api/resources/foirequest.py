@@ -20,12 +20,13 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships
+from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships,getgroupsfromtoken
 from request_api.exceptions import BusinessException, Error
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema
 from marshmallow import Schema, fields, validate, ValidationError
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
 
 
@@ -44,10 +45,20 @@ class FOIRequest(Resource):
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
     def get(foirequestid,foiministryrequestid,usertype = None):
-        try :            
+        try :
+            groups = getgroupsfromtoken()           
+            ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))            
             jsondata = {}
-            jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
-            return jsondata , 200 
+            statuscode = 200
+            if ('Intake Team' in groups or 'Flex Team' in groups) and (usertype is None or (usertype == "iao")):
+                jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
+            elif  usertype is not None and usertype == "ministry" and ministrygroups is not None and len(ministrygroups) > 0:
+                jsondata = requestservice().getrequestdetailsforministry(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid,authMembershipgroups=ministrygroups)
+            else:
+                if len(ministrygroups) == 0 :
+                  statuscode = 401 
+
+            return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:

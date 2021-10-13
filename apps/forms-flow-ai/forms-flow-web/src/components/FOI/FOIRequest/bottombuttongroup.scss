@@ -1,7 +1,4 @@
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-  }
+
 
 .foi-bottom-button-group {
     display: flex;
@@ -13,5 +10,5 @@
     margin-top: 10px;
     position: relative;
     width: 30%;
-    font-family: "BCSans-Bold", sans-serif;
+    font-family: "BCSans-Bold", sans-serif!important;
 }

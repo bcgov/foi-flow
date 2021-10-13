@@ -289,6 +289,44 @@ class requestservice:
 
         return baserequestInfo
 
+
+    def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authMembershipgroups):
+        request = FOIRequest.getrequest(foirequestid)
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        baserequestInfo = {}
+        if requestministry["assignedministrygroup"] in authMembershipgroups:
+
+            _receivedDate = parse(request['receiveddate'])        
+            baserequestInfo = {
+                'id': request['foirequestid'],
+                'requestType': request['requesttype'],
+                'receivedDate': _receivedDate.strftime('%Y %b, %d'),
+                'receivedDateUF': parse(request['receiveddate']).strftime('%Y-%m-%d %H:%M:%S.%f'),
+                'deliverymodeid':request['deliverymode.deliverymodeid'],
+                'deliveryMode':request['deliverymode.name'],
+                'receivedmodeid':request['receivedmode.receivedmodeid'],
+                'receivedMode':request['receivedmode.name'],
+                'assignedGroup': requestministry["assignedgroup"],
+                'assignedTo': requestministry["assignedto"],
+                'idNumber':requestministry["filenumber"],
+                'description': requestministry['description'],
+                'fromDate': parse(requestministry['recordsearchfromdate']).strftime('%Y-%m-%d') if requestministry['recordsearchfromdate'] is not None else '',
+                'toDate': parse(requestministry['recordsearchtodate']).strftime('%Y-%m-%d') if requestministry['recordsearchtodate'] is not None else '',
+                'currentState':requestministry['requeststatus.name'],
+                'requeststatusid':requestministry['requeststatus.requeststatusid'],
+                'requestProcessStart': parse(requestministry['startdate']).strftime('%Y-%m-%d') if requestministry['startdate'] is not None else '',
+                'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),            
+                'programareaid':requestministry['programarea.programareaid'],
+                'category':request['applicantcategory.name'],
+                'categoryid':request['applicantcategory.applicantcategoryid'],
+                'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
+            }
+
+            if requestministry['cfrduedate'] is not None:
+                baserequestInfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime('%Y-%m-%d')})
+
+        return baserequestInfo
+
 class FOIRequestUtil:   
     
     def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
@@ -311,7 +349,7 @@ class FOIRequestUtil:
         requeststatusid =  requestSchema.get("requeststatusid") if 'requeststatusid' in requestSchema  else None
         if requeststatusid is not None:
             status = FOIRequestUtil().getStatusName(requeststatusid)       
-            if status == "Call For Records":
+            if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed":
                 foiministryRequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")

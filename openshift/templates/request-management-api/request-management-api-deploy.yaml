@@ -79,6 +79,60 @@ objects:
                   key: database-name
             - name: DATABASE_HOST
               value: "${DB_SECRETS}"
+            - name: FLASK_ENV
+              value: production
+            - name: FOI_REQUESTQUEUE_REDISHOST
+              value: redis-formio
+            - name: FOI_REQUESTQUEUE_REDISPORT
+              value: 6379
+            - name: FOI_REQUESTQUEUE_REDISPASSWORD
+              value: TODO
+            - name: FOI_REQUESTQUEUE_REDISCHANNEL
+              value: foi-rawrequest
+            - name: KEYCLOAK_ADMIN_HOST
+              value: https://dev.oidc.gov.bc.ca
+            - name: KEYCLOAK_ADMIN_REALM
+              value: TODO
+            - name: KEYCLOAK_ADMIN_CLIENT_ID
+              value: TODO
+            - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+              value: TODO
+            - name: KEYCLOAK_ADMIN_SRVACCOUNT
+              value: TODO
+            - name: KEYCLOAK_ADMIN_SRVPASSWORD
+              value: TODO
+            - name: KEYCLOAK_ADMIN_INTAKE_GROUPID
+              value: TODO
+            - name: BPM_ENGINE_REST_URL
+              value: TODO
+            - name: BPM_TOKEN_URL
+              value: TODO
+            - name: BPM_CLIENT_ID
+              value: TODO
+            - name: BPM_CLIENT_SECRET
+              value: TODO
+            - name: JWT_OIDC_WELL_KNOWN_CONFIG
+              value: TODO
+            - name: JWT_OIDC_AUDIENCE
+              value: forms-flow-web
+            - name: JWT_OIDC_ISSUER
+              value: TODO
+            - name: JWT_OIDC_ALGORITHMS
+              value: RS256
+            - name: CORS_ORIGIN
+              value: TODO
+            - name: JWT_OIDC_JWKS_URI
+              value: TODO
+            - name: JWT_OIDC_CACHING_ENABLED
+              value: True
+            - name: JWT_OIDC_JWKS_CACHE_TIMEOUT
+              value: 300
+            - name: CACHE_TIMEOUT
+              value: 36000
+            - name: FOI_REQUESTQUEUE_REDISURL
+              value: TODO
+            - name: CACHE_ENABLED
+              value: N
           # command:
           #   - gunicorn
           #   - '-b'

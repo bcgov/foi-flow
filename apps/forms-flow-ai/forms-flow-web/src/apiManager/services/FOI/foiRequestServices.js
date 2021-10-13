@@ -7,6 +7,7 @@ import {
   setFOILoader,
   setFOIAssignedToListLoader,
   setFOIRequestDetail,
+  setFOIMinistryViewRequestDetail,
   setFOICategoryList,
   setFOIProgramAreaList,
   clearRequestDetails,
@@ -82,7 +83,6 @@ export const fetchFOIProgramAreaList = (...rest) => {
 
 export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
   let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
   if (requestType && status) {
     apiUrlGETAssignedToList = replaceUrl(replaceUrl(
@@ -99,8 +99,6 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
           let data = foiAssignedToList.map((assignedTo) => {
             return { ...assignedTo};
           });
-          data.unshift(unAssignedGroup);
-          // dispatch(setFOIAssignedToList([]));
           dispatch(setFOIAssignedToList(data));          
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -121,7 +119,6 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
 
 export const fetchFOIFullAssignedToList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  // const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
 
   return (dispatch) => {
     httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
@@ -131,7 +128,6 @@ export const fetchFOIFullAssignedToList = (...rest) => {
           let data = foiFullAssignedToList.map((assignedTo) => {
             return { ...assignedTo};
           });
-          // data.unshift(unAssignedGroup);
           dispatch(setFOIFullAssignedToList(data));
           dispatch(setFOIAssignedToListLoader(false));
           done(null, res.data);
@@ -372,6 +368,42 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
       });
   };
 };
+
+export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId, ...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+    API.FOI_MINISTRYVIEW_REQUEST_API,
+    "<requestid>",
+    requestId
+  ),"<ministryid>", ministryId);  
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;         
+          dispatch(clearRequestDetails({}));
+          dispatch(setFOIMinistryViewRequestDetail(foiRequest));                    
+          dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));        
+        done(error);
+      });
+  };
+};
+
+
+
+
 
 export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};

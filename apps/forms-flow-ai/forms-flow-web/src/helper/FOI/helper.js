@@ -21,8 +21,13 @@ const formatInTimeZone = (date, fmt, tz) =>
 			fmt, 
 			{ timeZone: tz });
 
-const formatDate = (d, formatString = 'yyyy-MM-dd') => {	
+const formatDate = (d, formatString = 'yyyy-MM-dd') => {
+	if (d) {	
 	return formatInTimeZone(d, formatString, 'UTC');
+	}
+	else {
+		return "";
+	}
 }
 
 const businessDay = (date) => {	

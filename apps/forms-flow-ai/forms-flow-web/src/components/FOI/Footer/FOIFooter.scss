@@ -1,8 +1,5 @@
 
-@font-face {
-  font-family: "BCSans-Regualar";
-  src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
+
 
 .footerstyle {
     background-color: #003366;
@@ -11,7 +8,7 @@
 }
 
 .footerstyle a   {
-  font-family: 'BCSans-Regualar', sans-serif;
+ // font-family: 'BCSans-Regular', sans-serif;
   color: #ffff;
   text-decoration: none;
   font-size: small;

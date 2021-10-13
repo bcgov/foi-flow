@@ -607,9 +607,9 @@ const FOIRequest = React.memo((props) => {
           </div>
           
         <div className="tab">
-          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}><span className="circle"></span> Request</div>
-          <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}><span className="circle"></span> Correspondence Log</div>
-          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}><span className="circle"></span> Option 3</div>
+          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+          <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
+          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
         {_requestStatus.toLowerCase().includes("days") &&  bottomTextArray.length > 1  ?
         <div className="foileftpanelstatus"> 

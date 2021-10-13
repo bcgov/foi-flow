@@ -1,11 +1,3 @@
-@font-face {
-    font-family: "BCSans-Regular";
-    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
 
 
 .btn-save {
@@ -27,7 +19,7 @@
 }
 
 #state-change-dialog-title {
-    font-family: "BCSans-Bold", sans-serif;
+    font-family: "BCSans-Bold", sans-serif!important;
     color: #036 ;
     padding: 30px 26px 30px;
     display: flex;
