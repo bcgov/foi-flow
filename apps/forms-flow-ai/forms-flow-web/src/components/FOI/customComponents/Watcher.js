@@ -34,9 +34,13 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList}) {
+export default function Watcher({watcherFullList, requestWatcherList}) {
 
-    
+    const watchList = [{"watchedby": "sumathi","watchedbygroup": "Intake Team"}, {"watchedby": "testidir","watchedbygroup": "Intake Team"}];
+    const test = watchList.map(watcher => {
+        return `${watcher.watchedbygroup}|${watcher.watchedby}`;
+    });
+    console.log(`test = ${JSON.stringify(test)}`);
     const classes = useStyles();
     const [personName, setPersonName] = React.useState(['Unassigned|Unassigned']);
     const [noOfWatchers, setNoOfWatcers] = React.useState(0);
@@ -44,7 +48,7 @@ export default function Watcher({watcherFullList}) {
         return  firstName !== "" ? `${lastName}, ${firstName}` : username;
    }
    
-   //creates the grouped menu items for assignedTo combobox    
+   //creates the grouped menu items for assignedTo combobox
    const getMenuItems = () => {
        var menuItems = [];
        var i = 1;

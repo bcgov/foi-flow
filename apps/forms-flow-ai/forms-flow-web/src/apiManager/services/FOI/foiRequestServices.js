@@ -18,6 +18,7 @@ import {
   setFOIReceivedModeList,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
+  setFOIWatcherList
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -237,6 +238,70 @@ export const fetchFOIReceivedModeList = (...rest) => {
         console.log("Error", error);
         dispatch(serviceActionError(error));
         dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIWatcherList = (ministryId,...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+
+  let apiUrl = API.FOI_GET_RAW_REQUEST_WATCHERS;
+  if (ministryId) {
+    apiUrl = replaceUrl(
+      API.FOI_GET_MINISTRY_REQUEST_WATCHERS,
+      "<ministryid>",
+      ministryId
+    );
+  }
+
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          let data = res.data.map((watcher) => {
+            return { ...watcher};
+          });          
+          dispatch(setFOIWatcherList(data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const saveWatcher = (data, ministryId, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};  
+  let apiUrl = API.FOI_POST_RAW_REQUEST_WATCHERS;
+  if (ministryId) {
+    apiUrl = replaceUrl(
+      API.FOI_RAW_REQUEST_API,
+      "<ministryid>",
+      ministryId
+    );
+  }
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {                   
+          done(null, res.data);
+        } else {         
+          dispatch(serviceActionError(res));
+          done("Error Posting data");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
         done(error);
       });
   };

@@ -100,7 +100,9 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                                         || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase();
-    
+
+    const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
+
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
@@ -110,7 +112,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <Watcher watcherFullList={assignedToList} />                    
+                    <Watcher watcherFullList={assignedToList} requestWatcherList={requestWatcherList} />                    
                 </div>          
             </div>
             
