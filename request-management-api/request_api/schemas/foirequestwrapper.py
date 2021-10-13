@@ -102,3 +102,14 @@ class EditableFOIMinistryRequestWrapperSchema(Schema):
 class EditableFOIRequestWrapperSchema(Schema):
     wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
     selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)  
+
+class FOIRequestMinistrySchema(Schema):
+    
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE    
+    assignedministrygroup = fields.Str(data_key="assignedministrygroup",allow_none=True)   
+    assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True)   
+    assignedgroup = fields.Str(data_key="assignedgroup",allow_none=True)   
+    assignedto = fields.Str(data_key="assignedto",allow_none=True)   
