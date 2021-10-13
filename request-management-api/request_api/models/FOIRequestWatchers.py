@@ -33,12 +33,12 @@ class FOIRequestWatcher(db.Model):
 
     @classmethod
     def getwatchers(cls, ministryrequestid):                
-        sql = 'select distinct on (watchedby) watchedby, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid order by watchedby, created_at desc'
+        sql = 'select distinct on (watchedby) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid order by watchedby, created_at desc'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         watchers = []
         for row in rs:
             if row["isactive"] == True:
-                watchers.append({"watchedby": row["watchedby"]})
+                watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
         return watchers 
 
     @classmethod
