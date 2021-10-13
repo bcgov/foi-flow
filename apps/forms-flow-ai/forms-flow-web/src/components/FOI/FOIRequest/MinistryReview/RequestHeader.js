@@ -12,6 +12,7 @@ import { Watcher } from '../../customComponents';
 
 const RequestHeader = React.memo((requestDetails) => {
     const _requestDetails = requestDetails.requestDetails;
+    const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
 
     const preventDefault = (event) => event.preventDefault();
 
@@ -60,7 +61,7 @@ const RequestHeader = React.memo((requestDetails) => {
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <Watcher />
+                    <Watcher watcherFullList={ministryAssignedToList} />
                     <img src="/assets/Images/wacher.PNG" alt="wacher" style={{width:200+'px',height:50+'px'}} />
                 </div>
             </div>
@@ -82,7 +83,7 @@ const RequestHeader = React.memo((requestDetails) => {
 
             
                     <>
-                      <MinistryAssignToDropdown requestDetails={_requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={true} />
                     </>
                 
             </div>

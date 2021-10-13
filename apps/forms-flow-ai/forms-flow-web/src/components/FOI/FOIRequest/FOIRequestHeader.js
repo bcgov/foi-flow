@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining, isMinistryCoordinator } from "../../../helper/FOI/helper";
 import MinistryAssignToDropdown from './MinistryAssignToDropdown';
 import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
+import { Watcher } from '../customComponents'
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -55,6 +56,10 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
 
     },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
+    //local state management for assignedTo
+    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+    
+    const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
 
     const getFullName = (lastName, firstName, username) => {
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
@@ -64,20 +69,19 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const getMenuItems = () => {
         var menuItems = [];
         var i = 1;
+        menuItems.push(<MenuItem className={classes.group} key={0} value={'|'}>{}</MenuItem>);
+        menuItems.push(<MenuItem key={0} className={classes.item} value={selectedAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
         if (assignedToList && assignedToList.length > 0) {
             for (var group of assignedToList) {
                 menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`}>{group.name}</MenuItem>);
                 for (var assignee of group.members) {
-                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
+                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} >{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
                 }
             }
         }
         return menuItems;
     }
-     //local state management for assignedTo
-    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
-   
-    const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
+    
     const preventDefault = (event) => event.preventDefault();
     
     //handle onChange event for assigned To
@@ -104,7 +108,10 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     <Link href="#" onClick={preventDefault}>
                         <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
-                </div>           
+                </div>
+                <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
+                    <Watcher watcherFullList={assignedToList} />                    
+                </div>          
             </div>
             
             <div className="foi-assigned-to-container">

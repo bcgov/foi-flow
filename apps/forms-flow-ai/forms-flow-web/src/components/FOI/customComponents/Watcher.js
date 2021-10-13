@@ -6,6 +6,7 @@ import FormControl from '@material-ui/core/FormControl';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
+import { makeStyles } from '@material-ui/core/styles';
 import './Watcher.scss'
 
 const ITEM_HEIGHT = 48;
@@ -19,48 +20,68 @@ const MenuProps = {
   },
 };
 
-export default function Watcher({}) {
+const useStyles = makeStyles((theme) => ({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
+    item: {
+        paddingLeft: theme.spacing(3),
+    },
+    group: {
+        fontWeight: theme.typography.fontWeightBold,
+        opacity: 1,
+    },
+  }));
+
+export default function Watcher({watcherFullList}) {
+
     
-       
-    const names = [
-        'Oliver Hansen',
-        'Van Henry',
-        'April Tucker',
-        'Ralph Hubbard',
-        'Omar Alexander',
-        'Carlos Abbott',
-        'Miriam Wagner',
-        'Bradley Wilkerson',
-        'Virginia Andrews',
-        'Kelly Snyder',
-      ];
-      const [personName, setPersonName] = React.useState([]);
-      const [noOfWatchers, setNoOfWatcers] = React.useState(0);
+    const classes = useStyles();
+    const [personName, setPersonName] = React.useState(['Unassigned|Unassigned']);
+    const [noOfWatchers, setNoOfWatcers] = React.useState(0);
+    const getFullName = (lastName, firstName, username) => {
+        return  firstName !== "" ? `${lastName}, ${firstName}` : username;
+   }
+   
+   //creates the grouped menu items for assignedTo combobox    
+   const getMenuItems = () => {
+       var menuItems = [];
+       var i = 1;
+       if (watcherFullList && watcherFullList.length > 0) {
+           for (var group of watcherFullList) {
+               menuItems.push(<MenuItem className={classes.item} disabled={true} key={group.id} value={`${group.name}|${group.name}`}>
+                   {group.name}
+               </MenuItem>);
+               for (var assignee of group.members) {
+                   menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>
+                       <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} />
+                        <ListItemText primary={getFullName(assignee.lastname, assignee.firstname, assignee.username)} />
+                       </MenuItem>)
+               }
+           }
+       }
+       return menuItems;
+   }
 
   const handleChange = (event) => {
     const {
       target: { value },
-    } = event;
-    console.log(event);
-    setNoOfWatcers(value.length)
-    // setNoOfWatcers(value.length)
+    } = event; 
+    setNoOfWatcers(value.length-1);
     setPersonName(        
       // On autofill we get a the stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
   };
 
-  const renderValue = (option) => {
-    // With more selections, render "N items selected".
-    // Other than the first one are hidden in CSS.
+  const renderValue = (option) => {    
     return <span>{noOfWatchers}</span>;
   }
     return (  
         
         <div>
         <FormControl>
-          {/* <InputLabel id="demo-multiple-name-label">Name</InputLabel> */}         
-          {/* <div className="foi-watcher-container"> */}
               <div className="foi-watcher-all">
                 <div className="foi-eye-container">
                     <i className="fa fa-eye foi-eye"> <b>Watcher</b></i>
@@ -72,22 +93,16 @@ export default function Watcher({}) {
                     id="foi-watcher"
                     className="foi-watcher"
                     multiple
-                    value={personName}                   
+                    value={personName}
                     onChange={handleChange}
                     input={<OutlinedInput label="Tag" />}
-                    renderValue={renderValue}
+                    renderValue={renderValue}                    
                     MenuProps={MenuProps}
                     >
-                    {names.map((name) => (
-                        <MenuItem key={name} value={name}>
-                        <Checkbox checked={personName.indexOf(name) > -1} />
-                        <ListItemText primary={name} />
-                        </MenuItem>
-                    ))}
+                    {getMenuItems()}
                     </Select>
                 </div>
             </div>
-        {/* </div> */}
         </FormControl>
       </div> 
            
