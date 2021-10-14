@@ -34,7 +34,7 @@ class FOIRawRequestWatcher(db.Model):
     
     @classmethod
     def getwatchers(cls, requestid):                
-        sql = 'select distinct on (watchedby) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid order by watchedby, created_at desc'
+        sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid order by watchedby, watchedbygroup, created_at desc'
         rs = db.session.execute(text(sql), {'requestid': requestid})
         watchers = []
         for row in rs:

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
@@ -13,6 +13,7 @@ import { calculateDaysRemaining, isMinistryCoordinator } from "../../../helper/F
 import MinistryAssignToDropdown from './MinistryAssignToDropdown';
 import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { Watcher } from '../customComponents'
+import { saveWatcher } from "../../../apiManager/services/FOI/foiRequestServices";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -34,7 +35,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {ministryId} = useParams();
+    const {requestId, ministryId} = useParams();
     const user = useSelector((state) => state.user.userDetail);
 
     let _isMinistryCoordinator = false;
@@ -100,7 +101,12 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                                         || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase();
-    
+
+    const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
+    const dispatch = useDispatch();
+    const handleWatcherUpdate = (watcher) => {
+        dispatch(saveWatcher(ministryId, watcher));
+    }
      return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
@@ -110,7 +116,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <Watcher watcherFullList={assignedToList} />                    
+                    <Watcher watcherFullList={assignedToList} requestWatcherList={requestWatcherList} requestId={requestId} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} />                    
                 </div>          
             </div>
             
