@@ -314,16 +314,17 @@ def test_post_foirequest_general_cfr_assignment(app, client):
 
 def test_get_foirequestqueue(app, client):
   response = client.get('/api/dashboard', headers=factory_user_auth_header(app, client), content_type='application/json')
-  jsondata = json.loads(response.data)
+  jsondata = json.loads(response.data)  
+  if jsondata is not None and len(jsondata) > 0 :    
+    assert jsondata[0]['watchers']
   assert response.status_code == 200  
 
 def test_get_foiministryrequestqueue(app, client):
   response = client.get('/api/dashboard/ministry', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
-  assert response.status_code == 200
-
-def test_get_foiministryrequestqueue(app, client):
-  response = client.get('/api/dashboard/all', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
-  assert response.status_code == 200       
+  jsondata = json.loads(response.data)
+  if jsondata is not None and len(jsondata) > 0 :    
+    assert jsondata[0]['watchers']
+  assert response.status_code == 200    
 
 def test_get_foirequestqueuewithoutheader(app, client):    
   response = client.get('/api/dashboard', content_type='application/json')    

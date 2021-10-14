@@ -329,6 +329,8 @@ class requestservice:
                 'programareaid':requestministry['programarea.programareaid'],
                 'category':request['applicantcategory.name'],
                 'categoryid':request['applicantcategory.applicantcategoryid'],
+                'assignedministrygroup':requestministry["assignedministrygroup"],
+                'assignedministryperson':requestministry["assignedministryperson"],
                 'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
             }
 
@@ -398,7 +400,7 @@ class FOIRequestUtil:
         requeststatusid =  requestSchema.get("requeststatusid") if 'requeststatusid' in requestSchema  else None
         if requeststatusid is not None:
             status = FOIRequestUtil().getStatusName(requeststatusid)       
-            if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed":
+            if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed" or status == "Ministry Sign Off" or status == "Response":
                 foiministryRequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
         if self.isNotBlankorNone(requestSchema,"fromDate","main") == True:
             foiministryRequest.recordsearchfromdate = requestSchema.get("fromDate")
