@@ -8,15 +8,14 @@ class divisionstageservice:
     def getdivisionandstages(self, bcgovcode):
         divisionstages = []
         programarea = ProgramArea.getprogramarea(bcgovcode)
-        divisions = ProgramAreaDivision.getdivisionstagesummary(programarea['programareaid'])
+        divisions = ProgramAreaDivision.getprogramareadivisions(programarea['programareaid'])
         for division in divisions:
-            divisionid = division['count'] if division['count'] > 0 else 0
-            divisionstages.append({"divisionid": division['divisionid'], "name": self.escapestr(division['name']), "stages": self.getstages(divisionid)})
-        return divisionstages
+            divisionstages.append({"divisionid": division['divisionid'], "name": self.escapestr(division['name'])})
+        return {"divisions": divisionstages, "stages": self.getstages()}
     
-    def getstages(self, divisionid):
+    def getstages(self):
         activestages = []
-        division_stages = ProgramAreaDivisionStage.getprogramareadivisionstages(divisionid)
+        division_stages = ProgramAreaDivisionStage.getprogramareadivisionstages()
         for stage in division_stages:
             if stage['isactive'] == True:
                 activestages.append({"stageid": stage['stageid'], "name": self.escapestr(stage['name'])})

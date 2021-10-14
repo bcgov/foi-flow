@@ -26,14 +26,6 @@ class ProgramAreaDivision(db.Model):
         query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
-    @classmethod
-    def getdivisionstagesummary(cls, programareaid):
-        sql ='select pad2.divisionid as divisionid, pad2.name as name, count(pads.divisionid) as rcount from "ProgramAreaDivisions" pad2  LEFT JOIN "ProgramAreaDivisionStages" pads on pads.divisionid   = pad2.divisionid where pad2.programareaid  = :programareaid group by pad2.divisionid'
-        rs = db.session.execute(text(sql), {'programareaid': programareaid})
-        divisionstagesummary = []
-        for row in rs:
-            divisionstagesummary.append({"divisionid": row["divisionid"], "name": row["name"], "count": row["rcount"]})
-        return divisionstagesummary 
              
 
 class ProgramAreaDivisionSchema(ma.Schema):

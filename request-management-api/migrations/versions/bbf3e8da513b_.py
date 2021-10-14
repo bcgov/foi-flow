@@ -32,7 +32,6 @@ def upgrade():
     
     division_stage_table = op.create_table('ProgramAreaDivisionStages',
     sa.Column('stageid', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('divisionid', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=500), nullable=False),
     sa.Column('isactive', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True, default=datetime.now()),
@@ -86,17 +85,17 @@ def upgrade():
     op.bulk_insert(
         division_stage_table,
         [
-            {'divisionid':0,'name':'Clarification','isactive':True},
-            {'divisionid':0,'name':'Assigned to Division','isactive':True},
-            {'divisionid':0,'name':'Awaiting Fees','isactive':True},
-            {'divisionid':0,'name':'Fees Received','isactive':True},
-            {'divisionid':0,'name':'Gathering Records','isactive':True},
-            {'divisionid':0,'name':'Records Received','isactive':True},
-            {'divisionid':0,'name':'Awaiting Harms','isactive':True},
-            {'divisionid':0,'name':'Harms Received','isactive':True},
-            {'divisionid':0,'name':'Pending Sign Off','isactive':True},
-            {'divisionid':0,'name':'Sign Off Complete','isactive':True},
-            {'divisionid':0,'name':'No Records Response','isactive':True},
+            {'name':'Clarification','isactive':True},
+            {'name':'Assigned to Division','isactive':True},
+            {'name':'Awaiting Fees','isactive':True},
+            {'name':'Fees Received','isactive':True},
+            {'name':'Gathering Records','isactive':True},
+            {'name':'Records Received','isactive':True},
+            {'name':'Awaiting Harms','isactive':True},
+            {'name':'Harms Received','isactive':True},
+            {'name':'Pending Sign Off','isactive':True},
+            {'name':'Sign Off Complete','isactive':True},
+            {'name':'No Records Response','isactive':True},
            
         ]
     )

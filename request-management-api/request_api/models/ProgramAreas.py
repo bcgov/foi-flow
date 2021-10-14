@@ -20,10 +20,8 @@ class ProgramArea(db.Model):
 
     @classmethod
     def getprogramarea(cls,pgbcgovcode):
-        print(pgbcgovcode)
         programarea_schema = ProgramAreaSchema()
         query = db.session.query(ProgramArea).filter_by(bcgovcode=pgbcgovcode.upper()).first()
-        print(query)
         return programarea_schema.dump(query)
 
 class ProgramAreaSchema(ma.Schema):
