@@ -29,8 +29,16 @@ class FOIRawRequestWatcher(db.Model):
         newwatcher = FOIRawRequestWatcher(requestid=foirawrequestwatcher["requestid"], version=version, watchedbygroup=foirawrequestwatcher["watchedbygroup"], watchedby=foirawrequestwatcher["watchedby"], isactive=foirawrequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
         db.session.add(newwatcher)
         db.session.commit()               
-        return DefaultMethodResult(True,'Request added',newwatcher.watcherid)
+        return DefaultMethodResult(True,'Request added')
     
+    @classmethod
+    def savewatcherbygroups(cls, foirawrequestwatcher, version, userid, watchergroups)->DefaultMethodResult:             
+        for group in watchergroups:
+            foirawrequestwatcher["watchedbygroup"] = group
+            newwatcher = FOIRawRequestWatcher(requestid=foirawrequestwatcher["requestid"], version=version, watchedbygroup=foirawrequestwatcher["watchedbygroup"], watchedby=foirawrequestwatcher["watchedby"], isactive=foirawrequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
+            db.session.add(newwatcher)
+            db.session.commit()               
+        return DefaultMethodResult(True,'Request added')
     
     @classmethod
     def getwatchers(cls, requestid):                

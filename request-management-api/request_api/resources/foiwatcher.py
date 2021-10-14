@@ -66,8 +66,8 @@ class CreateFOIRawRequestWatcher(Resource):
         try:
             requestjson = request.get_json() 
             rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)  
-            result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getUserId())
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+            result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getUserId(), AuthHelper.getUserGroups())
+            return {'status': result.success, 'message':result.message} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
@@ -108,7 +108,7 @@ class FOIRequestWatcher(Resource):
     @auth.require
     def get(ministryrequestid):      
         try:
-            result = watcherservice().getministryrequestwatchers(ministryrequestid)
+            result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isMinistryMember())
             return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -131,8 +131,8 @@ class CreateFOIRequestWatcher(Resource):
         try:
             requestjson = request.get_json() 
             minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)  
-            result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getUserId())
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+            result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getUserId(),AuthHelper.getUserGroups())
+            return {'status': result.success, 'message':result.message} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
