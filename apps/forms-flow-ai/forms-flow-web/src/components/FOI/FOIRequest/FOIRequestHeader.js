@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, handleMinistryAssignedToValue, createSaveRequestObject, handlestatusudpate}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, handleMinistryAssignedToValue, createSaveRequestObject, handlestatusudpate, userDetail}) => {
    
      /**
      *  Header of Review request in the UI
@@ -116,7 +116,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <Watcher watcherFullList={assignedToList} requestWatcherList={requestWatcherList} requestId={requestId} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} />                    
+                    <Watcher watcherFullList={assignedToList} requestWatcherList={requestWatcherList} requestId={requestId} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} userDetail={userDetail} />                    
                 </div>          
             </div>
             

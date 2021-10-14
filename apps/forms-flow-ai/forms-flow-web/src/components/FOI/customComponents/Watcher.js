@@ -34,10 +34,13 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, handleWatcherUpdate}) {
+export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, handleWatcherUpdate, userDetail}) {
 
     console.log(watcherFullList);
-    // const watchList = [{"watchedby": "sumathi","watchedbygroup": "Intake Team"}, {"watchedby": "testidir","watchedbygroup": "Intake Team"}];
+    console.log(`preferred_username = ${userDetail.preferred_username} `);
+    const watcherUsers = requestWatcherList.map(watcher => watcher.watchedby);
+    const isUseraWatcher = !!watcherUsers.find(watcher => watcher === userDetail.preferred_username);
+    console.log(`isUseraWatcher = ${isUseraWatcher}`);
     const watchList = requestWatcherList.map(watcher => {
         return `${watcher.watchedbygroup}|${watcher.watchedby}`;
     });
@@ -99,6 +102,7 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
 //   const dispatch = useDispatch();
   const updateWatcher = (event) => {    
     let watcher = {};
+    console.log('button')
     if (ministryId) {
         watcher.ministryrequestid = ministryId;
     }
@@ -106,11 +110,22 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         watcher.requestid = requestId;
     }    
     if (event.target.name) {
+        console.log('button if')
         const watcherDetails = event.target.name.split('|');
         watcher.watchedbygroup = watcherDetails[0];
         watcher.watchedby = watcherDetails[1];
         watcher.isactive = event.target.checked;
     }
+    else {
+        console.log('button else')
+        watcher.watchedby = userDetail.preferred_username;
+        if (isUseraWatcher) { 
+            watcher.isactive = false;
+        }
+        else {
+            watcher.isactive = true;
+        }
+    }   
     console.log(watcher);
     handleWatcherUpdate(watcher);
     // dispatch(saveWatcher(ministryId, watcher));
@@ -124,9 +139,9 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         <div>
         <FormControl>
               <div className="foi-watcher-all">
-                <div className="foi-eye-container">
-                    <i className="fa fa-eye foi-eye"> <b>Watcher</b></i>
-                </div>
+                {/* <div className="foi-eye-container"> */}
+                   <button onClick={updateWatcher} className="foi-eye-container"> <i className="fa fa-eye foi-eye"> <b>{isUseraWatcher? "Unwatch" : "Watch" }</b></i></button>
+                {/* </div> */}
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>
                     <Select

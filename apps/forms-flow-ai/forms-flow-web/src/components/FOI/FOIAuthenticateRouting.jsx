@@ -32,6 +32,8 @@ const FOIAuthenticateRouting = React.memo((props) => {
     const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
     isMinistry = isMinistryLogin(userGroups);
 }
+
+console.log(userDetail);
   return (
       <>
         {isAuth && Object.entries(userDetail).length !== 0 ? (
@@ -46,16 +48,16 @@ const FOIAuthenticateRouting = React.memo((props) => {
               
             </Route>
             <Route path="/foi/reviewrequest/:requestId/:requestState">
-              <FOIRequest  />
+              <FOIRequest userDetail={userDetail} />
             </Route>
             <Route path="/foi/addrequest">
-              <FOIRequest  />
+              <FOIRequest  userDetail={userDetail}/>
             </Route>
             <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/:requestState">
-              <FOIRequest  />
+              <FOIRequest userDetail={userDetail} />
             </Route>
             <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId/:requestState">
-              <MinistryReview/>
+              <MinistryReview userDetail={userDetail} />
             </Route>
             <FOIFooter />
             </>
