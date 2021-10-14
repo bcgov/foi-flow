@@ -32,8 +32,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
     const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
     isMinistry = isMinistryLogin(userGroups);
 }
-
-console.log(userDetail);
   return (
       <>
         {isAuth && Object.entries(userDetail).length !== 0 ? (

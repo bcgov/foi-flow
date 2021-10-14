@@ -20,8 +20,8 @@ import {
   fetchFOIAssignedToList, 
   fetchFOIDeliveryModeList, 
   fetchFOIReceivedModeList,
-  fetchFOIRequestDescriptionList,
-  fetchFOIWatcherList
+  fetchFOIRequestDescriptionList
+  
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -75,8 +75,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchFOIWatcherList(ministryId));
+  useEffect(() => {   
     if (ministryId) {
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));

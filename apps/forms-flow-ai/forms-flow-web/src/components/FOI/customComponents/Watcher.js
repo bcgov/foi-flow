@@ -34,34 +34,38 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, handleWatcherUpdate, userDetail}) {
-
-    console.log(watcherFullList);
-    console.log(`preferred_username = ${userDetail.preferred_username} `);
-    const watcherUsers = requestWatcherList.map(watcher => watcher.watchedby);
-    const isUseraWatcher = !!watcherUsers.find(watcher => watcher === userDetail.preferred_username);
-    console.log(`isUseraWatcher = ${isUseraWatcher}`);
-    const watchList = requestWatcherList.map(watcher => {
-        return `${watcher.watchedbygroup}|${watcher.watchedby}`;
-    });
-    console.log(watchList);
+export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, handleWatcherUpdate, userDetail}) {    
     const classes = useStyles();
-    const [personName, setPersonName] = React.useState(watchList.length > 0 ? watchList : ['Unassigned']);
-    const [noOfWatchers, setNoOfWatcers] = React.useState(watchList.length > 0 ? watchList.length : 0);
+   
+    const [personName, setPersonName] = React.useState(['Unassigned']);
+    const [noOfWatchers, setNoOfWatcers] = React.useState(0);
+    const [isUseraWatcher, setUseraWatcher] = React.useState(false);
+
+    React.useEffect(() => {
+        const watchList = requestWatcherList.map(watcher => {
+            return `${watcher.watchedbygroup}|${watcher.watchedby}`;
+        });
+        const watcherUsers = requestWatcherList.map(watcher => watcher.watchedby);        
+        setPersonName(watchList.length > 0 ? watchList : ['Unassigned']);
+        setNoOfWatcers(watchList.length > 0 ? watchList.length : 0);
+        setUseraWatcher(!!watcherUsers.find(watcher => watcher === userDetail.preferred_username))
+      },[requestWatcherList])
+
+      
     const getFullName = (lastName, firstName, username) => {
         return  firstName !== "" ? `${lastName}, ${firstName}` : username;
-   }
+   }  
    
    //creates the grouped menu items for assignedTo combobox
    const getMenuItems = () => {
        var menuItems = [];
-       var i = 1;
+       var i = 1;      
        if (watcherFullList && watcherFullList.length > 0) {
-           for (var group of watcherFullList) {
+           for (var group of watcherFullList) {             
                menuItems.push(<MenuItem className={classes.item} disabled={true} key={group.id} value={`${group.name}|${group.name}`}>
                    {group.name}
                </MenuItem>);
-               for (var assignee of group.members) {
+               for (var assignee of group.members) {               
                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>
                         <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} onChange={updateWatcher} />
                         <ListItemText primary={getFullName(assignee.lastname, assignee.firstname, assignee.username)} />
@@ -73,8 +77,6 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
    }
 
   const handleChange = (event) => {
-
-    // console.log(event);
     const {
       target: { value },
     } = event;
@@ -84,25 +86,13 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         count = count - 1;
     }
     setNoOfWatcers(count);
-    setPersonName(        
-      // On autofill we get a the stringified value.
+    setPersonName(
       typeof value === 'string' ? value.split(',') : value,
     );
-    
-    // console.log(`watcher = ${value[count]}`);
-    // let watcher = {};
-    // if (value[count]) {
-    //     const watcherDetails = value[count].split('|');
-    //     watcher.watchedby = 
-    // }
-    
-
-    // saveWatcher()
   };
-//   const dispatch = useDispatch();
+
   const updateWatcher = (event) => {    
     let watcher = {};
-    console.log('button')
     if (ministryId) {
         watcher.ministryrequestid = ministryId;
     }
@@ -110,14 +100,12 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         watcher.requestid = requestId;
     }    
     if (event.target.name) {
-        console.log('button if')
         const watcherDetails = event.target.name.split('|');
         watcher.watchedbygroup = watcherDetails[0];
         watcher.watchedby = watcherDetails[1];
         watcher.isactive = event.target.checked;
     }
     else {
-        console.log('button else')
         watcher.watchedby = userDetail.preferred_username;
         if (isUseraWatcher) { 
             watcher.isactive = false;
@@ -125,10 +113,10 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         else {
             watcher.isactive = true;
         }
-    }   
-    console.log(watcher);
+        console.log(`watcher`);
+        console.log(watcher);
+    }
     handleWatcherUpdate(watcher);
-    // dispatch(saveWatcher(ministryId, watcher));
 }
 
   const renderValue = (option) => {    

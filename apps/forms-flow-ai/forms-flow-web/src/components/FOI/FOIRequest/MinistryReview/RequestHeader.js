@@ -11,10 +11,10 @@ import { fetchFOIFullAssignedToList, fetchFOIWatcherList, saveWatcher } from "..
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
 
-const RequestHeader = React.memo((requestDetails, userDetail) => {
+const RequestHeader = React.memo(({requestDetails, userDetail}) => {
 
     const {ministryId} = useParams();
-    const _requestDetails = requestDetails.requestDetails;
+    const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
 
     const preventDefault = (event) => event.preventDefault();
@@ -68,7 +68,9 @@ const RequestHeader = React.memo((requestDetails, userDetail) => {
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <Watcher watcherFullList={ministryAssignedToList} requestWatcherList={requestWatcherList} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} userDetail={userDetail} />                    
+                  
+                        <Watcher watcherFullList={ministryAssignedToList} requestWatcherList={requestWatcherList} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} userDetail={userDetail} />
+                   
                 </div>
             </div>
             
