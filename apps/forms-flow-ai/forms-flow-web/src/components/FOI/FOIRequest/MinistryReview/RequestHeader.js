@@ -7,7 +7,7 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
 import { openRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
 import RequestDetails from './RequestDetails';
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFOIFullAssignedToList, fetchFOIWatcherList } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIFullAssignedToList, fetchFOIWatcherList, saveWatcher } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
 
@@ -55,6 +55,9 @@ const RequestHeader = React.memo((requestDetails) => {
     const headerText = _requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
     const assignedToValue = getFullName(assignedToList, _requestDetails);
     const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
+    const handleWatcherUpdate = (watcher) => {
+        dispatch(saveWatcher(ministryId, watcher));
+    }
     return (
 
         <div className="foi-request-review-header-row1">
@@ -65,8 +68,7 @@ const RequestHeader = React.memo((requestDetails) => {
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <Watcher watcherFullList={ministryAssignedToList} requestWatcherList={requestWatcherList} />
-                    <img src="/assets/Images/wacher.PNG" alt="wacher" style={{width:200+'px',height:50+'px'}} />
+                    <Watcher watcherFullList={ministryAssignedToList} requestWatcherList={requestWatcherList} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} />                    
                 </div>
             </div>
             

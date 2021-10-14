@@ -261,7 +261,8 @@ export const fetchFOIWatcherList = (ministryId,...rest) => {
         if (res.data) {
           let data = res.data.map((watcher) => {
             return { ...watcher};
-          });          
+          });
+          console.log(`data = ${JSON.stringify(data)}`);
           dispatch(setFOIWatcherList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -280,15 +281,11 @@ export const fetchFOIWatcherList = (ministryId,...rest) => {
   };
 };
 
-export const saveWatcher = (data, ministryId, ...rest) => {  
-  const done = rest.length ? rest[0] : () => {};  
+export const saveWatcher = (ministryId, data, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
   let apiUrl = API.FOI_POST_RAW_REQUEST_WATCHERS;
   if (ministryId) {
-    apiUrl = replaceUrl(
-      API.FOI_RAW_REQUEST_API,
-      "<ministryid>",
-      ministryId
-    );
+    apiUrl = API.FOI_POST_MINISTRY_REQUEST_WATCHERS;     
   }
   return (dispatch) => {
     httpPOSTRequest(apiUrl, data)

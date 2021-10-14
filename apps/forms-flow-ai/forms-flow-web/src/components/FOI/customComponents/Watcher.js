@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React  from 'react';
+// import { useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -34,16 +34,17 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList, requestWatcherList}) {
+export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, handleWatcherUpdate}) {
 
-    const watchList = [{"watchedby": "sumathi","watchedbygroup": "Intake Team"}, {"watchedby": "testidir","watchedbygroup": "Intake Team"}];
-    const test = watchList.map(watcher => {
+    console.log(watcherFullList);
+    // const watchList = [{"watchedby": "sumathi","watchedbygroup": "Intake Team"}, {"watchedby": "testidir","watchedbygroup": "Intake Team"}];
+    const watchList = requestWatcherList.map(watcher => {
         return `${watcher.watchedbygroup}|${watcher.watchedby}`;
     });
-    console.log(`test = ${JSON.stringify(test)}`);
+    console.log(watchList);
     const classes = useStyles();
-    const [personName, setPersonName] = React.useState(['Unassigned|Unassigned']);
-    const [noOfWatchers, setNoOfWatcers] = React.useState(0);
+    const [personName, setPersonName] = React.useState(watchList.length > 0 ? watchList : ['Unassigned']);
+    const [noOfWatchers, setNoOfWatcers] = React.useState(watchList.length > 0 ? watchList.length : 0);
     const getFullName = (lastName, firstName, username) => {
         return  firstName !== "" ? `${lastName}, ${firstName}` : username;
    }
@@ -59,7 +60,7 @@ export default function Watcher({watcherFullList, requestWatcherList}) {
                </MenuItem>);
                for (var assignee of group.members) {
                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>
-                       <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} />
+                        <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} onChange={updateWatcher} />
                         <ListItemText primary={getFullName(assignee.lastname, assignee.firstname, assignee.username)} />
                        </MenuItem>)
                }
@@ -69,15 +70,51 @@ export default function Watcher({watcherFullList, requestWatcherList}) {
    }
 
   const handleChange = (event) => {
+
+    // console.log(event);
     const {
       target: { value },
-    } = event; 
-    setNoOfWatcers(value.length-1);
+    } = event;
+    let count = value.length;
+
+    if (value.includes('Unassigned')) {
+        count = count - 1;
+    }
+    setNoOfWatcers(count);
     setPersonName(        
       // On autofill we get a the stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
+    
+    // console.log(`watcher = ${value[count]}`);
+    // let watcher = {};
+    // if (value[count]) {
+    //     const watcherDetails = value[count].split('|');
+    //     watcher.watchedby = 
+    // }
+    
+
+    // saveWatcher()
   };
+//   const dispatch = useDispatch();
+  const updateWatcher = (event) => {    
+    let watcher = {};
+    if (ministryId) {
+        watcher.ministryrequestid = ministryId;
+    }
+    else {
+        watcher.requestid = requestId;
+    }    
+    if (event.target.name) {
+        const watcherDetails = event.target.name.split('|');
+        watcher.watchedbygroup = watcherDetails[0];
+        watcher.watchedby = watcherDetails[1];
+        watcher.isactive = event.target.checked;
+    }
+    console.log(watcher);
+    handleWatcherUpdate(watcher);
+    // dispatch(saveWatcher(ministryId, watcher));
+}
 
   const renderValue = (option) => {    
     return <span>{noOfWatchers}</span>;
