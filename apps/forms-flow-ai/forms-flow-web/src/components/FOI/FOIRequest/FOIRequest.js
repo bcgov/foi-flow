@@ -596,7 +596,7 @@ const FOIRequest = React.memo((props) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false}/>
+            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">

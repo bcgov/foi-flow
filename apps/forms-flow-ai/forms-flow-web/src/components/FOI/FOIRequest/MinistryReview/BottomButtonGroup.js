@@ -74,7 +74,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            const _state = currentSelectedStatus ? currentSelectedStatus : (requestState ? requestState: StateEnum.callforrecords.name);
+            const _state = currentSelectedStatus ? currentSelectedStatus : requestState;
             handleSaveRequest(_state, false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
@@ -103,7 +103,8 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            handleSaveRequest(currentSelectedStatus, false, res.id);
+            const _state = currentSelectedStatus ? currentSelectedStatus : requestState;
+            handleSaveRequest(_state, false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",

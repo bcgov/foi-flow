@@ -9,7 +9,7 @@ import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 
-export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator}) {
+export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator, isValidationError}) {
 
     const {requestState} = useParams();
 
@@ -60,9 +60,10 @@ export default function StateDropDown({requestStatus, handleStateChange, isMinis
     }
     
     const statusList = getStatusList(status);    
-    const menuItems = statusList.length > 0 && statusList.map((item) => {
+    const menuItems = statusList.length > 0 && statusList.map((item, index) => {
+
         return (        
-        <MenuItem className="foi-state-menuitem" key={item.status} value={item.status} >
+        <MenuItem disabled={index>0 && isValidationError} className="foi-state-menuitem" key={item.status} value={item.status} >
             <span className={`foi-menuitem-span ${item.status.toLowerCase().replace(/\s/g, '')}`} ></span>
             {item.status}
         </MenuItem> 

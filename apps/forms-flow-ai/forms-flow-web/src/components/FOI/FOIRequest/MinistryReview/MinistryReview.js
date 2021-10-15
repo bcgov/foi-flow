@@ -67,7 +67,7 @@ const MinistryReview = React.memo((props) => {
   const [_tabStatus, settabStatus] = React.useState(requestState);
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
-  
+    
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
@@ -82,9 +82,12 @@ const MinistryReview = React.memo((props) => {
     }     
   },[requestId, dispatch]); 
 
+  let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
+    ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
+    setMinistryAssignedToValue(ministryassignedtousername);
   },[requestDetails]); 
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
@@ -102,7 +105,9 @@ const MinistryReview = React.memo((props) => {
   }
 
   //Variable to find if all required fields are filled or not
+  console.log(ministryAssignedToValue);
   const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned");
+  console.log(isValidationError);
 
   const createMinistryRequestDetailsObject = (requestObject, name, value) => {
     requestObject.assignedGroup = requestDetails.assignedGroup;
@@ -170,6 +175,9 @@ const MinistryReview = React.memo((props) => {
   }
   
   const handleStateChange =(currentStatus)=>{
+    console.log("hello");
+    console.log(_currentrequestStatus);
+    console.log(currentStatus);
     createSaveRequestObject("", "", "");
     setcurrentrequestStatus(currentStatus);
   }
@@ -237,7 +245,7 @@ const MinistryReview = React.memo((props) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true}/>
+            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">
