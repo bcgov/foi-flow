@@ -7,7 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { useParams } from 'react-router-dom';
-import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -30,7 +30,7 @@ const MinistryAssignToDropdown = React.memo(({requestDetails,  handleMinistryAss
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {ministryId} = useParams();
+    const {requestState} = useParams();
     const user = useSelector((state) => state.user.userDetail);
 
     //local state management for assignedTo
@@ -85,9 +85,9 @@ const MinistryAssignToDropdown = React.memo(({requestDetails,  handleMinistryAss
                     input={<Input />} 
                     variant="outlined"
                     fullWidth
-                    required = {isMinistryCoordinator}
-                    disabled = {!isMinistryCoordinator}
-                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")}                    
+                    required = {isMinistryCoordinator && requestState.toLocaleLowerCase() == StateEnum.callforrecords.name.toLocaleLowerCase() }
+                    disabled = {!isMinistryCoordinator || requestState.toLocaleLowerCase() != StateEnum.callforrecords.name.toLocaleLowerCase() }
+                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")  && requestState.toLocaleLowerCase() == StateEnum.callforrecords.name.toLocaleLowerCase() }                    
                 >            
                     {getMenuItems()}
                 </TextField> 
