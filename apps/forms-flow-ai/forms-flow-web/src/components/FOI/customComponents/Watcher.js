@@ -2,6 +2,7 @@ import React  from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -38,15 +39,16 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     const classes = useStyles();
     const dispatch = useDispatch();
 
+    const [updateWatchList, setUpdateWatchList] = React.useState(false);
+    const [isUseraWatcher, setUseraWatcher] = React.useState(false);
+
+    React.useEffect(() => {
+        console.log(`dispatch`);
+        dispatch(fetchFOIWatcherList(requestId,ministryId));
+    },[dispatch, updateWatchList, isUseraWatcher, requestId, ministryId] )
+
     const [personName, setPersonName] = React.useState(['Unassigned']);
     const [noOfWatchers, setNoOfWatchers] = React.useState(0);
-    const [isUseraWatcher, setUseraWatcher] = React.useState(false);
-    const [updateWatchList, setUpdateWatchList] = React.useState(false);
-
-    React.useEffect(() => {        
-        dispatch(fetchFOIWatcherList(requestId,ministryId));
-    },[dispatch, ministryId, updateWatchList] )
-
     const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
 
     React.useEffect(() => {
@@ -74,16 +76,31 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
                    {group.name}
                </MenuItem>);
                for (var assignee of group.members) {               
-                   menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={`${classes.item} foi-watcher-menuitem`} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>
-                        <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} onChange={updateWatcher} />
-                        <ListItemText primary={getFullName(assignee.lastname, assignee.firstname, assignee.username)} />
-                       </MenuItem>)
+                   menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={`${classes.item} foi-watcher-menuitem`} 
+                   value={`${group.name}|${assignee.username}`} 
+                   disabled={assignee.username.toLowerCase().includes("unassigned")}
+                   name={`${group.name}|${assignee.username}`}
+                //    onClick={listClick(`${group.name}|${assignee.username}`, personName.indexOf(`${group.name}|${assignee.username}`) > -1)}
+                   >      
+                        <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} onChange={watcherOnChange}/>
+                        {/* <ListItemText primary={getFullName(assignee.lastname, assignee.firstname, assignee.username)} onClick={listClick(`${group.name}|${assignee.username}`, personName.indexOf(`${group.name}|${assignee.username}`) > -1)} /> */}
+                        {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
+                      
+                    </MenuItem>)
                }
            }
        }
        return menuItems;
    }
 
+   const listClick = (_watcher, isChecked) => {
+    console.log(`_watcher = ${_watcher} isChecked = ${isChecked}`);
+    // console.log(event);
+}
+ const labelClick = (event) => {
+     console.log(`item click`);
+     console.log(event);
+ }
   const handleChange = (event) => {
     const {
       target: { value },
@@ -99,11 +116,14 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     );
   };
 
-  const handleWatcherUpdate = async (watcher) => {
-    dispatch(saveWatcher(ministryId, watcher));
+  const handleWatcherUpdate = (watcher) => {
+    dispatch(saveWatcher(ministryId, watcher, (err, res) => {
+        console.log(`saveWatcher`);
+    }        
+        ));
 }
 
-  const updateWatcher = (event) => {
+const watcherOnChange = (event) => {
     console.log(event);
     let watcher = {};
     if (ministryId) {
@@ -111,7 +131,8 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     }
     else {
         watcher.requestid = requestId;
-    }    
+    }
+    
     if (event.target.name) {
         const watcherDetails = event.target.name.split('|');
         watcher.watchedbygroup = watcherDetails[0];
@@ -121,8 +142,8 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
         if (watcher.watchedby === userDetail.preferred_username) {
             setUseraWatcher(watcher.isactive);
         }
-        setUpdateWatchList(true);
-    }
+        setUpdateWatchList(watcher.isactive);
+    }   
     else {
         watcher.watchedby = userDetail.preferred_username;
         if (isUseraWatcher) { 
@@ -133,9 +154,30 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
         }
         handleWatcherUpdate(watcher);
         setUseraWatcher(watcher.isactive);
-        setUpdateWatchList(true);
+        setUpdateWatchList(watcher.isactive);
         event.preventDefault();
     }
+    console.log(watcher);
+}
+
+  const updateWatcher = (_watcher, isChecked) => {   
+    console.log(`_watcher = ${_watcher} isChecked = ${isChecked}`);   
+    let watcher = {};
+    if (ministryId) {
+        watcher.ministryrequestid = ministryId;
+    }
+    else {
+        watcher.requestid = requestId;
+    }
+    const watcherDetails = _watcher.split('|');
+    watcher.watchedbygroup = watcherDetails[0];
+    watcher.watchedby = watcherDetails[1];
+    watcher.isactive = isChecked;
+    handleWatcherUpdate(watcher);
+    if (watcher.watchedby === userDetail.preferred_username) {
+        setUseraWatcher(watcher.isactive);
+    }
+    setUpdateWatchList(watcher.isactive);  
     console.log(watcher);
 }
 
@@ -147,7 +189,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
         
         <div>
               <div className="foi-watcher-all">
-                   <button onClick={updateWatcher} className="foi-eye-container"> <i className="fa fa-eye foi-eye"> <b>{isUseraWatcher? "Unwatch" : "Watch" }</b></i></button>
+                   <button onClick={watcherOnChange} className="foi-eye-container"> <i className="fa fa-eye foi-eye"> <b>{isUseraWatcher? "Unwatch" : "Watch" }</b></i></button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>
                     <Select
