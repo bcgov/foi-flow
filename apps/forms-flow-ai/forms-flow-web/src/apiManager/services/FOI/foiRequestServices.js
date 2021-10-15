@@ -432,8 +432,6 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
       id
     );
   }  
-  console.log(apiUrl);
-  console.log(JSON.stringify(data));
   return (dispatch) => {
     httpPOSTRequest(apiUrl, data)
       .then((res) => {
@@ -479,8 +477,6 @@ export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest)
       "<requestid>",
       requestId
     ),"<ministryid>", ministryId);  
-    console.log(apiUrl);
-    console.log(JSON.stringify(data));
     return (dispatch) => {
       httpPOSTRequest(apiUrl, data)
         .then((res) => {

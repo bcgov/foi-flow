@@ -71,7 +71,6 @@ const MinistryAssignToDropdown = React.memo(({requestDetails,  handleMinistryAss
         setMinistryAssignedTo(event.target.value);
         handleMinistryAssignedToValue(event.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO, event.target.value, event.target.name);
-        console.log(`handleMinstryAssignedToOnChange Header ${event.target.value}`)
     }
 
     return (

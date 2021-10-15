@@ -105,9 +105,7 @@ const MinistryReview = React.memo((props) => {
   }
 
   //Variable to find if all required fields are filled or not
-  console.log(ministryAssignedToValue);
   const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned");
-  console.log(isValidationError);
 
   const createMinistryRequestDetailsObject = (requestObject, name, value) => {
     requestObject.assignedGroup = requestDetails.assignedGroup;
@@ -175,9 +173,6 @@ const MinistryReview = React.memo((props) => {
   }
   
   const handleStateChange =(currentStatus)=>{
-    console.log("hello");
-    console.log(_currentrequestStatus);
-    console.log(currentStatus);
     createSaveRequestObject("", "", "");
     setcurrentrequestStatus(currentStatus);
   }
