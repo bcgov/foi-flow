@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, handleMinistryAssignedToValue, createSaveRequestObject, handlestatusudpate}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject, handlestatusudpate}) => {
    
      /**
      *  Header of Review request in the UI
@@ -37,11 +37,11 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const user = useSelector((state) => state.user.userDetail);
 
     let _isMinistryCoordinator = false;
-    if(requestDetails.selectedMinistries && requestDetails.selectedMinistries[0] && user)
-    {
-        var ministrycode = requestDetails.selectedMinistries[0]
-        _isMinistryCoordinator = isMinistryCoordinator(user,MINISTRYGROUPS[ministrycode.code])
-    }
+    // if(requestDetails.selectedMinistries && requestDetails.selectedMinistries[0] && user)
+    // {
+    //     var ministrycode = requestDetails.selectedMinistries[0]
+    //     _isMinistryCoordinator = isMinistryCoordinator(user,MINISTRYGROUPS[ministrycode.code])
+    // }
 
      //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
@@ -88,6 +88,10 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);        
     }
 
+    const handleMinistryAssignedToValue = (value) => {
+        //place holder - do nothing here
+    }
+
     const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
@@ -120,7 +124,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     variant="outlined"
                     fullWidth
                     required
-                    disabled = {_isMinistryCoordinator}
+                    // disabled = {_isMinistryCoordinator}
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}

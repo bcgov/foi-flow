@@ -352,6 +352,8 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;         
+          console.log("fetchFOIRequestDetails");
+          console.log(foiRequest);
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           //dispatch(setFOIAssignedToList([]));
@@ -386,6 +388,8 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId, ...res
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;         
+          console.log("fetchFOIMinistryViewRequestDetails");
+          console.log(foiRequest);
           dispatch(clearRequestDetails({}));
           dispatch(setFOIMinistryViewRequestDetail(foiRequest));                    
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
@@ -428,6 +432,8 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
       id
     );
   }  
+  console.log(apiUrl);
+  console.log(JSON.stringify(data));
   return (dispatch) => {
     httpPOSTRequest(apiUrl, data)
       .then((res) => {
@@ -462,6 +468,36 @@ export const openRequestDetails = (data, ...rest) => {
         done(error);
       });
   };
+};
+
+export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  let apiUrl = "";
+  if (ministryId) {
+    apiUrl = replaceUrl(replaceUrl(
+      API.FOI_MINISTRYVIEW_REQUEST_API,
+      "<requestid>",
+      requestId
+    ),"<ministryid>", ministryId);  
+    console.log(apiUrl);
+    console.log(JSON.stringify(data));
+    return (dispatch) => {
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {
+          if (res.data) {                   
+            done(null, res.data);
+          } else {         
+            dispatch(serviceActionError(res));
+            done("Error Posting data");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+  }
+  done("Error Posting data");
 };
 
 export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) => {

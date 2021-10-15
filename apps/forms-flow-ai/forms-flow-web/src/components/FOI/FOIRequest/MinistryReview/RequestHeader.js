@@ -4,23 +4,13 @@ import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
-import { openRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
-import RequestDetails from './RequestDetails';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-const RequestHeader = React.memo((requestDetails) => {
-    const _requestDetails = requestDetails.requestDetails;
+const RequestHeader = React.memo(({requestDetails, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
+    const _requestDetails = requestDetails;
 
     const preventDefault = (event) => event.preventDefault();
-
-    const handleMinistryAssignedToValue =()=>{
-
-    }
-
-    const createSaveRequestObject = () =>{
-
-    }
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -80,7 +70,7 @@ const RequestHeader = React.memo((requestDetails) => {
 
             
                     <>
-                      <MinistryAssignToDropdown requestDetails={_requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestDetails={_requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
                     </>
                 
             </div>

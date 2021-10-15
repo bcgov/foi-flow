@@ -21,8 +21,9 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: theme.typography.fontWeightBold,
         opacity: 1,
     },
-  }));
-const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
+}));
+
+const MinistryAssignToDropdown = React.memo(({requestDetails,  handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
    
      /**
      *  Header of Review request in the UI
@@ -34,8 +35,8 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
 
     //local state management for assignedTo
     //------- update this later when $567 is ready
-    const minsitryAssignedToGroup = requestDetails.selectedMinistries && requestDetails.selectedMinistries[0].code ? MINISTRYGROUPS[requestDetails.selectedMinistries[0].code] : "";
-    const ministryAssignedTo = requestDetails.ministryAssignedTo ? `${minsitryAssignedToGroup}|${requestDetails.ministryAssignedTo}` : `|Unassigned`;
+    const minsitryAssignedToGroup = requestDetails.assignedministrygroup ? requestDetails.assignedministrygroup : "";
+    const ministryAssignedTo = requestDetails.assignedministryperson ? `${minsitryAssignedToGroup}|${requestDetails.assignedministryperson}` : `|Unassigned`;
     const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
 
     //get the assignedTo master data
@@ -68,9 +69,7 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
     //handle onChange event for assigned To
     const handleMinistryAssignedToOnChange = (event) => {
         setMinistryAssignedTo(event.target.value);
-        //event bubble up - to validate required fields
         handleMinistryAssignedToValue(event.target.value);
-        //save ministry assignedTo to request - on hold
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO, event.target.value, event.target.name);
         console.log(`handleMinstryAssignedToOnChange Header ${event.target.value}`)
     }
@@ -88,9 +87,6 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, handleMinistryAss
                     variant="outlined"
                     fullWidth
                     required = {isMinistryCoordinator}
-                    // inputProps={
-                    //     { readOnly: ministryReadonly, }
-                    // }
                     disabled = {!isMinistryCoordinator}
                     error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
