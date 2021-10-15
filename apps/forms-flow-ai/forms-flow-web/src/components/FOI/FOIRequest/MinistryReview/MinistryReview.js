@@ -69,9 +69,6 @@ const MinistryReview = React.memo(({userDetail}) => {
      }     
    },[requestId, dispatch]); 
 
-
-
-  
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
 
   let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate); 
@@ -109,8 +106,6 @@ const MinistryReview = React.memo(({userDetail}) => {
   const handleStateChange =(currentStatus)=>{
 
   }
-
-
 
   const tabclick =(evt,param)=>{
    

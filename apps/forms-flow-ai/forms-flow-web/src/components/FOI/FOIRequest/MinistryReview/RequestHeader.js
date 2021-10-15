@@ -4,8 +4,6 @@ import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
-import { openRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
-import RequestDetails from './RequestDetails';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList, fetchFOIWatcherList, saveWatcher } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { Watcher } from '../../customComponents';
@@ -69,7 +67,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail}) => {
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
                   
-                        <Watcher watcherFullList={ministryAssignedToList} requestWatcherList={requestWatcherList} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} userDetail={userDetail} />
+                        <Watcher watcherFullList={ministryAssignedToList} requestWatcherList={requestWatcherList} ministryId={ministryId} userDetail={userDetail} handleWatcherUpdate={handleWatcherUpdate} />
                    
                 </div>
             </div>

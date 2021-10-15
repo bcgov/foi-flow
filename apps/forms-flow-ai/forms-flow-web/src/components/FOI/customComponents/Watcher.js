@@ -1,5 +1,4 @@
 import React  from 'react';
-// import { useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -34,9 +33,9 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, handleWatcherUpdate, userDetail}) {    
+export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, userDetail, handleWatcherUpdate}) {    
     const classes = useStyles();
-   
+    
     const [personName, setPersonName] = React.useState(['Unassigned']);
     const [noOfWatchers, setNoOfWatcers] = React.useState(0);
     const [isUseraWatcher, setUseraWatcher] = React.useState(false);
@@ -127,9 +126,7 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         <div>
         <FormControl>
               <div className="foi-watcher-all">
-                {/* <div className="foi-eye-container"> */}
                    <button onClick={updateWatcher} className="foi-eye-container"> <i className="fa fa-eye foi-eye"> <b>{isUseraWatcher? "Unwatch" : "Watch" }</b></i></button>
-                {/* </div> */}
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>
                     <Select

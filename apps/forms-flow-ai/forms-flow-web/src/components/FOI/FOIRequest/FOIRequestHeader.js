@@ -110,9 +110,11 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
     
     const handleWatcherUpdate = (watcher) => {
-        console.log(`header`);
-        console.log(watcher);
-        dispatch(saveWatcher(ministryId, watcher));
+        dispatch(saveWatcher(ministryId, watcher, (err, res) => {
+            if (!err) {
+                window.location.reload()
+            } 
+          }));
     }
      return (
         <div className="foi-request-review-header-row1">
@@ -124,9 +126,9 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
                    
-                        <Watcher watcherFullList={assignedToList} requestWatcherList={requestWatcherList} requestId={requestId} ministryId={ministryId} handleWatcherUpdate={handleWatcherUpdate} userDetail={userDetail} />
+                        <Watcher watcherFullList={assignedToList} requestWatcherList={requestWatcherList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} handleWatcherUpdate={handleWatcherUpdate} />
                    
-                </div>          
+                </div>
             </div>
             
             <div className="foi-assigned-to-container">
