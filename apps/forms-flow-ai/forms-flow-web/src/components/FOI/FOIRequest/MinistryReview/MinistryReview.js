@@ -123,8 +123,6 @@ const MinistryReview = React.memo((props) => {
     const requestObject = {...saveMinistryRequestObject};  
     setUnSavedRequest(true);
     createMinistryRequestDetailsObject(requestObject, name, value);    
-    console.log("requestObject: ");
-    console.log(requestObject);
     setSaveMinistryRequestObject(requestObject);
   }
 
@@ -156,21 +154,18 @@ const MinistryReview = React.memo((props) => {
     const requestObject = {...saveRequestObject};  
     setUnSavedRequest(true);
     createRequestDetailsObject(requestObject, name, value);    
-    console.log("requestObject: ");
-    console.log(requestObject);
     setSaveRequestObject(requestObject);
   }
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
-    if (!_unSaved) {      
+    if (!_unSaved && ministryId && requestId) {
       setTimeout(() => 
       { 
-        ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}/${_state}` : dispatch(push(`/foi/reviewrequest/${id}/${_state}`)) 
+        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}` 
       }
       , 1000);
-      // setTimeout(() => { requestId ? window.location.reload()  : window.location.href = `/foi/reviewrequest/${id}/${value}` }, 1000);
     }
   }
   
