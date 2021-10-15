@@ -352,8 +352,6 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;         
-          console.log("fetchFOIRequestDetails");
-          console.log(foiRequest);
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           //dispatch(setFOIAssignedToList([]));
@@ -388,8 +386,6 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId, ...res
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;         
-          console.log("fetchFOIMinistryViewRequestDetails");
-          console.log(foiRequest);
           dispatch(clearRequestDetails({}));
           dispatch(setFOIMinistryViewRequestDetail(foiRequest));                    
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
