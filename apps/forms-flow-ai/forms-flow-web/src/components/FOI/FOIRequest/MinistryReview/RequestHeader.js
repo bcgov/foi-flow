@@ -5,7 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFOIFullAssignedToList, fetchFOIWatcherList, saveWatcher } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
 
@@ -28,7 +28,6 @@ const RequestHeader = React.memo(({requestDetails, userDetail}) => {
     const dispatch = useDispatch();
     useEffect(() => {
       dispatch(fetchFOIFullAssignedToList());
-      dispatch(fetchFOIWatcherList(ministryId));
     },[dispatch]); 
 
     const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
@@ -52,10 +51,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail}) => {
 
     const headerText = _requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
     const assignedToValue = getFullName(assignedToList, _requestDetails);
-    const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
-    const handleWatcherUpdate = (watcher) => {
-        dispatch(saveWatcher(ministryId, watcher));
-    }
+
     return (
 
         <div className="foi-request-review-header-row1">
@@ -67,7 +63,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail}) => {
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
                   
-                        <Watcher watcherFullList={ministryAssignedToList} requestWatcherList={requestWatcherList} ministryId={ministryId} userDetail={userDetail} handleWatcherUpdate={handleWatcherUpdate} />
+                    <Watcher watcherFullList={ministryAssignedToList} ministryId={ministryId} userDetail={userDetail} />
                    
                 </div>
             </div>

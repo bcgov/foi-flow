@@ -1,12 +1,13 @@
 import React  from 'react';
+import { useSelector, useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
 import './Watcher.scss'
+import { saveWatcher, fetchFOIWatcherList } from "../../../apiManager/services/FOI/foiRequestServices";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -33,12 +34,19 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList, requestWatcherList, requestId, ministryId, userDetail, handleWatcherUpdate}) {    
+export default function Watcher({watcherFullList, requestId, ministryId, userDetail}) {    
     const classes = useStyles();
-    
+    const dispatch = useDispatch();
+
     const [personName, setPersonName] = React.useState(['Unassigned']);
     const [noOfWatchers, setNoOfWatcers] = React.useState(0);
     const [isUseraWatcher, setUseraWatcher] = React.useState(false);
+
+    React.useEffect(() => {        
+        dispatch(fetchFOIWatcherList(ministryId));
+    },[dispatch, isUseraWatcher, ministryId] )
+
+    const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
 
     React.useEffect(() => {
         const watchList = requestWatcherList.map(watcher => {
@@ -48,7 +56,7 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         setPersonName(watchList.length > 0 ? watchList : ['Unassigned']);
         setNoOfWatcers(watchList.length > 0 ? watchList.length : 0);
         setUseraWatcher(!!watcherUsers.find(watcher => watcher === userDetail.preferred_username))
-      },[requestWatcherList])
+      },[requestWatcherList, userDetail])
 
       
     const getFullName = (lastName, firstName, username) => {
@@ -90,7 +98,12 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
     );
   };
 
-  const updateWatcher = (event) => {    
+  const handleWatcherUpdate = async (watcher) => {
+    dispatch(saveWatcher(ministryId, watcher));
+}
+
+  const updateWatcher = (event) => {
+    
     let watcher = {};
     if (ministryId) {
         watcher.ministryrequestid = ministryId;
@@ -103,6 +116,10 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         watcher.watchedbygroup = watcherDetails[0];
         watcher.watchedby = watcherDetails[1];
         watcher.isactive = event.target.checked;
+        handleWatcherUpdate(watcher);
+        if (watcher.watchedby === userDetail.preferred_username) {
+            setUseraWatcher(watcher.isactive);
+        }
     }
     else {
         watcher.watchedby = userDetail.preferred_username;
@@ -112,10 +129,10 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
         else {
             watcher.isactive = true;
         }
-        console.log(`watcher`);
-        console.log(watcher);
+        handleWatcherUpdate(watcher);
+        setUseraWatcher(watcher.isactive);
+        event.preventDefault();
     }
-    handleWatcherUpdate(watcher);
 }
 
   const renderValue = (option) => {    
@@ -124,7 +141,6 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
     return (  
         
         <div>
-        <FormControl>
               <div className="foi-watcher-all">
                    <button onClick={updateWatcher} className="foi-eye-container"> <i className="fa fa-eye foi-eye"> <b>{isUseraWatcher? "Unwatch" : "Watch" }</b></i></button>
                 <div className="foi-watcher-select">
@@ -144,7 +160,6 @@ export default function Watcher({watcherFullList, requestWatcherList, requestId,
                     </Select>
                 </div>
             </div>
-        </FormControl>
       </div> 
            
     );
