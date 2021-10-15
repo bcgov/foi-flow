@@ -243,10 +243,10 @@ export const fetchFOIReceivedModeList = (...rest) => {
   };
 };
 
-export const fetchFOIWatcherList = (ministryId,...rest) => {
+export const fetchFOIWatcherList = (requestId, ministryId,...rest) => {
   const done = rest.length ? rest[0] : () => {};
 
-  let apiUrl = API.FOI_GET_RAW_REQUEST_WATCHERS;
+  let apiUrl = '';
   if (ministryId) {
     apiUrl = replaceUrl(
       API.FOI_GET_MINISTRY_REQUEST_WATCHERS,
@@ -254,7 +254,13 @@ export const fetchFOIWatcherList = (ministryId,...rest) => {
       ministryId
     );
   }
-
+  else if (requestId) {
+    apiUrl = replaceUrl(
+      API.FOI_GET_RAW_REQUEST_WATCHERS,
+      "<requestid>",
+      requestId
+    );
+  }  
   return (dispatch) => {
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
@@ -262,7 +268,6 @@ export const fetchFOIWatcherList = (ministryId,...rest) => {
           let data = res.data.map((watcher) => {
             return { ...watcher};
           });
-          console.log(`data = ${JSON.stringify(data)}`);
           dispatch(setFOIWatcherList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
