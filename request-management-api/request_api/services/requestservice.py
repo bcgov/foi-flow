@@ -163,11 +163,17 @@ class requestservice:
     def saveMinistryRequestVersion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype):
         _foirequest = FOIRequest().getrequest(foirequestid) 
         _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)  
+        _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicants(foirequestid,_foirequest["version"])
+        _foirequestcontact = FOIRequestContactInformation().getrequestcontactinformation(foirequestid,_foirequest["version"])
+        _foirequestpersonalattrbs = FOIRequestPersonalAttribute().getrequestpersonalattributes(foirequestid,_foirequest["version"])
         foiministryrequestarr = []     
         foirequest = FOIRequestUtil().createFOIRequestFromObject(_foirequest, userid)
         foiministryrequest = FOIRequestUtil().createFOIMinistryRequestFromObject(_foiministryrequest, ministryrequestschema, userid)
         foiministryrequestarr.append(foiministryrequest)
         foirequest.ministryRequests = foiministryrequestarr
+        foirequest.requestApplicants = FOIRequestUtil().createFOIRequestAppplicantFromObject(_foirequestapplicant, foirequestid,  _foirequest['version']+1, userid)
+        foirequest.contactInformations = FOIRequestUtil().createFOIRequestContactFromObject( _foirequestcontact, foirequestid, _foirequest['version']+1, userid)
+        foirequest.personalAttributes = FOIRequestUtil().createFOIRequestPersonalAttributeFromObject( _foirequestpersonalattrbs, foirequestid, _foirequest['version']+1, userid)
         FOIMinistryRequest.deActivateFileNumberVersion(ministryid, _foiministryrequest['filenumber'], _foiministryrequest['version']+1, userid)
         return FOIRequest.saverequest(foirequest)        
                
@@ -373,10 +379,48 @@ class FOIRequestUtil:
         foiministryrequest.assignedministryperson = requestschema['assignedministryperson'] if 'assignedministryperson' in requestschema  else ministryschema["assignedministryperson"]
         foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"]
         foiministryrequest.assignedto = requestschema['assignedto'] if 'assignedto' in requestschema  else ministryschema["assignedto"]
-        foiministryrequest.requeststatusid = ministryschema["requeststatus.requeststatusid"] if 'requeststatus.requeststatusid' in ministryschema  else None
+        foiministryrequest.requeststatusid = requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"]
         foiministryrequest.programareaid = ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None
         foiministryrequest.createdby = userid
         return foiministryrequest
+    
+    def createFOIRequestAppplicantFromObject(self, requestapplicants, requestid, version, userid): 
+        requestapplicantarr = []
+        for requestapplicant in requestapplicants:
+            applicantmapping  = FOIRequestApplicantMapping()
+            applicantmapping.foirequest_id = requestid
+            applicantmapping.foirequestversion_id = version
+            applicantmapping.foirequestapplicantid = requestapplicant["foirequestapplicant.foirequestapplicantid"]
+            applicantmapping.requestortypeid = requestapplicant["requestortype.requestortypeid"]
+            applicantmapping.createdby = userid
+            requestapplicantarr.append(applicantmapping)
+        return requestapplicantarr
+
+    def createFOIRequestContactFromObject(self, requestcontacts, requestid, version, userid):
+        requestcontactarr = []
+        for requestcontact in requestcontacts:
+            contactinfo  = FOIRequestContactInformation()
+            contactinfo.contacttypeid = requestcontact["contacttype.contacttypeid"]
+            contactinfo.foirequest_id = requestid
+            contactinfo.foirequestversion_id = version
+            contactinfo.contactinformation = requestcontact["contactinformation"]
+            contactinfo.dataformat = requestcontact["dataformat"]
+            contactinfo.createdby = userid
+            requestcontactarr.append(contactinfo)
+        return requestcontactarr
+    
+    def createFOIRequestPersonalAttributeFromObject(self,personalattributes, requestid, version, userid):
+        personalattributesarr = []
+        for personalattribute in personalattributes:
+            attribute = FOIRequestPersonalAttribute()
+            attribute.personalattributeid = personalattribute["personalattributeid"]
+            attribute.attributevalue = personalattribute["attributevalue"]
+            attribute.foirequest_id = requestid
+            attribute.foirequestversion_id = version
+            attribute.createdby = userid
+            personalattributesarr.append(attribute)
+        return personalattributesarr
+        
     
     def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
         foiministryRequest = FOIMinistryRequest()
