@@ -79,13 +79,10 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={`${classes.item} foi-watcher-menuitem`} 
                    value={`${group.name}|${assignee.username}`} 
                    disabled={assignee.username.toLowerCase().includes("unassigned")}
-                   name={`${group.name}|${assignee.username}`}
-                //    onClick={listClick(`${group.name}|${assignee.username}`, personName.indexOf(`${group.name}|${assignee.username}`) > -1)}
-                   >      
-                        <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} onChange={watcherOnChange}/>
-                        {/* <ListItemText primary={getFullName(assignee.lastname, assignee.firstname, assignee.username)} onClick={listClick(`${group.name}|${assignee.username}`, personName.indexOf(`${group.name}|${assignee.username}`) > -1)} /> */}
+                   name={`${group.name}|${assignee.username}`}               
+                   >
+                        <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} />
                         {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
-                      
                     </MenuItem>)
                }
            }
@@ -93,14 +90,6 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
        return menuItems;
    }
 
-   const listClick = (_watcher, isChecked) => {
-    console.log(`_watcher = ${_watcher} isChecked = ${isChecked}`);
-    // console.log(event);
-}
- const labelClick = (event) => {
-     console.log(`item click`);
-     console.log(event);
- }
   const handleChange = (event) => {
     const {
       target: { value },
@@ -114,11 +103,30 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     setPersonName(
       typeof value === 'string' ? value.split(',') : value,
     );
+    const currentWatcher = event.nativeEvent.target.dataset.value;
+    if (currentWatcher) {
+      let watcher = {};
+      if (ministryId) {
+        watcher.ministryrequestid = ministryId;
+    }
+    else {
+        watcher.requestid = requestId;
+    }
+      const watcherDetails = currentWatcher.split('|');
+      watcher.watchedbygroup = watcherDetails[0];
+      watcher.watchedby = watcherDetails[1];
+      const isActive = !!event.target.value.find(_watcher => _watcher === currentWatcher);
+      watcher.isactive = isActive;
+      handleWatcherUpdate(watcher);
+        if (watcher.watchedby === userDetail.preferred_username) {
+            setUseraWatcher(watcher.isactive);
+        }
+        setUpdateWatchList(watcher.isactive);
+    }
   };
 
   const handleWatcherUpdate = (watcher) => {
     dispatch(saveWatcher(ministryId, watcher, (err, res) => {
-        console.log(`saveWatcher`);
     }        
         ));
 }
@@ -132,19 +140,6 @@ const watcherOnChange = (event) => {
     else {
         watcher.requestid = requestId;
     }
-    
-    if (event.target.name) {
-        const watcherDetails = event.target.name.split('|');
-        watcher.watchedbygroup = watcherDetails[0];
-        watcher.watchedby = watcherDetails[1];
-        watcher.isactive = event.target.checked;
-        handleWatcherUpdate(watcher);
-        if (watcher.watchedby === userDetail.preferred_username) {
-            setUseraWatcher(watcher.isactive);
-        }
-        setUpdateWatchList(watcher.isactive);
-    }   
-    else {
         watcher.watchedby = userDetail.preferred_username;
         if (isUseraWatcher) { 
             watcher.isactive = false;
@@ -156,8 +151,6 @@ const watcherOnChange = (event) => {
         setUseraWatcher(watcher.isactive);
         setUpdateWatchList(watcher.isactive);
         event.preventDefault();
-    }
-    console.log(watcher);
 }
 
   const updateWatcher = (_watcher, isChecked) => {   
