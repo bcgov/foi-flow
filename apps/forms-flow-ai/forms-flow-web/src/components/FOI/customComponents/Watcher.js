@@ -43,7 +43,6 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     const [isUseraWatcher, setUseraWatcher] = React.useState(false);
 
     React.useEffect(() => {
-        console.log(`dispatch`);
         dispatch(fetchFOIWatcherList(requestId,ministryId));
     },[dispatch, updateWatchList, isUseraWatcher, requestId, ministryId] )
 
@@ -64,8 +63,8 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
       
     const getFullName = (lastName, firstName, username) => {
         return  firstName !== "" ? `${lastName}, ${firstName}` : username;
-   }  
-   console.log(`requestWatcherList = ${JSON.stringify(requestWatcherList)}`);
+    }
+
    //creates the grouped menu items for assignedTo combobox
    const getMenuItems = () => {
        var menuItems = [];
@@ -90,12 +89,36 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
        return menuItems;
    }
 
+  const handleWatcherUpdate = (watcher) => {
+    dispatch(saveWatcher(ministryId, watcher, (err, res) => {      
+    }
+        ));
+  }
+   const updateWatcher = (currentWatcher, watchers) => {
+    let watcher = {};
+    if (ministryId) {
+      watcher.ministryrequestid = ministryId;
+    }
+    else {
+      watcher.requestid = requestId;
+    }
+    const watcherDetails = currentWatcher.split('|');
+    watcher.watchedbygroup = watcherDetails[0];
+    watcher.watchedby = watcherDetails[1];
+    const isActive = watchers? !!watchers.find(_watcher => _watcher === currentWatcher): false;
+    watcher.isactive = isActive;
+    handleWatcherUpdate(watcher);
+    if (watcher.watchedby === userDetail.preferred_username) {
+      setUseraWatcher(watcher.isactive);
+    }
+    setUpdateWatchList(watcher.isactive);
+  }
+
   const handleChange = (event) => {
     const {
       target: { value },
     } = event;
-    let count = value.length;
-    console.log(count);
+    let count = value.length;    
     if (value.includes('Unassigned')) {
         count = count - 1;
     }
@@ -103,36 +126,21 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     setPersonName(
       typeof value === 'string' ? value.split(',') : value,
     );
-    const currentWatcher = event.nativeEvent.target.dataset.value;
-    if (currentWatcher) {
-      let watcher = {};
-      if (ministryId) {
-        watcher.ministryrequestid = ministryId;
+
+    let currentWatcher = "";
+   
+    if (event.nativeEvent.target.dataset.value) {
+      currentWatcher = event.nativeEvent.target.dataset.value;     
     }
-    else {
-        watcher.requestid = requestId;
+    else if (event.nativeEvent.target.name) {
+      currentWatcher = event.nativeEvent.target.name;
     }
-      const watcherDetails = currentWatcher.split('|');
-      watcher.watchedbygroup = watcherDetails[0];
-      watcher.watchedby = watcherDetails[1];
-      const isActive = !!event.target.value.find(_watcher => _watcher === currentWatcher);
-      watcher.isactive = isActive;
-      handleWatcherUpdate(watcher);
-        if (watcher.watchedby === userDetail.preferred_username) {
-            setUseraWatcher(watcher.isactive);
-        }
-        setUpdateWatchList(watcher.isactive);
-    }
+    
+    updateWatcher(currentWatcher, event.target.value);
   };
 
-  const handleWatcherUpdate = (watcher) => {
-    dispatch(saveWatcher(ministryId, watcher, (err, res) => {
-    }        
-        ));
-}
-
 const watcherOnChange = (event) => {
-    console.log(event);
+    
     let watcher = {};
     if (ministryId) {
         watcher.ministryrequestid = ministryId;
@@ -153,29 +161,7 @@ const watcherOnChange = (event) => {
         event.preventDefault();
 }
 
-  const updateWatcher = (_watcher, isChecked) => {   
-    console.log(`_watcher = ${_watcher} isChecked = ${isChecked}`);   
-    let watcher = {};
-    if (ministryId) {
-        watcher.ministryrequestid = ministryId;
-    }
-    else {
-        watcher.requestid = requestId;
-    }
-    const watcherDetails = _watcher.split('|');
-    watcher.watchedbygroup = watcherDetails[0];
-    watcher.watchedby = watcherDetails[1];
-    watcher.isactive = isChecked;
-    handleWatcherUpdate(watcher);
-    if (watcher.watchedby === userDetail.preferred_username) {
-        setUseraWatcher(watcher.isactive);
-    }
-    setUpdateWatchList(watcher.isactive);  
-    console.log(watcher);
-}
-
   const renderValue = (option) => {
-    console.log(`noOfWatchers = ${noOfWatchers}`);
     return <span>{noOfWatchers}</span>;
   }
     return (  
