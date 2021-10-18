@@ -70,8 +70,7 @@ const MinistryReview = React.memo((props) => {
     
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
-  const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
-  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState({});
+  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -85,7 +84,7 @@ const MinistryReview = React.memo((props) => {
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
-    setSaveRequestObject(requestDetailsValue);
+    setSaveMinistryRequestObject(requestDetailsValue);
     ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
   },[requestDetails]); 
@@ -129,37 +128,6 @@ const MinistryReview = React.memo((props) => {
     setSaveMinistryRequestObject(requestObject);
   }
 
-  const createRequestDetailsObject = (requestObject, name, value) => {
-    requestObject.id = requestId;
-    requestObject.requestProcessStart = requestDetails.requestProcessStart;
-    requestObject.dueDate = requestDetails.dueDate;
-    requestObject.receivedMode = requestDetails.receivedMode;
-    requestObject.deliveryMode = requestDetails.deliveryMode;
-    requestObject.assignedGroup = requestDetails.assignedGroup;
-    requestObject.assignedTo = requestDetails.assignedTo;
-    //--------------- need update this later: fn and ln should not be required field for ministry request
-    requestObject.firstName = "test";
-    requestObject.lastName = "test";
-    requestObject.additionalPersonalInfo = {};
-    requestObject.assignedministrygroup = requestDetails.assignedministrygroup;
-    requestObject.assignedministryperson = requestDetails.assignedministryperson;
-    // requestDetails.
-    if (name === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
-      const assignedToValue = value.split("|");
-      if (assignedToValue.length > 1 && assignedToValue[0] && assignedToValue[1]) {
-        requestObject.assignedministrygroup = assignedToValue[0];
-        requestObject.assignedministryperson = assignedToValue[1];
-      }
-    }
-  }
-
-  const createSaveRequestObject = (name, value, value2) => {
-    const requestObject = {...saveRequestObject};  
-    setUnSavedRequest(true);
-    createRequestDetailsObject(requestObject, name, value);    
-    setSaveRequestObject(requestObject);
-  }
-
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
@@ -173,7 +141,7 @@ const MinistryReview = React.memo((props) => {
   }
   
   const handleStateChange =(currentStatus)=>{
-    createSaveRequestObject("", "", "");
+    createMinistrySaveRequestObject("", "", "");
     setcurrentrequestStatus(currentStatus);
   }
 
@@ -269,7 +237,7 @@ const MinistryReview = React.memo((props) => {
                     <RequestTracking/>                    
                     <RequestNotes />
                     { _requestStatus.toLowerCase() == StateEnum.callforrecords.name.toLocaleLowerCase() ?
-                      <BottomButtonGroup isValidationError={isValidationError} saveRequestObject={saveRequestObject} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
+                      <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                       : null 
                     }
                   </>

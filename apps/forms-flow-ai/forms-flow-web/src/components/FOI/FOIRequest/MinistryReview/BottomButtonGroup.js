@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
 
 const BottomButtonGroup = React.memo(({
   isValidationError,
-  saveRequestObject,
   saveMinistryRequestObject,
   unSavedRequest,
   handleSaveRequest,
@@ -62,35 +61,6 @@ const BottomButtonGroup = React.memo(({
       }
     }
  
-    const saveRequest = async () => {
-      dispatch(saveRequestDetails(saveRequestObject, 0, requestId, ministryId, (err, res) => {
-        if (!err) {
-          toast.success('The request has been saved successfully.', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            });
-            const _state = currentSelectedStatus ? currentSelectedStatus : requestState;
-            handleSaveRequest(_state, false, res.id);
-        } else {
-          toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            });
-            handleSaveRequest(currentSelectedStatus, true, "");
-        }
-      }));      
-    }
-
     const saveMinistryRequest = async () => {
       dispatch(saveMinistryRequestDetails(saveMinistryRequestObject, requestId, ministryId, (err, res) => {
         if (!err) {
@@ -158,8 +128,8 @@ const BottomButtonGroup = React.memo(({
       if (value) {
         if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
         {
-          saveRequestObject.requeststatusid = StateEnum.review.id;
-          saveRequest();
+          saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
+          saveMinistryRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
         //else if(currentSelectedStatus == StateEnum.response.name && !isValidationError) {}
@@ -168,7 +138,7 @@ const BottomButtonGroup = React.memo(({
 
   return (
     <div className={classes.root}>
-      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject}/>
+      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveMinistryRequestObject}/>
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveMinistryRequest}>Save</button>
       {/* <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>       */}
