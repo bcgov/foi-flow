@@ -113,3 +113,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True)   
     assignedgroup = fields.Str(data_key="assignedgroup",allow_none=True)   
     assignedto = fields.Str(data_key="assignedto",allow_none=True)   
+    requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
