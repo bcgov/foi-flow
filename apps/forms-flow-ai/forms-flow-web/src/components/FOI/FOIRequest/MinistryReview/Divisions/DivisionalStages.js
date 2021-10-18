@@ -64,12 +64,12 @@ return (
             </TextField>
         </div>
         <div className="col-lg-2 foi-details-col">
-        <i class="fa fa-trash fa-3 foi-bin" aria-hidden="true"></i>
+        <i className="fa fa-trash fa-3 foi-bin" aria-hidden="true"></i>
         </div>
     </div>
     <div className="row foi-details-row">       
         <div className="col-lg-7 foi-details-col">
-            <i class="fa fa-plus-circle fa-3 foi-add" aria-hidden="true"></i>  <a href="#">Add division to track</a>
+            <i className="fa fa-plus-circle fa-3 foi-add" aria-hidden="true"></i>  <a href="#">Add division to track</a>
         </div>
     </div>
     </>

@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const MinistryReview = React.memo((props) => {
+const MinistryReview = React.memo(({userDetail}) => {
 
   const {requestId, ministryId, requestState} = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
@@ -69,9 +69,6 @@ const MinistryReview = React.memo((props) => {
      }     
    },[requestId, dispatch]); 
 
-
-
-  
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
 
   let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate); 
@@ -109,8 +106,6 @@ const MinistryReview = React.memo((props) => {
   const handleStateChange =(currentStatus)=>{
 
   }
-
-
 
   const tabclick =(evt,param)=>{
    
@@ -164,7 +159,7 @@ const MinistryReview = React.memo((props) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
                   <>
-                    <RequestHeader requestDetails={requestDetails} />
+                    <RequestHeader requestDetails={requestDetails} userDetail={userDetail} />
                     <ApplicantDetails requestDetails={requestDetails}/> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
