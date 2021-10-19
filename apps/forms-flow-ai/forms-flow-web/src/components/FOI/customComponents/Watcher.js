@@ -111,8 +111,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     if (watcher.watchedby === userDetail.preferred_username) {
       setUseraWatcher(watcher.isactive);
     }
-    handleWatcherUpdate(watcher);
-    // setUpdateWatchList(watcher.isactive);
+    handleWatcherUpdate(watcher);    
   }
 
   const handleChange = (event) => {
@@ -156,7 +155,6 @@ const watcherOnChange = (event) => {
         else {
             watcher.isactive = true;
         }
-        setUseraWatcher(watcher.isactive);
         handleWatcherUpdate(watcher);        
         event.preventDefault();
 }

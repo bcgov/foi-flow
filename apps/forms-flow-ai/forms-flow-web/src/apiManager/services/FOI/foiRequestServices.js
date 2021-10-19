@@ -347,10 +347,13 @@ export const fetchFOIMinistryRequestList = (...rest) => {
       .then((res) => {
         if (res.data) {
           const foiRequests = res.data;         
-          let data = foiRequests.map((foiRequest) => {            
+          let data = foiRequests.map((foiRequest) => {
+            foiRequest.bcgovcode = foiRequest.idNumber.split("-")[0];
             return { ...foiRequest};
           });          
-          dispatch(clearRequestDetails({}));         
+          dispatch(clearRequestDetails({}));
+          console.log(foiRequests);
+          dispatch(fetchFOIMinistryAssignedToList(foiRequests[0].bcgovcode.toLowerCase()));     
           dispatch(setFOIMinistryRequestList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
