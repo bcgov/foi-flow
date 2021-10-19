@@ -42,7 +42,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
 
     React.useEffect(() => {
         dispatch(fetchFOIWatcherList(requestId,ministryId));
-    },[dispatch, updateWatchList, isUseraWatcher, requestId, ministryId] )
+    },[dispatch, updateWatchList, requestId, ministryId] )
 
     const [personName, setPersonName] = React.useState(['Unassigned']);
     const [noOfWatchers, setNoOfWatchers] = React.useState(0);
