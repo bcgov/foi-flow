@@ -47,6 +47,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
 
      //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+    const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
@@ -146,7 +147,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
 
                 {showMinistryAssignedTo ? (
                     <>
-                      <MinistryAssignToDropdown requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={_isMinistryCoordinator} />
+                      <MinistryAssignToDropdown requestDetails={requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={_isMinistryCoordinator} />
                     </>
                 ) : null}
             </div>

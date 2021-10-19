@@ -49,7 +49,7 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
 
         //add default value (unassigned)
         menuItems.push(<MenuItem className={classes.group} key={0} value={'|'}>{}</MenuItem>);
-        menuItems.push(<MenuItem key={0} className={classes.item} value={ministryAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
+        menuItems.push(<MenuItem key={0} className={classes.item} value={'|Unassigned'} disabled={true} >{'Unassigned'}</MenuItem>)
 
         if (ministryAssignedToList && ministryAssignedToList.length > 0) {
             for (var group of ministryAssignedToList) {
