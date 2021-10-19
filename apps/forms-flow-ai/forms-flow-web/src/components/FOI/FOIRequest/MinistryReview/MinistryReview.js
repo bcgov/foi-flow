@@ -75,7 +75,6 @@ const MinistryReview = React.memo((props) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (ministryId) {
-      dispatch(fetchFOIRequestDetails(requestId, ministryId));
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
     }     
@@ -107,10 +106,6 @@ const MinistryReview = React.memo((props) => {
   const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned");
 
   const createMinistryRequestDetailsObject = (requestObject, name, value) => {
-    requestObject.assignedGroup = requestDetails.assignedGroup;
-    requestObject.assignedTo = requestDetails.assignedTo;
-    requestObject.assignedministrygroup = requestDetails.assignedministrygroup;
-    requestObject.assignedministryperson = requestDetails.assignedministryperson;
     // requestDetails.
     if (name === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
       const assignedToValue = value.split("|");
@@ -124,7 +119,7 @@ const MinistryReview = React.memo((props) => {
   const createMinistrySaveRequestObject = (name, value, value2) => {
     const requestObject = {...saveMinistryRequestObject};  
     setUnSavedRequest(true);
-    createMinistryRequestDetailsObject(requestObject, name, value);    
+    createMinistryRequestDetailsObject(requestObject, name, value);   
     setSaveMinistryRequestObject(requestObject);
   }
 
@@ -141,7 +136,6 @@ const MinistryReview = React.memo((props) => {
   }
   
   const handleStateChange =(currentStatus)=>{
-    createMinistrySaveRequestObject("", "", "");
     setcurrentrequestStatus(currentStatus);
   }
 

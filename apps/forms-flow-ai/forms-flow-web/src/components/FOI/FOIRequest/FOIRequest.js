@@ -353,6 +353,8 @@ const FOIRequest = React.memo((props) => {
     requestObject.dueDate = requiredRequestDetailsValues.dueDate;
     requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
     requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
+    requestObject.assignedministrygroup = requiredRequestDetailsValues.assignedministrygroup;
+    requestObject.assignedministryperson = requiredRequestDetailsValues.assignedministryperson;
     if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
       requestObject.receivedDate = value.receivedDate;     
       requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";

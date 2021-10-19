@@ -3,7 +3,7 @@ import '../bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
-import { saveRequestDetails, saveMinistryRequestDetails } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { saveMinistryRequestDetails } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../../customComponents';
@@ -123,7 +123,7 @@ const BottomButtonGroup = React.memo(({
       setsaveModal(true);
     }
 
-    const handleSaveModal = (value) => {      
+    const handleSaveModal = (value) => {
       setsaveModal(false);      
       if (value) {
         if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
