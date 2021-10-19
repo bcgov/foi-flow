@@ -43,12 +43,15 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecordsoverdue.name}?`;
         default:
             return [];
+      }
     }
-  }
-  const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
-  const selectedMinistry= saveRequestObject.selectedMinistries ? saveRequestObject.selectedMinistries[0] : "";
-  const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
-  let message = getMessage(state, requestNumber);  
+
+    const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
+    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup : "";
+    const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
+    const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
+    let message = getMessage(state, requestNumber);  
+
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -82,7 +85,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                 <tbody>
                   <tr>
                     <th scope="row">Ministry Assigned To</th>
-                    <td>{`${selectedMinistry.name} Queue`}</td>
+                    <td>{selectedMinistryAssignedTo}</td>
                   </tr>
                 </tbody>
               </table>
