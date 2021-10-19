@@ -54,6 +54,8 @@ const BottomButtonGroup = React.memo(({
     
     const [opensaveModal, setsaveModal] = useState(false);
 
+    const disableSave = isValidationError || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase();
+
     const returnToQueue = (e) => {
       e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
@@ -140,7 +142,7 @@ const BottomButtonGroup = React.memo(({
     <div className={classes.root}>
       <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveMinistryRequestObject}/>
       <div className="foi-bottom-button-group">
-      <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveMinistryRequest}>Save</button>
+      <button type="button" className={`btn btn-bottom ${disableSave ? classes.btndisabled : classes.btnenabled}`} disabled={disableSave} onClick={saveMinistryRequest}>Save</button>
       {/* <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>       */}
       </div>
     </div>

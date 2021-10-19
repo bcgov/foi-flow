@@ -39,13 +39,8 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const dispatch = useDispatch();
 
     let _isMinistryCoordinator = false;
-    // if(requestDetails.selectedMinistries && requestDetails.selectedMinistries[0] && user)
-    // {
-    //     var ministrycode = requestDetails.selectedMinistries[0]
-    //     _isMinistryCoordinator = isMinistryCoordinator(user,MINISTRYGROUPS[ministrycode.code])
-    // }
 
-     //get the assignedTo master data
+    //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     
@@ -138,7 +133,6 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     variant="outlined"
                     fullWidth
                     required
-                    // disabled = {_isMinistryCoordinator}
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}

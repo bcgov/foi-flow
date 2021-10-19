@@ -244,10 +244,7 @@ const MinistryReview = React.memo(({userDetail}) => {
                     <RequestDetails requestDetails={requestDetails} />
                     <RequestTracking/>                    
                     <RequestNotes />
-                    { _requestStatus.toLowerCase() == StateEnum.callforrecords.name.toLocaleLowerCase() ?
-                      <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
-                      : null 
-                    }
+                    <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
                 : null }
                 </form>
