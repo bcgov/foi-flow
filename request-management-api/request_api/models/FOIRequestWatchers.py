@@ -29,16 +29,35 @@ class FOIRequestWatcher(db.Model):
         newwatcher = FOIRequestWatcher(ministryrequestid=foirequestwatcher["ministryrequestid"], version=version, watchedbygroup=foirequestwatcher["watchedbygroup"], watchedby=foirequestwatcher["watchedby"], isactive=foirequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
         db.session.add(newwatcher)
         db.session.commit()               
-        return DefaultMethodResult(True,'Request added',newwatcher.watcherid)   
+        return DefaultMethodResult(True,'Request added')   
 
     @classmethod
-    def getwatchers(cls, ministryrequestid):                
-        sql = 'select distinct on (watchedby) watchedby, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid order by watchedby, created_at desc'
+    def savewatcherbygroups(cls, foirequestwatcher, version, userid, watchergroups)->DefaultMethodResult:             
+        for group in watchergroups:
+            foirequestwatcher["watchedbygroup"] = group
+            newwatcher = FOIRequestWatcher(ministryrequestid=foirequestwatcher["ministryrequestid"], version=version, watchedbygroup=foirequestwatcher["watchedbygroup"], watchedby=foirequestwatcher["watchedby"], isactive=foirequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
+            db.session.add(newwatcher)
+            db.session.commit()               
+        return DefaultMethodResult(True,'Request added')
+
+    @classmethod
+    def getMinistrywatchers(cls, ministryrequestid):                
+        sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         watchers = []
         for row in rs:
             if row["isactive"] == True:
-                watchers.append({"watchedby": row["watchedby"]})
+                watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+        return watchers 
+    
+    @classmethod
+    def getNonMinistrywatchers(cls, ministryrequestid):                
+        sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        watchers = []
+        for row in rs:
+            if row["isactive"] == True:
+                watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
         return watchers 
 
     @classmethod

@@ -295,6 +295,12 @@ def test_get_foiministryrequestqueue(app, client):
     assert jsondata[0]['watchers']
   assert response.status_code == 200    
 
+
+def test_get_foiministryrequestqueue(app, client):
+  response = client.get('/api/dashboard/all', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
+  assert response.status_code == 200       
+  
+
 def test_get_foirequestqueuewithoutheader(app, client):    
   response = client.get('/api/dashboard', content_type='application/json')    
   jsondata = json.loads(response.data)
