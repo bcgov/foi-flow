@@ -1,12 +1,4 @@
-@font-face {
-    font-family: "BCSans-Regular";
-    src: url("../../../assets/FOI/fonts/BCSans-Regular.woff") format('woff');
-}
 
-@font-face {
-    font-family: "BCSans-Bold";
-    src: url("../../../assets/FOI/fonts/BCSans-Bold.woff") format('woff');
-}
 
 #app > div {
     height: 100%!important;
@@ -48,14 +40,13 @@ div .foi-dashboard {
 }
 
 .foi-request-queue-text {
-    font-family: "BCSans-Bold", sans-serif;
+    font-family: "BCSans-Bold", sans-serif!important;
 }
 .has-search .form-control {
     padding-left: 2.375rem;
     display: inline-block;
     width: 200%;
-    color: #5a7296;
-    font-family: 'BCSans-Regular', sans-serif;
+    color: #5a7296;   
     border: 1px solid #38598A;
 }
 
@@ -74,7 +65,7 @@ div .foi-dashboard {
 .has-search .apply-btn {
     border: none;   
     background-color: #38598A !important;   
-    font-family: 'BCSans-Bold', sans-serif;
+    font-family: 'BCSans-Bold', sans-serif!important;
     color: #FFFF; 
     margin-top: 10px;
     position: absolute;
@@ -121,8 +112,7 @@ input[type='radio'] {
     background:#38598A;
   }
 .foi-data-grid {
-    border: none !important;
-    font-family: 'BCSans-Regualar', sans-serif !important;
+    border: none !important;   
 }
 .MuiDataGrid-iconSeparator {
     visibility: hidden;
@@ -180,7 +170,7 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     margin-left: auto;
     position: relative;
     width: 20% !important;
-    font-family: "BCSans-Bold", sans-serif;
+    font-family: "BCSans-Bold", sans-serif!important;
     border: none !important;
     background-color: #38598A !important;
     color: #FFFFFF !important;

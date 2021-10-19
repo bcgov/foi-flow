@@ -66,7 +66,7 @@ const Note = React.memo((note) => {
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
           <div className="col-lg-12 foi-details-col">                      
-            <hr class="solid" />
+            <hr className="solid" />
           </div>
         </div>
       </div>

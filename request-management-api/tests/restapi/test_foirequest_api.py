@@ -280,10 +280,43 @@ def test_post_foirequest_general_consulttoreview(app, client):
     foireqresponse3 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')    
     assert foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foireqresponse.status_code == 200 and foireqresponse2.status_code == 200 and foireqresponse3.status_code == 200
 
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_post_foirequest_general_cfr_assignment(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_user_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_user_auth_header(app, client), content_type='application/json') 
+    foirequest = generalrequestjson
+    foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
+    foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foijsondata = json.loads(foiresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiupdaterequest = generalupdaterequestjson
+    foiupdaterequest["id"] = str(foijsondata["id"])
+    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
+    foiupdaterequest["requeststatusid"] = 2
+    foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
+    foiassignrequest = {
+    "assignedministrygroup":"AEST Ministry Team",
+    "assignedministryperson": "foiaed@idir",
+    "assignedgroup": "Flex Team",
+    "assignedto": "foiflex@idir"
+    }
+    foicfrassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiassignrequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    assert foiministryreqResponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foiministryreqResponse.status_code == 200 and foicfrassignresponse.status_code == 200
+
+
 
 def test_get_foirequestqueue(app, client):
   response = client.get('/api/dashboard', headers=factory_user_auth_header(app, client), content_type='application/json')
-  jsondata = json.loads(response.data)
+  jsondata = json.loads(response.data)  
+  if jsondata is not None and len(jsondata) > 0 :    
+    assert jsondata[0]['watchers']
   assert response.status_code == 200  
 
 def test_get_foiministryrequestqueue(app, client):
@@ -293,6 +326,7 @@ def test_get_foiministryrequestqueue(app, client):
 def test_get_foiministryrequestqueue(app, client):
   response = client.get('/api/dashboard/all', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
   assert response.status_code == 200       
+  
 
 def test_get_foirequestqueuewithoutheader(app, client):    
   response = client.get('/api/dashboard', content_type='application/json')    

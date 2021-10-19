@@ -74,7 +74,7 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
         else:            
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,FOIMinistryRequest.requeststatusid == 2))).all()    
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid == 2,FOIMinistryRequest.requeststatusid == 7, FOIMinistryRequest.requeststatusid == 9, FOIMinistryRequest.requeststatusid == 8,FOIMinistryRequest.requeststatusid == 10)))).all()    
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
@@ -125,6 +125,10 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.asc())
         return request_schema.dump(query)   
+    
+    @classmethod
+    def getversionforrequest(cls,ministryrequestid):   
+       return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

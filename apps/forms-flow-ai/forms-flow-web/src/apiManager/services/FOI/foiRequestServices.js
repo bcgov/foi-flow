@@ -18,6 +18,7 @@ import {
   setFOIReceivedModeList,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
+  setFOIWatcherList
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -83,7 +84,6 @@ export const fetchFOIProgramAreaList = (...rest) => {
 
 export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, status, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
   let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
   if (requestType && status) {
     apiUrlGETAssignedToList = replaceUrl(replaceUrl(
@@ -100,8 +100,6 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
           let data = foiAssignedToList.map((assignedTo) => {
             return { ...assignedTo};
           });
-          data.unshift(unAssignedGroup);
-          // dispatch(setFOIAssignedToList([]));
           dispatch(setFOIAssignedToList(data));          
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -122,7 +120,6 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
 
 export const fetchFOIFullAssignedToList = (...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  // const unAssignedGroup = {"id":0,"name":"","members":[{"id": 0, "username": "Unassigned", "firstname":"", "lastname":""}]};  
 
   return (dispatch) => {
     httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
@@ -132,7 +129,6 @@ export const fetchFOIFullAssignedToList = (...rest) => {
           let data = foiFullAssignedToList.map((assignedTo) => {
             return { ...assignedTo};
           });
-          // data.unshift(unAssignedGroup);
           dispatch(setFOIFullAssignedToList(data));
           dispatch(setFOIAssignedToListLoader(false));
           done(null, res.data);
@@ -242,6 +238,72 @@ export const fetchFOIReceivedModeList = (...rest) => {
         console.log("Error", error);
         dispatch(serviceActionError(error));
         dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchFOIWatcherList = (requestId, ministryId,...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+
+  let apiUrl = '';
+  if (ministryId) {
+    apiUrl = replaceUrl(
+      API.FOI_GET_MINISTRY_REQUEST_WATCHERS,
+      "<ministryid>",
+      ministryId
+    );
+  }
+  else if (requestId) {
+    apiUrl = replaceUrl(
+      API.FOI_GET_RAW_REQUEST_WATCHERS,
+      "<requestid>",
+      requestId
+    );
+  }  
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          let data = res.data.map((watcher) => {
+            return { ...watcher};
+          });
+          dispatch(setFOIWatcherList(data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const saveWatcher = (ministryId, data, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  let apiUrl = API.FOI_POST_RAW_REQUEST_WATCHERS;
+  if (ministryId) {
+    apiUrl = API.FOI_POST_MINISTRY_REQUEST_WATCHERS;     
+  }
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {                   
+          done(null, res.data);
+        } else {         
+          dispatch(serviceActionError(res));
+          done("Error Posting data");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
         done(error);
       });
   };
@@ -462,6 +524,34 @@ export const openRequestDetails = (data, ...rest) => {
         done(error);
       });
   };
+};
+
+export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  let apiUrl = "";
+  if (ministryId) {
+    apiUrl = replaceUrl(replaceUrl(
+      API.FOI_MINISTRYVIEW_REQUEST_API,
+      "<requestid>",
+      requestId
+    ),"<ministryid>", ministryId);  
+    return (dispatch) => {
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {
+          if (res.data) {                   
+            done(null, res.data);
+          } else {         
+            dispatch(serviceActionError(res));
+            done("Error Posting data");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+  }
+  done("Error Posting data");
 };
 
 export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) => {

@@ -24,7 +24,7 @@ from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredm
 from request_api.exceptions import BusinessException, Error
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
-from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema
+from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
@@ -34,7 +34,7 @@ API = Namespace('FOIRequests', description='Endpoints for FOI request management
 TRACER = Tracer.get_instance()
 
 
-@cors_preflight('GET,POST,OPTIONS')
+@cors_preflight('GET,OPTIONS')
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIRequest(Resource):
@@ -87,6 +87,7 @@ class FOIRequests(Resource):
             if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
+                    requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getUserId())
                     requestservice().postOpeneventtoworkflow(result.identifier, rawresult.args[0],request_json,result.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
@@ -116,6 +117,36 @@ class FOIRequestsById(Resource):
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
                 requestservice().postEventToWorkflow(fOIRequestsSchema, json.loads(metadata))
+                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+            else:
+                 return {'status': False, 'message':'Record not found','id':foirequestid} , 404
+        except ValidationError as err:
+            return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400    
+        except TypeError:
+            return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+    
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
+class FOIRequestsByIdAndType(Resource):
+    """Resource for managing FOI requests."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedOrigins())
+    @auth.require
+    def post(foirequestid,foiministryrequestid,usertype):
+        """ POST Method for capturing FOI requests before processing"""
+        try:
+            if usertype != "ministry":
+                return {'status': False, 'message':'Bad Request'}, 400   
+            request_json = request.get_json()    
+            ministryrequestschema = FOIRequestMinistrySchema().load(request_json)    
+            result = requestservice().saveMinistryRequestVersion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getUserId(), usertype)
+            if result.success == True:
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining, isMinistryCoordinator } from "../../../helper/FOI/helper";
 import MinistryAssignToDropdown from './MinistryAssignToDropdown';
 import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
+import { Watcher } from '../customComponents'
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -26,25 +27,22 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, handleMinistryAssignedToValue, createSaveRequestObject, handlestatusudpate}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject, handlestatusudpate, userDetail}) => {
    
      /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {ministryId} = useParams();
+    const {requestId, ministryId} = useParams();
     const user = useSelector((state) => state.user.userDetail);
+    const dispatch = useDispatch();
 
     let _isMinistryCoordinator = false;
-    if(requestDetails.selectedMinistries && requestDetails.selectedMinistries[0] && user)
-    {
-        var ministrycode = requestDetails.selectedMinistries[0]
-        _isMinistryCoordinator = isMinistryCoordinator(user,MINISTRYGROUPS[ministrycode.code])
-    }
 
-     //get the assignedTo master data
+    //get the assignedTo master data
     const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
+    const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     
     //handle default value for the validation of required fields
     React.useEffect(() => {
@@ -55,6 +53,11 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
 
     },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
+   
+    //local state management for assignedTo
+    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+    
+    const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
 
     const getFullName = (lastName, firstName, username) => {
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
@@ -64,20 +67,19 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const getMenuItems = () => {
         var menuItems = [];
         var i = 1;
+        menuItems.push(<MenuItem className={classes.group} key={0} value={'|'}>{}</MenuItem>);
+        menuItems.push(<MenuItem key={0} className={classes.item} value={selectedAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
         if (assignedToList && assignedToList.length > 0) {
             for (var group of assignedToList) {
                 menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`}>{group.name}</MenuItem>);
                 for (var assignee of group.members) {
-                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
+                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} >{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
                 }
             }
         }
         return menuItems;
     }
-     //local state management for assignedTo
-    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
-   
-    const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
+    
     const preventDefault = (event) => event.preventDefault();
     
     //handle onChange event for assigned To
@@ -88,6 +90,10 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);        
     }
 
+    const handleMinistryAssignedToValue = (value) => {
+        //place holder - do nothing here
+    }
+
     const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
     const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
     const hideDaysRemaining = ministryId && daysRemaining ? false: true;
@@ -96,15 +102,22 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                                         || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase();
+
     
-     return (
+    
+    return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
                 <div className="foi-request-review-header-col1-row">
                     <Link href="#" onClick={preventDefault}>
                         <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
-                </div>           
+                </div>
+                <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
+                   
+                    <Watcher watcherFullList={assignedToList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} />
+                   
+                </div>
             </div>
             
             <div className="foi-assigned-to-container">
@@ -120,7 +133,6 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     variant="outlined"
                     fullWidth
                     required
-                    disabled = {_isMinistryCoordinator}
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
@@ -129,7 +141,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
 
                 {showMinistryAssignedTo ? (
                     <>
-                      <MinistryAssignToDropdown requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={_isMinistryCoordinator} />
+                      <MinistryAssignToDropdown requestDetails={requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={_isMinistryCoordinator} />
                     </>
                 ) : null}
             </div>
