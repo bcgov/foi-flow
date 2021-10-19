@@ -238,7 +238,7 @@ const MinistryReview = React.memo(({userDetail}) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
                   <>
-                    <RequestHeader requestDetails={requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
+                    <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
                     <ApplicantDetails requestDetails={requestDetails} /> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails} />

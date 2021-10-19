@@ -77,7 +77,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
 
             
                     <>
-                      <MinistryAssignToDropdown requestDetails={_requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
                     </>
                 
             </div>
