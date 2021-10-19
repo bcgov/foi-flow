@@ -7,8 +7,22 @@ const StateList = Object.freeze({
     callforrecords: [{status: "Call For Records", isSelected: false},{status: "Review", isSelected: false},{status: "Fee Assessed", isSelected: false},{status: "Open", isSelected: false},{status: "Closed", isSelected: false}],
     review: [{status: "Review", isSelected: false},{status: "Call For Records", isSelected: false},{status: "Consult", isSelected: false},{status: "Ministry Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
     consult: [{status: "Consult", isSelected: false},{status: "Review", isSelected: false},{status: "Closed", isSelected: false}],
-    signoff: [{status: "Ministry Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Assessed", isSelected: false},{status: "Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Ministry Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
+    signoff: [{status: "Ministry Sign Off", isSelected: false},{status: "Closed", isSelected: false}],
+});
+
+const MinistryStateList = Object.freeze({
+    unopened: [{status: "Unopened", isSelected: false}],
+    intakeinprogress: [{status:"Intake in Progress", isSelected: false}],
+    open: [{status: "Open", isSelected: false}],
+    closed: [{status: "Closed", isSelected: false}],
+    redirect: [{status: "Redirect", isSelected: false}],
+    //callforrecords: [{status: "Call For Records", isSelected: false},{status: "Review", isSelected: false},{status: "Fee Assessed", isSelected: false}],
+    callforrecords: [{status: "Call For Records", isSelected: false},{status: "Review", isSelected: false}],
+    review: [{status: "Review", isSelected: false}],
+    consult: [{status: "Consult", isSelected: false}],
+    feeassessed: [{status: "Fee Assessed", isSelected: false}],
+    signoff: [{status: "Ministry Sign Off", isSelected: false}],
 });
 
 const StateEnum = Object.freeze({
@@ -25,4 +39,4 @@ const StateEnum = Object.freeze({
     callforrecordsoverdue: {name: "Call For Records Overdue", id: 11}
 });
 
-export { StateList, StateEnum };
+export { StateList, MinistryStateList, StateEnum };

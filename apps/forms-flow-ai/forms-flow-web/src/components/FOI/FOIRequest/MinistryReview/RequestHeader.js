@@ -9,21 +9,13 @@ import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
 
-const RequestHeader = React.memo(({requestDetails, userDetail}) => {
+const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
 
     const {ministryId} = useParams();
     const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
 
     const preventDefault = (event) => event.preventDefault();
-
-    const handleMinistryAssignedToValue =()=>{
-
-    }
-
-    const createSaveRequestObject = () =>{
-
-    }
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -85,7 +77,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail}) => {
 
             
                     <>
-                      <MinistryAssignToDropdown requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
                     </>
                 
             </div>

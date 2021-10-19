@@ -137,10 +137,8 @@ const FOIRequest = React.memo(({userDetail}) => {
   //below states are used to find if required fields are set or not
   const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
   const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);  
-    
  
   const [assignedToValue, setAssignedToValue] = React.useState("Unassigned");
-  const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
   const [requiredApplicantDetails, setRequiredApplicantDetails] = React.useState(requiredApplicantDetailsValues);
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
@@ -247,11 +245,6 @@ const FOIRequest = React.memo(({userDetail}) => {
   //gets the latest assigned to value
   const handleAssignedToValue = (value) => {   
     setAssignedToValue(value);
-  }
-
-  //gets the latest assigned to value
-  const handleMinistryAssignedToValue = (value) => {   
-    setMinistryAssignedToValue(value);
   }
 
   //handle email validation
@@ -605,7 +598,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} requestDetail={requestDetails}/>
+            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">
@@ -631,7 +624,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
                     <>
-                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails}  handleAssignedToValue={handleAssignedToValue} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} />
+                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} />
                       <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
                        {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
                         <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null}
