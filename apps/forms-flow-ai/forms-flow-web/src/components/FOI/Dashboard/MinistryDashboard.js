@@ -11,14 +11,12 @@ import Loading from "../../../containers/Loading";
 const MinistryDashboard = ({userDetail}) => {
 
   const dispatch = useDispatch();  
-  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiMinistryRequestsList);  
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);  
   const [requestFilter, setRequestFilter] = useState("All");
-  const [searchText, setSearchText] = useState("");
-  const [currentUser, setCurrentUser] = useState("");
+  const [searchText, setSearchText] = useState("");  
   const classes = useStyles();
 
   useEffect(()=>{
@@ -26,22 +24,12 @@ const MinistryDashboard = ({userDetail}) => {
     dispatch(fetchFOIMinistryRequestList());    
   },[dispatch]);
 
-  useEffect(()=>{
-    console.log(`user = ${userDetail ? userDetail.preferred_username : ""}`)
-    setCurrentUser(userDetail ? userDetail.preferred_username : "");
-  },[userDetail]);
-
   function getAssigneeValue(row) {
     const groupName = row.assignedministrygroup ? row.assignedministrygroup : "Unassigned";
-    const assignedTo = row.assignedministryperson ? row.assignedministryperson : groupName;
-    console.log(`assignedTo = ${assignedTo}`);
-    console.log(`ministryAssignedToList = ${JSON.stringify(ministryAssignedToList)}`);
+    const assignedTo = row.assignedministryperson ? row.assignedministryperson : groupName;    
     if (ministryAssignedToList.length > 0) {
-      console.log(`ministryAssignedToList = ${JSON.stringify(ministryAssignedToList)}`);
       const assigneeDetails = ministryAssignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
-      console.log(`assigneeDetails = ${JSON.stringify(assigneeDetails)}`);
-      console.log(`assignee = ${JSON.stringify(assignee)}`);
+      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);      
       if (groupName === assignedTo) {
         return assignedTo;
       }
@@ -129,10 +117,6 @@ const setSearch = (e) => {
 
 const search = (data) => {
 
-  var _requestFilter =  (requestFilter === "myRequests" || requestFilter === "watchingRequests") ? requestFilter : null ;
-  
-  console.log(`user = ${currentUser}`);
-
   const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
   let dashboardData = updatedRows.filter(row => (
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
@@ -145,16 +129,15 @@ const search = (data) => {
   )  
   );
   if (requestFilter === "myRequests" ) {
-    dashboardData = dashboardData.filter(row => row.assignedministryperson === currentUser)
+    dashboardData = dashboardData.filter(row => row.assignedministryperson === userDetail.preferred_username)
   }
   else if (requestFilter === "watchingRequests") {
     dashboardData = dashboardData.filter(row => {
-      if (!!row.watchers.find(watcher => watcher.watchedby === currentUser)){
+      if (row.watchers && !!row.watchers.find(watcher => watcher.watchedby === userDetail.preferred_username)){
         return row;
       }
     })
   }
-  console.log(dashboardData);
   return dashboardData;
 }
  
