@@ -3,53 +3,36 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './divisionstages.scss';
+import { useDispatch, useSelector } from "react-redux";
+import {
+    fetchFOIMinistryDivisionalStages
+  } from "../../../../../apiManager/services/FOI/foiRequestServices";
 const DivisionalStages = React.memo((props) => {
     const [minDivStages, setMinDivStages] = React.useState([]);
-    const divisionList = [{ id: "0", division: "Select Division to Send CFR" }, { id: "1", division: "Divison 1" }, { id: "2", division: "Divison 2" }]
-    const divisionItems = divisionList.length > 0 && divisionList.map((item) => {
-
-        let _mindivtem = minDivStages.filter(d=>d.division.toLowerCase() === item.division.toLowerCase())               
-        return (
-            <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.id} value={item.division} >
-                <span className={`foi-menuitem-span ${item.division.toLowerCase().replace(/\s/g, '')}`} ></span>
-                {item.division}
-            </MenuItem>
-        )
-    });
-
-    const divisionstageList = [{ id: "0", divisionstage: "Select Division Stage" }, { id: "1", divisionstage: "Clarification" }, { id: "2", divisionstage: "Assign to division" }]
-    const divisionstageItems = divisionstageList.length > 0 && divisionstageList.map((item) => {
-
-        return (
-            <MenuItem className="foi-divisionstage-menuitem" key={item.id} value={item.divisionstage} >
-                <span className={`foi-menuitem-span ${item.divisionstage.toLowerCase().replace(/\s/g, '')}`} ></span>
-                {item.divisionstage}
-            </MenuItem>
-        )
-    });
+    
 
     const handleDivisionChange = (e,id)=> {
 
         console.log('handleDivisionChange')
         console.log(e)
         let arr = minDivStages;
-        const exists = arr.filter(st=>st.division === e.target.value).length > 0
+        const exists = arr.filter(st=>st.name === e.target.value).length > 0
         if(!exists)
         {
-            arr.push({id:id,division:e.target.value,stage:""})            
+            arr.push({divisionid:id,name:e.target.value,stage:""})            
             setMinDivStages([...arr])
             appendstageIterator([...arr])
         }
         
         console.log(minDivStages)
     }
-    const handleDivisionStageChange = (e,id)=> {
+    const handleDivisionStageChange = (e,divisionid)=> {
 
         let arr = minDivStages;
-        const exists = arr.filter(st=>st.id === id).length > 0
+        const exists = arr.filter(st=>st.divisionid === divisionid).length > 0
         if(exists)
         {
-            arr.filter(st=>st.id === id).forEach(item=>item.stage = e.target.value)
+            arr.filter(st=>st.divisionid === divisionid).forEach(item=>item.stage = e.target.value)
 
         }
         setMinDivStages([...arr])
@@ -61,16 +44,68 @@ const DivisionalStages = React.memo((props) => {
     console.log("Divstages")
     console.log(minDivStages)
 
-    const deleteMinistryDivision = (id)=>{
+    const deleteMinistryDivision = (divisionid)=>{
 
         let existing = stageIterator;
-        let updatedIterator = existing.filter(i=>i.id !== id);
+        let updatedIterator = existing.filter(i=>i.divisionid !== divisionid);
        
         appendstageIterator([...updatedIterator])
         setMinDivStages([...updatedIterator])
        
 
     }
+
+  
+
+    var stageCounter = []
+    stageCounter.push({divisionid:0,name:"",stage:""})
+    const [stageIterator, appendstageIterator] = React.useState(stageCounter);
+    
+    
+    const addDivisionalStage = () => {
+
+        let existing = stageIterator;
+        var val = stageIterator[stageIterator.length - 1].id + 1
+        if (divisionList.length >= val) {           
+            existing.push({divisionid:val,name:"",stage:""})
+            appendstageIterator([...existing])
+        }
+        console.log(stageIterator)
+    }
+const bcgovcode ="EDUC"
+    const dispatch = useDispatch();
+  useEffect(() => {
+    if (bcgovcode) {
+      dispatch(fetchFOIMinistryDivisionalStages("EDUC"));      
+    }       
+  },[dispatch]);
+
+  let divisionalstages = useSelector(state=> state.foiRequests.foiMinistryDivisionalStages);
+  console.log("Division stage Data")
+  console.log(divisionalstages)
+
+  const divisionList = divisionalstages.divisions
+    const divisionItems = divisionList !=undefined && divisionList.length > 0 && divisionList.map((item) => {
+
+        let _mindivtem = minDivStages.filter(d=>d.name.toLowerCase() === item.name.toLowerCase())               
+        return (
+            <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid} value={item.name} >
+                <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
+                {item.name}
+            </MenuItem>
+        )
+    });
+
+    const divisionstageList = divisionalstages.stages
+    const divisionstageItems = divisionstageList!=undefined && divisionstageList.length > 0 && divisionstageList.map((item) => {
+
+        return (
+            <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.name} >
+                <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
+                {item.name}
+            </MenuItem>
+        )
+    });
 
     var divisionalStagesRow = (row) => {
 
@@ -118,29 +153,12 @@ const DivisionalStages = React.memo((props) => {
 
     }
 
-    var stageCounter = []
-    stageCounter.push({id:0,division:"",stage:""})
-    const [stageIterator, appendstageIterator] = React.useState(stageCounter);
-    
-    
-    const addDivisionalStage = () => {
-
-        let existing = stageIterator;
-        var val = stageIterator[stageIterator.length - 1].id + 1
-        if (divisionList.length >= val) {           
-            existing.push({id:val,division:"",stage:""})
-            appendstageIterator([...existing])
-        }
-        console.log(stageIterator)
-    }
-
-
     return (
         <>
             <div id="divstages" >
 
                 {
-                    stageIterator.map((item) =>
+                   divisionstageList!=undefined && divisionstageList!=undefined && stageIterator.map((item) =>
 
                         divisionalStagesRow(item)
                     )
