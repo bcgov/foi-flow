@@ -112,7 +112,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
       setUseraWatcher(watcher.isactive);
     }
     handleWatcherUpdate(watcher);
-    setUpdateWatchList(watcher.isactive);
+    // setUpdateWatchList(watcher.isactive);
   }
 
   const handleChange = (event) => {
@@ -157,7 +157,7 @@ const watcherOnChange = (event) => {
             watcher.isactive = true;
         }
         handleWatcherUpdate(watcher);
-        setUseraWatcher(watcher.isactive);
+        // setUseraWatcher(watcher.isactive);
         event.preventDefault();
 }
 
