@@ -155,6 +155,7 @@ const watcherOnChange = (event) => {
         else {
             watcher.isactive = true;
         }
+        setUseraWatcher(watcher.isactive);
         handleWatcherUpdate(watcher);
         event.preventDefault();
 }
