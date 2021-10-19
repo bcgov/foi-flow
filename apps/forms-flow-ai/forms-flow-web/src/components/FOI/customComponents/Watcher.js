@@ -2,8 +2,6 @@ import React  from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
@@ -56,7 +54,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
         });
         const watcherUsers = requestWatcherList.map(watcher => watcher.watchedby);        
         setPersonName(watchList.length > 0 ? watchList : ['Unassigned']);
-        setNoOfWatchers(watchList.length > 0 ? watchList.length : 0);
+        setNoOfWatchers(watchList.length > 0 ? watchList.length : 0);        
         setUseraWatcher(!!watcherUsers.find(watcher => watcher === userDetail.preferred_username))
       },[requestWatcherList, userDetail])
 
@@ -108,9 +106,6 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     const isActive = watchers? !!watchers.find(_watcher => _watcher === currentWatcher): false;
     watcher.isactive = isActive;
     handleWatcherUpdate(watcher);
-    if (watcher.watchedby === userDetail.preferred_username) {
-      setUseraWatcher(watcher.isactive);
-    }
     setUpdateWatchList(watcher.isactive);
   }
 
