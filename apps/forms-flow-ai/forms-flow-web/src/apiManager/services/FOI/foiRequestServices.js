@@ -18,6 +18,8 @@ import {
   setFOIReceivedModeList,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
+  setFOIMinistryDivisionalStages,
+  clearFOIMinistryDivisionalStages
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -406,6 +408,32 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId, ...res
   };
 };
 
+export const fetchFOIMinistryDivisionalStages = (bcgovcode, ...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  const apiUrlgetdivisionalstages = replaceUrl(API.FOI_MINISTRY_DIVISIONALSTAGES,"<bcgovcode>", bcgovcode);  
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetdivisionalstages, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiMinistryDivisionalStages = res.data;         
+          dispatch(clearFOIMinistryDivisionalStages({}));
+          dispatch(setFOIMinistryDivisionalStages(foiMinistryDivisionalStages));                             
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));        
+        done(error);
+      });
+  };
+};
 
 
 

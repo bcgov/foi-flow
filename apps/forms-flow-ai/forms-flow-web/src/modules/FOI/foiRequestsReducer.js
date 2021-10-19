@@ -18,6 +18,7 @@ const initialState = {
   foiMinistryAssignedToList: [],
   foiProgramAreaList:[],
   foiRequestDescriptionHistoryList: [], 
+  foiMinistryDivisionalStages:[]
 }
 
 
@@ -87,6 +88,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, foiMinistryViewRequestDetail: action.payload};  
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY:
       return {...state, foiRequestDescriptionHistoryList: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES:
+      return {...state, foiMinistryDivisionalStages: action.payload};
     default:
       return state;
   }

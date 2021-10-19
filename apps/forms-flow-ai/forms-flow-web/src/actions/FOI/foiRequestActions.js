@@ -147,3 +147,17 @@ export const setFOIRequestDescriptionHistory = (data) => dispatch => {
         payload:data      
     })
 }
+
+export const setFOIMinistryDivisionalStages = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES,
+        payload:data      
+    })
+}
+
+export const clearFOIMinistryDivisionalStages = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES,
+        payload:data      
+    })
+}
