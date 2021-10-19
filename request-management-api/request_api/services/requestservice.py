@@ -238,6 +238,8 @@ class requestservice:
             'programareaid':requestministry['programarea.programareaid'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
+            'assignedministrygroup':requestministry["assignedministrygroup"],
+            'assignedministryperson':requestministry["assignedministryperson"],
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
          }
 
@@ -341,6 +343,8 @@ class requestservice:
                 'programareaid':requestministry['programarea.programareaid'],
                 'category':request['applicantcategory.name'],
                 'categoryid':request['applicantcategory.applicantcategoryid'],
+                'assignedministrygroup':requestministry["assignedministrygroup"],
+                'assignedministryperson':requestministry["assignedministryperson"],
                 'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
             }
 

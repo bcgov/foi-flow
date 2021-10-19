@@ -62,7 +62,7 @@ describe('FOI RequestHeader component', () => {
             return callback(localState);
         });
         useParams.mockImplementation(() => {
-            return {ministryId: "123"};
+            return {ministryId: "123",requestState: "Call For Records"};
         }); 
         const tree = renderer.create(<Provider store={store}><RequestHeader requestDetails={localState.requestDetails} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();

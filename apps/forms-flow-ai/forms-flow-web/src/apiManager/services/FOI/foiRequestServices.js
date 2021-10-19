@@ -526,6 +526,34 @@ export const openRequestDetails = (data, ...rest) => {
   };
 };
 
+export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  let apiUrl = "";
+  if (ministryId) {
+    apiUrl = replaceUrl(replaceUrl(
+      API.FOI_MINISTRYVIEW_REQUEST_API,
+      "<requestid>",
+      requestId
+    ),"<ministryid>", ministryId);  
+    return (dispatch) => {
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {
+          if (res.data) {                   
+            done(null, res.data);
+          } else {         
+            dispatch(serviceActionError(res));
+            done("Error Posting data");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+  }
+  done("Error Posting data");
+};
+
 export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) => {
   const done = rest.length ? rest[0] : () => {};  
   let apiUrl = "";

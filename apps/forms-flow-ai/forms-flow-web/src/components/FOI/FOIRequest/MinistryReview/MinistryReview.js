@@ -8,6 +8,7 @@ import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import {
+  fetchFOIRequestDetails,
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
@@ -20,6 +21,10 @@ import RequestDescription from './RequestDescription';
 import RequestHeader from './RequestHeader';
 import RequestNotes from './RequestNotes';
 import RequestTracking from './RequestTracking';
+import BottomButtonGroup from './BottomButtonGroup';
+
+import {push} from "connected-react-router";
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,18 +63,32 @@ const MinistryReview = React.memo(({userDetail}) => {
 
   const {requestId, ministryId, requestState} = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
+  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-   //gets the request detail from the store
- 
-   const dispatch = useDispatch();
-   useEffect(() => {
-     if (ministryId) {
-       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-     }     
-   },[requestId, dispatch]); 
-
+  const [headerValue, setHeader] = useState("");
+  const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
+    
+  //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
+  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (ministryId) {
+      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+    }     
+  },[requestId, dispatch]); 
+
+  let ministryassignedtousername = "Unassigned";
+  useEffect(() => {
+    const requestDetailsValue = requestDetails;
+    setSaveMinistryRequestObject(requestDetailsValue);
+    ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
+    setMinistryAssignedToValue(ministryassignedtousername);
+  },[requestDetails]); 
+
+  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
   let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate); 
   const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';
@@ -78,11 +97,60 @@ const MinistryReview = React.memo(({userDetail}) => {
   const bottomText =  `${_cfrDaysRemainingText}|${_daysRemainingText}`;
   const bottomTextArray = bottomText.split('|'); 
  
+  //gets the latest ministry assigned to value
+  const handleMinistryAssignedToValue = (value) => {   
+    setMinistryAssignedToValue(value);
+  }
+
+  //Variable to find if all required fields are filled or not
+  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned");
+
+  const createMinistryRequestDetailsObject = (requestObject, name, value) => {
+    // requestDetails.
+    if (name === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
+      const assignedToValue = value.split("|");
+      if (assignedToValue.length > 1 && assignedToValue[0] && assignedToValue[1]) {
+        requestObject.assignedministrygroup = assignedToValue[0];
+        requestObject.assignedministryperson = assignedToValue[1];
+      }
+    }
+  }
+
+  const createMinistrySaveRequestObject = (name, value, value2) => {
+    const requestObject = {...saveMinistryRequestObject};  
+    setUnSavedRequest(true);
+    createMinistryRequestDetailsObject(requestObject, name, value);   
+    setSaveMinistryRequestObject(requestObject);
+  }
+
+  const handleSaveRequest = (_state, _unSaved, id) => {
+    setHeader(_state);
+    setUnSavedRequest(_unSaved);
+    if (!_unSaved && ministryId && requestId) {
+      setTimeout(() => 
+      { 
+        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}` 
+      }
+      , 1000);
+    }
+  }
   
+  const handleStateChange =(currentStatus)=>{
+    setcurrentrequestStatus(currentStatus);
+  }
+
+  const hasStatusRequestSaved =(issavecompleted,state)=>{
+    if(issavecompleted)
+      {
+        settabStatus(state)
+        setcurrentrequestStatus("")
+      }
+  }
+
+
   var foitabheaderBG;
   const classes = useStyles();
  
-
   switch (_tabStatus){
     case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
@@ -99,12 +167,24 @@ const MinistryReview = React.memo(({userDetail}) => {
     case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
+    case StateEnum.callforrecordsoverdue.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
+      break;
+    case StateEnum.review.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"
+      break;
+    case StateEnum.feeassessed.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderFeeBG"
+      break;
+    case StateEnum.consult.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderConsultBG"
+      break;
+    case StateEnum.signoff.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
+      break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
-      break;      
-  }
-  const handleStateChange =(currentStatus)=>{
-
+      break;  
   }
 
   const tabclick =(evt,param)=>{
@@ -124,7 +204,6 @@ const MinistryReview = React.memo(({userDetail}) => {
     evt.currentTarget.className += " active";
 
   }
-
   
 
   return (
@@ -137,7 +216,7 @@ const MinistryReview = React.memo(({userDetail}) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} requestDetail={requestDetails}/>
+            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">
@@ -159,15 +238,13 @@ const MinistryReview = React.memo(({userDetail}) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
                   <>
-                    <RequestHeader requestDetails={requestDetails} userDetail={userDetail} />
-                    <ApplicantDetails requestDetails={requestDetails}/> 
+                    <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
+                    <ApplicantDetails requestDetails={requestDetails} /> 
                     <RequestDescription requestDetails={requestDetails} />
-                    <RequestDetails requestDetails={requestDetails}/>
+                    <RequestDetails requestDetails={requestDetails} />
                     <RequestTracking/>                    
                     <RequestNotes />
-                    <div className="foi-bottom-button-group">
-                      <button type="button" className="btn btn-bottom btnenabled">Save</button>                      
-                    </div>
+                    <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
                 : null }
                 </form>

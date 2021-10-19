@@ -7,7 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { useParams } from 'react-router-dom';
-import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -29,13 +29,13 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {ministryId} = useParams();
+    const {requestState} = useParams();
     const user = useSelector((state) => state.user.userDetail);
 
     //local state management for assignedTo
     //------- update this later when $567 is ready
-    const minsitryAssignedToGroup = requestDetails.selectedMinistries && requestDetails.selectedMinistries[0].code ? MINISTRYGROUPS[requestDetails.selectedMinistries[0].code] : "";
-    const ministryAssignedTo = requestDetails.ministryAssignedTo ? `${minsitryAssignedToGroup}|${requestDetails.ministryAssignedTo}` : `|Unassigned`;
+    const minsitryAssignedToGroup = requestDetails.assignedministrygroup ? requestDetails.assignedministrygroup : "";
+    const ministryAssignedTo = requestDetails.assignedministryperson ? `${minsitryAssignedToGroup}|${requestDetails.assignedministryperson}` : `|Unassigned`;
     const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
     
     const getFullName = (lastName, firstName, username) => {
@@ -49,7 +49,7 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
 
         //add default value (unassigned)
         menuItems.push(<MenuItem className={classes.group} key={0} value={'|'}>{}</MenuItem>);
-        menuItems.push(<MenuItem key={0} className={classes.item} value={ministryAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
+        menuItems.push(<MenuItem key={0} className={classes.item} value={'|Unassigned'} disabled={true} >{'Unassigned'}</MenuItem>)
 
         if (ministryAssignedToList && ministryAssignedToList.length > 0) {
             for (var group of ministryAssignedToList) {
@@ -65,11 +65,8 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
     //handle onChange event for assigned To
     const handleMinistryAssignedToOnChange = (event) => {
         setMinistryAssignedTo(event.target.value);
-        //event bubble up - to validate required fields
         handleMinistryAssignedToValue(event.target.value);
-        //save ministry assignedTo to request - on hold
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO, event.target.value, event.target.name);
-        console.log(`handleMinstryAssignedToOnChange Header ${event.target.value}`)
     }
 
     return (
@@ -84,12 +81,9 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
                     input={<Input />} 
                     variant="outlined"
                     fullWidth
-                    required = {isMinistryCoordinator}
-                    // inputProps={
-                    //     { readOnly: ministryReadonly, }
-                    // }
-                    disabled = {!isMinistryCoordinator}
-                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")}                    
+                    required = {isMinistryCoordinator && requestState.toLowerCase() == StateEnum.callforrecords.name.toLowerCase() }
+                    disabled = {!isMinistryCoordinator || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase() }
+                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")  && requestState.toLowerCase() == StateEnum.callforrecords.name.toLowerCase() }                    
                 >            
                     {getMenuItems()}
                 </TextField> 
