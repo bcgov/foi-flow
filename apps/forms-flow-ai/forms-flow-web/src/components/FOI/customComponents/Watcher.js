@@ -88,7 +88,10 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
    }
 
   const handleWatcherUpdate = (watcher) => {
-    dispatch(saveWatcher(ministryId, watcher, (err, res) => {      
+    dispatch(saveWatcher(ministryId, watcher, (err, res) => {
+      if(!err) {
+        setUpdateWatchList(watcher.isactive);
+      }
     }
         ));
   }
@@ -105,6 +108,9 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     watcher.watchedby = watcherDetails[1];
     const isActive = watchers? !!watchers.find(_watcher => _watcher === currentWatcher): false;
     watcher.isactive = isActive;
+    if (watcher.watchedby === userDetail.preferred_username) {
+      setUseraWatcher(watcher.isactive);
+    }
     handleWatcherUpdate(watcher);
     setUpdateWatchList(watcher.isactive);
   }
@@ -152,7 +158,6 @@ const watcherOnChange = (event) => {
         }
         handleWatcherUpdate(watcher);
         setUseraWatcher(watcher.isactive);
-        setUpdateWatchList(watcher.isactive);
         event.preventDefault();
 }
 
