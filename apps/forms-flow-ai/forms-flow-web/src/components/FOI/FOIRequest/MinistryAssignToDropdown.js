@@ -81,9 +81,9 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
                     input={<Input />} 
                     variant="outlined"
                     fullWidth
-                    required = {isMinistryCoordinator && requestState.toLocaleLowerCase() == StateEnum.callforrecords.name.toLocaleLowerCase() }
-                    disabled = {!isMinistryCoordinator || requestState.toLocaleLowerCase() != StateEnum.callforrecords.name.toLocaleLowerCase() }
-                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")  && requestState.toLocaleLowerCase() == StateEnum.callforrecords.name.toLocaleLowerCase() }                    
+                    required = {isMinistryCoordinator && requestState.toLowerCase() == StateEnum.callforrecords.name.toLowerCase() }
+                    disabled = {!isMinistryCoordinator || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase() }
+                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")  && requestState.toLowerCase() == StateEnum.callforrecords.name.toLowerCase() }                    
                 >            
                     {getMenuItems()}
                 </TextField> 
