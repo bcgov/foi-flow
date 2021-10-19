@@ -101,6 +101,14 @@ class _Config():  # pylint: disable=too-few-public-methods
     # email
     MAIL_FROM_ID = os.getenv('MAIL_FROM_ID')
 
+    # Fees
+    LEGISLATIVE_TIMEZONE = 'America/Vancouver'
+    FOI_WEB_PAY_URL = os.getenv('FOI_WEB_PAY_URL')
+    PAYBC_REF_NUMBER = os.getenv('PAYBC_REF_NUMBER')
+    PAYBC_PORTAL_URL = os.getenv('PAYBC_PORTAL_URL')
+    PAYBC_TXN_PREFIX = os.getenv('PAYBC_TXN_PREFIX', 'FOI')
+    PAYBC_API_KEY = os.getenv('PAYBC_API_KEY')
+
     
 
 

@@ -16,7 +16,7 @@ from request_api.exceptions.errors import Error  # noqa: I001, I003
 class BusinessException(Exception):
     """Exception that adds error code and error name, that can be used for i18n support."""
 
-    def __init__(self, error, exception, *args, **kwargs):
+    def __init__(self, error, *args, **kwargs):
         """Return a valid BusinessException."""
         super().__init__(*args, **kwargs)
 
@@ -24,7 +24,7 @@ class BusinessException(Exception):
         self.error = error.message
         self.code = error.name
         self.status_code = error.status_code
-        self.detail = exception
+        self.detail = error.message
 
         # log/tracing exception
         #ExceptionTracing.trace(self, traceback.format_exc())
