@@ -44,7 +44,8 @@ describe('FOI StateDropDown component', () => {
             requestDetail: {
               selectedMinistries: ["AEST"]
             },
-            user: {"userDetail": {}}
+            user: {"userDetail": {}},
+            isValidationError: false,
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
@@ -52,7 +53,7 @@ describe('FOI StateDropDown component', () => {
           useParams.mockImplementation(() => {
             return {requestState: "Open"};
         }); 
-        shallow(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange} requestDetail={localState.requestDetail} /></Provider>)
+        shallow(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange} requestDetail={localState.requestDetail} isValidationError={localState.isValidationError} /></Provider>)
       });
 
       it('FOI StateDropDown snapshot check', () => {
@@ -71,7 +72,7 @@ describe('FOI StateDropDown component', () => {
           useParams.mockImplementation(() => {
             return {requestState: "Open"};
         });
-        const tree = renderer.create(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange} requestDetail={localState.requestDetail} /></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><StateDropDown requestStatus={localState.requestStatus} handleStateChange={localState.handleStateChange} requestDetail={localState.requestDetail} isValidationError={localState.isValidationError} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })

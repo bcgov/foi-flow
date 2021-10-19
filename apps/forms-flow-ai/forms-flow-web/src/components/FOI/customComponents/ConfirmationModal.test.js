@@ -56,6 +56,8 @@ describe('FOI ConfirmationModal component', () => {
             saveRequestObject: {
                 assignedTo: "dviswana@idir",
                 assignedGroup: "Intake Team",
+                assignedministrygroup: "Ministry of Advanced Education and Skills Training",
+                assignedministryperson: "foiaed@idir",
                 idNumber: "U-001",
                 selectedMinistries: [
                     {code:"AEST",name:"Ministry of Advanced Education and Skills Training",selected:"true"}
