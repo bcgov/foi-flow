@@ -13,7 +13,7 @@ def test_create_payment(app, client):
     foi_req = client.post(f'/api/foirawrequests', data=json.dumps({'requestData': {}}), content_type='application/json')
     request_id = foi_req.json.get('id')
     fee_code = 'FOI0001'
-    pay_response = client.post(f'/api/foirequests/{request_id}/payments', data=json.dumps({
+    pay_response = client.post(f'/api/foirawrequests/{request_id}/payments', data=json.dumps({
         'fee_code': fee_code,
         'quantity': 5
     }), content_type='application/json')
@@ -29,7 +29,7 @@ def test_complete_payment(app, client):
                               content_type='application/json')
         request_id = foi_req.json.get('id')
         fee_code = 'FOI0001'
-        pay_response = client.post(f'/api/foirequests/{request_id}/payments', data=json.dumps({
+        pay_response = client.post(f'/api/foirawrequests/{request_id}/payments', data=json.dumps({
             'fee_code': fee_code,
             'quantity': 5
         }), content_type='application/json')
@@ -39,7 +39,7 @@ def test_complete_payment(app, client):
                        f'cardType=VI&authCode=TEST&trnDate=2021-10-18&pbcTxnNumber={txn_number}'
         response_url = f'{response_url}&hashValue={HashService.encode(response_url)}'
         # Update payment
-        pay_response = client.put(f'/api/foirequests/{request_id}/payments/{pay_id}', data=json.dumps({
+        pay_response = client.put(f'/api/foirawrequests/{request_id}/payments/{pay_id}', data=json.dumps({
             'response_url': response_url
         }), content_type='application/json')
         assert pay_response.json.get('status') == 'PAID'

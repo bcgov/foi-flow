@@ -42,7 +42,7 @@ class Fee(Resource):
 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foirequests/<int:request_id>/payments')
+@API.route('/foirawrequests/<int:request_id>/payments')
 class Payment(Resource):
 
     @staticmethod
@@ -58,7 +58,7 @@ class Payment(Resource):
 
 
 @cors_preflight('PUT,OPTIONS')
-@API.route('/foirequests/<int:request_id>/payments/<int:payment_id>')
+@API.route('/foirawrequests/<int:request_id>/payments/<int:payment_id>')
 class Payment(Resource):
 
     @staticmethod
