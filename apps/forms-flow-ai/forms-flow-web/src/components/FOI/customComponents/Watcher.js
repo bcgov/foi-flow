@@ -42,7 +42,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
 
     React.useEffect(() => {
         dispatch(fetchFOIWatcherList(requestId,ministryId));
-    },[dispatch, updateWatchList, isUseraWatcher, requestId, ministryId] )
+    },[dispatch, updateWatchList, requestId, ministryId] )
 
     const [personName, setPersonName] = React.useState(['Unassigned']);
     const [noOfWatchers, setNoOfWatchers] = React.useState(0);
@@ -111,7 +111,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     if (watcher.watchedby === userDetail.preferred_username) {
       setUseraWatcher(watcher.isactive);
     }
-    handleWatcherUpdate(watcher);    
+    handleWatcherUpdate(watcher);
   }
 
   const handleChange = (event) => {
@@ -155,7 +155,8 @@ const watcherOnChange = (event) => {
         else {
             watcher.isactive = true;
         }
-        handleWatcherUpdate(watcher);        
+        setUseraWatcher(watcher.isactive);
+        handleWatcherUpdate(watcher);
         event.preventDefault();
 }
 

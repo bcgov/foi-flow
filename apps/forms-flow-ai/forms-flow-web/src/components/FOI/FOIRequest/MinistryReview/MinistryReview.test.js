@@ -39,30 +39,44 @@ describe('FOI MinistryReview component', () => {
         store = mockStore(initialState)
         const localState = {            
             foiRequests: {foiMinistryViewRequestDetail: {}},
-            user: {userDetail: {}}
+            user: {userDetail: {}},
+            requestDetails: {
+                assignedTo: '',
+                assignedGroup: '',
+                assignedministrygroup: '',
+                assignedministryperson: '',
+                currentState: 'Call For Records'
+            },
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
         });
         useParams.mockImplementation(() => {
-            return {requestId: "123", ministryId: "234", requestState: "Open"};
+            return {requestId: "123", ministryId: "234", requestState: "Call For Records"};
         });   
-        shallow(<Provider store={store}><MinistryReview /></Provider>)
+        shallow(<Provider store={store}><MinistryReview userDetail={localState.userDetail} /></Provider>)
       });
 
       it('FOI MinistryReview snapshot check', () => {
         store = mockStore(initialState)
         const localState = {
             foiRequests: {foiMinistryViewRequestDetail: {}},
-            user: {userDetail: {}}
+            user: {userDetail: {}},
+            requestDetails: {
+                assignedTo: '',
+                assignedGroup: '',
+                assignedministrygroup: '',
+                assignedministryperson: '',
+                currentState: 'Call For Records'
+            },
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
         });
         useParams.mockImplementation(() => {
-            return {requestId: "123", ministryId: "234", requestState: "Open"};
+            return {requestId: "123", ministryId: "234", requestState: "Call For Records"};
         }); 
-        const tree = renderer.create(<Provider store={store}><MinistryReview /></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><MinistryReview userDetail={localState.userDetail} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })
