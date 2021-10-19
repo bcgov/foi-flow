@@ -91,6 +91,8 @@ class FeeService:
             current_app.logger.warning(f'Transaction is approved, but hash is not matching : {response_url}')
             raise BusinessException(Error.INVALID_INPUT)
 
+        # TODO Add paybc api call to verify
+
         self.payment.order_id = parsed_args.get('trnOrderId')
         self.payment.completed_on = datetime.now()
         if trn_approved == '1':
@@ -106,7 +108,8 @@ class FeeService:
             paybc_url=self.payment.paybc_url,
             payment_id=self.payment.payment_id,
             request_id=self.payment.request_id,
-            status=self.payment.status
+            status=self.payment.status,
+            total=self.payment.total
         )
         return pay_response
 
@@ -114,7 +117,7 @@ class FeeService:
         """Return the payment system url."""
         date_val = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime(
             '%Y-%m-%d')
-        return_url = f"{current_app.config['FOI_WEB_PAY_URL']}/{self.payment.request_id}/{self.payment.payment_id}"  # TODO
+        return_url = f"{current_app.config['FOI_WEB_PAY_URL']}/{self.payment.request_id}/{self.payment.payment_id}"
         revenue_account: RevenueAccount = RevenueAccount.find_by_id(fee_code.revenue_account_id)
 
         url_params_dict = {'trnDate': date_val,
