@@ -64,7 +64,7 @@ class dashboardservice:
                 requestqueue.append(unopenrequest)
 
             for openrequest in openedrequests : 
-                    watchers = FOIRequestWatcher.getwatchers(openrequest['ministryrequestid'])
+                    watchers = FOIRequestWatcher.getNonMinistrywatchers(openrequest['ministryrequestid'])
                     _openrequest = {'id': openrequest["id"],
                                  'firstName':  openrequest["firstName"],
                                  'lastName':  openrequest["lastName"],
@@ -94,7 +94,7 @@ class dashboardservice:
             requestqueue = []
             
             for openrequest in openedrequests : 
-                    watchers = FOIRequestWatcher.getwatchers(openrequest['ministryrequestid'])
+                    watchers = FOIRequestWatcher.getMinistrywatchers(openrequest['ministryrequestid'])
                     _openrequest = {'id': openrequest["id"],                                 
                                  'requestType':  openrequest["requestType"],
                                  'currentState':  openrequest["currentState"],
