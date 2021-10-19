@@ -29,13 +29,13 @@ class HashService:
         """Return a hashed string using the static salt from config."""
         current_app.logger.debug(f'encoding for string {param}')
         api_key = current_app.config.get('PAYBC_API_KEY')
-        return hashlib.md5(f'{param}{api_key}'.encode()).hexdigest()
+        return hashlib.md5(f'{param}{api_key}'.encode()).hexdigest()  # NOSONAR as PayBC needs MD5
 
     @staticmethod
     def is_valid_checksum(param: str, hash_val: str) -> bool:
         """Validate if the checksum matches."""
         api_key = current_app.config.get('PAYBC_API_KEY')
-        return hashlib.md5(f'{param}{api_key}'.encode()).hexdigest() == hash_val
+        return hashlib.md5(f'{param}{api_key}'.encode()).hexdigest() == hash_val  # NOSONAR as PayBC needs MD5
 
     @staticmethod
     def parse_url_params(url_params: str) -> Dict:
