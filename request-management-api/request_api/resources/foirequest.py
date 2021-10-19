@@ -87,6 +87,7 @@ class FOIRequests(Resource):
             if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
+                    requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getUserId())
                     requestservice().postOpeneventtoworkflow(result.identifier, rawresult.args[0],request_json,result.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:

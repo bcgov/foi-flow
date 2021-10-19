@@ -21,9 +21,8 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: theme.typography.fontWeightBold,
         opacity: 1,
     },
-}));
-
-const MinistryAssignToDropdown = React.memo(({requestDetails,  handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
+  }));
+const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
    
      /**
      *  Header of Review request in the UI
@@ -38,9 +37,6 @@ const MinistryAssignToDropdown = React.memo(({requestDetails,  handleMinistryAss
     const minsitryAssignedToGroup = requestDetails.assignedministrygroup ? requestDetails.assignedministrygroup : "";
     const ministryAssignedTo = requestDetails.assignedministryperson ? `${minsitryAssignedToGroup}|${requestDetails.assignedministryperson}` : `|Unassigned`;
     const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
-
-    //get the assignedTo master data
-    const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     
     const getFullName = (lastName, firstName, username) => {
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         

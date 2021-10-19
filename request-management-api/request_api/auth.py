@@ -81,3 +81,20 @@ class AuthHelper:
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
         return unverified_claims['preferred_username']
+    
+    def isMinistryMember():
+        token = request.headers.get("Authorization", None)
+        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        userGroups = unverified_claims['groups']
+        userGroups = [userGroup.replace('/','',1) if userGroup.startswith('/') else userGroup for userGroup in userGroups]
+        for group in userGroups:
+            if group.endswith("Ministry Team"):
+                return True
+        return False
+            
+    def getUserGroups():
+        token = request.headers.get("Authorization", None)
+        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        userGroups = unverified_claims['groups']
+        userGroups = [userGroup.replace('/','',1) if userGroup.startswith('/') else userGroup for userGroup in userGroups]
+        return userGroups

@@ -6,9 +6,14 @@ import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { Watcher } from '../../customComponents';
+import { useParams } from 'react-router-dom';
 
-const RequestHeader = React.memo(({requestDetails, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
+const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
+
+    const {ministryId} = useParams();
     const _requestDetails = requestDetails;
+    const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
 
     const preventDefault = (event) => event.preventDefault();
 
@@ -49,7 +54,9 @@ const RequestHeader = React.memo(({requestDetails, handleMinistryAssignedToValue
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <img src="/assets/Images/wacher.PNG" alt="wacher" style={{width:200+'px',height:50+'px'}} />
+                  
+                    <Watcher watcherFullList={ministryAssignedToList} ministryId={ministryId} userDetail={userDetail} />
+                   
                 </div>
             </div>
             

@@ -20,6 +20,7 @@ from dateutil.parser import *
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.workflowservice import workflowservice
+from request_api.services.watcherservice import watcherservice
 from enum import Enum
 import datetime 
 from datetime import datetime as datetime2
@@ -199,7 +200,12 @@ class requestservice:
     def postOpeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
         workflowservice.postintakeevent(id, wfinstanceid, requestschema, "Open", ministries)
        
-
+    def copywatchers(self, rawrequestid, ministries, userid):
+        watchers = watcherservice().getrawrequestwatchers(int(rawrequestid))
+        for ministry in ministries:           
+            for watcher in watchers:
+                watcherschema = {"ministryrequestid":ministry["id"],"watchedbygroup":watcher["watchedbygroup"],"watchedby":watcher["watchedby"],"isactive":True}
+                watcherservice().createministryrequestwatcher(watcherschema, userid, None)
        
     def getrequest(self,foirequestid,foiministryrequestid):        
         request = FOIRequest.getrequest(foirequestid)

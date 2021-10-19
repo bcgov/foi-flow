@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const MinistryReview = React.memo((props) => {
+const MinistryReview = React.memo(({userDetail}) => {
 
   const {requestId, ministryId, requestState} = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
@@ -186,7 +186,6 @@ const MinistryReview = React.memo((props) => {
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;  
   }
-
 
   const tabclick =(evt,param)=>{
    

@@ -14,7 +14,7 @@ class FOIRawRequestWatcherSchema(Schema):
 
         unknown = EXCLUDE    
     requestid = fields.Int(data_key="requestid")
-    watchedbygroup = fields.Str(data_key="watchedbygroup")
+    watchedbygroup = fields.Str(data_key="watchedbygroup",allow_none=True)
     watchedby = fields.Str(data_key="watchedby")
     isactive = fields.Bool(data_key="isactive")
 
@@ -25,6 +25,6 @@ class FOIMinistryRequestWatcherSchema(Schema):
 
         unknown = EXCLUDE    
     ministryrequestid = fields.Int(data_key="ministryrequestid")
-    watchedbygroup = fields.Str(data_key="watchedbygroup")
+    watchedbygroup = fields.Str(data_key="watchedbygroup",allow_none=True)
     watchedby = fields.Str(data_key="watchedby")
     isactive = fields.Bool(data_key="isactive")
