@@ -461,6 +461,10 @@ class FOIRequestUtil:
         foiministryRequest.assignedgroup = requestSchema.get("assignedGroup")
         if self.isNotBlankorNone(requestSchema,"assignedTo","main") == True:
             foiministryRequest.assignedto = requestSchema.get("assignedTo")
+        if self.isNotBlankorNone(requestSchema,"assignedministrygroup","main") == True:
+            foiministryRequest.assignedministrygroup = requestSchema.get("assignedministrygroup")
+        if self.isNotBlankorNone(requestSchema,"assignedministryperson","main") == True:
+            foiministryRequest.assignedministryperson = requestSchema.get("assignedministryperson")
         return foiministryRequest
     
     def createContactInformation(self,dataformat, name, value, contactTypes, userId):
