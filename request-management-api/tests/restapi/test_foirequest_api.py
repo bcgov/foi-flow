@@ -334,6 +334,7 @@ def test_post_foirequest_general_cfr_division(app, client):
     foidivisionrequest = {
     "assignedministrygroup":"EDUC Ministry Team",
     "assignedministryperson": "foiedu@idir",
+    "requeststatusid": 2,
      "divisions": [{"divisionid":1,"stageid":1},{"divisionid":2,"stageid":1}]
     }
     foicfrdivisionresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foidivisionrequest), headers=factory_user_auth_header(app, client), content_type='application/json')
