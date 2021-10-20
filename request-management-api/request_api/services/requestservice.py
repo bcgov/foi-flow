@@ -214,7 +214,7 @@ class requestservice:
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
-
+        requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
         _receivedDate = parse(request['receiveddate'])
         
         baserequestInfo = {
@@ -240,8 +240,9 @@ class requestservice:
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
             'assignedministrygroup':requestministry["assignedministrygroup"],
-            'assignedministryperson':requestministry["assignedministryperson"],
-            'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
+            'assignedministryperson':requestministry["assignedministryperson"],            
+            'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
+            'divisions': FOIRequestUtil().getdivisions(requestministrydivisions)
          }
 
         if requestministry['cfrduedate'] is not None:
@@ -311,13 +312,16 @@ class requestservice:
                     baserequestInfo.update({'adoptiveFatherFirstName': personalattribute['attributevalue']})
                 elif personalattribute['personalattributeid'] == 7:     
                     baserequestInfo.update({'adoptiveFatherLastName': personalattribute['attributevalue']})        
+        
 
+            
         return baserequestInfo
 
 
     def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authMembershipgroups):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
         baserequestInfo = {}
         if requestministry["assignedministrygroup"] in authMembershipgroups:
 
@@ -345,8 +349,9 @@ class requestservice:
                 'category':request['applicantcategory.name'],
                 'categoryid':request['applicantcategory.applicantcategoryid'],
                 'assignedministrygroup':requestministry["assignedministrygroup"],
-                'assignedministryperson':requestministry["assignedministryperson"],
-                'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}]
+                'assignedministryperson':requestministry["assignedministryperson"],                
+                'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
+                'divisions': FOIRequestUtil().getdivisions(requestministrydivisions)
             }
 
             if requestministry['cfrduedate'] is not None:
@@ -496,6 +501,10 @@ class FOIRequestUtil:
             foiministryRequest.assignedministrygroup = requestSchema.get("assignedministrygroup")
         if self.isNotBlankorNone(requestSchema,"assignedministryperson","main") == True:
             foiministryRequest.assignedministryperson = requestSchema.get("assignedministryperson")
+        if ministryId is not None:
+            divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
+            foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
+        
         return foiministryRequest
     
     def createContactInformation(self,dataformat, name, value, contactTypes, userId):
@@ -544,6 +553,20 @@ class FOIRequestUtil:
                     personalAttribute.personalattributeid = attributeType["attributeid"]
                     personalAttribute.attributevalue = value
         return personalAttribute
+    
+    def getdivisions(self, ministrydivisions):
+        divisions = []
+        if ministrydivisions is not None:            
+            for ministrydivision in ministrydivisions:
+                division = {
+                    "foiministrydivisionid": ministrydivision["foiministrydivisionid"],
+                    "divisionid": ministrydivision["division.divisionid"],
+                    "divisionname": ministrydivision["division.name"],
+                    "stageid": ministrydivision["stage.stageid"],
+                    "stagename": ministrydivision["stage.name"],
+                    } 
+                divisions.append(division)
+        return divisions
     
     def getStatusName(self,requeststatusid):
         allStatus = FOIRequestStatus().getrequeststatuses()
