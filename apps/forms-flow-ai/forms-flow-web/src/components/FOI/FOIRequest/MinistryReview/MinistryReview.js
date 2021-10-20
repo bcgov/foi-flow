@@ -83,13 +83,7 @@ const MinistryReview = React.memo(({userDetail}) => {
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
   const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
 
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (ministryId) {
-      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-    }     
-  },[requestId, dispatch]); 
+  
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
