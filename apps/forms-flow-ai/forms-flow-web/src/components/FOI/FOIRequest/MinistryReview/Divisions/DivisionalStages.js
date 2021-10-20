@@ -7,25 +7,27 @@ import { useDispatch, useSelector } from "react-redux";
 
 const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popselecteddivstages}) => {
     var stageCounter = []
+    
     if(existingDivStages.length === 0 || existingDivStages == undefined)
-    {
-        stageCounter.push({id:0,divisionid:-1,name:"",stage:"",stagename:""})
+    {        
+        stageCounter.push({id:0,divisionid:-1,stageid:""})
     }
     else{
        
-        stageCounter=existingDivStages
+        existingDivStages.forEach((item,index)=>{
+            stageCounter.push({id:index,divisionid:item.divisionid,stageid:item.stageid})
+        })        
     }
     
     const [minDivStages, setMinDivStages] = React.useState(stageCounter);
     
-
     const handleDivisionChange = (e,id)=> {                
         let arr = minDivStages;        
         //const divisionnotexists = arr.filter(st=>st.divisionid === e.target.value).length === 0;
         const idexists = arr.filter(st=>st.id === id).length > 0;
         if(idexists)
         {           
-            arr.filter(item=>item.id === id).forEach(item=> {item.divisionid = e.target.value;item.name = e.target.name})            
+            arr.filter(item=>item.id === id).forEach(item=> {item.divisionid = e.target.value})            
             setMinDivStages([...arr])
             appendstageIterator([...arr])            
         }
@@ -38,7 +40,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
         const exists = arr.filter(st=>st.id === id).length > 0
         if(exists)
         {
-            arr.filter(st=>st.id === id).forEach(item=>{item.stage = e.target.value;item.stagename=e.target.name})
+            arr.filter(st=>st.id === id).forEach(item=>{item.stageid = e.target.value})
             
         }
         else{
@@ -66,7 +68,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
         let existing = stageIterator;
         var val = stageIterator.length > 0 ?  stageIterator[stageIterator.length - 1].id + 1 :0
         if (divisionList.length >= stageIterator.length) {           
-            existing.push({id:val,divisionid:-1,name:"",stage:"",stagename:""})
+            existing.push({id:val,divisionid:-1,stageid:""})
             setMinDivStages([...existing]) 
             appendstageIterator([...existing])
         }        
@@ -78,7 +80,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
 
         let _mindivtem = minDivStages.filter(d=>d.divisionid === item.divisionid)               
         return (
-            <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid} name= {item.name} value={item.divisionid} >
+            <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid}  value={item.divisionid} >
                 <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
                 {item.name}
             </MenuItem>
@@ -89,16 +91,26 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
     const divisionstageItems = divisionstageList!=undefined && divisionstageList.length > 0 && divisionstageList.map((item) => {
 
         return (
-            <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.stageid} name= {item.name}  >
+            <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.stageid}   >
                 <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
                 {item.name}
             </MenuItem>
         )
     });
 
-    var divisionalStagesRow = (row) => {
+    var divisionalStagesRow = (row,index) => {
 
         let _id = row.id
+        let binclass = `fa fa-trash fa-3 foi-bin`
+        
+        if(index ===  0 && stageIterator.length > 1 )
+        {
+            binclass = `fa fa-trash fa-3 foi-bin` 
+        }
+        else if(index ===  0 && stageIterator.length === 1) 
+        {
+            binclass = `fa fa-trash fa-3 foi-bin hidebin` 
+        }
        
         return (
             <div className="row foi-details-row" id={`foi-division-row${_id}`}>
@@ -112,8 +124,9 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                         variant="outlined"
                         onChange={e => handleDivisionChange(e,_id)}
                         fullWidth                        
-                        label="Select Divison"
-                        value={row.divisionid}                        
+                        label="Select Divison*"
+                        value={row.divisionid !== -1 ? row.divisionid : "Select Division"} 
+                        error= {row.divisionid ===-1 || row.divisionid === ""}                       
                     >
                         {[...divisionItems]}
                     </TextField>
@@ -128,15 +141,16 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                         input={<Input />}
                         variant="outlined"
                         fullWidth                        
-                        label="Select Divison Stage"
+                        label="Select Divison Stage*"
                         onChange={e => handleDivisionStageChange(e,_id)} 
-                        value={row.stage}                      
+                        value={row.stageid !== "" || row.stageid !== -1 ? row.stageid : "Select Division stage" } 
+                        error= {row.stageid ===-1 || row.stageid === ""}                     
                     >
                         {divisionstageItems}
                     </TextField>
                 </div>
                 <div className="col-lg-2 foi-details-col">
-                    <i class="fa fa-trash fa-3 foi-bin" aria-hidden="true" onClick={e=>deleteMinistryDivision(_id)}></i>
+                    <i className={binclass} aria-hidden="true" onClick={e=>deleteMinistryDivision(_id)}></i>
                 </div>
             </div>
         )
@@ -148,9 +162,9 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
             <div id="divstages" >
 
                 {
-                   divisionstageList!=undefined && divisionstageList!=undefined && stageIterator.map((item) =>
+                   divisionstageList!=undefined && divisionstageList!=undefined && stageIterator.map((item,index) =>
 
-                        divisionalStagesRow(item)
+                        divisionalStagesRow(item,index)
                     )
                 }
 
