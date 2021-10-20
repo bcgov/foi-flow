@@ -4,92 +4,110 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './divisionstages.scss';
 import { useDispatch, useSelector } from "react-redux";
-import {
-    fetchFOIMinistryDivisionalStages
-  } from "../../../../../apiManager/services/FOI/foiRequestServices";
-const DivisionalStages = React.memo((props) => {
-    const [minDivStages, setMinDivStages] = React.useState([]);
+
+const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popselecteddivstages}) => {
+    var stageCounter = []
+    if(existingDivStages.length === 0 || existingDivStages == undefined)
+    {
+        stageCounter.push({id:0,divisionid:-1,name:"",stage:"",stagename:""})
+    }
+    else{
+        console.log("Exising stages")
+        console.log(existingDivStages)
+        stageCounter=existingDivStages
+    }
+    
+    const [minDivStages, setMinDivStages] = React.useState(stageCounter);
     
 
     const handleDivisionChange = (e,id)=> {
 
-        console.log('handleDivisionChange')
-        console.log(e)
+        console.log(`handleDivisionChange${id}`)        
         let arr = minDivStages;
-        const exists = arr.filter(st=>st.name === e.target.value).length > 0
-        if(!exists)
-        {
-            arr.push({divisionid:id,name:e.target.value,stage:""})            
+        console.log("Current Arr - handleDivisionChange")
+        console.log(arr)
+        //const divisionnotexists = arr.filter(st=>st.divisionid === e.target.value).length === 0;
+        const idexists = arr.filter(st=>st.id === id).length > 0;
+        if(idexists)
+        {           
+            arr.filter(item=>item.id === id).forEach(item=> {item.divisionid = e.target.value;item.name = e.target.name})
+            console.log("arr - handleDivisionChange after update")
+            console.log(arr)
             setMinDivStages([...arr])
             appendstageIterator([...arr])
+            
         }
-        
+        else{
+            console.log("No Id found - handleDivisionChange ")
+        }
+        console.log("Divstages handleDivisionChange")                
         console.log(minDivStages)
     }
-    const handleDivisionStageChange = (e,divisionid)=> {
-
+    const handleDivisionStageChange = (e,id)=> {
+        console.log(`handleDivisionStageChange ${id}`)    
         let arr = minDivStages;
-        const exists = arr.filter(st=>st.divisionid === divisionid).length > 0
+        console.log("Current Arr - handleDivisionStageChange")
+        console.log(arr)
+        const exists = arr.filter(st=>st.id === id).length > 0
         if(exists)
         {
-            arr.filter(st=>st.divisionid === divisionid).forEach(item=>item.stage = e.target.value)
-
+            arr.filter(st=>st.id === id).forEach(item=>{item.stage = e.target.value;item.stagename=e.target.name})
+            console.log("arr - handleDivisionStageChange after update")
+            console.log(arr)
+        }
+        else{
+            console.log("No Id found - handleDivisionStageChange ")
         }
         setMinDivStages([...arr])
-        console.log('handleDivisionStageChange')    
-        console.log(e)
+                    
+        console.log("Divstages handleDivisionStageChange")
         console.log(minDivStages)
     }
 
     console.log("Divstages")
     console.log(minDivStages)
-
-    const deleteMinistryDivision = (divisionid)=>{
-
+    popselecteddivstages(minDivStages)
+    const deleteMinistryDivision = (id)=>{
+        console.log(`deleteMinistryDivision ${id}`)
         let existing = stageIterator;
-        let updatedIterator = existing.filter(i=>i.divisionid !== divisionid);
-       
-        appendstageIterator([...updatedIterator])
+        let updatedIterator = existing.filter(i=>i.id !== id);
+        console.log("arr - deleteMinistryDivision after update")
+        console.log(updatedIterator)
         setMinDivStages([...updatedIterator])
-       
-
+        appendstageIterator([...updatedIterator])
+               
     }
 
   
 
-    var stageCounter = []
-    stageCounter.push({divisionid:0,name:"",stage:""})
+    
     const [stageIterator, appendstageIterator] = React.useState(stageCounter);
     
     
     const addDivisionalStage = () => {
 
         let existing = stageIterator;
-        var val = stageIterator[stageIterator.length - 1].id + 1
-        if (divisionList.length >= val) {           
-            existing.push({divisionid:val,name:"",stage:""})
+        var val = stageIterator.length > 0 ?  stageIterator[stageIterator.length - 1].id + 1 :0
+        if (divisionList.length >= stageIterator.length) {           
+            existing.push({id:val,divisionid:-1,name:"",stage:"",stagename:""})
+            setMinDivStages([...existing]) 
             appendstageIterator([...existing])
         }
+        console.log("Divstages - addDivisionalStage")
         console.log(stageIterator)
     }
-const bcgovcode ="EDUC"
-    const dispatch = useDispatch();
-  useEffect(() => {
-    if (bcgovcode) {
-      dispatch(fetchFOIMinistryDivisionalStages("EDUC"));      
-    }       
-  },[dispatch]);
 
-  let divisionalstages = useSelector(state=> state.foiRequests.foiMinistryDivisionalStages);
-  console.log("Division stage Data")
-  console.log(divisionalstages)
+   
 
-  const divisionList = divisionalstages.divisions
+
+    console.log("Div stages all - POint last")
+    console.log(divisionalstages)
+    const divisionList = divisionalstages.divisions
     const divisionItems = divisionList !=undefined && divisionList.length > 0 && divisionList.map((item) => {
 
-        let _mindivtem = minDivStages.filter(d=>d.name.toLowerCase() === item.name.toLowerCase())               
+        let _mindivtem = minDivStages.filter(d=>d.divisionid === item.divisionid)               
         return (
-            <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid} value={item.name} >
+            <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid} name= {item.name} value={item.divisionid} >
                 <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
                 {item.name}
             </MenuItem>
@@ -100,7 +118,7 @@ const bcgovcode ="EDUC"
     const divisionstageItems = divisionstageList!=undefined && divisionstageList.length > 0 && divisionstageList.map((item) => {
 
         return (
-            <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.name} >
+            <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.stageid} name= {item.name}  >
                 <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
                 {item.name}
             </MenuItem>
@@ -110,8 +128,11 @@ const bcgovcode ="EDUC"
     var divisionalStagesRow = (row) => {
 
         let _id = row.id
+        console.log(`divisionalStagesRow${_id}`)
+        console.log(`divisionalStagesRow - row`)
+        console.log(row)
         return (
-            <div className="row foi-details-row" id="foi-division-row"_id>
+            <div className="row foi-details-row" id={`foi-division-row${_id}`}>
                 <div className="col-lg-5 foi-details-col">
                     <TextField
                         id="foi-division-dropdown"_id
@@ -123,7 +144,7 @@ const bcgovcode ="EDUC"
                         onChange={e => handleDivisionChange(e,_id)}
                         fullWidth                        
                         label="Select Divison"
-                        value={row.division}
+                        value={row.divisionid}                        
                     >
                         {[...divisionItems]}
                     </TextField>
@@ -139,8 +160,8 @@ const bcgovcode ="EDUC"
                         variant="outlined"
                         fullWidth                        
                         label="Select Divison Stage"
-                        onChange={e => handleDivisionStageChange(e,_id)}
-                        value={row.stage}
+                        onChange={e => handleDivisionStageChange(e,_id)} 
+                        value={row.stage}                      
                     >
                         {divisionstageItems}
                     </TextField>

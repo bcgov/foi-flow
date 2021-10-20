@@ -9,7 +9,8 @@ import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   fetchFOIMinistryViewRequestDetails,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
+  fetchFOIMinistryDivisionalStages,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
@@ -66,6 +67,7 @@ const MinistryReview = React.memo((props) => {
      if (ministryId) {
        dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
        dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+       dispatch(fetchFOIMinistryDivisionalStages("EDUC")); //TODO: this need to be take from request
      }     
    },[requestId, dispatch]); 
 
@@ -130,7 +132,10 @@ const MinistryReview = React.memo((props) => {
 
   }
 
-  
+  const pubmindivstagestomain =(divstages)=>{
+    console.log("Min. stages from Ministry Review main view")
+    console.log(divstages)
+  }
 
   return (
     
@@ -168,7 +173,7 @@ const MinistryReview = React.memo((props) => {
                     <ApplicantDetails requestDetails={requestDetails}/> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
-                    <RequestTracking/>                    
+                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain}/>                    
                     <RequestNotes />
                     <div className="foi-bottom-button-group">
                       <button type="button" className="btn btn-bottom btnenabled">Save</button>                      

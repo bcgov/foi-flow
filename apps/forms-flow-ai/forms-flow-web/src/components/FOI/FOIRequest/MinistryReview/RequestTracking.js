@@ -3,9 +3,24 @@ import CFRStatus from './CFRStatus';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import DivisionalStages from './Divisions/DivisionalStages';
-const RequestTracking = React.memo((props) => {
+import { useDispatch, useSelector } from "react-redux";
+import {
+    fetchFOIMinistryDivisionalStages
+  } from "../../../../apiManager/services/FOI/foiRequestServices";
+const RequestTracking = React.memo(({pubmindivstagestomain}) => {
 
+  
+  let divisionalstages = useSelector(state=> state.foiRequests.foiMinistryDivisionalStages);
+  console.log("Division stage Data")
+  console.log(divisionalstages)
 
+  let existingDivStages = [{id:0,divisionid:7, stage:1} , {id:1,divisionid:5, stage:2}]
+
+  const popselecteddivstages = (selectedMinDivstages) => {
+      console.log("Request Tracking selected Min Div Stages")
+      console.log(selectedMinDivstages)
+      pubmindivstagestomain(selectedMinDivstages)
+  }
 
     return(
 
@@ -14,8 +29,12 @@ const RequestTracking = React.memo((props) => {
         <CardContent>                       
                 <div className="row foi-details-row">
               
-                <div className="col-lg-12 foi-details-col">                      
-                  <DivisionalStages />
+                <div className="col-lg-12 foi-details-col">
+                    {
+
+                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 > 0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popselecteddivstages={popselecteddivstages}   /> : null
+                    }                      
+                  
                 </div>
             </div>  
         </CardContent>
