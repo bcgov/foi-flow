@@ -161,3 +161,9 @@ export const clearFOIMinistryDivisionalStages = (data) => dispatch => {
         payload:data      
     })
 }
+export const setFOIWatcherList = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST,
+        payload:data      
+    })
+}

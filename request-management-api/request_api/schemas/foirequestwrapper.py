@@ -69,7 +69,10 @@ class FOIRequestWrapperSchema(Schema):
     deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
     receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
     receivedDate = fields.Str(data_key="receivedDateUF", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
-    startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])        
+    startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])  
+    assignedministrygroup = fields.Str(data_key="assignedministrygroup",allow_none=True)
+    assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True)        
+
     
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True)    
     workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True)  

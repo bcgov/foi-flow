@@ -1,7 +1,5 @@
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
-from request_api.models.FOIRequestWatchers import FOIRequestWatcher
-from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
 from dateutil import parser
 from dateutil import tz
 import datetime as dt
@@ -46,7 +44,7 @@ class dashboardservice:
                     lastName = request.requestrawdata['contactInfo']['lastName']
                     requestType = request.requestrawdata['requestType']['requestType']
 
-                rawrequestwatchers = FOIRawRequestWatcher.getwatchers(request.requestid)
+                
                 unopenrequest = {'id': request.requestid,
                                  'firstName': firstName,
                                  'lastName': lastName,
@@ -58,13 +56,11 @@ class dashboardservice:
                                  'assignedTo': request.assignedto,
                                  'xgov': 'No',
                                  'idNumber': 'U-00' + str(request.requestid),
-                                 'version':request.version,
-                                 'watchers':rawrequestwatchers
+                                 'version':request.version
                                  }
                 requestqueue.append(unopenrequest)
 
             for openrequest in openedrequests : 
-                    watchers = FOIRequestWatcher.getwatchers(openrequest['ministryrequestid'])
                     _openrequest = {'id': openrequest["id"],
                                  'firstName':  openrequest["firstName"],
                                  'lastName':  openrequest["lastName"],
@@ -77,8 +73,7 @@ class dashboardservice:
                                  'xgov': 'No',
                                  'idNumber':  openrequest["idNumber"],
                                  'version': openrequest["version"],
-                                 'ministryrequestid':openrequest['ministryrequestid'],
-                                 'watchers':watchers
+                                 'ministryrequestid':openrequest['ministryrequestid']
                                  }
                     requestqueue.append(_openrequest)
                         
@@ -94,7 +89,6 @@ class dashboardservice:
             requestqueue = []
             
             for openrequest in openedrequests : 
-                    watchers = FOIRequestWatcher.getwatchers(openrequest['ministryrequestid'])
                     _openrequest = {'id': openrequest["id"],                                 
                                  'requestType':  openrequest["requestType"],
                                  'currentState':  openrequest["currentState"],
@@ -111,7 +105,7 @@ class dashboardservice:
                                  'version': openrequest["version"],
                                  'ministryrequestid':openrequest['ministryrequestid'],
                                  'applicantcategory':openrequest['applicantcategory'],
-                                 'watchers':watchers
+                                 'watchers':[]
                                  }
                     requestqueue.append(_openrequest)
                         

@@ -29,17 +29,25 @@ class FOIRawRequestWatcher(db.Model):
         newwatcher = FOIRawRequestWatcher(requestid=foirawrequestwatcher["requestid"], version=version, watchedbygroup=foirawrequestwatcher["watchedbygroup"], watchedby=foirawrequestwatcher["watchedby"], isactive=foirawrequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
         db.session.add(newwatcher)
         db.session.commit()               
-        return DefaultMethodResult(True,'Request added',newwatcher.watcherid)
+        return DefaultMethodResult(True,'Request added')
     
+    @classmethod
+    def savewatcherbygroups(cls, foirawrequestwatcher, version, userid, watchergroups)->DefaultMethodResult:             
+        for group in watchergroups:
+            foirawrequestwatcher["watchedbygroup"] = group
+            newwatcher = FOIRawRequestWatcher(requestid=foirawrequestwatcher["requestid"], version=version, watchedbygroup=foirawrequestwatcher["watchedbygroup"], watchedby=foirawrequestwatcher["watchedby"], isactive=foirawrequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
+            db.session.add(newwatcher)
+            db.session.commit()               
+        return DefaultMethodResult(True,'Request added')
     
     @classmethod
     def getwatchers(cls, requestid):                
-        sql = 'select distinct on (watchedby) watchedby, isactive from "FOIRawRequestWatchers" where requestid=:requestid order by watchedby, created_at desc'
+        sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid order by watchedby, watchedbygroup, created_at desc'
         rs = db.session.execute(text(sql), {'requestid': requestid})
         watchers = []
         for row in rs:
             if row["isactive"] == True:
-                watchers.append({"watchedby": row["watchedby"]})
+                watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
         return watchers 
 
     @classmethod

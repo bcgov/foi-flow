@@ -2,7 +2,7 @@ import {render, screen, cleanup} from '@testing-library/react';
 import renderer from 'react-test-renderer';
 import { Provider } from "react-redux";
 import configureStore from 'redux-mock-store'
-import RequestHeader from './RequestHeader';
+import Watcher from './Watcher';
 import { useSelector } from "react-redux";
 import { shallow } from 'enzyme';
 import Router, { useParams } from "react-router-dom";
@@ -10,20 +10,21 @@ import Router, { useParams } from "react-router-dom";
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
     useSelector: jest.fn()
-}));
+  }));
+
 jest.mock("react-router-dom", () => ({
     ...jest.requireActual("react-router-dom"),
     useParams: jest.fn(),
 }));
 
-describe('FOI RequestHeader component', () => {
+describe('FOI Watcher component', () => {
   
     beforeEach(() => {
         useSelector.mockImplementation(callback => {
           return callback(mockAppState);
         });
         useParams.mockImplementation(() => {
-            return mockAppState;
+          return mockAppState;
         });
       });
       afterEach(() => {
@@ -32,39 +33,39 @@ describe('FOI RequestHeader component', () => {
       });
 
     const initialState = {output:10}
-    const mockStore = configureStore()    
-    let store;    
+    const mockStore = configureStore()
+    let store,wrapper
    
-    it("FOI RequestHeader Rendering Unit test - shallow check", () => {
+    it("FOI Watcher Rendering Unit test - shallow check", () => {
         store = mockStore(initialState)
-        const localState = {
-            requestDetails: {requestDetails: {}},
-            foiRequests: {foiFullAssignedToList: []},
-            user: {userDetail: {}}
+        const localState = {            
+            watcherFullList: [],
+            requestWatcherList: [],
+            requestId: 1,
+            ministryId: 1,
+            userDetail: {},
+            handleWatcherUpdate:  jest.fn(),
+            foiRequests: {foiWatcherList: []}           
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
-        });
-        useParams.mockImplementation(() => {
-            return {ministryId: "123"};
-        });   
-        shallow(<Provider store={store}><RequestHeader requestDetails={localState.requestDetails} /></Provider>)
+        });       
+        shallow(<Provider store={store}><Watcher watcherFullList={localState.watcherFullList} requestId={localState.requestId} ministryId={localState.ministryId} userDetail={localState.userDetail}  /></Provider>)
       });
 
-      it('FOI RequestHeader snapshot check', () => {
+      it('FOI Watcher snapshot check', () => {
         store = mockStore(initialState)
         const localState = {
-            requestDetails: {requestDetails: {}},
-            foiRequests: {foiFullAssignedToList: []},
-            user: {userDetail: {}}
+            watcherFullList: [],            
+            requestId: 1,
+            ministryId: 1,
+            userDetail: {},           
+            foiRequests: {foiWatcherList: []}    
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
-        });
-        useParams.mockImplementation(() => {
-            return {ministryId: "123",requestState: "Call For Records"};
-        }); 
-        const tree = renderer.create(<Provider store={store}><RequestHeader requestDetails={localState.requestDetails} /></Provider>).toJSON();  
+        });        
+        const tree = renderer.create(<Provider store={store}><Watcher watcherFullList={localState.watcherFullList} requestId={localState.requestId} ministryId={localState.ministryId} userDetail={localState.userDetail} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })

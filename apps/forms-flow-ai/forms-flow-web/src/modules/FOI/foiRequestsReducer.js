@@ -18,7 +18,8 @@ const initialState = {
   foiMinistryAssignedToList: [],
   foiProgramAreaList:[],
   foiRequestDescriptionHistoryList: [], 
-  foiMinistryDivisionalStages:[]
+  foiMinistryDivisionalStages:[], 
+  foiWatcherList: [],
 }
 
 
@@ -90,6 +91,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, foiRequestDescriptionHistoryList: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES:
       return {...state, foiMinistryDivisionalStages: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST:
+      return {...state, foiWatcherList: action.payload};
     default:
       return state;
   }

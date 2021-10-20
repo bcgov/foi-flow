@@ -4,23 +4,18 @@ import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
-import { openRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
-import RequestDetails from './RequestDetails';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { Watcher } from '../../customComponents';
+import { useParams } from 'react-router-dom';
 
-const RequestHeader = React.memo((requestDetails) => {
-    const _requestDetails = requestDetails.requestDetails;
+const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
+
+    const {ministryId} = useParams();
+    const _requestDetails = requestDetails;
+    const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
 
     const preventDefault = (event) => event.preventDefault();
-
-    const handleMinistryAssignedToValue =()=>{
-
-    }
-
-    const createSaveRequestObject = () =>{
-
-    }
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -59,7 +54,9 @@ const RequestHeader = React.memo((requestDetails) => {
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                    <img src="/assets/Images/wacher.PNG" alt="wacher" style={{width:200+'px',height:50+'px'}} />
+                  
+                    <Watcher watcherFullList={ministryAssignedToList} ministryId={ministryId} userDetail={userDetail} />
+                   
                 </div>
             </div>
             
@@ -80,7 +77,7 @@ const RequestHeader = React.memo((requestDetails) => {
 
             
                     <>
-                      <MinistryAssignToDropdown requestDetails={_requestDetails} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
                     </>
                 
             </div>
