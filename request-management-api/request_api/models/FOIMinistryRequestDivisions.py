@@ -40,10 +40,11 @@ class FOIMinistryRequestDivision(db.Model):
     foiministryrequestversion = relationship("FOIMinistryRequest",foreign_keys="[FOIMinistryRequestDivision.foiministryrequestversion_id]")
 
     @classmethod
-    def getrequest(cls,ministryrequestid):
-        request_schema = FOIMinistryRequestDivisionSchema(many=True)
-        query = db.session.query(FOIMinistryRequestDivisionSchema).filter_by(foiministryrequest_id=ministryrequestid).all()
-        return request_schema.dump(query)  
+    def getrequest(cls,ministryrequestid,ministryrequestversion):
+        division_schema = FOIMinistryRequestDivisionSchema(many=True)
+        _divisions = db.session.query(FOIMinistryRequestDivision).filter(FOIMinistryRequestDivision.foiministryrequest_id == ministryrequestid , FOIMinistryRequestDivision.foiministryrequestversion_id == ministryrequestversion).order_by(FOIMinistryRequestDivision.foiministrydivisionid.asc()).all()
+        applicantinfos = division_schema.dump(_divisions)       
+        return applicantinfos
     
 class FOIMinistryRequestDivisionSchema(ma.Schema):
     class Meta:

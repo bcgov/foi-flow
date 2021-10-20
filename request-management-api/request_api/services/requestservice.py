@@ -384,8 +384,10 @@ class FOIRequestUtil:
         foiministryrequest.programareaid = ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None
         foiministryrequest.createdby = userid
         if 'divisions' in requestschema:
-            divisions = FOIRequestUtil().createFOIRequestDivision(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)
-            foiministryrequest.divisions = divisions
+            foiministryrequest.divisions = FOIRequestUtil().createFOIRequestDivision(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
+        else:
+            divisions = FOIMinistryRequestDivision().getrequest(ministryschema["foiministryrequestid"] ,ministryschema["version"])
+            foiministryrequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
         return foiministryrequest
     
     def createFOIRequestAppplicantFromObject(self, requestapplicants, requestid, version, userid): 
@@ -425,6 +427,18 @@ class FOIRequestUtil:
                 ministrydivision.createdby = userid
                 divisionarr.append(ministrydivision)
             return divisionarr
+    
+    def createFOIRequestDivisionFromObject(self, divisions, requestid, version, userid):
+        divisionarr = []
+        for division in divisions:
+            ministrydivision = FOIMinistryRequestDivision()
+            ministrydivision.divisionid = division["division.divisionid"]
+            ministrydivision.stageid = division["stage.stageid"]
+            ministrydivision.foiministryrequest_id = requestid
+            ministrydivision.foiministryrequestversion_id = version
+            ministrydivision.createdby = userid
+            divisionarr.append(ministrydivision)
+        return divisionarr
     
     def createFOIRequestPersonalAttributeFromObject(self,personalattributes, requestid, version, userid):
         personalattributesarr = []
