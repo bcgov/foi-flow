@@ -68,25 +68,28 @@ const MinistryReview = React.memo(({userDetail}) => {
   const [_tabStatus, settabStatus] = React.useState(requestState);
    //gets the request detail from the store
  
+  
+   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
        dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
        dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-       dispatch(fetchFOIMinistryDivisionalStages("EDUC")); //TODO: this need to be take from request
+       
      }     
    },[requestId, dispatch]); 
+
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
-    
   //gets the request detail from the store
-  let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
+   
+  
+  
   const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
-   let existingDivStages = [{id:0,divisionid:7, stage:1} , {id:1,divisionid:5, stage:2}]
-  const [divstages,setdivStages] = React.useState(existingDivStages)
-
   
 
+  const [divstages,setdivStages] = React.useState([])
+  
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
@@ -109,8 +112,16 @@ const MinistryReview = React.memo(({userDetail}) => {
     setMinistryAssignedToValue(value);
   }
 
+  let hasincompleteDivstage = false;
+  divstages.forEach((item)=>{
+    if(item.divisionid === -1 || item.stageid === -1 || item.stageid === "" || item.divisionid === "")
+    {
+      hasincompleteDivstage = true
+    }
+  })
+
   //Variable to find if all required fields are filled or not
-  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned");
+  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned")  || (divstages.length === 0 || hasincompleteDivstage);
 
   const createMinistryRequestDetailsObject = (requestObject, name, value) => {
     // requestDetails.
@@ -213,14 +224,11 @@ const MinistryReview = React.memo(({userDetail}) => {
   }
 
   const pubmindivstagestomain =(divstages)=>{
-    console.log("Min. stages from Ministry Review main view")
-    console.log(divstages)
+  
     saveMinistryRequestObject.divisions = divstages
     setdivStages(divstages)
   }
   
-console.log("Save Object Ministry review")
-console.log(saveMinistryRequestObject)
   return (
     
     <div className="foiformcontent">
@@ -257,7 +265,7 @@ console.log(saveMinistryRequestObject)
                     <ApplicantDetails requestDetails={requestDetails} /> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
-                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={divstages}/>                                                
+                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
                     <RequestNotes />
                     <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>

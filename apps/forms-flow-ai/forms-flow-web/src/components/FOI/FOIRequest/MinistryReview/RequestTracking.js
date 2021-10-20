@@ -7,14 +7,21 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     fetchFOIMinistryDivisionalStages
   } from "../../../../apiManager/services/FOI/foiRequestServices";
-const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages}) => {
+const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,ministrycode}) => {
+
+    const dispatch = useDispatch();
+    useEffect(() => {    
+        if(ministrycode)
+        {
+            
+            dispatch(fetchFOIMinistryDivisionalStages(ministrycode)); 
+        }
+        
+   },[ministrycode,dispatch])
 
   
   let divisionalstages = useSelector(state=> state.foiRequests.foiMinistryDivisionalStages);
   
-
-  //let existingDivStages = [{id:0,divisionid:7, stage:1} , {id:1,divisionid:5, stage:2}]
-
   const popselecteddivstages = (selectedMinDivstages) => {      
       pubmindivstagestomain(selectedMinDivstages)
   }
@@ -29,7 +36,7 @@ const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages}) =
                 <div className="col-lg-12 foi-details-col">
                     {
 
-                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 > 0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popselecteddivstages={popselecteddivstages}   /> : null
+                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 && divisionalstages.divisions.length >0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popselecteddivstages={popselecteddivstages}   /> : null
                     }                      
                   
                 </div>
