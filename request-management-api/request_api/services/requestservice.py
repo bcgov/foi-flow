@@ -3,6 +3,7 @@ from re import T
 from request_api import version
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
 from request_api.models.ProgramAreas import ProgramArea
 from request_api.models.RequestorType import RequestorType
 from request_api.models.ContactTypes import ContactType
@@ -162,7 +163,7 @@ class requestservice:
     
     def saveMinistryRequestVersion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype):
         _foirequest = FOIRequest().getrequest(foirequestid) 
-        _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)  
+        _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)
         _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicants(foirequestid,_foirequest["version"])
         _foirequestcontact = FOIRequestContactInformation().getrequestcontactinformation(foirequestid,_foirequest["version"])
         _foirequestpersonalattrbs = FOIRequestPersonalAttribute().getrequestpersonalattributes(foirequestid,_foirequest["version"])
@@ -382,6 +383,9 @@ class FOIRequestUtil:
         foiministryrequest.requeststatusid = requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"]
         foiministryrequest.programareaid = ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None
         foiministryrequest.createdby = userid
+        if 'divisions' in requestschema:
+            divisions = FOIRequestUtil().createFOIRequestDivision(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)
+            foiministryrequest.divisions = divisions
         return foiministryrequest
     
     def createFOIRequestAppplicantFromObject(self, requestapplicants, requestid, version, userid): 
@@ -408,6 +412,19 @@ class FOIRequestUtil:
             contactinfo.createdby = userid
             requestcontactarr.append(contactinfo)
         return requestcontactarr
+    
+    def createFOIRequestDivision(self, requestschema, requestid, version, userid):
+        divisionarr = []
+        if 'divisions' in  requestschema:
+            for division in requestschema['divisions']:
+                ministrydivision = FOIMinistryRequestDivision()
+                ministrydivision.divisionid = division["divisionid"]
+                ministrydivision.stageid = division["stageid"]
+                ministrydivision.foiministryrequest_id = requestid
+                ministrydivision.foiministryrequestversion_id = version
+                ministrydivision.createdby = userid
+                divisionarr.append(ministrydivision)
+            return divisionarr
     
     def createFOIRequestPersonalAttributeFromObject(self,personalattributes, requestid, version, userid):
         personalattributesarr = []
