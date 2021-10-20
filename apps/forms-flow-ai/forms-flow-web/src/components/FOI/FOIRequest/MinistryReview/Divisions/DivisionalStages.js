@@ -12,78 +12,55 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
         stageCounter.push({id:0,divisionid:-1,name:"",stage:"",stagename:""})
     }
     else{
-        console.log("Exising stages")
-        console.log(existingDivStages)
+       
         stageCounter=existingDivStages
     }
     
     const [minDivStages, setMinDivStages] = React.useState(stageCounter);
     
 
-    const handleDivisionChange = (e,id)=> {
-
-        console.log(`handleDivisionChange${id}`)        
-        let arr = minDivStages;
-        console.log("Current Arr - handleDivisionChange")
-        console.log(arr)
+    const handleDivisionChange = (e,id)=> {                
+        let arr = minDivStages;        
         //const divisionnotexists = arr.filter(st=>st.divisionid === e.target.value).length === 0;
         const idexists = arr.filter(st=>st.id === id).length > 0;
         if(idexists)
         {           
-            arr.filter(item=>item.id === id).forEach(item=> {item.divisionid = e.target.value;item.name = e.target.name})
-            console.log("arr - handleDivisionChange after update")
-            console.log(arr)
+            arr.filter(item=>item.id === id).forEach(item=> {item.divisionid = e.target.value;item.name = e.target.name})            
             setMinDivStages([...arr])
-            appendstageIterator([...arr])
-            
+            appendstageIterator([...arr])            
         }
         else{
             console.log("No Id found - handleDivisionChange ")
-        }
-        console.log("Divstages handleDivisionChange")                
-        console.log(minDivStages)
+        }        
     }
-    const handleDivisionStageChange = (e,id)=> {
-        console.log(`handleDivisionStageChange ${id}`)    
-        let arr = minDivStages;
-        console.log("Current Arr - handleDivisionStageChange")
-        console.log(arr)
+    const handleDivisionStageChange = (e,id)=> {          
+        let arr = minDivStages;       
         const exists = arr.filter(st=>st.id === id).length > 0
         if(exists)
         {
             arr.filter(st=>st.id === id).forEach(item=>{item.stage = e.target.value;item.stagename=e.target.name})
-            console.log("arr - handleDivisionStageChange after update")
-            console.log(arr)
+            
         }
         else{
             console.log("No Id found - handleDivisionStageChange ")
         }
-        setMinDivStages([...arr])
-                    
-        console.log("Divstages handleDivisionStageChange")
-        console.log(minDivStages)
+        setMinDivStages([...arr])                            
     }
-
-    console.log("Divstages")
-    console.log(minDivStages)
+   
     popselecteddivstages(minDivStages)
+
     const deleteMinistryDivision = (id)=>{
-        console.log(`deleteMinistryDivision ${id}`)
+       
         let existing = stageIterator;
         let updatedIterator = existing.filter(i=>i.id !== id);
-        console.log("arr - deleteMinistryDivision after update")
-        console.log(updatedIterator)
+        
         setMinDivStages([...updatedIterator])
         appendstageIterator([...updatedIterator])
                
     }
-
-  
-
-    
+      
     const [stageIterator, appendstageIterator] = React.useState(stageCounter);
-    
-    
+        
     const addDivisionalStage = () => {
 
         let existing = stageIterator;
@@ -92,16 +69,10 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
             existing.push({id:val,divisionid:-1,name:"",stage:"",stagename:""})
             setMinDivStages([...existing]) 
             appendstageIterator([...existing])
-        }
-        console.log("Divstages - addDivisionalStage")
-        console.log(stageIterator)
+        }        
     }
 
-   
 
-
-    console.log("Div stages all - POint last")
-    console.log(divisionalstages)
     const divisionList = divisionalstages.divisions
     const divisionItems = divisionList !=undefined && divisionList.length > 0 && divisionList.map((item) => {
 
@@ -128,9 +99,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
     var divisionalStagesRow = (row) => {
 
         let _id = row.id
-        console.log(`divisionalStagesRow${_id}`)
-        console.log(`divisionalStagesRow - row`)
-        console.log(row)
+       
         return (
             <div className="row foi-details-row" id={`foi-division-row${_id}`}>
                 <div className="col-lg-5 foi-details-col">
@@ -194,9 +163,6 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
             </div>
         </>
     )
-
-
-
 })
 
 export default DivisionalStages

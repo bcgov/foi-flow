@@ -82,6 +82,8 @@ const MinistryReview = React.memo(({userDetail}) => {
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
   const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
+   let existingDivStages = [{id:0,divisionid:7, stage:1} , {id:1,divisionid:5, stage:2}]
+  const [divstages,setdivStages] = React.useState(existingDivStages)
 
   
 
@@ -213,9 +215,12 @@ const MinistryReview = React.memo(({userDetail}) => {
   const pubmindivstagestomain =(divstages)=>{
     console.log("Min. stages from Ministry Review main view")
     console.log(divstages)
+    saveMinistryRequestObject.divisions = divstages
+    setdivStages(divstages)
   }
   
-
+console.log("Save Object Ministry review")
+console.log(saveMinistryRequestObject)
   return (
     
     <div className="foiformcontent">
@@ -252,7 +257,7 @@ const MinistryReview = React.memo(({userDetail}) => {
                     <ApplicantDetails requestDetails={requestDetails} /> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
-                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain}/>                                                
+                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={divstages}/>                                                
                     <RequestNotes />
                     <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>

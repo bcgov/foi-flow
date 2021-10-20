@@ -7,18 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     fetchFOIMinistryDivisionalStages
   } from "../../../../apiManager/services/FOI/foiRequestServices";
-const RequestTracking = React.memo(({pubmindivstagestomain}) => {
+const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages}) => {
 
   
   let divisionalstages = useSelector(state=> state.foiRequests.foiMinistryDivisionalStages);
-  console.log("Division stage Data")
-  console.log(divisionalstages)
+  
 
-  let existingDivStages = [{id:0,divisionid:7, stage:1} , {id:1,divisionid:5, stage:2}]
+  //let existingDivStages = [{id:0,divisionid:7, stage:1} , {id:1,divisionid:5, stage:2}]
 
-  const popselecteddivstages = (selectedMinDivstages) => {
-      console.log("Request Tracking selected Min Div Stages")
-      console.log(selectedMinDivstages)
+  const popselecteddivstages = (selectedMinDivstages) => {      
       pubmindivstagestomain(selectedMinDivstages)
   }
 

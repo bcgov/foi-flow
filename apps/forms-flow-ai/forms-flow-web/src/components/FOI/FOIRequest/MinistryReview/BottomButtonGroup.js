@@ -64,6 +64,8 @@ const BottomButtonGroup = React.memo(({
     }
  
     const saveMinistryRequest = async () => {
+      console.log("SaveObject - Bottom Button group misnitry")
+      console.log(saveMinistryRequestObject)
       dispatch(saveMinistryRequestDetails(saveMinistryRequestObject, requestId, ministryId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
