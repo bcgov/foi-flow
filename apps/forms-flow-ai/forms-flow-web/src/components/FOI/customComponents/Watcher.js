@@ -90,10 +90,10 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
   const handleWatcherUpdate = (watcher) => {
     dispatch(saveWatcher(ministryId, watcher, (err, res) => {
       if(!err) {
-        setUpdateWatchList(watcher.isactive);
+        setUpdateWatchList(!updateWatchList);
       }
-    }
-        ));
+    }));
+
   }
    const updateWatcher = (currentWatcher, watchers) => {
     let watcher = {};
