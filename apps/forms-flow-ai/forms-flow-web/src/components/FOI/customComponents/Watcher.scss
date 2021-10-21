@@ -27,11 +27,9 @@
 }
 
 .foi-eye-container {
-    // padding-top: 8px; 
-    width: 110px;
+    width: auto;
     height: 40px;
     background-color: #00336652;
-    // border-radius: 40px 40px 40px 40px;
     border-radius: 40px 0px 0px 40px;
     border: none;
 }
@@ -57,4 +55,12 @@
 
 .MuiCheckbox-colorSecondary.Mui-checked {
     color: green !important;
+}
+
+.MuiPaper-elevation8 {
+    max-height: 60% !important;
+}
+
+b {
+    font-family: 'BCSans-Regular', sans-serif!important;  
 }

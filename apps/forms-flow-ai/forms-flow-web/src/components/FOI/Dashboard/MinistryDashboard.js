@@ -70,8 +70,8 @@ const MinistryDashboard = ({userDetail}) => {
       headerAlign: 'left'       
     },
     
-    { field: 'cfrstatus', 
-      headerName: 'CFR STATUS',  
+    { field: 'currentState', 
+      headerName: 'REQUEST STATUS',  
       width: 150, 
       headerAlign: 'left'      
     },    
@@ -187,7 +187,7 @@ const renderReviewRequest = (e) => {
                 sortingMode={'client'}
                 onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'cfrstatus').toLowerCase().replace(/ +/g, "")}`
+                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}-${params.getValue(params.id, 'cfrstatus').toLowerCase().replace(/ +/g, "")}`
                 } 
                 onRowClick={renderReviewRequest}
                 />
