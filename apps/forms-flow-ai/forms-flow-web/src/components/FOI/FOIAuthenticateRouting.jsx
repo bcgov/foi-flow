@@ -12,11 +12,13 @@ import { Dashboard, MinistryDashboard } from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
 import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
 import { isMinistryLogin } from '../../helper/FOI/helper';
+import UnAuthorized from "./UnAuthorized";
 
 //import TabbedContainer from "./TabbedContainer/TabbedContainer";
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated); 
+
 
   useEffect(()=>{
     console.log('authenticate')
@@ -26,40 +28,48 @@ const FOIAuthenticateRouting = React.memo((props) => {
       });
     }
   },[props.store, dispatch]);
-  const userDetail = useSelector(state=> state.user.userDetail); 
+  const userDetail = useSelector(state=> state.user.userDetail);
+  const isAuthorized = useSelector(state=> state.user.isAuthorized);
   let isMinistry = false;
   if (Object.entries(userDetail).length !== 0) {
     const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
     isMinistry = isMinistryLogin(userGroups);
-}
+  }
+
   return (
       <>
         {isAuth && Object.entries(userDetail).length !== 0 ? (
-          <>
-          <FOIHeader /> 
-          
-            <Route exact path="/foi/dashboard">
-              {isMinistry ? 
-              <MinistryDashboard />
-              : <Dashboard />
-              }
-              
-            </Route>
-            <Route path="/foi/reviewrequest/:requestId/:requestState">
-              <FOIRequest userDetail={userDetail} />
-            </Route>
-            <Route path="/foi/addrequest">
-              <FOIRequest  userDetail={userDetail}/>
-            </Route>
-            <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/:requestState">
-              <FOIRequest userDetail={userDetail} />
-            </Route>
-            <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId/:requestState">
-              <MinistryReview userDetail={userDetail} />
-            </Route>
-            <FOIFooter />
+          isAuthorized ? (
+            <>
+              <FOIHeader /> 
+              <Route exact path={["/foi", "/foi/dashboard"]}>
+                {isMinistry ? 
+                <MinistryDashboard />
+                : <Dashboard />
+                }
+              </Route>
+              <Route path="/foi/reviewrequest/:requestId/:requestState">
+                <FOIRequest userDetail={userDetail} />
+              </Route>
+              <Route path="/foi/addrequest">
+                <FOIRequest  userDetail={userDetail}/>
+              </Route>
+              <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/:requestState">
+                <FOIRequest userDetail={userDetail} />
+              </Route>
+              <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId/:requestState">
+                <MinistryReview userDetail={userDetail} />
+              </Route>
+              <FOIFooter />
             </>
-         ) : (
+          ) : (
+            <Route path="/foi">
+              <FOIHeader /> 
+              <UnAuthorized />
+              <FOIFooter />
+            </Route>
+          )
+        ) : (
           <Loading />
         )} 
       </>
