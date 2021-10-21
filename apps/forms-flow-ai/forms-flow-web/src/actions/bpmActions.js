@@ -28,7 +28,6 @@ export const setUserRole = (data) => dispatch => {
   })
 }
 export const setUserDetails = (data) => dispatch => {
-  localStorage.setItem('UserDetails', JSON.stringify(data));
   dispatch({
     type: ACTION_CONSTANTS.SET_USER_DETAILS,
     payload: data
@@ -39,5 +38,12 @@ export const serviceActionError = (data) => dispatch => {
   dispatch({
     type: ACTION_CONSTANTS.ERROR,
     payload: 'Error Handling Message'
+  })
+}
+
+export const setUserAuthorization = (data) => dispatch => {
+  dispatch({
+    type: ACTION_CONSTANTS.SET_USER_AUTHORIZATION,
+    payload: data
   })
 }

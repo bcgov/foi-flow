@@ -49,7 +49,7 @@ const user = useSelector((state) => state.user.userDetail);
                       </li>
                       <li className="nav-item bell-icon foinavitem">
                       <Badge color="secondary" badgeContent=" " variant="dot">
-                          <i className="fa fa-bell-o"></i>
+                          <i className="fa fa-bell-o foi-bell"></i>
                       </Badge>
                         
                       </li>

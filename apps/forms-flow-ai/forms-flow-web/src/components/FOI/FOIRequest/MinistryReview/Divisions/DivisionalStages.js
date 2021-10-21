@@ -79,7 +79,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
     const getdivisionMenuList = () =>{
 
         var _divisionItems = []
-        _divisionItems.push(<MenuItem key={0} className="foi-division-menuitem" value={-1} disabled={true} >{'Select Division'}</MenuItem>)
+        _divisionItems.push(<MenuItem key={0} name="selectmenuitem"  value={-1} disabled={true} >{'Select Division'}</MenuItem>)
 
         const divisionItems = divisionList !=undefined && divisionList.length > 0 && divisionList.map((item) => {
 
@@ -99,7 +99,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
 
     const getDivisionalStages = () =>{
         var divisionstagesItems = []
-        divisionstagesItems.push(<MenuItem key={0} className="foi-divisionstage-menuitem" value={-1} disabled={true} >{'Select Division Stage'}</MenuItem>)
+        divisionstagesItems.push(<MenuItem key={0} name="selectmenuitem"  value={-1} disabled={true} >{'Select Division Stage'}</MenuItem>)
 
         const divisionstageItems = divisionstageList!=undefined && divisionstageList.length > 0 && divisionstageList.map((item) => {
 

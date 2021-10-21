@@ -7,11 +7,13 @@ import {
   setUserRole,
   setUserToken,
   setUserDetails,
+  setUserAuthorization,
 } from "../actions/bpmActions";
 
 import {AppConfig} from '../config';
 import {WEB_BASE_URL} from "../apiManager/endpoints/config";
 import {_kc} from "../constants/tenantConstant";
+import { isMinistryLogin } from '../helper/FOI/helper';
 
 const jwt = require("jsonwebtoken");
 
@@ -43,7 +45,14 @@ const initKeycloak = (store, ...rest) => {
           setApiBaseUrlToLocalStorage();
 
           
-          KeycloakData.loadUserInfo().then((res) => store.dispatch(setUserDetails(res)));
+          KeycloakData.loadUserInfo().then((res) => {
+            store.dispatch(setUserDetails(res));
+            const userGroups = res.groups.map(group => group.slice(1));
+            const authorized = userGroups.indexOf("Intake Team") !== -1
+                || userGroups.indexOf("Flex Team") !== -1
+                || isMinistryLogin(userGroups)
+            store.dispatch(setUserAuthorization(authorized));
+          });
           const email = KeycloakData.tokenParsed.email || "external";
           
           // onAuthenticatedCallback();
