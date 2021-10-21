@@ -354,7 +354,6 @@ export const fetchFOIMinistryRequestList = (...rest) => {
             return { ...foiRequest};
           });          
           dispatch(clearRequestDetails({}));
-          console.log(foiRequests);
           dispatch(fetchFOIMinistryAssignedToList(foiRequests[0].bcgovcode.toLowerCase()));     
           dispatch(setFOIMinistryRequestList(data));
           dispatch(setFOILoader(false));
