@@ -48,13 +48,17 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     const [noOfWatchers, setNoOfWatchers] = React.useState(0);
     const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
 
+    const getCountOfWatchers = (_watcherList) => {
+      const watchedByList = requestWatcherList.map(watcher => watcher.watchedby);
+      return new Set(watchedByList).size;
+    }
     React.useEffect(() => {
         const watchList = requestWatcherList.map(watcher => {
             return `${watcher.watchedbygroup}|${watcher.watchedby}`;
         });
         const watcherUsers = requestWatcherList.map(watcher => watcher.watchedby);        
         setPersonName(watchList.length > 0 ? watchList : ['Unassigned']);
-        setNoOfWatchers(watchList.length > 0 ? watchList.length : 0);        
+        setNoOfWatchers(getCountOfWatchers(requestWatcherList));
         setUseraWatcher(!!watcherUsers.find(watcher => watcher === userDetail.preferred_username))
       },[requestWatcherList, userDetail])
 
@@ -90,10 +94,10 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
   const handleWatcherUpdate = (watcher) => {
     dispatch(saveWatcher(ministryId, watcher, (err, res) => {
       if(!err) {
-        setUpdateWatchList(watcher.isactive);
+        setUpdateWatchList(!updateWatchList);
       }
-    }
-        ));
+    }));
+
   }
    const updateWatcher = (currentWatcher, watchers) => {
     let watcher = {};
@@ -118,11 +122,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
     const {
       target: { value },
     } = event;
-    let count = value.length;    
-    if (value.includes('Unassigned')) {
-        count = count - 1;
-    }
-    setNoOfWatchers(count);
+    
     setPersonName(
       typeof value === 'string' ? value.split(',') : value,
     );
