@@ -106,6 +106,14 @@ class EditableFOIRequestWrapperSchema(Schema):
     wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
     selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)  
 
+class FOIMinistryRequestDivisionSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    divisionid = fields.Int(data_key="divisionid")
+    stageid = fields.Int(data_key="stageid")
+
 class FOIRequestMinistrySchema(Schema):
     
     class Meta:  # pylint: disable=too-few-public-methods
@@ -117,3 +125,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedgroup = fields.Str(data_key="assignedgroup",allow_none=True)   
     assignedto = fields.Str(data_key="assignedto",allow_none=True)   
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
+    divisions = fields.Nested(FOIMinistryRequestDivisionSchema, many=True,allow_none=True)

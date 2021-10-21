@@ -55,7 +55,8 @@ class FOIMinistryRequest(db.Model):
     foirequestkey = relationship("FOIRequest",foreign_keys="[FOIMinistryRequest.foirequest_id]")
     foirequestversion = relationship("FOIRequest",foreign_keys="[FOIMinistryRequest.foirequestversion_id]")
 
-         
+    divisions = relationship('FOIMinistryRequestDivision', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDivision.foiministryrequest_id, "
+                        "FOIMinistryRequest.version==FOIMinistryRequestDivision.foiministryrequestversion_id)") 
     @classmethod
     def getrequest(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema(many=True)
