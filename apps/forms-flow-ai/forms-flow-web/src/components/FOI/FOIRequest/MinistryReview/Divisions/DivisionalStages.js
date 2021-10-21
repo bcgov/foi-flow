@@ -10,7 +10,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
     
     if(existingDivStages.length === 0 || existingDivStages == undefined)
     {        
-        stageCounter.push({id:0,divisionid:-1,stageid:""})
+        stageCounter.push({id:0,divisionid:-1,stageid:-1})
     }
     else{
        
@@ -22,8 +22,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
     const [minDivStages, setMinDivStages] = React.useState(stageCounter);
     
     const handleDivisionChange = (e,id)=> {                
-        let arr = minDivStages;        
-        //const divisionnotexists = arr.filter(st=>st.divisionid === e.target.value).length === 0;
+        let arr = minDivStages;                
         const idexists = arr.filter(st=>st.id === id).length > 0;
         if(idexists)
         {           
@@ -68,7 +67,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
         let existing = stageIterator;
         var val = stageIterator.length > 0 ?  stageIterator[stageIterator.length - 1].id + 1 :0
         if (divisionList.length > stageIterator.length) {           
-            existing.push({id:val,divisionid:-1,stageid:""})
+            existing.push({id:val,divisionid:-1,stageid:-1})
             setMinDivStages([...existing]) 
             appendstageIterator([...existing])
         }        
@@ -76,27 +75,48 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
 
 
     const divisionList = divisionalstages.divisions
-    const divisionItems = divisionList !=undefined && divisionList.length > 0 && divisionList.map((item) => {
 
-        let _mindivtem = minDivStages.filter(d=>d.divisionid === item.divisionid)               
-        return (
-            <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid}  value={item.divisionid} >
-                <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
-                {item.name}
-            </MenuItem>
-        )
-    });
+    const getdivisionMenuList = () =>{
+
+        var _divisionItems = []
+        _divisionItems.push(<MenuItem key={0} className="foi-division-menuitem" value={-1} disabled={true} >{'Select Division'}</MenuItem>)
+
+        const divisionItems = divisionList !=undefined && divisionList.length > 0 && divisionList.map((item) => {
+
+            let _mindivtem = minDivStages.filter(d=>d.divisionid === item.divisionid)               
+            return (
+                <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid}  value={item.divisionid} >
+                    <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
+                    {item.name}
+                </MenuItem>
+            )
+        });
+        _divisionItems.push(divisionItems)
+        return _divisionItems;
+    }
 
     const divisionstageList = divisionalstages.stages
-    const divisionstageItems = divisionstageList!=undefined && divisionstageList.length > 0 && divisionstageList.map((item) => {
 
-        return (
-            <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.stageid}   >
-                <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
-                {item.name}
-            </MenuItem>
-        )
-    });
+    const getDivisionalStages = () =>{
+        var divisionstagesItems = []
+        divisionstagesItems.push(<MenuItem key={0} className="foi-divisionstage-menuitem" value={-1} disabled={true} >{'Select Division Stage'}</MenuItem>)
+
+        const divisionstageItems = divisionstageList!=undefined && divisionstageList.length > 0 && divisionstageList.map((item) => {
+
+            return (
+                <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.stageid}   >
+                    <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
+                    {item.name}
+                </MenuItem>
+            )
+        });
+
+        divisionstagesItems.push(divisionstageItems)     
+
+        return divisionstagesItems
+    }
+
+    
 
     var divisionalStagesRow = (row,index) => {
 
@@ -125,10 +145,10 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                         onChange={e => handleDivisionChange(e,_id)}
                         fullWidth                        
                         label="Select Divison*"
-                        value={row.divisionid !== -1 ? row.divisionid : "Select Division"} 
+                        value={row.divisionid !== -1 ? row.divisionid : -1} 
                         error= {row.divisionid ===-1 || row.divisionid === ""}                       
                     >
-                        {[...divisionItems]}
+                        {getdivisionMenuList()}
                     </TextField>
 
                 </div>
@@ -143,10 +163,10 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                         fullWidth                        
                         label="Select Divison Stage*"
                         onChange={e => handleDivisionStageChange(e,_id)} 
-                        value={row.stageid !== "" || row.stageid !== -1 ? row.stageid : "Select Division stage" } 
+                        value={row.stageid !== "" || row.stageid !== -1 ? row.stageid : -1 } 
                         error= {row.stageid ===-1 || row.stageid === ""}                     
                     >
-                        {divisionstageItems}
+                        {getDivisionalStages()}
                     </TextField>
                 </div>
                 <div className="col-lg-2 foi-details-col">
