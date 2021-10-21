@@ -28,8 +28,8 @@
     "description": "test",
     "selectedMinistries": [
         {
-            "code": "AEST",
-            "name": "Ministry of Advanced Education and Skills Training",
+            "code": "EDUC",
+            "name": "Ministry of Education",
             "isSelected": true
         }
     ],
