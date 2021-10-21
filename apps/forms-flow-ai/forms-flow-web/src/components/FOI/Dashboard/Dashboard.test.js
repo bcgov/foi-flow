@@ -33,13 +33,14 @@ describe('FOI Dashboard component', () => {
             user: {
                 name: 'John',
                 preferred_username: 'John Smith'
-            }        
+            },
+            userDetail: {}  
             
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
           });    
-        shallow(<Provider store={store}><Dashboard/></Provider>)
+        shallow(<Provider store={store}><Dashboard userDetail={localState.userDetail} /></Provider>)
       });
 
       it('FOI header snapshot check', () => {
@@ -50,13 +51,14 @@ describe('FOI Dashboard component', () => {
                 name: 'John',
                 preferred_username: 'John Smith'
             },
-            foiRequests:{"foiRequestsList":[]}
+            foiRequests:{"foiRequestsList":[]},
+            userDetail: {}
             
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
           });
-        const tree = renderer.create(<Provider store={store}><Dashboard/></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><Dashboard userDetail={localState.userDetail} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })
