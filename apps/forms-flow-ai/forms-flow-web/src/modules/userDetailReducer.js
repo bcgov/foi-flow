@@ -6,6 +6,7 @@ const initialState = {
   userDetail:{},
   isAuthenticated:false,
   currentPage:'',
+  isAuthorized:false,
 }
 
 
@@ -22,6 +23,8 @@ const user = (state = initialState, action)=> {
       return {...state, userDetail:action.payload}
     case ACTION_CONSTANTS.SET_USER_AUTHENTICATION:
       return {...state, isAuthenticated:action.payload}
+    case ACTION_CONSTANTS.SET_USER_AUTHORIZATION:
+      return {...state, isAuthorized:action.payload}
     default:
       return state;
   }

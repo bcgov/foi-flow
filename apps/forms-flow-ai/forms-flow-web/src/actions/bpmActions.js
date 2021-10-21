@@ -41,3 +41,10 @@ export const serviceActionError = (data) => dispatch => {
     payload: 'Error Handling Message'
   })
 }
+
+export const setUserAuthorization = (data) => dispatch => {
+  dispatch({
+    type: ACTION_CONSTANTS.SET_USER_AUTHORIZATION,
+    payload: data
+  })
+}
