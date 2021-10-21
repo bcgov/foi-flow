@@ -10,7 +10,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
   fetchFOIRequestDetails,
   fetchFOIMinistryViewRequestDetails,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
+  fetchFOIMinistryDivisionalStages,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
@@ -65,21 +66,30 @@ const MinistryReview = React.memo(({userDetail}) => {
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
+   //gets the request detail from the store
+ 
+  
+   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
+   const dispatch = useDispatch();
+   useEffect(() => {
+     if (ministryId) {
+       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+       
+     }     
+   },[requestId, dispatch]); 
+
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
-    
   //gets the request detail from the store
-  let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
+   
+  
+  
   const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
+  
 
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (ministryId) {
-      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-    }     
-  },[requestId, dispatch]); 
-
+  const [divstages,setdivStages] = React.useState([])
+  
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
@@ -95,15 +105,23 @@ const MinistryReview = React.memo(({userDetail}) => {
   const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
   const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
   const bottomText =  `${_cfrDaysRemainingText}|${_daysRemainingText}`;
-  const bottomTextArray = bottomText.split('|'); 
+  const bottomTextArray = bottomText.split('|');
  
   //gets the latest ministry assigned to value
   const handleMinistryAssignedToValue = (value) => {   
     setMinistryAssignedToValue(value);
   }
 
+  let hasincompleteDivstage = false;
+  divstages.forEach((item)=>{
+    if(item.divisionid === -1 || item.stageid === -1 || item.stageid === "" || item.divisionid === "")
+    {
+      hasincompleteDivstage = true
+    }
+  })
+
   //Variable to find if all required fields are filled or not
-  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned");
+  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned")  || (divstages.length === 0 || hasincompleteDivstage);
 
   const createMinistryRequestDetailsObject = (requestObject, name, value) => {
     // requestDetails.
@@ -158,17 +176,16 @@ const MinistryReview = React.memo(({userDetail}) => {
     case StateEnum.closed.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
-    case StateEnum.callforrecords.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
-      break;
-    case StateEnum.callforrecordsoverdue.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
+    case StateEnum.callforrecords.name:
+      if (_cfrDaysRemaining < 0) {
+        foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
+      }
+      else {
+        foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+      }      
       break;
     case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
-      break;
-    case StateEnum.callforrecordsoverdue.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
       break;
     case StateEnum.review.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"
@@ -204,8 +221,13 @@ const MinistryReview = React.memo(({userDetail}) => {
     evt.currentTarget.className += " active";
 
   }
-  
 
+  const pubmindivstagestomain =(divstages)=>{
+  
+    saveMinistryRequestObject.divisions = divstages
+    setdivStages(divstages)
+  }
+  
   return (
     
     <div className="foiformcontent">
@@ -241,8 +263,8 @@ const MinistryReview = React.memo(({userDetail}) => {
                     <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
                     <ApplicantDetails requestDetails={requestDetails} /> 
                     <RequestDescription requestDetails={requestDetails} />
-                    <RequestDetails requestDetails={requestDetails} />
-                    <RequestTracking/>                    
+                    <RequestDetails requestDetails={requestDetails}/>
+                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
                     <RequestNotes />
                     <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>

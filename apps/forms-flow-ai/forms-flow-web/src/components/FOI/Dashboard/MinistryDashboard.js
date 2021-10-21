@@ -8,28 +8,28 @@ import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../.
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 
-const MinistryDashboard = (props) => {
+const MinistryDashboard = ({userDetail}) => {
 
   const dispatch = useDispatch();  
-  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
   const rows = useSelector(state=> state.foiRequests.foiMinistryRequestsList);  
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);  
   const [requestFilter, setRequestFilter] = useState("All");
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");  
   const classes = useStyles();
+
   useEffect(()=>{
     dispatch(fetchFOIFullAssignedToList());
-    dispatch(fetchFOIMinistryRequestList());
-    
+    dispatch(fetchFOIMinistryRequestList());    
   },[dispatch]);
 
   function getAssigneeValue(row) {
     const groupName = row.assignedministrygroup ? row.assignedministrygroup : "Unassigned";
-    const assignedTo = row.assignedministryperson ? row.assignedministryperson : groupName;
-    if (assignedToList.length > 0) {
-      const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
+    const assignedTo = row.assignedministryperson ? row.assignedministryperson : groupName;    
+    if (ministryAssignedToList.length > 0) {
+      const assigneeDetails = ministryAssignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
+      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);      
       if (groupName === assignedTo) {
         return assignedTo;
       }
@@ -70,8 +70,8 @@ const MinistryDashboard = (props) => {
       headerAlign: 'left'       
     },
     
-    { field: 'cfrstatus', 
-      headerName: 'CFR STATUS',  
+    { field: 'currentState', 
+      headerName: 'REQUEST STATUS',  
       width: 150, 
       headerAlign: 'left'      
     },    
@@ -116,8 +116,9 @@ const setSearch = (e) => {
 }
 
 const search = (data) => {
+
   const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
-  return updatedRows.filter(row => (
+  let dashboardData = updatedRows.filter(row => (
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
@@ -127,7 +128,17 @@ const search = (data) => {
   (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
   )  
   );
-
+  if (requestFilter === "myRequests" ) {
+    dashboardData = dashboardData.filter(row => row.assignedministryperson === userDetail.preferred_username)
+  }
+  else if (requestFilter === "watchingRequests") {
+    dashboardData = dashboardData.filter(row => {
+      if (row.watchers && !!row.watchers.find(watcher => watcher.watchedby === userDetail.preferred_username)){
+        return row;
+      }
+    })
+  }
+  return dashboardData;
 }
  
 
@@ -176,7 +187,7 @@ const renderReviewRequest = (e) => {
                 sortingMode={'client'}
                 onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'cfrstatus').toLowerCase().replace(/ +/g, "")}`
+                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}-${params.getValue(params.id, 'cfrstatus').toLowerCase().replace(/ +/g, "")}`
                 } 
                 onRowClick={renderReviewRequest}
                 />

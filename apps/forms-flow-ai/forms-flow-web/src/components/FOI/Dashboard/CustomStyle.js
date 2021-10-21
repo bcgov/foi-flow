@@ -33,7 +33,7 @@ const useStyles = makeStyles(
             backgroundColor: '#f1f1f1',
           },
         },
-        '& .super-app-theme--selectdivision': {
+        '& .super-app-theme--callforrecords-selectdivision': {
           backgroundColor: '#cfd7e3', 
           '&:hover': {
             backgroundColor: getHoverBackgroundColor(theme.palette.info.main),

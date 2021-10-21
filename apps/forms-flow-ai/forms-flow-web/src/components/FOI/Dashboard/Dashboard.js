@@ -9,13 +9,12 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
 
-const Dashboard = () => {
-
+const Dashboard = ({userDetail}) => {
 
   const dispatch = useDispatch();
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList);
+  const rows = useSelector(state=> state.foiRequests.foiRequestsList);  
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
-  const [requestType, setRequestType] = useState("All");
+  const [requestFilter, setRequestFilter] = useState("All");
   const [searchText, setSearchText] = useState("");
   const classes = useStyles();
   useEffect(()=>{
@@ -116,19 +115,18 @@ const Dashboard = () => {
       },   
     ]);
 
-const requestTypeChange = (e) => { 
-  setRequestType(e.target.value);
-  
-}
+    const requestFilterChange = (e) => { 
+      setRequestFilter(e.target.value);
+      
+    }
 
 const setSearch = (e) => {
   setSearchText(e.target.value);
 }
 
-const search = (data) => {   
-  var _rt =  (requestType === "general" || requestType === "personal") ? requestType : null ;
+const search = (data) => {  
   const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
-  return updatedRows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
+  let dashboardData = updatedRows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
   (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
@@ -136,7 +134,19 @@ const search = (data) => {
   row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  ) && (_rt !== null ? row.requestType === _rt : (row.requestType === "general" || row.requestType === "personal") ) );
+  ) ); 
+
+  if (requestFilter === "myRequests" ) {
+    dashboardData = dashboardData.filter(row => row.assignedTo === userDetail.preferred_username)
+  }
+  else if (requestFilter === "watchingRequests") {
+    dashboardData = dashboardData.filter(row => {
+      if (row.watchers && !!row.watchers.find(watcher => watcher.watchedby === userDetail.preferred_username)){        
+        return row;
+      }      
+    })
+  }  
+  return dashboardData;
 
 }
  
@@ -170,9 +180,9 @@ const addRequest = (e) => {
               </div>
              
               <div className="foi-request-type">
-                <input className="foi-general-radio" type="radio" value="general" name="requestType" onChange={requestTypeChange} /> General
-                <input className="foi-personal-radio" type="radio" value="personal" name="requestType" onChange={requestTypeChange} /> Personal
-                <input className="foi-all-radio" type="radio" value="All" name="requestType" onChange={requestTypeChange} defaultChecked  /> All              
+                <input className="foi-general-radio" type="radio" value="myRequests" name="requestFilter" onChange={requestFilterChange} /> My Requests
+                <input className="foi-personal-radio" type="radio" value="watchingRequests" name="requestFilter" onChange={requestFilterChange} /> Watching Requests
+                <input className="foi-all-radio" type="radio" value="All" name="requestFilter" onChange={requestFilterChange} defaultChecked  /> My Team Requests            
               </div>            
               
             </div>

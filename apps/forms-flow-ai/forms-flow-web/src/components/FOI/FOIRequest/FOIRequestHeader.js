@@ -103,8 +103,6 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase();
 
-    
-    
     return (
         <div className="foi-request-review-header-row1">
             <div className="foi-request-review-header-col1">
@@ -113,11 +111,13 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                         <h3 className="foi-review-request-text">{hearderText}</h3>
                     </Link>
                 </div>
+                { window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ?
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
                    
                     <Watcher watcherFullList={assignedToList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} />
                    
                 </div>
+                : null}
             </div>
             
             <div className="foi-assigned-to-container">
