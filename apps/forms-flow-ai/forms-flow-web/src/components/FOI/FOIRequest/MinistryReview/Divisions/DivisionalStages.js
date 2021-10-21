@@ -67,7 +67,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
 
         let existing = stageIterator;
         var val = stageIterator.length > 0 ?  stageIterator[stageIterator.length - 1].id + 1 :0
-        if (divisionList.length >= stageIterator.length) {           
+        if (divisionList.length > stageIterator.length) {           
             existing.push({id:val,divisionid:-1,stageid:""})
             setMinDivStages([...existing]) 
             appendstageIterator([...existing])
@@ -162,19 +162,23 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
             <div id="divstages" >
 
                 {
-                   divisionstageList!=undefined && divisionstageList!=undefined && stageIterator.map((item,index) =>
+                   divisionList!=undefined && divisionstageList!=undefined && stageIterator.map((item,index) =>
 
                         divisionalStagesRow(item,index)
                     )
                 }
 
             </div>
-            <div className="row foi-details-row">
+            {
+                divisionList!=undefined &&  divisionList.length > stageIterator.length ?
+                <div className="row foi-details-row">
                 <div className="col-lg-7 foi-details-col">
                     <i class="fa fa-plus-circle fa-3 foi-add" aria-hidden="true"></i>  <a href="#" onClick={addDivisionalStage}>Add division to track</a>
                 </div>
+            </div> : <span/>
 
-            </div>
+            }
+            
         </>
     )
 })
