@@ -167,7 +167,7 @@ const watcherOnChange = (event) => {
         
         <div>
               <div className="foi-watcher-all">
-                   <button onClick={watcherOnChange} className="foi-eye-container"> <i className="fa fa-eye foi-eye"> <b>{isUseraWatcher? "Unwatch" : "Watch" }</b></i></button>
+                   <button onClick={watcherOnChange} className="foi-eye-container"> <i className="fa fa-eye foi-eye"></i> {isUseraWatcher? "Unwatch" : "Watch" }</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>
                     <Select

@@ -105,7 +105,7 @@ const MinistryReview = React.memo(({userDetail}) => {
   const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
   const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
   const bottomText =  `${_cfrDaysRemainingText}|${_daysRemainingText}`;
-  const bottomTextArray = bottomText.split('|'); 
+  const bottomTextArray = bottomText.split('|');
  
   //gets the latest ministry assigned to value
   const handleMinistryAssignedToValue = (value) => {   
@@ -176,17 +176,16 @@ const MinistryReview = React.memo(({userDetail}) => {
     case StateEnum.closed.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
-    case StateEnum.callforrecords.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
-      break;
-    case StateEnum.callforrecordsoverdue.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
+    case StateEnum.callforrecords.name:
+      if (_cfrDaysRemaining < 0) {
+        foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
+      }
+      else {
+        foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+      }      
       break;
     case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
-      break;
-    case StateEnum.callforrecordsoverdue.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
       break;
     case StateEnum.review.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"

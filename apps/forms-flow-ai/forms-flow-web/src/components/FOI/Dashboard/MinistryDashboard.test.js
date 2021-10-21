@@ -33,13 +33,14 @@ describe('FOI MinistryDashboard component', () => {
             user: {
                 name: 'John',
                 preferred_username: 'John Smith'
-            }        
+            },
+            userDetail: {}       
             
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
           });    
-        shallow(<Provider store={store}><MinistryDashboard/></Provider>)
+        shallow(<Provider store={store}><MinistryDashboard userDetail={localState.userDetail} /></Provider>)
       });
 
       it('FOI MinistryDashboard snapshot check', () => {
@@ -50,13 +51,14 @@ describe('FOI MinistryDashboard component', () => {
                 name: 'John',
                 preferred_username: 'John Smith'
             },
+            userDetail: {},
             foiRequests:{"foiMinistryRequestsList":[], "foiFullAssignedToList": []},            
             
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
           });
-        const tree = renderer.create(<Provider store={store}><MinistryDashboard/></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><MinistryDashboard userDetail={localState.userDetail} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })

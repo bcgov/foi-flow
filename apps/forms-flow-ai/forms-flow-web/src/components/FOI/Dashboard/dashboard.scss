@@ -137,12 +137,13 @@ input[type='radio'] {
     padding: 0px !important;
 }
 .MuiDataGrid-columnHeaderWrapper {
-    font-weight: bolder !important;    
+    font-weight: bolder !important;
 }
 
 .MuiDataGrid-columnHeaderTitle {
     overflow: visible !important;
     text-overflow: unset !important;
+    font-family: 'BCSans-Bold', sans-serif!important;  
 }
 
 .MuiDataGrid-footerContainer {
