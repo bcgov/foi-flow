@@ -5,8 +5,7 @@ import configureStore from 'redux-mock-store'
 import { useSelector } from "react-redux";
 import { shallow } from 'enzyme';
 import Router, { useParams } from "react-router-dom";
-import DivisionalStages from './DivisionalStages';
-
+import RequestTracking from './RequestTracking';
 
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
@@ -41,13 +40,15 @@ describe('FOI DivisionalStages component', () => {
         const localState = {            
             minDivStages: [{id:0,divisionid:1,stageid:1}],
             stageIterator:  [{id:0,divisionid:-1,stageid:-1}],
-            divisionalstages:{divisions: [{divisionid: 2, name: "Deputy Minister's Office"}] , stages:[{stageid: 1, name: "Clarification"}] }         
+            divisionalstages:{divisions: [{divisionid: 2, name: "Deputy Minister's Office"}] , stages:[{stageid: 1, name: "Clarification"}] },      
+            popminDivstatetoParent:  jest.fn(),            
+            foiRequests: {foiMinistryDivisionalStages: {}},
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
         });
         
-        shallow(<Provider store={store}><DivisionalStages divisionalstages={localState.divisionalstages} existingDivStages={localState.minDivStages} /></Provider>)
+        shallow(<Provider store={store}><RequestTracking ministrycode="EDUC" existingDivStages={localState.minDivStages} pubmindivstagestomain={localState.popminDivstatetoParent} /></Provider>)
       });
 
       it('FOI DivisionalStages snapshot check', () => {
@@ -56,16 +57,14 @@ describe('FOI DivisionalStages component', () => {
             minDivStages: [{id:0,divisionid:1,stageid:1}],
             stageIterator:  [{id:0,divisionid:-1,stageid:-1}],
             divisionalstages:{divisions: [{divisionid: 2, name: "Deputy Minister's Office"}] , stages:[{stageid: 1, name: "Clarification"}] } ,
-            popminDivstatetoParent:  jest.fn(),        
+            popminDivstatetoParent:  jest.fn(),   
+            foiRequests: {foiMinistryDivisionalStages: {}},     
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
         });
         
-        const tree = renderer.create(<Provider store={store}><DivisionalStages divisionalstages={localState.divisionalstages} existingDivStages={localState.minDivStages} popselecteddivstages={localState.popminDivstatetoParent} /></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><RequestTracking ministrycode="EDUC" existingDivStages={localState.minDivStages} pubmindivstagestomain={localState.popminDivstatetoParent} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })
-
-
-  
