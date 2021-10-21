@@ -160,6 +160,7 @@ class requestservice:
             else:
                 return _foiRequest  
             FOIMinistryRequest.deActivateFileNumberVersion(ministryId, fileNumber, activeVersion, userId)
+            self.disablewatchers(ministryId, fOIRequestsSchema, userId)
             return self.saverequest(fOIRequestsSchema, userId, foirequestid,ministryId,fileNumber,activeVersion,_foiRequest["foirawrequestid"],_foiRequest["wfinstanceid"])    
     
     def saveMinistryRequestVersion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype):
@@ -207,6 +208,16 @@ class requestservice:
             for watcher in watchers:
                 watcherschema = {"ministryrequestid":ministry["id"],"watchedbygroup":watcher["watchedbygroup"],"watchedby":watcher["watchedby"],"isactive":True}
                 watcherservice().createministryrequestwatcher(watcherschema, userid, None)
+                
+    def disablewatchers(Self, ministryid, requestschema, userid):
+        requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
+        if requeststatusid is not None: 
+            status = FOIRequestUtil().getStatusName(requeststatusid)
+            if status == "Open":
+                watchers = watcherservice().getministryrequestwatchers(int(ministryid), True)
+                for watcher in watchers:
+                    watcherschema = {"ministryrequestid":ministryid,"watchedbygroup":watcher["watchedbygroup"],"watchedby":watcher["watchedby"],"isactive":False}
+                    watcherservice().createministryrequestwatcher(watcherschema, userid, None)
        
     def getrequest(self,foirequestid,foiministryrequestid):        
         request = FOIRequest.getrequest(foirequestid)
