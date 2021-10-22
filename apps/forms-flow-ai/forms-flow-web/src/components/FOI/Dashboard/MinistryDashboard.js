@@ -72,7 +72,7 @@ const MinistryDashboard = ({userDetail}) => {
     
     { field: 'currentState', 
       headerName: 'REQUEST STATUS',  
-      width: 150, 
+      width: 180, 
       headerAlign: 'left'      
     },    
     {      
