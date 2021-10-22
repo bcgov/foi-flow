@@ -51,6 +51,7 @@ class FeeService:
         if not fee:
             raise BusinessException(Error.INVALID_INPUT)
 
+        return_route = pay_request.get('return_route')
         quantity = int(pay_request.get('quantity', 1))
         self.payment = Payment(
             fee_code_id=fee.fee_code_id,
@@ -60,7 +61,7 @@ class FeeService:
             request_id=self.request_id
         ).flush()
 
-        self.payment.paybc_url = self._get_paybc_url(fee)
+        self.payment.paybc_url = self._get_paybc_url(fee, return_route)
         self.payment.transaction_number = self._get_transaction_number()
         self.payment.commit()
         pay_response = self._dump()
@@ -113,11 +114,11 @@ class FeeService:
         )
         return pay_response
 
-    def _get_paybc_url(self, fee_code: FeeCode):
+    def _get_paybc_url(self, fee_code: FeeCode, return_route):
         """Return the payment system url."""
         date_val = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime(
             '%Y-%m-%d')
-        return_url = f"{current_app.config['FOI_WEB_PAY_URL']}/{self.payment.request_id}/{self.payment.payment_id}"
+        return_url = f"{current_app.config['FOI_WEB_PAY_URL']}{return_route if return_route else ''}/{self.payment.request_id}/{self.payment.payment_id}"
         revenue_account: RevenueAccount = RevenueAccount.find_by_id(fee_code.revenue_account_id)
 
         url_params_dict = {'trnDate': date_val,
