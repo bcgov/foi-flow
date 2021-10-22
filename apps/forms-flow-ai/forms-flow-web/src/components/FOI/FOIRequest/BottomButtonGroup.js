@@ -253,12 +253,6 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
-        else if(currentSelectedStatus == StateEnum.callforrecordsoverdue.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.callforrecordsoverdue.id;
-          saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
       }
     }
 

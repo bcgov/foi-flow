@@ -39,8 +39,6 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             return `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`;
         case StateEnum.feeassessed.name.toLowerCase():
             return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`;
-        case StateEnum.callforrecordsoverdue.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecordsoverdue.name}?`;
         default:
             return [];
       }
