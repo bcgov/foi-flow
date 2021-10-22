@@ -31,7 +31,6 @@ def upgrade():
             {'name':'On Hold','description':'On Hold','isactive':True},
             {'name':'Deduplication','description':'Deduplication','isactive':True},
             {'name':'Harms Assessment','description':'Harms Assessment','isactive':True},
-            {'name':'Redirect','description':'Redirect','isactive':True},
             {'name':'Response','description':'Response','isactive':True}
            
         ]
