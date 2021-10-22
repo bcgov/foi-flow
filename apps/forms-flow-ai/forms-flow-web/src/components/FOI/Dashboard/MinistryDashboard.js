@@ -100,6 +100,10 @@ const MinistryDashboard = ({userDetail}) => {
 
     const [sortModel, setSortModel]= useState([
       {
+        field: 'currentState',
+        sort: 'asc',
+      },
+      {
         field: 'cfrduedate',
         sort: 'asc',
       },        
