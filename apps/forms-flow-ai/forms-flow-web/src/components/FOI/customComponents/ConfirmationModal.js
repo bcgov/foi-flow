@@ -128,7 +128,11 @@ const CloseForm = React.memo(({saveRequestObject}) => {
   const lastStatusChangeDate = _requestDetails.requestProcessStart;
 
   const handleClosingDateChange = (e) => {
-    setClosingDate(e.target.value);
+    let pickedDate = e.target.value;
+    if(new Date(pickedDate) > today)
+      pickedDate = formatDate(today);
+
+    setClosingDate(pickedDate);
 
     // handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
     // createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value);
@@ -179,6 +183,14 @@ const CloseForm = React.memo(({saveRequestObject}) => {
       </div>
       <div className="col-lg-6 foi-details-col confirm-label-area">
         <div className="confirm-label-area"><b>Organization: </b><span className="confirm-label-content">{_requestDetails.businessName}</span></div>
+      </div>
+    </div>
+    <div className="row foi-details-row confirm-modal-row">
+      <div className="col-lg-6 foi-details-col">
+        <div className="confirm-label-area"><b>Fee Waiver: </b><span className="confirm-label-content">{"N/A"}</span></div>
+      </div>
+      <div className="col-lg-6 foi-details-col confirm-label-area">
+        <div className="confirm-label-area"><b>Fee Remaining: </b><span className="confirm-label-content">{"N/A"}</span></div>
       </div>
     </div>
     <div className="row foi-details-row confirm-modal-row">
