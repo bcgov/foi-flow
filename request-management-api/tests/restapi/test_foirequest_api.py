@@ -358,18 +358,11 @@ def test_post_foirequest_general_close(app, client):
     foiupdaterequest = generalupdaterequestjson
     foiupdaterequest["id"] = str(foijsondata["id"])
     foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
-    foiupdaterequest["requeststatusid"] = 2
+    foiupdaterequest["requeststatusid"] = 3
+    foiupdaterequest["closedate"] = '2021-10-25'
+    foiupdaterequest["closereasonid"] = 1
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
-    foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
-    foicloserequest = {
-    "requeststatusid":3,
-    "closedate": "2022-10-25",
-     "closereasonid":1
-    }
-    foicfrdivisionresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foicloserequest), headers=factory_user_auth_header(app, client), content_type='application/json')
-    assert foiministryreqResponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foiministryreqResponse.status_code == 200 and foicfrdivisionresponse.status_code == 200
-
-
+    assert foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 
 
 def test_get_foirequestqueue(app, client):
   response = client.get('/api/dashboard', headers=factory_user_auth_header(app, client), content_type='application/json')
