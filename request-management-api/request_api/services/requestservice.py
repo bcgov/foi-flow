@@ -515,7 +515,8 @@ class FOIRequestUtil:
         if ministryId is not None:
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
-        
+        foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
+        foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
         return foiministryRequest
     
     def createContactInformation(self,dataformat, name, value, contactTypes, userId):

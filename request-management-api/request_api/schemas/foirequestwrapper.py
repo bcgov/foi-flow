@@ -85,7 +85,8 @@ class FOIRequestWrapperSchema(Schema):
     postal = fields.Str(data_key="postal",allow_none=True)   
     country = fields.Str(data_key="country",allow_none=True) 
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
-    
+    closedate = fields.Date(data_key="closedate", required=False,allow_none=True)
+    closereasonid = fields.Int(data_key="closereasonid",allow_none=True)
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True) 
   
