@@ -93,6 +93,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, foiMinistryDivisionalStages: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST:
       return {...state, foiWatcherList: action.payload};
+    case FOI_ACTION_CONSTANTS.CLOSING_REASONS:
+      return {...state, closingReasons: action.payload};
     default:
       return state;
   }
