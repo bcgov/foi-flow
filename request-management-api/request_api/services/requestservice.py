@@ -414,6 +414,8 @@ class FOIRequestUtil:
         else:
             divisions = FOIMinistryRequestDivision().getrequest(ministryschema["foiministryrequestid"] ,ministryschema["version"])
             foiministryrequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
+        foiministryrequest.closedate = requestschema['closedate'] if 'closedate' in requestschema  else None
+        foiministryrequest.closereasonid = requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
         return foiministryrequest
     
     def createFOIRequestAppplicantFromObject(self, requestapplicants, requestid, version, userid): 
