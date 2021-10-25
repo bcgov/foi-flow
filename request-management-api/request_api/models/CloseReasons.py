@@ -20,7 +20,7 @@ class CloseReason(db.Model):
         return closereason_schema.dump(query)
 
     @classmethod
-    def getprogramareadivisions(cls,closereasonid):
+    def getclosereason(cls,closereasonid):
         closereason_schema = CloseReasonSchema(many=True)
         query = db.session.query(CloseReason).filter_by(closereasonid=closereasonid).order_by(CloseReason.name.asc())
         return closereason_schema.dump(query)
