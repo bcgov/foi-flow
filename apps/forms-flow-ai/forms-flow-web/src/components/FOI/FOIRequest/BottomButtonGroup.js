@@ -7,7 +7,7 @@ import {saveRequestDetails, openRequestDetails} from "../../../apiManager/servic
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
-import { addBusinessDays } from "../../../helper/FOI/helper";
+import { addBusinessDays, formatDate } from "../../../helper/FOI/helper";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
@@ -91,7 +91,7 @@ const BottomButtonGroup = React.memo(({
             progress: undefined,
             });
             const _state = currentSelectedStatus ? currentSelectedStatus : ((requestState && requestState === StateEnum.unopened.name && saveRequestObject.sourceOfSubmission === 'onlineform') || urlIndexCreateRequest > -1 ? StateEnum.intakeinprogress.name : requestState);
-            // handleSaveRequest(_state, false, res.id);
+            handleSaveRequest(_state, false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
