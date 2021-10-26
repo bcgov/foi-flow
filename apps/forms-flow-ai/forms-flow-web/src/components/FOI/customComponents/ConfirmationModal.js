@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate } from "../../../helper/FOI/helper";
+import { useSelector } from "react-redux";
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject }) {    
     
@@ -119,6 +120,8 @@ const CloseForm = React.memo(({saveRequestObject}) => {
 
   const _requestDetails = saveRequestObject;
   console.log(_requestDetails);
+  const _closingReasons = useSelector(state=> state.foiRequests.closingReasons);
+  console.log(_closingReasons);
 
   const today = new Date();
   const [closingDateText, setClosingDate] = React.useState( formatDate(today) );
@@ -142,34 +145,6 @@ const CloseForm = React.memo(({saveRequestObject}) => {
     setClosingReason(e.target.value);
   }
   
-  const _closingReasons = [
-    {
-        "isactive": false,
-        "closereasonid": 0,
-        "name": "Select Reason for Closing Request"
-    },
-    {
-        "isactive": true,
-        "closereasonid": 1,
-        "name": "Abandoned"
-    },
-    {
-        "isactive": true,
-        "closereasonid": 2,
-        "name": "Access Denied"
-    },
-    {
-        "isactive": true,
-        "closereasonid": 3,
-        "name": "Application Fee - Abandoned"
-    },
-    {
-        "isactive": true,
-        "closereasonid": 4,
-        "name": "Full Disclosure"
-    }
-  ];
-
   const closingReasons = _closingReasons.map((reason)=>{
     return ( <MenuItem key={reason.closereasonid} value={reason.closereasonid} >{reason.name}</MenuItem> )
   });
