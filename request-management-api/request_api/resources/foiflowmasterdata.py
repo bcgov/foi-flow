@@ -28,8 +28,10 @@ from request_api.services.programareaservice import programareaservice
 from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
 from request_api.services.divisionstageservice import divisionstageservice
+from request_api.services.s3signatureservice import s3signatureservice
 import json
 import request_api
+import sys, os, base64, datetime, hashlib, hmac
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
 TRACER = Tracer.get_instance()
@@ -118,3 +120,22 @@ class FOIFlowDivisions(Resource):
             return jsondata , 200
         except:
             return "Error happened while accessing divisions" , 500 
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oss/authheader/<key>')
+class FOIFlowDocumentStorage(Resource):
+    @staticmethod
+    @TRACER.trace()
+    #@cross_origin(origins=allowedOrigins())       
+    #@auth.require
+    def get(key):
+        try:
+           
+            data = s3signatureservice().getAuthHeaders()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+    
+            
