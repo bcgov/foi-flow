@@ -57,6 +57,8 @@ def test_post_foirawrequestscancel(app, client):
     print(str(jsondata["id"]))    
     updatejson['ispiiredacted'] = True
     updatejson['requeststatusid'] = 3
+    updatejson['closedate'] = '2021-10-26'
+    updatejson['requeststatusid'] = 2
     wfupdateresponse = client.post('/api/foirawrequest/'+str(jsondata["id"]),data=json.dumps(updatejson), headers=factory_auth_header(app, client), content_type='application/json')
     assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1 
     
