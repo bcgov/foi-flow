@@ -149,7 +149,6 @@ const CloseForm = React.memo(({saveRequestObject}) => {
     return ( <MenuItem key={reason.closereasonid} value={reason.closereasonid} >{reason.name}</MenuItem> )
   });
 
-
   return (
     <>
     <div className="row foi-details-row confirm-modal-row first-row">

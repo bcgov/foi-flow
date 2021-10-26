@@ -20,7 +20,8 @@ import {
   fetchFOIAssignedToList, 
   fetchFOIDeliveryModeList, 
   fetchFOIReceivedModeList,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
+  fetchClosingReasonList
   
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
@@ -92,6 +93,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
+    dispatch(fetchClosingReasonList());
   },[requestId, dispatch]);
  
 

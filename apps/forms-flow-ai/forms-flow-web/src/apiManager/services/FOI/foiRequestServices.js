@@ -629,11 +629,6 @@ export const fetchClosingReasonList = (...rest) => {
       .then((res) => {
         if (res.data) {
           const closingReasons = res.data;
-          console.log(closingReasons);
-          // let data = foiRequests.map((foiRequest) => {
-          //   foiRequest.bcgovcode = foiRequest.idNumber.split("-")[0];
-          //   return { ...foiRequest};
-          // });          
           dispatch(setClosingReasons(closingReasons));
           dispatch(setFOILoader(false));
           done(null, res.data);
