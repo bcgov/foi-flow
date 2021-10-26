@@ -46,7 +46,7 @@ class FOIMinistryRequest(db.Model):
     #ForeignKey References
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
-    closereason = relationship("CloseReason",backref=backref("CloseReasons"),uselist=False)
+    closereason = relationship("CloseReason",uselist=False)
     
     programareaid = db.Column(db.Integer,ForeignKey('ProgramAreas.programareaid'))
     programarea =  relationship("ProgramArea",backref=backref("ProgramAreas"),uselist=False)
