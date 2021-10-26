@@ -15,7 +15,7 @@ import Input from '@material-ui/core/Input';
 import { formatDate } from "../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
 
-export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject }) {    
+export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, handleClosingDateChange, handleClosingReasonChange }) {    
     
     const handleClose = () => {
       //handleModal(false);
@@ -76,7 +76,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
               {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ? 
-                <CloseForm saveRequestObject={saveRequestObject} />
+                <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
               :
                 <>
                 {message}
@@ -116,12 +116,10 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
 }
 
 
-const CloseForm = React.memo(({saveRequestObject}) => {
+const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handleClosingReasonChange}) => {
 
   const _requestDetails = saveRequestObject;
-  console.log(_requestDetails);
   const _closingReasons = useSelector(state=> state.foiRequests.closingReasons);
-  console.log(_closingReasons);
 
   const today = new Date();
   const [closingDateText, setClosingDate] = React.useState( formatDate(today) );
@@ -130,19 +128,18 @@ const CloseForm = React.memo(({saveRequestObject}) => {
   //############### replace this with the last status change date
   const lastStatusChangeDate = _requestDetails.requestProcessStart;
 
-  const handleClosingDateChange = (e) => {
+  const _handleClosingDateChange = (e) => {
     let pickedDate = e.target.value;
     if(new Date(pickedDate) > today)
       pickedDate = formatDate(today);
 
     setClosingDate(pickedDate);
-
-    // handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
-    // createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value);
+    handleClosingDateChange(pickedDate);
   }
 
-  const handleReasonChange = (e) => {
+  const _handleReasonChange = (e) => {
     setClosingReason(e.target.value);
+    handleClosingReasonChange(e.target.value);
   }
   
   const closingReasons = _closingReasons.map((reason)=>{
@@ -187,7 +184,7 @@ const CloseForm = React.memo(({saveRequestObject}) => {
             label="Closing Date"
             type="date" 
             value={closingDateText || ''} 
-            onChange={handleClosingDateChange}
+            onChange={_handleClosingDateChange}
             InputLabelProps={{
               shrink: true,
             }}
@@ -207,7 +204,7 @@ const CloseForm = React.memo(({saveRequestObject}) => {
             InputLabelProps={{ shrink: true, }}          
             select
             value={selectedReason}
-            onChange={handleReasonChange}
+            onChange={_handleReasonChange}
             input={<Input />} 
             variant="outlined"
             fullWidth

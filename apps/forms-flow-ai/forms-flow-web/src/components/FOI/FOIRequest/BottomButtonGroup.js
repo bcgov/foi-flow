@@ -58,6 +58,17 @@ const BottomButtonGroup = React.memo(({
     const [openModal, setOpenModal] = useState(false);
     const [opensaveModal, setsaveModal] = useState(false);
 
+    const [closingDate, setClosingDate] = useState( formatDate(new Date()) );
+    const [closingReasonId, setClosingReasonId] = useState();
+
+    const handleClosingDateChange = (cDate) => {
+      setClosingDate(cDate);
+    }
+
+    const handleClosingReasonChange = (cReasonId) => {
+      setClosingReasonId(cReasonId);
+    }
+
     const returnToQueue = (e) => {
       e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
@@ -80,7 +91,7 @@ const BottomButtonGroup = React.memo(({
             progress: undefined,
             });
             const _state = currentSelectedStatus ? currentSelectedStatus : ((requestState && requestState === StateEnum.unopened.name && saveRequestObject.sourceOfSubmission === 'onlineform') || urlIndexCreateRequest > -1 ? StateEnum.intakeinprogress.name : requestState);
-            handleSaveRequest(_state, false, res.id);
+            // handleSaveRequest(_state, false, res.id);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
@@ -198,6 +209,8 @@ const BottomButtonGroup = React.memo(({
         if(currentSelectedStatus == StateEnum.closed.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.closed.id;
+          saveRequestObject.closedate = closingDate;
+          saveRequestObject.closereasonid = closingReasonId;
           saveRequest();
           hasStatusRequestSaved(true, currentSelectedStatus)
         }
@@ -259,7 +272,7 @@ const BottomButtonGroup = React.memo(({
   return (
     <div className={classes.root}>
       <ConfirmationModal openModal={openModal} handleModal={handleModal} state={StateEnum.open.name} saveRequestObject={saveRequestObject} />  
-      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject}/>
+      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
