@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -8,6 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import './confirmationmodal.scss';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import FileUpload from './FileUpload';
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject }) {    
     
@@ -50,7 +51,13 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
     const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
     const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
-    let message = getMessage(state, requestNumber);  
+    let message = getMessage(state, requestNumber);
+    const multipleFiles = false;
+    const [file, setFile] = useState({});
+    const updateFilesCb = (file) => {
+      setFile(file);
+    }
+
 
     return (
       <div className="state-change-dialog">        
@@ -72,6 +79,8 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
               {message}
+              {state.toLowerCase() === StateEnum.review.name.toLowerCase()? <FileUpload updateFilesCb={updateFilesCb} multipleFiles={multipleFiles} /> :
+              <>
               <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
                 <tbody>
                   <tr>
@@ -90,6 +99,8 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                 </tbody>
               </table>
               : null }
+              </>
+              }
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
