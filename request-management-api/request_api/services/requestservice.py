@@ -253,7 +253,8 @@ class requestservice:
             'assignedministrygroup':requestministry["assignedministrygroup"],
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
-            'divisions': FOIRequestUtil().getdivisions(requestministrydivisions)
+            'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
+            'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d')
          }
 
         if requestministry['cfrduedate'] is not None:

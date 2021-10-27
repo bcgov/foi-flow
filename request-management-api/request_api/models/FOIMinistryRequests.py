@@ -66,6 +66,11 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
+
+    @classmethod
+    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
+        query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=foiministryrequestid,requeststatusid=requeststatusid).order_by(FOIMinistryRequest.version).first()
+        return query.created_at
     
     @classmethod
     def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion, userId)->DefaultMethodResult:

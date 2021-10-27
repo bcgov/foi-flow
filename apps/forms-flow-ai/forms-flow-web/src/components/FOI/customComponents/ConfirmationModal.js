@@ -126,7 +126,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
   const [selectedReason, setClosingReason] = React.useState( 0 );
 
   //############### replace this with the last status change date
-  const lastStatusChangeDate = _requestDetails.requestProcessStart;
+  const lastStatusChangeDate = _requestDetails.lastStatusUpdateDate;
 
   const _handleClosingDateChange = (e) => {
     let pickedDate = e.target.value;

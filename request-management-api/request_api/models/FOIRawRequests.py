@@ -128,6 +128,11 @@ class FOIRawRequest(db.Model):
        request_schema = FOIRawRequestSchema()
        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
        return request_schema.dump(request)
+    
+    @classmethod
+    def getLastStatusUpdateDate(cls,requestid,status):
+        query = db.session.query(FOIRawRequest).filter_by(requestid=requestid,status=status).order_by(FOIRawRequest.version).first()
+        return query.created_at
 
     @classmethod
     def getversionforrequest(cls,requestid):   
