@@ -114,7 +114,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 { window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ?
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
                    
-                    <Watcher watcherFullList={assignedToList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} />
+                    <Watcher watcherFullList={assignedToList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} disableInput={disableInput} />
                    
                 </div>
                 : null}
