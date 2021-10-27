@@ -21,7 +21,7 @@ from request_api.auth import auth
 
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.programareaservice import programareaservice
@@ -132,6 +132,7 @@ class FOIFlowDocumentStorage(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post():
         try:
 
@@ -142,8 +143,8 @@ class FOIFlowDocumentStorage(Resource):
             s3region = os.getenv('OSS_S3_REGION')
             s3service = os.getenv('OSS_S3_SERVICE')
 
-            if(accesskey is None or secretkey is None or s3host is None):
-                return {'status': "Configuration Issue", 'message':"accesskey is None or secretkey is None or S3 host is None"}, 500
+            if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
+                return {'status': "Configuration Issue", 'message':"accesskey is None or secretkey is None or S3 host is None or formsbucket is None"}, 500
 
             requestfilejson = request.get_json()
 
@@ -165,8 +166,9 @@ class FOIFlowDocumentStorage(Resource):
                             auth=auth)
                 file['filepath']=s3uri
                 file['authheader']=response.request.headers['Authorization'] 
-                file['amzdate']=response.request.headers['x-amz-date']                                                        
-            return requestfilejson , 200
+                file['amzdate']=response.request.headers['x-amz-date']  
+
+            return json.dumps(requestfilejson) , 200
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
