@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject }) {    
+export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, handleClosingDateChange, handleClosingReasonChange }) {    
     const classes = useStyles();
     const handleClose = () => {
       //handleModal(false);
@@ -107,11 +107,13 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ? 
                 <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} /> :
               <>
-              {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ? 
-                <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
+              <span className="confirmation-message">
+               {message}
+               </span>
+              {state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() ? 
+                <FileUpload  multipleFiles={multipleFiles} updateFilesCb={updateFilesCb} />
               :
                 <>
-                {message}
                 <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
                   <tbody>
                     <tr>

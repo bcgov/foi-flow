@@ -23,9 +23,6 @@ const FileUpload = ({
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
 
     const addNewFiles = (newFiles) => {
-      console.log(`add`);
-      console.log(newFiles);
-      
         for (let file of newFiles) {
           console.log(file);
           if (mimeTypes.includes(file.type)) {
@@ -58,6 +55,7 @@ const FileUpload = ({
         if (newFiles.length) {
             let updatedFiles = addNewFiles(newFiles);
             setFiles(updatedFiles);
+            setErrorMessage("");
             callUpdateFilesCb(updatedFiles);
         }
     };
