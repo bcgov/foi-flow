@@ -7,7 +7,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { formatDate } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
+const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput}) => {
 
      /**
      *  Child details box in the UI
@@ -78,7 +78,8 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
                             value={childFirstNameText}
                             variant="outlined"
                             onChange={handleFirtNameChange}
-                            fullWidth                         
+                            fullWidth
+                            disabled={disableInput}
                         />
                         <TextField                            
                             label="Middle Name" 
@@ -87,6 +88,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
                             variant="outlined"
                             onChange={handleMiddleNameChange}
                             fullWidth
+                            disabled={disableInput}
                         />
                         <TextField                            
                             label="Last Name" 
@@ -95,6 +97,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
                             variant="outlined"
                             onChange={handleLastNameChange}
                             fullWidth
+                            disabled={disableInput}
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col">
@@ -105,6 +108,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
                             variant="outlined"
                             onChange={handleNickNameChange}
                             fullWidth
+                            disabled={disableInput}
                         />                        
                         <TextField                
                             label="Date of Birth"
@@ -116,6 +120,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
                             }}
                             variant="outlined"
                             fullWidth
+                            disabled={disableInput}
                         />
                         <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>

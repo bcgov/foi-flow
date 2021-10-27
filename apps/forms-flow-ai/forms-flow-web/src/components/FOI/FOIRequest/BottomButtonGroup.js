@@ -45,13 +45,15 @@ const BottomButtonGroup = React.memo(({
   handleSaveRequest,
   handleOpenRequest,
   currentSelectedStatus,
-  hasStatusRequestSaved
+  hasStatusRequestSaved,
+  disableInput
   }) => {
   /**
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
     const {requestId, ministryId, requestState} = useParams();  
+
     const classes = useStyles();
     const dispatch = useDispatch();
     
@@ -274,7 +276,7 @@ const BottomButtonGroup = React.memo(({
       <ConfirmationModal openModal={openModal} handleModal={handleModal} state={StateEnum.open.name} saveRequestObject={saveRequestObject} />  
       <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
       <div className="foi-bottom-button-group">
-      <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError || disableInput} onClick={saveRequest}>Save</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>

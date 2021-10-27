@@ -7,7 +7,7 @@ import { formatDate } from "../../../helper/FOI/helper";
 
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject}) => {
+const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput}) => {
     /**
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
@@ -84,6 +84,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       value={personalHealthNumberText}
                       onChange={handlePersonalHealthNumber}
                       fullWidth
+                      disabled={disableInput}
                   />                 
                   <TextField                
                             label="Date of Birth"
@@ -95,6 +96,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                             }}
                             variant="outlined" 
                             fullWidth
+                            disabled={disableInput}
                         />
                   
                   <TextField                            
@@ -104,6 +106,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       value={identityVerifiedText}
                       onChange={handleIdentityVerified}
                       fullWidth
+                      disabled={disableInput}
                   />                                                
               </div>
               <div className="col-lg-6 foi-details-col">
@@ -114,6 +117,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       value={correctionsNumberText}
                       onChange={handleCorrectionsNumber}
                       fullWidth
+                      disabled={disableInput}
                   /> 
                   <TextField                            
                       label="Employee Number" 
@@ -122,6 +126,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       value={employeeNumberText}
                       onChange={handleEmployeeNumber}
                       fullWidth
+                      disabled={disableInput}
                   />                 
               </div>
           </div> 

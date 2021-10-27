@@ -27,14 +27,14 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject, handlestatusudpate, userDetail}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject, handlestatusudpate, userDetail, disableInput}) => {
    
      /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {requestId, ministryId} = useParams();
+    const {requestId, ministryId, requestState} = useParams();
     const user = useSelector((state) => state.user.userDetail);
     const dispatch = useDispatch();
 
@@ -133,6 +133,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     variant="outlined"
                     fullWidth
                     required
+                    disabled = {disableInput}
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
