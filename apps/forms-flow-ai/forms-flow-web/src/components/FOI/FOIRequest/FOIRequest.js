@@ -67,7 +67,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   // Tab panel ends here
 
   const {requestId, ministryId, requestState} = useParams();
-  const disableInput = requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
+  const disableInput = requestState && requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
 
   const [_tabStatus, settabStatus] = React.useState(requestState);
   
