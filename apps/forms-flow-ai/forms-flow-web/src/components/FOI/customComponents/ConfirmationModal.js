@@ -9,9 +9,33 @@ import CloseIcon from '@material-ui/icons/Close';
 import './confirmationmodal.scss';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import FileUpload from './FileUpload';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+    marginTop:'30px',
+    marginBottom:'50px'
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+  btndisabled: {
+    border: 'none',
+    backgroundColor: '#eceaea',
+    color: '#FFFFFF'
+  },
+  btnenabled: {
+    border: 'none',
+    backgroundColor: '#38598A',
+    color: '#FFFFFF'
+  },
+
+}));
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject }) {    
-    
+    const classes = useStyles();
     const handleClose = () => {
       //handleModal(false);
       window.location.reload()
@@ -33,7 +57,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.callforrecords.name.toLowerCase():
             return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`;
         case StateEnum.review.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`;
+            return `Upload completed Call for Records form to change the state.`;
         case StateEnum.consult.name.toLowerCase():
             return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`;
         case StateEnum.signoff.name.toLowerCase():
@@ -58,7 +82,6 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
       setFile(file);
     }
 
-
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -71,7 +94,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           // id="state-change-dialog"
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
-              <h2 className="state-change-header">Changing the state            </h2>
+              <h2 className="state-change-header">{`${state.toLowerCase() === StateEnum.review.name.toLowerCase() ? 'Review Recrods' : 'Changing the state'}`}</h2>
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
@@ -79,7 +102,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
               {message}
-              {state.toLowerCase() === StateEnum.review.name.toLowerCase()? <FileUpload updateFilesCb={updateFilesCb} multipleFiles={multipleFiles} /> :
+              {state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() ? <FileUpload updateFilesCb={updateFilesCb} multipleFiles={multipleFiles} /> :
               <>
               <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
                 <tbody>
@@ -89,7 +112,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   </tr>
                 </tbody>
               </table>
-              {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.signoff.name.toLowerCase() ? 
+              {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.signoff.name.toLowerCase() ? 
               <table className="table table-bordered table-assignedto">
                 <tbody>
                   <tr>
@@ -104,7 +127,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className="btn-bottom btn-save" onClick={handleSave}>
+            <button className={`btn-bottom btn-save ${Object.entries(file).length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase()) ? classes.btndisabled : classes.btnenabled }`} disabled={Object.entries(file).length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase())} onClick={handleSave}>
               Save Change
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>

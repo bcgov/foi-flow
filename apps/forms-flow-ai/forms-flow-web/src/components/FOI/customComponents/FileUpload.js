@@ -1,9 +1,7 @@
 import React, { useRef, useState } from "react";
 import "./FileUpload.scss"
 
-const DEFAULT_MAX_FILE_SIZE_IN_BYTES = 13397960;
-//1073741824;
-//13397965
+const DEFAULT_MAX_FILE_SIZE_IN_BYTES = 52428800; //50MB
 const KILO_BYTES_PER_BYTE = 1000;
 
 const convertBytesToKB = (bytes) => Math.round(bytes / KILO_BYTES_PER_BYTE);
@@ -31,15 +29,16 @@ const FileUpload = ({
         for (let file of newFiles) {
           console.log(file);
           if (mimeTypes.includes(file.type)) {
-            if (file.size <= maxFileSizeInBytes) {                
+            const sizeInMB = (file.size / (1024*1024)).toFixed(2);
+            if (sizeInMB <= 50) {                
                 files[file.name] = file;
             }
             else {
-              setErrorMessage(`invalid size, file name: ${file.name}`);
+              setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files 50mb or under can be uploaded. `);
             }
           }
           else {
-            setErrorMessage(`invalid filetype, file name: ${file.name}`);
+            setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: pdf, xlsx, docx`);
           }
         }
         return { ...files };
@@ -68,13 +67,13 @@ const FileUpload = ({
         callUpdateFilesCb({ ...files });
         setErrorMessage("");
     };
-    console.log(files);
+    
   return (
     <>
       <section className="file-upload-container">       
         <div className="row file-upload-preview" >
           {Object.entries(files).length === 0 ?
-          <>
+         
           <div className="col-lg-12 file-upload-btn">
             <p className="drag-and-drop-text">Drag and drop request letter(s) or</p>
             <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>
@@ -83,10 +82,6 @@ const FileUpload = ({
               Add Files
             </button>           
           </div>
-           {errorMessage ? 
-            <p className="error-message">{errorMessage}</p>
-            : null}
-          </>
           :
           // {files != undefined && Object.entries(files).length > 0 ?
           <FilePreviewContainer files={files} removeFile={removeFile} />
@@ -104,7 +99,13 @@ const FileUpload = ({
           accept={mimeTypes}
         />
         : null}
+        
       </section>
+      {errorMessage ?
+           <div className="error-message-container">
+             <p>{errorMessage}</p>
+           </div>
+      : null}
      
     </>
   );
