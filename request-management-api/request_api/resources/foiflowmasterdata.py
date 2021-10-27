@@ -28,10 +28,12 @@ from request_api.services.programareaservice import programareaservice
 from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
 from request_api.services.divisionstageservice import divisionstageservice
-from request_api.services.s3signatureservice import s3signatureservice
+from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 import json
 import request_api
-import sys, os, base64, datetime, hashlib, hmac
+import requests
+from aws_requests_auth.aws_auth import AWSRequestsAuth
+import os
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
 TRACER = Tracer.get_instance()
@@ -123,18 +125,48 @@ class FOIFlowDivisions(Resource):
 
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/oss/authheader/<key>')
+@API.route('/foiflow/oss/authheader')
 class FOIFlowDocumentStorage(Resource):
+
     @staticmethod
     @TRACER.trace()
-    #@cross_origin(origins=allowedOrigins())       
-    #@auth.require
-    def get(key):
+    @cross_origin(origins=allowedOrigins())       
+    @auth.require
+    def post():
         try:
-           
-            data = s3signatureservice().getAuthHeaders()
-            jsondata = json.dumps(data)
-            return jsondata , 200
+
+            formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
+            accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
+            secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
+            s3host = os.getenv('OSS_S3_HOST')
+            s3region = os.getenv('OSS_S3_REGION')
+            s3service = os.getenv('OSS_S3_SERVICE')
+
+            if(accesskey is None or secretkey is None or s3host is None):
+                return {'status': "Configuration Issue", 'message':"accesskey is None or secretkey is None or S3 host is None"}, 500
+
+            requestfilejson = request.get_json()
+
+            for file in requestfilejson:                
+                foirequestform = FOIRequestsFormsList().load(file)                
+                ministrycode = foirequestform.get('ministrycode')
+                requestnumber = foirequestform.get('requestnumber')
+                filestatustransition = foirequestform.get('filestatustransition')
+                filename = foirequestform.get('filename')
+
+                auth = AWSRequestsAuth(aws_access_key=accesskey,
+                        aws_secret_access_key=secretkey,
+                        aws_host=s3host,
+                        aws_region=s3region,
+                        aws_service=s3service) 
+
+                s3uri = 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,filename)        
+                response = requests.put(s3uri,data=None,
+                            auth=auth)
+                file['filepath']=s3uri
+                file['authheader']=response.request.headers['Authorization'] 
+                file['amzdate']=response.request.headers['x-amz-date']                                                        
+            return requestfilejson , 200
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
