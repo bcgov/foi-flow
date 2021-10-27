@@ -167,3 +167,10 @@ export const setFOIWatcherList = (data) => dispatch => {
         payload:data      
     })
 }
+
+export const setClosingReasons = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.CLOSING_REASONS,
+        payload:data      
+    })
+}

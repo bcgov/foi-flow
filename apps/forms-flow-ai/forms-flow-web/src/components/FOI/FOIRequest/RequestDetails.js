@@ -10,7 +10,7 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
-const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject}) => {
+const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject, disableInput}) => {
 
     /**
      *  Request details box in the UI
@@ -162,6 +162,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined"
                             fullWidth
                             required
+                            disabled={disableInput}
                             error={selectedRequestType.toLowerCase().includes("select")}                            
                         >            
                         {requestTypes}
@@ -178,7 +179,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             fullWidth
                             required
                             error={selectedReceivedMode.toLowerCase().includes("select")}
-                            disabled={requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || requestDetails.currentState && requestDetails.currentState.toLowerCase() === StateEnum.unopened.name.toLowerCase() }                         
+                            disabled={disableInput || ( requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || requestDetails.currentState && requestDetails.currentState.toLowerCase() === StateEnum.unopened.name.toLowerCase() ) }                         
                         >            
                         {receivedModes}
                         </TextField> 
@@ -193,6 +194,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             variant="outlined"
                             fullWidth
                             required
+                            disabled={disableInput}
                             error={selectedDeliveryMode.toLowerCase().includes("select")}                            
                         >            
                         {deliveryModes}
@@ -211,7 +213,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={receivedDateText === undefined || receivedDateText === ""}
                             fullWidth
-                            disabled={!!ministryId}
+                            disabled={!!ministryId || disableInput}
                         />
                         <TextField                
                             label="Start Date"
@@ -226,7 +228,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             required
                             error={startDateText === undefined || startDateText === ""}
                             fullWidth
-                            disabled={!!ministryId}
+                            disabled={!!ministryId || disableInput}
                         />
                         <TextField                
                             label="Due Date"

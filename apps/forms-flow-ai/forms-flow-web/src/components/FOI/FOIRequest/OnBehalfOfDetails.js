@@ -7,7 +7,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { formatDate } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
-const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject}) => {
+const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput}) => {
     
      /**
      *  On Behalf of details box in the UI
@@ -78,6 +78,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
                             value={anotherFirstNameText}
                             onChange={handleFirtNameChange}
                             fullWidth
+                            disabled={disableInput}
                         />
                         <TextField                          
                             label="Middle Name" 
@@ -86,6 +87,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
                             variant="outlined" 
                             onChange={handleMiddleNameChange}
                             fullWidth
+                            disabled={disableInput}
                         />
                         <TextField                           
                             label="Last Name" 
@@ -94,6 +96,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
                             variant="outlined"
                             onChange={handleLastNameChange}
                             fullWidth
+                            disabled={disableInput}
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col"> 
@@ -104,6 +107,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
                             variant="outlined" 
                             onChange={handleNickNameChange}
                             fullWidth
+                            disabled={disableInput}
                         />                       
                         <TextField                
                             label="Date of Birth"
@@ -115,6 +119,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject})
                             }}
                             variant="outlined"
                             fullWidth
+                            disabled={disableInput}
                         />                   
                         <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>

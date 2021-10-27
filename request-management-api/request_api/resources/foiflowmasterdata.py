@@ -28,6 +28,7 @@ from request_api.services.programareaservice import programareaservice
 from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
 from request_api.services.divisionstageservice import divisionstageservice
+from request_api.services.closereasonservice import closereasonservice
 import json
 import request_api
 
@@ -118,3 +119,20 @@ class FOIFlowDivisions(Resource):
             return jsondata , 200
         except:
             return "Error happened while accessing divisions" , 500 
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/closereasons')
+class FOIFlowCloseReasons(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedOrigins())       
+    @auth.require
+    @request_api.cache.cached(key_prefix="closereasons")
+    def get():
+        try:
+            data = closereasonservice.getclosereasons()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except:
+            return "Error happened while accessing received modes" , 500
