@@ -100,7 +100,8 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   useEffect(() => {  
     if( url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 && requestDetails && requestDetails.currentState && requestState.toLowerCase() !== requestDetails.currentState.toLowerCase() ) {
-      dispatch(push(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState)));
+      // dispatch(push(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState)));
+      window.location.replace(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState));
     }
     
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
