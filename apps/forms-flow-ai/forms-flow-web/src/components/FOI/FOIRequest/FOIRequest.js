@@ -100,7 +100,11 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   useEffect(() => {  
     if( url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 && requestDetails && requestDetails.currentState && requestState.toLowerCase() !== requestDetails.currentState.toLowerCase() ) {
-      dispatch(push(`/foi/reviewrequest/${requestDetails.id}/${requestDetails.currentState}`));
+      if(ministryId) {
+        dispatch(push(`/foi/foirequests/${ministryId}/ministryrequest/${requestDetails.id}/${requestDetails.currentState}`));
+      } else {
+        dispatch(push(`/foi/reviewrequest/${requestDetails.id}/${requestDetails.currentState}`));
+      }
     }
     
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
