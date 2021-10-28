@@ -68,7 +68,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.signoff.name.toLowerCase():
             return `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`;
         case StateEnum.feeassessed.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`;
+            return `Upload Fee Estimate in order to change the state.`;
         default:
             return [];
       }
@@ -85,6 +85,23 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
       setFile(file);
     }
 
+    const getHeaderText = () => {
+      switch(state.toLowerCase()) {
+        case StateEnum.closed.name.toLowerCase():
+            return "Close Request"; 
+        case StateEnum.redirect.name.toLowerCase():
+            return "Redirect Request";
+        case StateEnum.review.name.toLowerCase():
+            return `Review Request`;        
+        case StateEnum.signoff.name.toLowerCase():
+            return `Ministry Sign Off`;
+        case StateEnum.feeassessed.name.toLowerCase():
+            return `Fee Estimate`;
+        default:
+            return 'Changing the state';
+      }
+    }
+
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -97,7 +114,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           // id="state-change-dialog"
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
-              <h2 className="state-change-header">{`${state.toLowerCase() === StateEnum.review.name.toLowerCase() ? 'Review Recrods' : 'Changing the state'}`}</h2>
+              <h2 className="state-change-header">{getHeaderText()}</h2>
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
