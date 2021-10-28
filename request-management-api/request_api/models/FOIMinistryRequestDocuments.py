@@ -41,5 +41,5 @@ class FOIMinistryRequestDocument(db.Model):
     
 class FOIMinistryRequestDocumentSchema(ma.Schema):
     class Meta:
-        fields = ('foiministrydocumentid','documentpath','foiministryrequest_id','foiministryrequestversion_id')
+        fields = ('foiministrydocumentid','documentpath','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby')
     

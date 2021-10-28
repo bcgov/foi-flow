@@ -626,7 +626,9 @@ class FOIRequestUtil:
         if ministrydocuments is not None:            
             for ministrydocument in ministrydocuments:
                 document = {
-                    "documentpath": ministrydocument["documentpath"]
+                    "documentpath": ministrydocument["documentpath"],
+                    "createdby": ministrydocument["createdby"],
+                    "createdat": parse(ministrydocument["created_at"]).strftime('%Y-%m-%d %H:%M:%S.%f')
                     } 
                 documents.append(document)
         return documents
