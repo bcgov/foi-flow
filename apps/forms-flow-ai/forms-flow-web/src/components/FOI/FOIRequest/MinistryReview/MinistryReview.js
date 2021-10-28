@@ -93,7 +93,6 @@ const MinistryReview = React.memo(({userDetail}) => {
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     if( requestDetails && requestDetails.currentState && requestState.toLowerCase() !== requestDetails.currentState.toLowerCase() ) {
-      // dispatch(push(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState)));
       window.location.replace(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState));
     }
 

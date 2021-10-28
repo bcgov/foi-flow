@@ -34,7 +34,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {requestId, ministryId, requestState} = useParams();
+    const {requestId, ministryId} = useParams();
     const user = useSelector((state) => state.user.userDetail);
     const dispatch = useDispatch();
 

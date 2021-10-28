@@ -69,8 +69,6 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
-        # query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=foiministryrequestid,requeststatusid=requeststatusid).order_by(FOIMinistryRequest.version).first()
-        # return query.created_at
         sql = """select created_at from "FOIMinistryRequests" 
                     where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
                     order by version desc limit 1;"""
