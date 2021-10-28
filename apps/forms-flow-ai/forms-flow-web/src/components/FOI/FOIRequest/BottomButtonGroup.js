@@ -164,7 +164,7 @@ const BottomButtonGroup = React.memo(({
       setsaveModal(true);
     }
 
-    const handleModal = (value) => {
+    const handleModal = (value, fileInfoList) => {
       if (value) {
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
@@ -205,7 +205,7 @@ const BottomButtonGroup = React.memo(({
       setOpenModal(false);
     }
 
-    const handleSaveModal = (value) => {      
+    const handleSaveModal = (value, fileInfoList) => {      
       setsaveModal(false);      
       if (value) {
         if(currentSelectedStatus == StateEnum.closed.name && !isValidationError)

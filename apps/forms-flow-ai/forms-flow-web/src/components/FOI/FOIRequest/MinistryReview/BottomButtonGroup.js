@@ -3,7 +3,7 @@ import '../bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
-import { saveMinistryRequestDetails } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { saveMinistryRequestDetails, getOSSHeaderDetails, saveFilesinS3 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../../customComponents';
@@ -127,16 +127,30 @@ const BottomButtonGroup = React.memo(({
       setsaveModal(true);
     }
 
-    const handleSaveModal = (value) => {
-      setsaveModal(false);      
+    const handleSaveModal = (value, fileInfoList, files) => {
+      setsaveModal(false);
       if (value) {
-        if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
+        if(!isValidationError)
         {
-          saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {
+            if (!err) {
+              res.map(header => {
+                const _file = files.find(file => file.name === header.filename);
+                console.log(_file);
+                dispatch(saveFilesinS3(header, _file, (err, res) => {
+                  console.log(res);
+                  if (res === 200) {
+                    if (currentSelectedStatus == StateEnum.review.name)
+                      saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
+                    saveMinistryRequest();
+                    hasStatusRequestSaved(true,currentSelectedStatus)
+                  }
+                }));
+              });
+            }
+          }));
         }
-        //else if(currentSelectedStatus == StateEnum.response.name && !isValidationError) {}
+       
       }
     }
 

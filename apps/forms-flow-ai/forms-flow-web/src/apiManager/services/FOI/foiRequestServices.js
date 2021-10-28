@@ -1,4 +1,4 @@
-import { httpPOSTRequest, httpGETRequest } from "../../httpRequestHandler";
+import { httpPOSTRequest, httpGETRequest, httpOSSPUTRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -645,4 +645,49 @@ export const fetchClosingReasonList = (...rest) => {
         done(error);
       });
   };
+};
+
+export const getOSSHeaderDetails = (data, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};  
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_POST_OSS_HEADER, data)
+        .then((res) => {
+          if (res.data) {                   
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error Posting data");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+};
+
+export const saveFilesinS3 = (headerDetails, file, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  var requestOptions = {
+    headers: {
+      'X-Amz-Date': headerDetails.amzdate,
+      'Authorization': headerDetails.authheader,
+    }    
+  };
+  console.log(`requestOptions = ${JSON.stringify(requestOptions)}`);
+    return (dispatch) => {
+      httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
+        .then((res) => {
+          if (res) {
+            done(null, res.status);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
 };

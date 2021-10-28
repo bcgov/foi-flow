@@ -41,13 +41,36 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, handleClosingDateChange, handleClosingReasonChange }) {    
     const classes = useStyles();
+
+    const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
+    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
+    const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
+    const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
+
+    const multipleFiles = false;
+    const [files, setFiles] = useState([]);
+    const updateFilesCb = (_files) => {
+      setFiles(_files);
+    }
+
     const handleClose = () => {
       //handleModal(false);
       window.location.reload()
     };
 
     const handleSave = () => {
-      handleModal(true);
+      let fileInfoList = [];
+      if (files.length > 0) {
+      fileInfoList = files.map(file => {
+        return {
+          ministrycode: requestNumber.split("-")[0],
+          requestnumber: requestNumber,
+          filestatustransition: 'cfr-review',
+          filename: file.name,
+        }
+      });
+    }
+      handleModal(true, fileInfoList, files);
     }   
     const getMessage = (_state, _requestNumber) => {
       switch(_state.toLowerCase()) {     
@@ -74,16 +97,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
       }
     }
 
-    const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
-    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
-    const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
-    const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
     let message = getMessage(state, requestNumber);
-    const multipleFiles = false;
-    const [file, setFile] = useState({});
-    const updateFilesCb = (file) => {
-      setFile(file);
-    }
 
     const getHeaderText = () => {
       switch(state.toLowerCase()) {
@@ -158,7 +172,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className={`btn-bottom btn-save ${Object.entries(file).length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase()) ? classes.btndisabled : classes.btnenabled }`} disabled={Object.entries(file).length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase())} onClick={handleSave}>
+            <button className={`btn-bottom btn-save ${files.length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase()) ? classes.btndisabled : classes.btnenabled }`} disabled={files.length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase())} onClick={handleSave}>
               Save Change
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>

@@ -24,7 +24,6 @@ const FileUpload = ({
 
     const addNewFiles = (newFiles) => {
         for (let file of newFiles) {
-          console.log(file);
           if (mimeTypes.includes(file.type)) {
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
             if (sizeInMB <= 50) {                
@@ -49,9 +48,7 @@ const FileUpload = ({
         updateFilesCb(filesAsArray);
     };
     const handleNewFileUpload = (e) => {
-      console.log(e);
         const { files: newFiles } = e.target;
-        console.log(newFiles);
         if (newFiles.length) {
             let updatedFiles = addNewFiles(newFiles);
             setFiles(updatedFiles);
