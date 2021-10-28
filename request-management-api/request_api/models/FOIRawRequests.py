@@ -131,8 +131,15 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def getLastStatusUpdateDate(cls,requestid,status):
-        query = db.session.query(FOIRawRequest).filter_by(requestid=requestid,status=status).order_by(FOIRawRequest.version).first()
-        return query.created_at
+        # query = db.session.query(FOIRawRequest).filter_by(requestid=requestid,status=status).order_by(FOIRawRequest.version).first()
+        # return query.created_at
+        sql = """select created_at from "FOIRawRequests" 
+                    where requestid = :requestid and status = :status
+                    order by version desc limit 1;"""
+        rs = db.session.execute(text(sql), {'requestid': requestid, 'status': status})
+        return [row[0] for row in rs][0]
+        # for row in rs:
+        #     return row[0]
 
     @classmethod
     def getversionforrequest(cls,requestid):   
