@@ -8,7 +8,7 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 
 const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, handleApplicantDetailsInitialValue, 
-    handleApplicantDetailsValue, handleEmailValidation, createSaveRequestObject}) => {
+    handleApplicantDetailsValue, handleEmailValidation, createSaveRequestObject, disableInput}) => {
     /**
      *  Applicant Details box in the UI
      *  FirstName, LastName and Category - Mandatory fields
@@ -135,6 +135,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             fullWidth
                             onChange={handleFirtNameChange}
                             required={true}
+                            disabled={disableInput}
                             error={applicantFirstNameText===""}
                         />
                         <TextField                          
@@ -143,6 +144,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             value={applicantMiddleNameText}
                             variant="outlined"
                             fullWidth
+                            disabled={disableInput}
                             onChange={handleMiddleNameChange}
                         />
                         <TextField                            
@@ -153,6 +155,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             fullWidth
                             onChange={handleLastNameChange}
                             required={true}
+                            disabled={disableInput}
                             error={applicantLastNameText===""}
                         />                                                
                     </div>
@@ -164,6 +167,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             value={organizationText}
                             variant="outlined" 
                             fullWidth
+                            disabled={disableInput}
                             onChange={handleOrganizationChange}
                         /> 
                         <TextField
@@ -177,6 +181,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             variant="outlined"
                             fullWidth
                             required
+                            disabled={disableInput}
                             error={selectedCategory.toLowerCase().includes("select")}
                         >            
                         {menuItems}
@@ -188,6 +193,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             variant="outlined" 
                             fullWidth
                             required={true}
+                            disabled={disableInput}
                             onChange={handleEmailChange}
                             error={(validation.helperTextValue !== undefined && validation.helperTextValue !== "") || (emailText == "" && contactDetailsNotGiven)}
                             helperText={validation.helperTextValue}

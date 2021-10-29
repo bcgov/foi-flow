@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList, requestId, ministryId, userDetail}) {    
+export default function Watcher({watcherFullList, requestId, ministryId, userDetail, disableInput}) {    
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -167,7 +167,7 @@ const watcherOnChange = (event) => {
         
         <div>
               <div className="foi-watcher-all">
-                   <button onClick={watcherOnChange} className="foi-eye-container"> <i className="fa fa-eye foi-eye"></i> {isUseraWatcher? "Unwatch" : "Watch" }</button>
+                   <button onClick={watcherOnChange} className="foi-eye-container" disabled = {disableInput} > <i className="fa fa-eye foi-eye"></i> {isUseraWatcher? "Unwatch" : "Watch" }</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>
                     <Select
@@ -180,6 +180,7 @@ const watcherOnChange = (event) => {
                     input={<OutlinedInput label="Tag" />}
                     renderValue={renderValue}                    
                     MenuProps={MenuProps}
+                    disabled = {disableInput}
                     >
                     {getMenuItems()}
                     </Select>

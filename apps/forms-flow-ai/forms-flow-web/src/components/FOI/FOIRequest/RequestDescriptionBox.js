@@ -30,7 +30,8 @@ const RequestDescription = React.memo(({
     handleOnChangeRequiredRequestDescriptionValues,
     handleInitialRequiredRequestDescriptionValues,
     handleUpdatedProgramAreaList,
-    createSaveRequestObject
+    createSaveRequestObject,
+    disableInput
 }) => {
     
     
@@ -193,6 +194,7 @@ const RequestDescription = React.memo(({
                         onChange={handleRequestDescriptionChange}
                         error={requestDescriptionText===""}
                         fullWidth
+                        disabled={disableInput}
                     />
                     <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
                     <input
@@ -200,14 +202,14 @@ const RequestDescription = React.memo(({
                         className="checkmark"
                         checked={isPIIRedacted}
                         onChange={handlePIIRedacted}
-                        disabled={isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase())}
+                        disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
                     />
                     <span className="checkmark"></span>
                         Description contains NO Personal Information
                     </label>      
                     </div>
                     { Object.entries(masterProgramAreaList).length !== 0 ?
-                    <MinistriesList masterProgramAreaList={masterProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} />
+                    <MinistriesList masterProgramAreaList={masterProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
                     :null}
             </CardContent>
         </Card>

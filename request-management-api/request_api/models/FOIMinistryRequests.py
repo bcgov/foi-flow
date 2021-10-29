@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_,and_
+from sqlalchemy import or_, and_, text
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 
@@ -42,7 +42,11 @@ class FOIMinistryRequest(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     assignedministryperson = db.Column(db.String(120), unique=False, nullable=True)
     assignedministrygroup = db.Column(db.String(120), unique=False, nullable=True)
+    closedate = db.Column(db.DateTime, nullable=True) 
     #ForeignKey References
+    
+    closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
+    closereason = relationship("CloseReason",uselist=False)
     
     programareaid = db.Column(db.Integer,ForeignKey('ProgramAreas.programareaid'))
     programarea =  relationship("ProgramArea",backref=backref("ProgramAreas"),uselist=False)
@@ -62,6 +66,14 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
+
+    @classmethod
+    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
+        sql = """select created_at from "FOIMinistryRequests" 
+                    where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
+                    order by version desc limit 1;"""
+        rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
+        return [row[0] for row in rs][0]
     
     @classmethod
     def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion, userId)->DefaultMethodResult:
@@ -133,5 +145,5 @@ class FOIMinistryRequest(db.Model):
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
-        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson','assignedministrygroup','cfrduedate')
+        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson','assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name')
     

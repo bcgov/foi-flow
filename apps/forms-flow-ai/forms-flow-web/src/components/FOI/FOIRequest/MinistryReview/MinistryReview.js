@@ -92,6 +92,10 @@ const MinistryReview = React.memo(({userDetail}) => {
   
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
+    if( requestDetails && requestDetails.currentState && requestState.toLowerCase() !== requestDetails.currentState.toLowerCase() ) {
+      window.location.replace(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState));
+    }
+
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
     ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";

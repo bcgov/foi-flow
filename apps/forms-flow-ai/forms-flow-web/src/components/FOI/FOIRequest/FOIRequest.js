@@ -20,7 +20,8 @@ import {
   fetchFOIAssignedToList, 
   fetchFOIDeliveryModeList, 
   fetchFOIReceivedModeList,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
+  fetchClosingReasonList
   
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
@@ -66,6 +67,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   // Tab panel ends here
 
   const {requestId, ministryId, requestState} = useParams();
+  const disableInput = requestState && requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
 
   const [_tabStatus, settabStatus] = React.useState(requestState);
   
@@ -92,10 +94,15 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
+    dispatch(fetchClosingReasonList());
   },[requestId, dispatch]);
  
 
-  useEffect(() => {    
+  useEffect(() => {  
+    if( url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 && requestDetails && requestDetails.currentState && requestState.toLowerCase() !== requestDetails.currentState.toLowerCase() ) {
+      window.location.replace(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState));
+    }
+    
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue); 
     let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
@@ -517,9 +524,6 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
 
   const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{    
-    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {      
-      settabStatus(StateEnum.callforrecordsoverdue.name)
-    }
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
     const bottomText = _status === StateEnum.open.name ? _daysRemainingText : _status === StateEnum.callforrecords.name ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
@@ -543,9 +547,6 @@ const FOIRequest = React.memo(({userDetail}) => {
       break;
     case StateEnum.callforrecords.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
-      break;
-    case StateEnum.callforrecordsoverdue.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
       break;
     case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
@@ -621,20 +622,20 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
                     <>
-                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} />
-                      <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} /> 
+                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
+                      <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> 
                        {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null}
+                        <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null}
                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} /> : null}
-                       <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} />
-                      <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails={requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} />
-                      <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} />
+                        <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null}
+                       <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} disableInput={disableInput} />
+                      <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails={requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
+                      <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} /> : null} 
+                        <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
                       <RequestNotes />
 
-                      <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
+                      <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
                     </>
                   ) : null}
                 </form>

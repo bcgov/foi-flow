@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterProgramAreaList}) => { 
+const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterProgramAreaList, disableInput}) => { 
     const classes = useStyles();
     const {ministryId} = useParams(); 
     const [programAreaList, setProgramAreaListItems] = React.useState(masterProgramAreaList);
@@ -51,7 +51,7 @@ const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterPr
                 onChange={handleOnChangeProgramArea}
                 checked={programArea.isChecked}
                 required
-                disabled={!!ministryId}
+                disabled={!!ministryId || disableInput}
               />
               <span key={index+1} className="checkmark"></span>
             {programArea.iaocode}</label>
