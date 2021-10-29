@@ -136,7 +136,36 @@ const BottomButtonGroup = React.memo(({
           saveMinistryRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
-        //else if(currentSelectedStatus == StateEnum.response.name && !isValidationError) {}
+        else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.deduplication.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.feeassessed.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.callforrecords.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.callforrecords.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
       }
     }
 
