@@ -131,17 +131,32 @@ const BottomButtonGroup = React.memo(({
     const [fileCount, setFileCount] = useState(0);
     const [documents, setDocuments] = useState([]);
 
-    React.useEffect(() => {
-      console.log(`documents = ${JSON.stringify(documents)}`);
-      console.log(`successCount === fileCount : ${successCount}, ${fileCount}`)
-      if (successCount === fileCount && successCount !== 0) {
-        console.log(`IF successCount === fileCount : ${successCount}, ${fileCount}`)
-          if (currentSelectedStatus == StateEnum.review.name)
+    const saveStatusId = () => {
+      if (currentSelectedStatus) {
+        switch(currentSelectedStatus.toLowerCase()) {
+          case StateEnum.review.name.toLowerCase(): 
             saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
-                    
+            break;
+          case StateEnum.feeassessed.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.feeassessed.id;
+            break;
+          case StateEnum.deduplication.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.deduplication.id;
+            break;
+          case StateEnum.signoff.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
+            break;
+        }
+      }
+    }
+
+    React.useEffect(() => {
+      if (successCount === fileCount && successCount !== 0) {
+          setsaveModal(false);
+          saveStatusId();
           saveMinistryRequestObject.documents = documents;
-          // saveMinistryRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
       }
     },[successCount])
 
@@ -151,36 +166,35 @@ const BottomButtonGroup = React.memo(({
       if (value) {
         if(!isValidationError)
         {
-          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
-            let _documents = [];
-            if (!err) {
-              res.map((header, index) => {
-                const _file = files.find(file => file.name === header.filename);
-                const documentpath = {documentpath: header.filepath};
-                _documents.push(documentpath);
-                setDocuments(_documents);
-                dispatch(saveFilesinS3(header, _file, (err, res) => {
-                  // console.log(res);
-                  if (res === 200) {
-                    console.log(`index = ${index}`);
-                    setSuccessCount(index+1);
-                  }
-                  else {
-                    setSuccessCount(0);
-                  }
-                }));
-              });              
-              //   if (currentSelectedStatus == StateEnum.review.name)
-              //         saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
-                    
-              //       saveMinistryRequestObject.documents = documents;
-              //       saveMinistryRequest();
-              //       hasStatusRequestSaved(true,currentSelectedStatus)
-             
-            }
-          }));
+          if (files.length !== 0) {
+            dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
+              let _documents = [];
+              if (!err) {
+                res.map((header, index) => {
+                  const _file = files.find(file => file.name === header.filename);
+                  const documentpath = {documentpath: header.filepath};
+                  _documents.push(documentpath);
+                  setDocuments(_documents);
+                  dispatch(saveFilesinS3(header, _file, (err, res) => {
+
+                    if (res === 200) {
+
+                      setSuccessCount(index+1);
+                    }
+                    else {
+                      setSuccessCount(0);
+                    }
+                  }));
+                });
+              }
+            }));
+          }
+          else {
+            saveStatusId();         
+            saveMinistryRequest();
+            hasStatusRequestSaved(true,currentSelectedStatus)
+          }
         }
-       
       }
     }
 
