@@ -16,7 +16,17 @@ import { formatDate } from "../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, handleClosingDateChange, handleClosingReasonChange }) {    
-    
+
+    const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
+
+    React.useEffect(() => {  
+      setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
+    },[state]);
+
+    const enableSaveBtn = () => {
+      setDisableSaveBtn(false);
+    }
+
     const handleClose = () => {
       //handleModal(false);
       window.location.reload()
@@ -28,25 +38,25 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const getMessage = (_state, _requestNumber) => {
       switch(_state.toLowerCase()) {     
         case StateEnum.intakeinprogress.name.toLowerCase():
-            return "Are you sure you want Save the request?";
+            return {title: "Changing the state", body: "Are you sure you want Save the request?"};
         case StateEnum.open.name.toLowerCase():
-            return "Are you sure you want to Open this request?";
+            return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
         case StateEnum.closed.name.toLowerCase():
-            return "Are you sure you want to Close this request?"; 
+            return {title: "Close Request", body: "Are you sure you want to Close this request?"}; 
         case StateEnum.redirect.name.toLowerCase():
-            return "Are you sure you want to Redirect this request?";  
+            return {title: "Changing the state", body: "Are you sure you want to Redirect this request?"};  
         case StateEnum.callforrecords.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
         case StateEnum.review.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
         case StateEnum.consult.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`};
         case StateEnum.signoff.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`};
         default:
-            return [];
+            return {title: "", body: ""};
       }
     }
 
@@ -68,7 +78,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           // id="state-change-dialog"
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
-              <h2 className="state-change-header">Changing the state            </h2>
+              <h2 className="state-change-header">{message.title}</h2>
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
@@ -76,10 +86,10 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
               {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ? 
-                <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
+                <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
               :
                 <>
-                {message}
+                {message.body}
                 <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
                   <tbody>
                     <tr>
@@ -103,7 +113,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className="btn-bottom btn-save" onClick={handleSave}>
+            <button className="btn-bottom btn-save" onClick={handleSave} disabled={disableSaveBtn}>
               Save Change
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
@@ -116,7 +126,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
 }
 
 
-const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handleClosingReasonChange}) => {
+const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handleClosingReasonChange, enableSaveBtn}) => {
 
   const _requestDetails = saveRequestObject;
   const _closingReasons = useSelector(state=> state.foiRequests.closingReasons);
@@ -140,6 +150,8 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
   const _handleReasonChange = (e) => {
     setClosingReason(e.target.value);
     handleClosingReasonChange(e.target.value);
+
+    enableSaveBtn();
   }
   
   const closingReasons = _closingReasons.map((reason)=>{
