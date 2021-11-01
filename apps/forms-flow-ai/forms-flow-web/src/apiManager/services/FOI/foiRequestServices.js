@@ -668,15 +668,20 @@ export const getOSSHeaderDetails = (data, ...rest) => {
 
 export const saveFilesinS3 = (headerDetails, file, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};
+  const filePath = "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/EDUC/EDUC-2021-18147/cfr-review/TestConsent.docx";
+  const amzdate = "20211030T042525Z";
+  const authHeader = "AWS4-HMAC-SHA256 Credential=AKIA95AE3AF038A4DC93/20211030/us-east-1/execute-api/aws4_request,SignedHeaders=host;x-amz-date, Signature=e93a7529b42d9abcb4415d05f629eb0875f3d821acfaf986003c3c6ab2a17ba9"
   var requestOptions = {
     headers: {
-      'X-Amz-Date': headerDetails.amzdate,
-      'Authorization': headerDetails.authheader,
+      // 'X-Amz-Date': headerDetails.amzdate,
+      // 'Authorization': headerDetails.authheader,
+      'X-Amz-Date': amzdate,
+      'Authorization': authHeader,
     }    
   };
   console.log(`requestOptions = ${JSON.stringify(requestOptions)}`);
     return (dispatch) => {
-      httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
+      httpOSSPUTRequest(filePath, file, requestOptions) //headerDetails.filepath
         .then((res) => {
           if (res) {
             done(null, res.status);

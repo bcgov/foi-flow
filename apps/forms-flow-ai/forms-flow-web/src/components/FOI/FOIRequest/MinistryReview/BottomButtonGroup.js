@@ -127,26 +127,56 @@ const BottomButtonGroup = React.memo(({
       setsaveModal(true);
     }
 
+    const [successCount, setSuccessCount] = useState(0);
+    const [fileCount, setFileCount] = useState(0);
+    const [documents, setDocuments] = useState([]);
+
+    React.useEffect(() => {
+      console.log(`documents = ${JSON.stringify(documents)}`);
+      console.log(`successCount === fileCount : ${successCount}, ${fileCount}`)
+      if (successCount === fileCount && successCount !== 0) {
+        console.log(`IF successCount === fileCount : ${successCount}, ${fileCount}`)
+          if (currentSelectedStatus == StateEnum.review.name)
+            saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
+                    
+          saveMinistryRequestObject.documents = documents;
+          // saveMinistryRequest();
+          // hasStatusRequestSaved(true,currentSelectedStatus)
+      }
+    },[successCount])
+
     const handleSaveModal = (value, fileInfoList, files) => {
       setsaveModal(false);
+      setFileCount(files.length);
       if (value) {
         if(!isValidationError)
         {
-          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {
+          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
+            let _documents = [];
             if (!err) {
-              res.map(header => {
+              res.map((header, index) => {
                 const _file = files.find(file => file.name === header.filename);
-                console.log(_file);
+                const documentpath = {documentpath: header.filepath};
+                _documents.push(documentpath);
+                setDocuments(_documents);
                 dispatch(saveFilesinS3(header, _file, (err, res) => {
-                  console.log(res);
+                  // console.log(res);
                   if (res === 200) {
-                    if (currentSelectedStatus == StateEnum.review.name)
-                      saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
-                    saveMinistryRequest();
-                    hasStatusRequestSaved(true,currentSelectedStatus)
+                    console.log(`index = ${index}`);
+                    setSuccessCount(index+1);
+                  }
+                  else {
+                    setSuccessCount(0);
                   }
                 }));
-              });
+              });              
+              //   if (currentSelectedStatus == StateEnum.review.name)
+              //         saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
+                    
+              //       saveMinistryRequestObject.documents = documents;
+              //       saveMinistryRequest();
+              //       hasStatusRequestSaved(true,currentSelectedStatus)
+             
             }
           }));
         }
