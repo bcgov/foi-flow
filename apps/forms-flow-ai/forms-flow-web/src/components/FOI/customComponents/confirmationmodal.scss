@@ -9,6 +9,10 @@
     height: 30px;
 }
 
+.btn-save:disabled {
+    opacity: 0.65;
+}
+
 .btn-cancel {
     border: 1px solid #38598A;
     background-color: #FFFFFF;
