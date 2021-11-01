@@ -80,7 +80,16 @@
     "sass": "^1.32.13",
     "semantic-ui-css": "^2.4.1",
     "sockjs-client": "^1.5.1",
-    "source-map-explorer": "^2.5.2"
+    "source-map-explorer": "^2.5.2",
+   
+    "@fortawesome/fontawesome-svg-core": "^1.2.34",
+    "@fortawesome/free-solid-svg-icons": "^5.15.2",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "jquery": "^3.5.1",
+    "node-sass": "^6.0.1",
+    "popper.js": "^1.16.1",
+    "react-uuid": "^1.0.2",
+    "reactjs-popup": "^2.0.4"
   },
   "resolutions": {
     "xmldom": "^0.6.0",
