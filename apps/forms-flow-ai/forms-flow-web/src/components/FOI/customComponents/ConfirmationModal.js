@@ -21,12 +21,10 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
 
     React.useEffect(() => {  
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
-      console.log("init");
     },[state]);
 
     const enableSaveBtn = () => {
       setDisableSaveBtn(false);
-      console.log("enable btn");
     }
 
     const handleClose = () => {
