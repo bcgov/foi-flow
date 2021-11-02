@@ -27,10 +27,7 @@ export const CommentSection = ({
       signupUrl={signupUrl}
       customInput={customInput}
     >
-      <div className="section">
-        <div className="inputBox">
-          {signupUrl && !currentUser ? <SignField /> : <Input />}
-        </div>
+      <div className="section">        
         <div className="displayComments">
           <DisplayComments comments={comments} />
         </div>
