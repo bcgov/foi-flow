@@ -517,10 +517,10 @@ const FOIRequest = React.memo(({userDetail}) => {
     setcurrentrequestStatus(currentStatus);
   }
 
-  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{    
+  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-    const bottomText = _status === StateEnum.open.name ? _daysRemainingText : _status === StateEnum.callforrecords.name ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
+    const bottomText = _status === StateEnum.open.name ? _daysRemainingText : (_status === StateEnum.callforrecords.name || _status === StateEnum.feeassessed.name || _status === StateEnum.review.name) ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
     setRequestStatus(bottomText);       
   }
 
@@ -598,7 +598,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
-        {_requestStatus.toLowerCase().includes("days") &&  bottomTextArray.length > 1  ?
+        {bottomTextArray.length > 1  ?
         <div className="foileftpanelstatus"> 
           <h4>{bottomTextArray[0]}</h4>
           <h4>{bottomTextArray[1]}</h4>
