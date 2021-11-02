@@ -21,7 +21,7 @@ from request_api.auth import auth
 
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.programareaservice import programareaservice
@@ -29,8 +29,12 @@ from request_api.services.deliverymodeservice import deliverymodeservice
 from request_api.services.receivedmodeservice import receivedmodeservice
 from request_api.services.divisionstageservice import divisionstageservice
 from request_api.services.closereasonservice import closereasonservice
+from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 import json
 import request_api
+import requests
+from aws_requests_auth.aws_auth import AWSRequestsAuth
+import os
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
 TRACER = Tracer.get_instance()
@@ -136,3 +140,53 @@ class FOIFlowCloseReasons(Resource):
             return jsondata , 200
         except:
             return "Error happened while accessing received modes" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oss/authheader')
+class FOIFlowDocumentStorage(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedOrigins())       
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def post():
+        try:
+
+            formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
+            accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
+            secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
+            s3host = os.getenv('OSS_S3_HOST')
+            s3region = os.getenv('OSS_S3_REGION')
+            s3service = os.getenv('OSS_S3_SERVICE')
+
+            if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
+                return {'status': "Configuration Issue", 'message':"accesskey is None or secretkey is None or S3 host is None or formsbucket is None"}, 500
+
+            requestfilejson = request.get_json()
+
+            for file in requestfilejson:                
+                foirequestform = FOIRequestsFormsList().load(file)                
+                ministrycode = foirequestform.get('ministrycode')
+                requestnumber = foirequestform.get('requestnumber')
+                filestatustransition = foirequestform.get('filestatustransition')
+                filename = foirequestform.get('filename')
+
+                auth = AWSRequestsAuth(aws_access_key=accesskey,
+                        aws_secret_access_key=secretkey,
+                        aws_host=s3host,
+                        aws_region=s3region,
+                        aws_service=s3service) 
+
+                s3uri = 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,filename)        
+                response = requests.put(s3uri,data=None,
+                            auth=auth)
+                file['filepath']=s3uri
+                file['authheader']=response.request.headers['Authorization'] 
+                file['amzdate']=response.request.headers['x-amz-date']  
+
+            return json.dumps(requestfilejson) , 200
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+    
+            

@@ -61,6 +61,11 @@ class FOIMinistryRequest(db.Model):
 
     divisions = relationship('FOIMinistryRequestDivision', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDivision.foiministryrequest_id, "
                         "FOIMinistryRequest.version==FOIMinistryRequestDivision.foiministryrequestversion_id)") 
+    
+    documents = relationship('FOIMinistryRequestDocument', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDocument.foiministryrequest_id, "
+                        "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
+    
+     
     @classmethod
     def getrequest(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema(many=True)
@@ -83,11 +88,11 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getrequests(cls, group = None):
         _session = db.session
-        _ministryrequestids = []        
+        _ministryrequestids = [] 
         if group is None:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
-        else:            
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid == 2,FOIMinistryRequest.requeststatusid == 7, FOIMinistryRequest.requeststatusid == 9, FOIMinistryRequest.requeststatusid == 8,FOIMinistryRequest.requeststatusid == 10)))).all()    
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True and FOIMinistryRequest.requeststatusid != 3).all()
+        else:  
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.requeststatusid != 3,FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.requeststatusid != 3, FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()

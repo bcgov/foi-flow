@@ -1,12 +1,13 @@
 
 
 .btn-save {
-    border: none;
-    background-color: #38598A;
-    color: #FFFFFF;
     border-radius: 3px;
     font-size: small;
     height: 30px;
+}
+
+.btn-save:disabled {
+    opacity: 0.65;
 }
 
 .btn-cancel {
@@ -46,6 +47,10 @@
 #state-change-description {
     padding-left: 50px;
     color: black;
+}
+
+.confirmation-message {
+    font-size: 20px;
 }
 
 .table-assignedto {

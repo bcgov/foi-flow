@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -8,53 +8,124 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import './confirmationmodal.scss';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
-
+import FileUpload from './FileUpload';
+import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate } from "../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
 
-export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, handleClosingDateChange, handleClosingReasonChange }) {    
-    
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+    marginTop:'30px',
+    marginBottom:'50px'
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+  btndisabled: {
+    border: 'none',
+    backgroundColor: '#eceaea',
+    color: '#FFFFFF'
+  },
+  btnenabled: {
+    border: 'none',
+    backgroundColor: '#38598A',
+    color: '#FFFFFF'
+  },
+
+}));
+
+export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, 
+  handleClosingDateChange, handleClosingReasonChange }) {    
+    const classes = useStyles();
+
+    const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
+    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
+    const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
+    const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
+
+    const multipleFiles = false;
+    const [files, setFiles] = useState([]);
+    const updateFilesCb = (_files) => {
+      setFiles(_files);
+    }
+
+    const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
+
+    React.useEffect(() => {  
+      setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
+    },[state]);
+
+    const enableSaveBtn = () => {
+      setDisableSaveBtn(false);
+    }
+
     const handleClose = () => {
       //handleModal(false);
       window.location.reload()
     };
 
     const handleSave = () => {
-      handleModal(true);
+      let fileInfoList = [];
+      if (files.length > 0) {
+        fileInfoList = files.map(file => {
+          return {
+            ministrycode: requestNumber.split("-")[0],
+            requestnumber: requestNumber,
+            filestatustransition: 'cfr-review',
+            filename: file.name,
+          }
+        });
+      }
+      handleModal(true, fileInfoList, files);
     }   
     const getMessage = (_state, _requestNumber) => {
       switch(_state.toLowerCase()) {     
         case StateEnum.intakeinprogress.name.toLowerCase():
-            return "Are you sure you want Save the request?";
+            return {title: "Changing the state", body: "Are you sure you want Save the request?"};
         case StateEnum.open.name.toLowerCase():
-            return "Are you sure you want to Open this request?";
+            return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
         case StateEnum.closed.name.toLowerCase():
-            return "Are you sure you want to Close this request?"; 
+            return {title: "Close Request", body: "Are you sure you want to Close this request?"}; 
         case StateEnum.redirect.name.toLowerCase():
-            return "Are you sure you want to Redirect this request?";  
+            return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};  
         case StateEnum.callforrecords.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
         case StateEnum.review.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`;
+            return {title: "Review Request", body: `Upload completed Call for Records form to change the state.`};
         case StateEnum.consult.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`};
         case StateEnum.signoff.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`;
+            return {title: "Ministry Sign Off", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`;
+            return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
         default:
-            return [];
+            return {title: "", body: ""};
       }
     }
 
-    const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
-    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
-    const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
-    const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
-    let message = getMessage(state, requestNumber);  
+    let message = getMessage(state, requestNumber);
+
+    const getHeaderText = () => {
+      switch(state.toLowerCase()) {
+        case StateEnum.closed.name.toLowerCase():
+            return "Close Request"; 
+        case StateEnum.redirect.name.toLowerCase():
+            return "Redirect Request";
+        case StateEnum.review.name.toLowerCase():
+            return `Review Request`;        
+        case StateEnum.signoff.name.toLowerCase():
+            return `Ministry Sign Off`;
+        case StateEnum.feeassessed.name.toLowerCase():
+            return `Fee Estimate`;
+        default:
+            return 'Changing the state';
+      }
+    }
 
     return (
       <div className="state-change-dialog">        
@@ -68,42 +139,51 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           // id="state-change-dialog"
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
-              <h2 className="state-change-header">Changing the state            </h2>
+              <h2 className="state-change-header">{message.title}</h2>
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-              {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ? 
-                <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
-              :
-                <>
-                {message}
-                <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
-                  <tbody>
-                    <tr>
-                      <th scope="row">IAO Assigned To</th>
-                      <td>{assignedTo}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.signoff.name.toLowerCase() ? 
-                <table className="table table-bordered table-assignedto">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Ministry Assigned To</th>
-                      <td>{selectedMinistryAssignedTo}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                : null}
-                </>
-              }
+              <span className="confirmation-message">
+                  {message.body}
+              </span>                         
+              {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ?              
+                  <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
+                  : (
+                    <>
+                    {state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() ?
+                      <FileUpload  multipleFiles={multipleFiles} updateFilesCb={updateFilesCb} />
+                      :
+                      <>
+                        <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
+                          <tbody>
+                            <tr>
+                              <th scope="row">IAO Assigned To</th>
+                              <td>{assignedTo}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() ? 
+                          <table className="table table-bordered table-assignedto">
+                            <tbody>
+                              <tr>
+                                <th scope="row">Ministry Assigned To</th>
+                                <td>{selectedMinistryAssignedTo}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        : null}
+                      </>
+                    }
+                    </>
+                  )
+              }                      
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className="btn-bottom btn-save" onClick={handleSave}>
+            <button className={`btn-bottom btn-save ${files.length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase()) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || (files.length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase()))} onClick={handleSave}>
               Save Change
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
@@ -115,8 +195,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     );
 }
 
-
-const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handleClosingReasonChange}) => {
+const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handleClosingReasonChange, enableSaveBtn}) => {
 
   const _requestDetails = saveRequestObject;
   const _closingReasons = useSelector(state=> state.foiRequests.closingReasons);
@@ -140,6 +219,8 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
   const _handleReasonChange = (e) => {
     setClosingReason(e.target.value);
     handleClosingReasonChange(e.target.value);
+
+    enableSaveBtn();
   }
   
   const closingReasons = _closingReasons.map((reason)=>{
@@ -217,4 +298,4 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
     </div>
     </>
   );
-})
+});

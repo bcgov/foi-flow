@@ -44,7 +44,12 @@ class FOIAdditionallPersonalInfoWrapperSchema(Schema):
     birthDate = fields.Str(data_key="birthDate",allow_none=True)
     alsoKnownAs = fields.Str(data_key="alsoKnownAs",allow_none=True)
     
-        
+class FOIMinistryRequestDocumentSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    documentpath = fields.Str(data_key="documentpath",allow_none=False)         
 class FOIRequestWrapperSchema(Schema):
 
     class Meta:  # pylint: disable=too-few-public-methods
@@ -92,7 +97,7 @@ class FOIRequestWrapperSchema(Schema):
   
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)
-    
+    documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
     idNumber = fields.Str(data_key="idNumber",allow_none=True) 
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
@@ -115,6 +120,7 @@ class FOIMinistryRequestDivisionSchema(Schema):
     divisionid = fields.Int(data_key="divisionid")
     stageid = fields.Int(data_key="stageid")
 
+  
 class FOIRequestMinistrySchema(Schema):
     
     class Meta:  # pylint: disable=too-few-public-methods
@@ -127,3 +133,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedto = fields.Str(data_key="assignedto",allow_none=True)   
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
     divisions = fields.Nested(FOIMinistryRequestDivisionSchema, many=True,allow_none=True)
+    documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
