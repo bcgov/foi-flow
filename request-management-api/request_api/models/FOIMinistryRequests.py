@@ -88,11 +88,11 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getrequests(cls, group = None):
         _session = db.session
-        _ministryrequestids = []        
+        _ministryrequestids = [] 
         if group is None:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
-        else:            
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid == 2,FOIMinistryRequest.requeststatusid == 7, FOIMinistryRequest.requeststatusid == 9, FOIMinistryRequest.requeststatusid == 8,FOIMinistryRequest.requeststatusid == 10)))).all()    
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True and FOIMinistryRequest.requeststatusid != 3).all()     
+        else:  
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.requeststatusid != 3 and FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.requeststatusid != 3 and FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid == 2,FOIMinistryRequest.requeststatusid == 7, FOIMinistryRequest.requeststatusid == 9, FOIMinistryRequest.requeststatusid == 8,FOIMinistryRequest.requeststatusid == 10)))).all()    
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
