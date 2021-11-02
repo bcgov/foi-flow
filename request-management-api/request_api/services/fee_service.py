@@ -1,9 +1,11 @@
+import base64
 from datetime import date
 from datetime import datetime
 from typing import Dict
 from urllib.parse import unquote_plus, urlencode
 
 import pytz
+import requests
 from flask import current_app
 
 from request_api.exceptions import BusinessException, Error
@@ -82,24 +84,32 @@ class FeeService:
         if self.payment.transaction_number != parsed_args.get('pbcTxnNumber'):
             raise BusinessException(Error.INVALID_INPUT)
 
-        # validate if hashValue matches with rest of the values hashed
-        hash_value = parsed_args.pop('hashValue', None)
-        pay_response_url_without_hash = urlencode(parsed_args)
-
         # Check if trnApproved is 1=Success, 0=Declined
-        trn_approved: str = parsed_args.get('trnApproved')
-        if trn_approved == '1' and not HashService.is_valid_checksum(pay_response_url_without_hash, hash_value):
-            current_app.logger.warning(f'Transaction is approved, but hash is not matching : {response_url}')
-            raise BusinessException(Error.INVALID_INPUT)
+        trn_approved: bool = parsed_args.get('trnApproved') == '1'
+        if trn_approved:
+            # validate if hashValue matches with rest of the values hashed
+            hash_value = parsed_args.pop('hashValue', None)
+            pay_response_url_without_hash = urlencode(parsed_args)
 
-        # TODO Add paybc api call to verify
+            if not HashService.is_valid_checksum(pay_response_url_without_hash, hash_value):
+                current_app.logger.warning(f'Transaction is approved, but hash is not matching : {response_url}')
+                raise BusinessException(Error.INVALID_INPUT)
+
+        #  Add paybc api call to verify
+        #  handle duplicate payment response.
+        paybc_status = None
+        if trn_approved or parsed_args.get('trnNumber', '').upper() == 'DUPLICATE PAYMENT':
+            paybc_response = self._get_paybc_transaction_details()
+            if trn_approved and (paybc_status := paybc_response.get('paymentstatus')) != 'PAID':
+                raise BusinessException(Error.INVALID_INPUT)
+
+            if paybc_status == 'PAID':
+                if self.payment.total != float(paybc_response.get('trnamount')):
+                    raise BusinessException(Error.INVALID_INPUT)
 
         self.payment.order_id = parsed_args.get('trnOrderId')
         self.payment.completed_on = datetime.now()
-        if trn_approved == '1':
-            self.payment.status = 'PAID'
-        else:
-            self.payment.status = parsed_args.get('messageText').upper()
+        self.payment.status = 'PAID' if paybc_status == 'PAID' else parsed_args.get('messageText').upper()
         self.payment.commit()
 
         return self._dump()
@@ -149,3 +159,43 @@ class FeeService:
 
     def _get_transaction_number(self):
         return f"{current_app.config.get('PAYBC_TXN_PREFIX')}{self.payment.payment_id:0>8}"
+
+    def _get_paybc_transaction_details(self):
+        # Call PAYBC web service, get access token and use it in get txn call
+        access_token = self._get_token().json().get('access_token')
+
+        paybc_transaction_url: str = current_app.config.get('PAYBC_API_BASE_URL')
+        paybc_ref_number: str = current_app.config.get('PAYBC_REF_NUMBER')
+
+        endpoint = f'{paybc_transaction_url}/paybc/payment/{paybc_ref_number}/{self.payment.transaction_number}'
+        response = requests.get(
+            endpoint,
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'Content-Type': 'application/json'
+            },
+            timeout=current_app.config.get('CONNECT_TIMEOUT')
+        )
+
+        return response.json()
+
+    def _get_token(self):
+        """Generate oauth token from payBC which will be used for all communication."""
+        current_app.logger.debug('<Getting token')
+        token_url = current_app.config.get('PAYBC_API_BASE_URL') + '/oauth/token'
+        basic_auth_encoded = base64.b64encode(
+            bytes(current_app.config.get('PAYBC_API_CLIENT') + ':' + current_app.config.get(
+                'PAYBC_API_SECRET'), 'utf-8')).decode('utf-8')
+        data = 'grant_type=client_credentials'
+        response = requests.post(
+            token_url,
+            data=data,
+            headers={
+                'Authorization': f'Basic {basic_auth_encoded}',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            timeout=current_app.config.get('CONNECT_TIMEOUT')
+        )
+
+        current_app.logger.debug('>Getting token')
+        return response
