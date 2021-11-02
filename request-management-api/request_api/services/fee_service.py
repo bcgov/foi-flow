@@ -93,7 +93,7 @@ class FeeService:
         #  handle duplicate payment response.
         paybc_status = None
         if trn_approved or parsed_args.get('trnNumber', '').upper() == 'DUPLICATE PAYMENT':
-            paybc_status = self._validate_with_paybc(paybc_status, trn_approved)
+            paybc_status = self._validate_with_paybc(trn_approved)
 
         self.payment.order_id = parsed_args.get('trnOrderId')
         self.payment.completed_on = datetime.now()
@@ -102,7 +102,8 @@ class FeeService:
 
         return self._dump()
 
-    def _validate_with_paybc(self, paybc_status, trn_approved):
+    def _validate_with_paybc(self, trn_approved):
+        paybc_status = None
         paybc_response = self._get_paybc_transaction_details()
         if trn_approved and (paybc_status := paybc_response.get('paymentstatus')) != 'PAID':
             raise BusinessException(Error.INVALID_INPUT)
