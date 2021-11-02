@@ -77,9 +77,14 @@ class assigneeservice:
                 {"status":"Open","groups":["Intake Team","Flex Team"]},
                 {"status":"Closed","groups":["Intake Team","Flex Team"]},
                 {"status":"Call For Records","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Review","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
+                {"status":"Fee Estimate","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
+                {"status":"Deduplication","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
+                {"status":"On Hold","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
+                {"status":"Harms Assessment","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
+                {"status":"Records Review","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
                 {"status":"Consult","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
                 {"status":"Ministry Sign Off","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
+                {"status":"Response","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
                 {"status":"Redirect","groups":["Intake Team","Flex Team"]},
             ]
         
@@ -94,12 +99,17 @@ class assigneeservice:
         allgroups =  [{"status":"Unopened", "groups":["Intake Team"]},
                 {"status":"Intake In Progress","groups":["Intake Team"]},
                 {"status":"Open","groups":["Intake Team","Processing Team"]},
-                {"status":"Closed","groups":["Intake Team","Flex Team"]},
+                {"status":"Closed","groups":["Intake Team","Processing Team"]},
                 {"status":"Call For Records","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Review","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
+                {"status":"Fee Estimate","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
+                {"status":"Deduplication","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
+                {"status":"On Hold","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
+                {"status":"Harms Assessment","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
+                {"status":"Records Review","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
                 {"status":"Consult","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
                 {"status":"Ministry Sign Off","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Redirect","groups":["Intake Team","Flex Team"]},
+                {"status":"Response","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
+                {"status":"Redirect","groups":["Intake Team","Processing Team"]},
             ]
         for entry in allgroups:
             groups.append({"status": entry["status"], "groups": self.formatgroups(entry["groups"], bcgovcode)})
