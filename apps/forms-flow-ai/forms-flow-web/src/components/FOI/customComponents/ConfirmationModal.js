@@ -61,15 +61,15 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const handleSave = () => {
       let fileInfoList = [];
       if (files.length > 0) {
-      fileInfoList = files.map(file => {
-        return {
-          ministrycode: requestNumber.split("-")[0],
-          requestnumber: requestNumber,
-          filestatustransition: 'cfr-review',
-          filename: file.name,
-        }
-      });
-    }
+        fileInfoList = files.map(file => {
+          return {
+            ministrycode: requestNumber.split("-")[0],
+            requestnumber: requestNumber,
+            filestatustransition: 'cfr-review',
+            filename: file.name,
+          }
+        });
+      }
       handleModal(true, fileInfoList, files);
     }   
     const getMessage = (_state, _requestNumber) => {
