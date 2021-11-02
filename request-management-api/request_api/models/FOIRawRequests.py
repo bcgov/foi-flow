@@ -100,7 +100,7 @@ class FOIRawRequest(db.Model):
     def getrequests(cls):
         request_schema = FOIRawRequestSchema(many=True)
         _session = db.session
-        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status =="Archived").all()
+        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived', 'Closed'])).all()
         _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedRequestids)).all()
         requests = []
         for _requestid in _requestids:
@@ -128,6 +128,14 @@ class FOIRawRequest(db.Model):
        request_schema = FOIRawRequestSchema()
        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
        return request_schema.dump(request)
+    
+    @classmethod
+    def getLastStatusUpdateDate(cls,requestid,status):
+        sql = """select created_at from "FOIRawRequests" 
+                    where requestid = :requestid and status = :status
+                    order by version desc limit 1;"""
+        rs = db.session.execute(text(sql), {'requestid': requestid, 'status': status})
+        return [row[0] for row in rs][0]
 
     @classmethod
     def getversionforrequest(cls,requestid):   

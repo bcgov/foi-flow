@@ -9,7 +9,8 @@ const AddressContactDetails = React.memo(({
   contactDetailsNotGiven,
   createSaveRequestObject, 
   handleContactDetailsInitialValue, 
-  handleContanctDetailsValue
+  handleContanctDetailsValue,
+  disableInput
 }) => {
 
     /**
@@ -142,6 +143,7 @@ const AddressContactDetails = React.memo(({
                             onChange={handleStreetAddressChange}
                             fullWidth
                             required={true}
+                            disabled={disableInput}
                             error={streetAddressText === "" && contactDetailsNotGiven}
                         />
                         <TextField 
@@ -152,6 +154,7 @@ const AddressContactDetails = React.memo(({
                             value={secondaryStreetAddressText}
                             onChange={handleScondaryStreetAddressChange}
                             fullWidth
+                            disabled={disableInput}
                         />  
                         <TextField 
                             id="outlined-city" 
@@ -162,6 +165,7 @@ const AddressContactDetails = React.memo(({
                             onChange={handleCityChange}
                             fullWidth
                             required={true}
+                            disabled={disableInput}
                             error={CityText === "" && contactDetailsNotGiven}
                         />
                         <TextField 
@@ -173,6 +177,7 @@ const AddressContactDetails = React.memo(({
                             onChange={handleProvinceChange}
                             fullWidth
                             required={true}
+                            disabled={disableInput}
                             error={ProvinceText === "" && contactDetailsNotGiven}
                         />
                         <TextField 
@@ -184,6 +189,7 @@ const AddressContactDetails = React.memo(({
                             onChange={handleCountryChange}
                             fullWidth
                             required={true}
+                            disabled={disableInput}
                             error={CountryText === "" && contactDetailsNotGiven}
                         />
                         <TextField 
@@ -196,6 +202,7 @@ const AddressContactDetails = React.memo(({
                             inputProps={{ maxLength: 6 }}
                             fullWidth
                             required={true}
+                            disabled={disableInput}
                             error={PostalText === "" && contactDetailsNotGiven}
                         />                                     
                     </div>
@@ -208,6 +215,7 @@ const AddressContactDetails = React.memo(({
                             value={homePhoneText}
                             onChange={handleHomePhoneChange}
                             fullWidth
+                            disabled={disableInput}
                         />
                         <TextField 
                             id="outlined-mobilePhone" 
@@ -217,6 +225,7 @@ const AddressContactDetails = React.memo(({
                             value={mobilePhoneText}
                             onChange={handleMobilePhoneChange}
                             fullWidth
+                            disabled={disableInput}
                         />                      
                     <TextField 
                             id="outlined-workPhone1" 
@@ -226,6 +235,7 @@ const AddressContactDetails = React.memo(({
                            value={workPhonePrimaryText}
                            onChange={handleWorkPhonePrimaryChange}
                            fullWidth
+                           disabled={disableInput}
                         />
                         <TextField 
                             id="outlined-workPhone2" 
@@ -235,6 +245,7 @@ const AddressContactDetails = React.memo(({
                             value={workPhoneSecondaryText}
                             onChange={handleWorkPhoneSecondarChange}
                             fullWidth
+                            disabled={disableInput}
                         />
                         
                     </div>

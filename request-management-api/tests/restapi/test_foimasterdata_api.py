@@ -43,3 +43,12 @@ def test_get_divisions(app, client):
 def test_get_closereasons(app, client):
   response = client.get('/api/foiflow/closereasons', headers=factory_user_auth_header(app, client), content_type='application/json')
   assert response.status_code == 200
+
+with open('tests/samplerequestjson/s3storagerequest.json') as f:
+  s3requestjson = json.load(f)
+def test_post_fois3storagerequests(app, client):    
+    response = client.post('api/foiflow/oss/authheader',headers=factory_user_auth_header(app, client),data=json.dumps(s3requestjson), content_type='application/json')
+    jsonresponse = json.loads(response.data)
+    for item in jsonresponse:
+        assert item['authheader'] is not None and  item['filepath'] is not None
+    assert response.status_code == 200 and len(jsonresponse) >=1  

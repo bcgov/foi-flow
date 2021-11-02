@@ -7,7 +7,7 @@ import {saveRequestDetails, openRequestDetails} from "../../../apiManager/servic
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
-import { addBusinessDays } from "../../../helper/FOI/helper";
+import { addBusinessDays, formatDate } from "../../../helper/FOI/helper";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
@@ -45,18 +45,31 @@ const BottomButtonGroup = React.memo(({
   handleSaveRequest,
   handleOpenRequest,
   currentSelectedStatus,
-  hasStatusRequestSaved
+  hasStatusRequestSaved,
+  disableInput
   }) => {
   /**
    * Bottom Button Group of Review request Page
    * Button enable/disable is handled here based on the validation
    */
     const {requestId, ministryId, requestState} = useParams();  
+
     const classes = useStyles();
     const dispatch = useDispatch();
     
     const [openModal, setOpenModal] = useState(false);
     const [opensaveModal, setsaveModal] = useState(false);
+
+    const [closingDate, setClosingDate] = useState( formatDate(new Date()) );
+    const [closingReasonId, setClosingReasonId] = useState();
+
+    const handleClosingDateChange = (cDate) => {
+      setClosingDate(cDate);
+    }
+
+    const handleClosingReasonChange = (cReasonId) => {
+      setClosingReasonId(cReasonId);
+    }
 
     const returnToQueue = (e) => {
       e.preventDefault();
@@ -151,7 +164,7 @@ const BottomButtonGroup = React.memo(({
       setsaveModal(true);
     }
 
-    const handleModal = (value) => {
+    const handleModal = (value, fileInfoList) => {
       if (value) {
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
@@ -192,12 +205,14 @@ const BottomButtonGroup = React.memo(({
       setOpenModal(false);
     }
 
-    const handleSaveModal = (value) => {      
+    const handleSaveModal = (value, fileInfoList) => {      
       setsaveModal(false);      
       if (value) {
         if(currentSelectedStatus == StateEnum.closed.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.closed.id;
+          saveRequestObject.closedate = closingDate;
+          saveRequestObject.closereasonid = closingReasonId;
           saveRequest();
           hasStatusRequestSaved(true, currentSelectedStatus)
         }
@@ -205,7 +220,6 @@ const BottomButtonGroup = React.memo(({
         {        
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
-            console.log(saveRequestObject);
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           }         
@@ -253,21 +267,15 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
-        else if(currentSelectedStatus == StateEnum.callforrecordsoverdue.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.callforrecordsoverdue.id;
-          saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
       }
     }
 
   return (
     <div className={classes.root}>
       <ConfirmationModal openModal={openModal} handleModal={handleModal} state={StateEnum.open.name} saveRequestObject={saveRequestObject} />  
-      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject}/>
+      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
       <div className="foi-bottom-button-group">
-      <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError} onClick={saveRequest}>Save</button>
+      <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError || disableInput} onClick={saveRequest}>Save</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
       </div>
     </div>

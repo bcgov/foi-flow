@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_,and_
+from sqlalchemy import or_, and_, text
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 
@@ -71,6 +71,14 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
+
+    @classmethod
+    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
+        sql = """select created_at from "FOIMinistryRequests" 
+                    where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
+                    order by version desc limit 1;"""
+        rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
+        return [row[0] for row in rs][0]
     
     @classmethod
     def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion, userId)->DefaultMethodResult:
@@ -80,11 +88,11 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getrequests(cls, group = None):
         _session = db.session
-        _ministryrequestids = []        
+        _ministryrequestids = [] 
         if group is None:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()     
-        else:            
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True , or_(FOIMinistryRequest.assignedgroup == group,and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid == 2,FOIMinistryRequest.requeststatusid == 7, FOIMinistryRequest.requeststatusid == 9, FOIMinistryRequest.requeststatusid == 8,FOIMinistryRequest.requeststatusid == 10)))).all()    
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True and FOIMinistryRequest.requeststatusid != 3).all()
+        else:  
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.requeststatusid != 3,FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.requeststatusid != 3, FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()

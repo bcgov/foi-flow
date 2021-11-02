@@ -1,4 +1,4 @@
-import { httpPOSTRequest, httpGETRequest } from "../../httpRequestHandler";
+import { httpPOSTRequest, httpGETRequest, httpOSSPUTRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -20,7 +20,8 @@ import {
   setFOIMinistryRequestList,
   setFOIMinistryDivisionalStages,
   clearFOIMinistryDivisionalStages,
-  setFOIWatcherList
+  setFOIWatcherList,
+  setClosingReasons
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -619,4 +620,74 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) =>
         done(error);
       });
   };
+};
+
+export const fetchClosingReasonList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  return (dispatch) => {
+    httpGETRequest(API.FOI_GET_CLOSING_REASONS, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const closingReasons = res.data;
+          dispatch(setClosingReasons(closingReasons));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const getOSSHeaderDetails = (data, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};  
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_POST_OSS_HEADER, data)
+        .then((res) => {
+          if (res.data) {                   
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error Posting data");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+};
+
+export const saveFilesinS3 = (headerDetails, file, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  var requestOptions = {
+    headers: {
+      'X-Amz-Date': headerDetails.amzdate,
+      'Authorization': headerDetails.authheader,     
+    }    
+  };
+  console.log(`requestOptions = ${JSON.stringify(requestOptions)}`);
+    return (dispatch) => {
+      httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
+        .then((res) => {
+          if (res) {
+            done(null, res.status);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
 };

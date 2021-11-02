@@ -130,6 +130,7 @@ class rawrequestservice:
                                'publicServiceEmployeeNumber': decriptionTimeframe['publicServiceEmployeeNumber'],
                                'topic': decriptionTimeframe['topic'],
                                'selectedMinistries': requestrawdata['ministry']['selectedMinistry'],
+                               'lastStatusUpdateDate': FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
                                }
             if ispersonal:
                 childInformation = requestrawdata.get('childInformation')
@@ -167,10 +168,12 @@ class rawrequestservice:
             return baserequestInfo
         elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":
             request['requestrawdata']['currentState'] = request['status']
+            request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['currentState'] = request['status']
+            request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
             return request['requestrawdata']
         else:
             return None
