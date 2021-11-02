@@ -55,6 +55,14 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`};
+        case StateEnum.onhold.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.onhold.name}?`};
+        case StateEnum.deduplication.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
+        case StateEnum.harms.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
+        case StateEnum.response.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
         default:
             return {title: "", body: ""};
       }
