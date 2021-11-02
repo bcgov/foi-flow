@@ -1,5 +1,7 @@
-import pytest
 import json
+
+import pytest
+
 from request_api.services.hash_service import HashService
 
 
@@ -23,15 +25,30 @@ def test_create_payment(app, client):
     assert pay_response.json.get('status') == 'PENDING'
 
 
-def test_complete_payment(app, client):
+def test_complete_payment(app, client, monkeypatch):
     with app.app_context():
+        fee_code = 'FOI0001'
+        quantity = 5
+
+        total_fee = client.get(f'/api/fees/{fee_code}?quantity={quantity}', content_type='application/json')
+
+        # Mock paybc response to return success message
+        def mock_paybc_response(self):  # pylint: disable=unused-argument; mocks of library methods
+            return {
+                'paymentstatus': 'PAID',
+                'trnamount': total_fee.json.get('total')
+            }
+
+        monkeypatch.setattr('request_api.services.fee_service.FeeService._get_paybc_transaction_details',
+                            mock_paybc_response)
+
         foi_req = client.post(f'/api/foirawrequests', data=json.dumps({'requestData': {}}),
                               content_type='application/json')
         request_id = foi_req.json.get('id')
-        fee_code = 'FOI0001'
+
         pay_response = client.post(f'/api/foirawrequests/{request_id}/payments', data=json.dumps({
             'fee_code': fee_code,
-            'quantity': 5
+            'quantity': quantity
         }), content_type='application/json')
         pay_id = pay_response.json.get('payment_id')
         txn_number = f"{app.config.get('PAYBC_TXN_PREFIX')}{pay_id:0>8}"

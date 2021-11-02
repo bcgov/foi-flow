@@ -109,6 +109,11 @@ class _Config():  # pylint: disable=too-few-public-methods
     PAYBC_TXN_PREFIX = os.getenv('PAYBC_TXN_PREFIX', 'FOI')
     PAYBC_API_KEY = os.getenv('PAYBC_API_KEY')
 
+    PAYBC_API_BASE_URL = os.getenv('PAYBC_API_BASE_URL')
+    PAYBC_API_CLIENT = os.getenv('PAYBC_API_CLIENT')
+    PAYBC_API_SECRET = os.getenv('PAYBC_API_SECRET')
+    CONNECT_TIMEOUT = os.getenv('CONNECT_TIMEOUT', 60)
+
     
 
 
