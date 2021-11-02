@@ -100,7 +100,7 @@ class FOIRawRequest(db.Model):
     def getrequests(cls):
         request_schema = FOIRawRequestSchema(many=True)
         _session = db.session
-        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status =="Archived" and FOIRawRequest.status =="Closed").all()
+        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived', 'Closed'])).all()
         _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedRequestids)).all()
         requests = []
         for _requestid in _requestids:
