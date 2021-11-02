@@ -87,25 +87,13 @@ class FeeService:
         # Check if trnApproved is 1=Success, 0=Declined
         trn_approved: bool = parsed_args.get('trnApproved') == '1'
         if trn_approved:
-            # validate if hashValue matches with rest of the values hashed
-            hash_value = parsed_args.pop('hashValue', None)
-            pay_response_url_without_hash = urlencode(parsed_args)
-
-            if not HashService.is_valid_checksum(pay_response_url_without_hash, hash_value):
-                current_app.logger.warning(f'Transaction is approved, but hash is not matching : {response_url}')
-                raise BusinessException(Error.INVALID_INPUT)
+            self._validate_hash(parsed_args, response_url)
 
         #  Add paybc api call to verify
         #  handle duplicate payment response.
         paybc_status = None
         if trn_approved or parsed_args.get('trnNumber', '').upper() == 'DUPLICATE PAYMENT':
-            paybc_response = self._get_paybc_transaction_details()
-            if trn_approved and (paybc_status := paybc_response.get('paymentstatus')) != 'PAID':
-                raise BusinessException(Error.INVALID_INPUT)
-
-            if paybc_status == 'PAID':
-                if self.payment.total != float(paybc_response.get('trnamount')):
-                    raise BusinessException(Error.INVALID_INPUT)
+            paybc_status = self._validate_with_paybc(paybc_status, trn_approved)
 
         self.payment.order_id = parsed_args.get('trnOrderId')
         self.payment.completed_on = datetime.now()
@@ -113,6 +101,22 @@ class FeeService:
         self.payment.commit()
 
         return self._dump()
+
+    def _validate_with_paybc(self, paybc_status, trn_approved):
+        paybc_response = self._get_paybc_transaction_details()
+        if trn_approved and (paybc_status := paybc_response.get('paymentstatus')) != 'PAID':
+            raise BusinessException(Error.INVALID_INPUT)
+        if paybc_status == 'PAID' and self.payment.total != float(paybc_response.get('trnamount')):
+            raise BusinessException(Error.INVALID_INPUT)
+        return paybc_status
+
+    def _validate_hash(self, parsed_args, response_url):
+        # validate if hashValue matches with rest of the values hashed
+        hash_value = parsed_args.pop('hashValue', None)
+        pay_response_url_without_hash = urlencode(parsed_args)
+        if not HashService.is_valid_checksum(pay_response_url_without_hash, hash_value):
+            current_app.logger.warning(f'Transaction is approved, but hash is not matching : {response_url}')
+            raise BusinessException(Error.INVALID_INPUT)
 
     def _dump(self):
         pay_response = dict(
