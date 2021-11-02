@@ -253,7 +253,8 @@ class requestservice:
             'assignedministrygroup':requestministry["assignedministrygroup"],
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
-            'divisions': FOIRequestUtil().getdivisions(requestministrydivisions)
+            'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
+            'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d')
          }
 
         if requestministry['cfrduedate'] is not None:
@@ -414,6 +415,8 @@ class FOIRequestUtil:
         else:
             divisions = FOIMinistryRequestDivision().getrequest(ministryschema["foiministryrequestid"] ,ministryschema["version"])
             foiministryrequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
+        foiministryrequest.closedate = requestschema['closedate'] if 'closedate' in requestschema  else None
+        foiministryrequest.closereasonid = requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
         return foiministryrequest
     
     def createFOIRequestAppplicantFromObject(self, requestapplicants, requestid, version, userid): 
@@ -515,7 +518,8 @@ class FOIRequestUtil:
         if ministryId is not None:
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
-        
+        foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
+        foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
         return foiministryRequest
     
     def createContactInformation(self,dataformat, name, value, contactTypes, userId):

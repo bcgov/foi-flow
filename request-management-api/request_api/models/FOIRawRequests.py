@@ -1,11 +1,13 @@
 from enum import unique
 
-
+from flask.app import Flask
+from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.expression import distinct
 from .db import  db, ma
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
+from sqlalchemy.orm import relationship,backref
 from sqlalchemy import insert, and_, text
 from flask import jsonify
 
@@ -27,7 +29,11 @@ class FOIRawRequest(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     sourceofsubmission = db.Column(db.String(120),  nullable=True)
     ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)    
+    closedate = db.Column(db.DateTime, nullable=True) 
+    #ForeignKey References
     
+    closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
+    closereason = relationship("CloseReason", uselist=False)
     @classmethod
     def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, assigneegroup= None,assignee= None)->DefaultMethodResult:                
         createdat = datetime.now()
@@ -42,11 +48,12 @@ class FOIRawRequest(db.Model):
         updatedat = datetime.now()
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
-                
+            closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
+            closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None                
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updatedby=None,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted,createdby=userId)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updatedby=None,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted,createdby=userId,closedate=closedate,closereasonid=closereasonid)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
@@ -93,7 +100,7 @@ class FOIRawRequest(db.Model):
     def getrequests(cls):
         request_schema = FOIRawRequestSchema(many=True)
         _session = db.session
-        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status =="Archived").all()
+        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived', 'Closed'])).all()
         _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedRequestids)).all()
         requests = []
         for _requestid in _requestids:
@@ -121,6 +128,14 @@ class FOIRawRequest(db.Model):
        request_schema = FOIRawRequestSchema()
        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
        return request_schema.dump(request)
+    
+    @classmethod
+    def getLastStatusUpdateDate(cls,requestid,status):
+        sql = """select created_at from "FOIRawRequests" 
+                    where requestid = :requestid and status = :status
+                    order by version desc limit 1;"""
+        rs = db.session.execute(text(sql), {'requestid': requestid, 'status': status})
+        return [row[0] for row in rs][0]
 
     @classmethod
     def getversionforrequest(cls,requestid):   

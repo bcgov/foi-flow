@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject, handlestatusudpate, userDetail}) => {
+const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject, handlestatusudpate, userDetail, disableInput}) => {
    
      /**
      *  Header of Review request in the UI
@@ -101,7 +101,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const showMinistryAssignedTo = status.toLowerCase()===StateEnum.callforrecords.name.toLowerCase() || status.toLowerCase()===StateEnum.closed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
-                                        || status.toLowerCase()===StateEnum.callforrecordsoverdue.name.toLowerCase() || status.toLowerCase()===StateEnum.redirect.name.toLowerCase();
+                                        || status.toLowerCase()===StateEnum.redirect.name.toLowerCase();
 
     return (
         <div className="foi-request-review-header-row1">
@@ -114,7 +114,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                 { window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ?
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
                    
-                    <Watcher watcherFullList={assignedToList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} />
+                    <Watcher watcherFullList={assignedToList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} disableInput={disableInput} />
                    
                 </div>
                 : null}
@@ -133,6 +133,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     variant="outlined"
                     fullWidth
                     required
+                    disabled = {disableInput}
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}

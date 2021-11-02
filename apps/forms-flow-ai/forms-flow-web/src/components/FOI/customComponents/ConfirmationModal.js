@@ -9,8 +9,24 @@ import CloseIcon from '@material-ui/icons/Close';
 import './confirmationmodal.scss';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
-export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject }) {    
-    
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Input from '@material-ui/core/Input';
+import { formatDate } from "../../../helper/FOI/helper";
+import { useSelector } from "react-redux";
+
+export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, handleClosingDateChange, handleClosingReasonChange }) {    
+
+    const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
+
+    React.useEffect(() => {  
+      setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
+    },[state]);
+
+    const enableSaveBtn = () => {
+      setDisableSaveBtn(false);
+    }
+
     const handleClose = () => {
       //handleModal(false);
       window.location.reload()
@@ -22,27 +38,25 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const getMessage = (_state, _requestNumber) => {
       switch(_state.toLowerCase()) {     
         case StateEnum.intakeinprogress.name.toLowerCase():
-            return "Are you sure you want Save the request?";
+            return {title: "Changing the state", body: "Are you sure you want Save the request?"};
         case StateEnum.open.name.toLowerCase():
-            return "Are you sure you want to Open this request?";
+            return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
         case StateEnum.closed.name.toLowerCase():
-            return "Are you sure you want to Close this request?"; 
+            return {title: "Close Request", body: "Are you sure you want to Close this request?"}; 
         case StateEnum.redirect.name.toLowerCase():
-            return "Are you sure you want to Redirect this request?";  
+            return {title: "Changing the state", body: "Are you sure you want to Redirect this request?"};  
         case StateEnum.callforrecords.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
         case StateEnum.review.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
         case StateEnum.consult.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`};
         case StateEnum.signoff.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`;
-        case StateEnum.callforrecordsoverdue.name.toLowerCase():
-            return `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecordsoverdue.name}?`;
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`};
         default:
-            return [];
+            return {title: "", body: ""};
       }
     }
 
@@ -64,36 +78,42 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           // id="state-change-dialog"
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
-              <h2 className="state-change-header">Changing the state            </h2>
+              <h2 className="state-change-header">{message.title}</h2>
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-              {message}
-              <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
-                <tbody>
-                  <tr>
-                    <th scope="row">IAO Assigned To</th>
-                    <td>{assignedTo}</td>
-                  </tr>
-                </tbody>
-              </table>
-              {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.signoff.name.toLowerCase() ? 
-              <table className="table table-bordered table-assignedto">
-                <tbody>
-                  <tr>
-                    <th scope="row">Ministry Assigned To</th>
-                    <td>{selectedMinistryAssignedTo}</td>
-                  </tr>
-                </tbody>
-              </table>
-              : null }
+              {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ? 
+                <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
+              :
+                <>
+                {message.body}
+                <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
+                  <tbody>
+                    <tr>
+                      <th scope="row">IAO Assigned To</th>
+                      <td>{assignedTo}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.signoff.name.toLowerCase() ? 
+                <table className="table table-bordered table-assignedto">
+                  <tbody>
+                    <tr>
+                      <th scope="row">Ministry Assigned To</th>
+                      <td>{selectedMinistryAssignedTo}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                : null}
+                </>
+              }
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className="btn-bottom btn-save" onClick={handleSave}>
+            <button className="btn-bottom btn-save" onClick={handleSave} disabled={disableSaveBtn}>
               Save Change
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
@@ -103,4 +123,110 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         </Dialog>
       </div>
     );
+}
+
+
+const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handleClosingReasonChange, enableSaveBtn}) => {
+
+  const _requestDetails = saveRequestObject;
+  const _closingReasons = useSelector(state=> state.foiRequests.closingReasons);
+
+  const today = new Date();
+  const [closingDateText, setClosingDate] = React.useState( formatDate(today) );
+  const [selectedReason, setClosingReason] = React.useState( 0 );
+
+  //############### replace this with the last status change date
+  const lastStatusChangeDate = _requestDetails.lastStatusUpdateDate;
+
+  const _handleClosingDateChange = (e) => {
+    let pickedDate = e.target.value;
+    if(new Date(pickedDate) > today)
+      pickedDate = formatDate(today);
+
+    setClosingDate(pickedDate);
+    handleClosingDateChange(pickedDate);
   }
+
+  const _handleReasonChange = (e) => {
+    setClosingReason(e.target.value);
+    handleClosingReasonChange(e.target.value);
+
+    enableSaveBtn();
+  }
+  
+  const closingReasons = _closingReasons.map((reason)=>{
+    return ( <MenuItem key={reason.closereasonid} value={reason.closereasonid} >{reason.name}</MenuItem> )
+  });
+
+  return (
+    <>
+    <div className="row foi-details-row confirm-modal-row first-row">
+      <div className="col-lg-6 foi-details-col">
+        <div className="confirm-label-area"><b>Application: </b><span className="confirm-label-content">{_requestDetails.firstName+" "+_requestDetails.lastName}</span></div>
+      </div>
+      <div className="col-lg-6 foi-details-col confirm-label-area">
+        <div className="confirm-label-area"><b>Organization: </b><span className="confirm-label-content">{_requestDetails.businessName}</span></div>
+      </div>
+    </div>
+    <div className="row foi-details-row confirm-modal-row">
+      <div className="col-lg-6 foi-details-col">
+        <div className="confirm-label-area"><b>Fee Waiver: </b><span className="confirm-label-content">{"N/A"}</span></div>
+      </div>
+      <div className="col-lg-6 foi-details-col confirm-label-area">
+        <div className="confirm-label-area"><b>Fee Remaining: </b><span className="confirm-label-content">{"N/A"}</span></div>
+      </div>
+    </div>
+    <div className="row foi-details-row confirm-modal-row">
+      <div className="col-lg-6 foi-details-col">
+        <TextField                
+            label="Start Date"
+            type="date" 
+            value={_requestDetails.requestProcessStart}                            
+            InputLabelProps={{
+              shrink: true,
+            }}
+            variant="outlined" 
+            required
+            disabled
+            fullWidth
+        />
+      </div>
+      <div className="col-lg-6 foi-details-col">
+        <TextField                
+            label="Closing Date"
+            type="date" 
+            value={closingDateText || ''} 
+            onChange={_handleClosingDateChange}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{inputProps: { min: lastStatusChangeDate, max: formatDate(today)} }}
+            variant="outlined" 
+            required
+            error={closingDateText === undefined || closingDateText === ""}
+            fullWidth
+        />
+      </div>
+    </div>
+    <div className="row foi-details-row confirm-modal-row">
+      <div className="col-lg-12 foi-details-col">
+        <TextField
+            id="requestType"
+            label="Reason for Closing Request"
+            InputLabelProps={{ shrink: true, }}          
+            select
+            value={selectedReason}
+            onChange={_handleReasonChange}
+            input={<Input />} 
+            variant="outlined"
+            fullWidth
+            required
+            error={selectedReason==0}
+        >            
+          {closingReasons}
+        </TextField>
+      </div>
+    </div>
+    </>
+  );
+})
