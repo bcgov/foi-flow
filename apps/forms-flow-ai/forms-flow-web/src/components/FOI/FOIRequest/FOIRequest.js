@@ -97,10 +97,6 @@ const FOIRequest = React.memo(({userDetail}) => {
  
 
   useEffect(() => {  
-    if( url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 && requestDetails && requestDetails.currentState && requestState.toLowerCase() !== requestDetails.currentState.toLowerCase() ) {
-      window.location.replace(decodeURI(window.location.pathname).replace(requestState, requestDetails.currentState));
-    }
-    
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue); 
     let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");

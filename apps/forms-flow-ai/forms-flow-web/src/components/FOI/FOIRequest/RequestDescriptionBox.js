@@ -164,6 +164,7 @@ const RequestDescription = React.memo(({
                             InputProps={{inputProps: { max: formatDate(new Date())} }}   
                             variant="outlined"
                             fullWidth
+                            disabled={disableInput}
                         />                       
                         <TextField                
                             label="End Date"
@@ -177,6 +178,7 @@ const RequestDescription = React.memo(({
                              InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
                             variant="outlined" 
                             fullWidth
+                            disabled={disableInput}
                         />  
                         </div>                                                              
                     </div>
