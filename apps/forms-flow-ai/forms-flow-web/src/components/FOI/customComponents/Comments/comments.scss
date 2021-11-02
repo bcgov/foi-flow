@@ -130,7 +130,7 @@
           width:70px;
           padding: 5px;
           border-radius: 4px;
-  
+          
           &:hover{
             outline:none;
             background-color: rgba(160, 160, 160, 0.315);
@@ -165,6 +165,10 @@
     margin-left: 35px;
     border-left: 2px solid rgb(199, 199, 199);
     margin-top: 6px;
+  }
+
+  .hide{
+    display: none!important;
   }
   
 }

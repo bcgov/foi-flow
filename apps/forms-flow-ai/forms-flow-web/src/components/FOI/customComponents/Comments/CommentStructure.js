@@ -14,7 +14,7 @@ import {
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
 
-const CommentStructure = ({ i, reply, parentId }) => {
+const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex }) => {
   const actions = useContext(ActionContext)
   const edit = true
 
@@ -36,7 +36,7 @@ const CommentStructure = ({ i, reply, parentId }) => {
           <div className="fullName">{i.fullName} </div>
           <div>
             <button
-              className="replyBtn"
+              className={`replyBtn ${ totalcommentCount-1 > currentIndex && totalcommentCount != -101 ? " hide" : " show" }`}
               onClick={() => actions.handleAction(i.comId)}
               disabled={!actions.user}
             >

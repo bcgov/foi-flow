@@ -24,7 +24,7 @@ const DisplayComments = ({ comments }) => {
               <InputField cancellor={i.comId} value={i.text} edit />
             )
           ) : (
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} />
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={-101} currentIndex={index} />
           )}
           {actions.replies.filter((id) => id === i.comId).length !== 0 &&
             (actions.customInput ? (
@@ -66,7 +66,7 @@ const DisplayComments = ({ comments }) => {
                       i={a}
                       reply
                       parentId={i.comId}
-                      handleEdit={() => actions.handleAction}
+                      handleEdit={() => actions.handleAction} totalcommentCount ={i.replies.length} currentIndex={index}
                     />
                   )}
                   {actions.replies.filter((id) => id === a.comId).length !==

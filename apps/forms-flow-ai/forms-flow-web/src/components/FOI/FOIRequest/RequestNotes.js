@@ -26,7 +26,7 @@ const RequestNotes = React.memo((props) => {
         "comId": "012",
         "fullName": "Abin Antony",
         "avatarUrl": "https://ui-avatars.com/api/name=Riya&background=random" ,
-        "text": "Hey, Loved your blog! ",
+        "text": "This FOI Request is ready for CFR, @Divya please forward ",
         "replies": [
           {
             "userId": "02a",
@@ -50,22 +50,23 @@ const RequestNotes = React.memo((props) => {
         "userId": "02a",
         "comId": "07",
         "fullName": "Divya Viswanath",
-        "text": "Follow my page for more such interesting blogs!😇",
-        "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random"
+        "text": "Yes CFR can be done, but waiting for MC to reply",
+        "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random",
+        "replies":[]
       },
       {
         "userId": "02a",
         "comId": "015",
         "fullName": "Robert Jae",
         "avatarUrl": "https://ui-avatars.com/api/name=Robert&background=random",
-        "text": "Woah pretty helpful! how did you solve for x?",
+        "text": "I can look into it",
         "replies": [
           {
             "userId": "01b",
             "comId": "016",
       
             "fullName": "Divya Viswanath",
-            "text": "Thanks! refer to this link -> acs.com",
+            "text": "Thanks! refer here mmm",
             "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random"
           }
         ]
