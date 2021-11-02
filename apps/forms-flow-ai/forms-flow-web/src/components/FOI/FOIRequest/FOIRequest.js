@@ -54,8 +54,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FOIRequest = React.memo(({userDetail}) => {
-
-
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   

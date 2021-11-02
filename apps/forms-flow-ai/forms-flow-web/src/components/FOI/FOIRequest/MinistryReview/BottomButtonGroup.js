@@ -3,7 +3,7 @@ import '../bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
-import { saveMinistryRequestDetails } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { saveMinistryRequestDetails, getOSSHeaderDetails, saveFilesinS3 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../../customComponents';
@@ -125,14 +125,73 @@ const BottomButtonGroup = React.memo(({
       setsaveModal(true);
     }
 
-    const handleSaveModal = (value) => {
-      setsaveModal(false);      
-      if (value) {
-        if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
+    const [successCount, setSuccessCount] = useState(0);
+    const [fileCount, setFileCount] = useState(0);
+    const [documents, setDocuments] = useState([]);
+
+    const saveStatusId = () => {
+      if (currentSelectedStatus) {
+        switch(currentSelectedStatus.toLowerCase()) {
+          case StateEnum.review.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
+            break;
+          case StateEnum.feeassessed.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.feeassessed.id;
+            break;
+          case StateEnum.deduplication.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.deduplication.id;
+            break;
+          case StateEnum.signoff.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
+            break;
+        }
+      }
+    }
+
+    React.useEffect(() => {
+      if (successCount === fileCount && successCount !== 0) {
+          setsaveModal(false);
+          saveStatusId();
+          saveMinistryRequestObject.documents = documents;
           saveMinistryRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
+      }
+    },[successCount])
+
+    const handleSaveModal = (value, fileInfoList, files) => {
+      setsaveModal(false);
+      setFileCount(files.length);
+      if (value) {
+        if(!isValidationError)
+        {
+          if (files.length !== 0) {
+            dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
+              let _documents = [];
+              if (!err) {
+                res.map((header, index) => {
+                  const _file = files.find(file => file.name === header.filename);
+                  const documentpath = {documentpath: header.filepath};
+                  _documents.push(documentpath);
+                  setDocuments(_documents);
+                  dispatch(saveFilesinS3(header, _file, (err, res) => {
+
+                    if (res === 200) {
+
+                      setSuccessCount(index+1);
+                    }
+                    else {
+                      setSuccessCount(0);
+                    }
+                  }));
+                });
+              }
+            }));
+          }
+          else {
+            saveStatusId();         
+            saveMinistryRequest();
+            hasStatusRequestSaved(true,currentSelectedStatus)
+          }
         }
         else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
         {

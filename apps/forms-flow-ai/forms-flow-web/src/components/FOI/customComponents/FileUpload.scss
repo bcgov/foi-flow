@@ -1,0 +1,87 @@
+.file-upload-container {
+    position: relative;
+    padding: 35px 20px 0px 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+}
+.drag-and-drop-text {
+    margin-top: 50px !important;  
+    margin-left: 20%;
+    text-align: center;
+    font-size: 15px;
+}
+.btn-add-files {
+    margin-left: 50px;
+    margin-top: 45px;
+    font-size: 12px;
+    height: 25%;
+    width: 12%;
+    border-radius: 3px;
+    border: none;
+    background-color: #38598A;
+    color: #FFFFFF;
+}
+.file-upload-input {
+    font-size: 18px;
+    display: block;
+    width: 90%;
+    height: 150px;
+    border: none;
+    text-transform: none;
+    position: absolute;
+    opacity: 0;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.file-upload-btn {
+    font-size: 18px;
+    display: flex;
+    width: 90%;
+    height: 150px;
+    text-transform: none;
+    position: absolute;
+}
+
+.file-upload-preview {
+    display: block;
+    border: 4px solid gray;
+    border-radius: 15px;
+    width: 90%;
+    height: 150px;
+}
+
+
+.file-preview-container {
+    margin-top: 50px;
+    margin-bottom: 35px;
+    margin-left: 22%;
+
+  span {
+    font-size: 14px;
+    text-decoration: underline;
+    font-weight: bold;
+  }
+}
+
+.file-name {
+    padding-right: 20px;
+}
+.foi-file-close {
+  font: normal normal normal 14px/1 FontAwesome!important;
+}
+.error-message-container {
+    margin-left: 10%;
+    margin-top: 10px;
+    display: block;
+    p {
+      color:red;
+      line-height: 0.5rem;
+      font-size: 10px;
+    }
+    
+}
