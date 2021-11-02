@@ -20,7 +20,8 @@ import {
   setFOIMinistryRequestList,
   setFOIMinistryDivisionalStages,
   clearFOIMinistryDivisionalStages,
-  setFOIWatcherList
+  setFOIWatcherList,
+  setClosingReasons
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -604,6 +605,31 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId,...rest) =>
       .then((res) => {
         if (res.data) {
           dispatch(setFOIRequestDescriptionHistory(res.data.audit));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          console.log("Error", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };
+};
+
+export const fetchClosingReasonList = (...rest) => {
+  const done = rest.length ? rest[0] : () => {};
+  return (dispatch) => {
+    httpGETRequest(API.FOI_GET_CLOSING_REASONS, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const closingReasons = res.data;
+          dispatch(setClosingReasons(closingReasons));
           dispatch(setFOILoader(false));
           done(null, res.data);
         } else {

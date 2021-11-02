@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_,and_
+from sqlalchemy import or_, and_, text
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 
@@ -66,6 +66,14 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
+
+    @classmethod
+    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
+        sql = """select created_at from "FOIMinistryRequests" 
+                    where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
+                    order by version desc limit 1;"""
+        rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
+        return [row[0] for row in rs][0]
     
     @classmethod
     def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion, userId)->DefaultMethodResult:

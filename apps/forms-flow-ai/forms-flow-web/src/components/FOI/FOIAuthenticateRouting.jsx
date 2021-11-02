@@ -44,8 +44,8 @@ const FOIAuthenticateRouting = React.memo((props) => {
               <FOIHeader /> 
               <Route exact path={["/foi", "/foi/dashboard"]}>
                 {isMinistry ? 
-                <MinistryDashboard />
-                : <Dashboard />
+                <MinistryDashboard userDetail={userDetail} />
+                : <Dashboard userDetail={userDetail} />
                 }
               </Route>
               <Route path="/foi/reviewrequest/:requestId/:requestState">
