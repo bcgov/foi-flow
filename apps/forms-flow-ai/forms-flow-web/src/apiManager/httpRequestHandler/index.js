@@ -28,6 +28,11 @@ export const httpOpenPOSTRequest = (url, data) => {
   return axios.post(url, data, axiosConfig);
 };
 
+export const httpOSSPUTRequest = (url, data, requestOptions) => {  
+  return axios.put(url, data, requestOptions);
+};
+
+
 export const httpPOSTRequest = (url, data, token, isBearer = true) => {
   return axios.post(url, data, {
     headers: {

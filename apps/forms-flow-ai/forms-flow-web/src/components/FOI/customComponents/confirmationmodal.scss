@@ -1,9 +1,6 @@
 
 
 .btn-save {
-    border: none;
-    background-color: #38598A;
-    color: #FFFFFF;
     border-radius: 3px;
     font-size: small;
     height: 30px;
@@ -25,7 +22,7 @@
 #state-change-dialog-title {
     font-family: "BCSans-Bold", sans-serif!important;
     color: #036 ;
-    padding: 30px 26px 30px;
+    padding: 30px 26px 0px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -50,6 +47,10 @@
 #state-change-description {
     padding-left: 50px;
     color: black;
+}
+
+.confirmation-message {
+    font-size: 20px;
 }
 
 .table-assignedto {
@@ -86,4 +87,8 @@
 
 .confirm-label-content {
     padding-left: 35px;
+}
+
+.modal-message {
+    margin-left: 50px;
 }
