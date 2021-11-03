@@ -255,14 +255,18 @@ const MinistryReview = React.memo(({userDetail}) => {
           <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
+        
+        <div className="foileftpanelstatus">
         {_requestStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? null : 
-        <div className="foileftpanelstatus"> 
+          <>
           {_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() ?
           <h4>{bottomTextArray[0]}</h4>
           : null }
           <h4>{bottomTextArray[1]}</h4>
-        </div>  
+          </>
         }
+        </div>  
+     
         </div>
         <div className="foitabpanelcollection"> 
           <div id="Request" className="tabcontent active">                                
