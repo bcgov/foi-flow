@@ -10,6 +10,8 @@ const DisplayComments = ({ comments }) => {
   return (
     <div>
       {comments.map((i, index) => (
+
+
         <div key={i.comId}>
           {actions.editArr.filter((id) => id === i.comId).length !== 0 ? (
             actions.customInput ? (
@@ -24,7 +26,8 @@ const DisplayComments = ({ comments }) => {
               <InputField cancellor={i.comId} value={i.text} edit />
             )
           ) : (
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={-101} currentIndex={index} />
+           
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies === undefined ? -101 : -100 } currentIndex={index} />
           )}
           {actions.replies.filter((id) => id === i.comId).length !== 0 &&
             (actions.customInput ? (

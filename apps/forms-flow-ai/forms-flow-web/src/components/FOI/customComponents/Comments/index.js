@@ -31,6 +31,9 @@ export const CommentSection = ({
         <div className="displayComments">
           <DisplayComments comments={comments} />
         </div>
+        <div className="inputBox">
+          { <Input />}
+        </div>
       </div>
     </ActionProvider>
   )
