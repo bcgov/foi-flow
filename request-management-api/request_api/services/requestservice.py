@@ -257,6 +257,7 @@ class requestservice:
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
             'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
+            'statetransition': FOIRequestUtil().getstatetransition(foiministryrequestid),
             'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d')
          }
 
@@ -368,7 +369,8 @@ class requestservice:
                 'assignedministryperson':requestministry["assignedministryperson"],                
                 'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
                 'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
-                'documents': FOIRequestUtil().getdocuments(requestministrydocuments)
+                'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
+                'statetransition': FOIRequestUtil().getstatetransition(foiministryrequestid)
             }
 
             if requestministry['cfrduedate'] is not None:
@@ -633,6 +635,16 @@ class FOIRequestUtil:
                     } 
                 documents.append(document)
         return documents
+    
+    def getstatetransition(self, foiministryrequestid):
+        summary = []
+        transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
+        tmprec = None
+        for entry in transitions:
+            if tmprec != entry['requeststatusid']:
+                summary.append({"requeststatusid": entry['requeststatusid'], "createdat":parse(str(entry['created_at'])).strftime("%Y-%m-%d")})
+            tmprec = entry['requeststatusid']     
+        return summary;
     
     def getStatusName(self,requeststatusid):
         allStatus = FOIRequestStatus().getrequeststatuses()
