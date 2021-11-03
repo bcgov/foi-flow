@@ -60,20 +60,23 @@
   }
 
   .foitabheaderdefaultBG {
-    // background-color: #048ba8;
-    background-color: teal;
+    background-color: #FAA915;
+  }
+
+  .foitabheaderIntakeInProgressBG {
+    background-color: #EC7D10;
   }
 
   .foitabheaderOpenBG {
-    background-color: #008000;
+    background-color: #00A676;
   }
 
   .foitabheaderClosedBG{
-    background-color: #4b296b;
+    background-color: #000000;
   }
 
   .foitabheaderCFRG{
-    background-color: #ec7d10;
+    background-color: #F25489;
   }
 
   .foitabheaderCFROverdueBG{
@@ -81,26 +84,40 @@
   }
   
   .foitabheaderRedirectBG{
-    background-color: #dd1155;
+    background-color: #1B8103;
   }
   
   .foitabheaderReviewBG{
-    background-color: #40E0D0;
+    background-color: #248BA8;
   }
   
   .foitabheaderFeeBG{
-    background-color: maroon;
+    background-color: #A0192F;
   }
 
   .foitabheaderConsultBG{
-    background-color: grey;
+    background-color: #9448BC;
   }
 
   .foitabheaderSignoffBG{
-    background-color: skyblue;
+    background-color: #683286;
   }
 
+  .foitabheaderDeduplicationBG{
+    background-color: #DD2255;
+  }
 
+  .foitabheaderOnHoldBG{
+    background-color: #808080;
+  }
+
+  .foitabheaderHarmsBG{
+    background-color: #B988D3;
+  }
+
+  .foitabheaderResponseBG{
+    background-color: #0A4454;
+  }
 
 
   .foileftpanelheader

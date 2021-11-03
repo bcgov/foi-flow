@@ -54,8 +54,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FOIRequest = React.memo(({userDetail}) => {
-
-
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   
@@ -519,11 +517,14 @@ const FOIRequest = React.memo(({userDetail}) => {
     setcurrentrequestStatus(currentStatus);
   }
 
-  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{    
+  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{
+    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {      
+      settabStatus(StateEnum.callforrecordsoverdue.name)
+    }
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-    const bottomText = _status === StateEnum.open.name ? _daysRemainingText : _status === StateEnum.callforrecords.name ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
-    setRequestStatus(bottomText);       
+    const bottomText = _status === StateEnum.open.name ? _daysRemainingText : (_status === StateEnum.callforrecords.name || _status === StateEnum.feeassessed.name || _status === StateEnum.review.name) ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
+    setRequestStatus(bottomText);
   }
 
   const hasStatusRequestSaved =(issavecompleted,state)=>{
@@ -535,6 +536,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
 
   switch (_tabStatus){
+    case StateEnum.intakeinprogress.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderIntakeInProgressBG"
+      break;
     case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
@@ -543,6 +547,9 @@ const FOIRequest = React.memo(({userDetail}) => {
       break;
     case StateEnum.callforrecords.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+      break;
+    case StateEnum.callforrecordsoverdue.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
       break;
     case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
@@ -558,6 +565,15 @@ const FOIRequest = React.memo(({userDetail}) => {
       break;
     case StateEnum.signoff.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
+      break;
+    case StateEnum.deduplication.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
+      break;
+    case StateEnum.harms.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
+      break;
+    case StateEnum.onhold.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
@@ -600,9 +616,11 @@ const FOIRequest = React.memo(({userDetail}) => {
           <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
-        {_requestStatus.toLowerCase().includes("days") &&  bottomTextArray.length > 1  ?
-        <div className="foileftpanelstatus"> 
+        {bottomTextArray.length > 1  ?
+        <div className="foileftpanelstatus">
+          {_tabStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() ? 
           <h4>{bottomTextArray[0]}</h4>
+          : null }
           <h4>{bottomTextArray[1]}</h4>
         </div>
         : 

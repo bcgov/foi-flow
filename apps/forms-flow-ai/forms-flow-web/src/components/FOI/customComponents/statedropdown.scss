@@ -26,38 +26,65 @@
     display: none !important;
 }
 
+.unopened {
+    background-color: #FAA915;
+}
+
 .intakeinprogress {
-    background-color: #048ba8;
+    background-color: #EC7D10;
 }
 
 .open {
-    background-color: #008000;
-}
-
-.callforrecords {
-    background-color: #ec7d10;
+    background-color: #00A676;
 }
 
 .redirect {
-    background-color: #dd1155;
+    background-color: #1B8103;
 }
 
-.closed {
-    background-color: #4b296b;
+.callforrecords {
+    background-color: #F25489;
 }
 
-.review {
-     background-color: #40E0D0;
+.deduplication {
+    background-color: #DD2255;
 }
 
-.feeassessed {
-    background-color: maroon;
+.feeestimate {
+    background-color: #A0192F;
+}
+
+.onhold {
+    background-color: #808080;
+}
+
+.harmsassessment {
+    background-color: #B988D3;
 }
 
 .consult {
-    background-color: grey;
+    background-color: #9448BC;
 }
 
 .ministrysignoff {
-    background-color: skyblue;
+    background-color: #683286;
 }
+
+.recordsreview {
+    background-color: #248BA8;
+}
+
+.response {
+    background-color: #0A4454;
+}
+
+.closed {
+    background-color: #000000;
+}
+
+
+
+
+
+
+
