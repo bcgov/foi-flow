@@ -26,17 +26,13 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex })
       >
         <div>{i.text}</div>
         <div className="commentsTwo">
-          <div>
-            <img
-              src={i.avatarUrl}
-              style={{ width: 24, height: 24, borderRadius: 24 / 2 }}
-              alt='userIcon'
-            />
-          </div>
+          
           <div className="fullName">{i.fullName} </div>
-          <div>
+         
+        </div>
+        <div>
             <button
-              className={`replyBtn ${ totalcommentCount-1 > currentIndex && totalcommentCount != -101 ? " hide" : " show" }`}
+              className={`replyBtn ${ totalcommentCount-1 > currentIndex || totalcommentCount == -100 ? " hide" : " show" }`}
               onClick={() => actions.handleAction(i.comId)}
               disabled={!actions.user}
             >
@@ -44,7 +40,6 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex })
               <FontAwesomeIcon icon={faReply} size='1x' color='#a5a5a5' /> Reply
             </button>
           </div>
-        </div>
       </div>
       <div className="userActions">
         {actions.userId === i.userId && actions.user && (

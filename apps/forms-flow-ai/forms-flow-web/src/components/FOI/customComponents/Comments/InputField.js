@@ -23,13 +23,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
           : { marginLeft: 8 }
       }
     >
-      <div className="userImg">
-        <img
-          src={actions.userImg}
-          style={{ width: 38, height: 38, borderRadius: 38 / 2 }}
-          alt='userIcon'
-        />
-      </div>
+     
       <input
         className="postComment"
         type='text'
