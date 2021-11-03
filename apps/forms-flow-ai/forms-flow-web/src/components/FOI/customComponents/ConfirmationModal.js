@@ -111,6 +111,8 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
         case StateEnum.response.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
+        case StateEnum.onhold.name.toLowerCase():
+            return {title: "Hold Request", body: `Are you sure you want to change Request #${_requestNumber} to on hold?`};
         default:
             return {title: "", body: ""};
       }
@@ -154,9 +156,18 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-              <span className="confirmation-message">
+            {state.toLowerCase() === StateEnum.onhold.name.toLowerCase() ?
+              <div className="modal-message">
+                <span className="confirmation-message">
                   {message.body}
-              </span>                         
+                  <br/>This will <b>stop</b> the clock and assign to Processing Team             
+                </span>                
+              </div>
+            : 
+            <span className="confirmation-message">
+                {message.body}
+              </span> 
+              }
               {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ?              
                   <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
                   : (
@@ -173,7 +184,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                             </tr>
                           </tbody>
                         </table>
-                        {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() ? 
+                        {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 
                           <table className="table table-bordered table-assignedto">
                             <tbody>
                               <tr>
