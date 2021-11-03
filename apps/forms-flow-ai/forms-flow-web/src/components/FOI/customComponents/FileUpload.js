@@ -1,15 +1,9 @@
 import React, { useRef, useState } from "react";
 import "./FileUpload.scss"
 
-const DEFAULT_MAX_FILE_SIZE_IN_BYTES = 52428800; //50MB
-const KILO_BYTES_PER_BYTE = 1000;
-
-const convertBytesToKB = (bytes) => Math.round(bytes / KILO_BYTES_PER_BYTE);
-
 const FileUpload = ({
     multipleFiles,
-    updateFilesCb,
-    maxFileSizeInBytes = DEFAULT_MAX_FILE_SIZE_IN_BYTES
+    updateFilesCb
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({});
