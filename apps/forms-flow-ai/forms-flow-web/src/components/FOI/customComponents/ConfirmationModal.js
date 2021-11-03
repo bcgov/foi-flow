@@ -90,7 +90,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.open.name.toLowerCase():
             return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
         case StateEnum.closed.name.toLowerCase():
-            return {title: "Close Request", body: "Are you sure you want to Close this request?"}; 
+            return {title: "Close Request", body: ""}; 
         case StateEnum.redirect.name.toLowerCase():
             return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};  
         case StateEnum.callforrecords.name.toLowerCase():
@@ -103,6 +103,14 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
             return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
+        case StateEnum.onhold.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.onhold.name}?`};
+        case StateEnum.deduplication.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
+        case StateEnum.harms.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
+        case StateEnum.response.name.toLowerCase():
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
         case StateEnum.onhold.name.toLowerCase():
             return {title: "Hold Request", body: `Are you sure you want to change Request #${_requestNumber} to on hold?`};
         case StateEnum.response.name.toLowerCase():
@@ -244,7 +252,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
     <>
     <div className="row foi-details-row confirm-modal-row first-row">
       <div className="col-lg-6 foi-details-col">
-        <div className="confirm-label-area"><b>Application: </b><span className="confirm-label-content">{_requestDetails.firstName+" "+_requestDetails.lastName}</span></div>
+        <div className="confirm-label-area"><b>Applicant: </b><span className="confirm-label-content">{_requestDetails.firstName+" "+_requestDetails.lastName}</span></div>
       </div>
       <div className="col-lg-6 foi-details-col confirm-label-area">
         <div className="confirm-label-area"><b>Organization: </b><span className="confirm-label-content">{_requestDetails.businessName}</span></div>
