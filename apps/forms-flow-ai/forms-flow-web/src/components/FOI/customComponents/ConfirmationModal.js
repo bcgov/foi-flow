@@ -102,7 +102,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.signoff.name.toLowerCase():
             return {title: "Ministry Sign Off", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
-          return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
+            return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
         case StateEnum.onhold.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.onhold.name}?`};
         case StateEnum.deduplication.name.toLowerCase():
