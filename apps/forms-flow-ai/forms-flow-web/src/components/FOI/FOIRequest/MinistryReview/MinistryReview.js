@@ -208,6 +208,9 @@ const MinistryReview = React.memo(({userDetail}) => {
     case StateEnum.onhold.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
       break;
+    case StateEnum.response.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderResponseBG"
+      break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;  
@@ -257,9 +260,9 @@ const MinistryReview = React.memo(({userDetail}) => {
         </div>
         
         <div className="foileftpanelstatus">
-        {_requestStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? null : 
+        {_requestStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _requestStatus.toLowerCase() === StateEnum.closed.name.toLowerCase() ? <h4> N/A </h4>  : 
           <>
-          {_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() ?
+          {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
           <h4>{bottomTextArray[0]}</h4>
           : null }
           <h4>{bottomTextArray[1]}</h4>

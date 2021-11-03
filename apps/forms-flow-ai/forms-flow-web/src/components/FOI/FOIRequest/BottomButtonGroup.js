@@ -273,6 +273,12 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
+        else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.response.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
       }
     }
 
