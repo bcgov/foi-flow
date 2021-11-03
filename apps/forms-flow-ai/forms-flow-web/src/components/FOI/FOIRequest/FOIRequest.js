@@ -35,6 +35,7 @@ import Typography from '@material-ui/core/Typography';
 import { StateDropDown } from '../customComponents';
 import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import {CommentSection} from '../customComponents/Comments'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -580,6 +581,78 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   }
   const bottomTextArray = _requestStatus.split('|');
+
+  const data = [
+    {
+      "userId": "01a",
+      "comId": "012",
+      "fullName": "Abin Antony",
+      "avatarUrl": "https://ui-avatars.com/api/name=Riya&background=random" ,
+      "text": "This FOI Request is ready for CFR, @Divya please forward ",
+      "replies": [
+        {
+          "userId": "02a",
+          "comId": "013",
+    
+          "fullName": "Divya Viswanath",
+          "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random" ,
+          "text": "Thanks! It took me 1 month to finish this project but I am glad it helped out someone!🥰"
+        },
+        {
+          "userId": "01a",
+          "comId": "014",
+    
+          "fullName": "Abin Antony",
+          "avatarUrl": "https://ui-avatars.com/api/name=Riya&background=random",
+          "text": "thanks!😊"
+        }
+      ]
+    },
+    {
+      "userId": "02a",
+      "comId": "07",
+      "fullName": "Divya Viswanath",
+      "text": "Yes CFR can be done, but waiting for MC to reply",
+      "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random",      
+    },
+    {
+      "userId": "02a",
+      "comId": "015",
+      "fullName": "Robert Jae",
+      "avatarUrl": "https://ui-avatars.com/api/name=Robert&background=random",
+      "text": "I can look into it",
+      "replies": [
+        {
+          "userId": "01b",
+          "comId": "016",
+    
+          "fullName": "Divya Viswanath",
+          "text": "Thanks! refer here mmm",
+          "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random"
+        }
+      ]
+    },
+    {
+      "userId": "02b",
+      "comId": "017",
+      "fullName": "Sumathi",
+      "text": "I have a doubt about the 4th point🤔",
+      "avatarUrl": "https://ui-avatars.com/api/name=Lily&background=random"
+    }
+  ]
+  const [comment, setComment] = useState(data)
+  const userId = "01a"
+  const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
+  const name = "xyz"
+  const signinUrl = "/signin"
+  const signupUrl = "/signup"
+  let count = 0
+
+comment.map(i => { count += 1; i.replies && i.replies.map(i => count += 1) })
+
+
+
+
   return (
 
     <div className="foiformcontent">
@@ -595,7 +668,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           
         <div className="tab">
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
-          <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
+          <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
         {bottomTextArray.length > 1  ?
@@ -636,8 +709,9 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
-          <div id="CorrespondenceLog" className="tabcontent">
-              
+          <div id="Comments" className="tabcontent">
+          <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={comment}
+        setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} />
               </div> 
           <div id="Option3" className="tabcontent">
            <h3>Option 3</h3>
