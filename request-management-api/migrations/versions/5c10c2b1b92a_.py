@@ -35,7 +35,7 @@ def upgrade():
             {'name':'Application Fee - Abandoned','isactive':True},
             {'name':'Full Disclosure','isactive':True},
             {'name':'No Resp. Records Exist/Located','isactive':True},
-            {'name':'Outdated Scope of Act','isactive':True},
+            {'name':'Outside Scope of Act','isactive':True},
             {'name':'Partial Disclosure','isactive':True},
             {'name':'Records in another Min/Org','isactive':True},
             {'name':'Refuse to Confirm or Deny','isactive':True},
