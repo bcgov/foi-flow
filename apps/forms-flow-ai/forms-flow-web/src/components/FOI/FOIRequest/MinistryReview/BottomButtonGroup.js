@@ -141,6 +141,9 @@ const BottomButtonGroup = React.memo(({
           case StateEnum.deduplication.name.toLowerCase(): 
             saveMinistryRequestObject.requeststatusid = StateEnum.deduplication.id;
             break;
+          case StateEnum.harms.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.harms.id;
+            break;
           case StateEnum.signoff.name.toLowerCase(): 
             saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
             break;
