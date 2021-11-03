@@ -533,6 +533,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
 
   switch (_tabStatus){
+    case StateEnum.intakeinprogress.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderIntakeInProgressBG"
+      break;
     case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
@@ -556,6 +559,15 @@ const FOIRequest = React.memo(({userDetail}) => {
       break;
     case StateEnum.signoff.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
+      break;
+    case StateEnum.deduplication.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
+      break;
+    case StateEnum.harms.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
+      break;
+    case StateEnum.onhold.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
@@ -599,8 +611,10 @@ const FOIRequest = React.memo(({userDetail}) => {
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
         {bottomTextArray.length > 1  ?
-        <div className="foileftpanelstatus"> 
+        <div className="foileftpanelstatus">
+          {_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() ? 
           <h4>{bottomTextArray[0]}</h4>
+          : null }
           <h4>{bottomTextArray[1]}</h4>
         </div>
         : 
