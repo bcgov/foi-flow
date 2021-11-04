@@ -16,13 +16,13 @@ class CloseReason(db.Model):
     @classmethod
     def getallclosereasons(cls):
         closereason_schema = CloseReasonSchema(many=True)
-        query = db.session.query(CloseReason).filter_by(isactive=True).all()
+        query = db.session.query(CloseReason).filter_by(isactive=True).order_by(CloseReason.closereasonid.asc()).all()
         return closereason_schema.dump(query)
 
     @classmethod
     def getclosereason(cls,closereasonid):
         closereason_schema = CloseReasonSchema(many=True)
-        query = db.session.query(CloseReason).filter_by(closereasonid=closereasonid).order_by(CloseReason.name.asc())
+        query = db.session.query(CloseReason).filter_by(closereasonid=closereasonid).first()
         return closereason_schema.dump(query)
     
              
