@@ -619,16 +619,19 @@ const FOIRequest = React.memo(({userDetail}) => {
           <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
-        {bottomTextArray.length > 0  ?
+       
         <div className="foileftpanelstatus">
-          <h4>{_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()? "N/A" : bottomTextArray[0]}</h4>
+        {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) ?
+        <>
+          <h4>{_tabStatus && (_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()) ? "" : bottomTextArray[0]}</h4>
           {bottomTextArray.length > 1  ?
           <h4>{bottomTextArray[1]}</h4>
           : null }
+          </>
+          : null
+          }
         </div>
-        : null 
-        // <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days") ? _requestStatus : ""}</h4>
-        }
+        
 
         </div>
         <div className="foitabpanelcollection"> 

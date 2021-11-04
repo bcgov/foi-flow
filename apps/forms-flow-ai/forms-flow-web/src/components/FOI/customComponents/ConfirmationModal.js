@@ -100,17 +100,13 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.consult.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`};
         case StateEnum.signoff.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
             return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
-        case StateEnum.onhold.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.onhold.name}?`};
         case StateEnum.deduplication.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
         case StateEnum.harms.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
-        case StateEnum.response.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};       
         case StateEnum.onhold.name.toLowerCase():
             return {title: "Hold Request", body: `Are you sure you want to change Request #${_requestNumber} to on hold?`};
         case StateEnum.response.name.toLowerCase():
