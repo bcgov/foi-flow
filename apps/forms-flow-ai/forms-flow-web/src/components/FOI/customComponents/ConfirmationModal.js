@@ -170,7 +170,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
                   : (
                     <>
-                    {state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ?
+                    {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ?
                       <FileUpload  multipleFiles={multipleFiles} updateFilesCb={updateFilesCb} />
                       :
                       <>
@@ -200,7 +200,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className={`btn-bottom btn-save ${files.length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || (files.length === 0 && (state.toLowerCase() === StateEnum.review.name.toLowerCase() || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ))} onClick={handleSave}>
+            <button className={`btn-bottom btn-save ${files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || (files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ))} onClick={handleSave}>
               Save Change
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
