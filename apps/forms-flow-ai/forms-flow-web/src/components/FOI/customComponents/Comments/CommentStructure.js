@@ -14,22 +14,25 @@ import {
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
 
-const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex }) => {
+const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, isreplysection }) => {
   const actions = useContext(ActionContext)
   const edit = true
 
+  let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
+
   return (
-    <div className="halfDiv">
+    <div className={halfDivclassname}>
       <div
         className="userInfo"
         style={reply && { marginLeft: 15, marginTop: '6px' }}
       >
-        <div>{i.text}</div>
         <div className="commentsTwo">
           
-          <div className="fullName">{i.fullName} </div>
+          <div className="fullName">{i.fullName} </div> |  <div className="fullName">{i.date} </div>
          
         </div>
+        <div className="commenttext">{i.text}</div>
+        
         <div>
             <button
               className={`replyBtn ${ totalcommentCount-1 > currentIndex || totalcommentCount == -100 ? " hide" : " show" }`}

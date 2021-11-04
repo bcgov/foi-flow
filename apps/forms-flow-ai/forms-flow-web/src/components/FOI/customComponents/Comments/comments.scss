@@ -23,11 +23,11 @@
       border-radius:5px;
       transition: 0.5s;
       padding:8px 16px;
-      background-color: #84dcff;
+      background-color: transparent!important;
       border:none;
       margin-right: 10px;
       font-weight:bolder;
-    font-size: 16px;
+      font-size: 12px;
 
       &:hover {
         background-position: right center;
@@ -100,17 +100,17 @@
 
 
 .displayComments{
-  margin-top: 18px;
-  margin-left: 38px;
+  margin:25px;
 
   .halfDiv{
     display: flex;
     justify-content: space-between;
+    
 
     .userInfo{
       display: flex;
       flex-direction: column;
-      margin-top: 16px;
+     
   
       .commentsTwo{
         display: flex;
@@ -124,13 +124,12 @@
         }                
       }
       .replyBtn{
-        background-color: transparent;
+        background-color: transparent!important;
         border:none;
-        color: gray;
+        color: darkblue;
         outline:none;
         font-weight: 600;
-        font-size:14px;
-        margin: 0px 5px!important;
+        font-size:13px;       
         width:70px;
         padding: 5px;
         border-radius: 4px;
@@ -140,6 +139,10 @@
           background-color: rgba(160, 160, 160, 0.315);
         }
         &:focus {outline:0;}
+
+        svg {
+          color: darkblue;
+        }
       }
     }
     .userActions{
@@ -163,10 +166,13 @@
     }
   }
   
-  .replySection{
-    margin-left: 35px;
-    border-left: 2px solid rgb(199, 199, 199);
-    margin-top: 6px;
+  .replySection{        
+   margin-top:3px;    
+  }
+
+  .replySection .halfDiv   {
+      
+    margin-bottom: unset;  
   }
 
   .hide{
@@ -240,3 +246,23 @@
   }
 }
 
+.commentsection{ 
+  background-color: rgb(210, 226, 246);
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.commentsection .halfDiv {
+  margin: 3px; 
+}
+
+.undermaincomment{
+  margin: unset!important;
+  background-color:rgb(234, 237, 241);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.commenttext{
+  margin-left:10px
+}

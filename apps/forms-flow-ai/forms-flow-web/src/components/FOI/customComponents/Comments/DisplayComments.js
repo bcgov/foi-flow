@@ -12,7 +12,7 @@ const DisplayComments = ({ comments }) => {
       {comments.map((i, index) => (
 
 
-        <div key={i.comId}>
+        <div key={i.comId} className="commentsection">
           {actions.editArr.filter((id) => id === i.comId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -27,7 +27,7 @@ const DisplayComments = ({ comments }) => {
             )
           ) : (
            
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies === undefined ? -101 : -100 } currentIndex={index} />
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies === undefined ? -101 : -100 } currentIndex={index} c={false} />
           )}
           {actions.replies.filter((id) => id === i.comId).length !== 0 &&
             (actions.customInput ? (
@@ -69,7 +69,7 @@ const DisplayComments = ({ comments }) => {
                       i={a}
                       reply
                       parentId={i.comId}
-                      handleEdit={() => actions.handleAction} totalcommentCount ={i.replies.length} currentIndex={index}
+                      handleEdit={() => actions.handleAction} totalcommentCount ={i.replies.length} currentIndex={index} isreplysection={true}
                     />
                   )}
                   {actions.replies.filter((id) => id === a.comId).length !==

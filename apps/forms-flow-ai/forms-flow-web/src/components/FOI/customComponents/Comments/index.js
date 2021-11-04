@@ -27,13 +27,14 @@ export const CommentSection = ({
       signupUrl={signupUrl}
       customInput={customInput}
     >
-      <div className="section">        
+      <div className="section"> 
+      <div className="inputBox">
+          { <Input />}
+        </div>       
         <div className="displayComments">
           <DisplayComments comments={comments} />
         </div>
-        <div className="inputBox">
-          { <Input />}
-        </div>
+        
       </div>
     </ActionProvider>
   )

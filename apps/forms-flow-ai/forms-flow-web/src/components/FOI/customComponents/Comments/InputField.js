@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react'
 import  './comments.scss'
 import { ActionContext } from './ActionContext'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 
 const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
   const [text, setText] = useState('')
@@ -48,7 +50,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
               : { backgroundColor: '#30c3fd' }
           }
         >
-          Post
+         {' '}
+              <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#a5a5a5' />
         </button>
         {(text || parentId) && (
           <button
