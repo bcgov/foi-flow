@@ -147,6 +147,9 @@ const BottomButtonGroup = React.memo(({
           case StateEnum.signoff.name.toLowerCase(): 
             saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
             break;
+          case StateEnum.response.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
+            break;
         }
       }
     }
