@@ -257,7 +257,7 @@ class requestservice:
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
             'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
-            'statetransition': FOIRequestUtil().getstatetransition(foiministryrequestid),
+            'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid),
             'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d')
          }
 
@@ -370,7 +370,7 @@ class requestservice:
                 'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
                 'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
                 'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
-                'statetransition': FOIRequestUtil().getstatetransition(foiministryrequestid)
+                'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid)
             }
 
             if requestministry['cfrduedate'] is not None:
@@ -636,15 +636,16 @@ class FOIRequestUtil:
                 documents.append(document)
         return documents
     
-    def getstatetransition(self, foiministryrequestid):
-        summary = []
+    def getonholdtransition(self, foiministryrequestid):
+        onholddate = None
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
-        tmprec = None
         for entry in transitions:
-            if tmprec != entry['requeststatusid']:
-                summary.append({"requeststatusid": entry['requeststatusid'], "createdat":parse(str(entry['created_at'])).strftime("%Y-%m-%d")})
-            tmprec = entry['requeststatusid']     
-        return summary;
+            if entry['requeststatusid'] == 11:
+                onholddate = parse(str(entry['created_at'])).strftime("%Y-%m-%d")
+            else:
+                if onholddate is not None:
+                    break;
+        return onholddate;
     
     def getStatusName(self,requeststatusid):
         allStatus = FOIRequestStatus().getrequeststatuses()

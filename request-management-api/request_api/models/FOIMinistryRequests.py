@@ -146,7 +146,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequeststatusById(cls,ministryrequestid):
-        sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid order by created_at;'
+        sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid order by version desc;'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         summary = []
         for row in rs:
