@@ -545,7 +545,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     case StateEnum.closed.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
-    case StateEnum.callforrecords.name: 
+    case StateEnum.callforrecords.name:
       foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
       break;
     case StateEnum.callforrecordsoverdue.name:
@@ -621,13 +621,13 @@ const FOIRequest = React.memo(({userDetail}) => {
         </div>
         {bottomTextArray.length > 0  ?
         <div className="foileftpanelstatus">
-          <h4>{bottomTextArray[0]}</h4>
+          <h4>{_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()? "N/A" : bottomTextArray[0]}</h4>
           {bottomTextArray.length > 1  ?
           <h4>{bottomTextArray[1]}</h4>
           : null }
         </div>
-        : 
-        <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days") ? _requestStatus : ""}</h4>
+        : null 
+        // <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days") ? _requestStatus : ""}</h4>
         }
 
         </div>
