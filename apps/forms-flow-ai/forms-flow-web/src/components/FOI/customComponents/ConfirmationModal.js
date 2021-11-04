@@ -76,7 +76,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
           return {
             ministrycode: requestNumber.split("-")[0],
             requestnumber: requestNumber,
-            filestatustransition: 'cfr-review',
+            filestatustransition: state.toLowerCase() === StateEnum.response.name.toLowerCase() ? 'signoff-response' : 'cfr-review',
             filename: file.name,
           }
         });
@@ -100,19 +100,17 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.consult.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`};
         case StateEnum.signoff.name.toLowerCase():
-            return {title: "Ministry Sign Off", body: `Are you sure you want to change Request #${_requestNumber} to${StateEnum.signoff.name}?`};
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.signoff.name}?`};
         case StateEnum.feeassessed.name.toLowerCase():
             return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
-        case StateEnum.onhold.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.onhold.name}?`};
         case StateEnum.deduplication.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
         case StateEnum.harms.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
-        case StateEnum.response.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
+            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};       
         case StateEnum.onhold.name.toLowerCase():
             return {title: "Hold Request", body: `Are you sure you want to change Request #${_requestNumber} to on hold?`};
+        case StateEnum.response.name.toLowerCase():
+            return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
         default:
             return {title: "", body: ""};
       }
@@ -172,7 +170,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
                   : (
                     <>
-                    {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() ?
+                    {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ?
                       <FileUpload  multipleFiles={multipleFiles} updateFilesCb={updateFilesCb} />
                       :
                       <>
@@ -202,7 +200,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className={`btn-bottom btn-save ${files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase()) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || (files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase()))} onClick={handleSave}>
+            <button className={`btn-bottom btn-save ${files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || (files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ))} onClick={handleSave}>
               Save Change
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
