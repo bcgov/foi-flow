@@ -21,7 +21,7 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
 
   return (
-    <div className={halfDivclassname}>
+    <div className={halfDivclassname} >
       <div
         className="userInfo"
         style={reply && { marginLeft: 15, marginTop: '6px' }}

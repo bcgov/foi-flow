@@ -41,11 +41,19 @@ export const ActionProvider = ({
   const onSubmit = (text, parentId, child) => {
     if (text.length > 0) {
       if (!parentId && !child) {
+
+
+        const maxId = comments.reduce(
+          (max, comment) => (comment.comId > max ? comment.comId : max),
+          comments[0].comId
+        );  
+
+
         setComment([
           ...comments,
           {
             userId: currentUser.userId,
-            comId: uuid(),
+            comId: maxId+1,
             avatarUrl: currentUser.avatarUrl,
             fullName: currentUser.name,
             text: text

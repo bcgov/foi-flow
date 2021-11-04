@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import  './comments.scss'
+import './comments.scss'
 import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import SignField from './SignField'
@@ -27,14 +27,14 @@ export const CommentSection = ({
       signupUrl={signupUrl}
       customInput={customInput}
     >
-      <div className="section"> 
-      <div className="inputBox">
-          { <Input />}
-        </div>       
+      <div className="section">
+        <div className="inputBox">
+          {<Input />}
+        </div>
         <div className="displayComments">
           <DisplayComments comments={comments} />
         </div>
-        
+
       </div>
     </ActionProvider>
   )

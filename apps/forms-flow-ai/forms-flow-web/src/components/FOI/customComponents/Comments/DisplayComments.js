@@ -6,13 +6,18 @@ import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 
 const DisplayComments = ({ comments }) => {
+
+  comments =  comments.sort(function(a, b) { 
+      return b.comId - a.comId;
+    });
+
   const actions = useContext(ActionContext)
   return (
     <div>
       {comments.map((i, index) => (
 
 
-        <div key={i.comId} className="commentsection">
+        <div key={i.comId} className="commentsection" data-comid={i.comId}>
           {actions.editArr.filter((id) => id === i.comId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({

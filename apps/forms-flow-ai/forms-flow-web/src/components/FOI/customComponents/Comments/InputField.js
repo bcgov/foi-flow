@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import  './comments.scss'
+import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
@@ -15,6 +15,14 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
     setText(value)
   }, [value])
 
+
+  const cancel = () => {
+    setText("")
+    edit
+      ? actions.handleCancel(cancellor, edit)
+      : actions.handleCancel(cancellor)
+  }
+
   const actions = useContext(ActionContext)
   return (
     <form
@@ -25,7 +33,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
           : { marginLeft: 8 }
       }
     >
-     
+
       <input
         className="postComment"
         type='text'
@@ -50,17 +58,13 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
               : { backgroundColor: '#30c3fd' }
           }
         >
-         {' '}
-              <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#a5a5a5' />
+          {' '}
+          <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#a5a5a5' />
         </button>
         {(text || parentId) && (
           <button
             className="cancelBtn"
-            onClick={() =>
-              edit
-                ? actions.handleCancel(cancellor, edit)
-                : actions.handleCancel(cancellor)
-            }
+            onClick={cancel}
           >
             Cancel
           </button>

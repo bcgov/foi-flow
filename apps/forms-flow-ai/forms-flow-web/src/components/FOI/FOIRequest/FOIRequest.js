@@ -585,7 +585,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const data = [
     {
       "userId": "01a",
-      "comId": "012",
+      "comId": "1",
       "date":"2021 Nov 2 10:30:00",
       "fullName": "Abin Antony",
       "avatarUrl": "https://ui-avatars.com/api/name=Riya&background=random" ,
@@ -593,7 +593,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       "replies": [
         {
           "userId": "02a",
-          "comId": "013",
+          "comId": "13",
           "date":"2021 Nov 2 11:30:00",
           "fullName": "Divya Viswanath",
           "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random" ,
@@ -601,7 +601,7 @@ const FOIRequest = React.memo(({userDetail}) => {
         },
         {
           "userId": "01a",
-          "comId": "014",
+          "comId": "14",
           "date":"2021 Nov 2 11:32:00",
           "fullName": "Abin Antony",
           "avatarUrl": "https://ui-avatars.com/api/name=Riya&background=random",
@@ -611,7 +611,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     },
     {
       "userId": "02a",
-      "comId": "07",
+      "comId": "7",
       "date":"2021 Nov 2 09:30:00",
       "fullName": "Divya Viswanath",
       "text": "Yes CFR can be done, but waiting for MC to reply",
@@ -619,7 +619,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     },
     {
       "userId": "02a",
-      "comId": "015",
+      "comId": "15",
       "date":"2021 Nov 2 08:30:00",
       "fullName": "Robert Jae",
       "avatarUrl": "https://ui-avatars.com/api/name=Robert&background=random",
@@ -627,7 +627,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       "replies": [
         {
           "userId": "01b",
-          "comId": "016",
+          "comId": "16",
           "date":"2021 Nov 2 08:32:00",
           "fullName": "Divya Viswanath",
           "text": "Thanks! refer here mmm",
@@ -637,7 +637,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     },
     {
       "userId": "02b",
-      "comId": "017",
+      "comId": "17",
       "date":"2021 Nov 2 07:30:00",
       "fullName": "Sumathi",
       "text": "I have a doubt about the 4th point🤔",
@@ -652,9 +652,11 @@ const FOIRequest = React.memo(({userDetail}) => {
   const signupUrl = "/signup"
   let count = 0
 
-comment.map(i => { count += 1; i.replies && i.replies.map(i => count += 1) })
+//comment.map(i => { count += 1; i.replies && i.replies.map(i => count += 1) })
 
-
+// let sortedcomment = comment.sort(function(a, b) { 
+//   return a.comId - b.comId;
+// });
 
 
   return (
