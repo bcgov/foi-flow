@@ -673,8 +673,7 @@ export const saveFilesinS3 = (headerDetails, file, ...rest) => {
       'X-Amz-Date': headerDetails.amzdate,
       'Authorization': headerDetails.authheader,     
     }    
-  };
-  console.log(`requestOptions = ${JSON.stringify(requestOptions)}`);
+  };  
     return (dispatch) => {
       httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
         .then((res) => {

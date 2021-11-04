@@ -518,10 +518,13 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
 
   const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{
+    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {      
+      settabStatus(StateEnum.callforrecordsoverdue.name)
+    }
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-    const bottomText = _status === StateEnum.open.name ? _daysRemainingText : (_status === StateEnum.callforrecords.name || _status === StateEnum.feeassessed.name || _status === StateEnum.review.name) ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
-    setRequestStatus(bottomText);       
+    const bottomText = (_status === StateEnum.open.name || _status === StateEnum.review.name || _status === StateEnum.redirect.name || _status === StateEnum.consult.name || _status === StateEnum.signoff.name || _status === StateEnum.response.name || _status === StateEnum.closed.name) ? _daysRemainingText : (_status === StateEnum.callforrecords.name || _status === StateEnum.feeassessed.name || _status === StateEnum.deduplication.name || _status === StateEnum.harms.name) ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
+    setRequestStatus(bottomText);
   }
 
   const hasStatusRequestSaved =(issavecompleted,state)=>{
@@ -533,14 +536,20 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
 
   switch (_tabStatus){
+    case StateEnum.intakeinprogress.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderIntakeInProgressBG"
+      break;
     case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
     case StateEnum.closed.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
-    case StateEnum.callforrecords.name: 
+    case StateEnum.callforrecords.name:
       foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+      break;
+    case StateEnum.callforrecordsoverdue.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
       break;
     case StateEnum.redirect.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
@@ -556,6 +565,18 @@ const FOIRequest = React.memo(({userDetail}) => {
       break;
     case StateEnum.signoff.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
+      break;
+    case StateEnum.deduplication.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
+      break;
+    case StateEnum.harms.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
+      break;
+    case StateEnum.onhold.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
+      break;
+    case StateEnum.response.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderResponseBG"
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
@@ -598,14 +619,19 @@ const FOIRequest = React.memo(({userDetail}) => {
           <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
-        {bottomTextArray.length > 1  ?
-        <div className="foileftpanelstatus"> 
-          <h4>{bottomTextArray[0]}</h4>
+       
+        <div className="foileftpanelstatus">
+        {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) ?
+        <>
+          <h4>{_tabStatus && (_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()) ? "" : bottomTextArray[0]}</h4>
+          {bottomTextArray.length > 1  ?
           <h4>{bottomTextArray[1]}</h4>
+          : null }
+          </>
+          : null
+          }
         </div>
-        : 
-        <h4 className="foileftpanelstatus">{_requestStatus.toLowerCase().includes("days") ? _requestStatus : ""}</h4>
-        }
+        
 
         </div>
         <div className="foitabpanelcollection"> 

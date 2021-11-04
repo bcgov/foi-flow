@@ -20,7 +20,7 @@ const MinistryStateList = Object.freeze({
     intakeinprogress: [{status:"Intake in Progress", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false}],
     open: [{status: "Open", isSelected: false}],
-    callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Fee Estimate", isSelected: false}, {status: "Deduplication", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}],
+    callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Fee Estimate", isSelected: false}, {status: "Harms Assessment", isSelected: false}, {status: "Deduplication", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}],
     deduplication: [{status: "Deduplication", isSelected: false}],
@@ -35,6 +35,7 @@ const MinistryStateList = Object.freeze({
 const StateEnum = Object.freeze({
     open: {name: "Open", id: 1},
     callforrecords: {name: "Call For Records", id: 2},
+    callforrecordsoverdue: {name: "Call For Records Overdue", id: 15},
     closed: {name: "Closed", id: 3},
     redirect: {name: "Redirect", id: 4},
     unopened: {name: "Unopened", id: 5},

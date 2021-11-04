@@ -4,11 +4,12 @@ import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import { InputLabel } from '@material-ui/core';
 import { formatDate } from "../../../../helper/FOI/helper";
+import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
 
 const RequestDetails = React.memo((requestDetails) => {
 
-    const _requestDetails = requestDetails.requestDetails
+    const _requestDetails = requestDetails.requestDetails;    
 
     return (
         Object.entries(_requestDetails).length >0 && _requestDetails!=undefined  ?
@@ -37,11 +38,11 @@ const RequestDetails = React.memo((requestDetails) => {
                   </div>
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                   <span><b>Records Due Date</b></span>                      
-                  <span className="foi-rowtoppadding">{formatDate(_requestDetails.cfrDueDate,'yyyy MMM, dd')}</span>
+                  <span className="foi-rowtoppadding">{_requestDetails.currentState && _requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase() ? formatDate(_requestDetails.cfrDueDate,'yyyy MMM, dd') : "N/A"}</span>
                   </div>
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                   <span><b>Legislated Due Date</b></span>                      
-                  <span className="foi-rowtoppadding">{formatDate(_requestDetails.dueDate,'yyyy MMM, dd')}</span>
+                  <span className="foi-rowtoppadding">{_requestDetails.currentState && _requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase() ? formatDate(_requestDetails.dueDate,'yyyy MMM, dd'): "N/A"}</span>
                   </div>
               </div>               
             </CardContent>
