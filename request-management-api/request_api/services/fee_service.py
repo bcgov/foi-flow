@@ -102,6 +102,11 @@ class FeeService:
 
         return self._dump()
 
+    def check_if_paid(self):
+        """Check payment."""
+
+        return self.payment.status == 'PAID'
+
     def _validate_with_paybc(self, trn_approved):
         paybc_status = None
         paybc_response = self._get_paybc_transaction_details()

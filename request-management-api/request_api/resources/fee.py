@@ -15,11 +15,12 @@
 
 from datetime import datetime
 
-from flask import request
+from flask import request, send_file
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
 
 from request_api.services import FeeService
+from request_api.services.cdogs_api_service import cdogsApiService
 from request_api.utils.util import cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 
@@ -69,5 +70,25 @@ class Payment(Resource):
             fee_service: FeeService = FeeService(request_id=request_id, payment_id=payment_id)
             pay_response = fee_service.complete_payment(request_json)
             return pay_response, 201
+        except BusinessException as e:
+            return {'status': e.code, 'message': e.message}, e.status_code
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirawrequests/<int:request_id>/payments/<int:payment_id>/receipt')
+class Payment(Resource):
+
+    @staticmethod
+    @cross_origin(origins=allowedOrigins())
+    def post(request_id: int, payment_id: int):
+        try:
+            request_json = request.get_json()
+            fee_service: FeeService = FeeService(request_id=request_id, payment_id=payment_id)
+            paid = fee_service.check_if_paid()
+            if paid is False:
+                return {'status': 400, 'message': "Fee has not been paid"}, 400
+            response = cdogsApiService().generate_receipt(data= request_json, templateHashCode= None);
+            return response.content, 201
+            return send_file(response, mimetype= "application/pdf"), 201
+
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
