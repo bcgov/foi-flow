@@ -42,8 +42,7 @@ const BottomButtonGroup = React.memo(({
   unSavedRequest,
   handleSaveRequest,
   currentSelectedStatus,
-  hasStatusRequestSaved,
-  setUnSavedRequest
+  hasStatusRequestSaved
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -55,14 +54,12 @@ const BottomButtonGroup = React.memo(({
     
     const [opensaveModal, setsaveModal] = useState(false);
 
-    const [hasUnSaved, setHasUnSaved] = useState();
-
     const disableSave = isValidationError || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase();
 
     const returnToQueue = (e) => {
-      if (!hasUnSaved || (hasUnSaved && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+      if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
         e.preventDefault();
-        setUnSavedRequest(false);
+        window.removeEventListener('beforeunload', alertUser);
         window.location.href = '/foi/dashboard';
       }
     }
@@ -97,7 +94,7 @@ const BottomButtonGroup = React.memo(({
     }
 
     const alertUser = e => {
-      if (hasUnSaved) {
+      if (unSavedRequest) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -106,10 +103,6 @@ const BottomButtonGroup = React.memo(({
     const handleOnHashChange = (e) => {       
       returnToQueue(e);
     };  
-
-    React.useEffect(() => {
-      setHasUnSaved(unSavedRequest);
-    }, [unSavedRequest]);
 
     React.useEffect(() => {
 
