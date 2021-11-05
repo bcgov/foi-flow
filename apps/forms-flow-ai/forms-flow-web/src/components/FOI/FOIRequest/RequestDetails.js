@@ -230,7 +230,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             fullWidth
                             disabled={!!ministryId || disableInput}
                         />
-                        {requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase() ?
+                        {requestDetails.currentState === undefined || (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) ?
                         <TextField                
                             label="Due Date"
                             type="date" 
