@@ -228,8 +228,9 @@ const BottomButtonGroup = React.memo(({
             const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);
             console.log(`onHoldDays = ${onHoldDays}`);
             const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays);
-            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays);      
-            console.log(`cfrDueDate = ${calculatedCFRDueDate}, requestDueDate = ${calculatedRequestDueDate}`);
+            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays);
+            console.log(`cfrDueDate = ${saveRequestObject.cfrDueDate}, requestDueDate = ${saveRequestObject.dueDate}`);      
+            console.log(`New cfrDueDate = ${calculatedCFRDueDate}, New requestDueDate = ${calculatedRequestDueDate}`);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             saveRequestObject.dueDate = calculatedRequestDueDate;
           }
