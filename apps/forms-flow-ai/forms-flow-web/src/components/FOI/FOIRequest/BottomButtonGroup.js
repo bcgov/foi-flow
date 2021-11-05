@@ -46,8 +46,7 @@ const BottomButtonGroup = React.memo(({
   handleOpenRequest,
   currentSelectedStatus,
   hasStatusRequestSaved,
-  disableInput,
-  setUnSavedRequest
+  disableInput
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -64,8 +63,6 @@ const BottomButtonGroup = React.memo(({
     const [closingDate, setClosingDate] = useState( formatDate(new Date()) );
     const [closingReasonId, setClosingReasonId] = useState();
 
-    const [hasUnSaved, setHasUnSaved] = useState();
-
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
     }
@@ -75,9 +72,9 @@ const BottomButtonGroup = React.memo(({
     }
 
     const returnToQueue = (e) => {
-      if (!hasUnSaved || (hasUnSaved && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+      if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
         e.preventDefault();
-        setUnSavedRequest(false);
+        window.removeEventListener('beforeunload', alertUser);
         window.location.href = '/foi/dashboard';
       }
     }
@@ -114,7 +111,7 @@ const BottomButtonGroup = React.memo(({
     }
 
     const alertUser = e => {
-      if (hasUnSaved) {
+      if (unSavedRequest) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -123,10 +120,6 @@ const BottomButtonGroup = React.memo(({
     const handleOnHashChange = (e) => {       
       returnToQueue(e);
     };  
-
-    React.useEffect(() => {
-      setHasUnSaved(unSavedRequest);
-    }, [unSavedRequest]);
 
     React.useEffect(() => {
            
@@ -227,20 +220,25 @@ const BottomButtonGroup = React.memo(({
         }
         else if(currentSelectedStatus === StateEnum.callforrecords.name && !isValidationError)
         {
+          console.log(saveRequestObject);
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           }
           else if (saveRequestObject.onholdTransitionDate) {
-            const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);            
-            const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays);
-            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays);            
+            const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);
+            console.log(`startDatepassed = ${saveRequestObject.onholdTransitionDate}, endDatePassed = ${new Date()}`);
+            console.log(`onHoldDays = ${onHoldDays-1}`);
+            const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays-1);
+            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays-1);
+            console.log(`cfrDueDate = ${saveRequestObject.cfrDueDate}, requestDueDate = ${saveRequestObject.dueDate}`);      
+            console.log(`New cfrDueDate = ${calculatedCFRDueDate}, New requestDueDate = ${calculatedRequestDueDate}`);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             saveRequestObject.dueDate = calculatedRequestDueDate;
           }
-          saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // saveRequest();
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }  
         else if(currentSelectedStatus == StateEnum.redirect.name && !isValidationError)
         {        

@@ -70,6 +70,7 @@ const MinistryReview = React.memo(({userDetail}) => {
  
   
    let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
+   console.log(requestDetails);
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
@@ -285,7 +286,7 @@ const MinistryReview = React.memo(({userDetail}) => {
                     <RequestDetails requestDetails={requestDetails}/>
                     <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
                     <RequestNotes />
-                    <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} setUnSavedRequest={setUnSavedRequest} />
+                    <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
                 : null }
                 </form>
