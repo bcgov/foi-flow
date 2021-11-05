@@ -257,6 +257,7 @@ class requestservice:
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
             'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
+            'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid),
             'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d')
          }
 
@@ -368,7 +369,8 @@ class requestservice:
                 'assignedministryperson':requestministry["assignedministryperson"],                
                 'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
                 'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
-                'documents': FOIRequestUtil().getdocuments(requestministrydocuments)
+                'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
+                'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid)
             }
 
             if requestministry['cfrduedate'] is not None:
@@ -633,6 +635,17 @@ class FOIRequestUtil:
                     } 
                 documents.append(document)
         return documents
+    
+    def getonholdtransition(self, foiministryrequestid):
+        onholddate = None
+        transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
+        for entry in transitions:
+            if entry['requeststatusid'] == 11:
+                onholddate = parse(str(entry['created_at'])).strftime("%Y-%m-%d")
+            else:
+                if onholddate is not None:
+                    break;
+        return onholddate;
     
     def getStatusName(self,requeststatusid):
         allStatus = FOIRequestStatus().getrequeststatuses()
