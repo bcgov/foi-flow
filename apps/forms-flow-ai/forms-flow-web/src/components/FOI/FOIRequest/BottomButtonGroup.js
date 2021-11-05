@@ -7,7 +7,7 @@ import {saveRequestDetails, openRequestDetails} from "../../../apiManager/servic
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
-import { addBusinessDays, formatDate } from "../../../helper/FOI/helper";
+import { addBusinessDays, formatDate, calculateDaysRemaining } from "../../../helper/FOI/helper";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
@@ -216,13 +216,23 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true, currentSelectedStatus)
         }
-        else if(currentSelectedStatus == StateEnum.callforrecords.name && !isValidationError)
-        {        
+        else if(currentSelectedStatus === StateEnum.callforrecords.name && !isValidationError)
+        {
+          console.log(saveRequestObject);
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-          }         
+          }
+          else if (saveRequestObject.onholdTransitionDate) {
+            const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);
+            console.log(`onHoldDays = ${onHoldDays}`);
+            const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays);
+            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays);      
+            console.log(`cfrDueDate = ${calculatedCFRDueDate}, requestDueDate = ${calculatedRequestDueDate}`);
+            saveRequestObject.cfrDueDate = calculatedCFRDueDate;
+            saveRequestObject.dueDate = calculatedRequestDueDate;
+          }
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }  

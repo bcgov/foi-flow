@@ -7,6 +7,7 @@ import {push} from "connected-react-router";
 import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const MinistryDashboard = ({userDetail}) => {
 
@@ -43,12 +44,26 @@ const MinistryDashboard = ({userDetail}) => {
   }
 
   function getRecordsDue(params) {
-    let receivedDateString = params.getValue(params.id, 'cfrduedate'); 
-    return formatDate(receivedDateString, 'yyyy MMM, dd');    
+    let receivedDateString = params.getValue(params.id, 'cfrduedate');
+    const currentStatus = params.getValue(params.id, 'currentState');
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) { 
+      return "N/A"
+    }
+    else {
+      return formatDate(receivedDateString, 'yyyy MMM, dd');
+    }
+        
   }
   function getLDD(params) {
-    let receivedDateString = params.getValue(params.id, 'duedate'); 
-    return formatDate(receivedDateString, 'yyyy MMM, dd');    
+    let receivedDateString = params.getValue(params.id, 'duedate');
+    const currentStatus = params.getValue(params.id, 'currentState');
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+      return "N/A"
+    }
+    else {
+      return formatDate(receivedDateString, 'yyyy MMM, dd'); 
+    } 
+       
   }
    const columns = React.useRef([
     { 

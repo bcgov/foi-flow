@@ -69,7 +69,8 @@ const MinistryReview = React.memo(({userDetail}) => {
    //gets the request detail from the store
  
   
-   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
+   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
+   console.log(requestDetails);
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
