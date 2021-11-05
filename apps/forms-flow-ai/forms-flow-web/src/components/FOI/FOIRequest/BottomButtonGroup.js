@@ -46,7 +46,8 @@ const BottomButtonGroup = React.memo(({
   handleOpenRequest,
   currentSelectedStatus,
   hasStatusRequestSaved,
-  disableInput
+  disableInput,
+  setUnSavedRequest
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -63,6 +64,8 @@ const BottomButtonGroup = React.memo(({
     const [closingDate, setClosingDate] = useState( formatDate(new Date()) );
     const [closingReasonId, setClosingReasonId] = useState();
 
+    const [hasUnSaved, setHasUnSaved] = useState();
+
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
     }
@@ -72,8 +75,9 @@ const BottomButtonGroup = React.memo(({
     }
 
     const returnToQueue = (e) => {
-      e.preventDefault();
-      if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+      if (!hasUnSaved || (hasUnSaved && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+        e.preventDefault();
+        setUnSavedRequest(false);
         window.location.href = '/foi/dashboard';
       }
     }
@@ -110,17 +114,22 @@ const BottomButtonGroup = React.memo(({
     }
 
     const alertUser = e => {
-      e.preventDefault();
-      if (unSavedRequest) {
+      if (hasUnSaved) {
+        e.preventDefault();
         e.returnValue = '';
       }
     }
 
+    const handleOnHashChange = (e) => {       
+      returnToQueue(e);
+    };  
+
     React.useEffect(() => {
-      const handleOnHashChange = (e) => {       
-        returnToQueue(e);
-      };  
-            
+      setHasUnSaved(unSavedRequest);
+    }, [unSavedRequest]);
+
+    React.useEffect(() => {
+           
       if(currentSelectedStatus == StateEnum.open.name && !isValidationError && (ministryId == undefined || ministryId == null || ministryId == ''))
       {
         saveRequestObject.requeststatusid = StateEnum.open.id;
@@ -143,12 +152,12 @@ const BottomButtonGroup = React.memo(({
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
       window.addEventListener('beforeunload', alertUser);
-      window.addEventListener('unload', handleOnHashChange);   
+      //window.addEventListener('unload', handleOnHashChange);   
       
       return () => {
         window.removeEventListener('popstate', handleOnHashChange);
         window.removeEventListener('beforeunload', alertUser);
-        window.removeEventListener('unload', handleOnHashChange);
+        //window.removeEventListener('unload', handleOnHashChange);
         
       }
     });
