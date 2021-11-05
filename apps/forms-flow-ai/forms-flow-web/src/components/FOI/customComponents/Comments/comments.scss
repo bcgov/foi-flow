@@ -6,6 +6,18 @@
   width:100%;
   background-color: white;
     
+  .addcommentBox{
+    width:100%;
+    margin-left:25px;
+    margin-top:25px;
+    padding-right:25px;
+
+    button.addcomment {
+      float: right;     
+    }
+
+  }
+
   .inputBox{
     width:100%;
     margin:25px;
