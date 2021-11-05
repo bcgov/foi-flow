@@ -86,7 +86,7 @@ const MinistryDashboard = ({userDetail}) => {
     },
     
     { field: 'currentState', 
-      headerName: 'REQUEST STATUS',  
+      headerName: 'REQUEST STATE',  
       width: 180, 
       headerAlign: 'left'      
     },    
@@ -141,7 +141,7 @@ const search = (data) => {
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.cfrstatus.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)

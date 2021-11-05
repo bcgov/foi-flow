@@ -80,7 +80,7 @@ const Dashboard = ({userDetail}) => {
     },
     { 
       field: 'currentState', 
-      headerName: 'CURRENT STATUS',      
+      headerName: 'CURRENT STATE',      
       headerAlign: 'left',
       width: 180
     },
