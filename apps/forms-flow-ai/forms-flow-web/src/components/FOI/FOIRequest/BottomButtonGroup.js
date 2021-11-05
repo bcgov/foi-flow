@@ -220,16 +220,15 @@ const BottomButtonGroup = React.memo(({
         }
         else if(currentSelectedStatus === StateEnum.callforrecords.name && !isValidationError)
         {
-          console.log(saveRequestObject);
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           }
           else if (saveRequestObject.onholdTransitionDate) {
-            const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);
+            const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);            
             const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays);
-            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays);
+            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays);            
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             saveRequestObject.dueDate = calculatedRequestDueDate;
           }
