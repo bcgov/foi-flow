@@ -143,7 +143,16 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.asc())
         return request_schema.dump(query)   
-    
+
+    @classmethod
+    def getrequeststatusById(cls,ministryrequestid):
+        sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid order by version desc;'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        summary = []
+        for row in rs:
+            summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
+        return summary      
+        
     @classmethod
     def getversionforrequest(cls,ministryrequestid):   
        return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()

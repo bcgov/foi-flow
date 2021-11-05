@@ -57,8 +57,9 @@ const BottomButtonGroup = React.memo(({
     const disableSave = isValidationError || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase();
 
     const returnToQueue = (e) => {
-      e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+        e.preventDefault();
+        window.removeEventListener('beforeunload', alertUser);
         window.location.href = '/foi/dashboard';
       }
     }
@@ -93,17 +94,18 @@ const BottomButtonGroup = React.memo(({
     }
 
     const alertUser = e => {
-      e.preventDefault();
       if (unSavedRequest) {
+        e.preventDefault();
         e.returnValue = '';
       }
     }
 
+    const handleOnHashChange = (e) => {       
+      returnToQueue(e);
+    };  
+
     React.useEffect(() => {
-      const handleOnHashChange = (e) => {       
-        returnToQueue(e);
-      };  
-            
+
       if (currentSelectedStatus !== "" && !isValidationError){
         saveRequestModal();
       }
@@ -111,12 +113,12 @@ const BottomButtonGroup = React.memo(({
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
       window.addEventListener('beforeunload', alertUser);
-      window.addEventListener('unload', handleOnHashChange);   
+      // window.addEventListener('unload', handleOnHashChange);   
       
       return () => {
         window.removeEventListener('popstate', handleOnHashChange);
         window.removeEventListener('beforeunload', alertUser);
-        window.removeEventListener('unload', handleOnHashChange);
+        // window.removeEventListener('unload', handleOnHashChange);
       }
     });
     

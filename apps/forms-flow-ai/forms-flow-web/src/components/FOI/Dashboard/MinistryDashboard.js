@@ -7,6 +7,7 @@ import {push} from "connected-react-router";
 import { fetchFOIMinistryRequestList, fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const MinistryDashboard = ({userDetail}) => {
 
@@ -43,12 +44,26 @@ const MinistryDashboard = ({userDetail}) => {
   }
 
   function getRecordsDue(params) {
-    let receivedDateString = params.getValue(params.id, 'cfrduedate'); 
-    return formatDate(receivedDateString, 'yyyy MMM, dd');    
+    let receivedDateString = params.getValue(params.id, 'cfrduedate');
+    const currentStatus = params.getValue(params.id, 'currentState');
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) { 
+      return "N/A"
+    }
+    else {
+      return formatDate(receivedDateString, 'yyyy MMM, dd');
+    }
+        
   }
   function getLDD(params) {
-    let receivedDateString = params.getValue(params.id, 'duedate'); 
-    return formatDate(receivedDateString, 'yyyy MMM, dd');    
+    let receivedDateString = params.getValue(params.id, 'duedate');
+    const currentStatus = params.getValue(params.id, 'currentState');
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+      return "N/A"
+    }
+    else {
+      return formatDate(receivedDateString, 'yyyy MMM, dd'); 
+    } 
+       
   }
    const columns = React.useRef([
     { 
@@ -71,7 +86,7 @@ const MinistryDashboard = ({userDetail}) => {
     },
     
     { field: 'currentState', 
-      headerName: 'REQUEST STATUS',  
+      headerName: 'REQUEST STATE',  
       width: 180, 
       headerAlign: 'left'      
     },    
@@ -126,7 +141,7 @@ const search = (data) => {
   row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
   row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.cfrstatus.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
   (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
   (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
