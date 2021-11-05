@@ -70,7 +70,6 @@ const MinistryReview = React.memo(({userDetail}) => {
  
   
    let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
-   console.log(requestDetails);
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
