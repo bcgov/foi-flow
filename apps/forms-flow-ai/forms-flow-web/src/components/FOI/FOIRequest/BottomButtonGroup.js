@@ -228,17 +228,13 @@ const BottomButtonGroup = React.memo(({
           }
           else if (saveRequestObject.onholdTransitionDate) {
             const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);
-            console.log(`startDatepassed = ${saveRequestObject.onholdTransitionDate}, endDatePassed = ${new Date()}`);
-            console.log(`onHoldDays = ${onHoldDays-1}`);
-            const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays-1);
-            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays-1);
-            console.log(`cfrDueDate = ${saveRequestObject.cfrDueDate}, requestDueDate = ${saveRequestObject.dueDate}`);      
-            console.log(`New cfrDueDate = ${calculatedCFRDueDate}, New requestDueDate = ${calculatedRequestDueDate}`);
+            const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays);
+            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             saveRequestObject.dueDate = calculatedRequestDueDate;
           }
-          // saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
         }  
         else if(currentSelectedStatus == StateEnum.redirect.name && !isValidationError)
         {        
