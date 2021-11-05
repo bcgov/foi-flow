@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import './comments.scss'
 import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faReply, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
+import { faReply, faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import {
   modal,
   modalClose,
@@ -50,7 +50,7 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
             role='tooltip'
             trigger={
               <button className="actionsBtn">
-                <FontAwesomeIcon icon={faEllipsisV} size='1x' color='#b9b9b9' />
+                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
               </button>
             }
             position='right center'

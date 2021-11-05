@@ -42,15 +42,14 @@
     }
 
     .cancelBtn {
-      color: rgb(139, 139, 139);
+      
       text-align: center;
-      background-size: 200% auto;
-      border-radius:5px;
+      background-size: 200% auto;      
       transition: 0.5s;
       padding:8px 10px;
-      border: 2px solid rgb(139, 139, 139);
-      font-weight:bolder;
-      font-size: 16px;
+      border: unset;
+      background-color: transparent;
+      font-size: 13px;
 
       &:hover {
         background-position: right center;
@@ -78,6 +77,7 @@
     border-color: lightgrey;
     border-width: 1px;
     border-style: solid;
+    margin-top : 5px ;
     .userImg{
       display: flex;
       width:10%;
@@ -270,4 +270,10 @@
 
 .commenttext{
   margin-left:10px
+}
+
+.characterlen{
+  font-size: 12px;
+  color: grey;
+  margin-left: 25px;
 }

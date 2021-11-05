@@ -2,17 +2,19 @@ import React, { useContext, useState, useEffect } from 'react'
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
   const [text, setText] = useState('')
-
+  const [textlength, setTextLength] = useState(1000)
   const handleChange = (e) => {
+    setTextLength(1000 - e.target.value.length)
     setText(e.target.value)
+
   }
 
   useEffect(() => {
-    setText(value)
+    setText(value)    
   }, [value])
 
 
@@ -23,8 +25,18 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
       : actions.handleCancel(cancellor)
   }
 
+  const post = () => {
+    
+    setTextLength(1000);
+
+    edit === true
+      ? actions.submit(cancellor, text, parentId, true, setText)
+      : actions.submit(cancellor, text, parentId, false, setText)
+  }
+
   const actions = useContext(ActionContext)
   return (
+    <>
     <form
       className="form"
       style={
@@ -45,32 +57,27 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
       <div className="inputActions">
         <button
           className="postBtn"
-          onClick={() =>
-            edit === true
-              ? actions.submit(cancellor, text, parentId, true, setText)
-              : actions.submit(cancellor, text, parentId, false, setText)
-          }
+          onClick={post}
           type='button'
           disabled={!text}
-          style={
-            !text
-              ? { backgroundColor: '#84dcff' }
-              : { backgroundColor: '#30c3fd' }
-          }
+         
         >
           {' '}
-          <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#a5a5a5' />
+          <FontAwesomeIcon icon={faPaperPlane} size='2x' color={!text ? '#a5a5a5':'darkblue'} />
         </button>
         {(text || parentId) && (
           <button
             className="cancelBtn"
             onClick={cancel}
           >
-            Cancel
+            <FontAwesomeIcon icon={faTrash} size='2x' color={!text ? '#a5a5a5':'darkblue'} />
           </button>
         )}
       </div>
+      
     </form>
+    <span className="characterlen">{textlength} characters remaining</span>
+    </>
   )
 }
 

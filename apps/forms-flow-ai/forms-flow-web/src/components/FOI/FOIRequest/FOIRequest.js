@@ -584,7 +584,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const data = [
     {
-      "userId": "01a",
+      "userId": "02b",
       "comId": "1",
       "date":"2021 Nov 2 10:30:00",
       "fullName": "Abin Antony",
@@ -600,7 +600,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           "text": "Thanks! It took me 1 month to finish this project but I am glad it helped out someone!🥰"
         },
         {
-          "userId": "01a",
+          "userId": "02b",
           "comId": "14",
           "date":"2021 Nov 2 11:32:00",
           "fullName": "Abin Antony",
@@ -639,24 +639,27 @@ const FOIRequest = React.memo(({userDetail}) => {
       "userId": "02b",
       "comId": "17",
       "date":"2021 Nov 2 07:30:00",
-      "fullName": "Sumathi",
+      "fullName": "Abin Antony",
       "text": "I have a doubt about the 4th point🤔",
-      "avatarUrl": "https://ui-avatars.com/api/name=Lily&background=random"
+      "avatarUrl": "https://ui-avatars.com/api/name=Lily&background=random",
+      "replies": [
+        {
+          "userId": "01b",
+          "comId": "16",
+          "date":"2021 Nov 2 08:32:00",
+          "fullName": "Divya Viswanath",
+          "text": "Thanks!",
+          "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random"
+        }]
     }
   ]
   const [comment, setComment] = useState(data)
-  const userId = "01a"
+  const userId = "02b"
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const name = "xyz"
+  const name = "Abin Antony"
   const signinUrl = "/signin"
   const signupUrl = "/signup"
-  let count = 0
 
-//comment.map(i => { count += 1; i.replies && i.replies.map(i => count += 1) })
-
-// let sortedcomment = comment.sort(function(a, b) { 
-//   return a.comId - b.comId;
-// });
 
 
   return (
