@@ -15,7 +15,6 @@
     button.addcomment {
       float: right;     
     }
-
   }
 
   .inputBox{
@@ -26,7 +25,7 @@
   .inputActions{
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: 3px;
     margin-left: 15px;
 
     .postBtn {
@@ -80,22 +79,22 @@
 
 
   .form{
-    display: flex;
+    display: inline-block;
     background-color: white;
     padding: 8px;
     padding-bottom: 15px;
     border-radius: 8px;
     width: 95%;
-    border-color: lightgrey;
-    border-width: 1px;
-    border-style: solid;
     margin-top : 5px ;
+    margin-bottom: 5px;
     .userImg{
       display: flex;
       width:10%;
       justify-content: center;
       align-items: center;
     }
+
+    
 
     .postComment{
       width:90%;
@@ -288,4 +287,5 @@
   font-size: 12px;
   color: grey;
   margin-left: 25px;
+  margin-top: 3px;
 }

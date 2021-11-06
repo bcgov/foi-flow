@@ -3,14 +3,24 @@ import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons'
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
+
 
 const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
   const [text, setText] = useState('')
   const [textlength, setTextLength] = useState(1000)
-  const handleChange = (e) => {
-    setTextLength(1000 - e.target.value.length)
-    setText(e.target.value)
+ 
+  // const handleChange = (e) => {   
+  //   setTextLength(1000 - e.target.value.length)
+  //   setText(e.target.value)
+  // }
 
+  const handleQuillChange = (htmlcontent, delta, source, editor)=>{    
+    let _text = editor.getText()   
+    setText(htmlcontent)
+    setTextLength(1000 - _text.length)
   }
 
   useEffect(() => {
@@ -33,7 +43,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
       ? actions.submit(cancellor, text, parentId, true, setText)
       : actions.submit(cancellor, text, parentId, false, setText)
   }
-
+ 
   const actions = useContext(ActionContext)
   return (
     <>
@@ -46,15 +56,11 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
       }
     >
 
-      <input
-        className="postComment"
-        type='text'
-        placeholder='Type your reply here.'
-        component='input'
-        value={text}
-        onChange={handleChange}
-      />
+      <ReactQuill theme="snow"  value={text || ''} onChange={handleQuillChange} placeholder={"Type your comments here"} />
+     
       <div className="inputActions">
+      
+      <span className="characterlen">{textlength} characters remaining</span>
         <button
           className="postBtn"
           onClick={post}
@@ -76,7 +82,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
       </div>
       
     </form>
-    <span className="characterlen">{textlength} characters remaining</span>
+    
     </>
   )
 }
