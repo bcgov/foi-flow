@@ -68,14 +68,21 @@ class cdogsApiService:
         template = {'template':('template', open(templateFilePath, 'rb'), "multipart/form-data")}
 
         try:
+            current_app.logger.info('Uploading template %s', templateFilePath)
             response = requests.post(url, headers= headers, files= template)
             
             if response.status_code == 405 and response.content['detail'] is not None:
-                return re.findall(r"'([^']*)'", response.content['detail'])[0]
+                match = re.findall(r"Hash '(.*?)'", response.content['detail']);
+                if match:
+                    current_app.logger.info('Template already hashed with code %s', match[0])
+                    return match[0]
+                
+                raise BusinessException(Error.DATA_NOT_FOUND)
             
             if hasattr(response.headers, "X-Template-Hash") is False:
                 raise BusinessException(Error.DATA_NOT_FOUND)
 
+            current_app.logger.info('Returning new hash %s', response.headers['X-Template-Hash'])
             return response.headers['X-Template-Hash'];
         except BaseException as e:
             raise e

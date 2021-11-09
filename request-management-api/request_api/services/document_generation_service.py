@@ -42,11 +42,19 @@ class documentGenerationService:
 
     def generate_receipt(self, data):            
         try:
-            if self.receipt_template.cdogs_hash_code is None or not cdogsApiService.check_template_cached(self.receipt_template.cdogs_hash_code):
+            
+            template_cached = False
+            if self.receipt_template.cdogs_hash_code:
+                current_app.logger.info('Checking if template %s is cached', self.receipt_template.cdogs_hash_code)
+                template_cached = cdogsApiService.check_template_cached(self.receipt_template.cdogs_hash_code)
+                
+            if self.receipt_template.cdogs_hash_code is None or not template_cached:
+                current_app.logger.info('Uploading new template')
                 self.receipt_template.cdogs_hash_code = cdogsApiService.upload_template()
                 self.receipt_template.flush()
                 self.receipt_template.commit()     
             
+            current_app.logger.info('Generating receipt')
             return cdogsApiService.generate_receipt(templateHashCode= self.receipt_template.cdogs_hash_code, data= data), 200
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
