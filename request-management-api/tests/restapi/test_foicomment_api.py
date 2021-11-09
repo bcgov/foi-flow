@@ -106,8 +106,15 @@ def test_foiministrycommentdisable(app, client):
     }
     createcommentresponse = client.post('/api/foicomment/ministryrequest', data=json.dumps(commentjson), headers=factory_auth_header(app, client), content_type='application/json')
     comment = json.loads(createcommentresponse.data)  
+    childcommentjson = {
+    "ministryrequestid":str(foijsondata["id"]),
+    "comment": "test comment",
+    "isactive": True,
+    "parentcommentid": str(comment["id"])
+    }
+    createcommentresponse2 = client.post('/api/foicomment/ministryrequest', data=json.dumps(childcommentjson), headers=factory_auth_header(app, client), content_type='application/json')
     disablecommentresponse = client.put('/api/foicomment/rawrequest/'+str(comment["id"])+'/disable',data=json.dumps(commentjson), headers=factory_auth_header(app, client), content_type='application/json')
-    assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and createcommentresponse.status_code == 200 and disablecommentresponse.status_code == 200 
+    assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and createcommentresponse.status_code == 200 and createcommentresponse2.status_code == 200 and disablecommentresponse.status_code == 200 
       
 with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y:
   generalrequestjson = json.load(y)
