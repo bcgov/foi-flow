@@ -40,7 +40,7 @@ def upgrade():
         [
             {
                 'document_type_id': 1,
-                'document_type_name': 'Receipt Template',
+                'document_type_name': 'receipt',
                 'description': 'A word template for generating receipts with Common Document Generation Service'
             }
         ]

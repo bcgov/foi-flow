@@ -17,15 +17,24 @@ class DocumentTemplate(db.Model):
     extension = db.Column(db.String(10), nullable=False)
 
     @classmethod
-    def get_template_by_type(cls, document_type_id: int,
-                extension: str = "docx"
-                ) -> DocumentTemplate:
+    def get_template_by_type(cls, document_type_id: int, extension: str = "docx"):
         """Given a type and optionally an extension, return the template."""
 
         query = cls.query.filter_by(document_type_id = document_type_id). \
             filter(DocumentTemplate.extension == extension)
 
         return query.one_or_none()
+
+    @staticmethod
+    def commit():
+        """Commit the session."""
+        db.session.commit()
+
+    def flush(self):
+        """Save and flush."""
+        db.session.add(self)
+        db.session.flush()
+        return self
 
 
 class DocumentTemplateSchema(ma.Schema):

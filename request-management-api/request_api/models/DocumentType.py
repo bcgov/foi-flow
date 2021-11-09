@@ -16,12 +16,23 @@ class DocumentType(db.Model):
     description = db.Column(db.String(100), unique=False, nullable=True)
 
     @classmethod
-    def get_document_type_by_name(cls, document_type_name: str) -> DocumentType:
+    def get_document_type_by_name(cls, document_type_name: str):
         """Given a type and optionally an extension, return the template."""
 
         query = cls.query.filter_by(document_type_name = document_type_name)
 
         return query.one_or_none()
+
+    @staticmethod
+    def commit():
+        """Commit the session."""
+        db.session.commit()
+
+    def flush(self):
+        """Save and flush."""
+        db.session.add(self)
+        db.session.flush()
+        return self
 
 
 class DocumentTypeSchema(ma.Schema):

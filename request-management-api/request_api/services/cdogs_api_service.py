@@ -17,6 +17,7 @@
 import base64
 import json
 import os
+import re
 
 from flask import current_app
 from urllib.parse import parse_qsl
@@ -47,8 +48,8 @@ class cdogsApiService:
             'Authorization': f'Bearer {access_token}'
         }
 
-        if templateHashCode is None:
-            templateHashCode = self.upload_template(access_token= access_token)
+        # if templateHashCode is None:
+        #     templateHashCode = self.upload_template(access_token= access_token)
 
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{templateHashCode}/render"
         try:
@@ -68,12 +69,32 @@ class cdogsApiService:
 
         try:
             response = requests.post(url, headers= headers, files= template)
+            
+            if response.status_code == 405 and response.content['detail'] is not None:
+                return re.findall(r"'([^']*)'", response.content['detail'])[0]
+            
             if hasattr(response.headers, "X-Template-Hash") is False:
                 raise BusinessException(Error.DATA_NOT_FOUND)
 
             return response.headers['X-Template-Hash'];
         except BaseException as e:
             raise e
+
+    def check_template_cached(self, template_hash_code: str, access_token = None):
+        # return '7b47a9f88f9f967d4f8ff72811615625190e113f84a03d3e606b80e262553003'
+        
+        headers = {
+        "Authorization": f'Bearer {access_token if access_token else self._get_access_token()}'
+        }
+
+        url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}"
+
+        try:
+            response = requests.post(url, headers= headers)
+            return response.status_code == 200
+        except BaseException as e:
+            raise e
+        
 
     @staticmethod
     def _get_access_token():
