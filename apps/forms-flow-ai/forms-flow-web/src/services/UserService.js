@@ -50,6 +50,7 @@ const initKeycloak = (store, ...rest) => {
             const userGroups = res.groups.map(group => group.slice(1));
             const authorized = userGroups.indexOf("Intake Team") !== -1
                 || userGroups.indexOf("Flex Team") !== -1
+                || userGroups.indexOf("Processing Team") !== -1
                 || isMinistryLogin(userGroups)
             store.dispatch(setUserAuthorization(authorized));
           });
