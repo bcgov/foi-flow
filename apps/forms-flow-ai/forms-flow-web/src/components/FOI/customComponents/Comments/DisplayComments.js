@@ -12,11 +12,12 @@ const DisplayComments = ({ comments }) => {
       return b.commentId - a.commentId;
     });
 
+  
   const actions = useContext(ActionContext)
   return (
     <div>
       {comments.map((i, index) => (
-
+       
 
         <div key={i.commentId} className="commentsection" data-comid={i.commentId}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
@@ -33,7 +34,7 @@ const DisplayComments = ({ comments }) => {
             )
           ) : (
            
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies === undefined ? -101 : -100 } currentIndex={index} c={false} />
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies && i.replies.length > 0 ? -100 : -101 } currentIndex={index} c={false} />
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
             (actions.customInput ? (
@@ -48,7 +49,8 @@ const DisplayComments = ({ comments }) => {
               <InputField cancellor={i.commentId} parentId={i.commentId} />
             ))}
           <div className="replySection">
-            {i.replies &&
+            {
+            i.replies.sort((a,b)=>{return a.commentId - b.commentId}) &&
               i.replies.map((a, index) => (
                 <div key={a.commentId}>
                   {actions.editArr.filter((id) => id === a.commentId).length !==

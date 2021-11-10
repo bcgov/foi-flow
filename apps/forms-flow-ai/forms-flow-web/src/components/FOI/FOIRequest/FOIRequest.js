@@ -72,8 +72,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
-  let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;
-  console.log(`Notes FOI Request ${JSON.stringify(requestNotes)}`)
+  let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
   const [comment, setComment] = useState(requestNotes)
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();

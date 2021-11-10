@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect,useState } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import './comments.scss'
 import Popup from 'reactjs-popup'
@@ -20,6 +20,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, isreplysection }) => {
+    
   const actions = useContext(ActionContext)
   const edit = true
 
@@ -33,17 +34,27 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
 
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let fullName =''
-  iaoassignedToList.forEach(function(obj){
-   var groupmembers =  obj.members
-   var user = groupmembers.find(m=>m["username"] === i.userId)
-   if(user && user!=undefined){
-    fullName = `${ user["lastname"] }, ${user["firstname"]}` 
-    return;
-   }      
-  })
   
-  //console.log(`User List ${JSON.stringify(iaoassignedToList)}`)
+  var _sessionuser = sessionStorage.getItem(i.userId)
+  
+  if(!_sessionuser)
+  {    
+    iaoassignedToList.forEach(function(obj){
+    var groupmembers =  obj.members   
+    var user = groupmembers.find(m=>m["username"] === i.userId)
+    if(user && user!=undefined){
+      fullName = `${ user["lastname"] }, ${user["firstname"]}`
+      sessionStorage.setItem(i.userId,fullName)
+      return true;
+    }      
+    })
+  }
+  else{
+    fullName = _sessionuser
+  }
+  
   return (
+    
     <div className={halfDivclassname} >
       <div
         className="userInfo"
@@ -61,8 +72,8 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
         
         <div>
             <button
-              className={`replyBtn ${ totalcommentCount-1 > currentIndex || totalcommentCount == -100 ? " hide" : " show" }`}
-              onClick={() => actions.handleAction(i.comId)}
+              className={`replyBtn ${ totalcommentCount === -100 || (isreplysection && totalcommentCount-1 > currentIndex)  ? " hide" : " show" }`}
+              onClick={() => actions.handleAction(i.commentId)}
               disabled={!actions.user}
             >
               {' '}
@@ -86,7 +97,7 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
               <div>
                 <button
                   className="editBtn"
-                  onClick={() => actions.handleAction(i.comId, edit)}
+                  onClick={() => actions.handleAction(i.commentId, edit)}
                 >
                   {' '}
                   edit
@@ -122,7 +133,7 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
                           className='button'
                           style={modalActionBtn}
                           onClick={() => {
-                            actions.onDelete(i.comId, parentId)
+                            actions.onDelete(i.commentId, parentId)
                             close()
                           }}
                         >

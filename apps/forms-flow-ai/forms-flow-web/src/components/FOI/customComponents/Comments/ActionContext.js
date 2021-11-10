@@ -28,7 +28,6 @@ export const ActionProvider = ({
   })
 
   
-
   const handleAction = (id, edit) => {
     edit ? setEdit([...editArr, id]) : setReplies([...replies, id])
   }
@@ -44,7 +43,7 @@ export const ActionProvider = ({
     }
   }
   
-  const onSubmit = (text, parentId, child) => {
+  const onSubmit = (text, parentId, child) => {   
     if (text.length > 0) {
       if (!parentId && !child) {       
         const _inputData = {"requestid" : requestid,"comment":text}        
@@ -52,9 +51,7 @@ export const ActionProvider = ({
         const maxId = comments.reduce(
           (max, comment) => (comment.commentId > max ? comment.commentId : max),
           comments[0].commentId
-        ); 
-        
-       
+        );                
         comments.push(        
           {
             userId: currentUser.userId,
@@ -90,6 +87,8 @@ export const ActionProvider = ({
           fullName: currentUser.name,
           text: text
         })
+        const _inputData = {"requestid" : requestid,"comment":text,"parentcommentid":parentId}        
+        dispatch(saveRawRequestNote(_inputData));
         newList[index].replies = newReplies
         setComment(newList)
       }
