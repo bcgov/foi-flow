@@ -160,7 +160,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
                   : (
                     <>
-                    {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && (saveRequestObject.requeststatusid === StateEnum.callforrecords.id || saveRequestObject.requeststatusid === StateEnum.harms.id)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || state.toLowerCase() === StateEnum.response.name.toLowerCase() ?
+                    {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id) ?
                       <FileUpload  multipleFiles={multipleFiles} updateFilesCb={updateFilesCb} />
                       :
                       <>
