@@ -162,7 +162,7 @@ const BottomButtonGroup = React.memo(({
           saveStatusId();
           saveMinistryRequestObject.documents = documents;
           saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          hasStatusRequestSaved(true,currentSelectedStatus);
       }
     },[successCount])
 
@@ -178,7 +178,7 @@ const BottomButtonGroup = React.memo(({
               if (!err) {
                 res.map((header, index) => {
                   const _file = files.find(file => file.name === header.filename);
-                  const documentpath = {documentpath: header.filepath};
+                  const documentpath = {documentpath: header.filepath, filename: header.filename, category: 'statetransition'};
                   _documents.push(documentpath);
                   setDocuments(_documents);
                   dispatch(saveFilesinS3(header, _file, (err, res) => {
