@@ -61,7 +61,7 @@ class cdogsApiService:
         # return '7b47a9f88f9f967d4f8ff72811615625190e113f84a03d3e606b80e262553003'
         
         headers = {
-        "Authorization": f'Bearer {access_token}'
+        "Authorization": f'Bearer {access_token if access_token else self._get_access_token()}'
         }
 
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template"
@@ -70,9 +70,10 @@ class cdogsApiService:
         try:
             current_app.logger.info('Uploading template %s', templateFilePath)
             response = requests.post(url, headers= headers, files= template)
+            response_json = json.loads(response.content)
             
-            if response.status_code == 405 and response.content['detail'] is not None:
-                match = re.findall(r"Hash '(.*?)'", response.content['detail']);
+            if response.status_code == 405 and response_json['detail'] is not None:
+                match = re.findall(r"Hash '(.*?)'", response_json['detail']);
                 if match:
                     current_app.logger.info('Template already hashed with code %s', match[0])
                     return match[0]
@@ -105,16 +106,13 @@ class cdogsApiService:
 
     @staticmethod
     def _get_access_token():
-        print("passed")
         token_url = current_app.config['CDOGS_TOKEN_URL']
         service_client = current_app.config['CDOGS_SERVICE_CLIENT']
         service_client_secret = current_app.config['CDOGS_SERVICE_CLIENT_SECRET']
-        cdogs_access_token = current_app.config['CDOGS_ACCESS_TOKEN']
 
         # if cdogs_access_token is not None:
         #     return cdogs_access_token
 
-        print("Get new token")
         basic_auth_encoded = base64.b64encode(
             bytes(service_client + ':' + service_client_secret, 'utf-8')).decode('utf-8')
         data = 'grant_type=client_credentials'

@@ -26,10 +26,11 @@ from request_api.models import DocumentTemplate, DocumentType, Payment
 from request_api.services.cdogs_api_service import cdogsApiService
 
 
-class documentGenerationService:
+class DocumentGenerationService:
     """document generation Service class."""
 
     def __init__(self):
+        self.cdgos_api_service = cdogsApiService()
         receipt_document_type : DocumentType = DocumentType.get_document_type_by_name('receipt')
         if receipt_document_type is None:
             raise BusinessException(Error.DATA_NOT_FOUND)
@@ -40,24 +41,20 @@ class documentGenerationService:
             raise BusinessException(Error.DATA_NOT_FOUND)  
         
 
-    def generate_receipt(self, data):            
-        try:
+    def generate_receipt(self, data):
+        template_cached = False
+        if self.receipt_template.cdogs_hash_code:
+            current_app.logger.info('Checking if template %s is cached', self.receipt_template.cdogs_hash_code)
+            template_cached = self.cdgos_api_service.check_template_cached(self.receipt_template.cdogs_hash_code)
             
-            template_cached = False
-            if self.receipt_template.cdogs_hash_code:
-                current_app.logger.info('Checking if template %s is cached', self.receipt_template.cdogs_hash_code)
-                template_cached = cdogsApiService.check_template_cached(self.receipt_template.cdogs_hash_code)
-                
-            if self.receipt_template.cdogs_hash_code is None or not template_cached:
-                current_app.logger.info('Uploading new template')
-                self.receipt_template.cdogs_hash_code = cdogsApiService.upload_template()
-                self.receipt_template.flush()
-                self.receipt_template.commit()     
-            
-            current_app.logger.info('Generating receipt')
-            return cdogsApiService.generate_receipt(templateHashCode= self.receipt_template.cdogs_hash_code, data= data), 200
-        except BusinessException as e:
-            return {'status': e.code, 'message': e.message}, e.status_code
+        if self.receipt_template.cdogs_hash_code is None or not template_cached:
+            current_app.logger.info('Uploading new template')
+            self.receipt_template.cdogs_hash_code = self.cdgos_api_service.upload_template()
+            self.receipt_template.flush()
+            self.receipt_template.commit()     
+        
+        current_app.logger.info('Generating receipt')
+        return self.cdgos_api_service.generate_receipt(templateHashCode= self.receipt_template.cdogs_hash_code, data= data)
             
         
         

@@ -14,14 +14,15 @@
 """API endpoints for managing a Feee resource."""
 
 from datetime import datetime
+import os
 
-from flask import request, send_file
+from flask import request, send_file, Response
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
 
 from request_api.services import FeeService
 from request_api.services.cdogs_api_service import cdogsApiService
-from request_api.services.document_generation_service import documentGenerationService
+from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.utils.util import cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 
@@ -87,9 +88,14 @@ class Payment(Resource):
             paid = fee_service.check_if_paid()
             if paid is False:
                 return {'status': 400, 'message': "Fee has not been paid"}, 400
-            response = documentGenerationService.generate_receipt(data= request_json)
-            return response.content, 201
-            return send_file(response, mimetype= "application/pdf"), 201
+            document_service : DocumentGenerationService = DocumentGenerationService()
+            response = document_service.generate_receipt(data= request_json)
+            
+            return Response(
+                response= response.content,
+                status= response.status_code,
+                headers= dict(response.headers)
+            )
 
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
