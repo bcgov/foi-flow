@@ -583,10 +583,11 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
   const bottomTextArray = _requestStatus.split('|');
 
+  console.log(userDetail)
     
-  const userId = "aantony@idir"
+  const userId = userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const name = "Abin Antony"
+  const name = `${userDetail.family_name}, ${userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
