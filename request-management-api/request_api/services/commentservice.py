@@ -14,6 +14,8 @@ class commentservice:
     """ FOI watcher management service
 
     """
+    
+    
     @classmethod    
     def createministryrequestcomment(self, data, userid):
         version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
@@ -49,34 +51,70 @@ class commentservice:
     def getrawrequestcomments(self, requestid):
         data = FOIRawRequestComment.getcomments(requestid)
         return self.preparecomments(data)        
-        
+    
+    @classmethod    
+    def copyrequestcomment(self, ministryrequestid, comments, userid):
+        _comments = []
+        for comment in comments:
+            response=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid) 
+            _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})
+            if comment['replies']:
+                for reply in comment['replies']:
+                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, response.identifier), 1, userid)      
+                    _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
+        return _comments
+    
+    @classmethod  
+    def getmatchednministryid(self, _comments, parentid):
+        for entry in _comments:
+            if entry['rawcommentid'] == parentid:
+                return  entry['ministrycommentid']      
+        return None
+    
+    @classmethod  
+    def copyparentcomment(self, ministryrequestid, entry):
+        return {
+            "ministryrequestid": ministryrequestid,
+            "comment": entry['text']
+            }
+    
+    @classmethod  
+    def copyreplycomment(self, ministryrequestid, entry, parentcommentid):
+        return {
+            "ministryrequestid": ministryrequestid,
+            "comment": entry['text'],
+            "parentcommentid":parentcommentid
+        }
+    
     @classmethod  
     def preparecomments(self, data):
         comments=[]
-        comments = self.createparentcomments(data)
+        comments = self.parentcomments(data)
         for entry in data:
             if entry['parentcommentid'] is not None:
-                for comment in comments:
-                    if entry['parentcommentid'] == comment['commentId']:
-                        comment['replies'].append(self.createcomment(entry))            
+                for _comment in comments:
+                    if entry['parentcommentid'] == _comment['commentId']:
+                        _comment['replies'].append(self.comment(entry))            
         return comments        
     
     @classmethod    
-    def createparentcomments(self, data):
+    def parentcomments(self, data):
         parentcomments = []
         for entry in data:
             if entry['parentcommentid'] is None:
-                _comment = self.createcomment(entry)
+                _comment = self.comment(entry)
                 _comment['replies'] = []
                 parentcomments.append(_comment)        
         return parentcomments
           
         
     @classmethod    
-    def createcomment(self, comment):
+    def comment(self, comment):
         return {
                 "userId": comment['createdby'],
                 "commentId": comment['commentid'],
                 "text": comment['comment'],
-                "date":  parse(comment["created_at"]).strftime('%Y-%m-%d %H:%M:%S.%f')
+                "date":  parse(comment["created_at"]).strftime('%Y-%m-%d %H:%M:%S.%f'),
+                "parentCommentId":comment['parentcommentid'],
+                "commentTypeId":comment['commenttypeid']
         }     
