@@ -21,7 +21,9 @@ import {
   setFOIMinistryDivisionalStages,
   clearFOIMinistryDivisionalStages,
   setFOIWatcherList,
-  setClosingReasons
+  setClosingReasons,
+  setRawRequestComments,
+  setMinistryRequestComments
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -691,3 +693,96 @@ export const saveFilesinS3 = (headerDetails, file, ...rest) => {
         });
     };
 };
+
+
+export const saveRawRequestNote = (data, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};  
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_POST_COMMENT_RAWREQUEST, data)
+        .then((res) => {
+          console.log(`Saved - saveRawRequestNote ${JSON.stringify(res)}`)
+          if (res.data) {                              
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error Posting Raw Request Note");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+};
+
+export const saveMinistryRequestNote = (data, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};  
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_POST_COMMENT_MINISTRYREQUEST, data)
+        .then((res) => {
+          if (res.data) {                              
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error Posting Ministry Request Note");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+};
+
+export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
+  const done = rest.length ? rest[0] : () => { };
+  let apiUrl = "";
+  if (ministryId !=null) {
+    apiUrl = replaceUrl(replaceUrl(
+      API.FOI_GET_COMMENT_MINISTRYREQUEST,
+    ), "<ministryrequestid>", ministryId);
+  }
+  else {
+    apiUrl = replaceUrl(
+      API.FOI_GET_COMMENT_RAWREQUEST,
+      "<requestid>",
+      requestId
+    );
+  }
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        
+        if (res.data) {
+         
+          if (ministryId!=null) 
+          {
+           
+            dispatch(setMinistryRequestComments(res.data));
+          }
+
+          if (requestId)
+            {
+              
+              dispatch(setRawRequestComments(res.data));
+            
+            }
+
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+          
+          } else {
+            console.log("Error", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+      .catch((error) => {
+        console.log("Error", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+        done(error);
+      });
+  };};
+
+
