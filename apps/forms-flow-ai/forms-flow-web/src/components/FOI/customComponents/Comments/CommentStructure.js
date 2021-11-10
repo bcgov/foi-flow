@@ -1,4 +1,5 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
+import { useDispatch, useSelector } from "react-redux";
 import './comments.scss'
 import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -13,6 +14,10 @@ import {
   modalDelBtn
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
+import {fetchFOIFullAssignedToList} from '../../../../apiManager/services/FOI/foiRequestServices'
+import { objectOf } from 'prop-types';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, isreplysection }) => {
   const actions = useContext(ActionContext)
@@ -20,6 +25,24 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
 
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
 
+  const dispatch = useDispatch();
+  useEffect(()=>{
+    dispatch(fetchFOIFullAssignedToList());
+   
+  },[dispatch]);
+
+  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  let fullName =''
+  iaoassignedToList.forEach(function(obj){
+   var groupmembers =  obj.members
+   var user = groupmembers.find(m=>m["username"] === i.userId)
+   if(user && user!=undefined){
+    fullName = `${ user["lastname"] }, ${user["firstname"]}` 
+    return;
+   }      
+  })
+  
+  //console.log(`User List ${JSON.stringify(iaoassignedToList)}`)
   return (
     <div className={halfDivclassname} >
       <div
@@ -28,10 +51,13 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
       >
         <div className="commentsTwo">
           
-          <div className="fullName">{i.fullName} </div> |  <div className="fullName">{i.date} </div>
+          <div className="fullName">{fullName} </div> |  <div className="fullName">{i.date} </div>
          
         </div>
-        <div className="commenttext">{i.text}</div>
+        <div className="commenttext">
+          
+          <ReactQuill value={i.text} readOnly={true} theme={"bubble"} />
+          </div>
         
         <div>
             <button

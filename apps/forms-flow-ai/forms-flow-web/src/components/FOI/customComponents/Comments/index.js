@@ -11,7 +11,8 @@ export const CommentSection = ({
   setComment,
   signinUrl,
   signupUrl,
-  customInput
+  customInput,
+  requestid
 }) => {
   const [comments, setComments] = useState(commentsArray)
   const [showaddbox, setshowaddbox] = useState(false)
@@ -19,6 +20,8 @@ export const CommentSection = ({
   useEffect(() => {
     setComments(commentsArray)
   }, [commentsArray])
+
+  
 
   return (
     <ActionProvider
@@ -28,6 +31,7 @@ export const CommentSection = ({
       signinUrl={signinUrl}
       signupUrl={signupUrl}
       customInput={customInput}
+      requestid={requestid}
     >
       <div className="section">
         <div className="addcommentBox">

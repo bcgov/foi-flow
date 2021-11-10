@@ -1,5 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react'
 import uuid from 'react-uuid'
+import {fetchFOIRawRequestDetails, fetchFOIRequestNotesList,saveRawRequestNote} from '../../../../apiManager/services/FOI/foiRequestServices'
+import { useDispatch, useSelector } from "react-redux";
 
 export const ActionContext = createContext()
 export const ActionProvider = ({
@@ -9,8 +11,10 @@ export const ActionProvider = ({
   comments,
   signinUrl,
   signupUrl,
-  customInput
+  customInput,
+  requestid
 }) => {
+  const dispatch = useDispatch();
   const [replies, setReplies] = useState([])
   const [user, setUser] = useState()
   const [editArr, setEdit] = useState([])
@@ -20,8 +24,10 @@ export const ActionProvider = ({
       setUser(true)
     } else {
       setUser(false)
-    }
+    }  
   })
+
+  
 
   const handleAction = (id, edit) => {
     edit ? setEdit([...editArr, id]) : setReplies([...replies, id])
@@ -37,34 +43,34 @@ export const ActionProvider = ({
       setReplies(newList)
     }
   }
-
+  
   const onSubmit = (text, parentId, child) => {
     if (text.length > 0) {
-      if (!parentId && !child) {
-
-
+      if (!parentId && !child) {       
+        const _inputData = {"requestid" : requestid,"comment":text}        
+        dispatch(saveRawRequestNote(_inputData));          
         const maxId = comments.reduce(
-          (max, comment) => (comment.comId > max ? comment.comId : max),
-          comments[0].comId
-        );  
-
-
-        setComment([
-          ...comments,
+          (max, comment) => (comment.commentId > max ? comment.commentId : max),
+          comments[0].commentId
+        ); 
+        
+       
+        comments.push(        
           {
             userId: currentUser.userId,
-            comId: maxId+1,
+            commentId: maxId+1,
             avatarUrl: currentUser.avatarUrl,
             fullName: currentUser.name,
             text: text
-          }
-        ])
+          })
+        setComment(comments)
+
       } else if (parentId && child) {
         const newList = [...comments]
-        const index = newList.findIndex((x) => x.comId === parentId)
+        const index = newList.findIndex((x) => x.commentId === parentId)
         newList[index].replies.push({
           userId: currentUser.userId,
-          comId: uuid(),
+          commentId: uuid(),
           avatarUrl: currentUser.avatarUrl,
           fullName: currentUser.name,
           text: text
@@ -72,14 +78,14 @@ export const ActionProvider = ({
         setComment(newList)
       } else if (parentId && !child) {
         const newList = [...comments]
-        const index = newList.findIndex((x) => x.comId === parentId)
+        const index = newList.findIndex((x) => x.commentId === parentId)
         const newReplies =
           newList[index].replies === undefined
             ? []
             : [...newList[index].replies]
         newReplies.push({
           userId: currentUser.userId,
-          comId: uuid(),
+          commentId: uuid(),
           avatarUrl: currentUser.avatarUrl,
           fullName: currentUser.name,
           text: text
@@ -93,13 +99,13 @@ export const ActionProvider = ({
   const editText = (id, text, parentId) => {
     if (parentId === undefined) {
       const newList = [...comments]
-      const index = newList.findIndex((x) => x.comId === id)
+      const index = newList.findIndex((x) => x.commentId === id)
       newList[index].text = text
       setComment(newList)
     } else if (parentId !== undefined) {
       const newList = [...comments]
-      const index = newList.findIndex((x) => x.comId === parentId)
-      const replyIndex = newList[index].replies.findIndex((i) => i.comId === id)
+      const index = newList.findIndex((x) => x.commentId === parentId)
+      const replyIndex = newList[index].replies.findIndex((i) => i.commentId === id)
       newList[index].replies[replyIndex].text = text
       setComment(newList)
     }
@@ -108,12 +114,12 @@ export const ActionProvider = ({
   const deleteText = (id, parentId) => {
     if (parentId === undefined) {
       const newList = [...comments]
-      const filter = newList.filter((x) => x.comId !== id)
+      const filter = newList.filter((x) => x.commentId !== id)
       setComment(filter)
     } else if (parentId !== undefined) {
       const newList = [...comments]
-      const index = newList.findIndex((x) => x.comId === parentId)
-      const filter = newList[index].replies.filter((x) => x.comId !== id)
+      const index = newList.findIndex((x) => x.commentId === parentId)
+      const filter = newList[index].replies.filter((x) => x.commentId !== id)
       newList[index].replies = filter
       setComment(newList)
     }
