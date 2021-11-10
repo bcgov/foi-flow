@@ -50,7 +50,7 @@ const DisplayComments = ({ comments }) => {
             ))}
           <div className="replySection">
             {
-            i.replies.sort((a,b)=>{return a.commentId - b.commentId}) &&
+           i.replies && i.replies.sort((a,b)=>{return a.commentId - b.commentId}) &&
               i.replies.map((a, index) => (
                 <div key={a.commentId}>
                   {actions.editArr.filter((id) => id === a.commentId).length !==
