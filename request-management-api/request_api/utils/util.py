@@ -70,7 +70,7 @@ def getrequiredmemberships():
     for group in MinistryTeamWithKeycloackGroup:
         membership+='{0},'.format(group.value)
 
-    membership+='Intake Team,Flex Team'    
+    membership+='Intake Team,Flex Team,Processing Team'    
     return membership
 
 def allowedOrigins():
