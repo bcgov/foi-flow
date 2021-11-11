@@ -12,7 +12,8 @@ export const CommentSection = ({
   signinUrl,
   signupUrl,
   customInput,
-  requestid
+  requestid,
+  ministryId
 }) => {
   const [comments, setComments] = useState(commentsArray)
   const [showaddbox, setshowaddbox] = useState(false)
@@ -32,6 +33,7 @@ export const CommentSection = ({
       signupUrl={signupUrl}
       customInput={customInput}
       requestid={requestid}
+      ministryId={ministryId}
     >
       <div className="section">
         <div className="addcommentBox">

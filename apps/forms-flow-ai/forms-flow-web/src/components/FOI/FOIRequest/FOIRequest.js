@@ -80,6 +80,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     if (ministryId) {
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(requestId,ministryId));
     
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {      
@@ -95,7 +96,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
-  },[requestId, dispatch,comment]);
+  },[requestId,ministryId, dispatch,comment]);
  
 
   useEffect(() => {  
@@ -582,16 +583,12 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   }
   const bottomTextArray = _requestStatus.split('|');
-
-  
-    
+      
   const userId = userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
   const name = `${userDetail.family_name}, ${userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
-
- 
 
   return (
 
@@ -654,7 +651,7 @@ const FOIRequest = React.memo(({userDetail}) => {
              requestNotes ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} />
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
                 
                 </> : null
             }
