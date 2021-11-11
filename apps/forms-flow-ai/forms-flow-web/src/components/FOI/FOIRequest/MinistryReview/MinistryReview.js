@@ -12,6 +12,7 @@ import {
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList,
   fetchFOIMinistryDivisionalStages,
+  fetchFOIRequestNotesList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
@@ -71,14 +72,17 @@ const MinistryReview = React.memo(({userDetail}) => {
  
   
    let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
+   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
+   const [comment, setComment] = useState(requestNotes)
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
        dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
        dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+       dispatch(fetchFOIRequestNotesList(requestId,ministryId))
        
      }     
-   },[requestId, dispatch]); 
+   },[requestId, dispatch,comment]); 
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -230,81 +234,10 @@ const MinistryReview = React.memo(({userDetail}) => {
   }
 
 
-  const data = [
-    {
-      "userId": "02b",
-      "comId": "1",
-      "date":"2021 Nov 2 10:30:00",
-      "fullName": "Abin Antony",
-      "avatarUrl": "https://ui-avatars.com/api/name=Riya&background=random" ,
-      "text": "This FOI Request is ready for CFR, @Divya please forward ",
-      "replies": [
-        {
-          "userId": "02a",
-          "comId": "13",
-          "date":"2021 Nov 2 11:30:00",
-          "fullName": "Divya Viswanath",
-          "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random" ,
-          "text": "Thanks! It took me 1 month to finish this project but I am glad it helped out someone!🥰"
-        },
-        {
-          "userId": "02b",
-          "comId": "14",
-          "date":"2021 Nov 2 11:32:00",
-          "fullName": "Abin Antony",
-          "avatarUrl": "https://ui-avatars.com/api/name=Riya&background=random",
-          "text": "thanks!😊"
-        }
-      ]
-    },
-    {
-      "userId": "02a",
-      "comId": "7",
-      "date":"2021 Nov 2 09:30:00",
-      "fullName": "Divya Viswanath",
-      "text": "Yes CFR can be done, but waiting for MC to reply",
-      "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random",      
-    },
-    {
-      "userId": "02a",
-      "comId": "15",
-      "date":"2021 Nov 2 08:30:00",
-      "fullName": "Robert Jae",
-      "avatarUrl": "https://ui-avatars.com/api/name=Robert&background=random",
-      "text": "I can look into it",
-      "replies": [
-        {
-          "userId": "01b",
-          "comId": "16",
-          "date":"2021 Nov 2 08:32:00",
-          "fullName": "Divya Viswanath",
-          "text": "Thanks! refer here mmm",
-          "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random"
-        }
-      ]
-    },
-    {
-      "userId": "02b",
-      "comId": "17",
-      "date":"2021 Nov 2 07:30:00",
-      "fullName": "Abin Antony",
-      "text": "I have a doubt about the 4th point🤔",
-      "avatarUrl": "https://ui-avatars.com/api/name=Lily&background=random",
-      "replies": [
-        {
-          "userId": "01b",
-          "comId": "16",
-          "date":"2021 Nov 2 08:32:00",
-          "fullName": "Divya Viswanath",
-          "text": "Thanks!",
-          "avatarUrl": "https://ui-avatars.com/api/name=Adam&background=random"
-        }]
-    }
-  ]
-  const [comment, setComment] = useState(data)
-  const userId = "02b"
+ 
+  const userId = userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const name = "Abin Antony"
+  const name = `${userDetail.family_name}, ${userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
@@ -355,8 +288,8 @@ const MinistryReview = React.memo(({userDetail}) => {
             </div>                            
           </div> 
           <div id="Comments" className="tabcontent">
-          <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={comment}
-        setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} />
+          <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
+        setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
               </div> 
           <div id="Option3" className="tabcontent">
            <h3>Option 3</h3>
