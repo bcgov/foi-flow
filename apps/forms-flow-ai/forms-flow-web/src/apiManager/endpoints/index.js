@@ -32,9 +32,9 @@ const API = {
   FOI_GET_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
   FOI_PUT_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
 
-  FOI_POST_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}api/foicomment/ministryrequest`,
-  FOI_GET_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}api/foicomment/ministryrequest/<ministryrequestid>`,
-
+  FOI_POST_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest`,
+  FOI_GET_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
+  FOI_PUT_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
 };
 
 export default API;

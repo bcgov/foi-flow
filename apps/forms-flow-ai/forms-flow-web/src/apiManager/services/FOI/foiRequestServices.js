@@ -723,7 +723,29 @@ export const editRawRequestNote = (data,requestid, ...rest) => {
     return (dispatch) => {
       httpPUTRequest(apiUrl, data)
         .then((res) => {
-          console.log(`Saved - editRawRequestNote ${JSON.stringify(res)}`)
+          
+          if (res.data) {                              
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error Posting Raw Request Note");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+};
+export const editMinistryRequestNote = (data,ministryrequestid, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};  
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_PUT_COMMENT_MINISTRYREQUEST,     
+  ),"<ministryrequestid>", ministryrequestid); 
+    return (dispatch) => {
+      httpPUTRequest(apiUrl, data)
+        .then((res) => {
+          
           if (res.data) {                              
             done(null, res.data);
           } else {
@@ -738,12 +760,15 @@ export const editRawRequestNote = (data,requestid, ...rest) => {
     };
 };
 
-export const saveMinistryRequestNote = (data, ...rest) => {  
+export const saveMinistryRequestNote = (data, ...rest) => { 
+   
   const done = rest.length ? rest[0] : () => {};  
     return (dispatch) => {
       httpPOSTRequest(API.FOI_POST_COMMENT_MINISTRYREQUEST, data)
         .then((res) => {
-          if (res.data) {                              
+          
+          if (res.data) { 
+                                         
             done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
@@ -761,9 +786,10 @@ export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
   const done = rest.length ? rest[0] : () => { };
   let apiUrl = "";
   if (ministryId !=null) {
-    apiUrl = replaceUrl(replaceUrl(
+    apiUrl = replaceUrl(
       API.FOI_GET_COMMENT_MINISTRYREQUEST,
-    ), "<ministryrequestid>", ministryId);
+     "<ministryrequestid>", ministryId);
+     
   }
   else {
     apiUrl = replaceUrl(
@@ -777,7 +803,7 @@ export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
       .then((res) => {
         
         if (res.data) {
-         
+        
           if (ministryId!=null) 
           {
            
