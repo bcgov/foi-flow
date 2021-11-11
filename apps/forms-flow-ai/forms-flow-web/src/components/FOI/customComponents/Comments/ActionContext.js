@@ -48,8 +48,8 @@ export const ActionProvider = ({
       if (!parentId && !child) {       
         const _inputData = {"requestid" : requestid,"comment":text}        
         dispatch(saveRawRequestNote(_inputData));          
-        const maxId = comments.reduce(
-          (max, comment) => (comment.commentId > max ? comment.commentId : max),
+        const maxId = comments && comments.length > 0 && comments.reduce(
+          (max, comment) => ( comment && comment.commentId > max ? comment.commentId : max),
           comments[0].commentId
         );                
         comments.push(        

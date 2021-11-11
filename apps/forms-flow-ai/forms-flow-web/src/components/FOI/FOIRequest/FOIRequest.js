@@ -583,7 +583,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
   const bottomTextArray = _requestStatus.split('|');
 
-  console.log(userDetail)
+  
     
   const userId = userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
@@ -651,7 +651,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div> 
           <div id="Comments" className="tabcontent">
             {
-              Object.entries(requestNotes).length !== 0 ?
+             requestNotes ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} />
