@@ -58,15 +58,17 @@ class commentservice:
         data = FOIRawRequestComment.getcomments(requestid)
         return self.preparecomments(data)        
     
+    
+
     @classmethod    
     def copyrequestcomment(self, ministryrequestid, comments, userid):
-        _comments = []
+        _comments = []        
         for comment in comments:
-            response=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid) 
-            _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})
+            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF']) 
+            _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
                 for reply in comment['replies']:
-                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, response.identifier), 1, userid)      
+                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
         return _comments
     
@@ -121,6 +123,7 @@ class commentservice:
                 "userId": comment['createdby'],
                 "commentId": comment['commentid'],
                 "text": comment['comment'],
+                "dateUF":comment["created_at"],
                 "date":  commentcreatedDate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
                 "commentTypeId":comment['commenttypeid']
