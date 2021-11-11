@@ -9,6 +9,12 @@ import json
 from dateutil.parser import *
 import datetime 
 
+from dateutil import parser
+from dateutil import tz
+from pytz import timezone
+import pytz
+import maya
+
 
 class commentservice:
     """ FOI watcher management service
@@ -110,11 +116,12 @@ class commentservice:
         
     @classmethod    
     def comment(self, comment):
+        commentcreatedDate = maya.parse(comment["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
         return {
                 "userId": comment['createdby'],
                 "commentId": comment['commentid'],
                 "text": comment['comment'],
-                "date":  parse(comment["created_at"]).strftime('%Y-%m-%d %H:%M:%S.%f'),
+                "date":  commentcreatedDate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
                 "commentTypeId":comment['commenttypeid']
         }     

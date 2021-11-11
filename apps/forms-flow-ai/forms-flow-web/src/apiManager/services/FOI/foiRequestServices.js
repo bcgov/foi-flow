@@ -1,4 +1,4 @@
-import { httpPOSTRequest, httpGETRequest, httpOSSPUTRequest } from "../../httpRequestHandler";
+import { httpPOSTRequest, httpGETRequest, httpOSSPUTRequest, httpPUTRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -700,7 +700,30 @@ export const saveRawRequestNote = (data, ...rest) => {
     return (dispatch) => {
       httpPOSTRequest(API.FOI_POST_COMMENT_RAWREQUEST, data)
         .then((res) => {
-          console.log(`Saved - saveRawRequestNote ${JSON.stringify(res)}`)
+          
+          if (res.data) {                              
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error Posting Raw Request Note");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+};
+
+export const editRawRequestNote = (data,requestid, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};  
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_PUT_COMMENT_RAWREQUEST,     
+  ),"<requestid>", requestid); 
+    return (dispatch) => {
+      httpPUTRequest(apiUrl, data)
+        .then((res) => {
+          console.log(`Saved - editRawRequestNote ${JSON.stringify(res)}`)
           if (res.data) {                              
             done(null, res.data);
           } else {

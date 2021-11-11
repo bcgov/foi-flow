@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react'
 import uuid from 'react-uuid'
-import {fetchFOIRawRequestDetails, fetchFOIRequestNotesList,saveRawRequestNote} from '../../../../apiManager/services/FOI/foiRequestServices'
+import {fetchFOIRawRequestDetails, fetchFOIRequestNotesList,saveRawRequestNote,editRawRequestNote} from '../../../../apiManager/services/FOI/foiRequestServices'
 import { useDispatch, useSelector } from "react-redux";
 
 export const ActionContext = createContext()
@@ -97,11 +97,15 @@ export const ActionProvider = ({
 
   const editText = (id, text, parentId) => {
     if (parentId === undefined) {
+      const _inputData = {"comment":text}        
+      dispatch(editRawRequestNote(_inputData,id));
       const newList = [...comments]
       const index = newList.findIndex((x) => x.commentId === id)
       newList[index].text = text
       setComment(newList)
     } else if (parentId !== undefined) {
+      const _inputData = {"comment":text}        
+      dispatch(editRawRequestNote(_inputData,id));
       const newList = [...comments]
       const index = newList.findIndex((x) => x.commentId === parentId)
       const replyIndex = newList[index].replies.findIndex((i) => i.commentId === id)
