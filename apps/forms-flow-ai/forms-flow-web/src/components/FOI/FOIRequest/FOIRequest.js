@@ -95,7 +95,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
-  },[requestId, dispatch]);
+  },[requestId, dispatch,comment]);
  
 
   useEffect(() => {  

@@ -18,6 +18,7 @@ import {fetchFOIFullAssignedToList} from '../../../../apiManager/services/FOI/fo
 import { objectOf } from 'prop-types';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { formatDate } from "../../../../helper/FOI/helper";
 
 const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, isreplysection }) => {
     
