@@ -29,7 +29,7 @@ class cdogsApiService:
     """cdogs api Service class."""
 
     fileDir = os.path.dirname(os.path.realpath('__file__'))
-    receiptTemplatePath = os.path.join(fileDir, 'request_api/receipt_templates/receipt_in_word.docx')
+    receiptTemplatePath = os.path.join(fileDir, 'request_api/receipt_templates/receipt_word.docx')
 
     def generate_receipt(self, templateHashCode: str, data):
         request_body = {
@@ -70,6 +70,14 @@ class cdogsApiService:
         try:
             current_app.logger.info('Uploading template %s', templateFilePath)
             response = requests.post(url, headers= headers, files= template)
+            
+            if response.status_code == 200:
+                if hasattr(response.headers, "X-Template-Hash") is False:
+                    raise BusinessException(Error.DATA_NOT_FOUND)
+
+                current_app.logger.info('Returning new hash %s', response.headers['X-Template-Hash'])
+                return response.headers['X-Template-Hash'];
+        
             response_json = json.loads(response.content)
             
             if response.status_code == 405 and response_json['detail'] is not None:
@@ -78,14 +86,11 @@ class cdogsApiService:
                     current_app.logger.info('Template already hashed with code %s', match[0])
                     return match[0]
                 
-                raise BusinessException(Error.DATA_NOT_FOUND)
+            raise BusinessException(Error.UNDEFINED_ERROR)
             
-            if hasattr(response.headers, "X-Template-Hash") is False:
-                raise BusinessException(Error.DATA_NOT_FOUND)
-
-            current_app.logger.info('Returning new hash %s', response.headers['X-Template-Hash'])
-            return response.headers['X-Template-Hash'];
+            
         except BaseException as e:
+            print(e)
             raise e
 
     def check_template_cached(self, template_hash_code: str, access_token = None):
