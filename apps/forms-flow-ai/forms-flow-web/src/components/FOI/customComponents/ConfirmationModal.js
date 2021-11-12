@@ -72,11 +72,20 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const handleSave = () => {
       let fileInfoList = [];
       if (files.length > 0) {
+        let fileStatusTransition = "";    
+        if (state.toLowerCase() === StateEnum.response.name.toLowerCase())
+          fileStatusTransition = 'signoff-response';
+        else if (saveRequestObject.requeststatusid === StateEnum.callforrecords.id && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = 'cfr-review';
+        else if (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase())
+          fileStatusTransition = 'cfr-feeassessed';
+        else if (saveRequestObject.requeststatusid === StateEnum.harms.id && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = 'harms-review';
         fileInfoList = files.map(file => {
           return {
             ministrycode: requestNumber.split("-")[0],
             requestnumber: requestNumber,
-            filestatustransition: state.toLowerCase() === StateEnum.response.name.toLowerCase() ? 'signoff-response' : 'cfr-review',
+            filestatustransition: fileStatusTransition,
             filename: file.name,
           }
         });
@@ -86,7 +95,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const getMessage = (_state, _requestNumber) => {
       switch(_state.toLowerCase()) {     
         case StateEnum.intakeinprogress.name.toLowerCase():
-            return {title: "Changing the state", body: "Are you sure you want Save the request?"};
+            return {title: "Changing the state", body: "Are you sure you want to change the state to Intake in Progress?"};
         case StateEnum.open.name.toLowerCase():
             return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
         case StateEnum.closed.name.toLowerCase():
