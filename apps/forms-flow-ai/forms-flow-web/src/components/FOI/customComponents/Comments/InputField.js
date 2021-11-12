@@ -71,24 +71,26 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
             : { marginLeft: 8 }
         }
       >
+        <div className="row">
+          <div className="col-lg-12">
+          {(!main) ? (
+              <button
+                className="cancelBtn"
+                onClick={cancel}               
+              >
+                <FontAwesomeIcon icon={faTimes} size='2x' color={ '#a5a5a5'} />
+              </button>
+            ):null}
+            </div>
+        </div>
 
         <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Type your comments here"} />
 
         <div className="inputActions">
-          <div className={!main ? 'col-lg-10' :'col-lg-11'}>
+          <div className={'col-lg-11'}>
             <span className="characterlen">{textlength} characters remaining</span>
           </div>
-          <div className="col-lg-2">
-          {(!main) ? (
-              <button
-                className="cancelBtn"
-                onClick={cancel}
-               
-              >
-                <FontAwesomeIcon icon={faTimes} size='2x' color={text === undefined || text.length === 0 || textlength === maxcharacterlimit ? '#a5a5a5' : 'darkblue'} />
-              </button>
-            ):null}
-
+          <div className="col-lg-1">        
             <button
               className="postBtn"
               onClick={post}
@@ -98,9 +100,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
             >
               {' '}
               <FontAwesomeIcon icon={faPaperPlane} size='2x' color={ text === undefined || text.length === 0 || textlength === maxcharacterlimit ? '#a5a5a5' : 'darkblue'} />
-            </button>
-         
-            
+            </button>                     
           </div>
         </div>
 
