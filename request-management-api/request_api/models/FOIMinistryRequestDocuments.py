@@ -39,9 +39,10 @@ class FOIMinistryRequestDocument(db.Model):
     @classmethod
     def getdocuments(cls,ministryrequestid,ministryrequestversion):
         file_schema = FOIMinistryRequestDocumentSchema(many=True)
-        _files = db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministryrequest_id == ministryrequestid , FOIMinistryRequestDocument.foiministryrequestversion_id == ministryrequestversion).order_by(FOIMinistryRequestDocument.foiministrydocumentid.asc()).all()
+        _files = db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministryrequest_id == ministryrequestid , FOIMinistryRequestDocument.foiministryrequestversion_id == ministryrequestversion, FOIMinistryRequestDocument.isactive == True).order_by(FOIMinistryRequestDocument.foiministrydocumentid.asc()).all()
         files = file_schema.dump(_files)       
         return files
+    
     
     @classmethod
     def getversionforrequestdocuments(cls,foiministrydocumentid):   
