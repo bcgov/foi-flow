@@ -73,8 +73,10 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
         <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Type your comments here"} />
 
         <div className="inputActions">
-
+          <div className="col-lg-11">
           <span className="characterlen">{textlength} characters remaining</span>
+          </div>
+          <div className="col-lg-1">
           <button
             className="postBtn"
             onClick={post}
@@ -84,7 +86,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
           >
             {' '}
             <FontAwesomeIcon icon={faPaperPlane} size='2x' color={!text ? '#a5a5a5' : 'darkblue'} />
-          </button>          
+          </button>  
+          </div>        
         </div>
 
       </form>

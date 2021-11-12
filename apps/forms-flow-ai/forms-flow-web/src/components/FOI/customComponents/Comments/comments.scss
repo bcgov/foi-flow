@@ -8,11 +8,9 @@
 .section{
   display: flex;
   flex-direction: column;
-  //width:auto;
+ 
   background-color: white;
-  //height: 100%;
-  
-    
+      
   .addcommentBox{
     width:100%;
     margin-left:25px;
@@ -32,9 +30,9 @@
 
   .inputActions{
     display: flex;
-    justify-content: flex-end;
+    //justify-content: flex-end;
     margin-top: 3px;
-    margin-left: 15px;
+    //margin-left: 15px;
 
     .postBtn {
       color: white;
@@ -45,7 +43,7 @@
       padding:8px 16px;
       background-color: transparent!important;
       border:none;
-      margin-right: 10px;
+      //margin-right: 10px;
       font-weight:bolder;
       font-size: 12px;
 
@@ -57,6 +55,9 @@
 
       &:focus {
         outline:0;
+      }
+      svg {
+        transform: rotate(42deg);
       }
     }
 
@@ -295,7 +296,7 @@
 .characterlen{
   font-size: 12px;
   color: grey;
-  margin-left: 25px;
+  //margin-left: 25px;
   margin-top: 3px;
 }
 .ql-hidden{
