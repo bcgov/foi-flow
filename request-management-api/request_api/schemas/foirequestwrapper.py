@@ -49,7 +49,9 @@ class FOIMinistryRequestDocumentSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE
-    documentpath = fields.Str(data_key="documentpath",allow_none=False)         
+    documentpath = fields.Str(data_key="documentpath",allow_none=False)
+    filename = fields.Str(data_key="filename",allow_none=False)
+    category = fields.Str(data_key="category",allow_none=False)
 class FOIRequestWrapperSchema(Schema):
 
     class Meta:  # pylint: disable=too-few-public-methods

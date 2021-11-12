@@ -479,6 +479,11 @@ class FOIRequestUtil:
             for document in requestschema['documents']:
                 ministrydocument = FOIMinistryRequestDocument()
                 ministrydocument.documentpath = document["documentpath"]
+                if 'filename' in document:
+                    ministrydocument.filename = document["filename"]
+                if 'category' in document:
+                    ministrydocument.category = document['category']
+                ministrydocument.version = 1
                 ministrydocument.foiministryrequest_id = requestid
                 ministrydocument.foiministryrequestversion_id = version
                 ministrydocument.createdby = userid
@@ -503,6 +508,11 @@ class FOIRequestUtil:
         for document in documents:
             ministrydocument = FOIMinistryRequestDocument()
             ministrydocument.documentpath = document["documentpath"]
+            if 'filename' in document:
+                ministrydocument.filename = document["filename"]
+            if 'category' in document:
+                ministrydocument.category = document['category']
+            ministrydocument.version = 1
             ministrydocument.foiministryrequest_id = requestid
             ministrydocument.foiministryrequestversion_id = version
             ministrydocument.createdby = userid
