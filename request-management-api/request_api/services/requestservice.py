@@ -483,7 +483,7 @@ class FOIRequestUtil:
                     ministrydocument.filename = document["filename"]
                 if 'category' in document:
                     ministrydocument.category = document['category']
-                ministrydocument.version = version
+                ministrydocument.version = 1
                 ministrydocument.foiministryrequest_id = requestid
                 ministrydocument.foiministryrequestversion_id = version
                 ministrydocument.createdby = userid
@@ -512,7 +512,7 @@ class FOIRequestUtil:
                 ministrydocument.filename = document["filename"]
             if 'category' in document:
                 ministrydocument.category = document['category']
-            ministrydocument.version = version
+            ministrydocument.version = 1
             ministrydocument.foiministryrequest_id = requestid
             ministrydocument.foiministryrequestversion_id = version
             ministrydocument.createdby = userid
