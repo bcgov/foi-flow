@@ -114,6 +114,13 @@ class _Config():  # pylint: disable=too-few-public-methods
     PAYBC_API_SECRET = os.getenv('PAYBC_API_SECRET')
     CONNECT_TIMEOUT = os.getenv('CONNECT_TIMEOUT', 60)
 
+    # CDOGS
+    CDOGS_ACCESS_TOKEN = os.getenv('CDOGS_ACCESS_TOKEN')
+    CDOGS_BASE_URL = os.getenv('CDOGS_BASE_URL')
+    CDOGS_SERVICE_CLIENT = os.getenv('CDOGS_SERVICE_CLIENT')
+    CDOGS_SERVICE_CLIENT_SECRET = os.getenv('CDOGS_SERVICE_CLIENT_SECRET')
+    CDOGS_TOKEN_URL = os.getenv('CDOGS_TOKEN_URL')
+
     
 
 
