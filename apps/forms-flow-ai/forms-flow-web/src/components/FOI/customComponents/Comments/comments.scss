@@ -2,14 +2,15 @@
 #Comments{
   height: 900px;
   overflow-y: scroll;
-  width: 95%;
+  width: auto;
+  background-color:white;
 }
 .section{
   display: flex;
   flex-direction: column;
-  width:100%;
+  //width:auto;
   background-color: white;
-  height: auto;
+  //height: 100%;
   
     
   .addcommentBox{

@@ -18,7 +18,7 @@ export const CommentSection = ({
 }) => {
   const [comments, setComments] = useState(commentsArray)
   const [showaddbox, setshowaddbox] = useState(false)
-  const [addbuttontext, setaddbuttontext] = useState("Add Comment")
+  
   useEffect(() => {
     setComments(commentsArray)
   }, [commentsArray])
@@ -37,7 +37,7 @@ export const CommentSection = ({
     >
       <div className="section">
         <div className="addcommentBox">
-            <button type="button" className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); addbuttontext == "Add Comment" ? setaddbuttontext("Hide") : setaddbuttontext("Add Comment");   }}>{addbuttontext}</button>
+            <button type="button" style={ {display: !showaddbox ? 'block':'none'}} className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); }}>Add Comment</button>
         </div>
 
         <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
