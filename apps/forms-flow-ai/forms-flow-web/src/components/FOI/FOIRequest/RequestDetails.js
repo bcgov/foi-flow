@@ -230,6 +230,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             fullWidth
                             disabled={!!ministryId || disableInput}
                         />
+                        {requestDetails.currentState === undefined || (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) ?
                         <TextField                
                             label="Due Date"
                             type="date" 
@@ -242,6 +243,19 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
                             disabled
                             fullWidth
                         />
+                        :
+                        <TextField                
+                            label="Due Date"                            
+                            value="N/A"                            
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                            variant="outlined" 
+                            required
+                            disabled
+                            fullWidth
+                        />
+                      }
                     </div>
                 </div>                
             </CardContent>

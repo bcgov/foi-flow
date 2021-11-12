@@ -1,15 +1,9 @@
 import React, { useRef, useState } from "react";
 import "./FileUpload.scss"
 
-const DEFAULT_MAX_FILE_SIZE_IN_BYTES = 52428800; //50MB
-const KILO_BYTES_PER_BYTE = 1000;
-
-const convertBytesToKB = (bytes) => Math.round(bytes / KILO_BYTES_PER_BYTE);
-
 const FileUpload = ({
     multipleFiles,
-    updateFilesCb,
-    maxFileSizeInBytes = DEFAULT_MAX_FILE_SIZE_IN_BYTES
+    updateFilesCb
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({});
@@ -19,15 +13,16 @@ const FileUpload = ({
         fileInputField.current.click();
     };
     const mimeTypes = ['application/pdf', 
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
 
     const addNewFiles = (newFiles) => {
         for (let file of newFiles) {
           if (mimeTypes.includes(file.type)) {
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
-            if (sizeInMB <= 50) {                
+            if (sizeInMB <= 50) {             
                 files[file.name] = file;
+                setErrorMessage("");
             }
             else {
               setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files 50mb or under can be uploaded. `);
@@ -51,8 +46,7 @@ const FileUpload = ({
         const { files: newFiles } = e.target;
         if (newFiles.length) {
             let updatedFiles = addNewFiles(newFiles);
-            setFiles(updatedFiles);
-            setErrorMessage("");
+            setFiles(updatedFiles);           
             callUpdateFilesCb(updatedFiles);
         }
     };
@@ -71,14 +65,11 @@ const FileUpload = ({
          
           <div className="col-lg-12 file-upload-btn">
             <p className="drag-and-drop-text">Drag and drop request letter(s) or</p>
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>
-              {/* <i className="fas fa-file-upload" /> */}
-              {/* <span> Upload {otherProps.multiple ? "files" : "a file"}</span> */}
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
               Add Files
             </button>           
           </div>
-          :
-          // {files != undefined && Object.entries(files).length > 0 ?
+          :         
           <FilePreviewContainer files={files} removeFile={removeFile} />
           }
         </div>
@@ -109,8 +100,7 @@ const FileUpload = ({
 
 function FilePreviewContainer({files, removeFile}) {
   return (
-    <article className="file-preview-container">
-      {/* <span>To Upload</span> */}
+    <article className="file-preview-container">     
       <section>
         {Object.keys(files).map((fileName, index) => {
           let file = files[fileName];

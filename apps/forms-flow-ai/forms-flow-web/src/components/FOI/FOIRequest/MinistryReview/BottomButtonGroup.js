@@ -57,15 +57,14 @@ const BottomButtonGroup = React.memo(({
     const disableSave = isValidationError || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase();
 
     const returnToQueue = (e) => {
-      e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+        e.preventDefault();
+        window.removeEventListener('beforeunload', alertUser);
         window.location.href = '/foi/dashboard';
       }
     }
  
     const saveMinistryRequest = async () => {
-      console.log("SaveObject - Bottom Button group misnitry")
-      console.log(saveMinistryRequestObject)
       dispatch(saveMinistryRequestDetails(saveMinistryRequestObject, requestId, ministryId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
@@ -95,17 +94,18 @@ const BottomButtonGroup = React.memo(({
     }
 
     const alertUser = e => {
-      e.preventDefault();
       if (unSavedRequest) {
+        e.preventDefault();
         e.returnValue = '';
       }
     }
 
+    const handleOnHashChange = (e) => {       
+      returnToQueue(e);
+    };  
+
     React.useEffect(() => {
-      const handleOnHashChange = (e) => {       
-        returnToQueue(e);
-      };  
-            
+
       if (currentSelectedStatus !== "" && !isValidationError){
         saveRequestModal();
       }
@@ -113,12 +113,12 @@ const BottomButtonGroup = React.memo(({
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
       window.addEventListener('beforeunload', alertUser);
-      window.addEventListener('unload', handleOnHashChange);   
+      // window.addEventListener('unload', handleOnHashChange);   
       
       return () => {
         window.removeEventListener('popstate', handleOnHashChange);
         window.removeEventListener('beforeunload', alertUser);
-        window.removeEventListener('unload', handleOnHashChange);
+        // window.removeEventListener('unload', handleOnHashChange);
       }
     });
     
@@ -143,8 +143,14 @@ const BottomButtonGroup = React.memo(({
           case StateEnum.deduplication.name.toLowerCase(): 
             saveMinistryRequestObject.requeststatusid = StateEnum.deduplication.id;
             break;
+          case StateEnum.harms.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.harms.id;
+            break;
           case StateEnum.signoff.name.toLowerCase(): 
             saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
+            break;
+          case StateEnum.response.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
             break;
         }
       }
@@ -194,6 +200,48 @@ const BottomButtonGroup = React.memo(({
             saveMinistryRequest();
             hasStatusRequestSaved(true,currentSelectedStatus)
           }
+        }
+        else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.deduplication.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.feeassessed.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.callforrecords.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.callforrecords.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.harms.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.harms.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
+        {
+          saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
+          saveMinistryRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
         }
       }
     }

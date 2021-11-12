@@ -73,7 +73,7 @@ const MinistryReview = React.memo(({userDetail}) => {
   
    let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
    let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
-   const [comment, setComment] = useState(requestNotes)
+   const [comment, setComment] = useState(requestNotes)   
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
@@ -204,6 +204,18 @@ const MinistryReview = React.memo(({userDetail}) => {
     case StateEnum.signoff.name: 
       foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
       break;
+    case StateEnum.deduplication.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
+      break;
+    case StateEnum.harms.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
+      break;
+    case StateEnum.onhold.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
+      break;
+    case StateEnum.response.name: 
+      foitabheaderBG = "foitabheadercollection foitabheaderResponseBG"
+      break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;  
@@ -261,10 +273,17 @@ const MinistryReview = React.memo(({userDetail}) => {
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
         
-        <div className="foileftpanelstatus"> 
+        <div className="foileftpanelstatus">
+        {_requestStatus.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?  
+          <>
+          {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
           <h4>{bottomTextArray[0]}</h4>
+          : null }
           <h4>{bottomTextArray[1]}</h4>
-        </div>        
+          </>
+        : null }
+        </div>  
+     
         </div>
         <div className="foitabpanelcollection"> 
           <div id="Request" className="tabcontent active">                                

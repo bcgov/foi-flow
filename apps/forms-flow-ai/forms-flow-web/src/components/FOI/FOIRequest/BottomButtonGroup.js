@@ -7,7 +7,7 @@ import {saveRequestDetails, openRequestDetails} from "../../../apiManager/servic
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../customComponents';
-import { addBusinessDays, formatDate } from "../../../helper/FOI/helper";
+import { addBusinessDays, formatDate, calculateDaysRemaining } from "../../../helper/FOI/helper";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
@@ -72,8 +72,9 @@ const BottomButtonGroup = React.memo(({
     }
 
     const returnToQueue = (e) => {
-      e.preventDefault();
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+        e.preventDefault();
+        window.removeEventListener('beforeunload', alertUser);
         window.location.href = '/foi/dashboard';
       }
     }
@@ -110,17 +111,18 @@ const BottomButtonGroup = React.memo(({
     }
 
     const alertUser = e => {
-      e.preventDefault();
       if (unSavedRequest) {
+        e.preventDefault();
         e.returnValue = '';
       }
     }
 
+    const handleOnHashChange = (e) => {       
+      returnToQueue(e);
+    };  
+
     React.useEffect(() => {
-      const handleOnHashChange = (e) => {       
-        returnToQueue(e);
-      };  
-            
+           
       if(currentSelectedStatus == StateEnum.open.name && !isValidationError && (ministryId == undefined || ministryId == null || ministryId == ''))
       {
         saveRequestObject.requeststatusid = StateEnum.open.id;
@@ -143,12 +145,12 @@ const BottomButtonGroup = React.memo(({
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
       window.addEventListener('beforeunload', alertUser);
-      window.addEventListener('unload', handleOnHashChange);   
+      //window.addEventListener('unload', handleOnHashChange);   
       
       return () => {
         window.removeEventListener('popstate', handleOnHashChange);
         window.removeEventListener('beforeunload', alertUser);
-        window.removeEventListener('unload', handleOnHashChange);
+        //window.removeEventListener('unload', handleOnHashChange);
         
       }
     });
@@ -216,13 +218,20 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true, currentSelectedStatus)
         }
-        else if(currentSelectedStatus == StateEnum.callforrecords.name && !isValidationError)
-        {        
+        else if(currentSelectedStatus === StateEnum.callforrecords.name && !isValidationError)
+        {
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
           if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-          }         
+          }
+          else if (saveRequestObject.onholdTransitionDate) {
+            const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);            
+            const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays-1);
+            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays-1);            
+            saveRequestObject.cfrDueDate = calculatedCFRDueDate;
+            saveRequestObject.dueDate = calculatedRequestDueDate;
+          }
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }  
@@ -249,6 +258,12 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
+        else if(currentSelectedStatus == StateEnum.onhold.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.onhold.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
         else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.signoff.id;
@@ -264,6 +279,24 @@ const BottomButtonGroup = React.memo(({
         else if(currentSelectedStatus == StateEnum.consult.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.consult.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.deduplication.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.harms.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.harms.id;
+          saveRequest();
+          hasStatusRequestSaved(true,currentSelectedStatus)
+        }
+        else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
+        {
+          saveRequestObject.requeststatusid = StateEnum.response.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }

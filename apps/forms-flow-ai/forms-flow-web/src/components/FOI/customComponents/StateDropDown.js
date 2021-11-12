@@ -48,12 +48,22 @@ export default function StateDropDown({requestStatus, handleStateChange, isMinis
                 return _stateList.callforrecords; 
             case StateEnum.review.name.toLowerCase():
                 return _stateList.review;
+            case StateEnum.onhold.name.toLowerCase():
+                return _stateList.onhold;
             case StateEnum.consult.name.toLowerCase():
                 return _stateList.consult;
             case StateEnum.signoff.name.toLowerCase():
                 return _stateList.signoff;
             case StateEnum.feeassessed.name.toLowerCase():
                 return _stateList.feeassessed;                                        
+            case StateEnum.onhold.name.toLowerCase():
+                return _stateList.onhold;  
+            case StateEnum.deduplication.name.toLowerCase():
+                return _stateList.deduplication;  
+            case StateEnum.harms.name.toLowerCase():
+                return _stateList.harms;    
+            case StateEnum.response.name.toLowerCase():
+                return _stateList.response;  
             default:
                 return [];
         }
