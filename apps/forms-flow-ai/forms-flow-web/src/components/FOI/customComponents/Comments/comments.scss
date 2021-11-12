@@ -1,10 +1,16 @@
 /* add css module styles here (optional) */
-
+#Comments{
+  height: 900px;
+  overflow-y: scroll;
+  width: 95%;
+}
 .section{
   display: flex;
   flex-direction: column;
   width:100%;
   background-color: white;
+  height: auto;
+  
     
   .addcommentBox{
     width:100%;
@@ -20,6 +26,7 @@
   .inputBox{
     width:100%;
     margin:25px;
+    margin-top:10px;
   }  
 
   .inputActions{
@@ -117,6 +124,7 @@
 
 .displayComments{
   margin:25px;
+  margin-top:10px;
 
   .halfDiv{
     display: flex;
