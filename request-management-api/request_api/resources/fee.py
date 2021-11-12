@@ -21,7 +21,7 @@ from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
 
 from request_api.services import FeeService
-from request_api.services.cdogs_api_service import cdogsApiService
+from request_api.services.cdogs_api_service import CdogsApiService
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.utils.util import cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error

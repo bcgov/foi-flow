@@ -20,18 +20,17 @@ import os
 import re
 
 from flask import current_app
-from urllib.parse import parse_qsl
 import requests
 from request_api.exceptions import BusinessException, Error
 
 
-class cdogsApiService:
+class CdogsApiService:
     """cdogs api Service class."""
 
-    fileDir = os.path.dirname(os.path.realpath('__file__'))
-    receiptTemplatePath = os.path.join(fileDir, 'request_api/receipt_templates/receipt_word.docx')
+    file_dir = os.path.dirname(os.path.realpath('__file__'))
+    receipt_template_path = os.path.join(file_dir, 'request_api/receipt_templates/receipt_word.docx')
 
-    def generate_receipt(self, templateHashCode: str, data):
+    def generate_receipt(self, template_hash_code: str, data):
         request_body = {
             "options": {
                 "cachereport": False,
@@ -47,66 +46,49 @@ class cdogsApiService:
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {access_token}'
         }
-
-        # if templateHashCode is None:
-        #     templateHashCode = self.upload_template(access_token= access_token)
-
-        url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{templateHashCode}/render"
-        try:
-            return requests.post(url, data= json_request_body, headers= headers)
-        except BaseException as e:
-            raise e
-
-    def upload_template(self, templateFilePath: str = receiptTemplatePath, access_token: str = None):
-        # return '7b47a9f88f9f967d4f8ff72811615625190e113f84a03d3e606b80e262553003'
         
+        url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}/render"
+        return requests.post(url, data= json_request_body, headers= headers)
+
+    def upload_template(self, template_file_path: str = receipt_template_path, access_token: str = None):
+
         headers = {
         "Authorization": f'Bearer {access_token if access_token else self._get_access_token()}'
         }
 
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template"
-        template = {'template':('template', open(templateFilePath, 'rb'), "multipart/form-data")}
+        template = {'template':('template', open(template_file_path, 'rb'), "multipart/form-data")}
 
-        try:
-            current_app.logger.info('Uploading template %s', templateFilePath)
-            response = requests.post(url, headers= headers, files= template)
-            
-            if response.status_code == 200:
-                if hasattr(response.headers, "X-Template-Hash") is False:
-                    raise BusinessException(Error.DATA_NOT_FOUND)
-
-                current_app.logger.info('Returning new hash %s', response.headers['X-Template-Hash'])
-                return response.headers['X-Template-Hash'];
+        current_app.logger.info('Uploading template %s', template_file_path)
+        response = requests.post(url, headers= headers, files= template)
         
-            response_json = json.loads(response.content)
+        if response.status_code == 200:
+            if hasattr(response.headers, "X-Template-Hash") is False:
+                raise BusinessException(Error.DATA_NOT_FOUND)
+
+            current_app.logger.info('Returning new hash %s', response.headers['X-Template-Hash'])
+            return response.headers['X-Template-Hash'];
+    
+        response_json = json.loads(response.content)
+        
+        if response.status_code == 405 and response_json['detail'] is not None:
+            match = re.findall(r"Hash '(.*?)'", response_json['detail']);
+            if match:
+                current_app.logger.info('Template already hashed with code %s', match[0])
+                return match[0]
             
-            if response.status_code == 405 and response_json['detail'] is not None:
-                match = re.findall(r"Hash '(.*?)'", response_json['detail']);
-                if match:
-                    current_app.logger.info('Template already hashed with code %s', match[0])
-                    return match[0]
-                
-            raise BusinessException(Error.UNDEFINED_ERROR)
-            
-            
-        except BaseException as e:
-            print(e)
-            raise e
+        raise BusinessException(Error.UNDEFINED_ERROR)
 
     def check_template_cached(self, template_hash_code: str, access_token = None):
-        # return '7b47a9f88f9f967d4f8ff72811615625190e113f84a03d3e606b80e262553003'
-        
+
         headers = {
         "Authorization": f'Bearer {access_token if access_token else self._get_access_token()}'
         }
 
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}"
 
-        try:
-            response = requests.post(url, headers= headers)
-            return response.status_code == 200
-        except BaseException as e:
-            raise e
+        response = requests.post(url, headers= headers)
+        return response.status_code == 200
         
 
     @staticmethod
@@ -114,9 +96,6 @@ class cdogsApiService:
         token_url = current_app.config['CDOGS_TOKEN_URL']
         service_client = current_app.config['CDOGS_SERVICE_CLIENT']
         service_client_secret = current_app.config['CDOGS_SERVICE_CLIENT_SECRET']
-
-        # if cdogs_access_token is not None:
-        #     return cdogs_access_token
 
         basic_auth_encoded = base64.b64encode(
             bytes(service_client + ':' + service_client_secret, 'utf-8')).decode('utf-8')
@@ -132,7 +111,3 @@ class cdogsApiService:
 
         response_json = response.json()
         return response_json['access_token']
-
-
-
-

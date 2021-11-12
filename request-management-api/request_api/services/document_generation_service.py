@@ -14,23 +14,18 @@
 
 
 """Service for receipt generation."""
-import base64
-import json
-import os
 
 from flask import current_app
-from urllib.parse import parse_qsl
-import requests
 from request_api.exceptions import BusinessException, Error
-from request_api.models import DocumentTemplate, DocumentType, Payment
-from request_api.services.cdogs_api_service import cdogsApiService
+from request_api.models import DocumentTemplate, DocumentType
+from request_api.services.cdogs_api_service import CdogsApiService
 
 
 class DocumentGenerationService:
     """document generation Service class."""
 
     def __init__(self):
-        self.cdgos_api_service = cdogsApiService()
+        self.cdgos_api_service = CdogsApiService()
         receipt_document_type : DocumentType = DocumentType.get_document_type_by_name('receipt')
         if receipt_document_type is None:
             raise BusinessException(Error.DATA_NOT_FOUND)
@@ -54,13 +49,4 @@ class DocumentGenerationService:
             self.receipt_template.commit()     
         
         current_app.logger.info('Generating receipt')
-        return self.cdgos_api_service.generate_receipt(templateHashCode= self.receipt_template.cdogs_hash_code, data= data)
-            
-        
-        
-
-
-
-
-
-
+        return self.cdgos_api_service.generate_receipt(template_hash_code= self.receipt_template.cdogs_hash_code, data= data)
