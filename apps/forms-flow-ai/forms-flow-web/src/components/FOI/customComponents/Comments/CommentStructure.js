@@ -14,14 +14,15 @@ import {
   modalDelBtn
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
-import {fetchFOIFullAssignedToList} from '../../../../apiManager/services/FOI/foiRequestServices'
+import {fetchFOIFullAssignedToList,fetchFOIMinistryAssignedToList} from '../../../../apiManager/services/FOI/foiRequestServices'
 import { objectOf } from 'prop-types';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { formatDate } from "../../../../helper/FOI/helper";
 
-const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, isreplysection }) => {
+const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, isreplysection ,bcgovcode }) => {
     
+
   const actions = useContext(ActionContext)
   const edit = true
 
@@ -30,11 +31,15 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
   const dispatch = useDispatch();
   useEffect(()=>{
     dispatch(fetchFOIFullAssignedToList());
-   
+    if(bcgovcode)
+      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   },[dispatch]);
 
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  let ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
   let fullName =''
+
+  console.log(`Ministry assigned to list ${JSON.stringify(ministryAssignedToList)}`)
   
   var _sessionuser = sessionStorage.getItem(i.userId)
   
@@ -49,6 +54,20 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
       return true;
     }      
     })
+
+    if(!fullName)
+    {
+      ministryAssignedToList.forEach(function(obj){
+        var groupmembers =  obj.members   
+        var user = groupmembers.find(m=>m["username"] === i.userId)
+        if(user && user!=undefined){
+          fullName = `${ user["lastname"] }, ${user["firstname"]}`
+          sessionStorage.setItem(i.userId,fullName)
+          return true;
+        }      
+        })
+    }
+
   }
   else{
     fullName = _sessionuser

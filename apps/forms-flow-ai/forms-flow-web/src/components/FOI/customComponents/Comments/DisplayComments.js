@@ -5,9 +5,8 @@ import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 
-const DisplayComments = ({ comments }) => {
-
-  
+const DisplayComments = ({ comments, bcgovcode }) => {
+   
   comments =  comments.sort(function(a, b) { 
       return b.commentId - a.commentId;
     });
@@ -34,7 +33,7 @@ const DisplayComments = ({ comments }) => {
             )
           ) : (
            
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies && i.replies.length > 0 ? -100 : -101 } currentIndex={index} c={false} />
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies && i.replies.length > 0 ? -100 : -101 } currentIndex={index} c={false}  bcgovcode={bcgovcode}/>
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
             (actions.customInput ? (
@@ -77,7 +76,7 @@ const DisplayComments = ({ comments }) => {
                       i={a}
                       reply
                       parentId={i.commentId}
-                      handleEdit={() => actions.handleAction} totalcommentCount ={i.replies.length} currentIndex={index} isreplysection={true}
+                      handleEdit={() => actions.handleAction} totalcommentCount ={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode}
                     />
                   )}
                   {actions.replies.filter((id) => id === a.commentId).length !==

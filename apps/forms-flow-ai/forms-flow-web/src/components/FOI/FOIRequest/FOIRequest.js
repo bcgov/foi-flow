@@ -23,7 +23,7 @@ import {
   fetchFOIRequestDescriptionList,
   fetchClosingReasonList,
   fetchFOIRequestNotesList
-  
+    
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -590,6 +590,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
+  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
+  
+
   return (
 
     <div className="foiformcontent">
@@ -651,7 +654,7 @@ const FOIRequest = React.memo(({userDetail}) => {
              requestNotes ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode}  />
                 
                 </> : null
             }

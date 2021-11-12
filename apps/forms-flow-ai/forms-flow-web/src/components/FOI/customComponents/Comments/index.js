@@ -13,7 +13,8 @@ export const CommentSection = ({
   signupUrl,
   customInput,
   requestid,
-  ministryId
+  ministryId,
+  bcgovcode
 }) => {
   const [comments, setComments] = useState(commentsArray)
   const [showaddbox, setshowaddbox] = useState(false)
@@ -21,7 +22,6 @@ export const CommentSection = ({
   useEffect(() => {
     setComments(commentsArray)
   }, [commentsArray])
-
   
 
   return (
@@ -44,7 +44,7 @@ export const CommentSection = ({
           {<Input />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={comments} />
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} />
         </div>
 
       </div>
