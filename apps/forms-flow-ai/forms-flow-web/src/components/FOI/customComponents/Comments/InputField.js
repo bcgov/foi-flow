@@ -27,7 +27,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
         setText(_unformattedtext.substring(0, maxcharacterlimit - 1))
       }
 
-      setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.length - 1 <= maxcharacterlimit ? _unformattedtext.length - 1 : 0))
+      if(_unformattedtext.length - 1 <= maxcharacterlimit)
+        setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.length - 1 <= maxcharacterlimit ? _unformattedtext.length - 1 : 0))
     }
   }
 
@@ -84,11 +85,11 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
             </div>
         </div>
 
-        <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Type your comments here"} />
+        <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Add a new note"} />
 
         <div className="inputActions">
           <div className={'col-lg-11'}>
-            <span className="characterlen">{textlength} characters remaining</span>
+            <span  className={textlength > 25 ?"characterlen":"characterlen textred"}>{textlength} characters remaining</span>
           </div>
           <div className="col-lg-1">        
             <button

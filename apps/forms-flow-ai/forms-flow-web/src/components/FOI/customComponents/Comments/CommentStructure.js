@@ -82,7 +82,7 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
       >
         <div className="commentsTwo">
           
-          <div className="fullName">{fullName} </div> |  <div className="fullName">{i.date} </div>
+          <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
          
         </div>
         <div className="commenttext">

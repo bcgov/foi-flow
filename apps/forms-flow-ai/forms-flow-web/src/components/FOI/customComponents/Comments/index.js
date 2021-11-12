@@ -37,7 +37,7 @@ export const CommentSection = ({
     >
       <div className="section">
         <div className="addcommentBox">
-            <button type="button" style={ {display: !showaddbox ? 'block':'none'}} className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); }}>Add Comment</button>
+            <button type="button" style={ {display: !showaddbox ? 'block':'none'}} className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); }}>+ Add Comment</button>
         </div>
 
         <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>

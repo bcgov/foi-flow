@@ -171,6 +171,7 @@
           margin-left: 10px;
           font-size: 13px;
           font-weight: bold;
+          padding-right: 10px
         }                
       }
       .replyBtn{
@@ -334,4 +335,13 @@ border: 0px!important;
   border: 1px solid lightblue !important;
   height: 100px;
   border-radius:8px
+}
+
+.commentdate{
+  color:grey;
+  font-size:13px;
+  padding-left: 10px
+}
+.textred{
+  color:red
 }
