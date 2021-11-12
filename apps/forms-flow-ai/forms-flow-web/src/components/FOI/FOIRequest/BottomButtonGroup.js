@@ -135,7 +135,7 @@ const BottomButtonGroup = React.memo(({
         saveRequestObject.requeststatusid = StateEnum.open.id;        
         saveRequestModal();
       }
-      else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && !isValidationError){
+      else if (currentSelectedStatus !== "" && saveRequestObject.requeststatusid != undefined && !isValidationError){
         saveRequestModal();
       }
       
@@ -249,6 +249,7 @@ const BottomButtonGroup = React.memo(({
         }
         else if(currentSelectedStatus == StateEnum.intakeinprogress.name && !isValidationError)
         {
+          saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }

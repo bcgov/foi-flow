@@ -535,7 +535,6 @@ class FOIRequestUtil:
     def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
-        foiministryRequest.version = activeVersion
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
@@ -566,9 +565,12 @@ class FOIRequestUtil:
         if self.isNotBlankorNone(requestSchema,"assignedministryperson","main") == True:
             foiministryRequest.assignedministryperson = requestSchema.get("assignedministryperson")
         if ministryId is not None:
+            foiministryRequest.version = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
             foiministryRequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestSchema,ministryId , activeVersion , userId)       
+        else:
+            foiministryRequest.version = activeVersion
         foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
         foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
         return foiministryRequest
