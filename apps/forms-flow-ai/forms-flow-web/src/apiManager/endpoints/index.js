@@ -26,8 +26,15 @@ const API = {
   FOI_POST_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest`,
   FOI_GET_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest/<ministryid>`,
   FOI_GET_CLOSING_REASONS: `${FOI_BASE_API_URL}/api/foiflow/closereasons`,
-
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
+
+  FOI_POST_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
+  FOI_GET_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
+  FOI_PUT_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
+
+  FOI_POST_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest`,
+  FOI_GET_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
+  FOI_PUT_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
 };
 
 export default API;

@@ -174,3 +174,31 @@ export const setClosingReasons = (data) => dispatch => {
         payload:data      
     })
 }
+
+export const clearRawRequestComments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_RAWREQUEST_COMMENTS,
+        payload:{}      
+    })
+}
+
+export const setRawRequestComments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
+        payload:data      
+    })
+}
+
+export const setMinistryRequestComments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
+        payload:data      
+    })
+}
+
+export const clearMinistryRequestComments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
+        payload:{}      
+    })
+}
