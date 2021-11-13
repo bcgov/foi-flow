@@ -12,6 +12,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
+  const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(maxcharacterlimit)
 
   const handleQuillChange = (htmlcontent, delta, source, editor) => {
@@ -26,8 +27,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
       else {
         setText(_unformattedtext.substring(0, maxcharacterlimit - 1))
       }
-
-      if(_unformattedtext.length - 1 <= maxcharacterlimit)
+      setuftext(_unformattedtext)
+      if (_unformattedtext.length - 1 <= maxcharacterlimit)
         setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.length - 1 <= maxcharacterlimit ? _unformattedtext.length - 1 : 0))
     }
   }
@@ -40,25 +41,30 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
   useEffect(() => {
     setText(value)
+    setuftext(value)
   }, [value])
 
 
   const cancel = (e) => {
     setText('')
+    setuftext('')
     edit
       ? actions.handleCancel(cancellor, edit)
       : actions.handleCancel(cancellor)
 
-     e.preventDefault() 
+    e.preventDefault()
   }
 
   const post = () => {
 
     setTextLength(1000);
+    if (text !== '<p><br></p>') {
+      
+      edit === true
+        ? actions.submit(cancellor, text, parentId, true, setText)
+        : actions.submit(cancellor, text, parentId, false, setText)
+    }
 
-    edit === true
-      ? actions.submit(cancellor, text, parentId, true, setText)
-      : actions.submit(cancellor, text, parentId, false, setText)
   }
 
   const actions = useContext(ActionContext)
@@ -74,34 +80,34 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
       >
         <div className="row">
           <div className="col-lg-12">
-          {(!main) ? (
+            {(!main) ? (
               <button
                 className="cancelBtn"
-                onClick={cancel}               
+                onClick={cancel}
               >
-                <FontAwesomeIcon icon={faTimes} size='2x' color={ '#a5a5a5'} />
+                <FontAwesomeIcon icon={faTimes} size='2x' color={'#a5a5a5'} />
               </button>
-            ):null}
-            </div>
+            ) : null}
+          </div>
         </div>
 
         <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Add a new note"} />
 
         <div className="inputActions">
           <div className={'col-lg-11'}>
-            <span  className={textlength > 25 ?"characterlen":"characterlen textred"}>{textlength} characters remaining</span>
+            <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
           </div>
-          <div className="col-lg-1">        
+          <div className="col-lg-1">
             <button
               className="postBtn"
               onClick={post}
               type='button'
-              disabled={!text}
+              disabled={!uftext}
 
             >
               {' '}
-              <FontAwesomeIcon icon={faPaperPlane} size='2x' color={ text === undefined || text.length === 0 || textlength === maxcharacterlimit ? '#a5a5a5' : 'darkblue'} />
-            </button>                     
+              <FontAwesomeIcon disabled={text === undefined || textlength === 0} icon={faPaperPlane} size='2x' color={text === undefined || text.length === 0 || textlength === maxcharacterlimit ? '#a5a5a5' : 'darkblue'} />
+            </button>
           </div>
         </div>
 
