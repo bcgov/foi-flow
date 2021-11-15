@@ -60,7 +60,7 @@ class FOIRawRequestComment(db.Model):
     @classmethod
     def getcomments(cls, requestid)->DefaultMethodResult:   
         comment_schema = FOIRawRequestCommentSchema(many=True)
-        query = db.session.query(FOIRawRequestComment).filter_by(requestid=requestid, isactive = True).order_by(FOIRawRequestComment.commentid.desc()).all()
+        query = db.session.query(FOIRawRequestComment).filter_by(requestid=requestid, isactive = True).order_by(FOIRawRequestComment.commentid.asc()).all()
         return comment_schema.dump(query)   
     
 class FOIRawRequestCommentSchema(ma.Schema):

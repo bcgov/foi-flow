@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import  './comments.scss'
+import './comments.scss'
 import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import SignField from './SignField'
@@ -11,12 +11,18 @@ export const CommentSection = ({
   setComment,
   signinUrl,
   signupUrl,
-  customInput
+  customInput,
+  requestid,
+  ministryId,
+  bcgovcode
 }) => {
   const [comments, setComments] = useState(commentsArray)
+  const [showaddbox, setshowaddbox] = useState(false)
+  
   useEffect(() => {
     setComments(commentsArray)
   }, [commentsArray])
+  
 
   return (
     <ActionProvider
@@ -26,11 +32,21 @@ export const CommentSection = ({
       signinUrl={signinUrl}
       signupUrl={signupUrl}
       customInput={customInput}
+      requestid={requestid}
+      ministryId={ministryId}
     >
-      <div className="section">        
-        <div className="displayComments">
-          <DisplayComments comments={comments} />
+      <div className="section">
+        <div className="addcommentBox">
+            <button type="button" style={ {display: !showaddbox ? 'block':'none'}} className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); }}>+ Add Comment</button>
         </div>
+
+        <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
+          {<Input />}
+        </div>
+        <div className="displayComments">
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} />
+        </div>
+
       </div>
     </ActionProvider>
   )

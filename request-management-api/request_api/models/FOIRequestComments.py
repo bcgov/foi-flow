@@ -29,9 +29,10 @@ class FOIRequestComment(db.Model):
  
     
     @classmethod
-    def savecomment(cls, commenttypeid, foirequestcomment, version, userid)->DefaultMethodResult:   
+    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None)->DefaultMethodResult:   
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
-        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=datetime.now(), createdby=userid)
+        _createdDate = datetime.now() if commentcreatedate is None else commentcreatedate
+        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at= _createdDate, createdby=userid)
         db.session.add(newcomment)
         db.session.commit()               
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    

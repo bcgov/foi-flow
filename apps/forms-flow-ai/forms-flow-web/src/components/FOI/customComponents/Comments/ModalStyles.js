@@ -18,10 +18,9 @@ export const modalClose = {
 }
 
 export const modalHeader = {
-  width: '100%',
-  borderBottom: '1px solid gray',
-  fontSize: '18px',
-  textAlign: 'center',
+  width: '100%',  
+  fontSize: '20px',
+  textAlign: 'left',
   padding: '5px'
 }
 export const modalContent = {
@@ -36,16 +35,14 @@ export const modalActions = {
   textAlign: ' center'
 }
 
-export const modalActionBtn = {
-  backgroundColor: 'transparent',
+export const modalActionBtn = {  
   outline: 'none',
   border: '1px solid gray',
   padding: '4px 12px',
   cursor: 'pointer'
 }
 
-export const modalDelBtn = {
-  backgroundColor: 'transparent',
+export const modalDelBtn = {  
   outline: 'none',
   border: '1px solid gray',
   marginLeft: '10px',

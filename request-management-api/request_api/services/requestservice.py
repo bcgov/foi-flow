@@ -23,6 +23,7 @@ from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.workflowservice import workflowservice
 from request_api.services.watcherservice import watcherservice
+from request_api.services.commentservice import commentservice
 from enum import Enum
 import datetime 
 from datetime import datetime as datetime2
@@ -209,6 +210,11 @@ class requestservice:
             for watcher in watchers:
                 watcherschema = {"ministryrequestid":ministry["id"],"watchedbygroup":watcher["watchedbygroup"],"watchedby":watcher["watchedby"],"isactive":True}
                 watcherservice().createministryrequestwatcher(watcherschema, userid, None)
+                
+    def copycomments(self, rawrequestid, ministries, userid):
+        comments = commentservice().getrawrequestcomments(int(rawrequestid))
+        for ministry in ministries:           
+            commentservice().copyrequestcomment(ministry["id"], comments, userid)
                 
     def disablewatchers(Self, ministryid, requestschema, userid):
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
