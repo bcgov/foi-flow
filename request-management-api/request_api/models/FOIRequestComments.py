@@ -16,7 +16,7 @@ class FOIRequestComment(db.Model):
     commentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     ministryrequestid =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
-    comment = db.Column(db.String(1000), unique=False, nullable=True)  
+    comment = db.Column(db.Text, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
