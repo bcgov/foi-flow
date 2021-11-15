@@ -20,6 +20,7 @@ const initialState = {
   foiRequestDescriptionHistoryList: [], 
   foiMinistryDivisionalStages:[], 
   foiWatcherList: [],
+  foiRequestComments:[]
 }
 
 
@@ -95,6 +96,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, foiWatcherList: action.payload};
     case FOI_ACTION_CONSTANTS.CLOSING_REASONS:
       return {...state, closingReasons: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS:
+      return {...state, foiRequestComments: action.payload};
     default:
       return state;
   }
