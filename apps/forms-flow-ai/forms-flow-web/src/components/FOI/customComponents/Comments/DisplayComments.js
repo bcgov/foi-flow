@@ -32,7 +32,7 @@ const DisplayComments = ({ comments, bcgovcode,currentUser }) => {
             )
           ) : (
            
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies && i.replies.length > 0 ? -100 : -101 } currentIndex={index} c={false}  bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies.filter(r=>r.userId !== currentUser.userId).length > 0)}/>
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies && i.replies.length > 0 ? -100 : -101 } currentIndex={index} c={false}  bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r=>r.userId !== currentUser.userId).length > 0)}/>
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
             (actions.customInput ? (
