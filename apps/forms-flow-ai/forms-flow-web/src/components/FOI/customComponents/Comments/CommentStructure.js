@@ -39,8 +39,6 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
   let ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
   let fullName =''
 
-  console.log(`Ministry assigned to list ${JSON.stringify(ministryAssignedToList)}`)
-  
   var _sessionuser = sessionStorage.getItem(i.userId)
   
   if(!_sessionuser)
@@ -132,14 +130,8 @@ const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, i
                   nested
                 >
                   {(close) => (
-                    <div className='modal' style={modal}>
-                      <button
-                        className='close'
-                        onClick={close}
-                        style={modalClose}
-                      >
-                        &times;
-                      </button>
+                    <div className='modal deletemodal' style={modal}>
+                     
                       <div className='header' style={modalHeader}>
                         {' '}
                         Delete Comment{' '}

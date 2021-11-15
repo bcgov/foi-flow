@@ -345,3 +345,18 @@ border: 0px!important;
 .textred{
   color:red
 }
+
+.deletemodal {
+  width: 600px!important;
+  height: 400px!important;
+  display: block!important;
+  top:100px!important;
+  left:100px!important;
+  background-color: white;
+}
+
+.popup-content {
+  border:unset!important;
+  width: 120px!important;
+  position: absolute!important;
+}
