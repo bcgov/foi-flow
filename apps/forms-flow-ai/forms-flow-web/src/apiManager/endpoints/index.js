@@ -31,10 +31,12 @@ const API = {
   FOI_POST_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
   FOI_GET_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
   FOI_PUT_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
+  FOI_DELETE_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<commentid>/disable`,
 
   FOI_POST_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest`,
   FOI_GET_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
   FOI_PUT_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
+  FOI_DELETE_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<commentid>/disable`,
 };
 
 export default API;

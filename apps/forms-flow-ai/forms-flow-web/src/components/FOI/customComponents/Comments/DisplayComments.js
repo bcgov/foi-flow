@@ -5,13 +5,12 @@ import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 
-const DisplayComments = ({ comments, bcgovcode }) => {
+const DisplayComments = ({ comments, bcgovcode,currentUser }) => {
    
   comments =  comments.sort(function(a, b) { 
       return b.commentId - a.commentId;
     });
 
-  
   const actions = useContext(ActionContext)
   return (
     <div>
@@ -33,7 +32,7 @@ const DisplayComments = ({ comments, bcgovcode }) => {
             )
           ) : (
            
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies && i.replies.length > 0 ? -100 : -101 } currentIndex={index} c={false}  bcgovcode={bcgovcode}/>
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount ={ i.replies && i.replies.length > 0 ? -100 : -101 } currentIndex={index} c={false}  bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r=>r.userId !== currentUser.userId).length > 0)}/>
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
             (actions.customInput ? (
@@ -76,7 +75,7 @@ const DisplayComments = ({ comments, bcgovcode }) => {
                       i={a}
                       reply
                       parentId={i.commentId}
-                      handleEdit={() => actions.handleAction} totalcommentCount ={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode}
+                      handleEdit={() => actions.handleAction} totalcommentCount ={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false}
                     />
                   )}
                   {actions.replies.filter((id) => id === a.commentId).length !==

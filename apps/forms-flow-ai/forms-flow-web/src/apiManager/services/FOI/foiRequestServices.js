@@ -833,4 +833,49 @@ export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
       });
   };};
 
+  export const deleteRawRequestNote = (data,commentid, ...rest) => {  
+    const done = rest.length ? rest[0] : () => {};  
+    let apiUrl = replaceUrl(replaceUrl(
+      API.FOI_DELETE_COMMENT_RAWREQUEST,     
+    ),"<commentid>", commentid); 
+      return (dispatch) => {
+        httpPUTRequest(apiUrl, data)
+          .then((res) => {
+            
+            if (res.data) {                              
+              done(null, res.data);
+            } else {
+              dispatch(serviceActionError(res));
+              done("Error deleting Raw Request Note");
+            }
+          })
+          .catch((error) => {
+            dispatch(serviceActionError(error));
+            done(error);
+          });
+      };
+  };
+  export const deleteMinistryRequestNote = (data,commentid, ...rest) => {  
+    const done = rest.length ? rest[0] : () => {};  
+    let apiUrl = replaceUrl(replaceUrl(
+      API.FOI_DELETE_COMMENT_MINISTRYREQUEST,     
+    ),"<commentid>", commentid); 
+      return (dispatch) => {
+        httpPUTRequest(apiUrl, data)
+          .then((res) => {
+            
+            if (res.data) {                              
+              done(null, res.data);
+            } else {
+              dispatch(serviceActionError(res));
+              done("Error deleting ministry Request Note");
+            }
+          })
+          .catch((error) => {
+            dispatch(serviceActionError(error));
+            done(error);
+          });
+      };
+  };
+
 

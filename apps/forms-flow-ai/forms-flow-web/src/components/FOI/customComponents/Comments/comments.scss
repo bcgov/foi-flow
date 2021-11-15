@@ -8,7 +8,7 @@
 .section{
   display: flex;
   flex-direction: column;
- 
+  overflow-x: hidden;;
   background-color: white;
       
   .addcommentBox{
@@ -247,8 +247,13 @@
     outline:none;
     border:none;
     cursor: pointer;
-
+    
   }
+
+}
+
+button[disabled]{
+  cursor: none!important;
 }
 
 .signBox{
@@ -315,7 +320,8 @@
 }
 
 .commenttext{
-  margin-left:10px
+  margin-left:10px;
+  word-break: break-all!important;
 }
 
 .characterlen{
@@ -323,6 +329,18 @@
   color: grey;
   //margin-left: 25px;
   margin-top: 3px;
+}
+.commenttext .ql-editor{
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all!important;
+    
+}
+.ql-editor{
+  max-width: 900px
 }
 .ql-hidden{
  display: none;
@@ -345,3 +363,38 @@ border: 0px!important;
 .textred{
   color:red
 }
+
+.deletemodal {
+  left: 50%!important;
+  top: 50%!important;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  display: block!important;
+  width: 40%!important;
+  height: auto!important;  
+.header , .content, .actions {
+  margin: 15px !important;
+  background-color: white;
+}
+
+.header {
+  font-size: 20px;
+  color:#036;
+  font-weight: bold;
+}
+
+}
+
+.popup-content {
+  border:unset!important;
+  width: 120px!important;
+  position: absolute!important;
+}
+
+.deletevalidationInfo{
+  padding-left: 4px;
+  font-size: 16px;
+}
+
+
+
