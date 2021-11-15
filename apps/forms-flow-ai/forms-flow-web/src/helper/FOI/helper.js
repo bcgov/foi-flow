@@ -105,7 +105,7 @@ const isMinistryCoordinator = (userdetail, ministryteam) =>
 		return false
 	}
 
-	if(userdetail.groups.indexOf("/Intake Team") != -1 || userdetail.groups.indexOf("/Flex Team") != -1)
+	if(userdetail.groups.indexOf("/Intake Team") != -1 || userdetail.groups.indexOf("/Flex Team") != -1 || userdetail.groups.indexOf("/Processing Team") != -1)
 	{
 		return false
 	}

@@ -35,6 +35,7 @@ import request_api
 import requests
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
+import uuid
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
 TRACER = Tracer.get_instance()
@@ -171,6 +172,9 @@ class FOIFlowDocumentStorage(Resource):
                 requestnumber = foirequestform.get('requestnumber')
                 filestatustransition = foirequestform.get('filestatustransition')
                 filename = foirequestform.get('filename')
+                filenamesplittext = os.path.splitext(filename)
+                uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
+                print(uniquefilename)
 
                 auth = AWSRequestsAuth(aws_access_key=accesskey,
                         aws_secret_access_key=secretkey,
@@ -178,12 +182,13 @@ class FOIFlowDocumentStorage(Resource):
                         aws_region=s3region,
                         aws_service=s3service) 
 
-                s3uri = 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,filename)        
+                s3uri = 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)        
                 response = requests.put(s3uri,data=None,
                             auth=auth)
                 file['filepath']=s3uri
                 file['authheader']=response.request.headers['Authorization'] 
-                file['amzdate']=response.request.headers['x-amz-date']  
+                file['amzdate']=response.request.headers['x-amz-date']
+                file['uniquefilename']=uniquefilename
 
             return json.dumps(requestfilejson) , 200
         except BusinessException as exception:            

@@ -33,7 +33,7 @@ class Dashboard(Resource):
             groups = getgroupsfromtoken()           
             ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
             statuscode = 200                        
-            if ('Intake Team' in groups or 'Flex Team' in groups) and (queuetype is None or queuetype == "all"):                                                                                           
+            if ('Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups) and (queuetype is None or queuetype == "all"):                                                                                           
                 requestqueue = dashboardservice.getrequestqueue(groups)                                                              
             elif  queuetype is not None and queuetype == "ministry" and ministrygroups is not None and len(ministrygroups) > 0:                                                 
                 requestqueue = dashboardservice.getministryrequestqueue(ministrygroups)                

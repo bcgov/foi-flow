@@ -152,6 +152,9 @@ const BottomButtonGroup = React.memo(({
           case StateEnum.response.name.toLowerCase(): 
             saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
             break;
+          case StateEnum.callforrecords.name.toLowerCase(): 
+            saveMinistryRequestObject.requeststatusid = StateEnum.callforrecords.id;
+            break;
         }
       }
     }
@@ -162,7 +165,7 @@ const BottomButtonGroup = React.memo(({
           saveStatusId();
           saveMinistryRequestObject.documents = documents;
           saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          hasStatusRequestSaved(true,currentSelectedStatus);
       }
     },[successCount])
 
@@ -178,7 +181,7 @@ const BottomButtonGroup = React.memo(({
               if (!err) {
                 res.map((header, index) => {
                   const _file = files.find(file => file.name === header.filename);
-                  const documentpath = {documentpath: header.filepath};
+                  const documentpath = {documentpath: header.filepath, filename: header.filename, category: 'statetransition'};
                   _documents.push(documentpath);
                   setDocuments(_documents);
                   dispatch(saveFilesinS3(header, _file, (err, res) => {
@@ -200,48 +203,6 @@ const BottomButtonGroup = React.memo(({
             saveMinistryRequest();
             hasStatusRequestSaved(true,currentSelectedStatus)
           }
-        }
-        else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.deduplication.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
-        else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.feeassessed.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
-        else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
-        else if(currentSelectedStatus == StateEnum.callforrecords.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.callforrecords.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
-        else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
-        else if(currentSelectedStatus == StateEnum.harms.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.harms.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
-        }
-        else if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
-        {
-          saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
-          saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
         }
       }
     }

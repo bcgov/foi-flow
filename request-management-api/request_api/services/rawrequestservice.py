@@ -3,6 +3,7 @@ from typing import Counter
 
 from flask.signals import request_started
 from request_api.models.FOIRawRequests import FOIRawRequest
+from request_api.models.FOIRequestStatus import FOIRequestStatus
 from dateutil.parser import *
 from datetime import datetime
 import json
@@ -93,7 +94,7 @@ class rawrequestservice:
             contactInfo = requestrawdata.get('contactInfo')
             decriptionTimeframe = requestrawdata.get('descriptionTimeframe')
             contactInfoOptions = requestrawdata.get('contactInfoOptions')
-
+           
             #_createdDate = parse(request['created_at'])
             _fromdate = parse(decriptionTimeframe['fromDate'])
             _todate = parse(decriptionTimeframe['toDate'])
@@ -167,12 +168,17 @@ class rawrequestservice:
                 baserequestInfo['additionalPersonalInfo'] = additionalpersonalInfo
             return baserequestInfo
         elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":
-            request['requestrawdata']['currentState'] = request['status']
+            
+            request['requestrawdata']['currentState'] = request['status']            
+            requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
+            request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
             return request['requestrawdata']    
-        elif request != {} and request['sourceofsubmission'] == "intake":
+        elif request != {} and request['sourceofsubmission'] == "intake":            
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['currentState'] = request['status']
+            requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
+            request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
             return request['requestrawdata']
         else:
