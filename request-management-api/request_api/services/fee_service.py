@@ -109,7 +109,7 @@ class FeeService:
 
     def _validate_with_paybc(self, trn_approved):
         paybc_status = None
-        paybc_response = self._get_paybc_transaction_details()
+        paybc_response = self.get_paybc_transaction_details()
         if trn_approved and (paybc_status := paybc_response.get('paymentstatus')) != 'PAID':
             raise BusinessException(Error.INVALID_INPUT)
         if paybc_status == 'PAID' and self.payment.total != float(paybc_response.get('trnamount')):
@@ -170,9 +170,9 @@ class FeeService:
     def _get_transaction_number(self):
         return f"{current_app.config.get('PAYBC_TXN_PREFIX')}{self.payment.payment_id:0>8}"
 
-    def _get_paybc_transaction_details(self):
+    def get_paybc_transaction_details(self):
         # Call PAYBC web service, get access token and use it in get txn call
-        access_token = self._get_token().json().get('access_token')
+        access_token = self.get_paybc_token().json().get('access_token')
 
         paybc_transaction_url: str = current_app.config.get('PAYBC_API_BASE_URL')
         paybc_ref_number: str = current_app.config.get('PAYBC_REF_NUMBER')
@@ -189,7 +189,7 @@ class FeeService:
 
         return response.json()
 
-    def _get_token(self):
+    def get_paybc_token(self):
         """Generate oauth token from payBC which will be used for all communication."""
         current_app.logger.debug('<Getting token')
         token_url = current_app.config.get('PAYBC_API_BASE_URL') + '/oauth/token'
