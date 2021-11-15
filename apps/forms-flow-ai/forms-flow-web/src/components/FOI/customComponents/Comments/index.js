@@ -44,7 +44,7 @@ export const CommentSection = ({
           {<Input />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={comments} bcgovcode={bcgovcode} />
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} />
         </div>
 
       </div>

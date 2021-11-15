@@ -247,8 +247,13 @@
     outline:none;
     border:none;
     cursor: pointer;
-
+    
   }
+
+}
+
+button[disabled]{
+  cursor: none!important;
 }
 
 .signBox{
@@ -352,8 +357,19 @@ border: 0px!important;
   transform: translate(-50%, -50%);
   background-color: white;
   display: block!important;
-  width: auto!important;
-  height: auto!important;
+  width: 40%!important;
+  height: auto!important;  
+.header , .content, .actions {
+  margin: 15px !important;
+  background-color: white;
+}
+
+.header {
+  font-size: 20px;
+  color:#036;
+  font-weight: bold;
+}
+
 }
 
 .popup-content {
@@ -361,3 +377,11 @@ border: 0px!important;
   width: 120px!important;
   position: absolute!important;
 }
+
+.deletevalidationInfo{
+  padding-left: 4px;
+  font-size: 16px;
+}
+
+
+
