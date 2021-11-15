@@ -8,7 +8,7 @@
 .section{
   display: flex;
   flex-direction: column;
- 
+  overflow-x: hidden;;
   background-color: white;
       
   .addcommentBox{
@@ -320,7 +320,8 @@ button[disabled]{
 }
 
 .commenttext{
-  margin-left:10px
+  margin-left:10px;
+  word-break: break-all!important;
 }
 
 .characterlen{
@@ -328,6 +329,18 @@ button[disabled]{
   color: grey;
   //margin-left: 25px;
   margin-top: 3px;
+}
+.commenttext .ql-editor{
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all!important;
+    
+}
+.ql-editor{
+  max-width: 900px
 }
 .ql-hidden{
  display: none;
