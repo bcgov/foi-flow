@@ -347,12 +347,13 @@ border: 0px!important;
 }
 
 .deletemodal {
-  width: 600px!important;
-  height: 400px!important;
-  display: block!important;
-  top:100px!important;
-  left:100px!important;
+  left: 50%!important;
+  top: 50%!important;
+  transform: translate(-50%, -50%);
   background-color: white;
+  display: block!important;
+  width: auto!important;
+  height: auto!important;
 }
 
 .popup-content {

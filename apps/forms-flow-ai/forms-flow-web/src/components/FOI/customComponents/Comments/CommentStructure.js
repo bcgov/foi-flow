@@ -15,10 +15,9 @@ import {
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
 import {fetchFOIFullAssignedToList,fetchFOIMinistryAssignedToList} from '../../../../apiManager/services/FOI/foiRequestServices'
-import { objectOf } from 'prop-types';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { formatDate } from "../../../../helper/FOI/helper";
+
 
 const CommentStructure = ({ i, reply, parentId,totalcommentCount,currentIndex, isreplysection ,bcgovcode }) => {
     
