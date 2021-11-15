@@ -12,6 +12,7 @@ import {
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList,
   fetchFOIMinistryDivisionalStages,
+  fetchFOIRequestNotesList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
@@ -23,6 +24,7 @@ import RequestHeader from './RequestHeader';
 import RequestNotes from './RequestNotes';
 import RequestTracking from './RequestTracking';
 import BottomButtonGroup from './BottomButtonGroup';
+import {CommentSection} from '../../customComponents/Comments'
 
 import {push} from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
@@ -69,15 +71,18 @@ const MinistryReview = React.memo(({userDetail}) => {
    //gets the request detail from the store
  
   
-   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail);
+   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
+   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
+   const [comment, setComment] = useState(requestNotes)   
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
        dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
        dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+       dispatch(fetchFOIRequestNotesList(requestId,ministryId))
        
      }     
-   },[requestId, dispatch]); 
+   },[requestId, dispatch,comment]); 
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -239,6 +244,15 @@ const MinistryReview = React.memo(({userDetail}) => {
     saveMinistryRequestObject.divisions = divstages
     setdivStages(divstages)
   }
+
+
+ 
+  const userId = userDetail.preferred_username
+  const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
+  const name = `${userDetail.family_name}, ${userDetail.given_name}`
+  const signinUrl = "/signin"
+  const signupUrl = "/signup"
+
   
   return (
     
@@ -255,7 +269,7 @@ const MinistryReview = React.memo(({userDetail}) => {
           
         <div className="tab">
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
-          <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
+          <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div>
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
         
@@ -284,7 +298,7 @@ const MinistryReview = React.memo(({userDetail}) => {
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
                     <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
-                    <RequestNotes />
+                    {/* <RequestNotes /> */}
                     <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
                 : null }
@@ -292,8 +306,9 @@ const MinistryReview = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
-          <div id="CorrespondenceLog" className="tabcontent">
-              
+          <div id="Comments" className="tabcontent">
+          <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
+        setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
               </div> 
           <div id="Option3" className="tabcontent">
            <h3>Option 3</h3>

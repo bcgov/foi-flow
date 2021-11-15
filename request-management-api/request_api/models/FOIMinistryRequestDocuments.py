@@ -20,6 +20,10 @@ class FOIMinistryRequestDocument(db.Model):
     # Defining the columns
     foiministrydocumentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     documentpath = db.Column(db.String(1000), unique=False, nullable=False)
+    filename = db.Column(db.String(120), unique=False, nullable=True)
+    category = db.Column(db.String(120), unique=False, nullable=True)
+    version =db.Column(db.Integer, nullable=True)
+    isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
  
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -39,7 +43,11 @@ class FOIMinistryRequestDocument(db.Model):
         files = file_schema.dump(_files)       
         return files
     
+    @classmethod
+    def getversionforrequestdocuments(cls,foiministrydocumentid):   
+       return db.session.query(FOIMinistryRequestDocument.version).filter_by(foiministrydocumentid=foiministrydocumentid).order_by(FOIMinistryRequestDocument.version.desc()).first()
+       
 class FOIMinistryRequestDocumentSchema(ma.Schema):
     class Meta:
-        fields = ('foiministrydocumentid','documentpath','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby')
+        fields = ('foiministrydocumentid','documentpath', 'filename','category','version','isactive','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby')
     

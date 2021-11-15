@@ -23,6 +23,7 @@ from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.workflowservice import workflowservice
 from request_api.services.watcherservice import watcherservice
+from request_api.services.commentservice import commentservice
 from enum import Enum
 import datetime 
 from datetime import datetime as datetime2
@@ -209,6 +210,11 @@ class requestservice:
             for watcher in watchers:
                 watcherschema = {"ministryrequestid":ministry["id"],"watchedbygroup":watcher["watchedbygroup"],"watchedby":watcher["watchedby"],"isactive":True}
                 watcherservice().createministryrequestwatcher(watcherschema, userid, None)
+                
+    def copycomments(self, rawrequestid, ministries, userid):
+        comments = commentservice().getrawrequestcomments(int(rawrequestid))
+        for ministry in ministries:           
+            commentservice().copyrequestcomment(ministry["id"], comments, userid)
                 
     def disablewatchers(Self, ministryid, requestschema, userid):
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
@@ -479,6 +485,11 @@ class FOIRequestUtil:
             for document in requestschema['documents']:
                 ministrydocument = FOIMinistryRequestDocument()
                 ministrydocument.documentpath = document["documentpath"]
+                if 'filename' in document:
+                    ministrydocument.filename = document["filename"]
+                if 'category' in document:
+                    ministrydocument.category = document['category']
+                ministrydocument.version = 1
                 ministrydocument.foiministryrequest_id = requestid
                 ministrydocument.foiministryrequestversion_id = version
                 ministrydocument.createdby = userid
@@ -503,6 +514,11 @@ class FOIRequestUtil:
         for document in documents:
             ministrydocument = FOIMinistryRequestDocument()
             ministrydocument.documentpath = document["documentpath"]
+            if 'filename' in document:
+                ministrydocument.filename = document["filename"]
+            if 'category' in document:
+                ministrydocument.category = document['category']
+            ministrydocument.version = 1
             ministrydocument.foiministryrequest_id = requestid
             ministrydocument.foiministryrequestversion_id = version
             ministrydocument.createdby = userid
@@ -525,7 +541,6 @@ class FOIRequestUtil:
     def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
-        foiministryRequest.version = activeVersion
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
@@ -556,9 +571,12 @@ class FOIRequestUtil:
         if self.isNotBlankorNone(requestSchema,"assignedministryperson","main") == True:
             foiministryRequest.assignedministryperson = requestSchema.get("assignedministryperson")
         if ministryId is not None:
+            foiministryRequest.version = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
             foiministryRequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestSchema,ministryId , activeVersion , userId)       
+        else:
+            foiministryRequest.version = activeVersion
         foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
         foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
         return foiministryRequest

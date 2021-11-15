@@ -21,8 +21,9 @@ import {
   fetchFOIDeliveryModeList, 
   fetchFOIReceivedModeList,
   fetchFOIRequestDescriptionList,
-  fetchClosingReasonList
-  
+  fetchClosingReasonList,
+  fetchFOIRequestNotesList
+    
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -35,6 +36,7 @@ import Typography from '@material-ui/core/Typography';
 import { StateDropDown } from '../customComponents';
 import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import {CommentSection} from '../customComponents/Comments'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,9 +62,6 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   var foitabheaderBG;
 
-  
-
-  // Tab panel ends here
 
   const {requestId, ministryId, requestState} = useParams();
   const disableInput = requestState && requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
@@ -73,16 +72,20 @@ const FOIRequest = React.memo(({userDetail}) => {
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
+  let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
+  const [comment, setComment] = useState(requestNotes)
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
   useEffect(() => {   
     if (ministryId) {
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(requestId,ministryId));
     
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {      
       dispatch(fetchFOIRawRequestDetails(requestId));
+      dispatch(fetchFOIRequestNotesList(requestId,null));
       dispatch(fetchFOIRequestDescriptionList(requestId, ""));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
@@ -93,7 +96,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
-  },[requestId, dispatch]);
+  },[requestId,ministryId, dispatch,comment]);
  
 
   useEffect(() => {  
@@ -601,6 +604,16 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   }
   const bottomTextArray = _requestStatus.split('|');
+      
+  const userId = userDetail.preferred_username
+  const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
+  const name = `${userDetail.family_name}, ${userDetail.given_name}`
+  const signinUrl = "/signin"
+  const signupUrl = "/signup"
+
+  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
+  
+
   return (
 
     <div className="foiformcontent">
@@ -616,7 +629,10 @@ const FOIRequest = React.memo(({userDetail}) => {
           
         <div className="tab">
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
-          <div className="tablinks" name="CorrespondenceLog" onClick={e=>tabclick(e,'CorrespondenceLog')}>Correspondence Log</div>
+          {
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div> : null
+          }
+          
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
         </div>
        
@@ -653,7 +669,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
                         <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
-                      <RequestNotes />
+                      {/* <RequestNotes /> */}
 
                       <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
                     </>
@@ -662,8 +678,17 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
-          <div id="CorrespondenceLog" className="tabcontent">
-              
+          <div id="Comments" className="tabcontent">
+            {
+             requestNotes ?
+                <>
+                <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode}  />
+                
+                </> : null
+            }
+
+          
               </div> 
           <div id="Option3" className="tabcontent">
            <h3>Option 3</h3>
