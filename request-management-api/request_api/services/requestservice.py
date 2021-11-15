@@ -48,11 +48,6 @@ class requestservice:
 
         
         #Prepare ministry records 
-        
-        if ministryId is not None:
-            activeVersion = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
-        
-             
                
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             for ministry in fOIRequestsSchema.get("selectedMinistries"):
@@ -549,6 +544,7 @@ class FOIRequestUtil:
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
+            activeVersion = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
         foiministryRequest.isactive = True
         foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid")) if fileNumber is None else fileNumber
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
@@ -579,7 +575,6 @@ class FOIRequestUtil:
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
             foiministryRequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestSchema,ministryId , activeVersion , userId)       
-       
         foiministryRequest.version = activeVersion
         foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
         foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
