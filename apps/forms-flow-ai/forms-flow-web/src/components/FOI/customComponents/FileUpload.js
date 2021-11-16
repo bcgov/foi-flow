@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { MimeTypeList } from "../../../constants/FOI/enum";
 import "./FileUpload.scss"
 
 const FileUpload = ({
@@ -12,9 +13,7 @@ const FileUpload = ({
     const handleUploadBtnClick = () => {
         fileInputField.current.click();
     };
-    const mimeTypes = ['application/pdf', 
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+    const mimeTypes = MimeTypeList.stateTransition;
 
     const addNewFiles = (newFiles) => {
         for (let file of newFiles) {

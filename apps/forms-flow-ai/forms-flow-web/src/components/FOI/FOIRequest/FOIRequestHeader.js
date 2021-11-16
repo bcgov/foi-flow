@@ -101,8 +101,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const showMinistryAssignedTo = status.toLowerCase()===StateEnum.callforrecords.name.toLowerCase() || status.toLowerCase()===StateEnum.closed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
-                                        || status.toLowerCase()===StateEnum.redirect.name.toLowerCase() || status.toLowerCase()===StateEnum.onhold.name.toLowerCase()
-                                        || status.toLowerCase()===StateEnum.response.name.toLowerCase();
+                                        || status.toLowerCase()===StateEnum.onhold.name.toLowerCase() || status.toLowerCase()===StateEnum.response.name.toLowerCase();
 
     return (
         <div className="foi-request-review-header-row1">

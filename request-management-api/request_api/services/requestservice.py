@@ -47,7 +47,7 @@ class requestservice:
         fOIRequestUtil = FOIRequestUtil()
 
         
-        #Prepare ministry records  
+        #Prepare ministry records 
                
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             for ministry in fOIRequestsSchema.get("selectedMinistries"):
@@ -485,6 +485,11 @@ class FOIRequestUtil:
             for document in requestschema['documents']:
                 ministrydocument = FOIMinistryRequestDocument()
                 ministrydocument.documentpath = document["documentpath"]
+                if 'filename' in document:
+                    ministrydocument.filename = document["filename"]
+                if 'category' in document:
+                    ministrydocument.category = document['category']
+                ministrydocument.version = 1
                 ministrydocument.foiministryrequest_id = requestid
                 ministrydocument.foiministryrequestversion_id = version
                 ministrydocument.createdby = userid
@@ -509,6 +514,11 @@ class FOIRequestUtil:
         for document in documents:
             ministrydocument = FOIMinistryRequestDocument()
             ministrydocument.documentpath = document["documentpath"]
+            if 'filename' in document:
+                ministrydocument.filename = document["filename"]
+            if 'category' in document:
+                ministrydocument.category = document['category']
+            ministrydocument.version = 1
             ministrydocument.foiministryrequest_id = requestid
             ministrydocument.foiministryrequestversion_id = version
             ministrydocument.createdby = userid
@@ -531,10 +541,10 @@ class FOIRequestUtil:
     def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
-        foiministryRequest.version = activeVersion
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
+            activeVersion = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
         foiministryRequest.isactive = True
         foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid")) if fileNumber is None else fileNumber
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
@@ -565,6 +575,7 @@ class FOIRequestUtil:
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
             foiministryRequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestSchema,ministryId , activeVersion , userId)       
+        foiministryRequest.version = activeVersion
         foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
         foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
         return foiministryRequest
