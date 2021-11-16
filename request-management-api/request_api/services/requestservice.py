@@ -23,6 +23,7 @@ from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.workflowservice import workflowservice
 from request_api.services.watcherservice import watcherservice
+from request_api.services.commentservice import commentservice
 from enum import Enum
 import datetime 
 from datetime import datetime as datetime2
@@ -46,7 +47,7 @@ class requestservice:
         fOIRequestUtil = FOIRequestUtil()
 
         
-        #Prepare ministry records  
+        #Prepare ministry records 
                
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             for ministry in fOIRequestsSchema.get("selectedMinistries"):
@@ -209,6 +210,11 @@ class requestservice:
             for watcher in watchers:
                 watcherschema = {"ministryrequestid":ministry["id"],"watchedbygroup":watcher["watchedbygroup"],"watchedby":watcher["watchedby"],"isactive":True}
                 watcherservice().createministryrequestwatcher(watcherschema, userid, None)
+                
+    def copycomments(self, rawrequestid, ministries, userid):
+        comments = commentservice().getrawrequestcomments(int(rawrequestid))
+        for ministry in ministries:           
+            commentservice().copyrequestcomment(ministry["id"], comments, userid)
                 
     def disablewatchers(Self, ministryid, requestschema, userid):
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
@@ -535,10 +541,10 @@ class FOIRequestUtil:
     def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
-        foiministryRequest.version = activeVersion
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
+            activeVersion = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
         foiministryRequest.isactive = True
         foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid")) if fileNumber is None else fileNumber
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
@@ -569,6 +575,7 @@ class FOIRequestUtil:
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
             foiministryRequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestSchema,ministryId , activeVersion , userId)       
+        foiministryRequest.version = activeVersion
         foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
         foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
         return foiministryRequest

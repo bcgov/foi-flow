@@ -1,19 +1,40 @@
 /* add css module styles here (optional) */
-
+#Comments{
+  height: 900px;
+  overflow-y: scroll;
+  width: auto;
+  background-color:white;
+}
 .section{
   display: flex;
   flex-direction: column;
-  width:100%;
-    
+  overflow-x: hidden;;
+  background-color: white;
+      
+  .addcommentBox{
+    width:100%;
+    margin-left:25px;
+    margin-top:25px;
+    padding-right:25px;
+
+    button.addcomment {
+      float: right; 
+      padding-top: 8px;
+      padding-bottom: 8px;    
+    }
+  }
+
   .inputBox{
     width:100%;
+    margin:25px;
+    margin-top:10px;
   }  
 
   .inputActions{
     display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-    margin-left: 15px;
+    //justify-content: flex-end;
+    margin-top: 3px;
+    //margin-left: 15px;
 
     .postBtn {
       color: white;
@@ -22,11 +43,11 @@
       border-radius:5px;
       transition: 0.5s;
       padding:8px 16px;
-      background-color: #84dcff;
+      background-color: transparent!important;
       border:none;
-      margin-right: 10px;
+      //margin-right: 10px;
       font-weight:bolder;
-    font-size: 16px;
+      font-size: 12px;
 
       &:hover {
         background-position: right center;
@@ -37,18 +58,20 @@
       &:focus {
         outline:0;
       }
+      svg {
+        transform: rotate(42deg);
+      }
     }
 
     .cancelBtn {
-      color: rgb(139, 139, 139);
+      
       text-align: center;
-      background-size: 200% auto;
-      border-radius:5px;
+      background-size: 200% auto;      
       transition: 0.5s;
       padding:8px 10px;
-      border: 2px solid rgb(139, 139, 139);
-      font-weight:bolder;
-      font-size: 16px;
+      border: unset;
+      background-color: transparent;
+      font-size: 13px;
 
       &:hover {
         background-position: right center;
@@ -65,13 +88,38 @@
   
 }
 
+.cancelBtn {
+      
+  text-align: center;
+  background-size: 200% auto;      
+  transition: 0.5s;
+  padding:8px 10px;
+  border: unset;
+  background-color: transparent;
+  font-size: 13px;
+
+  &:hover {
+    background-position: right center;
+    cursor: pointer;
+
+  }
+
+  &:focus {
+    outline:0;
+  }
+  float: right;
+}
+
 
   .form{
-    display: flex;
-    background-color: rgb(243, 243, 243);
+    display: inline-block;
+    background-color: white;
     padding: 8px;
     padding-bottom: 15px;
     border-radius: 8px;
+    width: 95%;
+    margin-top : 5px ;
+    margin-bottom: 5px;
     .userImg{
       display: flex;
       width:10%;
@@ -79,17 +127,19 @@
       align-items: center;
     }
 
+    
+
     .postComment{
-      width:80%;
+      width:90%;
       border: none;
-      border-bottom: 1px solid rgb(24, 24, 24);
+      // border-bottom: 1px solid rgb(24, 24, 24);
       text-decoration: none;
       background-color: transparent;
       margin-left: 4px;
     }
     .postComment:focus {
       outline:none;
-      border-bottom: 2px solid rgb(14, 14, 14);
+      // border-bottom: 2px solid rgb(14, 14, 14);
     }
     .postComment::placeholder{
       margin-top: -2px;
@@ -99,17 +149,18 @@
 
 
 .displayComments{
-  margin-top: 18px;
-  margin-left: 38px;
+  margin:25px;
+  margin-top:10px;
 
   .halfDiv{
     display: flex;
     justify-content: space-between;
+    
 
     .userInfo{
       display: flex;
       flex-direction: column;
-      margin-top: 16px;
+     
   
       .commentsTwo{
         display: flex;
@@ -118,26 +169,31 @@
         .fullName{
           display: flex;
           margin-left: 10px;
-        }
-        .replyBtn{
-          background-color: transparent;
-          border:none;
-          color: gray;
-          outline:none;
-          font-weight: 600;
-          font-size:14px;
-          margin: 0px 5px!important;
-          width:70px;
-          padding: 5px;
-          border-radius: 4px;
-          
-          &:hover{
-            outline:none;
-            background-color: rgba(160, 160, 160, 0.315);
-          }
-          &:focus {outline:0;}
-        }
+          font-size: 13px;
+          font-weight: bold;
+          padding-right: 10px
+        }                
+      }
+      .replyBtn{
+        background-color: transparent!important;
+        border:none;
+        color: darkblue;
+        outline:none;
+        font-weight: 600;
+        font-size:13px;       
+        width:70px;
+        padding: 5px;
+        border-radius: 4px;
         
+        &:hover{
+          outline:none;
+          background-color: rgba(160, 160, 160, 0.315);
+        }
+        &:focus {outline:0;}
+
+        svg {
+          color: darkblue;
+        }
       }
     }
     .userActions{
@@ -161,10 +217,13 @@
     }
   }
   
-  .replySection{
-    margin-left: 35px;
-    border-left: 2px solid rgb(199, 199, 199);
-    margin-top: 6px;
+  .replySection{        
+   margin-top:3px;    
+  }
+
+  .replySection .halfDiv   {
+      
+    margin-bottom: unset;  
   }
 
   .hide{
@@ -188,8 +247,13 @@
     outline:none;
     border:none;
     cursor: pointer;
-
+    
   }
+
+}
+
+button[disabled]{
+  cursor: none!important;
 }
 
 .signBox{
@@ -237,4 +301,100 @@
     }
   }
 }
+
+.commentsection{ 
+  background-color: rgb(210, 226, 246);
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.commentsection .halfDiv {
+  margin: 3px; 
+}
+
+.undermaincomment{
+  margin: unset!important;
+  background-color:rgb(234, 237, 241);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.commenttext{
+  margin-left:10px;
+  word-break: break-all!important;
+}
+
+.characterlen{
+  font-size: 12px;
+  color: grey;
+  //margin-left: 25px;
+  margin-top: 3px;
+}
+.commenttext .ql-editor{
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all!important;
+    
+}
+.ql-editor{
+  max-width: 900px
+}
+.ql-hidden{
+ display: none;
+}
+.ql-toolbar{
+border: 0px!important;
+}
+
+.ql-container.ql-snow {
+  border: 1px solid lightblue !important;
+  height: 100px;
+  border-radius:8px
+}
+
+.commentdate{
+  color:grey;
+  font-size:13px;
+  padding-left: 10px
+}
+.textred{
+  color:red
+}
+
+.deletemodal {
+  left: 50%!important;
+  top: 50%!important;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  display: block!important;
+  width: 40%!important;
+  height: auto!important;  
+.header , .content, .actions {
+  margin: 15px !important;
+  background-color: white;
+}
+
+.header {
+  font-size: 20px;
+  color:#036;
+  font-weight: bold;
+}
+
+}
+
+.popup-content {
+  border:unset!important;
+  width: 120px!important;
+  position: absolute!important;
+}
+
+.deletevalidationInfo{
+  padding-left: 4px;
+  font-size: 16px;
+}
+
+
 

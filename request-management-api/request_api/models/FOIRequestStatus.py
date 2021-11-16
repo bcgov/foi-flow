@@ -16,6 +16,11 @@ class FOIRequestStatus(db.Model):
         query = db.session.query(FOIRequestStatus).filter_by(isactive=True).all()
         return requeststatus_schema.dump(query)
 
+    @classmethod
+    def getrequeststatusid(cls,status):
+        requeststatus_schema = RequestStatusSchema()
+        query = db.session.query(FOIRequestStatus).filter_by(name=status).first()
+        return requeststatus_schema.dump(query)
 
 class RequestStatusSchema(ma.Schema):
     class Meta:

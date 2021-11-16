@@ -16,7 +16,7 @@ class FOIRawRequestComment(db.Model):
     commentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     requestid =db.Column(db.Integer, db.ForeignKey('FOIRawRequests.requestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIRawRequests.version'))
-    comment = db.Column(db.String(1000), unique=False, nullable=True)  
+    comment = db.Column(db.Text, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
@@ -60,7 +60,7 @@ class FOIRawRequestComment(db.Model):
     @classmethod
     def getcomments(cls, requestid)->DefaultMethodResult:   
         comment_schema = FOIRawRequestCommentSchema(many=True)
-        query = db.session.query(FOIRawRequestComment).filter_by(requestid=requestid, isactive = True).order_by(FOIRawRequestComment.commentid.desc()).all()
+        query = db.session.query(FOIRawRequestComment).filter_by(requestid=requestid, isactive = True).order_by(FOIRawRequestComment.commentid.asc()).all()
         return comment_schema.dump(query)   
     
 class FOIRawRequestCommentSchema(ma.Schema):
