@@ -47,7 +47,7 @@ class requestservice:
         fOIRequestUtil = FOIRequestUtil()
 
         
-        #Prepare ministry records  
+        #Prepare ministry records 
                
         if fOIRequestsSchema.get("selectedMinistries") is not None:
             for ministry in fOIRequestsSchema.get("selectedMinistries"):
@@ -544,6 +544,7 @@ class FOIRequestUtil:
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
         if ministryId is not None:
             foiministryRequest.foiministryrequestid = ministryId
+            activeVersion = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
         foiministryRequest.isactive = True
         foiministryRequest.filenumber = self.generateFileNumber(ministry["code"], requestSchema.get("foirawrequestid")) if fileNumber is None else fileNumber
         foiministryRequest.programareaid = self.getValueOf("programArea",ministry["code"])
@@ -571,12 +572,10 @@ class FOIRequestUtil:
         if self.isNotBlankorNone(requestSchema,"assignedministryperson","main") == True:
             foiministryRequest.assignedministryperson = requestSchema.get("assignedministryperson")
         if ministryId is not None:
-            foiministryRequest.version = FOIMinistryRequest.getversionforrequest(ministryId)[0]+1
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
             foiministryRequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestSchema,ministryId , activeVersion , userId)       
-        else:
-            foiministryRequest.version = activeVersion
+        foiministryRequest.version = activeVersion
         foiministryRequest.closedate = requestSchema.get("closedate") if 'closedate' in requestSchema  else None
         foiministryRequest.closereasonid = requestSchema.get("closereasonid") if 'closereasonid' in requestSchema  else None
         return foiministryRequest
