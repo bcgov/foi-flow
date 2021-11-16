@@ -37,6 +37,7 @@ import { StateDropDown } from '../customComponents';
 import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import {CommentSection} from '../customComponents/Comments'
+import {AttachmentSection} from '../customComponents/Attachments'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -630,10 +631,12 @@ const FOIRequest = React.memo(({userDetail}) => {
         <div className="tab">
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments</div> : null
+          }
+          {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div> : null
           }
-          
-          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
+          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
         </div>
        
         <div className="foileftpanelstatus">
@@ -678,6 +681,17 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
+          <div id="Attachments" className="tabcontent">
+            {
+             requestNotes ?
+                <>
+                <AttachmentSection  />
+                
+                </> : null
+            }
+
+          
+              </div> 
           <div id="Comments" className="tabcontent">
             {
              requestNotes ?
@@ -690,8 +704,8 @@ const FOIRequest = React.memo(({userDetail}) => {
 
           
               </div> 
-          <div id="Option3" className="tabcontent">
-           <h3>Option 3</h3>
+          <div id="Option4" className="tabcontent">
+           <h3>Option 4</h3>
           </div>        
         </div>
       </div>
