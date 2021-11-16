@@ -83,9 +83,7 @@ const Attachment = React.memo(({attachment}) => {
             </div>
             <div className="col-lg-7" style={{display:'inline-block'}}>
               <div className="col-lg-1" style={{marginLeft:'auto'}}>
-                <button className="actionsBtn">
-                  <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
-                </button>
+                <AttachmentPopup attachment={attachment} />
               </div>                      
             </div>
           </div>
@@ -107,6 +105,41 @@ const Attachment = React.memo(({attachment}) => {
         </div>
       </div>
     </div>
+  );
+})
+
+const AttachmentPopup = React.memo(({attachment}) => {
+
+  return (
+    <Popup
+      trigger={
+        <button className="actionsBtn">
+          <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
+        </button>
+      }
+      className="attachment-popup"
+      position={'bottom right'}
+      closeOnDocumentClick
+      // keepTooltipInside=".tooltipBoundary"
+    >
+      <div>
+        <button className="childActionsBtn">
+          Download
+        </button>
+        <button className="childActionsBtn">
+          Rename
+        </button>
+        {attachment.category?
+          <button className="childActionsBtn">
+            Replace
+          </button>
+          :
+          <button className="childActionsBtn">
+            Delete
+          </button>
+        }
+      </div>
+    </Popup>
   );
 })
 
