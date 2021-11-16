@@ -3,6 +3,7 @@ import './attachments.scss'
 import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
+import { formatDate } from "../../../../helper/FOI/helper";
 
 export const AttachmentSection = ({
   attachmentsArray,
@@ -90,7 +91,7 @@ const Attachment = React.memo(({attachment}) => {
         </div>
         <div className="row foi-details-row" style={{paddingTop:15+'px'}}>
           <div className="col-lg-12 foi-details-col">                      
-            {attachment.created_at}
+            {formatDate(attachment.created_at, 'yyyy MMM dd | HH:mm')}
           </div>
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
