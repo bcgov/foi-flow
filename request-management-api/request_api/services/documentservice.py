@@ -15,6 +15,11 @@ class documentservice:
     @classmethod    
     def getministryrequestdocuments(self, ministryrequestid):
         return FOIMinistryRequestDocument.getdocuments(ministryrequestid)
+ 
+    @classmethod    
+    def createministryrequestdocument(self, ministryrequestid, documentschema, userid):
+        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)[0]
+        return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema['documents'], userid) 
     
     @classmethod    
     def renameministryrequestdocument(self, ministryrequestid, documentid, documentschema, userid):

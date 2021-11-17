@@ -53,6 +53,16 @@ class FOIMinistryRequestDocument(db.Model):
         return document_schema.dump(request)
 
     @classmethod
+    def createdocuments(cls,ministryrequestid,ministryrequestversion, documents, userid):
+        newdocuments = []
+        for document in documents:
+            newdocuments.append(FOIMinistryRequestDocument(documentpath=document["documentpath"], version='1', filename=document["filename"], category=document["category"], isactive=True, foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid))
+        db.session.add_all(newdocuments)
+        db.session.commit()               
+        return DefaultMethodResult(True,'Documents created')   
+    
+
+    @classmethod
     def createdocumentversion(cls,ministryrequestid,ministryrequestversion, document, userid):
         newdocument = FOIMinistryRequestDocument(documentpath=document["documentpath"], foiministrydocumentid=document["foiministrydocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
         db.session.add(newdocument)
