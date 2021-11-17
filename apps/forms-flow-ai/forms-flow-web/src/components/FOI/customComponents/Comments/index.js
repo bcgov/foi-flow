@@ -22,8 +22,7 @@ export const CommentSection = ({
   useEffect(() => {
     setComments(commentsArray)
   }, [commentsArray])
-  
-
+    
   return (
     <ActionProvider
       currentUser={currentUser}
