@@ -184,3 +184,36 @@ def test_foiministrydocument_delete(app, client):
     getdocumentsresponsejsondata = json.loads(getdocumentsresponse.data) 
     deletedocumentresponse = client.post('/api/foidocument/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/documentid/'+str(getdocumentsresponsejsondata[0]['foiministrydocumentid'])+'/delete', headers=factory_ministry_auth_header(app, client), content_type='application/json')
     assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiministryresponse.status_code == 200 and foiministryresponse2.status_code == 200 and getdocumentsresponse.status_code == 200 and deletedocumentresponse.status_code == 200
+
+
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z, open('tests/samplerequestjson/foirequest-ministry-general-update.json') as v:
+  generalministryrequestjson = json.load(v)
+  generalupdaterequestjson = json.load(z)
+  generalrequestjson = json.load(y)
+  rawrequestjson = json.load(x)
+def test_foiministrydocument_create(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    foirequest = generalrequestjson
+    foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
+    foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    foijsondata = json.loads(foiresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    documentsschema = { 
+    "documents": [
+    {
+    "filename":"doc2.docx",
+    "documentpath": "/EDU-90909/doc2.docx",
+    "category": "new"
+    },
+     {
+    "filename":"doc3.docx",
+    "documentpath": "/EDU-90909/doc3.docx",
+    "category": "new-doc3"
+    }
+    ]
+}
+    foiministrydocresponse = client.post('/api/foidocument/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(documentsschema), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiministrydocresponse.status_code == 200
