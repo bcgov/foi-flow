@@ -31,7 +31,8 @@ class Payment(db.Model):
     @classmethod
     def find_paid_transaction(cls, transaction_number: str) -> Payment:
         """Return by transaction_number."""
-        return cls.query.filter_by(transaction_number=transaction_number, status='PAID').one_or_none()
+        a =  cls.query.filter_by(transaction_number=transaction_number, status='PAID').one_or_none()
+        return a
 
     @staticmethod
     def commit():

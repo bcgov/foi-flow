@@ -19,10 +19,12 @@ import getopt
 import json
 import sys
 from typing import List
-
-import requests
+import logging
 from flask import current_app
 
+
+import requests
+from request_api import app
 from request_api.models import Payment, FeeCode, RevenueAccount
 from request_api.services.fee_service import FeeService
 
@@ -97,5 +99,5 @@ if __name__ == '__main__':
             sys.exit()
         elif opt in ("-t", "--txns"):
             failed_transaction_numbers = [x.strip() for x in arg.split(',')]
-
-    update_failed_gl_codes(failed_transaction_numbers)
+    with app.app_context():
+        update_failed_gl_codes([123])
