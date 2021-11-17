@@ -7,11 +7,15 @@ const FileUpload = ({
     updateFilesCb
 }) => {
     const fileInputField = useRef(null);
+    const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
   
     const handleUploadBtnClick = () => {
+      if (fileInputField.current)
         fileInputField.current.click();
+      else
+        fileInputFieldMultiple.current.click();
     };    
 
     const addNewFiles = (newFiles) => {
@@ -59,17 +63,35 @@ const FileUpload = ({
     <>
       <section className="file-upload-container">       
         <div className="row file-upload-preview" >
-          {Object.entries(files).length === 0 ?
-         
-          <div className="col-lg-12 file-upload-btn">
-            <p className="drag-and-drop-text">Drag and drop request letter(s) or</p>
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
-              Add Files
-            </button>           
+          <div className="file-upload-column">
+            {Object.entries(files).length === 0 ?
+          
+            <div className="file-upload-btn">
+              <p className="drag-and-drop-text">{Object.entries(files).length === 0 ? `Drag and drop request letter(s) or`: null}</p>               
+                       
+            </div>
+            :         
+            <FilePreviewContainer files={files} removeFile={removeFile} />
+            }
           </div>
-          :         
-          <FilePreviewContainer files={files} removeFile={removeFile} />
-          }
+          <div className="file-upload-column file-upload-column-2">
+            <input
+            className="file-upload-input-multiple"
+            type="file"
+            ref={fileInputFieldMultiple}
+            onChange={handleNewFileUpload}
+            title=""
+            value=""
+            multiple={true}
+            accept={mimeTypes}
+            />
+          </div>
+          <div className="file-upload-column file-upload-column-3">
+            {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
+                  Add Files
+            </button>  : null}
+        </div>
         </div>
         {Object.entries(files).length === 0 ?
         <input
