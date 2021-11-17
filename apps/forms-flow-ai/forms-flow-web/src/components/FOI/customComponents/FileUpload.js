@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import { MimeTypeList } from "../../../constants/FOI/enum";
 import "./FileUpload.scss"
 
 const FileUpload = ({
     multipleFiles,
+    mimeTypes,
     updateFilesCb
 }) => {
     const fileInputField = useRef(null);
@@ -12,8 +12,7 @@ const FileUpload = ({
   
     const handleUploadBtnClick = () => {
         fileInputField.current.click();
-    };
-    const mimeTypes = MimeTypeList.stateTransition;
+    };    
 
     const addNewFiles = (newFiles) => {
         for (let file of newFiles) {

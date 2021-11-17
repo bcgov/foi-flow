@@ -685,7 +685,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             {
              requestNotes ?
                 <>
-                <AttachmentSection  />
+                <AttachmentSection requestNumber={Object.entries(requestDetails).length !== 0 ? requestDetails.requestNumber : "Misc"} />
                 
                 </> : null
             }

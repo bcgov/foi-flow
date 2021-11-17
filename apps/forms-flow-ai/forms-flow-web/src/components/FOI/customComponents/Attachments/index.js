@@ -3,8 +3,12 @@ import './attachments.scss'
 import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
+import { useDispatch } from "react-redux";
+import AttachmentModal from './AttachmentModal';
+import { getOSSHeaderDetails, saveFilesinS3 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 export const AttachmentSection = ({
+  requestNumber,
   attachmentsArray,
   currentUser,
   setComment,
@@ -49,6 +53,55 @@ export const AttachmentSection = ({
     },
   ];
 
+  const [openModal, setModal] = useState(false);
+  const [successCount, setSuccessCount] = useState(0);
+  const [fileCount, setFileCount] = useState(0);
+  const dispatch = useDispatch();
+  const [documents, setDocuments] = useState([]);
+  const addAttachments = () => {
+    setModal(true);
+  }
+  React.useEffect(() => {
+    if (successCount === fileCount && successCount !== 0) {
+        setModal(false);
+        console.log(documents);
+        // saveStatusId();
+        // saveMinistryRequestObject.documents = documents;
+        // saveMinistryRequest();
+        // hasStatusRequestSaved(true,currentSelectedStatus);
+    }
+  },[successCount])
+
+  const handleContinueModal = (value, fileInfoList, files) => {
+    setModal(false);
+    setFileCount(files.length);
+    if (value) {
+        if (files.length !== 0) {
+          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
+            let _documents = [];
+            if (!err) {
+              res.map((header, index) => {
+                const _file = files.find(file => file.name === header.filename);
+                const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'attachmentlog'};
+                _documents.push(documentDetails);
+                setDocuments(_documents);
+                dispatch(saveFilesinS3(header, _file, (err, res) => {
+
+                  if (res === 200) {
+
+                    setSuccessCount(index+1);
+                  }
+                  else {
+                    setSuccessCount(0);
+                  }
+                }));
+              });
+            }
+          }));
+        }             
+    }
+  }
+
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
     attachmentsList.push(<Attachment key={i} attachment={attachments[i]} />);
@@ -58,8 +111,9 @@ export const AttachmentSection = ({
     <div>
       <div className="section">
         <div className="addAttachmentBox">
-            <button type="button" className="btn foi-btn-create addAttachment" onClick={()=>{ alert("hello W"); }}>+ Add Attachment</button>
+            <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
         </div>
+        <AttachmentModal openModal={openModal} handleModal={handleContinueModal} multipleFiles={true} requestNumber={requestNumber} />
         <div className="displayAttachments">
           {attachmentsList}
         </div>
