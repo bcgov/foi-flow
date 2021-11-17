@@ -6,11 +6,7 @@ import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 
 const DisplayComments = ({ comments, bcgovcode,currentUser }) => {
-   
-  comments =  comments.sort(function(a, b) { 
-      return b.commentId - a.commentId;
-    });
-
+  
   const actions = useContext(ActionContext)
   return (
     <div>

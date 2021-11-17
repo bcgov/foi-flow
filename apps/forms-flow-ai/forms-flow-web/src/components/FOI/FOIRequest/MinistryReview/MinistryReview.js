@@ -1,4 +1,4 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
@@ -16,7 +16,7 @@ import {
   fetchFOIRequestAttachmentsList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
+import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
 
 import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
@@ -28,21 +28,21 @@ import BottomButtonGroup from './BottomButtonGroup';
 import {CommentSection} from '../../customComponents/Comments';
 import {AttachmentSection} from '../../customComponents/Attachments';
 
-import {push} from "connected-react-router";
+import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
-      margin: theme.spacing(1),  
-    },    
+      margin: theme.spacing(1),
+    },
   },
   validationErrorMessage: {
-    marginTop:'30px',
+    marginTop: '30px',
     color: "#fd0404",
   },
   validationMessage: {
-    marginTop:'30px',
+    marginTop: '30px',
     color: "#000000",
   },
   btndisabled: {
@@ -60,13 +60,13 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#FFFFFF',
     color: '#38598A'
   }
- 
+
 }));
 
 
-const MinistryReview = React.memo(({userDetail}) => {
+const MinistryReview = React.memo(({ userDetail }) => {
 
-  const {requestId, ministryId, requestState} = useParams();
+  const { requestId, ministryId, requestState } = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -91,46 +91,45 @@ const MinistryReview = React.memo(({userDetail}) => {
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
   //gets the request detail from the store
-   
-  
-  
-  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
-  
 
-  const [divstages,setdivStages] = React.useState([])
-  
+
+
+  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
+
+
+  const [divstages, setdivStages] = React.useState([])
+
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
     ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
-  },[requestDetails]); 
+  }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
-  let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate); 
-  const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';
+  let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
+  const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate) : '';
   const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
   const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-  const bottomText =  `${_cfrDaysRemainingText}|${_daysRemainingText}`;
+  const bottomText = `${_cfrDaysRemainingText}|${_daysRemainingText}`;
   const bottomTextArray = bottomText.split('|');
- 
+
   //gets the latest ministry assigned to value
-  const handleMinistryAssignedToValue = (value) => {   
+  const handleMinistryAssignedToValue = (value) => {
     setMinistryAssignedToValue(value);
   }
 
   let hasincompleteDivstage = false;
-  divstages.forEach((item)=>{
-    if(item.divisionid === -1 || item.stageid === -1 || item.stageid === "" || item.divisionid === "")
-    {
+  divstages.forEach((item) => {
+    if (item.divisionid === -1 || item.stageid === -1 || item.stageid === "" || item.divisionid === "") {
       hasincompleteDivstage = true
     }
   })
 
   //Variable to find if all required fields are filled or not
-  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned")  || (divstages.length === 0 || hasincompleteDivstage);
+  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned") || (divstages.length === 0 || hasincompleteDivstage);
 
   const createMinistryRequestDetailsObject = (requestObject, name, value) => {
     // requestDetails.
@@ -144,9 +143,9 @@ const MinistryReview = React.memo(({userDetail}) => {
   }
 
   const createMinistrySaveRequestObject = (name, value, value2) => {
-    const requestObject = {...saveMinistryRequestObject};  
+    const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
-    createMinistryRequestDetailsObject(requestObject, name, value);   
+    createMinistryRequestDetailsObject(requestObject, name, value);
     setSaveMinistryRequestObject(requestObject);
   }
 
@@ -154,35 +153,33 @@ const MinistryReview = React.memo(({userDetail}) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
     if (!_unSaved && ministryId && requestId) {
-      setTimeout(() => 
-      { 
-        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}` 
+      setTimeout(() => {
+        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}`
       }
-      , 1000);
+        , 1000);
     }
   }
-  
-  const handleStateChange =(currentStatus)=>{
+
+  const handleStateChange = (currentStatus) => {
     setcurrentrequestStatus(currentStatus);
   }
 
-  const hasStatusRequestSaved =(issavecompleted,state)=>{
-    if(issavecompleted)
-      {
-        settabStatus(state)
-        setcurrentrequestStatus("")
-      }
+  const hasStatusRequestSaved = (issavecompleted, state) => {
+    if (issavecompleted) {
+      settabStatus(state)
+      setcurrentrequestStatus("")
+    }
   }
 
 
   var foitabheaderBG;
   const classes = useStyles();
- 
-  switch (_tabStatus){
+
+  switch (_tabStatus) {
     case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
-    case StateEnum.closed.name: 
+    case StateEnum.closed.name:
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
     case StateEnum.callforrecords.name:
@@ -191,49 +188,49 @@ const MinistryReview = React.memo(({userDetail}) => {
       }
       else {
         foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
-      }      
+      }
       break;
-    case StateEnum.redirect.name: 
+    case StateEnum.redirect.name:
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
-    case StateEnum.review.name: 
+    case StateEnum.review.name:
       foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"
       break;
-    case StateEnum.feeassessed.name: 
+    case StateEnum.feeassessed.name:
       foitabheaderBG = "foitabheadercollection foitabheaderFeeBG"
       break;
-    case StateEnum.consult.name: 
+    case StateEnum.consult.name:
       foitabheaderBG = "foitabheadercollection foitabheaderConsultBG"
       break;
-    case StateEnum.signoff.name: 
+    case StateEnum.signoff.name:
       foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
       break;
-    case StateEnum.deduplication.name: 
+    case StateEnum.deduplication.name:
       foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
       break;
-    case StateEnum.harms.name: 
+    case StateEnum.harms.name:
       foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
       break;
-    case StateEnum.onhold.name: 
+    case StateEnum.onhold.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
       break;
-    case StateEnum.response.name: 
+    case StateEnum.response.name:
       foitabheaderBG = "foitabheadercollection foitabheaderResponseBG"
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
-      break;  
+      break;
   }
 
-  const tabclick =(evt,param)=>{
-   
+  const tabclick = (evt, param) => {
+
     var i, tabcontent, tablinks;
-    
+
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
     }
-   
+
     tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
@@ -243,23 +240,23 @@ const MinistryReview = React.memo(({userDetail}) => {
 
   }
 
-  const pubmindivstagestomain =(divstages)=>{
-  
+  const pubmindivstagestomain = (divstages) => {
+
     saveMinistryRequestObject.divisions = divstages
     setdivStages(divstages)
   }
 
 
- 
+
   const userId = userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
   const name = `${userDetail.family_name}, ${userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  
+
   return (
-    
+
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -290,8 +287,8 @@ const MinistryReview = React.memo(({userDetail}) => {
         </div>  
      
         </div>
-        <div className="foitabpanelcollection"> 
-          <div id="Request" className="tabcontent active">                                
+        <div className="foitabpanelcollection">
+          <div id="Request" className="tabcontent active">
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -328,6 +325,6 @@ const MinistryReview = React.memo(({userDetail}) => {
 
   );
 
-  })
+})
 
-  export default MinistryReview
+export default MinistryReview

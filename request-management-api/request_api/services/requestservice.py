@@ -485,8 +485,7 @@ class FOIRequestUtil:
             for document in requestschema['documents']:
                 ministrydocument = FOIMinistryRequestDocument()
                 ministrydocument.documentpath = document["documentpath"]
-                if 'filename' in document:
-                    ministrydocument.filename = document["filename"]
+                ministrydocument.filename = document["filename"]
                 if 'category' in document:
                     ministrydocument.category = document['category']
                 ministrydocument.version = 1

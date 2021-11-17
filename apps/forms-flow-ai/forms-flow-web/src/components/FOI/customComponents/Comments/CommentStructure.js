@@ -40,26 +40,27 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   let fullName = ''
 
-  var _sessionuser = sessionStorage.getItem(i.userId)
-
-  if (!_sessionuser) {
+  var _sessionuser = localStorage.getItem(i.userId)
+  
+  if (_sessionuser === undefined || _sessionuser === '' || _sessionuser === null) {
+    
     iaoassignedToList.forEach(function (obj) {
       var groupmembers = obj.members
       var user = groupmembers.find(m => m["username"] === i.userId)
       if (user && user != undefined) {
-        fullName = `${user["lastname"]}, ${user["firstname"]}`
-        sessionStorage.setItem(i.userId, fullName)
+        fullName = `${user["lastname"]}, ${user["firstname"]}`       
+        localStorage.setItem(i.userId, fullName)
         return true;
       }
     })
 
-    if (!fullName) {
+    if (fullName === '') {     
       ministryAssignedToList.forEach(function (obj) {
         var groupmembers = obj.members
         var user = groupmembers.find(m => m["username"] === i.userId)
-        if (user && user != undefined) {
-          fullName = `${user["lastname"]}, ${user["firstname"]}`
-          sessionStorage.setItem(i.userId, fullName)
+        if (user && user != undefined) {          
+          fullName = `${user["lastname"]}, ${user["firstname"]}`          
+          localStorage.setItem(i.userId, fullName)
           return true;
         }
       })
@@ -67,6 +68,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   }
   else {
+    console.log(`ELse condition for full name ${fullName}`)
     fullName = _sessionuser
   }
 
