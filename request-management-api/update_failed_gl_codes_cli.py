@@ -34,20 +34,20 @@ def update_failed_gl_codes(transaction_numbers: List[str]) -> None:  # pylint: d
 
     for transaction_number in transaction_numbers:
         try:
-            print('Beginning transaction %s', transaction_number)
+            print('Beginning transaction', transaction_number)
             # Find the payment record and create a fee_service instance.
             payment: Payment = Payment.find_paid_transaction(transaction_number)
             print('Found payment record')
             fee_service: FeeService = FeeService(request_id=payment.request_id, payment_id=payment.payment_id)
 
             payment_details: dict = fee_service.get_paybc_transaction_details()
-            print('Received payment details %s', payment_details.get('paymentstatus'))
+            print('Received payment details', payment_details.get('paymentstatus'))
             # Process only of the status of the payment is PAID, else ignore
             if payment_details and payment_details.get('paymentstatus') == 'PAID':
                 has_gl_completed: bool = True
                 # Check if any of the revenue line GL status is REJCTED or PAID (and not COMPLETED)
                 for revenue in payment_details.get('revenue'):
-                    print('Revenue GL Status %s', revenue.get('glstatus'))
+                    print('Revenue GL Status', revenue.get('glstatus'))
                     if revenue.get('glstatus') in ('PAID', 'RJCT'):
                         has_gl_completed = False
 
@@ -73,7 +73,7 @@ def update_failed_gl_codes(transaction_numbers: List[str]) -> None:  # pylint: d
 
                     access_token = fee_service.get_paybc_token().json().get('access_token')
                     endpoint = f'{paybc_transaction_url}/paybc/payment/{paybc_ref_number}/{transaction_number}'
-                    print('Update GL Status endpoint %s, %s', endpoint, post_revenue_payload)
+                    print('Update GL Status endpoint', endpoint, post_revenue_payload)
                     response = requests.post(
                         endpoint,
                         headers={
@@ -84,11 +84,12 @@ def update_failed_gl_codes(transaction_numbers: List[str]) -> None:  # pylint: d
                         data=json.dumps(post_revenue_payload)
                     )
                     response.raise_for_status()
-                    print('Successfully updated for transaction %s', transaction_number)
+                    print('Successfully updated for transaction', transaction_number)
+                    print(response.json())
 
         except Exception as e:  # pylint: disable=broad-except
             print(e)
-            print('Failed processing of %s', transaction_number)
+            print('Failed processing of', transaction_number)
 
 
 if __name__ == '__main__':
