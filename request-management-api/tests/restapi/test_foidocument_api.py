@@ -217,3 +217,143 @@ def test_foiministrydocument_create(app, client):
 }
     foiministrydocresponse = client.post('/api/foidocument/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(documentsschema), headers=factory_intake_auth_header(app, client), content_type='application/json')
     assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiministrydocresponse.status_code == 200
+
+
+
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)
+def test_foirawdocument_list(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    documentsschema = { 
+    "documents": [
+    {
+    "filename":"doc2.docx",
+    "documentpath": "/EDU-90909/doc2.docx",
+    "category": "new"
+    },
+     {
+    "filename":"doc3.docx",
+    "documentpath": "/EDU-90909/doc3.docx",
+    "category": "new-doc3"
+    }
+    ]
+}
+    foirawdocresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"]),data=json.dumps(documentsschema), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponse = client.get('/api/foidocument/rawrequest/'+str(jsondata["id"]), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    assert rawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foirawdocresponse.status_code == 200 and getdocumentsresponse.status_code == 200
+
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)
+def test_foirawdocument_rename(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    documentsschema = { 
+    "documents": [
+    {
+    "filename":"doc2.docx",
+    "documentpath": "/EDU-90909/doc2.docx",
+    "category": "new"
+    },
+     {
+    "filename":"doc3.docx",
+    "documentpath": "/EDU-90909/doc3.docx",
+    "category": "new-doc3"
+    }
+    ]
+}
+    foirawdocresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"]),data=json.dumps(documentsschema), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponse = client.get('/api/foidocument/rawrequest/'+str(jsondata["id"]), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponsejsondata = json.loads(getdocumentsresponse.data) 
+    renamedocumentjson = {
+        "filename": "newname.docx"
+    }
+    renamedocumentresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"])+'/documentid/'+str(getdocumentsresponsejsondata[0]['foidocumentid'])+'/rename',data=json.dumps(renamedocumentjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    assert rawresponse.status_code == 200 and foirawdocresponse.status_code == 200 and wfupdateresponse.status_code == 200 and getdocumentsresponse.status_code == 200 and renamedocumentresponse.status_code == 200
+
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)
+def test_foirawdocument_replace(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    documentsschema = { 
+    "documents": [
+    {
+    "filename":"doc2.docx",
+    "documentpath": "/EDU-90909/doc2.docx",
+    "category": "new"
+    },
+     {
+    "filename":"doc3.docx",
+    "documentpath": "/EDU-90909/doc3.docx",
+    "category": "new-doc3"
+    }
+    ]
+}
+    foirawdocresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"]),data=json.dumps(documentsschema), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponse = client.get('/api/foidocument/rawrequest/'+str(jsondata["id"]), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponsejsondata = json.loads(getdocumentsresponse.data) 
+    replacedocumentjson = {
+        "documentpath":"/EDUC/"+str(jsondata["id"])+"/intake/testnew.docx",
+        "filename":"testnew.docx"
+    }
+    replacedocumentresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"])+'/documentid/'+str(getdocumentsresponsejsondata[0]['foidocumentid'])+'/replace',data=json.dumps(replacedocumentjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    assert rawresponse.status_code == 200 and foirawdocresponse.status_code == 200 and wfupdateresponse.status_code == 200 and getdocumentsresponse.status_code == 200 and replacedocumentresponse.status_code == 200
+
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)
+def test_foirawdocument_delete(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    documentsschema = { 
+    "documents": [
+    {
+    "filename":"doc2.docx",
+    "documentpath": "/EDU-90909/doc2.docx",
+    "category": "new"
+    },
+     {
+    "filename":"doc3.docx",
+    "documentpath": "/EDU-90909/doc3.docx",
+    "category": "new-doc3"
+    }
+    ]
+}
+    foirawdocresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"]),data=json.dumps(documentsschema), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponse = client.get('/api/foidocument/rawrequest/'+str(jsondata["id"]), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponsejsondata = json.loads(getdocumentsresponse.data) 
+    deletedocumentresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"])+'/documentid/'+str(getdocumentsresponsejsondata[0]['foidocumentid'])+'/delete', headers=factory_intake_auth_header(app, client), content_type='application/json')
+    assert rawresponse.status_code == 200 and foirawdocresponse.status_code == 200 and wfupdateresponse.status_code == 200  and getdocumentsresponse.status_code == 200 and deletedocumentresponse.status_code == 200
+
+
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)
+def test_foirawdocument_create(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    documentsschema = { 
+    "documents": [
+    {
+    "filename":"doc2.docx",
+    "documentpath": "/EDU-90909/doc2.docx",
+    "category": "new"
+    },
+     {
+    "filename":"doc3.docx",
+    "documentpath": "/EDU-90909/doc3.docx",
+    "category": "new-doc3"
+    }
+    ]
+}
+    foirawdocresponse = client.post('/api/foidocument/rawrequest/'+str(jsondata["id"]),data=json.dumps(documentsschema), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    assert rawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foirawdocresponse.status_code == 200
