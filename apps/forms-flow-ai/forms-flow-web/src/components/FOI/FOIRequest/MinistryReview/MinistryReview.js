@@ -288,17 +288,17 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  {Object.entries(requestDetails).length > 0 && requestDetails !== undefined ?
-                    <>
-                      <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
-                      <ApplicantDetails requestDetails={requestDetails} />
-                      <RequestDescription requestDetails={requestDetails} />
-                      <RequestDetails requestDetails={requestDetails} />
-                      <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code} />
-                      <RequestNotes />
-                      <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
-                    </>
-                    : null}
+                  { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
+                  <>
+                    <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
+                    <ApplicantDetails requestDetails={requestDetails} /> 
+                    <RequestDescription requestDetails={requestDetails} />
+                    <RequestDetails requestDetails={requestDetails}/>
+                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
+                    {/* <RequestNotes /> */}
+                    <BottomButtonGroup isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
+                  </>
+                : null }
                 </form>
               </div>
             </div>

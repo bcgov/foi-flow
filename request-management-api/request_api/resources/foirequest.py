@@ -50,7 +50,7 @@ class FOIRequest(Resource):
             ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))            
             jsondata = {}
             statuscode = 200
-            if ('Intake Team' in groups or 'Flex Team' in groups) and (usertype is None or (usertype == "iao")):
+            if ('Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups) and (usertype is None or (usertype == "iao")):
                 jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
             elif  usertype is not None and usertype == "ministry" and ministrygroups is not None and len(ministrygroups) > 0:
                 jsondata = requestservice().getrequestdetailsforministry(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid,authMembershipgroups=ministrygroups)

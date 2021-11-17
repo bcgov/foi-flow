@@ -82,6 +82,8 @@ const BottomButtonGroup = React.memo(({
       return dateText? addBusinessDays(dateText, noOfBusinessDays) : "";
     }
     const saveRequest = async () => {
+      if (urlIndexCreateRequest > -1)
+        saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
       dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, ministryId, (err, res) => {
         if (!err) {
           toast.success('The request has been saved successfully.', {
@@ -122,20 +124,19 @@ const BottomButtonGroup = React.memo(({
     };  
 
     React.useEffect(() => {
-           
-      if(currentSelectedStatus == StateEnum.open.name && !isValidationError && (ministryId == undefined || ministryId == null || ministryId == ''))
+      if(currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId === undefined || ministryId === null || ministryId === ''))
       {
         saveRequestObject.requeststatusid = StateEnum.open.id;
         openRequest();
         hasStatusRequestSaved(true, StateEnum.open.name)
       }
-      else if(currentSelectedStatus == StateEnum.open.name && !isValidationError && (ministryId != undefined || ministryId != null || ministryId != ''))
+      else if(currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId !== undefined || ministryId !== null || ministryId !== ''))
       {
         console.log("Entered Open!")
         saveRequestObject.requeststatusid = StateEnum.open.id;        
         saveRequestModal();
       }
-      else if (currentSelectedStatus !== "" && currentSelectedStatus.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && !isValidationError){
+      else if (currentSelectedStatus !== "" && currentSelectedStatus !== undefined && (saveRequestObject.requeststatusid != undefined && saveRequestObject.currentState) && !isValidationError){
         saveRequestModal();
       }
       
@@ -249,6 +250,7 @@ const BottomButtonGroup = React.memo(({
         }
         else if(currentSelectedStatus == StateEnum.intakeinprogress.name && !isValidationError)
         {
+          saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
