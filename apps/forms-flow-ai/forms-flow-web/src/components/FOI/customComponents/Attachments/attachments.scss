@@ -1,4 +1,10 @@
 /* add css module styles here (optional) */
+#Attachments{
+  height: 900px;
+  overflow-y: scroll;
+  width: auto;
+  background-color:white;
+}
 
 .section{
   display: flex;
@@ -26,15 +32,31 @@
   margin-top:10px;
 }
 
-.actionsBtn{
+.actionsBtn, .childActionsBtn{
   background-color: transparent;
   border: none;
-  padding: 6px 12px;
   border-radius: 50%;
   cursor: pointer;
+}
 
-  // &:hover{
-  //   outline:none;
-  // }
-  // &:focus {outline:0;}
+.actionsBtn{
+  padding: 6px 12px;
+}
+
+.childActionsBtn{
+  padding: 10px 10px;
+}
+
+.attachment-popup-arrow {
+  display: none;
+}
+
+.attachment-popup-content {
+  margin-top: -35px;
+}
+
+[role='tooltip'].attachment-popup-content {
+  width: 150px!important;
+  border: 1 px solid #d7d7d7!important;
+  box-shadow: rgba(0, 0, 0, 0.4) 2px 2px 0px!important;
 }

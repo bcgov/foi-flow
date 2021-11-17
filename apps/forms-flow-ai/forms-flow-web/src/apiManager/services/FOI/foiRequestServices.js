@@ -23,7 +23,9 @@ import {
   setFOIWatcherList,
   setClosingReasons,
   setRawRequestComments,
-  setMinistryRequestComments
+  setMinistryRequestComments,
+  setRawRequestAttachments,
+  setMinistryRequestAttachments
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import {replaceUrl} from "../../../helper/FOI/helper";
@@ -879,3 +881,47 @@ export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
   };
 
 
+  export const fetchFOIRequestAttachmentsList = (requestId, ministryId, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    let apiUrl = "";
+    if (ministryId !=null) {
+      apiUrl = replaceUrl(
+        API.FOI_GET_ATTACHMENTS_MINISTRYREQUEST,
+       "<ministryrequestid>", ministryId);
+    }
+    else {
+      apiUrl = replaceUrl(
+        API.FOI_GET_ATTACHMENTS_RAWREQUEST,
+        "<requestid>",
+        requestId
+      );
+    }
+    return (dispatch) => {
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            if (ministryId!=null) {
+              dispatch(setMinistryRequestAttachments(res.data));
+            }
+  
+            if (requestId) {
+              dispatch(setRawRequestAttachments(res.data));
+            }
+  
+            dispatch(setFOILoader(false));
+            done(null, res.data);
+            
+          } else {
+            console.log("Error", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+          done(error);
+        });
+    };
+  };

@@ -12,7 +12,8 @@ import {
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList,
   fetchFOIMinistryDivisionalStages,
-  fetchFOIRequestNotesList
+  fetchFOIRequestNotesList,
+  fetchFOIRequestAttachmentsList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
@@ -24,7 +25,8 @@ import RequestHeader from './RequestHeader';
 import RequestNotes from './RequestNotes';
 import RequestTracking from './RequestTracking';
 import BottomButtonGroup from './BottomButtonGroup';
-import { CommentSection } from '../../customComponents/Comments'
+import {CommentSection} from '../../customComponents/Comments';
+import {AttachmentSection} from '../../customComponents/Attachments';
 
 import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
@@ -68,21 +70,23 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  //gets the request detail from the store
-
-
-  let requestDetails = useSelector(state => state.foiRequests.foiMinistryViewRequestDetail);
-  let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
-  const [comment, setComment] = useState(requestNotes)
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (ministryId) {
-      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-      dispatch(fetchFOIRequestNotesList(requestId, ministryId))
-
-    }
-  }, [requestId, dispatch, comment]);
+   //gets the request detail from the store
+ 
+  
+   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
+   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
+   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
+   const [comment, setComment] = useState(requestNotes)   
+   const [attachments, setAttachments] = useState(requestAttachments);
+   const dispatch = useDispatch();
+   useEffect(() => {
+     if (ministryId) {
+       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+       dispatch(fetchFOIRequestNotesList(requestId,ministryId))
+       dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+     }     
+   },[requestId, dispatch,comment,attachments]); 
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -263,24 +267,25 @@ const MinistryReview = React.memo(({ userDetail }) => {
           <div className="foileftpaneldropdown">
             <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
           </div>
-
-          <div className="tab">
-            <div className="tablinks active" name="Request" onClick={e => tabclick(e, 'Request')}>Request</div>
-            <div className="tablinks" name="Comments" onClick={e => tabclick(e, 'Comments')}>Comments</div>
-            <div className="tablinks" name="Option3" onClick={e => tabclick(e, 'Option3')}>Option 3</div>
-          </div>
-
-          <div className="foileftpanelstatus">
-            {_requestStatus.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?
-              <>
-                {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()) ?
-                  <h4>{bottomTextArray[0]}</h4>
-                  : null}
-                <h4>{bottomTextArray[1]}</h4>
-              </>
-              : null}
-          </div>
-
+          
+        <div className="tab">
+          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+          <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments</div>
+          <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div>
+          <div className="tablinks" name="Option4" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
+        </div>
+        
+        <div className="foileftpanelstatus">
+        {_requestStatus.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?  
+          <>
+          {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
+          <h4>{bottomTextArray[0]}</h4>
+          : null }
+          <h4>{bottomTextArray[1]}</h4>
+          </>
+        : null }
+        </div>  
+     
         </div>
         <div className="foitabpanelcollection">
           <div id="Request" className="tabcontent active">
@@ -301,19 +306,19 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 : null }
                 </form>
               </div>
-            </div>
-          </div>
+            </div>                            
+          </div> 
+          <div id="Attachments" className="tabcontent">
+            <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
+              setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} />
+          </div> 
           <div id="Comments" className="tabcontent">
-            {
-              requestNotes ?
-                <>
-                  <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} />
-                </> : null}
-          </div>
-          <div id="Option3" className="tabcontent">
-            <h3>Option 3</h3>
-          </div>
+          <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
+        setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
+              </div> 
+          <div id="Option4" className="tabcontent">
+           <h3>Option 4</h3>
+          </div>        
         </div>
       </div>
     </div>
