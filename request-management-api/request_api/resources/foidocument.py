@@ -33,8 +33,8 @@ TRACER = Tracer.get_instance()
         
     
 @cors_preflight('GET,OPTIONS')
-@API.route('/foidocument/ministryrequest/<requestid>')
-class CreateFOIDocument(Resource):
+@API.route('/foidocument/<requesttype>/<requestid>')
+class GetFOIDocument(Resource):
     """Resource for managing FOI requests."""
 
        
@@ -42,9 +42,11 @@ class CreateFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def get(requestid):      
+    def get(requestid, requesttype): 
+        if requesttype != "ministryrequest" and requesttype != "rawrequest":
+            return {'status': False, 'message':'Bad Request'}, 400          
         try:
-            result = documentservice().getministryrequestdocuments(requestid)
+            result = documentservice().getrequestdocuments(requestid, requesttype)
             return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -54,7 +56,7 @@ class CreateFOIDocument(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500   
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foidocument/ministryrequest/<requestid>')
+@API.route('/foidocument/<requesttype>/<requestid>')
 class CreateFOIDocument(Resource):
     """Resource for managing FOI requests."""
 
@@ -63,11 +65,13 @@ class CreateFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def post(requestid):      
+    def post(requestid, requesttype):      
         try:
+            if requesttype != "ministryrequest" and requesttype != "rawrequest":
+                return {'status': False, 'message':'Bad Request'}, 400
             requestjson = request.get_json() 
             documentschema = CreateDocumentSchema().load(requestjson)
-            result = documentservice().createministryrequestdocument(requestid, documentschema, AuthHelper.getUserId())
+            result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -78,7 +82,7 @@ class CreateFOIDocument(Resource):
         
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foidocument/ministryrequest/<requestid>/documentid/<documentid>/rename')
+@API.route('/foidocument/<requesttype>/<requestid>/documentid/<documentid>/rename')
 class RenameFOIDocument(Resource):
     """Resource for managing FOI requests."""
 
@@ -87,11 +91,11 @@ class RenameFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def post(requestid, documentid):      
+    def post(requestid, documentid, requesttype):      
         try:
             requestjson = request.get_json() 
             documentschema = RenameDocumentSchema().load(requestjson)
-            result = documentservice().renameministryrequestdocument(requestid, documentid, documentschema, AuthHelper.getUserId())
+            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -101,7 +105,7 @@ class RenameFOIDocument(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foidocument/ministryrequest/<requestid>/documentid/<documentid>/replace')
+@API.route('/foidocument/<requesttype>/<requestid>/documentid/<documentid>/replace')
 class ReplaceFOIDocument(Resource):
     """Resource for managing FOI requests."""
 
@@ -110,11 +114,11 @@ class ReplaceFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def post(requestid, documentid):      
+    def post(requestid, documentid, requesttype):      
         try:
             requestjson = request.get_json() 
             documentschema = ReplaceDocumentSchema().load(requestjson)
-            result = documentservice().replaceministryrequestdocument(requestid, documentid, documentschema, AuthHelper.getUserId())
+            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -125,8 +129,8 @@ class ReplaceFOIDocument(Resource):
         
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foidocument/ministryrequest/<requestid>/documentid/<documentid>/delete')
-class ReplaceFOIDocument(Resource):
+@API.route('/foidocument/<requesttype>/<requestid>/documentid/<documentid>/delete')
+class DeleteFOIDocument(Resource):
     """Resource for managing FOI requests."""
 
        
@@ -134,9 +138,9 @@ class ReplaceFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
     @auth.require
-    def post(requestid, documentid):      
+    def post(requestid, documentid, requesttype):      
         try:
-            result = documentservice().deleteministryrequestdocument(requestid, documentid, AuthHelper.getUserId())
+            result = documentservice().deleterequestdocument(requestid, documentid, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
