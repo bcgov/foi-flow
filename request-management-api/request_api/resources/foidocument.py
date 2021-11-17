@@ -95,7 +95,7 @@ class RenameFOIDocument(Resource):
         try:
             requestjson = request.get_json() 
             documentschema = RenameDocumentSchema().load(requestjson)
-            result = documentservice().renamerequestdocument(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
+            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -118,7 +118,7 @@ class ReplaceFOIDocument(Resource):
         try:
             requestjson = request.get_json() 
             documentschema = ReplaceDocumentSchema().load(requestjson)
-            result = documentservice().replacerequestdocument(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
+            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
