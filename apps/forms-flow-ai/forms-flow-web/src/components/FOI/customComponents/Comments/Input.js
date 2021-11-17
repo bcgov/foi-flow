@@ -3,6 +3,7 @@ import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 
 const Input = () => {
+  
   const action = useContext(ActionContext)
   return action.customInput ? (
     action.customInput({

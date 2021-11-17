@@ -614,7 +614,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
   
-
+   
   return (
 
     <div className="foiformcontent">
@@ -696,7 +696,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             {
              requestNotes ?
                 <>
-                <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
+                <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode}  />
                 
                 </> : null
