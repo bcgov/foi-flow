@@ -8,47 +8,18 @@ import { formatDate } from "../../../../helper/FOI/helper";
 export const AttachmentSection = ({
   attachmentsArray,
   currentUser,
-  setComment,
+  setAttachment,
   requestid,
   ministryId,
   bcgovcode
 }) => {
-  // const [attachments, setAttachments] = useState(attachmentsArray)
+  const [attachments, setAttachments] = useState(attachmentsArray)
   
-  // useEffect(() => {
-  //   setAttachments(attachmentsArray)
-  // }, [attachmentsArray])
+  useEffect(() => {
+    setAttachments(attachmentsArray);
+    console.log(attachmentsArray);
+  }, [attachmentsArray])
   
-  const attachments = [
-    {
-      documentpath: "Username1",
-      filename: "Fee Estimate Letter Sent",
-      category: "cfrtofee",
-      created_at: "2021-11-01",
-      createdby: "richard@idir"
-    },
-    {
-      documentpath: "Fees Form Complete",
-      filename: "Fees Form Complete",
-      category: "",
-      created_at: "2021-11-02",
-      createdby: "abin@idir"
-    },
-    {
-      documentpath: "Call Clarification",
-      filename: "Call Clarification",
-      category: "",
-      created_at: "2021-11-03",
-      createdby: "foimma@idir"
-    },
-    {
-      documentpath: "Call Sent to EDUC",
-      filename: "Call Sent to EDUC",
-      category: "",
-      created_at: "2021-11-05",
-      createdby: "foiedu@idir"
-    },
-  ];
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {

@@ -22,8 +22,8 @@ import {
   fetchFOIReceivedModeList,
   fetchFOIRequestDescriptionList,
   fetchClosingReasonList,
-  fetchFOIRequestNotesList
-    
+  fetchFOIRequestNotesList,
+  fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -36,8 +36,8 @@ import Typography from '@material-ui/core/Typography';
 import { StateDropDown } from '../customComponents';
 import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
-import {CommentSection} from '../customComponents/Comments'
-import {AttachmentSection} from '../customComponents/Attachments'
+import {CommentSection} from '../customComponents/Comments';
+import {AttachmentSection} from '../customComponents/Attachments';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,7 +74,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
-  const [comment, setComment] = useState(requestNotes)
+  let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
+  const [comment, setComment] = useState(requestNotes);
+  const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const dispatch = useDispatch();
   useEffect(() => {   
@@ -82,12 +84,13 @@ const FOIRequest = React.memo(({userDetail}) => {
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId,ministryId));
-    
+      dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {      
       dispatch(fetchFOIRawRequestDetails(requestId));
       dispatch(fetchFOIRequestNotesList(requestId,null));
       dispatch(fetchFOIRequestDescriptionList(requestId, ""));
+      dispatch(fetchFOIRequestAttachmentsList(requestId,null));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
       dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
@@ -97,7 +100,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
-  },[requestId,ministryId, dispatch,comment]);
+  },[requestId,ministryId, dispatch,comment,attachments]);
  
 
   useEffect(() => {  
@@ -683,15 +686,13 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div> 
           <div id="Attachments" className="tabcontent">
             {
-             requestNotes ?
+             requestAttachments ?
                 <>
-                <AttachmentSection  />
-                
+                  <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
+                    setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode} />
                 </> : null
             }
-
-          
-              </div> 
+          </div> 
           <div id="Comments" className="tabcontent">
             {
              requestNotes ?

@@ -12,7 +12,8 @@ import {
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList,
   fetchFOIMinistryDivisionalStages,
-  fetchFOIRequestNotesList
+  fetchFOIRequestNotesList,
+  fetchFOIRequestAttachmentsList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
@@ -24,7 +25,8 @@ import RequestHeader from './RequestHeader';
 import RequestNotes from './RequestNotes';
 import RequestTracking from './RequestTracking';
 import BottomButtonGroup from './BottomButtonGroup';
-import {CommentSection} from '../../customComponents/Comments'
+import {CommentSection} from '../../customComponents/Comments';
+import {AttachmentSection} from '../../customComponents/Attachments';
 
 import {push} from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
@@ -73,16 +75,18 @@ const MinistryReview = React.memo(({userDetail}) => {
   
    let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
    let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
+   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
    const [comment, setComment] = useState(requestNotes)   
+   const [attachments, setAttachments] = useState(requestAttachments);
    const dispatch = useDispatch();
    useEffect(() => {
      if (ministryId) {
        dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
        dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
        dispatch(fetchFOIRequestNotesList(requestId,ministryId))
-       
+       dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
      }     
-   },[requestId, dispatch,comment]); 
+   },[requestId, dispatch,comment,attachments]); 
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -269,8 +273,9 @@ const MinistryReview = React.memo(({userDetail}) => {
           
         <div className="tab">
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+          <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments</div>
           <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div>
-          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
+          <div className="tablinks" name="Option4" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
         </div>
         
         <div className="foileftpanelstatus">
@@ -306,12 +311,16 @@ const MinistryReview = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
+          <div id="Attachments" className="tabcontent">
+            <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
+              setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} />
+          </div> 
           <div id="Comments" className="tabcontent">
           <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
         setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
               </div> 
-          <div id="Option3" className="tabcontent">
-           <h3>Option 3</h3>
+          <div id="Option4" className="tabcontent">
+           <h3>Option 4</h3>
           </div>        
         </div>
       </div>
