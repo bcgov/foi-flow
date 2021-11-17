@@ -14,8 +14,29 @@ class documentservice:
     """
     @classmethod    
     def getministryrequestdocuments(self, ministryrequestid):
-        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        return FOIMinistryRequestDocument.getdocuments(ministryrequestid, version[0])
+        return FOIMinistryRequestDocument.getdocuments(ministryrequestid)
     
+    @classmethod    
+    def renameministryrequestdocument(self, ministryrequestid, documentid, documentschema, userid):
+        return self.createministrydocumentversion(ministryrequestid, documentid, documentschema, userid)
+    
+    @classmethod    
+    def replaceministryrequestdocument(self, ministryrequestid, documentid,documentschema,  userid):
+        return self.createministrydocumentversion(ministryrequestid, documentid, documentschema, userid)
+    
+    @classmethod    
+    def deleteministryrequestdocument(self, ministryrequestid, documentid, userid):
+        documentschema = {'isactive':False}
+        return self.createministrydocumentversion(ministryrequestid, documentid, documentschema, userid)
      
     
+    @classmethod    
+    def createministrydocumentversion(self, ministryrequestid, documentid, documentschema, userid):
+        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)[0]
+        document = FOIMinistryRequestDocument.getdocument(documentid)
+        document['version'] = document['version'] +1
+        document['filename'] = documentschema['filename'] if 'filename' in documentschema  else document['filename']
+        document['documentpath'] = documentschema['documentpath'] if 'documentpath' in documentschema else document['documentpath']
+        document['category'] =  documentschema['category'] if 'category' in documentschema  else document['category']
+        document['isactive'] =  documentschema['isactive'] if 'isactive' in documentschema  else True
+        return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, document, userid)    

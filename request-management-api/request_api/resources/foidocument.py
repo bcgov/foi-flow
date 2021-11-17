@@ -23,6 +23,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.documentservice import documentservice
+from request_api.schemas.foidocument import  RenameDocumentSchema, ReplaceDocumentSchema 
 import json
 from flask_cors import cross_origin
 
@@ -33,7 +34,7 @@ TRACER = Tracer.get_instance()
     
 @cors_preflight('GET,OPTIONS')
 @API.route('/foidocument/ministryrequest/<requestid>')
-class FOIComment(Resource):
+class CreateFOIDocument(Resource):
     """Resource for managing FOI requests."""
 
        
@@ -51,3 +52,73 @@ class FOIComment(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
+
+
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foidocument/ministryrequest/<requestid>/documentid/<documentid>/rename')
+class RenameFOIDocument(Resource):
+    """Resource for managing FOI requests."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedOrigins())
+    @auth.require
+    def post(requestid, documentid):      
+        try:
+            requestjson = request.get_json() 
+            documentschema = RenameDocumentSchema().load(requestjson)
+            result = documentservice().renameministryrequestdocument(requestid, documentid, documentschema, AuthHelper.getUserId())
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foidocument/ministryrequest/<requestid>/documentid/<documentid>/replace')
+class ReplaceFOIDocument(Resource):
+    """Resource for managing FOI requests."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedOrigins())
+    @auth.require
+    def post(requestid, documentid):      
+        try:
+            requestjson = request.get_json() 
+            documentschema = ReplaceDocumentSchema().load(requestjson)
+            result = documentservice().replaceministryrequestdocument(requestid, documentid, documentschema, AuthHelper.getUserId())
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+        
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foidocument/ministryrequest/<requestid>/documentid/<documentid>/delete')
+class ReplaceFOIDocument(Resource):
+    """Resource for managing FOI requests."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedOrigins())
+    @auth.require
+    def post(requestid, documentid):      
+        try:
+            result = documentservice().deleteministryrequestdocument(requestid, documentid, AuthHelper.getUserId())
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
