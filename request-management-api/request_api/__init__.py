@@ -43,9 +43,8 @@ from flask_caching import Cache
 #Cache Initialization
 app = Flask(__name__)
     
-#commenting caching for FOI payment release        
-#app.config.from_object('request_api.utils.cache.Config') 
-#cache = Cache(app) 
+app.config.from_object('request_api.utils.cache.Config') 
+cache = Cache(app) 
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   
@@ -133,6 +132,3 @@ def register_shellcontext(app):
         return {'app': app, 'jwt': jwt, 'db': db, 'models': models}  # pragma: no cover
 
     app.shell_context_processor(shell_context)
-
-
-
