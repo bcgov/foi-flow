@@ -104,7 +104,7 @@ const Attachment = React.memo(({attachment}) => {
           <div className="col-lg-12 foi-details-col">
             <div className="col-lg-5" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div style={{display:'inline',paddingRight:15+'px'}}>                      
-                <b>{attachment.filename}</b>
+                <b>{attachment.filename.split('.').shift()}</b>
               </div>
             </div>
             <div className="col-lg-7" style={{display:'inline-block'}}>
