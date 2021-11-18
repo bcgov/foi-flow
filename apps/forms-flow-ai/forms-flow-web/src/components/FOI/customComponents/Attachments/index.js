@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
-import { getOSSHeaderDetails, saveFilesinS3 } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate } from "../../../../helper/FOI/helper";
 
 export const AttachmentSection = ({
@@ -13,7 +13,7 @@ export const AttachmentSection = ({
   attachmentsArray,
   currentUser,
   setAttachment,
-  requestid,
+  requestId,
   ministryId,
   bcgovcode
 }) => {
@@ -37,11 +37,7 @@ export const AttachmentSection = ({
     if (successCount === fileCount && successCount !== 0) {
         setModal(false);
         const documentsObject = {documents: documents};
-        console.log(documentsObject);
-        // saveStatusId();
-        // saveMinistryRequestObject.documents = documents;
-        // saveMinistryRequest();
-        // hasStatusRequestSaved(true,currentSelectedStatus);
+        dispatch(saveFOIRequestAttachmentsList(requestId, ministryId,documentsObject));        
     }
   },[successCount])
 

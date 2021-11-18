@@ -38,8 +38,9 @@ const API = {
   FOI_PUT_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
   FOI_DELETE_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<commentid>/disable`,
 
-  FOI_GET_ATTACHMENTS_RAWREQUEST:`${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>`,
-  FOI_GET_ATTACHMENTS_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>`,
+  FOI_ATTACHMENTS_RAWREQUEST:`${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>`,
+  FOI_ATTACHMENTS_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>`,
+
 };
 
 export default API;

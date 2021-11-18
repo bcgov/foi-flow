@@ -887,12 +887,12 @@ export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
     let apiUrl = "";
     if (ministryId !=null) {
       apiUrl = replaceUrl(
-        API.FOI_GET_ATTACHMENTS_MINISTRYREQUEST,
+        API.FOI_ATTACHMENTS_MINISTRYREQUEST,
        "<ministryrequestid>", ministryId);
     }
     else {
       apiUrl = replaceUrl(
-        API.FOI_GET_ATTACHMENTS_RAWREQUEST,
+        API.FOI_ATTACHMENTS_RAWREQUEST,
         "<requestid>",
         requestId
       );
@@ -922,6 +922,38 @@ export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
           console.log("Error", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
+          done(error);
+        });
+    };
+  };
+
+  export const saveFOIRequestAttachmentsList = (requestId, ministryId, data, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    let apiUrl = "";
+    if (ministryId !=null) {
+      apiUrl = replaceUrl(
+        API.FOI_ATTACHMENTS_MINISTRYREQUEST,
+       "<ministryrequestid>", ministryId);
+    }
+    else {
+      apiUrl = replaceUrl(
+        API.FOI_ATTACHMENTS_RAWREQUEST,
+        "<requestid>",
+        requestId
+      );
+    }
+    return (dispatch) => {
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {          
+          if (res.data) {             
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error Posting Attachments");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
           done(error);
         });
     };
