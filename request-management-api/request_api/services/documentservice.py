@@ -6,12 +6,10 @@ from request_api.models.FOIRawRequestDocuments import FOIRawRequestDocument
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 import json
-from dateutil.parser import *
-import datetime 
 
 
 class documentservice:
-    """ FOI watcher management service
+    """ FOI Document management service
 
     """
     @classmethod    
@@ -29,27 +27,16 @@ class documentservice:
             return self.createrawrequestdocument(requestid, documentschema, userid)
     
     @classmethod    
-    def renamerequestdocument(self, requestid, documentid, documentschema, userid, requesttype):
+    def createrequestdocumentversion(self, requestid, documentid, documentschema, userid, requesttype):
         if requesttype == "ministryrequest":
            return self.createministrydocumentversion(requestid, documentid, documentschema, userid)
         else:
             return self.createrawdocumentversion(requestid, documentid, documentschema, userid)
 
     @classmethod    
-    def replacerequestdocument(self, requestid, documentid,documentschema,  userid, requesttype):
-        if requesttype == "ministryrequest":
-            return self.createministrydocumentversion(requestid, documentid, documentschema, userid)
-        else:
-            return self.createrawdocumentversion(requestid, documentid, documentschema, userid)
-    
- 
-    @classmethod    
     def deleterequestdocument(self, requestid, documentid, userid, requesttype):
         documentschema = {'isactive':False}
-        if requesttype == "ministryrequest":
-            return self.createministrydocumentversion(requestid, documentid, documentschema, userid)
-        else:
-            return self.createrawdocumentversion(requestid, documentid, documentschema, userid)
+        return self.createrequestdocumentversion(requestid, documentid, documentschema, userid, requesttype)
       
             
     @classmethod    

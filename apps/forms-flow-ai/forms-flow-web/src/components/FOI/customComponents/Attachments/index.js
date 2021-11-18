@@ -105,7 +105,7 @@ const Attachment = React.memo(({attachment}) => {
           <div className="col-lg-12 foi-details-col">
             <div className="col-lg-5" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div style={{display:'inline',paddingRight:15+'px'}}>                      
-                <b>{attachment.filename}</b>
+                <b>{attachment.filename.split('.').shift()}</b>
               </div>
             </div>
             <div className="col-lg-7" style={{display:'inline-block'}}>
@@ -117,7 +117,7 @@ const Attachment = React.memo(({attachment}) => {
         </div>
         <div className="row foi-details-row" style={{paddingTop:15+'px'}}>
           <div className="col-lg-12 foi-details-col">                      
-            {formatDate(attachment.created_at, 'yyyy MMM dd | HH:mm')}
+            {formatDate(attachment.created_at, 'yyyy MMM dd | p')}
           </div>
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
