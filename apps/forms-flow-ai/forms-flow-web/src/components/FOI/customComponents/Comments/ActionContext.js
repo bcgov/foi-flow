@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from 'react'
 import uuid from 'react-uuid'
 import { saveRawRequestNote, editRawRequestNote, saveMinistryRequestNote, editMinistryRequestNote, deleteMinistryRequestNote, deleteRawRequestNote } from '../../../../apiManager/services/FOI/foiRequestServices'
 import { useDispatch, useSelector } from "react-redux";
-
+import {setFOILoader} from '../../../../actions/FOI/foiRequestActions'
 export const ActionContext = createContext()
 export const ActionProvider = ({
   children,
@@ -46,16 +46,16 @@ export const ActionProvider = ({
   }
 
   const onSubmit = (text, parentId, child) => {
-
+    setFOILoader(true)
     if (text.length > 0) {
       if (!parentId && !child) {
         if (ministryId) {
           const _inputData = { "ministryrequestid": ministryId, "comment": text }
-          dispatch(saveMinistryRequestNote(_inputData));
+          dispatch(saveMinistryRequestNote(_inputData,ministryId));
         }
         else {
           const _inputData = { "requestid": requestid, "comment": text }
-          dispatch(saveRawRequestNote(_inputData));
+          dispatch(saveRawRequestNote(_inputData,requestid));
         }
         const maxId = comments && comments.length > 0 && comments.reduce(
           (max, comment) => (comment && comment.commentId > max ? comment.commentId : max),
@@ -98,11 +98,11 @@ export const ActionProvider = ({
         })
         if (ministryId) {
           const _inputData = { "ministryrequestid": ministryId, "comment": text, "parentcommentid": parentId }
-          dispatch(saveMinistryRequestNote(_inputData));
+          dispatch(saveMinistryRequestNote(_inputData,ministryId));
         }
         else {
           const _inputData = { "requestid": requestid, "comment": text, "parentcommentid": parentId }
-          dispatch(saveRawRequestNote(_inputData));
+          dispatch(saveRawRequestNote(_inputData,requestid));
         }
 
         newList[index].replies = newReplies
@@ -112,15 +112,16 @@ export const ActionProvider = ({
   }
 
   const editText = (id, text, parentId) => {
+    setFOILoader(true)
     if (parentId === undefined) {
 
       if (ministryId) {
         const _inputData = { "comment": text }
-        dispatch(editMinistryRequestNote(_inputData, id));
+        dispatch(editMinistryRequestNote(_inputData, id,ministryId));
       }
       else {
         const _inputData = { "comment": text }
-        dispatch(editRawRequestNote(_inputData, id));
+        dispatch(editRawRequestNote(_inputData, id,requestid));
       }
 
       const newList = [...comments]
@@ -130,11 +131,11 @@ export const ActionProvider = ({
     } else if (parentId !== undefined) {
       if (ministryId) {
         const _inputData = { "comment": text }
-        dispatch(editMinistryRequestNote(_inputData, id));
+        dispatch(editMinistryRequestNote(_inputData, id,ministryId));
       }
       else {
         const _inputData = { "comment": text }
-        dispatch(editRawRequestNote(_inputData, id));
+        dispatch(editRawRequestNote(_inputData, id,requestid));
       }
       const newList = [...comments]
       const index = newList.findIndex((x) => x.commentId === parentId)
@@ -145,12 +146,12 @@ export const ActionProvider = ({
   }
 
   const deleteText = (id, parentId) => {
-
+    setFOILoader(true)
     if (ministryId) {
-      dispatch(deleteMinistryRequestNote({},id));
+      dispatch(deleteMinistryRequestNote({},id,ministryId));
     }
     else {
-      dispatch(deleteRawRequestNote({},id));
+      dispatch(deleteRawRequestNote({},id,requestid));
     }
 
 
@@ -168,6 +169,7 @@ export const ActionProvider = ({
   }
 
   const submit = (cancellor, text, parentId, edit, setText, child) => {
+    
     if (edit) {
       editText(cancellor, text, parentId)
       handleCancel(cancellor, edit)

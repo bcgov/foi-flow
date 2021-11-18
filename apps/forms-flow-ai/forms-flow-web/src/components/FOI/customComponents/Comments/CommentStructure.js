@@ -19,59 +19,13 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment }) => {
-
-
-
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
 
   const actions = useContext(ActionContext)
   const edit = true
 
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchFOIFullAssignedToList());
-    if (bcgovcode)
-      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
-  }, [dispatch]);
-
-  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
-  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
-  let fullName = ''
-
-  var _sessionuser = localStorage.getItem(i.userId)
   
-  if (_sessionuser === undefined || _sessionuser === '' || _sessionuser === null) {
-    
-    iaoassignedToList.forEach(function (obj) {
-      var groupmembers = obj.members
-      var user = groupmembers.find(m => m["username"] === i.userId)
-      if (user && user != undefined) {
-        fullName = `${user["lastname"]}, ${user["firstname"]}`       
-        localStorage.setItem(i.userId, fullName)
-        return true;
-      }
-    })
-
-    if (fullName === '') {     
-      ministryAssignedToList.forEach(function (obj) {
-        var groupmembers = obj.members
-        var user = groupmembers.find(m => m["username"] === i.userId)
-        if (user && user != undefined) {          
-          fullName = `${user["lastname"]}, ${user["firstname"]}`          
-          localStorage.setItem(i.userId, fullName)
-          return true;
-        }
-      })
-    }
-
-  }
-  else {
-    console.log(`ELse condition for full name ${fullName}`)
-    fullName = _sessionuser
-  }
-
   return (
 
     <div className={halfDivclassname} >

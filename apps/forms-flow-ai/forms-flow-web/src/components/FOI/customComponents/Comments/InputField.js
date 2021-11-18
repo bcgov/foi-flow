@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
+import {setFOILoader} from '../../../../actions/FOI/foiRequestActions'
 
 
 const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
@@ -59,7 +59,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
     setTextLength(1000);
     if (text !== '<p><br></p>') {
-      
+      setFOILoader(true)
       edit === true
         ? actions.submit(cancellor, text, parentId, true, setText)
         : actions.submit(cancellor, text, parentId, false, setText)
