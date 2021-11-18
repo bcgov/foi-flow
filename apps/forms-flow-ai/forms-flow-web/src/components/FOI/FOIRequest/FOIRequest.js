@@ -616,7 +616,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const signupUrl = "/signup"
 
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
-  
+  const requestNumber = requestDetails && requestDetails.idNumber;
    
   return (
 
@@ -689,7 +689,7 @@ const FOIRequest = React.memo(({userDetail}) => {
              requestAttachments ?
                 <>
                   <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
-                    setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode} />
+                    setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode} requestNumber={requestNumber} />
                 </> : null
             }
           </div> 
