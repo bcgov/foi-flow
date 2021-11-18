@@ -1,6 +1,6 @@
 
 
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, validate
 
 """
 This class  consolidates schemas of document operations.
@@ -39,4 +39,4 @@ class CreateDocumentSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    documents = fields.Nested(DocumentSchema, many=True,required=True,allow_none=False)
+    documents = fields.Nested(DocumentSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
