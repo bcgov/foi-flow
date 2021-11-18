@@ -14,3 +14,5 @@
 """Exposes all of the Services used in the API."""
 
 #from .reset import ResetTestData
+from .fee_service import FeeService
+

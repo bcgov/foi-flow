@@ -35,6 +35,10 @@ class rawrequestservice:
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
 
+    def saverawrequest_foipayment(requestdatajson,notes):        
+        result = FOIRawRequest.saverawrequest_foipayment(_requestrawdata=requestdatajson,notes=notes)       
+        return result    
+
     def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status, userId):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status,ispiiredacted, userId)
