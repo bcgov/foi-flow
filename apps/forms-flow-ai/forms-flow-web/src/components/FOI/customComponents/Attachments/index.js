@@ -62,7 +62,7 @@ const Attachment = React.memo(({attachment}) => {
         </div>
         <div className="row foi-details-row" style={{paddingTop:15+'px'}}>
           <div className="col-lg-12 foi-details-col">                      
-            {formatDate(attachment.created_at, 'yyyy MMM dd | HH:mm')}
+            {formatDate(attachment.created_at, 'yyyy MMM dd | p')}
           </div>
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
