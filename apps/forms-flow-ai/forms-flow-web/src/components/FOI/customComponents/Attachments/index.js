@@ -36,7 +36,8 @@ export const AttachmentSection = ({
   React.useEffect(() => {
     if (successCount === fileCount && successCount !== 0) {
         setModal(false);
-        console.log(documents);
+        const documentsObject = {documents: documents};
+        console.log(documentsObject);
         // saveStatusId();
         // saveMinistryRequestObject.documents = documents;
         // saveMinistryRequest();

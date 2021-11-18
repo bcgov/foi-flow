@@ -233,7 +233,7 @@ class requestservice:
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
-        requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid,requestministry['version'])
+        requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
         _receivedDate = parse(request['receiveddate'])
         
         baserequestInfo = {
@@ -344,7 +344,7 @@ class requestservice:
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
-        requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid,requestministry['version'])
+        requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
         baserequestInfo = {}
         if requestministry["assignedministrygroup"] in authMembershipgroups:
 

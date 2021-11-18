@@ -4,6 +4,7 @@ import "./FileUpload.scss"
 const FileUpload = ({
     multipleFiles,
     mimeTypes,
+    maxFileSize,
     updateFilesCb
 }) => {
     const fileInputField = useRef(null);
@@ -22,12 +23,12 @@ const FileUpload = ({
         for (let file of newFiles) {
           if (mimeTypes.includes(file.type)) {
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
-            if (sizeInMB <= 50) {             
+            if (sizeInMB <= maxFileSize) {             
                 files[file.name] = file;
                 setErrorMessage("");
             }
             else {
-              setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files 50mb or under can be uploaded. `);
+              setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `);
             }
           }
           else {
@@ -46,10 +47,15 @@ const FileUpload = ({
     };
     const handleNewFileUpload = (e) => {
         const { files: newFiles } = e.target;
-        if (newFiles.length) {
+        if (multipleFiles && newFiles.length > 10) {
+            setErrorMessage("Maximum number of files allowed is 10.");
+        }
+        else if (newFiles.length) {
             let updatedFiles = addNewFiles(newFiles);
-            setFiles(updatedFiles);           
-            callUpdateFilesCb(updatedFiles);
+            if (!errorMessage) {
+              setFiles(updatedFiles);           
+              callUpdateFilesCb(updatedFiles);
+            }
         }
     };
     const removeFile = (fileName) => {

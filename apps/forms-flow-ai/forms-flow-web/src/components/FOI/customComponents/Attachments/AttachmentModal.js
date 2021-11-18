@@ -9,7 +9,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import '../confirmationmodal.scss';
 import FileUpload from '../FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
-import { MimeTypeList } from "../../../../constants/FOI/enum";
+import { MimeTypeList, MaxFileSize } from "../../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,24 +43,34 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
       setFiles(_files);
     }
     const handleClose = () => {
-      //handleModal(false);
-      window.location.reload()
+        //handleModal(false);
+        if (files.length > 0) {
+            if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
+                // window.location.reload();
+                handleModal(false);
+            }
+        }
+        else {
+            // window.location.reload();
+            handleModal(false);
+        }
     };
 
     const handleSave = () => {
-      let fileInfoList = [];
-      if (files.length > 0) {
-        let fileStatusTransition = "attachmentlog";    
-        fileInfoList = files.map(file => {
-          return {            
-            requestnumber: requestNumber,
-            filestatustransition: fileStatusTransition,
-            filename: file.name,
-          }
-        });
-      }
-      console.log(fileInfoList);
-    //   handleModal(true, fileInfoList, files);
+        let fileInfoList = [];
+        if (files.length > 0) {
+            let fileStatusTransition = "attachmentlog";    
+            fileInfoList = files.map(file => {
+            return {
+                ministrycode: "Misc",     
+                requestnumber: requestNumber,
+                filestatustransition: fileStatusTransition,
+                filename: file.name,
+            }
+            });
+        }
+        //console.log(fileInfoList);
+        handleModal(true, fileInfoList, files);
     }   
   
     return (
@@ -81,7 +91,7 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-                <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} updateFilesCb={updateFilesCb} />                                
+                <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.attachmentLog} maxFileSize={MaxFileSize.attachmentLog} updateFilesCb={updateFilesCb} />                                
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
