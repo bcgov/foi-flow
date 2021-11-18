@@ -126,7 +126,7 @@ class FOIRawRequests(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@expects_json(schema)
+    @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
