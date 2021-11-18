@@ -12,7 +12,9 @@ import {
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList,
   fetchFOIMinistryDivisionalStages,
-  fetchFOIRequestNotesList
+  fetchFOIRequestNotesList,
+  fetchFOIFullAssignedToList,
+  fetchFOIMinistryAssignedToList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
@@ -28,7 +30,7 @@ import { CommentSection } from '../../customComponents/Comments'
 
 import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
-
+import Loading from "../../../../containers/Loading";
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -73,16 +75,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   let requestDetails = useSelector(state => state.foiRequests.foiMinistryViewRequestDetail);
   let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
-  const [comment, setComment] = useState(requestNotes)
+  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
+  const [comment, setComment] = useState([])
   const dispatch = useDispatch();
   useEffect(() => {
     if (ministryId) {
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId))
-
+      dispatch(fetchFOIFullAssignedToList());
+      if (bcgovcode)
+        dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
-  }, [requestId, dispatch, comment]);
+    
+  }, [requestId, dispatch]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -250,6 +256,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
+  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
 
   return (
 
@@ -305,11 +314,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div>
           <div id="Comments" className="tabcontent">
             {
-              requestNotes ?
+             !isLoading && requestNotes && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
                 <>
                   <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} />
-                </> : null}
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}/>
+                </> : <Loading />}
           </div>
           <div id="Option3" className="tabcontent">
             <h3>Option 3</h3>

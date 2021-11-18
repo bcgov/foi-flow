@@ -22,7 +22,9 @@ import {
   fetchFOIReceivedModeList,
   fetchFOIRequestDescriptionList,
   fetchClosingReasonList,
-  fetchFOIRequestNotesList
+  fetchFOIRequestNotesList,
+  fetchFOIFullAssignedToList,
+  fetchFOIMinistryAssignedToList
     
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
@@ -37,6 +39,7 @@ import { StateDropDown } from '../customComponents';
 import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import {CommentSection} from '../customComponents/Comments'
+import Loading from "../../../containers/Loading";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -72,11 +75,12 @@ const FOIRequest = React.memo(({userDetail}) => {
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
-  let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
-  const [comment, setComment] = useState(requestNotes)
+  let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;   
+  const [comment, setComment] = useState([])
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
+  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
   const dispatch = useDispatch();
-  useEffect(() => {   
+  useEffect(() => {      
     if (ministryId) {
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
@@ -91,11 +95,14 @@ const FOIRequest = React.memo(({userDetail}) => {
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
       dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
     }
+    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
+    if (bcgovcode)
+      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));          
   },[requestId,ministryId, dispatch,comment]);
  
 
@@ -611,8 +618,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
-  
+  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
    
   return (
 
@@ -680,12 +688,12 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div> 
           <div id="Comments" className="tabcontent">
             {
-             requestNotes ?
+             !isLoading && requestNotes && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode}  />
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}  />
                 
-                </> : null
+                </> : <Loading />
             }
 
           
