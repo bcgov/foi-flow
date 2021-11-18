@@ -10,6 +10,7 @@ import { formatDate } from "../../../../helper/FOI/helper";
 
 export const AttachmentSection = ({
   requestNumber,
+  requestState,
   attachmentsArray,
   currentUser,
   setAttachment,
@@ -21,7 +22,6 @@ export const AttachmentSection = ({
   
   useEffect(() => {
     setAttachments(attachmentsArray);
-    console.log(attachmentsArray);
   }, [attachmentsArray])
   
 
@@ -37,12 +37,18 @@ export const AttachmentSection = ({
     if (successCount === fileCount && successCount !== 0) {
         setModal(false);
         const documentsObject = {documents: documents};
-        dispatch(saveFOIRequestAttachmentsList(requestId, ministryId,documentsObject));        
+        dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
+          if (!err) {            
+            window.location.href = ministryId ? `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${requestState}/Attachments` : requestId ? `/foi/reviewrequest/${requestId}/${requestState}/Attachments` : window.location.href;
+            
+          }
+        }));
     }
   },[successCount])
 
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
+    if (files) {
     setFileCount(files.length);
     if (value) {
         if (files.length !== 0) {
@@ -69,6 +75,7 @@ export const AttachmentSection = ({
           }));
         }             
     }
+  }
   }
 
   var attachmentsList = [];

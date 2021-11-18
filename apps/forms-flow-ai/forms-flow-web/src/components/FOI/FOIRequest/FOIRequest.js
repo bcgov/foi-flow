@@ -64,7 +64,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   var foitabheaderBG;
 
 
-  const {requestId, ministryId, requestState} = useParams();
+  const {requestId, ministryId, requestState, tabName} = useParams();  
   const disableInput = requestState && requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
 
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -99,7 +99,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
-    dispatch(fetchClosingReasonList());
+    dispatch(fetchClosingReasonList()); 
   },[requestId,ministryId, dispatch,comment,attachments]);
  
 
@@ -107,7 +107,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue); 
     let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
-    setAssignedToValue(assignedTo);
+    setAssignedToValue(assignedTo); 
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
@@ -632,9 +632,9 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div>
           
         <div className="tab">
-          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+          <div className={`tablinks ${!tabName ? 'active': ''}`} name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className={`tablinks ${tabName === 'Attachments' ? 'active': ''}`} name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments</div> : null
           }
           {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div> : null
@@ -657,7 +657,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
         </div>
         <div className="foitabpanelcollection"> 
-          <div id="Request" className="tabcontent active">                                
+          <div id="Request" className={`tabcontent ${!tabName ? 'active': ''}`}>                                
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -684,12 +684,13 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
-          <div id="Attachments" className="tabcontent">
+          <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
             {
              requestAttachments ?
                 <>
                   <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
-                    setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode} requestNumber={requestNumber} />
+                    setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} bcgovcode={bcgovcode} 
+                    requestNumber={requestNumber} requestState={requestState} />
                 </> : null
             }
           </div> 

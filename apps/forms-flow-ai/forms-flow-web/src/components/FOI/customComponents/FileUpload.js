@@ -11,7 +11,6 @@ const FileUpload = ({
     const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({});
     const [errorMessage, setErrorMessage] = useState("");
-  
     const handleUploadBtnClick = () => {
       if (fileInputField.current)
         fileInputField.current.click();
@@ -32,7 +31,7 @@ const FileUpload = ({
             }
           }
           else {
-            setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: pdf, xlsx, docx`);
+            setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: ${multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}`);
           }
         }
         return { ...files };
@@ -48,15 +47,15 @@ const FileUpload = ({
     const handleNewFileUpload = (e) => {
         const { files: newFiles } = e.target;
         if (multipleFiles && newFiles.length > 10) {
-            setErrorMessage("Maximum number of files allowed is 10.");
+          setErrorMessage("Maximum number of files allowed is 10.");
         }
         else if (newFiles.length) {
-            let updatedFiles = addNewFiles(newFiles);
-            if (!errorMessage) {
-              setFiles(updatedFiles);           
-              callUpdateFilesCb(updatedFiles);
-            }
-        }
+          let updatedFiles = addNewFiles(newFiles);
+          if (!errorMessage) {
+            setFiles(updatedFiles);
+            callUpdateFilesCb(updatedFiles);
+          }
+      }
     };
     const removeFile = (fileName) => {
         delete files[fileName];
@@ -64,7 +63,7 @@ const FileUpload = ({
         callUpdateFilesCb({ ...files });
         setErrorMessage("");
     };
-    
+
   return (
     <>
       <section className="file-upload-container">       

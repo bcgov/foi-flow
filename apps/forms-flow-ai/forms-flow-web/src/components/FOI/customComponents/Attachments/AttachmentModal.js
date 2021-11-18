@@ -69,7 +69,6 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
             }
             });
         }
-        //console.log(fileInfoList);
         handleModal(true, fileInfoList, files);
     }   
   
