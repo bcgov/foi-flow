@@ -17,19 +17,18 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
   const handleQuillChange = (htmlcontent, delta, source, editor) => {
     let _unformattedtext = editor.getText()
+    if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {
 
-    if (_unformattedtext && _unformattedtext != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {
-
-      if (_unformattedtext.length - 1 <= maxcharacterlimit) {
+      if (_unformattedtext.trim().length - 1 <= maxcharacterlimit) {
         setText(htmlcontent)
 
       }
       else {
-        setText(_unformattedtext.substring(0, maxcharacterlimit - 1))
+        setText(_unformattedtext.trim().substring(0, maxcharacterlimit - 1))
       }
-      setuftext(_unformattedtext)
+      setuftext(_unformattedtext.trim())
       if (_unformattedtext.length - 1 <= maxcharacterlimit)
-        setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.length - 1 <= maxcharacterlimit ? _unformattedtext.length - 1 : 0))
+        setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.trim().length - 1 <= maxcharacterlimit ? _unformattedtext.trim().length - 1 : 0))
     }
   }
 
