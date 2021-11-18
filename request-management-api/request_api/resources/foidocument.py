@@ -25,6 +25,7 @@ from request_api.exceptions import BusinessException, Error
 from request_api.services.documentservice import documentservice
 from request_api.schemas.foidocument import  CreateDocumentSchema, RenameDocumentSchema, ReplaceDocumentSchema 
 import json
+from marshmallow import Schema, fields, validate, ValidationError
 from flask_cors import cross_origin
 
 
@@ -73,6 +74,8 @@ class CreateFOIDocument(Resource):
             documentschema = CreateDocumentSchema().load(requestjson)
             result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message} , 200 
+        except ValidationError as err:
+                    return {'status': False, 'message':err.messages}, 400
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
@@ -97,6 +100,8 @@ class RenameFOIDocument(Resource):
             documentschema = RenameDocumentSchema().load(requestjson)
             result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValidationError as err:
+                    return {'status': False, 'message':err.messages}, 400
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
@@ -120,6 +125,8 @@ class ReplaceFOIDocument(Resource):
             documentschema = ReplaceDocumentSchema().load(requestjson)
             result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValidationError as err:
+                    return {'status': False, 'message':err.messages}, 400
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
