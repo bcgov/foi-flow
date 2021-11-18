@@ -1,13 +1,12 @@
 /* add css module styles here (optional) */
 #Attachments{
-  height: 900px;
+  height: 100%;
   overflow-y: scroll;
   width: auto;
   background-color:white;
 }
 
 .section{
-  display: flex;
   flex-direction: column;
   overflow-x: hidden;;
   background-color: white;
