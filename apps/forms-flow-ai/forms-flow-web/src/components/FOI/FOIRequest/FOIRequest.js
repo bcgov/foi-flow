@@ -597,6 +597,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
+      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
     }
    
     tablinks = document.getElementsByClassName("tablinks");
