@@ -16,7 +16,7 @@
 from datetime import datetime
 import os
 
-from flask import request, send_file, Response
+from flask import request, Response
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
 
