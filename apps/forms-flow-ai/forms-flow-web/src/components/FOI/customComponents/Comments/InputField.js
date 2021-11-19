@@ -67,7 +67,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
   }
 
   const quillRef = (el) => {
-    if (el) {     
+    if (el && document.getElementById('Comments').style.display === 'block') {     
       el.focus()
     }
   }
