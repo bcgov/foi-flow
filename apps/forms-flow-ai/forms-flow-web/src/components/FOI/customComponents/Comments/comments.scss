@@ -12,7 +12,7 @@
   background-color: white;
       
   .addcommentBox{
-    width:100%;
+    width:99%;
     margin-left:25px;
     margin-top:25px;
     padding-right:25px;
@@ -32,9 +32,7 @@
 
   .inputActions{
     display: flex;
-    //justify-content: flex-end;
-    margin-top: 3px;
-    //margin-left: 15px;
+    background-color: white;
 
     .postBtn {
       color: white;
@@ -42,7 +40,8 @@
       background-size: 200% auto;
       border-radius:5px;
       transition: 0.5s;
-      padding:8px 16px;
+      // padding:8px 16px;
+      //padding-top: 8px;
       background-color: transparent!important;
       border:none;
       //margin-right: 10px;
@@ -63,29 +62,14 @@
       }
     }
 
-    .cancelBtn {
-      
-      text-align: center;
-      background-size: 200% auto;      
-      transition: 0.5s;
-      padding:8px 10px;
-      border: unset;
-      background-color: transparent;
-      font-size: 13px;
-
-      &:hover {
-        background-position: right center;
-        cursor: pointer;
-
-      }
-
-      &:focus {
-        outline:0;
-      }
-    }
+    
 
   }  
   
+}
+
+.cancelrow {
+  height: 1px;
 }
 
 .cancelBtn {
@@ -93,11 +77,14 @@
   text-align: center;
   background-size: 200% auto;      
   transition: 0.5s;
-  padding:8px 10px;
+  //padding:8px 10px;
   border: unset;
   background-color: transparent;
   font-size: 13px;
-
+  position: relative;
+  top: 50px;
+  z-index: 100;
+  padding-right: 1%;
   &:hover {
     background-position: right center;
     cursor: pointer;
@@ -112,14 +99,12 @@
 
 
   .form{
-    display: inline-block;
-    background-color: white;
-    padding: 8px;
-    padding-bottom: 15px;
-    border-radius: 8px;
-    width: 95%;
-    margin-top : 5px ;
-    margin-bottom: 5px;
+    display: inline-block;    
+    // padding: 8px;    
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    width: 100%;
+    
     .userImg{
       display: flex;
       width:10%;
@@ -127,19 +112,15 @@
       align-items: center;
     }
 
-    
-
     .postComment{
       width:90%;
       border: none;
-      // border-bottom: 1px solid rgb(24, 24, 24);
       text-decoration: none;
       background-color: transparent;
       margin-left: 4px;
     }
     .postComment:focus {
       outline:none;
-      // border-bottom: 2px solid rgb(14, 14, 14);
     }
     .postComment::placeholder{
       margin-top: -2px;
@@ -217,10 +198,6 @@
     }
   }
   
-  .replySection{        
-   margin-top:3px;    
-  }
-
   .replySection .halfDiv   {
       
     margin-bottom: unset;  
@@ -303,20 +280,19 @@ button[disabled]{
 }
 
 .commentsection{ 
-  background-color: rgb(210, 226, 246);
-  border-radius: 8px;
+
   margin-bottom: 30px;
 }
 
 .commentsection .halfDiv {
-  margin: 3px; 
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: rgb(210, 226, 246);
 }
 
 .undermaincomment{
   margin: unset!important;
-  background-color:rgb(234, 237, 241);
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  background-color:#ededed !important;
 }
 
 .commenttext{
@@ -353,6 +329,11 @@ border: 0px!important;
   border: 1px solid lightblue !important;
   height: 100px;
   border-radius:8px
+}
+
+.commentsection .ql-container.ql-snow {
+  border-top-left-radius:0px!important;
+  border-top-right-radius:0px!important;
 }
 
 .commentdate{
@@ -396,5 +377,37 @@ border: 0px!important;
   font-size: 16px;
 }
 
+.commentsection .parentform {
+  background-color: #d2e2f6!important
+}
+
+.commentsection .form {
+  background-color: #ededed 
+}
+.replySection  .form  {
+  background-color:#ededed ;
+}
 
 
+
+.addform {
+  background-color: white!important;
+}
+ 
+.replySection > div > div.halfDiv {
+  border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.paperplanecontainer{
+  padding-right: 0px!important;
+  padding-left: 4%!important;
+}
+
+.inputBox .form ,.inputActions {
+  width: 95%;
+}
+
+.commentsection .inputActions {
+  width: 100%;
+}

@@ -8,7 +8,7 @@ import 'react-quill/dist/quill.snow.css';
 import {setFOILoader} from '../../../../actions/FOI/foiRequestActions'
 
 
-const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
+const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
 
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
@@ -17,19 +17,18 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
   const handleQuillChange = (htmlcontent, delta, source, editor) => {
     let _unformattedtext = editor.getText()
+    if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {
 
-    if (_unformattedtext && _unformattedtext != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {
-
-      if (_unformattedtext.length - 1 <= maxcharacterlimit) {
+      if (_unformattedtext.trim().length - 1 <= maxcharacterlimit) {
         setText(htmlcontent)
 
       }
       else {
-        setText(_unformattedtext.substring(0, maxcharacterlimit - 1))
+        setText(_unformattedtext.trim().substring(0, maxcharacterlimit - 1))
       }
-      setuftext(_unformattedtext)
+      setuftext(_unformattedtext.trim())
       if (_unformattedtext.length - 1 <= maxcharacterlimit)
-        setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.length - 1 <= maxcharacterlimit ? _unformattedtext.length - 1 : 0))
+        setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.trim().length - 1 <= maxcharacterlimit ? _unformattedtext.trim().length - 1 : 0))
     }
   }
 
@@ -67,18 +66,17 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
   }
 
+  let formclass = !parentId ? "parentform form" : "form"
+
+  formclass = add ?  `${formclass} addform` : formclass
+
   const actions = useContext(ActionContext)
   return (
     <>
       <form
-        className="form"
-        style={
-          !child && !edit && main === undefined
-            ? { marginLeft: 36 }
-            : { marginLeft: 8 }
-        }
+        className={formclass}        
       >
-        <div className="row">
+        <div className="row cancelrow">
           <div className="col-lg-12">
             {(!main) ? (
               <button
@@ -93,11 +91,14 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
         <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Add a new note"} />
 
-        <div className="inputActions">
+        
+
+      </form>
+      <div className="inputActions">
           <div className={'col-lg-11'}>
             <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
           </div>
-          <div className="col-lg-1">
+          <div className="col-lg-1 paperplanecontainer">
             <button
               className="postBtn"
               onClick={post}
@@ -110,8 +111,6 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
             </button>
           </div>
         </div>
-
-      </form>
 
     </>
   )

@@ -25,7 +25,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const edit = true
 
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
-  
+ 
   return (
 
     <div className={halfDivclassname} >
@@ -65,6 +65,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             }
             position='right center'
             nested
+            closeOnDocumentClick
           >
             <div className="actionDiv">
               <div>
@@ -83,6 +84,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                   }
                   modal
                   nested
+                  closeOnDocumentClick
                 >
                   {(close) => (
                     <div className='modal deletemodal' style={modal}>
