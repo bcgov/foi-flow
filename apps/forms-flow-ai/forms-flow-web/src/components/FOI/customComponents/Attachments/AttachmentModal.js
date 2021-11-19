@@ -39,7 +39,7 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
     const classes = useStyles();
 
     const [files, setFiles] = useState([]);
-    const updateFilesCb = (_files) => {
+    const updateFilesCb = (_files, _errorMessage) => {
       setFiles(_files);
     }
     const handleClose = () => {

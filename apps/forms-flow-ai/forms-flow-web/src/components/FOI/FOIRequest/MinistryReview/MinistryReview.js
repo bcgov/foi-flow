@@ -7,13 +7,13 @@ import "./MinistryReviewTabbedContainer.scss";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-  fetchFOIRequestDetails,
+import {  
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList,
-  fetchFOIMinistryDivisionalStages,
   fetchFOIRequestNotesList,
-  fetchFOIRequestAttachmentsList
+  fetchFOIRequestAttachmentsList,
+  fetchFOIFullAssignedToList,
+  fetchFOIMinistryAssignedToList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
@@ -27,9 +27,8 @@ import RequestTracking from './RequestTracking';
 import BottomButtonGroup from './BottomButtonGroup';
 import {CommentSection} from '../../customComponents/Comments';
 import {AttachmentSection} from '../../customComponents/Attachments';
-
-import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
+import Loading from "../../../../containers/Loading";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,23 +69,28 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-   //gets the request detail from the store
- 
-  
-   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
-   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
-   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
-   const [comment, setComment] = useState(requestNotes)   
-   const [attachments, setAttachments] = useState(requestAttachments);
-   const dispatch = useDispatch();
-   useEffect(() => {
-     if (ministryId) {
-       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-       dispatch(fetchFOIRequestNotesList(requestId,ministryId))
-       dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
-     }     
-   },[requestId, dispatch,comment,attachments]); 
+  //gets the request detail from the store
+
+
+  let requestDetails = useSelector(state => state.foiRequests.foiMinistryViewRequestDetail);
+  let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
+  let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
+  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
+  const [comment, setComment] = useState([])
+  const [attachments, setAttachments] = useState(requestAttachments);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (ministryId) {
+      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+      dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+      dispatch(fetchFOIFullAssignedToList());
+      if (bcgovcode)
+        dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
+    }
+    
+  }, [requestId, dispatch, attachments]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -229,6 +233,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
+      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
     }
 
     tablinks = document.getElementsByClassName("tablinks");
@@ -254,7 +259,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
+  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
 
+  const requestNumber = requestDetails && requestDetails.idNumber;
+  
   return (
 
     <div className="foiformcontent">
@@ -310,15 +320,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div> 
           <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
             <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
-              setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} />
+              setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
+              requestNumber={requestNumber} requestState={requestState} />
           </div> 
           <div id="Comments" className="tabcontent">
-          <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
-        setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
-              </div> 
-          <div id="Option4" className="tabcontent">
-           <h3>Option 4</h3>
-          </div>        
+            {
+             !isLoading && requestNotes && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
+                <>
+                  <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}/>
+                </> : <Loading />}
+          </div>
+          <div id="Option3" className="tabcontent">
+            <h3>Option 3</h3>
+          </div>
         </div>
       </div>
     </div>
