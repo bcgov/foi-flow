@@ -1,4 +1,4 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
@@ -12,10 +12,12 @@ import {
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList,
   fetchFOIMinistryDivisionalStages,
-  fetchFOIRequestNotesList
+  fetchFOIRequestNotesList,
+  fetchFOIFullAssignedToList,
+  fetchFOIMinistryAssignedToList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-import { calculateDaysRemaining} from "../../../../helper/FOI/helper";
+import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
 
 import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
@@ -24,23 +26,23 @@ import RequestHeader from './RequestHeader';
 import RequestNotes from './RequestNotes';
 import RequestTracking from './RequestTracking';
 import BottomButtonGroup from './BottomButtonGroup';
-import {CommentSection} from '../../customComponents/Comments'
+import { CommentSection } from '../../customComponents/Comments'
 
-import {push} from "connected-react-router";
+import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
-
+import Loading from "../../../../containers/Loading";
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
-      margin: theme.spacing(1),  
-    },    
+      margin: theme.spacing(1),
+    },
   },
   validationErrorMessage: {
-    marginTop:'30px',
+    marginTop: '30px',
     color: "#fd0404",
   },
   validationMessage: {
-    marginTop:'30px',
+    marginTop: '30px',
     color: "#000000",
   },
   btndisabled: {
@@ -58,75 +60,78 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#FFFFFF',
     color: '#38598A'
   }
- 
+
 }));
 
 
-const MinistryReview = React.memo(({userDetail}) => {
+const MinistryReview = React.memo(({ userDetail }) => {
 
-  const {requestId, ministryId, requestState} = useParams();
+  const { requestId, ministryId, requestState } = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-   //gets the request detail from the store
- 
-  
-   let requestDetails = useSelector(state=> state.foiRequests.foiMinistryViewRequestDetail); 
-   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
-   const [comment, setComment] = useState(requestNotes)   
-   const dispatch = useDispatch();
-   useEffect(() => {
-     if (ministryId) {
-       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-       dispatch(fetchFOIRequestNotesList(requestId,ministryId))
-       
-     }     
-   },[requestId, dispatch,comment]); 
+  //gets the request detail from the store
+
+
+  let requestDetails = useSelector(state => state.foiRequests.foiMinistryViewRequestDetail);
+  let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
+  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
+  const [comment, setComment] = useState([])
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (ministryId) {
+      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(requestId, ministryId))
+      dispatch(fetchFOIFullAssignedToList());
+      if (bcgovcode)
+        dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
+    }
+    
+  }, [requestId, dispatch]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
   //gets the request detail from the store
-   
-  
-  
-  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
-  
 
-  const [divstages,setdivStages] = React.useState([])
-  
+
+
+  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
+
+
+  const [divstages, setdivStages] = React.useState([])
+
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
     ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
-  },[requestDetails]); 
+  }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
-  let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate); 
-  const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';
+  let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
+  const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate) : '';
   const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
   const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-  const bottomText =  `${_cfrDaysRemainingText}|${_daysRemainingText}`;
+  const bottomText = `${_cfrDaysRemainingText}|${_daysRemainingText}`;
   const bottomTextArray = bottomText.split('|');
- 
+
   //gets the latest ministry assigned to value
-  const handleMinistryAssignedToValue = (value) => {   
+  const handleMinistryAssignedToValue = (value) => {
     setMinistryAssignedToValue(value);
   }
 
   let hasincompleteDivstage = false;
-  divstages.forEach((item)=>{
-    if(item.divisionid === -1 || item.stageid === -1 || item.stageid === "" || item.divisionid === "")
-    {
+  divstages.forEach((item) => {
+    if (item.divisionid === -1 || item.stageid === -1 || item.stageid === "" || item.divisionid === "") {
       hasincompleteDivstage = true
     }
   })
 
   //Variable to find if all required fields are filled or not
-  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned")  || (divstages.length === 0 || hasincompleteDivstage);
+  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned") || (divstages.length === 0 || hasincompleteDivstage);
 
   const createMinistryRequestDetailsObject = (requestObject, name, value) => {
     // requestDetails.
@@ -140,9 +145,9 @@ const MinistryReview = React.memo(({userDetail}) => {
   }
 
   const createMinistrySaveRequestObject = (name, value, value2) => {
-    const requestObject = {...saveMinistryRequestObject};  
+    const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
-    createMinistryRequestDetailsObject(requestObject, name, value);   
+    createMinistryRequestDetailsObject(requestObject, name, value);
     setSaveMinistryRequestObject(requestObject);
   }
 
@@ -150,35 +155,33 @@ const MinistryReview = React.memo(({userDetail}) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
     if (!_unSaved && ministryId && requestId) {
-      setTimeout(() => 
-      { 
-        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}` 
+      setTimeout(() => {
+        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}`
       }
-      , 1000);
+        , 1000);
     }
   }
-  
-  const handleStateChange =(currentStatus)=>{
+
+  const handleStateChange = (currentStatus) => {
     setcurrentrequestStatus(currentStatus);
   }
 
-  const hasStatusRequestSaved =(issavecompleted,state)=>{
-    if(issavecompleted)
-      {
-        settabStatus(state)
-        setcurrentrequestStatus("")
-      }
+  const hasStatusRequestSaved = (issavecompleted, state) => {
+    if (issavecompleted) {
+      settabStatus(state)
+      setcurrentrequestStatus("")
+    }
   }
 
 
   var foitabheaderBG;
   const classes = useStyles();
- 
-  switch (_tabStatus){
+
+  switch (_tabStatus) {
     case StateEnum.open.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
       break;
-    case StateEnum.closed.name: 
+    case StateEnum.closed.name:
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
       break;
     case StateEnum.callforrecords.name:
@@ -187,49 +190,49 @@ const MinistryReview = React.memo(({userDetail}) => {
       }
       else {
         foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
-      }      
+      }
       break;
-    case StateEnum.redirect.name: 
+    case StateEnum.redirect.name:
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
       break;
-    case StateEnum.review.name: 
+    case StateEnum.review.name:
       foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"
       break;
-    case StateEnum.feeassessed.name: 
+    case StateEnum.feeassessed.name:
       foitabheaderBG = "foitabheadercollection foitabheaderFeeBG"
       break;
-    case StateEnum.consult.name: 
+    case StateEnum.consult.name:
       foitabheaderBG = "foitabheadercollection foitabheaderConsultBG"
       break;
-    case StateEnum.signoff.name: 
+    case StateEnum.signoff.name:
       foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
       break;
-    case StateEnum.deduplication.name: 
+    case StateEnum.deduplication.name:
       foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
       break;
-    case StateEnum.harms.name: 
+    case StateEnum.harms.name:
       foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
       break;
-    case StateEnum.onhold.name: 
+    case StateEnum.onhold.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
       break;
-    case StateEnum.response.name: 
+    case StateEnum.response.name:
       foitabheaderBG = "foitabheadercollection foitabheaderResponseBG"
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
-      break;  
+      break;
   }
 
-  const tabclick =(evt,param)=>{
-   
+  const tabclick = (evt, param) => {
+
     var i, tabcontent, tablinks;
-    
+
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
     }
-   
+
     tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
@@ -239,23 +242,26 @@ const MinistryReview = React.memo(({userDetail}) => {
 
   }
 
-  const pubmindivstagestomain =(divstages)=>{
-  
+  const pubmindivstagestomain = (divstages) => {
+
     saveMinistryRequestObject.divisions = divstages
     setdivStages(divstages)
   }
 
 
- 
+
   const userId = userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
   const name = `${userDetail.family_name}, ${userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  
+  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
+
   return (
-    
+
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -266,27 +272,27 @@ const MinistryReview = React.memo(({userDetail}) => {
           <div className="foileftpaneldropdown">
             <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
           </div>
-          
-        <div className="tab">
-          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
-          <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div>
-          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
+
+          <div className="tab">
+            <div className="tablinks active" name="Request" onClick={e => tabclick(e, 'Request')}>Request</div>
+            <div className="tablinks" name="Comments" onClick={e => tabclick(e, 'Comments')}>Comments</div>
+            <div className="tablinks" name="Option3" onClick={e => tabclick(e, 'Option3')}>Option 3</div>
+          </div>
+
+          <div className="foileftpanelstatus">
+            {_requestStatus.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?
+              <>
+                {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()) ?
+                  <h4>{bottomTextArray[0]}</h4>
+                  : null}
+                <h4>{bottomTextArray[1]}</h4>
+              </>
+              : null}
+          </div>
+
         </div>
-        
-        <div className="foileftpanelstatus">
-        {_requestStatus.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?  
-          <>
-          {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
-          <h4>{bottomTextArray[0]}</h4>
-          : null }
-          <h4>{bottomTextArray[1]}</h4>
-          </>
-        : null }
-        </div>  
-     
-        </div>
-        <div className="foitabpanelcollection"> 
-          <div id="Request" className="tabcontent active">                                
+        <div className="foitabpanelcollection">
+          <div id="Request" className="tabcontent active">
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -304,21 +310,25 @@ const MinistryReview = React.memo(({userDetail}) => {
                 : null }
                 </form>
               </div>
-            </div>                            
-          </div> 
+            </div>
+          </div>
           <div id="Comments" className="tabcontent">
-          <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes}
-        setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}  />
-              </div> 
+            {
+             !isLoading && requestNotes && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
+                <>
+                  <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}/>
+                </> : <Loading />}
+          </div>
           <div id="Option3" className="tabcontent">
-           <h3>Option 3</h3>
-          </div>        
+            <h3>Option 3</h3>
+          </div>
         </div>
       </div>
     </div>
 
   );
 
-  })
+})
 
-  export default MinistryReview
+export default MinistryReview

@@ -14,21 +14,17 @@ export const CommentSection = ({
   customInput,
   requestid,
   ministryId,
-  bcgovcode
+  bcgovcode,
+  iaoassignedToList,
+  ministryAssignedToList
 }) => {
-  const [comments, setComments] = useState(commentsArray)
   const [showaddbox, setshowaddbox] = useState(false)
-  
-  useEffect(() => {
-    setComments(commentsArray)
-  }, [commentsArray])
-  
 
   return (
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
-      comments={comments}
+      comments={commentsArray}
       signinUrl={signinUrl}
       signupUrl={signupUrl}
       customInput={customInput}
@@ -41,10 +37,10 @@ export const CommentSection = ({
         </div>
 
         <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
-          {<Input />}
+          {<Input add="add" />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} />
+          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
         </div>
 
       </div>
