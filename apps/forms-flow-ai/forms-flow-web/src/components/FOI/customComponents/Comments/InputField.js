@@ -67,13 +67,16 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
   }
 
   const quillRef = (el) => {
-    if (el) {     
+    if (el && document.getElementById('Comments').style.display === 'block') {     
       el.focus()
     }
   }
 
   let formclass = !parentId ? "parentform form" : "form"
   formclass = add ? `${formclass} addform` : formclass
+  
+  formclass = (add === undefined && main === undefined && edit === undefined) ? `${formclass} addform newreply` : formclass
+
   const actions = useContext(ActionContext)
   return (
     <>

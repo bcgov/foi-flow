@@ -644,7 +644,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className={`tablinks ${tabName === 'Attachments' ? 'active': ''}`} name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments</div> : null
           }
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div> : null
           }
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
         </div>
