@@ -10,7 +10,7 @@ const FileUpload = ({
     const fileInputField = useRef(null);
     const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({});
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState([]);
     const handleUploadBtnClick = () => {
       if (fileInputField.current)
         fileInputField.current.click();
@@ -19,21 +19,22 @@ const FileUpload = ({
     };    
 
     const addNewFiles = (newFiles) => {
+      let _errorMessage = [];
         for (let file of newFiles) {
           if (mimeTypes.includes(file.type)) {
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
             if (sizeInMB <= maxFileSize) {             
                 files[file.name] = file;
-                setErrorMessage("");
             }
             else {
-              setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `);
+              _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `)              
             }
           }
           else {
-            setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: ${multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}`);
+            _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: ${multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}`);           
           }
         }
+        setErrorMessage(_errorMessage);
         return { ...files };
     };
 
@@ -47,7 +48,7 @@ const FileUpload = ({
     const handleNewFileUpload = (e) => {
         const { files: newFiles } = e.target;
         if (multipleFiles && newFiles.length > 10) {
-          setErrorMessage("Maximum number of files allowed is 10.");
+          setErrorMessage(["Maximum number of files allowed is 10."]);
         }
         else if (newFiles.length) {
           let updatedFiles = addNewFiles(newFiles);
@@ -61,9 +62,8 @@ const FileUpload = ({
         delete files[fileName];
         setFiles({ ...files });
         callUpdateFilesCb({ ...files });
-        setErrorMessage("");
+        setErrorMessage([]);
     };
-
   return (
     <>
       <section className="file-upload-container">       
@@ -112,10 +112,11 @@ const FileUpload = ({
         : null}
         
       </section>
-      {errorMessage ?
+      {errorMessage ? errorMessage.map(error => 
            <div className="error-message-container">
-             <p>{errorMessage}</p>
+             <p>{error}</p>
            </div>
+           )
       : null}
      
     </>
