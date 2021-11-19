@@ -621,6 +621,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const signupUrl = "/signup"
 
   const requestNumber = requestDetails && requestDetails.idNumber;
+
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
@@ -641,7 +642,7 @@ const FOIRequest = React.memo(({userDetail}) => {
         <div className="tab">
           <div className={`tablinks ${!tabName ? 'active': ''}`} name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className={`tablinks ${tabName === 'Attachments' ? 'active': ''}`} name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className={`tablinks ${tabName === 'Attachments' ? 'active': ''}`} name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
           }
           {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div> : null
@@ -706,7 +707,8 @@ const FOIRequest = React.memo(({userDetail}) => {
              !isLoading && requestNotes && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}  />
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
+                    bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}  />
                 
                 </> : <Loading />
             }

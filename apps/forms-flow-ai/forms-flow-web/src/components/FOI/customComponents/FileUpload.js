@@ -5,11 +5,13 @@ const FileUpload = ({
     multipleFiles,
     mimeTypes,
     maxFileSize,
+    totalFileSize,
     updateFilesCb
 }) => {
     const fileInputField = useRef(null);
     const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({});
+    const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]);
     const handleUploadBtnClick = () => {
       if (fileInputField.current)
@@ -20,20 +22,26 @@ const FileUpload = ({
 
     const addNewFiles = (newFiles) => {
       let _errorMessage = [];
+      let _totalFileSizeInMB = 0;
         for (let file of newFiles) {
           if (mimeTypes.includes(file.type)) {
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
-            if (sizeInMB <= maxFileSize) {             
-                files[file.name] = file;
-            }
-            else {
-              _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `)              
+            _totalFileSizeInMB += parseFloat(sizeInMB);
+            if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
+              if (sizeInMB <= maxFileSize) {             
+                  files[file.name] = file;
+              }
+              else {
+                _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `)              
+              }
             }
           }
           else {
             _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: ${multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}`);           
           }
         }
+        _totalFileSizeInMB += totalFileSizeCalculated;
+        setTotalFileSize(_totalFileSizeInMB);
         setErrorMessage(_errorMessage);
         return { ...files };
     };
@@ -47,11 +55,15 @@ const FileUpload = ({
     };
     const handleNewFileUpload = (e) => {
         const { files: newFiles } = e.target;
-        if (multipleFiles && newFiles.length > 10) {
-          setErrorMessage(["Maximum number of files allowed is 10."]);
+        const totalFiles = Object.entries(files).length + newFiles.length;
+        if (multipleFiles && (newFiles.length > 10  || totalFiles > 10)) {
+          setErrorMessage(["A maximum of 10 files can be uploaded at one time. Only 10 files have been added this upload window, please upload additional files separately"]);
         }
         else if (newFiles.length) {
           let updatedFiles = addNewFiles(newFiles);
+          if (multipleFiles && totalFileSizeCalculated > totalFileSize) {
+            setErrorMessage([`The total size of all files uploaded can not exceed  ${totalFileSize}MB. Please upload additional files separately.`]);            
+          }
           setFiles(updatedFiles);
           callUpdateFilesCb(updatedFiles);
       }

@@ -9,9 +9,10 @@ const MimeTypeList = Object.freeze({
     'application/vnd.ms-excel.sheet.macroEnabled.12','.msg'],    
 });
 
-const MaxFileSize = Object.freeze({
+const MaxFileSizeInMB = Object.freeze({
     stateTransition: 50,
-    attachmentLog: 1,
+    attachmentLog: 100,
+    totalFileSize: 500,
 });
 
-export { MimeTypeList, MaxFileSize };
+export { MimeTypeList, MaxFileSizeInMB };

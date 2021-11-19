@@ -9,7 +9,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import '../confirmationmodal.scss';
 import FileUpload from '../FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
-import { MimeTypeList, MaxFileSize } from "../../../../constants/FOI/enum";
+import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -90,7 +90,7 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-                <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.attachmentLog} maxFileSize={MaxFileSize.attachmentLog} updateFilesCb={updateFilesCb} />                                
+                <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.attachmentLog} maxFileSize={MaxFileSizeInMB.attachmentLog} totalFileSize={MaxFileSizeInMB.totalFileSize} updateFilesCb={updateFilesCb} />                                
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
