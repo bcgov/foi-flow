@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState,useRef  } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import './comments.scss'
 import Popup from 'reactjs-popup'
@@ -25,7 +25,10 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const edit = true
 
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
- 
+
+  const ref = useRef();
+  const closeTooltip = () => ref.current.close();
+
   return (
 
     <div className={halfDivclassname} >
@@ -57,6 +60,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       <div className="userActions">
         {actions.userId === i.userId && actions.user && (
           <Popup
+            ref={ref}
             role='tooltip'
             trigger={
               <button className="actionsBtn">
@@ -80,14 +84,14 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               <div>
                 <Popup
                   trigger={
-                    <button className="deleteBtn"> delete</button>
+                    <button className="deleteBtn" onClick={closeTooltip}> delete</button>
                   }
                   modal
                   nested
                   closeOnDocumentClick
                 >
                   {(close) => (
-                    <div className='modal deletemodal' style={modal}>
+                    <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
 
                       <div className='header' style={modalHeader}>
                         {' '}
@@ -125,7 +129,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                           className='button btn-bottom'
                           style={modalDelBtn}
                           onClick={() => {
-                            close()
+                            close();closeTooltip()
                           }}
                         >
                           Cancel
