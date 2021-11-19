@@ -20,6 +20,7 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from request_api.schemas.foirequest import  FOIRequestSchema
 from dateutil.parser import *
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
+from request_api.services.documentservice import documentservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.workflowservice import workflowservice
 from request_api.services.watcherservice import watcherservice
@@ -215,6 +216,11 @@ class requestservice:
         comments = commentservice().getrawrequestcomments(int(rawrequestid))
         for ministry in ministries:           
             commentservice().copyrequestcomment(ministry["id"], comments, userid)
+            
+    def copydocuments(Self, rawrequestid,ministries,userid):
+        attachments = documentservice().getrequestdocuments(int(rawrequestid),"rawrequest")
+        for ministry in ministries:
+            documentservice().copyrequestdocuments(ministry["id"], attachments, userid)
                 
     def disablewatchers(Self, ministryid, requestschema, userid):
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
