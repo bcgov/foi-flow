@@ -62,32 +62,14 @@
       }
     }
 
-    // .cancelBtn {
-      
-    //   text-align: center;
-    //   background-size: 200% auto;      
-    //   transition: 0.5s;
-    //   // padding:8px 10px;
-    //   border: unset;
-    //   background-color: transparent;
-    //   font-size: 13px;
-    //   position: relative;
-    //   top: 80px;
-    //   z-index: 100;
-    //   padding-right: 1%;
-    //   &:hover {
-    //     background-position: right center;
-    //     cursor: pointer;
-
-    //   }
-
-    //   &:focus {
-    //     outline:0;
-    //   }
-    // }
+    
 
   }  
   
+}
+
+.cancelrow {
+  height: 1px;
 }
 
 .cancelBtn {
@@ -100,7 +82,7 @@
   background-color: transparent;
   font-size: 13px;
   position: relative;
-  top: 80px;
+  top: 50px;
   z-index: 100;
   padding-right: 1%;
   &:hover {
@@ -302,11 +284,6 @@ button[disabled]{
   margin-bottom: 30px;
 }
 
-
-.replySection  .form {
-  background-color: #ededed !important;
-}
-
 .commentsection .halfDiv {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -400,11 +377,23 @@ border: 0px!important;
   font-size: 16px;
 }
 
-
-.replySection .form  {
-  background-color:#ededed !important;
+.commentsection .parentform {
+  background-color: #d2e2f6!important
 }
 
+.commentsection .form {
+  background-color: #ededed 
+}
+.replySection  .form  {
+  background-color:#ededed ;
+}
+
+
+
+.addform {
+  background-color: white!important;
+}
+ 
 .replySection > div > div.halfDiv {
   border-top-left-radius: 0px;
     border-top-right-radius: 0px;

@@ -37,7 +37,7 @@ export const CommentSection = ({
         </div>
 
         <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
-          {<Input />}
+          {<Input add="add" />}
         </div>
         <div className="displayComments">
           <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />

@@ -63,8 +63,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               <InputField cancellor={i.commentId} value={i.text} edit />
             )
           ) : (
-
+           
             <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.userId)} />
+   
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
             (actions.customInput ? (

@@ -8,7 +8,7 @@ import 'react-quill/dist/quill.snow.css';
 import {setFOILoader} from '../../../../actions/FOI/foiRequestActions'
 
 
-const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
+const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
 
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
@@ -66,13 +66,17 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
   }
 
+  let formclass = !parentId ? "parentform form" : "form"
+
+  formclass = add ?  `${formclass} addform` : formclass
+
   const actions = useContext(ActionContext)
   return (
     <>
       <form
-        className="form"        
+        className={formclass}        
       >
-        <div className="row">
+        <div className="row cancelrow">
           <div className="col-lg-12">
             {(!main) ? (
               <button
