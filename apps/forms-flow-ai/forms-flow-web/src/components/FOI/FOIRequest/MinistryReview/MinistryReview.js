@@ -328,7 +328,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
              !isLoading && requestNotes && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
                 <>
                   <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}/>
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
+                    ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
+                    requestNumber={requestNumber}/>
                 </> : <Loading />}
           </div>
           <div id="Option3" className="tabcontent">

@@ -86,6 +86,9 @@ export const AttachmentSection = ({
   return (
     <div>
       <div className="section">
+        <div className="foi-request-number-header">
+          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber :`U-00${requestId}`}`}</h1>
+        </div>
         <div className="addAttachmentBox">
             <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
         </div>
