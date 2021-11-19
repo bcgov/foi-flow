@@ -275,7 +275,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
           <div className="tab">
             <div className="tablinks active" name="Request" onClick={e => tabclick(e, 'Request')}>Request</div>
-            <div className="tablinks" name="Comments" onClick={e => tabclick(e, 'Comments')}>Comments</div>
+            <div className="tablinks" name="Comments" onClick={e => tabclick(e, 'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""} </div>
             <div className="tablinks" name="Option3" onClick={e => tabclick(e, 'Option3')}>Option 3</div>
           </div>
 

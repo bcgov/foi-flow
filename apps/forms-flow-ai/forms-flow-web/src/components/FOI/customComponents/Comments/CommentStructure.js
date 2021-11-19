@@ -53,7 +53,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             disabled={!actions.user}
           >
             {' '}
-            <FontAwesomeIcon icon={faReply} size='1x' color='#a5a5a5' /> Reply
+            <FontAwesomeIcon icon={faReply} size='1x' color='#003366' /> Reply
           </button>
         </div>
       </div>
@@ -64,7 +64,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             role='tooltip'
             trigger={
               <button className="actionsBtn">
-                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
+                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
               </button>
             }
             position='right center'
