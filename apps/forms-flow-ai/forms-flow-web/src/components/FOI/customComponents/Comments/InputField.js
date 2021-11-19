@@ -70,12 +70,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
   return (
     <>
       <form
-        className="form"
-        style={
-          !child && !edit && main === undefined
-            ? { marginLeft: 36 }
-            : { marginLeft: 8 }
-        }
+        className="form"        
       >
         <div className="row">
           <div className="col-lg-12">
@@ -92,11 +87,14 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
 
         <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Add a new note"} />
 
-        <div className="inputActions">
+        
+
+      </form>
+      <div className="inputActions">
           <div className={'col-lg-11'}>
             <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
           </div>
-          <div className="col-lg-1">
+          <div className="col-lg-1 paperplanecontainer">
             <button
               className="postBtn"
               onClick={post}
@@ -109,8 +107,6 @@ const InputField = ({ cancellor, parentId, child, value, edit, main }) => {
             </button>
           </div>
         </div>
-
-      </form>
 
     </>
   )
