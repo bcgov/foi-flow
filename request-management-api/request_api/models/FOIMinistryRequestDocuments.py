@@ -38,7 +38,7 @@ class FOIMinistryRequestDocument(db.Model):
 
     @classmethod
     def getdocuments(cls,ministryrequestid):
-        sql = 'SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid ORDER BY foiministrydocumentid, version DESC'
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         documents = []
         for row in rs:

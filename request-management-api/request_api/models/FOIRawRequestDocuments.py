@@ -36,7 +36,7 @@ class FOIRawRequestDocument(db.Model):
 
     @classmethod
     def getdocuments(cls,requestid):
-        sql = 'SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid ORDER BY foidocumentid, version DESC'
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
         rs = db.session.execute(text(sql), {'requestid': requestid})
         documents = []
         for row in rs:
