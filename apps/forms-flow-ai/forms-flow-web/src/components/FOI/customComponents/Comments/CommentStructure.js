@@ -26,7 +26,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
 
-  const ref = useRef();
+  const ref = useRef();  
   const closeTooltip = () => ref.current.close();
 
   return (
@@ -43,7 +43,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         </div>
         <div className="commenttext">
 
-          <ReactQuill value={i.text} readOnly={true} theme={"bubble"} />
+          <ReactQuill  value={i.text} readOnly={true} theme={"bubble"} />
         </div>
 
         <div>

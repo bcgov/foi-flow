@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import {setFOILoader} from '../../../../actions/FOI/foiRequestActions'
+import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 
 
 const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
@@ -66,15 +66,19 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
 
   }
 
+  const quillRef = (el) => {
+    if (el) {     
+      el.focus()
+    }
+  }
+
   let formclass = !parentId ? "parentform form" : "form"
-
-  formclass = add ?  `${formclass} addform` : formclass
-
+  formclass = add ? `${formclass} addform` : formclass
   const actions = useContext(ActionContext)
   return (
     <>
       <form
-        className={formclass}        
+        className={formclass}
       >
         <div className="row cancelrow">
           <div className="col-lg-12">
@@ -89,28 +93,28 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
           </div>
         </div>
 
-        <ReactQuill theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Add a new note"} />
+        <ReactQuill ref={(el) => { quillRef(el) }} theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Add a new note"} />
 
-        
+
 
       </form>
       <div className="inputActions">
-          <div className={'col-lg-11'}>
-            <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
-          </div>
-          <div className="col-lg-1 paperplanecontainer">
-            <button
-              className="postBtn"
-              onClick={post}
-              type='button'
-              disabled={!uftext}
-
-            >
-              {' '}
-              <FontAwesomeIcon disabled={text === undefined || textlength === 0} icon={faPaperPlane} size='2x' color={text === undefined || text.length === 0 || textlength === maxcharacterlimit ? '#a5a5a5' : 'darkblue'} />
-            </button>
-          </div>
+        <div className={'col-lg-11'}>
+          <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
         </div>
+        <div className="col-lg-1 paperplanecontainer">
+          <button
+            className="postBtn"
+            onClick={post}
+            type='button'
+            disabled={!uftext}
+
+          >
+            {' '}
+            <FontAwesomeIcon disabled={text === undefined || textlength === 0} icon={faPaperPlane} size='2x' color={text === undefined || text.length === 0 || textlength === maxcharacterlimit ? '#a5a5a5' : 'darkblue'} />
+          </button>
+        </div>
+      </div>
 
     </>
   )
