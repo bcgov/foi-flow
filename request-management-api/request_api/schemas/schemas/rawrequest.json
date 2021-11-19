@@ -208,9 +208,7 @@
       },
       "required": [
         "requestType",
-        "ministry",
-        "descriptionTimeframe",
-        "contactInfo"        
+        "ministry"    
       ]
     }
   },
