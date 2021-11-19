@@ -64,6 +64,14 @@ class documentservice:
         return FOIRawRequestDocument.createdocumentversion(requestid, version, self.copydocumentproperties(document,documentschema,document['version']), userid)  
     
     @classmethod    
+    def copyrequestdocuments(self, ministryrequestid, documents, userid):
+        _documents = []        
+        for document in documents:
+            _documents.append({"documentpath":document["documentpath"],"filename":document["filename"],"category":document["category"]})
+        documentschema = {"documents": _documents}
+        return self.createministryrequestdocument(ministryrequestid, documentschema, userid)
+    
+    @classmethod    
     def copydocumentproperties(self, document, documentschema, version):
         document['version'] = version +1
         document['filename'] = documentschema['filename'] if 'filename' in documentschema  else document['filename']
