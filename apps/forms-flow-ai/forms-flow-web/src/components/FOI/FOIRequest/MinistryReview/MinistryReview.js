@@ -233,6 +233,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
+      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
     }
 
     tablinks = document.getElementsByClassName("tablinks");
@@ -262,6 +263,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
 
+  const requestNumber = requestDetails && requestDetails.idNumber;
+  
   return (
 
     <div className="foiformcontent">
@@ -317,7 +320,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div> 
           <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
             <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
-              setAttachments={setAttachments} requestid={requestId} ministryId={ministryId} />
+              setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
+              requestNumber={requestNumber} requestState={requestState} />
           </div> 
           <div id="Comments" className="tabcontent">
             {

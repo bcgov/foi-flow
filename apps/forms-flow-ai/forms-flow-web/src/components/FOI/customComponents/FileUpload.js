@@ -43,7 +43,7 @@ const FileUpload = ({
 
     const callUpdateFilesCb = (files) => {
         const filesAsArray = convertNestedObjectToArray(files);
-        updateFilesCb(filesAsArray);
+        updateFilesCb(filesAsArray, errorMessage);
     };
     const handleNewFileUpload = (e) => {
         const { files: newFiles } = e.target;
@@ -52,10 +52,8 @@ const FileUpload = ({
         }
         else if (newFiles.length) {
           let updatedFiles = addNewFiles(newFiles);
-          if (!errorMessage) {
-            setFiles(updatedFiles);
-            callUpdateFilesCb(updatedFiles);
-          }
+          setFiles(updatedFiles);
+          callUpdateFilesCb(updatedFiles);
       }
     };
     const removeFile = (fileName) => {
