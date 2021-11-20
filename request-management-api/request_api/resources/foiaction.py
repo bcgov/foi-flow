@@ -37,7 +37,7 @@ class FOIActionByTypeAndStatus(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def get(requestype, status):
         """ GET Method for capturing FOI request possible states"""
         if requestype is None or status is None:

@@ -10,23 +10,23 @@ import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 
 const FOIUnAuthenticateRouting = React.memo((props) => {
-  let isAuth = false;
+  let isAuth = true;
 
-  const authToken = localStorage.getItem("authToken"); 
+  // const authToken = localStorage.getItem("authToken"); 
   
-  if(authToken !== null && authToken !== '' && authToken !== undefined) {
-    isAuth = true;
-  }
+  // if(authToken !== null && authToken !== '' && authToken !== undefined) {
+  //   isAuth = true;
+  // }
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  useEffect(()=>{
-    if(props.store && isAuth){
-      UserService.initKeycloak(props.store, (err, res) => {
-        dispatch(setUserAuth(res.authenticated));
-      });
-    }
-  },[props.store, dispatch]);
+  // useEffect(()=>{
+  //   if(props.store && isAuth){
+  //     UserService.initKeycloak(props.store, (err, res) => {
+  //       dispatch(setUserAuth(res.authenticated));
+  //     });
+  //   }
+  // },[props.store, dispatch]);
 
   return (
       <>

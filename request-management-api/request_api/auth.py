@@ -49,7 +49,7 @@ class Auth:
 
         def decorated(f):
             # Token verification is commented here with an expectation to use this decorator in conjuction with require.
-            #@Auth.require
+            ##@auth.require
             @wraps(f)
             def wrapper(*args, **kwargs):
                 _groups = groups.split(',')
@@ -78,9 +78,10 @@ auth = (
 class AuthHelper:
     
     def getUserId():
-        token = request.headers.get("Authorization", None)
-        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
-        return unverified_claims['preferred_username']
+        # token = request.headers.get("Authorization", None)
+        # unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        # return unverified_claims['preferred_username']
+        return 'aantony@idir'
     
     def isMinistryMember():
         token = request.headers.get("Authorization", None)

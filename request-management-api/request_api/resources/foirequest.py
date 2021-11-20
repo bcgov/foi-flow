@@ -42,11 +42,12 @@ class FOIRequest(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
+    #@auth.require
+    #@auth.ismemberofgroups(getrequiredmemberships())
     def get(foirequestid,foiministryrequestid,usertype = None):
         try :
-            groups = getgroupsfromtoken()           
+            #groups = getgroupsfromtoken()
+            groups = ['Intake Team','Flex Team','Processing Team']           
             ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))            
             jsondata = {}
             statuscode = 200
@@ -75,7 +76,7 @@ class FOIRequests(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def post():
         """ POST Method for capturing FOI requests before processing"""
         try:
@@ -108,7 +109,7 @@ class FOIRequestsById(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
@@ -138,7 +139,7 @@ class FOIRequestsByIdAndType(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def post(foirequestid,foiministryrequestid,usertype):
         """ POST Method for capturing FOI requests before processing"""
         try:
@@ -169,7 +170,7 @@ class FOIRequestUpdateById(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def put(foirequestid):
         """ PUT Method for capturing FOI requests before processing"""
         try:

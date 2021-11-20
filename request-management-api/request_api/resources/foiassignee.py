@@ -41,7 +41,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def get(requestype=None, status=None, bcgovcode=None):
         if requestype is not None and (requestype != "personal" and requestype != "general"):
             return {'status': False, 'message':'Bad Request'}, 400   
@@ -63,7 +63,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def get(groupname):
         """ POST Method for capturing FOI requests before processing"""
         try:

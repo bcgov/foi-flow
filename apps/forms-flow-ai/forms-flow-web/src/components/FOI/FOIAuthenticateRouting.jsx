@@ -17,24 +17,27 @@ import UnAuthorized from "./UnAuthorized";
 //import TabbedContainer from "./TabbedContainer/TabbedContainer";
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
-  const isAuth = useSelector((state) => state.user.isAuthenticated); 
+  //const isAuth = useSelector((state) => state.user.isAuthenticated); 
+  const isAuth = true
 
-
-  useEffect(()=>{
-    console.log('authenticate')
-    if(props.store){
-      UserService.initKeycloak(props.store, (err, res) => {
-        dispatch(setUserAuth(res.authenticated));
-      });
-    }
-  },[props.store, dispatch]);
-  const userDetail = useSelector(state=> state.user.userDetail);
-  const isAuthorized = useSelector(state=> state.user.isAuthorized);
+  // useEffect(()=>{
+  //   console.log('authenticate')
+  //   if(props.store){
+  //     UserService.initKeycloak(props.store, (err, res) => {
+  //       dispatch(setUserAuth(res.authenticated));
+  //     });
+  //   }
+  // },[props.store, dispatch]);
+  // const userDetail = useSelector(state=> state.user.userDetail);
+  // const isAuthorized = useSelector(state=> state.user.isAuthorized);
+  // let isMinistry = false;
+  // if (Object.entries(userDetail).length !== 0) {
+  //   const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
+  //   isMinistry = isMinistryLogin(userGroups);
+  // }
+  const userDetail = {preferred_username:'aantony@idir',family_name:'Antony',given_name:'Abin'}
+  const isAuthorized = true
   let isMinistry = false;
-  if (Object.entries(userDetail).length !== 0) {
-    const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
-    isMinistry = isMinistryLogin(userGroups);
-  }
 
   return (
       <>

@@ -41,7 +41,7 @@ class CreateFOIRequestComment(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def post():      
         try:
             requestjson = request.get_json() 
@@ -64,7 +64,7 @@ class CreateFOIRawRequestComment(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def post():      
         try:
             requestjson = request.get_json() 
@@ -87,7 +87,7 @@ class FOIComment(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def get(requesttype, requestid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
                 return {'status': False, 'message':'Bad Request'}, 400 
@@ -115,7 +115,7 @@ class FOIDisableComment(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
                 return {'status': False, 'message':'Bad Request'}, 400 
@@ -142,7 +142,7 @@ class FOIUpdateComment(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @auth.require
+    #@auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
                 return {'status': False, 'message':'Bad Request'}, 400 
