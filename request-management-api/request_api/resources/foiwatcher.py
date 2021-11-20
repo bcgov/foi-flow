@@ -40,7 +40,7 @@ class FOIRawRequestWatcher(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def get(requestid):      
         try:
             result = watcherservice().getrawrequestwatchers(requestid)
@@ -61,7 +61,7 @@ class CreateFOIRawRequestWatcher(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
@@ -84,7 +84,7 @@ class DisableFOIRawRequestWatcher(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def put(requestid):      
         try:
             result = watcherservice().disablerawrequestwatchers(requestid, AuthHelper.getUserId())
@@ -105,7 +105,7 @@ class FOIRequestWatcher(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def get(ministryrequestid):      
         try:
             result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isMinistryMember())
@@ -126,7 +126,7 @@ class CreateFOIRequestWatcher(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
@@ -149,7 +149,7 @@ class DisableFOIRequestWatcher(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def put(ministryrequestid):      
         try:
             result = watcherservice().disableministryrequestwatchers(ministryrequestid, AuthHelper.getUserId())

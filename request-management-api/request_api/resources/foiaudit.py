@@ -38,7 +38,7 @@ class FOIAuditByField(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def get(type, id, field):
         """ GET Method for auditing of FOI request field"""
         
@@ -53,7 +53,7 @@ class FOIAuditByField(Resource):
          
         try:
             isAll = False if request.url.endswith('summary') else True      
-            result = auditservice().getAuditforField(type, id, field, ['Intake Team','Flex Team','Processing Team'],isAll)
+            result = auditservice().getAuditforField(type, id, field, getgroupsfromtoken(),isAll)
             if result is not None:
                 return {"audit": result}, 200
             else:

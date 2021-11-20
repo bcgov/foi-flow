@@ -41,7 +41,7 @@ class FOIRawRequest(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
-    #@auth.require
+    @auth.require
     def get(requestid=None):
         try : 
             jsondata = {}
@@ -58,7 +58,7 @@ class FOIRawRequest(Resource):
     @staticmethod
     #@Tracer.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def post(requestid=None):
         try :                        
             updaterequest = request.get_json()
@@ -98,7 +98,7 @@ class FOIRawRequestBPMProcess(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     def put(_requestid=None):
             request_json = request.get_json()
             try:

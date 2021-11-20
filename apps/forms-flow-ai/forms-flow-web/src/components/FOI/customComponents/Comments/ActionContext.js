@@ -48,9 +48,8 @@ export const ActionProvider = ({
       const newList = list.filter((i) => i !== id)
       setEdit(newList)
     } else if (!edit) {
-      var btnreply = document.getElementById(`btncomment${id}`)
-      if(btnreply)      
-        btnreply.style.display = 'block'
+      var btnreply = document.getElementById(`btncomment${id}`)      
+      btnreply.style.display = 'block'
       const list = [...replies]
       const newList = list.filter((i) => i !== id)
       setReplies(newList)

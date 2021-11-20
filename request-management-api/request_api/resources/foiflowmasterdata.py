@@ -47,7 +47,7 @@ class FOIFlowApplicantCategories(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
-    #@auth.require
+    @auth.require
     @request_api.cache.cached(key_prefix="applicantcategories")
     def get():
         try:
@@ -65,7 +65,7 @@ class FOIFlowProgramAreas(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
-    #@auth.require
+    @auth.require
     @request_api.cache.cached(key_prefix="programareas")
     def get():
         try:
@@ -82,7 +82,7 @@ class FOIFlowDeliveryModes(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
-    #@auth.require
+    @auth.require
     @request_api.cache.cached(key_prefix="deliverymodes")
     def get():
         try:
@@ -99,7 +99,7 @@ class FOIFlowReceivedModes(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
-    #@auth.require
+    @auth.require
     @request_api.cache.cached(key_prefix="receivedmodes")
     def get():
         try:
@@ -116,7 +116,7 @@ class FOIFlowDivisions(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
-    #@auth.require
+    @auth.require
     def get(bcgovcode):
         try:
             data = divisionstageservice().getdivisionandstages(bcgovcode)
@@ -132,7 +132,7 @@ class FOIFlowCloseReasons(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
-    #@auth.require
+    @auth.require
     @request_api.cache.cached(key_prefix="closereasons")
     def get():
         try:
@@ -149,8 +149,8 @@ class FOIFlowDocumentStorage(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
-    #@auth.require
-    #@auth.ismemberofgroups(getrequiredmemberships())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post():
         try:
 

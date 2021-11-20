@@ -24,14 +24,13 @@ class Dashboard(Resource):
     @staticmethod
     @TRACER.trace()    
     @cross_origin(origins=allowedOrigins())
-    #@auth.require
+    @auth.require
     @cors_preflight('GET,POST,OPTIONS') 
-    #@auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(queuetype = None):        
         try:
             requestqueue = []
-            #groups = getgroupsfromtoken()
-            groups =['Intake Team','Flex Team','Processing Team']           
+            groups = getgroupsfromtoken()           
             ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
             statuscode = 200                        
             if ('Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups) and (queuetype is None or queuetype == "all"):                                                                                           
