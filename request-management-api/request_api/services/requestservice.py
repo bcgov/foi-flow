@@ -239,7 +239,7 @@ class requestservice:
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
-        requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
+        #requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
         _receivedDate = parse(request['receiveddate'])
         
         baserequestInfo = {
@@ -268,7 +268,7 @@ class requestservice:
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
-            'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
+            #'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
             'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid),
             'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d')
          }
@@ -350,7 +350,7 @@ class requestservice:
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
-        requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
+        #requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
         baserequestInfo = {}
         if requestministry["assignedministrygroup"] in authMembershipgroups:
 
@@ -381,7 +381,7 @@ class requestservice:
                 'assignedministryperson':requestministry["assignedministryperson"],                
                 'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
                 'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
-                'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
+               # 'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
                 'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid)
             }
 
@@ -443,7 +443,7 @@ class FOIRequestUtil:
         if 'documents' in requestschema:
             return FOIRequestUtil().createFOIRequestDocument(requestschema,ministryrequestid ,version + 1, userid)  
         else:
-            documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid ,version)
+            documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid)
             return FOIRequestUtil().createFOIRequestDocumentFromObject(documents,ministryrequestid ,version + 1, userid)       
         
     
@@ -652,6 +652,7 @@ class FOIRequestUtil:
             for ministrydocument in ministrydocuments:
                 document = {
                     "documentpath": ministrydocument["documentpath"],
+                    "filename": ministrydocument["filename"],
                     "createdby": ministrydocument["createdby"],
                     "createdat": parse(ministrydocument["created_at"]).strftime('%Y-%m-%d %H:%M:%S.%f')
                     } 
