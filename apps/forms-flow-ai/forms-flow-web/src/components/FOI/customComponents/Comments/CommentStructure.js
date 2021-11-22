@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState,useRef  } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import './comments.scss'
 import Popup from 'reactjs-popup'
@@ -19,58 +19,15 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment }) => {
-
-
-
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
 
   const actions = useContext(ActionContext)
   const edit = true
 
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
 
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchFOIFullAssignedToList());
-    if (bcgovcode)
-      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
-  }, [dispatch]);
-
-  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
-  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
-  let fullName = ''
-
-  var _sessionuser = localStorage.getItem(i.userId)
-  
-  if (_sessionuser === undefined || _sessionuser === '' || _sessionuser === null) {
-    
-    iaoassignedToList.forEach(function (obj) {
-      var groupmembers = obj.members
-      var user = groupmembers.find(m => m["username"] === i.userId)
-      if (user && user != undefined) {
-        fullName = `${user["lastname"]}, ${user["firstname"]}`       
-        localStorage.setItem(i.userId, fullName)
-        return true;
-      }
-    })
-
-    if (fullName === '') {     
-      ministryAssignedToList.forEach(function (obj) {
-        var groupmembers = obj.members
-        var user = groupmembers.find(m => m["username"] === i.userId)
-        if (user && user != undefined) {          
-          fullName = `${user["lastname"]}, ${user["firstname"]}`          
-          localStorage.setItem(i.userId, fullName)
-          return true;
-        }
-      })
-    }
-
-  }
-  else {
-    console.log(`ELse condition for full name ${fullName}`)
-    fullName = _sessionuser
-  }
+  const ref = useRef();  
+  const closeTooltip = () => ref.current.close();
 
   return (
 
@@ -86,7 +43,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         </div>
         <div className="commenttext">
 
-          <ReactQuill value={i.text} readOnly={true} theme={"bubble"} />
+          <ReactQuill  value={i.text} readOnly={true} theme={"bubble"} />
         </div>
 
         <div>
@@ -96,21 +53,23 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             disabled={!actions.user}
           >
             {' '}
-            <FontAwesomeIcon icon={faReply} size='1x' color='#a5a5a5' /> Reply
+            <FontAwesomeIcon icon={faReply} size='1x' color='#003366' /> Reply
           </button>
         </div>
       </div>
       <div className="userActions">
         {actions.userId === i.userId && actions.user && (
           <Popup
+            ref={ref}
             role='tooltip'
             trigger={
               <button className="actionsBtn">
-                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
+                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
               </button>
             }
             position='right center'
             nested
+            closeOnDocumentClick
           >
             <div className="actionDiv">
               <div>
@@ -125,13 +84,14 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               <div>
                 <Popup
                   trigger={
-                    <button className="deleteBtn"> delete</button>
+                    <button className="deleteBtn" onClick={closeTooltip}> delete</button>
                   }
                   modal
                   nested
+                  closeOnDocumentClick
                 >
                   {(close) => (
-                    <div className='modal deletemodal' style={modal}>
+                    <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
 
                       <div className='header' style={modalHeader}>
                         {' '}
@@ -169,7 +129,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                           className='button btn-bottom'
                           style={modalDelBtn}
                           onClick={() => {
-                            close()
+                            close();closeTooltip()
                           }}
                         >
                           Cancel

@@ -15,6 +15,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { formatDate } from "../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
+import { MimeTypeList, MaxFileSizeInMB } from "../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -170,7 +171,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   : (
                     <>
                     {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id) ?
-                      <FileUpload  multipleFiles={multipleFiles} updateFilesCb={updateFilesCb} />
+                      <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
                       :
                       <>
                         <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">

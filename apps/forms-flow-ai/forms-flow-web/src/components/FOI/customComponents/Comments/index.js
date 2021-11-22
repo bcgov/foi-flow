@@ -14,20 +14,18 @@ export const CommentSection = ({
   customInput,
   requestid,
   ministryId,
-  bcgovcode
+  bcgovcode,
+  iaoassignedToList,
+  ministryAssignedToList,
+  requestNumber
 }) => {
-  const [comments, setComments] = useState(commentsArray)
   const [showaddbox, setshowaddbox] = useState(false)
-  
-  useEffect(() => {
-    setComments(commentsArray)
-  }, [commentsArray])
-    
+
   return (
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
-      comments={comments}
+      comments={commentsArray}
       signinUrl={signinUrl}
       signupUrl={signupUrl}
       customInput={customInput}
@@ -35,15 +33,18 @@ export const CommentSection = ({
       ministryId={ministryId}
     >
       <div className="section">
+        <div className="foi-request-number-header">
+          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber :`U-00${requestid}`}`}</h1>
+        </div>
         <div className="addcommentBox">
             <button type="button" style={ {display: !showaddbox ? 'block':'none'}} className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); }}>+ Add Comment</button>
         </div>
 
         <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
-          {<Input />}
+          {<Input add="add" />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} />
+          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
         </div>
 
       </div>

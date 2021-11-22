@@ -202,3 +202,17 @@ export const clearMinistryRequestComments = (data) => dispatch => {
         payload:{}      
     })
 }
+
+export const setRawRequestAttachments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
+        payload:data      
+    })
+}
+
+export const setMinistryRequestAttachments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
+        payload:data      
+    })
+}

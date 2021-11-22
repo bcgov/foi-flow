@@ -22,21 +22,22 @@ import {
   fetchFOIReceivedModeList,
   fetchFOIRequestDescriptionList,
   fetchClosingReasonList,
-  fetchFOIRequestNotesList
+  fetchFOIRequestNotesList,
+  fetchFOIRequestAttachmentsList,
+  fetchFOIFullAssignedToList,
+  fetchFOIMinistryAssignedToList
     
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
 import {push} from "connected-react-router";
-
-import PropTypes from 'prop-types';
-
-import Typography from '@material-ui/core/Typography';
 import { StateDropDown } from '../customComponents';
 import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
-import {CommentSection} from '../customComponents/Comments'
+import {CommentSection} from '../customComponents/Comments';
+import {AttachmentSection} from '../customComponents/Attachments';
+import Loading from "../../../containers/Loading";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,7 +64,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   var foitabheaderBG;
 
 
-  const {requestId, ministryId, requestState} = useParams();
+  const {requestId, ministryId, requestState, tabName} = useParams();  
   const disableInput = requestState && requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
 
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -73,37 +74,44 @@ const FOIRequest = React.memo(({userDetail}) => {
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
-  const [comment, setComment] = useState(requestNotes)
+  let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
+  const [comment, setComment] = useState([]);
+  const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
+  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""  
   const dispatch = useDispatch();
-  useEffect(() => {   
+  useEffect(() => {      
     if (ministryId) {
       dispatch(fetchFOIRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId,ministryId));
-    
+      dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {      
       dispatch(fetchFOIRawRequestDetails(requestId));
       dispatch(fetchFOIRequestNotesList(requestId,null));
       dispatch(fetchFOIRequestDescriptionList(requestId, ""));
+      dispatch(fetchFOIRequestAttachmentsList(requestId,null));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
       dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
     }
+    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
-  },[requestId,ministryId, dispatch,comment]);
+    if (bcgovcode)
+      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));          
+  },[requestId,ministryId, dispatch,comment, attachments]);
  
 
   useEffect(() => {  
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue); 
     let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
-    setAssignedToValue(assignedTo);
+    setAssignedToValue(assignedTo); 
   },[requestDetails]);
   
   const requiredRequestDescriptionDefaultData = {
@@ -593,6 +601,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
+      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
     }
    
     tablinks = document.getElementsByClassName("tablinks");
@@ -611,8 +620,11 @@ const FOIRequest = React.memo(({userDetail}) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
-  
+  const requestNumber = requestDetails && requestDetails.idNumber;
+
+  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
+  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
    
   return (
 
@@ -628,12 +640,14 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div>
           
         <div className="tab">
-          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+          <div className={`tablinks ${!tabName ? 'active': ''}`} name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className={`tablinks ${tabName === 'Attachments' ? 'active': ''}`} name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
           }
-          
-          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option3')}>Option 3</div>
+          {
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div> : null
+          }
+          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
         </div>
        
         <div className="foileftpanelstatus">
@@ -651,7 +665,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
         </div>
         <div className="foitabpanelcollection"> 
-          <div id="Request" className="tabcontent active">                                
+          <div id="Request" className={`tabcontent ${!tabName ? 'active': ''}`}>                                
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -678,20 +692,31 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
+          <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
+            {
+             requestAttachments ?
+                <>
+                  <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
+                    setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} bcgovcode={bcgovcode} 
+                    requestNumber={requestNumber} requestState={requestState} />
+                </> : null
+            }
+          </div> 
           <div id="Comments" className="tabcontent">
             {
-             requestNotes ?
+             !isLoading && requestNotes && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} bcgovcode={bcgovcode}  />
+                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
+                    bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}  />
                 
-                </> : null
+                </> : <Loading />
             }
 
           
               </div> 
-          <div id="Option3" className="tabcontent">
-           <h3>Option 3</h3>
+          <div id="Option4" className="tabcontent">
+           <h3>Option 4</h3>
           </div>        
         </div>
       </div>
