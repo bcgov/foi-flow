@@ -42,10 +42,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, 
   handleClosingDateChange, handleClosingReasonChange }) {    
-    const classes = useStyles();
-
+    const classes = useStyles();    
     const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
-    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
+    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries && saveRequestObject.selectedMinistries.length > 0   ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
     const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
     const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
 

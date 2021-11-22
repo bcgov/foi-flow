@@ -14,12 +14,13 @@ class documentservice:
 
     """
     @classmethod    
-    def getrequestdocuments(self, requestid, requesttype):
+    def getrequestdocuments(self, requestid, requesttype, version=None):
+        requestversion =  self.getversionforrequest(requestid,requesttype) if version is None else version
         if requesttype == "ministryrequest":
-            documents = FOIMinistryRequestDocument.getdocuments(requestid)
+            documents = FOIMinistryRequestDocument.getdocuments(requestid, requestversion)
             return self.formatcreateddateforall(documents)
         else:
-            documents = FOIRawRequestDocument.getdocuments(requestid)
+            documents = FOIRawRequestDocument.getdocuments(requestid, requestversion)
             return self.formatcreateddateforall(documents)
             
     @classmethod    
@@ -44,25 +45,25 @@ class documentservice:
             
     @classmethod    
     def createministryrequestdocument(self, ministryrequestid, documentschema, userid):
-        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)[0]
+        version = self.getversionforrequest(ministryrequestid, "ministryrequest")
         return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema['documents'], userid) 
     
     
     @classmethod    
     def createrawrequestdocument(self, requestid, documentschema, userid):
-        version = FOIRawRequest.getversionforrequest(requestid)[0]
+        version = self.getversionforrequest(requestid, "rawrequest")
         return FOIRawRequestDocument.createdocuments(requestid, version, documentschema['documents'], userid) 
     
     @classmethod    
     def createministrydocumentversion(self, ministryrequestid, documentid, documentschema, userid):
-        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)[0]
+        version = self.getversionforrequest(ministryrequestid, "ministryrequest")
         document = FOIMinistryRequestDocument.getdocument(documentid)
         return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.copydocumentproperties(document,documentschema,document['version']), userid)    
 
 
     @classmethod    
     def createrawdocumentversion(self, requestid, documentid, documentschema, userid):
-        version = FOIRawRequest.getversionforrequest(requestid)[0]
+        version = self.getversionforrequest(requestid, "rawrequest")
         document = FOIRawRequestDocument.getdocument(documentid)
         return FOIRawRequestDocument.createdocumentversion(requestid, version, self.copydocumentproperties(document,documentschema,document['version']), userid)  
     
@@ -97,3 +98,19 @@ class documentservice:
         document['created_at'] = formatedCreatedDate.strftime('%Y %b %d | %I:%M %p')
         return document   
         
+    
+    @classmethod
+    def getversionforrequest(self, requestid, requesttype):
+        if requesttype == "ministryrequest":
+            return FOIMinistryRequest.getversionforrequest(requestid)[0]
+        else:
+            return FOIRawRequest.getversionforrequest(requestid)[0]
+      
+    @classmethod  
+    def createrawrequestdocumentversion(self, requestid):
+        newversion = self.getversionforrequest(requestid,"rawrequest")     
+        documents = self.getrequestdocuments(requestid, "rawrequest", newversion-1)
+        documentarr = []
+        for document in documents:
+            documentarr.append({"documentpath": document["documentpath"], "filename": document["filename"], "category": document['category'], "version": 1, "foirequest_id": requestid, "foirequestversion_id": newversion - 1, "createdby": document['createdby'], "created_at": document['created_at']     })
+        return self.createrawrequestdocument(requestid, {"documents": documentarr}, None)

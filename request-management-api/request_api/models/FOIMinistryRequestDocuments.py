@@ -37,9 +37,9 @@ class FOIMinistryRequestDocument(db.Model):
     foiministryrequestversion = relationship("FOIMinistryRequest",foreign_keys="[FOIMinistryRequestDocument.foiministryrequestversion_id]")
 
     @classmethod
-    def getdocuments(cls,ministryrequestid):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+    def getdocuments(cls,ministryrequestid,ministryrequestversion):
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
         documents = []
         for row in rs:
             if row["isactive"] == True:
