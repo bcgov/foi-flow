@@ -1,36 +1,48 @@
 import React, { useRef, useState } from "react";
-import { MimeTypeList } from "../../../constants/FOI/enum";
 import "./FileUpload.scss"
 
 const FileUpload = ({
     multipleFiles,
+    mimeTypes,
+    maxFileSize,
+    totalFileSize,
     updateFilesCb
 }) => {
     const fileInputField = useRef(null);
+    const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({});
-    const [errorMessage, setErrorMessage] = useState("");
-  
+    const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
+    const [errorMessage, setErrorMessage] = useState([]);
     const handleUploadBtnClick = () => {
+      if (fileInputField.current)
         fileInputField.current.click();
-    };
-    const mimeTypes = MimeTypeList.stateTransition;
+      else
+        fileInputFieldMultiple.current.click();
+    };    
 
     const addNewFiles = (newFiles) => {
+      let _errorMessage = [];
+      let _totalFileSizeInMB = 0;
         for (let file of newFiles) {
           if (mimeTypes.includes(file.type)) {
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
-            if (sizeInMB <= 50) {             
-                files[file.name] = file;
-                setErrorMessage("");
-            }
-            else {
-              setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files 50mb or under can be uploaded. `);
+            _totalFileSizeInMB += parseFloat(sizeInMB);
+            if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
+              if (sizeInMB <= maxFileSize) {             
+                  files[file.name] = file;
+              }
+              else {
+                _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `)              
+              }
             }
           }
           else {
-            setErrorMessage(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: pdf, xlsx, docx`);
+            _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: ${multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}`);           
           }
         }
+        _totalFileSizeInMB += totalFileSizeCalculated;
+        setTotalFileSize(_totalFileSizeInMB);
+        setErrorMessage(_errorMessage);
         return { ...files };
     };
 
@@ -39,38 +51,62 @@ const FileUpload = ({
 
     const callUpdateFilesCb = (files) => {
         const filesAsArray = convertNestedObjectToArray(files);
-        updateFilesCb(filesAsArray);
+        updateFilesCb(filesAsArray, errorMessage);
     };
     const handleNewFileUpload = (e) => {
         const { files: newFiles } = e.target;
-        if (newFiles.length) {
-            let updatedFiles = addNewFiles(newFiles);
-            setFiles(updatedFiles);           
-            callUpdateFilesCb(updatedFiles);
+        const totalFiles = Object.entries(files).length + newFiles.length;
+        if (multipleFiles && (newFiles.length > 10  || totalFiles > 10)) {
+          setErrorMessage(["A maximum of 10 files can be uploaded at one time. Only 10 files have been added this upload window, please upload additional files separately"]);
         }
+        else if (newFiles.length) {
+          let updatedFiles = addNewFiles(newFiles);
+          if (multipleFiles && totalFileSizeCalculated > totalFileSize) {
+            setErrorMessage([`The total size of all files uploaded can not exceed  ${totalFileSize}MB. Please upload additional files separately.`]);            
+          }
+          setFiles(updatedFiles);
+          callUpdateFilesCb(updatedFiles);
+      }
     };
     const removeFile = (fileName) => {
         delete files[fileName];
         setFiles({ ...files });
         callUpdateFilesCb({ ...files });
-        setErrorMessage("");
+        setErrorMessage([]);
     };
-    
   return (
     <>
       <section className="file-upload-container">       
         <div className="row file-upload-preview" >
-          {Object.entries(files).length === 0 ?
-         
-          <div className="col-lg-12 file-upload-btn">
-            <p className="drag-and-drop-text">Drag and drop request letter(s) or</p>
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
-              Add Files
-            </button>           
+          <div className="file-upload-column">
+            {Object.entries(files).length === 0 ?
+          
+            <div className="file-upload-btn">
+              <p className="drag-and-drop-text">{Object.entries(files).length === 0 ? `Drag and drop request letter(s) or`: null}</p>               
+                       
+            </div>
+            :         
+            <FilePreviewContainer files={files} removeFile={removeFile} />
+            }
           </div>
-          :         
-          <FilePreviewContainer files={files} removeFile={removeFile} />
-          }
+          <div className="file-upload-column file-upload-column-2">
+            <input
+            className="file-upload-input-multiple"
+            type="file"
+            ref={fileInputFieldMultiple}
+            onChange={handleNewFileUpload}
+            title=""
+            value=""
+            multiple={true}
+            accept={mimeTypes}
+            />
+          </div>
+          <div className="file-upload-column file-upload-column-3">
+            {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
+                  Add Files
+            </button>  : null}
+        </div>
         </div>
         {Object.entries(files).length === 0 ?
         <input
@@ -86,10 +122,11 @@ const FileUpload = ({
         : null}
         
       </section>
-      {errorMessage ?
+      {errorMessage ? errorMessage.map(error => 
            <div className="error-message-container">
-             <p>{errorMessage}</p>
+             <p>{error}</p>
            </div>
+           )
       : null}
      
     </>
