@@ -35,9 +35,9 @@ class FOIRawRequestDocument(db.Model):
     foirequestversion_id = db.Column(db.Integer, unique=False, nullable=False)
 
     @classmethod
-    def getdocuments(cls,requestid):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
-        rs = db.session.execute(text(sql), {'requestid': requestid})
+    def getdocuments(cls,requestid, requestversion):
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid and foirequestversion_id = :requestversion ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
+        rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
         documents = []
         for row in rs:
             if row["isactive"] == True:
