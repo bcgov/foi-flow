@@ -110,11 +110,7 @@ export const AttachmentSection = ({
 
 const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedToList}) => {
 
-  console.log(iaoassignedToList);
-  console.log(ministryAssignedToList);
-
   const getfullName = (userId) => {
-    console.log(userId);
     let user;
 
     iaoassignedToList.forEach(function (obj) {
@@ -132,7 +128,6 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
       ministryAssignedToList.forEach(function (obj) {
         var groupmembers = obj.members
         var ministry_user = groupmembers.find(m => m["username"] === userId)
-        console.log(ministry_user);
         if (ministry_user && ministry_user != undefined) {
           user = ministry_user;
         }
