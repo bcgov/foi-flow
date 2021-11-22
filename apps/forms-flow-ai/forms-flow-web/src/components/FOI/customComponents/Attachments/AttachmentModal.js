@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ openModal, handleModal, multipleFiles, requestNumber }) {
+export default function AttachmentModal({ openModal, handleModal, multipleFiles, requestNumber, requestId }) {
 
     const classes = useStyles();
 
@@ -62,8 +62,8 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
             let fileStatusTransition = "attachmentlog";    
             fileInfoList = files.map(file => {
             return {
-                ministrycode: "Misc",     
-                requestnumber: requestNumber,
+                ministrycode: "Misc",
+                requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
                 filestatustransition: fileStatusTransition,
                 filename: file.name,
             }
