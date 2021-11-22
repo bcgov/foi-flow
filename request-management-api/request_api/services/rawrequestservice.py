@@ -12,6 +12,9 @@ import os
 from request_api.utils.redispublisher import RedisPublisherService
 import maya
 from request_api.services.workflowservice import workflowservice
+from request_api.services.documentservice import documentservice
+from request_api.models.FOIRawRequestDocuments import FOIRawRequestDocument
+
 
 class rawrequestservice:
     """ FOI Request management service
@@ -37,9 +40,12 @@ class rawrequestservice:
 
     def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status, userId):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
+        #Get documents
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status,ispiiredacted, userId)
+        documentservice().createrawrequestdocumentversion(_requestid)
         return result
 
+   
     def updateworkflowinstance(wfinstanceid, requestid, userId):
         result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userId)
         return result
