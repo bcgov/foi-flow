@@ -7,6 +7,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 import json
 
+import maya
 
 class documentservice:
     """ FOI Document management service
@@ -15,9 +16,11 @@ class documentservice:
     @classmethod    
     def getrequestdocuments(self, requestid, requesttype):
         if requesttype == "ministryrequest":
-            return FOIMinistryRequestDocument.getdocuments(requestid)
+            documents = FOIMinistryRequestDocument.getdocuments(requestid)
+            return self.formatcreateddateforall(documents)
         else:
-            return FOIRawRequestDocument.getdocuments(requestid)
+            documents = FOIRawRequestDocument.getdocuments(requestid)
+            return self.formatcreateddateforall(documents)
             
     @classmethod    
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
@@ -81,4 +84,16 @@ class documentservice:
         document['created_at'] =  documentschema['created_at'] if 'created_at' in documentschema  else None
         document['createdby'] = documentschema['createdby'] if 'createdby' in documentschema  else None
         return document
+
+    @classmethod  
+    def formatcreateddateforall(self, documents):
+        for document in documents:
+            document = self.formatcreateddate(document)
+        return documents
+
+    @classmethod    
+    def formatcreateddate(self, document):
+        formatedCreatedDate = maya.parse(document['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
+        document['created_at'] = formatedCreatedDate.strftime('%Y %b %d | %I:%M %p')
+        return document   
         

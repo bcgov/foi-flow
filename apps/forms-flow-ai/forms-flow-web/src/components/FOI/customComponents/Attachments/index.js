@@ -6,7 +6,6 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiRequestServices";
-import { formatDateForDiaplay } from "../../../../helper/FOI/helper";
 
 export const AttachmentSection = ({
   requestNumber,
@@ -128,7 +127,7 @@ const Attachment = React.memo(({attachment}) => {
         </div>
         <div className="row foi-details-row" style={{paddingTop:15+'px'}}>
           <div className="col-sm-12 foi-details-col">                      
-            {formatDateForDiaplay(attachment.created_at, 'yyyy MMM dd | p', 'Amercia/Vancouver')}
+            {attachment.created_at}
           </div>
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
