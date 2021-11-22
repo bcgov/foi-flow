@@ -24,7 +24,7 @@ const FileUpload = ({
       let _errorMessage = [];
       let _totalFileSizeInMB = 0;
         for (let file of newFiles) {
-          if (mimeTypes.includes(file.type)) {
+          if (mimeTypes.includes(file.type) || (multipleFiles && file.name.endsWith(".msg"))) {
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
             _totalFileSizeInMB += parseFloat(sizeInMB);
             if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
