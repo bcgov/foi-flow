@@ -71,16 +71,13 @@
 .file-upload-column {
     display: flex;
     flex-direction: column;
-    flex-basis: 70% !important;
-    flex: 1;
+    flex-basis: 70% !important;    
   }
   .file-upload-column-2 {
-    flex-basis: 1% !important;
-    flex: 0.5;
+    flex-basis: 1% !important;   
   }
   .file-upload-column-3 {
     flex-basis: 29% !important;
-    flex: 0.5;
   }
 
   .file-upload-input-multiple {
