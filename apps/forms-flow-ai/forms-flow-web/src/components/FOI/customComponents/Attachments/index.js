@@ -6,7 +6,6 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiRequestServices";
-import { formatDateForDiaplay } from "../../../../helper/FOI/helper";
 
 export const AttachmentSection = ({
   requestNumber,
@@ -16,7 +15,9 @@ export const AttachmentSection = ({
   setAttachment,
   requestId,
   ministryId,
-  bcgovcode
+  bcgovcode,
+  iaoassignedToList,
+  ministryAssignedToList
 }) => {
   const [attachments, setAttachments] = useState(attachmentsArray)
   
@@ -85,7 +86,7 @@ export const AttachmentSection = ({
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} />);
+    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />);
   }
 
   return (
@@ -107,7 +108,38 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({attachment}) => {
+const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedToList}) => {
+
+  const getfullName = (userId) => {
+    let user;
+
+    iaoassignedToList.forEach(function (obj) {
+      var groupmembers = obj.members
+      var iao_user = groupmembers.find(m => m["username"] === userId)
+      if (iao_user && iao_user != undefined) {
+        user = iao_user;
+      }
+    })
+
+    if(user && user != undefined) {
+      return `${user["lastname"]}, ${user["firstname"]}`;
+    }
+    else {
+      ministryAssignedToList.forEach(function (obj) {
+        var groupmembers = obj.members
+        var ministry_user = groupmembers.find(m => m["username"] === userId)
+        if (ministry_user && ministry_user != undefined) {
+          user = ministry_user;
+        }
+      })
+    }
+
+    if(user && user != undefined) {
+      return userId;
+    } else {
+      return `${user["lastname"]}, ${user["firstname"]}`;
+    }
+  }
 
   return (
     <div className="container-fluid">
@@ -128,12 +160,12 @@ const Attachment = React.memo(({attachment}) => {
         </div>
         <div className="row foi-details-row" style={{paddingTop:15+'px'}}>
           <div className="col-sm-12 foi-details-col">                      
-            {formatDateForDiaplay(attachment.created_at, 'yyyy MMM dd | p', 'Amercia/Vancouver')}
+            {attachment.created_at}
           </div>
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
           <div className="col-sm-12 foi-details-col">                      
-            {attachment.createdby}
+            {getfullName(attachment.createdby)}
           </div>
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>

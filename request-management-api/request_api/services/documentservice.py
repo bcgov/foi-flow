@@ -7,6 +7,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 import json
 
+import maya
 
 class documentservice:
     """ FOI Document management service
@@ -16,9 +17,11 @@ class documentservice:
     def getrequestdocuments(self, requestid, requesttype, version=None):
         requestversion =  self.getversionforrequest(requestid,requesttype) if version is None else version
         if requesttype == "ministryrequest":
-            return FOIMinistryRequestDocument.getdocuments(requestid, requestversion)
+            documents = FOIMinistryRequestDocument.getdocuments(requestid, requestversion)
+            return self.formatcreateddateforall(documents)
         else:
-            return FOIRawRequestDocument.getdocuments(requestid, requestversion)
+            documents = FOIRawRequestDocument.getdocuments(requestid, requestversion)
+            return self.formatcreateddateforall(documents)
             
     @classmethod    
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
@@ -82,6 +85,19 @@ class documentservice:
         document['created_at'] =  documentschema['created_at'] if 'created_at' in documentschema  else None
         document['createdby'] = documentschema['createdby'] if 'createdby' in documentschema  else None
         return document
+
+    @classmethod  
+    def formatcreateddateforall(self, documents):
+        for document in documents:
+            document = self.formatcreateddate(document)
+        return documents
+
+    @classmethod    
+    def formatcreateddate(self, document):
+        formatedCreatedDate = maya.parse(document['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
+        document['created_at'] = formatedCreatedDate.strftime('%Y %b %d | %I:%M %p')
+        return document   
+        
     
     @classmethod
     def getversionforrequest(self, requestid, requesttype):
@@ -98,4 +114,3 @@ class documentservice:
         for document in documents:
             documentarr.append({"documentpath": document["documentpath"], "filename": document["filename"], "category": document['category'], "version": 1, "foirequest_id": requestid, "foirequestversion_id": newversion - 1, "createdby": document['createdby'], "created_at": document['created_at']     })
         return self.createrawrequestdocument(requestid, {"documents": documentarr}, None)
-          
