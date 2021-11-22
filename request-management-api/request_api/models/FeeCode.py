@@ -32,6 +32,11 @@ class FeeCode(db.Model):
 
         return query.one_or_none()
 
+    @classmethod
+    def find_by_id(cls, identifier: int) -> FeeCode:
+        """Return by id."""
+        return cls.query.get(identifier)
+
 
 class FeeCodeSchema(ma.Schema):
     class Meta:

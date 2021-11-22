@@ -39,7 +39,7 @@ def test_complete_payment(app, client, monkeypatch):
                 'trnamount': total_fee.json.get('total')
             }
 
-        monkeypatch.setattr('request_api.services.fee_service.FeeService._get_paybc_transaction_details',
+        monkeypatch.setattr('request_api.services.fee_service.FeeService.get_paybc_transaction_details',
                             mock_paybc_response)
 
         foi_req = client.post(f'/api/foirawrequests', data=json.dumps({'requestData': {}}),
