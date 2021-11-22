@@ -15,7 +15,9 @@ export const AttachmentSection = ({
   setAttachment,
   requestId,
   ministryId,
-  bcgovcode
+  bcgovcode,
+  iaoassignedToList,
+  ministryAssignedToList
 }) => {
   const [attachments, setAttachments] = useState(attachmentsArray)
   
@@ -84,7 +86,7 @@ export const AttachmentSection = ({
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} />);
+    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />);
   }
 
   return (
@@ -106,7 +108,43 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({attachment}) => {
+const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedToList}) => {
+
+  console.log(iaoassignedToList);
+  console.log(ministryAssignedToList);
+
+  const getfullName = (userId) => {
+    console.log(userId);
+    let user;
+
+    iaoassignedToList.forEach(function (obj) {
+      var groupmembers = obj.members
+      var iao_user = groupmembers.find(m => m["username"] === userId)
+      if (iao_user && iao_user != undefined) {
+        user = iao_user;
+      }
+    })
+
+    if(user && user != undefined) {
+      return `${user["lastname"]}, ${user["firstname"]}`;
+    }
+    else {
+      ministryAssignedToList.forEach(function (obj) {
+        var groupmembers = obj.members
+        var ministry_user = groupmembers.find(m => m["username"] === userId)
+        console.log(ministry_user);
+        if (ministry_user && ministry_user != undefined) {
+          user = ministry_user;
+        }
+      })
+    }
+
+    if(user && user != undefined) {
+      return userId;
+    } else {
+      return `${user["lastname"]}, ${user["firstname"]}`;
+    }
+  }
 
   return (
     <div className="container-fluid">
@@ -132,7 +170,7 @@ const Attachment = React.memo(({attachment}) => {
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
           <div className="col-sm-12 foi-details-col">                      
-            {attachment.createdby}
+            {getfullName(attachment.createdby)}
           </div>
         </div>
         <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
