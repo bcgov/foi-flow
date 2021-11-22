@@ -54,7 +54,9 @@ class FOIRawRequestDocument(db.Model):
     def createdocuments(cls,requestid,requestversion, documents, userid):
         newdocuments = []
         for document in documents:
-            newdocuments.append(FOIRawRequestDocument(documentpath=document["documentpath"], version='1', filename=document["filename"], category=document["category"], isactive=True, foirequest_id=requestid, foirequestversion_id=requestversion, created_at=datetime.now(), createdby=userid))
+            createuserid = document['createdby'] if 'createdby' in document and document['createdby'] is not None else userid
+            createdat = document['created_at'] if 'created_at' in document  and document['created_at'] is not None else datetime.now()
+            newdocuments.append(FOIRawRequestDocument(documentpath=document["documentpath"], version='1', filename=document["filename"], category=document["category"], isactive=True, foirequest_id=requestid, foirequestversion_id=requestversion, created_at=createdat, createdby=createuserid))
         db.session.add_all(newdocuments)
         db.session.commit()               
         return DefaultMethodResult(True,'Documents created')   
