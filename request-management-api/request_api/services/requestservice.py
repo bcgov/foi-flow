@@ -434,17 +434,17 @@ class FOIRequestUtil:
         else:
             divisions = FOIMinistryRequestDivision().getrequest(ministryschema["foiministryrequestid"] ,ministryschema["version"])
             foiministryrequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
-        foiministryrequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] , userid)       
+        foiministryrequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)       
         foiministryrequest.closedate = requestschema['closedate'] if 'closedate' in requestschema  else None
         foiministryrequest.closereasonid = requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
         return foiministryrequest
     
-    def createFOIRequestDocuments(self,requestschema, ministryrequestid, version, userid):
+    def createFOIRequestDocuments(self,requestschema, ministryrequestid, activeversion, userid):
         if 'documents' in requestschema:
-            return FOIRequestUtil().createFOIRequestDocument(requestschema,ministryrequestid ,version + 1, userid)  
+            return FOIRequestUtil().createFOIRequestDocument(requestschema,ministryrequestid ,activeversion, userid)  
         else:
-            documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid)
-            return FOIRequestUtil().createFOIRequestDocumentFromObject(documents,ministryrequestid ,version + 1, userid)       
+            documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
+            return FOIRequestUtil().createFOIRequestDocumentFromObject(documents,ministryrequestid ,activeversion, userid)       
         
     
     def createFOIRequestAppplicantFromObject(self, requestapplicants, requestid, version, userid): 
@@ -514,7 +514,7 @@ class FOIRequestUtil:
             divisionarr.append(ministrydivision)
         return divisionarr
    
-    def createFOIRequestDocumentFromObject(self, documents, requestid, version, userid):
+    def createFOIRequestDocumentFromObject(self, documents, requestid, activeversion, userid):
         documentarr = []
         for document in documents:
             ministrydocument = FOIMinistryRequestDocument()
@@ -525,8 +525,9 @@ class FOIRequestUtil:
                 ministrydocument.category = document['category']
             ministrydocument.version = 1
             ministrydocument.foiministryrequest_id = requestid
-            ministrydocument.foiministryrequestversion_id = version
-            ministrydocument.createdby = userid
+            ministrydocument.foiministryrequestversion_id = activeversion
+            ministrydocument.created_at = document["created_at"] if 'created_at' in document else None
+            ministrydocument.createdby =  document["createdby"] if 'createdby' in document else userid
             documentarr.append(ministrydocument)
         return documentarr   
     
