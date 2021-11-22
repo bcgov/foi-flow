@@ -440,12 +440,14 @@ class FOIRequestUtil:
         return foiministryrequest
     
     def createFOIRequestDocuments(self,requestschema, ministryrequestid, activeversion, userid):
+        documentarr = []
+        documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
+        existingdocuments = FOIRequestUtil().createFOIRequestDocumentFromObject(documents,ministryrequestid ,activeversion, userid)       
+        documentarr = existingdocuments
         if 'documents' in requestschema:
-            return FOIRequestUtil().createFOIRequestDocument(requestschema,ministryrequestid ,activeversion, userid)  
-        else:
-            documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
-            return FOIRequestUtil().createFOIRequestDocumentFromObject(documents,ministryrequestid ,activeversion, userid)       
-        
+            newdocuments = FOIRequestUtil().createFOIRequestDocument(requestschema,ministryrequestid ,activeversion, userid)  
+            documentarr = newdocuments + existingdocuments
+        return documentarr
     
     def createFOIRequestAppplicantFromObject(self, requestapplicants, requestid, version, userid): 
         requestapplicantarr = []
