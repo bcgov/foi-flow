@@ -500,6 +500,7 @@ class FOIRequestUtil:
                 ministrydocument.foiministryrequest_id = requestid
                 ministrydocument.foiministryrequestversion_id = version
                 ministrydocument.createdby = userid
+                ministrydocument.created_at = datetime2.now().isoformat()
                 documentarr.append(ministrydocument)
             return documentarr        
         
