@@ -18,7 +18,7 @@ const replaceUrl = (URL, key, value) => {
 };
 
 const formatDateForDiaplay = (date, fmt, tz) => {
-	return format(zonedTimeToUtc(new Date(date), tz), 
+	return format(zonedTimeToUtc(date, 'UTC'), 
 				fmt, 
 				{ timeZone: tz });
 }
