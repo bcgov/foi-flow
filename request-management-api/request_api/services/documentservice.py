@@ -67,7 +67,7 @@ class documentservice:
     def copyrequestdocuments(self, ministryrequestid, documents, userid):
         _documents = []        
         for document in documents:
-            _documents.append({"documentpath":document["documentpath"],"filename":document["filename"],"category":document["category"]})
+            _documents.append({"documentpath":document["documentpath"],"filename":document["filename"],"category":document["category"], "created_at":document["created_at"],"createdby": document["createdby"]})
         documentschema = {"documents": _documents}
         return self.createministryrequestdocument(ministryrequestid, documentschema, userid)
     
@@ -78,5 +78,7 @@ class documentservice:
         document['documentpath'] = documentschema['documentpath'] if 'documentpath' in documentschema else document['documentpath']
         document['category'] =  documentschema['category'] if 'category' in documentschema  else document['category']
         document['isactive'] =  documentschema['isactive'] if 'isactive' in documentschema  else True
+        document['created_at'] =  documentschema['created_at'] if 'created_at' in documentschema  else None
+        document['createdby'] = documentschema['createdby'] if 'createdby' in documentschema  else None
         return document
         
