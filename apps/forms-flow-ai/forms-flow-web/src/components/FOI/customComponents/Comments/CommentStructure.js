@@ -47,7 +47,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         </div>
 
         <div>
-          <button
+          <button id={`btncomment${i.commentId}`}
             className={`replyBtn ${totalcommentCount === -100 || (isreplysection && totalcommentCount - 1 > currentIndex) ? " hide" : " show"}`}
             onClick={() => actions.handleAction(i.commentId)}
             disabled={!actions.user}
