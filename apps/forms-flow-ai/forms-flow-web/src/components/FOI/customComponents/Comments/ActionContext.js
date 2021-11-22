@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from 'react'
 import uuid from 'react-uuid'
 import { saveRawRequestNote, editRawRequestNote, saveMinistryRequestNote, editMinistryRequestNote, deleteMinistryRequestNote, deleteRawRequestNote } from '../../../../apiManager/services/FOI/foiRequestServices'
 import { useDispatch, useSelector } from "react-redux";
-import {setFOILoader} from '../../../../actions/FOI/foiRequestActions'
+import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 export const ActionContext = createContext()
 export const ActionProvider = ({
   children,
@@ -31,7 +31,16 @@ export const ActionProvider = ({
 
 
   const handleAction = (id, edit) => {
-    edit ? setEdit([...editArr, id]) : setReplies([...replies, id])
+
+    if (edit) {
+      setEdit([...editArr, id])
+    }
+    else {
+      var btnreply = document.getElementById(`btncomment${id}`)
+      if (btnreply) { btnreply.style.display = 'none' }
+      setReplies([...replies, id])
+    }
+
   }
   const handleCancel = (id, edit) => {
     if (edit) {
@@ -39,6 +48,9 @@ export const ActionProvider = ({
       const newList = list.filter((i) => i !== id)
       setEdit(newList)
     } else if (!edit) {
+      var btnreply = document.getElementById(`btncomment${id}`)
+      if (btnreply)
+        btnreply.style.display = 'block'
       const list = [...replies]
       const newList = list.filter((i) => i !== id)
       setReplies(newList)
@@ -51,11 +63,11 @@ export const ActionProvider = ({
       if (!parentId && !child) {
         if (ministryId) {
           const _inputData = { "ministryrequestid": ministryId, "comment": text }
-          dispatch(saveMinistryRequestNote(_inputData,ministryId));
+          dispatch(saveMinistryRequestNote(_inputData, ministryId));
         }
         else {
           const _inputData = { "requestid": requestid, "comment": text }
-          dispatch(saveRawRequestNote(_inputData,requestid));
+          dispatch(saveRawRequestNote(_inputData, requestid));
         }
         const maxId = comments && comments.length > 0 && comments.reduce(
           (max, comment) => (comment && comment.commentId > max ? comment.commentId : max),
@@ -98,11 +110,11 @@ export const ActionProvider = ({
         })
         if (ministryId) {
           const _inputData = { "ministryrequestid": ministryId, "comment": text, "parentcommentid": parentId }
-          dispatch(saveMinistryRequestNote(_inputData,ministryId));
+          dispatch(saveMinistryRequestNote(_inputData, ministryId));
         }
         else {
           const _inputData = { "requestid": requestid, "comment": text, "parentcommentid": parentId }
-          dispatch(saveRawRequestNote(_inputData,requestid));
+          dispatch(saveRawRequestNote(_inputData, requestid));
         }
 
         newList[index].replies = newReplies
@@ -117,11 +129,11 @@ export const ActionProvider = ({
 
       if (ministryId) {
         const _inputData = { "comment": text }
-        dispatch(editMinistryRequestNote(_inputData, id,ministryId));
+        dispatch(editMinistryRequestNote(_inputData, id, ministryId));
       }
       else {
         const _inputData = { "comment": text }
-        dispatch(editRawRequestNote(_inputData, id,requestid));
+        dispatch(editRawRequestNote(_inputData, id, requestid));
       }
 
       const newList = [...comments]
@@ -131,11 +143,11 @@ export const ActionProvider = ({
     } else if (parentId !== undefined) {
       if (ministryId) {
         const _inputData = { "comment": text }
-        dispatch(editMinistryRequestNote(_inputData, id,ministryId));
+        dispatch(editMinistryRequestNote(_inputData, id, ministryId));
       }
       else {
         const _inputData = { "comment": text }
-        dispatch(editRawRequestNote(_inputData, id,requestid));
+        dispatch(editRawRequestNote(_inputData, id, requestid));
       }
       const newList = [...comments]
       const index = newList.findIndex((x) => x.commentId === parentId)
@@ -148,10 +160,10 @@ export const ActionProvider = ({
   const deleteText = (id, parentId) => {
     setFOILoader(true)
     if (ministryId) {
-      dispatch(deleteMinistryRequestNote({},id,ministryId));
+      dispatch(deleteMinistryRequestNote({}, id, ministryId));
     }
     else {
-      dispatch(deleteRawRequestNote({},id,requestid));
+      dispatch(deleteRawRequestNote({}, id, requestid));
     }
 
 
@@ -169,7 +181,7 @@ export const ActionProvider = ({
   }
 
   const submit = (cancellor, text, parentId, edit, setText, child) => {
-    
+
     if (edit) {
       editText(cancellor, text, parentId)
       handleCancel(cancellor, edit)
