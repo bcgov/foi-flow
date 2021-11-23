@@ -319,10 +319,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
             </div>                            
           </div> 
           <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
+            {
+             !isLoading && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
+                <>
                 <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
                   requestNumber={requestNumber} requestState={requestState}
                   iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+                </> : <Loading />
+            }
           </div> 
           <div id="Comments" className="tabcontent">
             {

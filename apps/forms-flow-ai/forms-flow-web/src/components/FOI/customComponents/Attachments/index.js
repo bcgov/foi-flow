@@ -20,10 +20,14 @@ export const AttachmentSection = ({
   ministryAssignedToList
 }) => {
   const [attachments, setAttachments] = useState(attachmentsArray)
+  const [iaoList, setIaoList] = useState(iaoassignedToList)
+  const [ministryList, setMinistryList] = useState(ministryAssignedToList)
   
   useEffect(() => {
     setAttachments(attachmentsArray);
-  }, [attachmentsArray])
+    setIaoList(iaoassignedToList);
+    setMinistryList(ministryAssignedToList);
+  }, [attachmentsArray, iaoassignedToList, ministryAssignedToList])
   
 
   const [openModal, setModal] = useState(false);
@@ -86,7 +90,7 @@ export const AttachmentSection = ({
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />);
+    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoList} ministryAssignedToList={ministryList} />);
   }
 
   return (
@@ -113,32 +117,33 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
   const getfullName = (userId) => {
     let user;
 
-    iaoassignedToList.forEach(function (obj) {
-      var groupmembers = obj.members
-      var iao_user = groupmembers.find(m => m["username"] === userId)
-      if (iao_user && iao_user != undefined) {
-        user = iao_user;
-      }
-    })
-
-    if(user && user != undefined) {
-      return `${user["lastname"]}, ${user["firstname"]}`;
-    }
-    else {
-      ministryAssignedToList.forEach(function (obj) {
+      iaoassignedToList.forEach(function (obj) {
         var groupmembers = obj.members
-        var ministry_user = groupmembers.find(m => m["username"] === userId)
-        if (ministry_user && ministry_user != undefined) {
-          user = ministry_user;
+        var iao_user = groupmembers.find(m => m["username"] === userId)
+        if (iao_user && iao_user != undefined) {
+          user = iao_user;
         }
       })
-    }
+  
+      if(user && user != undefined) {
+        return `${user["lastname"]}, ${user["firstname"]}`;
+      }
+      else {
+        ministryAssignedToList.forEach(function (obj) {
+          var groupmembers = obj.members
+          var ministry_user = groupmembers.find(m => m["username"] === userId)
+          if (ministry_user && ministry_user != undefined) {
+            user = ministry_user;
+          }
+        })
+      }
 
-    if(user && user != undefined) {
-      return userId;
-    } else {
-      return `${user["lastname"]}, ${user["firstname"]}`;
-    }
+      if(user && user != undefined) {
+        return userId;
+      } else {
+        return `${user["lastname"]}, ${user["firstname"]}`;
+      }
+
   }
 
   return (
