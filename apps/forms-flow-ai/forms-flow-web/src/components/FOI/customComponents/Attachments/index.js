@@ -117,6 +117,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
   const getfullName = (userId) => {
     let user;
 
+    if(iaoassignedToList.length > 0) {
       iaoassignedToList.forEach(function (obj) {
         var groupmembers = obj.members
         var iao_user = groupmembers.find(m => m["username"] === userId)
@@ -126,24 +127,33 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
       })
   
       if(user && user != undefined) {
-        return `${user["lastname"]}, ${user["firstname"]}`;
+        if(user["lastname"] && user["firstname"]) {
+          return `${user["lastname"]}, ${user["firstname"]}`;
+        } else {
+          return userId;
+        }
       }
-      else {
-        ministryAssignedToList.forEach(function (obj) {
-          var groupmembers = obj.members
-          var ministry_user = groupmembers.find(m => m["username"] === userId)
-          if (ministry_user && ministry_user != undefined) {
-            user = ministry_user;
-          }
-        })
-      }
+    }
+
+    if(ministryAssignedToList.length > 0 && !user) {
+      ministryAssignedToList.forEach(function (obj) {
+        var groupmembers = obj.members
+        var ministry_user = groupmembers.find(m => m["username"] === userId)
+        if (ministry_user && ministry_user != undefined) {
+          user = ministry_user;
+        }
+      })
 
       if(user && user != undefined) {
-        return userId;
-      } else {
-        return `${user["lastname"]}, ${user["firstname"]}`;
+        if(user["lastname"] && user["firstname"]) {
+          return `${user["lastname"]}, ${user["firstname"]}`;
+        } else {
+          return userId;
+        }
       }
-
+    }
+      
+    return userId;
   }
 
   return (
@@ -153,7 +163,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-5" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div style={{display:'inline',paddingRight:15+'px'}}>                      
-                <b>{attachment.filename.split('.').shift()}</b>
+                <b>{attachment && attachment.filename ? attachment.filename.split('.').shift() : ""}</b>
               </div>
             </div>
             <div className="col-sm-7" style={{display:'inline-block'}}>
