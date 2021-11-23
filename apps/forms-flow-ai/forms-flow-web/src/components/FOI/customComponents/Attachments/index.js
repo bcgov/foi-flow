@@ -163,7 +163,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-5" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div style={{display:'inline',paddingRight:15+'px'}}>                      
-                <b>{attachment.filename.split('.').shift()}</b>
+                <b>{attachment && attachment.filename ? attachment.filename.split('.').shift() : ""}</b>
               </div>
             </div>
             <div className="col-sm-7" style={{display:'inline-block'}}>
