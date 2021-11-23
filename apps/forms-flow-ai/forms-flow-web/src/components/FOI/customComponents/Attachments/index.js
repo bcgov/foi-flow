@@ -117,6 +117,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
   const getfullName = (userId) => {
     let user;
 
+    if(iaoassignedToList.length > 0) {
       iaoassignedToList.forEach(function (obj) {
         var groupmembers = obj.members
         var iao_user = groupmembers.find(m => m["username"] === userId)
@@ -132,26 +133,27 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
           return userId;
         }
       }
-      else {
-        ministryAssignedToList.forEach(function (obj) {
-          var groupmembers = obj.members
-          var ministry_user = groupmembers.find(m => m["username"] === userId)
-          if (ministry_user && ministry_user != undefined) {
-            user = ministry_user;
-          }
-        })
-      }
+    }
+
+    if(ministryAssignedToList.length > 0 && !user) {
+      ministryAssignedToList.forEach(function (obj) {
+        var groupmembers = obj.members
+        var ministry_user = groupmembers.find(m => m["username"] === userId)
+        if (ministry_user && ministry_user != undefined) {
+          user = ministry_user;
+        }
+      })
 
       if(user && user != undefined) {
-        return userId;
-      } else {
         if(user["lastname"] && user["firstname"]) {
           return `${user["lastname"]}, ${user["firstname"]}`;
         } else {
           return userId;
         }
       }
-
+    }
+      
+    return userId;
   }
 
   return (

@@ -90,7 +90,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
     
-  }, [requestId, dispatch, attachments]);
+  }, [requestId, dispatch]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
