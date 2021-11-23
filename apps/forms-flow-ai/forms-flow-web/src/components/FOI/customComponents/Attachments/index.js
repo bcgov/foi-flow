@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
+import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 export const AttachmentSection = ({
@@ -35,22 +36,18 @@ export const AttachmentSection = ({
   const [fileCount, setFileCount] = useState(0);
   const dispatch = useDispatch();
   const [documents, setDocuments] = useState([]);
+  const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const addAttachments = () => {
     setModal(true);
   }
-  React.useEffect(() => {
+
+  React.useEffect(() => {    
     if (successCount === fileCount && successCount !== 0) {
-      console.log(window.location.href.indexOf('ministryreview'));
         setModal(false);
         const documentsObject = {documents: documents};
         dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
-          if (!err) {            
-            if (window.location.href.indexOf('ministryreview') !== -1) {
-              window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${requestState}/Attachments`;
-            }
-            else {
-              window.location.href = ministryId ? `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${requestState}/Attachments` : requestId ? `/foi/reviewrequest/${requestId}/${requestState}/Attachments` : window.location.href;
-            }
+          if (!err) {
+            setAttachmentLoading(false);
           }
         }));
     }
@@ -62,6 +59,7 @@ export const AttachmentSection = ({
     setFileCount(files.length);
     if (value) {
         if (files.length !== 0) {
+          setAttachmentLoading(true);
           dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
             let _documents = [];
             if (!err) {
@@ -71,9 +69,7 @@ export const AttachmentSection = ({
                 _documents.push(documentDetails);
                 setDocuments(_documents);
                 dispatch(saveFilesinS3(header, _file, (err, res) => {
-
                   if (res === 200) {
-
                     setSuccessCount(index+1);
                   }
                   else {
@@ -95,6 +91,7 @@ export const AttachmentSection = ({
 
   return (
     <div>
+      { isAttachmentLoading ? <Loading /> : 
       <div className="section">
         <div className="foi-request-number-header">
           <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber :`U-00${requestId}`}`}</h1>
@@ -107,6 +104,7 @@ export const AttachmentSection = ({
           {attachmentsList}
         </div>
       </div>
+      }
     </div>
   )
 }

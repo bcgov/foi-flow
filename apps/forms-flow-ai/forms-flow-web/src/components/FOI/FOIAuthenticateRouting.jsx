@@ -48,16 +48,16 @@ const FOIAuthenticateRouting = React.memo((props) => {
                 : <Dashboard userDetail={userDetail} />
                 }
               </Route>
-              <Route path="/foi/reviewrequest/:requestId/:requestState/:tabName?">
+              <Route path="/foi/reviewrequest/:requestId/:requestState">
                 <FOIRequest userDetail={userDetail} />
               </Route>
               <Route path="/foi/addrequest">
                 <FOIRequest  userDetail={userDetail}/>
               </Route>
-              <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/:requestState/:tabName?">
+              <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/:requestState">
                 <FOIRequest userDetail={userDetail} />
               </Route>
-              <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId/:requestState/:tabName?">
+              <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId/:requestState">
                 <MinistryReview userDetail={userDetail} />
               </Route>
               <FOIFooter />
