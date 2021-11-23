@@ -78,29 +78,27 @@ def test_generate_receipt(app, client, monkeypatch):
             'fee_code': fee_code,
             'quantity': 5
         }), content_type='application/json')
-        payment_id = pay_response.json.get('payment_id')
+        payment_id = pay_response.json.get('payment_id')        
         
-        # Mock paybc response to return success message
-        def moch_check_paid(self):  # pylint: disable=unused-argument; mocks of library methods
+        def moch_check_paid(self):
             return True
 
         monkeypatch.setattr('request_api.services.fee_service.FeeService.check_if_paid',
                             moch_check_paid)
-
-        # Mock paybc response to return success message
-        def mock_get_token(self):  # pylint: disable=unused-argument; mocks of library methods
+        
+        def mock_get_token(self):
             return 'token'
         
         monkeypatch.setattr('request_api.services.cdogs_api_service.CdogsApiService._get_access_token',
                             mock_get_token)
         
-        def mock_check_hashed(self, template_hash_code):  # pylint: disable=unused-argument; mocks of library methods
+        def mock_check_hashed(self, template_hash_code):
             return False
          
         monkeypatch.setattr('request_api.services.cdogs_api_service.CdogsApiService.check_template_cached',
                             mock_check_hashed)
         
-        def mock_upload_template(self,  headers, url, template):  # pylint: disable=unused-argument; mocks of library methods
+        def mock_upload_template(self,  headers, url, template):
             return TestResponse(
                 status_code= 200,
                 headers= {'X-Template-Hash': "58G94G"}
@@ -109,7 +107,7 @@ def test_generate_receipt(app, client, monkeypatch):
         monkeypatch.setattr('request_api.services.cdogs_api_service.CdogsApiService._post_upload_template',
                             mock_upload_template)
         
-        def mock_generate_receipt(self, json_request_body, headers, ur):  # pylint: disable=unused-argument; mocks of library methods
+        def mock_generate_receipt(self, json_request_body, headers, ur):
             return TestResponse(
                 content= bytearray([2, 3, 5, 7]),
                 status_code= 200,
