@@ -320,7 +320,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div> 
           <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
             {
-             !isLoading && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
+             !isLoading && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
                 <>
                 <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
