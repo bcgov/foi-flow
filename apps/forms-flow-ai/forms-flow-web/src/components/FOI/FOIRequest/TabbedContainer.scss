@@ -1,4 +1,6 @@
-
+.active {
+  display: block !important;
+}
 
 .foiformcontent {
     display: inline-flex;  
@@ -8,6 +10,8 @@
     margin-left: 12%;
     margin-right: 12%;
     margin-bottom: 5%;
+
+    height: 90%;
   }
 
 

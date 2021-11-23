@@ -16,6 +16,7 @@ const hd = new DateHolidayjs('CA','BC');
 const replaceUrl = (URL, key, value) => {
   return URL.replace(key, value);
 };
+
 const formatInTimeZone = (date, fmt, tz) =>
 	format(utcToZonedTime(date, tz), 
 			fmt, 
