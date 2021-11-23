@@ -126,7 +126,11 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
       })
   
       if(user && user != undefined) {
-        return `${user["lastname"]}, ${user["firstname"]}`;
+        if(user["lastname"] && user["firstname"]) {
+          return `${user["lastname"]}, ${user["firstname"]}`;
+        } else {
+          return userId;
+        }
       }
       else {
         ministryAssignedToList.forEach(function (obj) {
@@ -141,7 +145,11 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
       if(user && user != undefined) {
         return userId;
       } else {
-        return `${user["lastname"]}, ${user["firstname"]}`;
+        if(user["lastname"] && user["firstname"]) {
+          return `${user["lastname"]}, ${user["firstname"]}`;
+        } else {
+          return userId;
+        }
       }
 
   }
