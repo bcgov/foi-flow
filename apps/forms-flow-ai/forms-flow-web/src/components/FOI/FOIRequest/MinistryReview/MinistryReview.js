@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MinistryReview = React.memo(({ userDetail }) => {
 
-  const { requestId, ministryId, requestState, tabName} = useParams();
+  const { requestId, ministryId, requestState} = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -280,8 +280,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div>
           
         <div className="tab">
-          <div className={`tablinks ${!tabName ? 'active': ''}`} name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
-          <div className={`tablinks ${tabName === 'Attachments' ? 'active': ''}`} name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div>
+          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+          <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div>
           <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div>
           <div className="tablinks" name="Option4" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
         </div>
@@ -299,7 +299,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
      
         </div>
         <div className="foitabpanelcollection">
-          <div id="Request" className={`tabcontent ${!tabName ? 'active': ''}`}>
+          <div id="Request" className="tabcontent active">
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -319,7 +319,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               </div>
             </div>                            
           </div> 
-          <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
+          <div id="Attachments" className="tabcontent">
             {
              !isAttachmentListLoading && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
                 <>

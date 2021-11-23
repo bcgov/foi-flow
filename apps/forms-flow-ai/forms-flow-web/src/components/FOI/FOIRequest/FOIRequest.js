@@ -64,7 +64,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   var foitabheaderBG;
 
 
-  const {requestId, ministryId, requestState, tabName} = useParams();  
+  const {requestId, ministryId, requestState} = useParams();  
   const disableInput = requestState && requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
 
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -594,6 +594,24 @@ const FOIRequest = React.memo(({userDetail}) => {
       break;      
   }
 
+  // const tabclick =(evt,param)=>{
+   
+  //   var i, tabcontent, tablinks;
+    
+  //   tabcontent = document.getElementsByClassName("tabcontent");
+  //   for (i = 0; i < tabcontent.length; i++) {
+  //     tabcontent[i].style.display = "none";
+  //   }
+   
+  //   tablinks = document.getElementsByClassName("tablinks");
+  //   for (i = 0; i < tablinks.length; i++) {
+  //     tablinks[i].className = tablinks[i].className.replace(" active", "");
+  //   }
+  //   document.getElementById(param).style.display = "block";
+  //   evt.currentTarget.className += " active";
+
+  // }
+
   const tabclick =(evt,param)=>{
    
     var i, tabcontent, tablinks;
@@ -601,7 +619,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
-      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+      tabcontent[i].className = tabcontent[i].className.replace(" active", "");    
     }
    
     tablinks = document.getElementsByClassName("tablinks");
@@ -639,10 +657,10 @@ const FOIRequest = React.memo(({userDetail}) => {
             <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
-        <div className="tab">
-          <div className={`tablinks ${!tabName ? 'active': ''}`} name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+        <div className="tab">          
+          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className={`tablinks ${tabName === 'Attachments' ? 'active': ''}`} name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
           }
           {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div> : null
@@ -665,7 +683,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
         </div>
         <div className="foitabpanelcollection"> 
-          <div id="Request" className={`tabcontent ${!tabName ? 'active': ''}`}>                                
+          <div id="Request" className="tabcontent active">                                
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -692,7 +710,7 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
-          <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
+          <div id="Attachments" className="tabcontent">
             {
              !isAttachmentListLoading && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
                 <>

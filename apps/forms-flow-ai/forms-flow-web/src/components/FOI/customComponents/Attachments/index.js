@@ -41,22 +41,13 @@ export const AttachmentSection = ({
     setModal(true);
   }
 
-  const componentRefresh = () => {
-    if (window.location.href.indexOf('ministryreview') !== -1) {
-      window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${requestState}/Attachments`;
-    }
-    else {
-      window.location.href = ministryId ? `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${requestState}/Attachments` : requestId ? `/foi/reviewrequest/${requestId}/${requestState}/Attachments` : window.location.href;
-    }
-  }
   React.useEffect(() => {    
     if (successCount === fileCount && successCount !== 0) {
-        console.log(window.location.href.indexOf('ministryreview'));
         setModal(false);
         const documentsObject = {documents: documents};
         dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
-          if (!err) {            
-            componentRefresh();
+          if (!err) {
+            setAttachmentLoading(false);
           }
         }));
     }

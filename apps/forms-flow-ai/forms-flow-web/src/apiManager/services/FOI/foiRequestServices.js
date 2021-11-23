@@ -945,6 +945,7 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
       httpPOSTRequest(apiUrl, data)
         .then((res) => {          
           if (res.data) {
+            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
             dispatch(setFOIAttachmentListLoader(false));           
             done(null, res.data);
           } else {
