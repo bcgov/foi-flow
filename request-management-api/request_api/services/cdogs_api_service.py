@@ -48,6 +48,9 @@ class CdogsApiService:
         }
         
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}/render"
+        return self._post_generate_receipt(json_request_body, headers, url)
+
+    def _post_generate_receipt(self, json_request_body, headers, url):
         return requests.post(url, data= json_request_body, headers= headers)
 
     def upload_template(self, template_file_path: str = receipt_template_path, access_token: str = None):
@@ -60,10 +63,10 @@ class CdogsApiService:
         template = {'template':('template', open(template_file_path, 'rb'), "multipart/form-data")}
 
         current_app.logger.info('Uploading template %s', template_file_path)
-        response = requests.post(url, headers= headers, files= template)
+        response = self._post_upload_template(headers, url, template)
         
         if response.status_code == 200:
-            if hasattr(response.headers, "X-Template-Hash") is False:
+            if response.headers.get("X-Template-Has") is not None:
                 raise BusinessException(Error.DATA_NOT_FOUND)
 
             current_app.logger.info('Returning new hash %s', response.headers['X-Template-Hash'])
@@ -77,7 +80,11 @@ class CdogsApiService:
                 current_app.logger.info('Template already hashed with code %s', match[0])
                 return match[0]
             
-        raise BusinessException(Error.UNDEFINED_ERROR)
+        raise BusinessException(Error.DATA_NOT_FOUND)
+
+    def _post_upload_template(self, headers, url, template):
+        response = requests.post(url, headers= headers, files= template)
+        return response
 
     def check_template_cached(self, template_hash_code: str, access_token = None):
 
@@ -87,7 +94,7 @@ class CdogsApiService:
 
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}"
 
-        response = requests.post(url, headers= headers)
+        response = requests.get(url, headers= headers)
         return response.status_code == 200
         
 

@@ -60,3 +60,64 @@ def test_complete_payment(app, client, monkeypatch):
             'response_url': response_url
         }), content_type='application/json')
         assert pay_response.json.get('status') == 'PAID'
+
+class TestResponse:
+    def __init__(self, status_code, content = None, headers = {}):
+        self.status_code = status_code
+        self.content = content
+        self.headers = headers
+        
+def test_generate_receipt(app, client, monkeypatch):
+    with app.app_context():
+        
+        foi_req = client.post(f'/api/foirawrequests', data=json.dumps({'requestData': {}}), content_type='application/json')
+        
+        request_id = foi_req.json.get('id')
+        fee_code = 'FOI0001'
+        pay_response = client.post(f'/api/foirawrequests/{request_id}/payments', data=json.dumps({
+            'fee_code': fee_code,
+            'quantity': 5
+        }), content_type='application/json')
+        payment_id = pay_response.json.get('payment_id')
+        
+        # Mock paybc response to return success message
+        def moch_check_paid(self):  # pylint: disable=unused-argument; mocks of library methods
+            return True
+
+        monkeypatch.setattr('request_api.services.fee_service.FeeService.check_if_paid',
+                            moch_check_paid)
+
+        # Mock paybc response to return success message
+        def mock_get_token(self):  # pylint: disable=unused-argument; mocks of library methods
+            return 'token'
+        
+        monkeypatch.setattr('request_api.services.cdogs_api_service.CdogsApiService._get_access_token',
+                            mock_get_token)
+        
+        def mock_check_hashed(self, template_hash_code):  # pylint: disable=unused-argument; mocks of library methods
+            return False
+         
+        monkeypatch.setattr('request_api.services.cdogs_api_service.CdogsApiService.check_template_cached',
+                            mock_check_hashed)
+        
+        def mock_upload_template(self,  headers, url, template):  # pylint: disable=unused-argument; mocks of library methods
+            return TestResponse(
+                status_code= 200,
+                headers= {'X-Template-Hash': "58G94G"}
+            );
+            
+        monkeypatch.setattr('request_api.services.cdogs_api_service.CdogsApiService._post_upload_template',
+                            mock_upload_template)
+        
+        def mock_generate_receipt(self, json_request_body, headers, ur):  # pylint: disable=unused-argument; mocks of library methods
+            return TestResponse(
+                content= bytearray([2, 3, 5, 7]),
+                status_code= 200,
+            );
+            
+        monkeypatch.setattr('request_api.services.cdogs_api_service.CdogsApiService._post_generate_receipt',
+                            mock_generate_receipt)
+        receipt_response = client.post(f'/api/foirawrequests/{request_id}/payments/{payment_id}/receipt', data=json.dumps({
+            'requestData': {}
+        }), content_type='application/json')
+        assert receipt_response.status_code == 200
