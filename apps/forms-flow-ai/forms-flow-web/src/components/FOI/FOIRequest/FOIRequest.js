@@ -700,7 +700,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
                   requestNumber={requestNumber} requestState={requestState}
                   iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
-              </> : <Loading />
+              </> : <></>
             }
           </div> 
           <div id="Comments" className="tabcontent">
