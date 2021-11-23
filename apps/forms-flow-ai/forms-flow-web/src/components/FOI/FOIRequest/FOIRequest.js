@@ -625,7 +625,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
-   
+  const isAttachmentListLoading = useSelector(state=> state.foiRequests.isAttachmentListLoading);
   return (
 
     <div className="foiformcontent">
@@ -694,7 +694,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div> 
           <div id="Attachments" className={`tabcontent ${tabName ? 'active': ''}`}>
             {
-             !isLoading && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
+             !isAttachmentListLoading && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
                 <>
                 <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 

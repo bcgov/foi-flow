@@ -6,6 +6,7 @@ import {
   setFOIUpdateLoader,
   setFOILoader,
   setFOIAssignedToListLoader,
+  setFOIAttachmentListLoader,
   setFOIRequestDetail,
   setFOIMinistryViewRequestDetail,
   setFOICategoryList,
@@ -907,19 +908,19 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
               dispatch(setRawRequestAttachments(res.data));
             }
   
-            dispatch(setFOILoader(false));
+            dispatch(setFOIAttachmentListLoader(false));
             done(null, res.data);
             
           } else {
             console.log("Error", res);
             dispatch(serviceActionError(res));
-            dispatch(setFOILoader(false));
+            dispatch(setFOIAttachmentListLoader(false));
           }
         })
         .catch((error) => {
           console.log("Error", error);
           dispatch(serviceActionError(error));
-          dispatch(setFOILoader(false));
+          dispatch(setFOIAttachmentListLoader(false));
           done(error);
         });
     };
@@ -943,15 +944,18 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
     return (dispatch) => {
       httpPOSTRequest(apiUrl, data)
         .then((res) => {          
-          if (res.data) {             
+          if (res.data) {
+            dispatch(setFOIAttachmentListLoader(false));           
             done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
             done("Error Posting Attachments");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
           done(error);
         });
     };
