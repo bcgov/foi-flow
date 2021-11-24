@@ -5,8 +5,8 @@ from datetime import datetime
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_,and_
-
+from sqlalchemy import or_,and_,text
+from dateutil.parser import *
 
 class FOIMinistryRequestDocument(db.Model):
     # Name of the table in our database
@@ -38,15 +38,40 @@ class FOIMinistryRequestDocument(db.Model):
 
     @classmethod
     def getdocuments(cls,ministryrequestid,ministryrequestversion):
-        file_schema = FOIMinistryRequestDocumentSchema(many=True)
-        _files = db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministryrequest_id == ministryrequestid , FOIMinistryRequestDocument.foiministryrequestversion_id == ministryrequestversion).order_by(FOIMinistryRequestDocument.foiministrydocumentid.asc()).all()
-        files = file_schema.dump(_files)       
-        return files
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
+        documents = []
+        for row in rs:
+            if row["isactive"] == True:
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        return documents 
     
     @classmethod
-    def getversionforrequestdocuments(cls,foiministrydocumentid):   
-       return db.session.query(FOIMinistryRequestDocument.version).filter_by(foiministrydocumentid=foiministrydocumentid).order_by(FOIMinistryRequestDocument.version.desc()).first()
-       
+    def getdocument(cls,foiministrydocumentid):   
+        document_schema = FOIMinistryRequestDocumentSchema()            
+        request = db.session.query(FOIMinistryRequestDocument).filter_by(foiministrydocumentid=foiministrydocumentid).order_by(FOIMinistryRequestDocument.version.desc()).first()
+        return document_schema.dump(request)
+
+    @classmethod
+    def createdocuments(cls,ministryrequestid,ministryrequestversion, documents, userid):
+        newdocuments = []
+        for document in documents:
+            createuserid = document['createdby'] if 'createdby' in document and document['createdby'] is not None else userid
+            createdat = document['created_at'] if 'created_at' in document  and document['created_at'] is not None else datetime.now()
+            newdocuments.append(FOIMinistryRequestDocument(documentpath=document["documentpath"], version='1', filename=document["filename"], category=document["category"], isactive=True, foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=createdat, createdby=createuserid))
+        db.session.add_all(newdocuments)
+        db.session.commit()               
+        return DefaultMethodResult(True,'Documents created')   
+    
+
+    @classmethod
+    def createdocumentversion(cls,ministryrequestid,ministryrequestversion, document, userid):
+        newdocument = FOIMinistryRequestDocument(documentpath=document["documentpath"], foiministrydocumentid=document["foiministrydocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
+        db.session.add(newdocument)
+        db.session.commit()               
+        return DefaultMethodResult(True,'New Document version created', newdocument.foiministrydocumentid)   
+    
+    
 class FOIMinistryRequestDocumentSchema(ma.Schema):
     class Meta:
         fields = ('foiministrydocumentid','documentpath', 'filename','category','version','isactive','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby')

@@ -14,6 +14,13 @@ export const setFOIAssignedToListLoader = (data) => dispatch =>{
     })
 }
 
+export const setFOIAttachmentListLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING,
+        payload:data
+    })
+}
+
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
@@ -200,5 +207,19 @@ export const clearMinistryRequestComments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
         payload:{}      
+    })
+}
+
+export const setRawRequestAttachments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
+        payload:data      
+    })
+}
+
+export const setMinistryRequestAttachments = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
+        payload:data      
     })
 }

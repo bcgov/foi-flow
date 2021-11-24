@@ -3,6 +3,7 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 const initialState = {
   isLoading:true,
   isAssignedToListLoading:true,
+  isAttachmentListLoading:true,
   foiRequestsList:[],
   foiMinistryRequestsList:[],
   foiRequestsCount:0,
@@ -20,7 +21,8 @@ const initialState = {
   foiRequestDescriptionHistoryList: [], 
   foiMinistryDivisionalStages:[], 
   foiWatcherList: [],
-  foiRequestComments:[]
+  foiRequestComments:[],
+  foiRequestAttachments:[]
 }
 
 
@@ -30,6 +32,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, isLoading: action.payload};
     case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
       return {...state, isAssignedToListLoading: action.payload};
+    case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
+      return {...state, isAttachmentListLoading: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return {...state, foiRequestsList: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
@@ -98,6 +102,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, closingReasons: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS:
       return {...state, foiRequestComments: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
+      return {...state, foiRequestAttachments: action.payload};
     default:
       return state;
   }

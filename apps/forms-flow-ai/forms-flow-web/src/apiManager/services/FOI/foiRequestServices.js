@@ -6,6 +6,7 @@ import {
   setFOIUpdateLoader,
   setFOILoader,
   setFOIAssignedToListLoader,
+  setFOIAttachmentListLoader,
   setFOIRequestDetail,
   setFOIMinistryViewRequestDetail,
   setFOICategoryList,
@@ -23,7 +24,9 @@ import {
   setFOIWatcherList,
   setClosingReasons,
   setRawRequestComments,
-  setMinistryRequestComments
+  setMinistryRequestComments,
+  setRawRequestAttachments,
+  setMinistryRequestAttachments
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
@@ -357,7 +360,8 @@ export const fetchFOIMinistryRequestList = (...rest) => {
             return { ...foiRequest };
           });
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIMinistryAssignedToList(foiRequests[0].bcgovcode.toLowerCase()));
+          if (foiRequests > 0)
+            dispatch(fetchFOIMinistryAssignedToList( foiRequests[0].bcgovcode.toLowerCase()));     
           dispatch(setFOIMinistryRequestList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
@@ -877,3 +881,83 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
 };
 
 
+  export const fetchFOIRequestAttachmentsList = (requestId, ministryId, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    let apiUrl = "";
+    if (ministryId !=null) {
+      apiUrl = replaceUrl(
+        API.FOI_ATTACHMENTS_MINISTRYREQUEST,
+       "<ministryrequestid>", ministryId);
+    }
+    else {
+      apiUrl = replaceUrl(
+        API.FOI_ATTACHMENTS_RAWREQUEST,
+        "<requestid>",
+        requestId
+      );
+    }
+    return (dispatch) => {
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            if (ministryId!=null) {
+              dispatch(setMinistryRequestAttachments(res.data));
+            }
+  
+            if (requestId) {
+              dispatch(setRawRequestAttachments(res.data));
+            }
+  
+            dispatch(setFOIAttachmentListLoader(false));
+            done(null, res.data);
+            
+          } else {
+            console.log("Error", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
+          done(error);
+        });
+    };
+  };
+
+  export const saveFOIRequestAttachmentsList = (requestId, ministryId, data, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    let apiUrl = "";
+    if (ministryId !=null) {
+      apiUrl = replaceUrl(
+        API.FOI_ATTACHMENTS_MINISTRYREQUEST,
+       "<ministryrequestid>", ministryId);
+    }
+    else {
+      apiUrl = replaceUrl(
+        API.FOI_ATTACHMENTS_RAWREQUEST,
+        "<requestid>",
+        requestId
+      );
+    }
+    return (dispatch) => {
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {          
+          if (res.data) {
+            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+            dispatch(setFOIAttachmentListLoader(false));           
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
+            done("Error Posting Attachments");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
+          done(error);
+        });
+    };
+  };
