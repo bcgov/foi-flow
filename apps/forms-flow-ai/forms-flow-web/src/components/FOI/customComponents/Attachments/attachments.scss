@@ -59,3 +59,16 @@
   border: 1 px solid #d7d7d7!important;
   box-shadow: rgba(0, 0, 0, 0.4) 2px 2px 0px!important;
 }
+
+.attachment-name {
+  font-size: 15px;
+  font-weight: 700;
+  display: inline;
+  padding-right: 15px;
+}
+
+.attachment-time, .attachment-owner {
+  font-size: 13px;
+  font-weight: 300;
+  font-style: italic;
+}

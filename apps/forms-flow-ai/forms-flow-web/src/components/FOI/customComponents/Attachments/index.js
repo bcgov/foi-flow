@@ -159,29 +159,29 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
       <div className="row foi-details-row">
         <div className="row foi-details-row">
           <div className="col-sm-12 foi-details-col">
-            <div className="col-sm-5" style={{display:'inline-block',paddingLeft:'0px'}}>
-              <div style={{display:'inline',paddingRight:15+'px'}}>                      
+            <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
+              <div className="attachment-name">                      
                 <b>{attachment && attachment.filename ? attachment.filename.split('.').shift() : ""}</b>
               </div>
             </div>
-            <div className="col-sm-7" style={{display:'inline-block'}}>
+            <div className="col-sm-2" style={{display:'inline-block'}}>
               <div className="col-sm-1" style={{marginLeft:'auto'}}>
                 <AttachmentPopup attachment={attachment} />
               </div>                      
             </div>
           </div>
         </div>
-        <div className="row foi-details-row" style={{paddingTop:15+'px'}}>
-          <div className="col-sm-12 foi-details-col">                      
+        <div className="row foi-details-row">
+          <div className="col-sm-12 foi-details-col attachment-time">                      
             {attachment.created_at}
           </div>
         </div>
-        <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
-          <div className="col-sm-12 foi-details-col">                      
+        <div className="row foi-details-row">
+          <div className="col-sm-12 foi-details-col attachment-owner">                      
             {getfullName(attachment.createdby)}
           </div>
         </div>
-        <div className="row foi-details-row" style={{paddingBottom:15+'px'}}>
+        <div className="row foi-details-row">
           <div className="col-sm-12 foi-details-col">                      
             <hr className="solid" />
           </div>
