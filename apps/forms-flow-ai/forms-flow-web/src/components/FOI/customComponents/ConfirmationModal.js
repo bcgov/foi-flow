@@ -7,7 +7,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import './confirmationmodal.scss';
-import { StateEnum } from '../../../constants/FOI/statusEnum';
+import { StateEnum, StateTransitionCategories } from '../../../constants/FOI/statusEnum';
 import FileUpload from './FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -74,13 +74,13 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
       if (files.length > 0) {
         let fileStatusTransition = "";    
         if (state.toLowerCase() === StateEnum.response.name.toLowerCase())
-          fileStatusTransition = 'signoff-response';
+          fileStatusTransition = StateTransitionCategories.signoffresponse.name;
         else if (saveRequestObject.requeststatusid === StateEnum.callforrecords.id && state.toLowerCase() === StateEnum.review.name.toLowerCase())
-          fileStatusTransition = 'cfr-review';
+          fileStatusTransition = StateTransitionCategories.cfrreview.name;
         else if (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase())
-          fileStatusTransition = 'cfr-feeassessed';
+          fileStatusTransition = StateTransitionCategories.cfrfeeassessed.name;
         else if (saveRequestObject.requeststatusid === StateEnum.harms.id && state.toLowerCase() === StateEnum.review.name.toLowerCase())
-          fileStatusTransition = 'harms-review';
+          fileStatusTransition = StateTransitionCategories.harmsreview.name;
         fileInfoList = files.map(file => {
           return {
             ministrycode: requestNumber.split("-")[0],
