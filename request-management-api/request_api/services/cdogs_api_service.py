@@ -66,7 +66,7 @@ class CdogsApiService:
         response = self._post_upload_template(headers, url, template)
         
         if response.status_code == 200:
-            if response.headers.get("X-Template-Has") is None:
+            if response.headers.get("X-Template-Hash") is None:
                 raise BusinessException(Error.DATA_NOT_FOUND)
 
             current_app.logger.info('Returning new hash %s', response.headers['X-Template-Hash'])
