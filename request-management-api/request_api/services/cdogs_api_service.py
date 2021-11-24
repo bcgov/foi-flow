@@ -26,6 +26,9 @@ from request_api.exceptions import BusinessException, Error
 
 class CdogsApiService:
     """cdogs api Service class."""
+    
+    def __init__(self):
+        self.access_token = self._get_access_token();
 
     file_dir = os.path.dirname(os.path.realpath('__file__'))
     receipt_template_path = os.path.join(file_dir, 'request_api/receipt_templates/receipt_word.docx')
@@ -41,10 +44,10 @@ class CdogsApiService:
             "data": data
         }
         json_request_body = json.dumps(request_body)
-        access_token = self._get_access_token()
+        
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {access_token}'
+            'Authorization': f'Bearer {self.access_token}'
         }
         
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}/render"
@@ -53,10 +56,10 @@ class CdogsApiService:
     def _post_generate_receipt(self, json_request_body, headers, url):
         return requests.post(url, data= json_request_body, headers= headers)
 
-    def upload_template(self, template_file_path: str = receipt_template_path, access_token: str = None):
-
+    def upload_template(self, template_file_path: str = receipt_template_path):
+        
         headers = {
-        "Authorization": f'Bearer {access_token if access_token else self._get_access_token()}'
+        "Authorization": f'Bearer {self.access_token}'
         }
 
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template"
@@ -86,10 +89,10 @@ class CdogsApiService:
         response = requests.post(url, headers= headers, files= template)
         return response
 
-    def check_template_cached(self, template_hash_code: str, access_token = None):
+    def check_template_cached(self, template_hash_code: str):
 
         headers = {
-        "Authorization": f'Bearer {access_token if access_token else self._get_access_token()}'
+        "Authorization": f'Bearer {self.access_token}'
         }
 
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}"
