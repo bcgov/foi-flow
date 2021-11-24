@@ -24,9 +24,15 @@ class Payment(db.Model):
     transaction_number = db.Column(db.String(50), nullable=True)
 
     @classmethod
-    def find_by_id(cls, identifier: int):
+    def find_by_id(cls, identifier: int) -> Payment:
         """Return by id."""
         return cls.query.get(identifier)
+
+    @classmethod
+    def find_paid_transaction(cls, transaction_number: str) -> Payment:
+        """Return by transaction_number."""
+        a =  cls.query.filter_by(transaction_number=transaction_number, status='PAID').one_or_none()
+        return a
 
     @staticmethod
     def commit():

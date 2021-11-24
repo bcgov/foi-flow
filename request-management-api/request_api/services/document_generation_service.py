@@ -46,7 +46,7 @@ class DocumentGenerationService:
             current_app.logger.info('Uploading new template')
             self.receipt_template.cdogs_hash_code = self.cdgos_api_service.upload_template()
             self.receipt_template.flush()
-            self.receipt_template.commit()     
+            self.receipt_template.commit()
         
         current_app.logger.info('Generating receipt')
         return self.cdgos_api_service.generate_receipt(template_hash_code= self.receipt_template.cdogs_hash_code, data= data)
