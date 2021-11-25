@@ -61,14 +61,18 @@
 }
 
 .attachment-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   display: inline;
   padding-right: 15px;
+  letter-spacing: 0;
+  line-height: 22px;
 }
 
 .attachment-time, .attachment-owner {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 300;
   font-style: italic;
+  letter-spacing: 0;
+  line-height: 19px;
 }

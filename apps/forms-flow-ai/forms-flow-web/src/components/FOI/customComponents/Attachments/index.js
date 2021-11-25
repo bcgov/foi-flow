@@ -37,6 +37,9 @@ export const AttachmentSection = ({
   const dispatch = useDispatch();
   const [documents, setDocuments] = useState([]);
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
+  const [openRenameModal, setRenameModal] = useState(false);
+  const [currentAttachment, setCurrentAttachment] = useState();
+
   const addAttachments = () => {
     setModal(true);
   }
@@ -84,6 +87,20 @@ export const AttachmentSection = ({
   }
   }
 
+  const handleRenameModal = (value, newFilename) => {
+    setRenameModal(false);
+    if (currentAttachment.filename !== newFilename) {
+      dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err, res) => {
+        if (res === 200) {
+          setSuccessCount(index+1);
+        }
+        else {
+          setSuccessCount(0);
+        }
+      }));
+    }
+  }
+
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
     attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoList} ministryAssignedToList={ministryList} />);
@@ -100,6 +117,7 @@ export const AttachmentSection = ({
             <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
         </div>
         <AttachmentModal openModal={openModal} handleModal={handleContinueModal} multipleFiles={true} requestNumber={requestNumber} requestId={requestId} />
+        <RenameModal openModal={openRenameModal} handleModal={handleRenameModal} requestNumber={requestNumber} requestId={requestId} />
         <div className="displayAttachments">
           {attachmentsList}
         </div>
@@ -161,7 +179,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div className="attachment-name">                      
-                <b>{attachment && attachment.filename ? attachment.filename.split('.').shift() : ""}</b>
+                {attachment && attachment.filename ? attachment.filename.split('.').shift() : ""}
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
@@ -209,7 +227,7 @@ const AttachmentPopup = React.memo(({attachment}) => {
         <button className="childActionsBtn">
           Download
         </button>
-        <button className="childActionsBtn">
+        <button className="childActionsBtn" onClick={rename(attachment)}>
           Rename
         </button>
         {attachment.category==="statetransition"?
