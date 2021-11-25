@@ -50,4 +50,11 @@ const StateEnum = Object.freeze({
     response: {name: "Response", id: 14}
 });
 
-export { StateList, MinistryStateList, StateEnum };
+const StateTransitionCategories = Object.freeze({
+    cfrreview: {name: "cfr-review", fromState: "Call For Records", toState: "Records Review"},
+    cfrfeeassessed: {name: "cfr-feeassessed", fromState: "Call For Records", toState: "Fee Estimate"},
+    signoffresponse: {name: "signoff-response", fromState: "Ministry Sign Off", toState: "Response"},
+    harmsreview: {name: "harms-review", fromState: "Harms Assessment", toState: "Records Review"},
+});
+
+export { StateList, MinistryStateList, StateEnum, StateTransitionCategories };

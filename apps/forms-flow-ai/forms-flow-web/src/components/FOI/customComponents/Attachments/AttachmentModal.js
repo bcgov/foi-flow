@@ -10,6 +10,7 @@ import '../confirmationmodal.scss';
 import FileUpload from '../FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,8 +35,9 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ openModal, handleModal, multipleFiles, requestNumber, requestId }) {
+export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment }) {
 
+  //mimetype, maxfilesize, totalfilesize;
     const classes = useStyles();
 
     const [files, setFiles] = useState([]);
@@ -70,8 +72,46 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
             });
         }
         handleModal(true, fileInfoList, files);
-    }   
-  
+    }
+    const getMessage = () => {
+      console.log(`modalFor.toLowerCase() === ${modalFor.toLowerCase()}`)
+      switch(modalFor.toLowerCase()) { 
+        case "add":
+          return {title: "Add Attachment", body: ""};
+        case "replace":
+          let _message = {};
+            if (attachment) {              
+              switch(attachment.category.toLowerCase()) {
+                case StateTransitionCategories.cfrreview.name: 
+                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.cfrreview.fromState} to ${StateTransitionCategories.cfrreview.toState}.`};
+                  break;
+                case StateTransitionCategories.cfrfeeassessed.name: 
+                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.cfrfeeassessed.fromState} to ${StateTransitionCategories.cfrfeeassessed.toState}.`};
+                  break;
+                case StateTransitionCategories.signoffresponse.name: 
+                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.signoffresponse.fromState} to ${StateTransitionCategories.signoffresponse.toState}.`};
+                  break;
+                case StateTransitionCategories.harmsreview.name: 
+                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.harmsreview.fromState} to ${StateTransitionCategories.harmsreview.toState}.`};
+                  break;
+                default:
+                  _message = {title: "", body: ""}
+                  break;
+              }
+              console.log(`message = ${_message}`);
+            }
+            console.log(`message out = ${_message}`);
+            return _message;
+        case "rename":
+          return {title: "Rename Attachment", body: ""};
+        case "delete":
+          return {title: "Delete Attachment", body: "Are you sure you want to delete the attachment?"};            
+        default:
+            return {title: "", body: ""};
+      }
+    }
+    let message = getMessage();
+    console.log(message);
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -83,14 +123,19 @@ export default function AttachmentModal({ openModal, handleModal, multipleFiles,
           fullWidth={true}
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
-              <h2 className="state-change-header">Add Attachment</h2>
+              <h2 className="state-change-header">{message.title}</h2>
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-                <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.attachmentLog} maxFileSize={MaxFileSizeInMB.attachmentLog} totalFileSize={MaxFileSizeInMB.totalFileSize} updateFilesCb={updateFilesCb} />                                
+              <div className="modal-message">
+                <span className="confirmation-message">
+                  {message.body}                               
+                </span>                
+              </div>
+              <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.attachmentLog} maxFileSize={MaxFileSizeInMB.attachmentLog} totalFileSize={MaxFileSizeInMB.totalFileSize} updateFilesCb={updateFilesCb} />                                
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
