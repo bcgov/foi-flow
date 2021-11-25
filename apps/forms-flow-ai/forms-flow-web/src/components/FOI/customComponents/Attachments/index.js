@@ -104,6 +104,7 @@ export const AttachmentSection = ({
     }
   }
   }
+
   const handleReplace = (_attachment) => {
     setModal(true);
     setMultipleFiles(false);
@@ -111,8 +112,11 @@ export const AttachmentSection = ({
     setModalFor('replace');
   }
 
-  const handleRenameModal = (value, newFilename) => {
-    setRenameModal(false);
+  const handleRename = (_attachment) => {
+    setModal(true);
+    setUpdateAttachment(_attachment);
+    setModalFor('replace');
+    
     if (currentAttachment.filename !== newFilename) {
       dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err, res) => {
         if (res === 200) {
