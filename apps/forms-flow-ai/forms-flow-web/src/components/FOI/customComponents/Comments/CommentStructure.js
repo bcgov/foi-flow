@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import './comments.scss'
 import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faReply, faEllipsisH, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+import { faReply, faEllipsisH, faInfoCircle,faCaretDown,faCaretUp } from '@fortawesome/free-solid-svg-icons'
 import {
   modal,
   modalClose,
@@ -23,19 +23,37 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const actions = useContext(ActionContext)
   const edit = true
-
+  let needCollapsed = false
+  
   let halfDivclassname = isreplysection ? "halfDiv undermaincomment" : "halfDiv"
+
+  needCollapsed = isreplysection && totalcommentCount > 3 && currentIndex < totalcommentCount-2 ? true : false
+   
+
+  const [toggleIcon, settoggleIcon] = useState(faCaretDown)
 
   const ref = useRef();  
   const closeTooltip = () => ref.current.close();
 
-  return (
+  const toggleCollapse = (e,parentId)=>{
+    
+     var hiddenreplies = document.getElementsByName(`hiddenreply_${parentId}`)
+     hiddenreplies.forEach((commentnode)=>{
+      commentnode.style.display === 'none'? commentnode.style.display = 'flex' : commentnode.style.display = 'none' 
+     })
+     let _toggleIcon = e.target.innerText === "Show more comments" ? faCaretUp :faCaretDown
+     settoggleIcon(_toggleIcon)
+     e.target.innerText === "See few comments" ? e.target.innerText = "Show more comments" : e.target.innerText = "See few comments"
+     
+  }
 
-    <div className={halfDivclassname} >
+  return (
+<>
+    <div name={needCollapsed ?`hiddenreply_${parentId}` : `reply_${parentId}` } className={halfDivclassname} style={needCollapsed ? {display:'none'}:{}} >
       <div
         className="userInfo"
         style={reply && { marginLeft: 15, marginTop: '6px' }}
-      >
+      >               
         <div className="commentsTwo">
 
           <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
@@ -144,6 +162,10 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         )}
       </div>
     </div>
+    {
+        i.replies && i.replies.length > 3 ? <div className="togglecollapseAll"><FontAwesomeIcon icon={toggleIcon} size='1x' color='#003366' /> <span onClick={(e)=>toggleCollapse(e,i.commentId)}>Show more comments</span></div> : ""
+      }
+    </>
   )
 }
 
