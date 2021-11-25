@@ -83,19 +83,19 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
             if (attachment) {              
               switch(attachment.category.toLowerCase()) {
                 case StateTransitionCategories.cfrreview.name: 
-                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.cfrreview.fromState} to ${StateTransitionCategories.cfrreview.toState}.`};
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.cfrreview.fromState}</b> to <b>{StateTransitionCategories.cfrreview.toState}</b>.</>};
                   break;
                 case StateTransitionCategories.cfrfeeassessed.name: 
-                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.cfrfeeassessed.fromState} to ${StateTransitionCategories.cfrfeeassessed.toState}.`};
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b> {StateTransitionCategories.cfrfeeassessed.fromState} </b> to <b> {StateTransitionCategories.cfrfeeassessed.toState} </b>.</>};
                   break;
                 case StateTransitionCategories.signoffresponse.name: 
-                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.signoffresponse.fromState} to ${StateTransitionCategories.signoffresponse.toState}.`};
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.signoffresponse.fromState}</b> to <b>{StateTransitionCategories.signoffresponse.toState}</b>.</>};
                   break;
                 case StateTransitionCategories.harmsreview.name: 
-                  _message = {title: "Replace Attachment", body: `This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber} changing from ${StateTransitionCategories.harmsreview.fromState} to ${StateTransitionCategories.harmsreview.toState}.`};
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.harmsreview.fromState}</b> to <b>{StateTransitionCategories.harmsreview.toState}</b>.</>};
                   break;
                 default:
-                  _message = {title: "", body: ""}
+                  _message = {title: "", body: ""}                  
                   break;
               }
               console.log(`message = ${_message}`);

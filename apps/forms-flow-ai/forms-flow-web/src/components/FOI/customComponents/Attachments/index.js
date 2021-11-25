@@ -6,7 +6,7 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 
 export const AttachmentSection = ({
@@ -39,7 +39,6 @@ export const AttachmentSection = ({
   const [documents, setDocuments] = useState([]);
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const [multipleFiles, setMultipleFiles] = useState(true);
-  const [isReplace, setIsReplace] = useState(false);
   const [modalFor, setModalFor] = useState("add");
   const [updateAttachment, setUpdateAttachment] = useState({});
 
@@ -51,16 +50,13 @@ export const AttachmentSection = ({
     if (successCount === fileCount && successCount !== 0) {
         setModal(false);
         const documentsObject = {documents: documents};
-        console.log(updateAttachment);
-        console.log(`modalFor = ${modalFor}`);
-        if (isReplace && updateAttachment) {
-          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};         
-          console.log(JSON.stringify(replaceDocumentObject));
-          // const replaceDocumentObject = {documents: documents,prevdocument: {
-          //   foiministrydocumentid = attachment.foiministrydocumentid,
-          //   filename: attachment.filename,
-
-          // }};
+        if (modalFor === 'replace' && updateAttachment) {
+          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};          
+          dispatch(replaceFOIRequestAttachment(requestId, ministryId, updateAttachment.foiministrydocumentid, replaceDocumentObject,(err, res) => {
+            if (!err) {
+              setAttachmentLoading(false);
+            }
+          }));
         }
         else {
         dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
