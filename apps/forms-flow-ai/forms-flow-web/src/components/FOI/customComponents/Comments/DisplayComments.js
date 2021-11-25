@@ -5,10 +5,10 @@ import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, enableShowMore }) => {
 
   const getfullName = (userId) => {
-    let fullName = ''    
+    let fullName = ''
     var _sessionuser = localStorage.getItem(userId)
 
     if (_sessionuser === undefined || _sessionuser === '' || _sessionuser === null) {
@@ -36,20 +36,49 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       }
 
     }
-    else {     
+    else {
       fullName = _sessionuser
     }
 
     return fullName
   }
 
+  console.log(`Display comments - enableShowMore from FOIRequests ${enableShowMore}`)
+  var commentsDiv = document.getElementById('Comments')
+  let canHideEarlierComments = false;
+  if (commentsDiv) {
+    canHideEarlierComments = (commentsDiv.scrollHeight - commentsDiv.clientHeight) > 100
+  }
+
+  const showhiddencomments = (e, count) => {
+    var hiddencomments = document.getElementsByName('commentsectionhidden')
+    if (hiddencomments && Array.from(hiddencomments).filter((_c)=>_c.style.display === 'none').length > 0) {
+      var cnt = 0
+      hiddencomments.forEach(_com => {
+
+        if (cnt < count &&  _com.style.display === 'none') {
+          _com.style.display = 'block';
+          cnt++;
+        }
+
+      })
+      hiddencomments = document.getElementsByName('commentsectionhidden')
+      if (Array.from(hiddencomments).filter((_c)=>_c.style.display === 'none').length === 0) {
+        document.getElementById('showMoreParentComments').style.display = 'none'
+      }
+    }
+    else
+    {
+      document.getElementById('showMoreParentComments').style.display = 'none'
+    }
+
+  }
+
   const actions = useContext(ActionContext)
   return (
-    <div>
+    <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
       {comments.map((i, index) => (
-
-
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId}>
+        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={canHideEarlierComments && index >= 2 ? 'commentsectionhidden' : ""} style={canHideEarlierComments && index >= 2 ? { display: 'none' } : {}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -63,9 +92,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               <InputField cancellor={i.commentId} value={i.text} edit />
             )
           ) : (
-           
+
             <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.userId)} />
-   
+
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
             (actions.customInput ? (
@@ -134,6 +163,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
+      <div id="showMoreParentComments" className="showMoreParentComments" style={canHideEarlierComments && comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
+        <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 2)}>Show more comments</button>
+      </div>
     </div>
   )
 }
