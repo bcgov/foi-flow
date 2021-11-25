@@ -82,6 +82,11 @@ class AuthHelper:
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
         return unverified_claims['preferred_username']
     
+    def getUserName():
+        token = request.headers.get("Authorization", None)
+        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        return unverified_claims['name']  
+    
     def isMinistryMember():
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())

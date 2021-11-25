@@ -1,7 +1,7 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
-from datetime import datetime
+from datetime import datetime as datetime2
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
@@ -19,7 +19,7 @@ class FOIRequestComment(db.Model):
     comment = db.Column(db.Text, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now())
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -29,10 +29,10 @@ class FOIRequestComment(db.Model):
  
     
     @classmethod
-    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None)->DefaultMethodResult:   
+    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None)->DefaultMethodResult: 
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
-        _createdDate = datetime.now() if commentcreatedate is None else commentcreatedate
-        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at= _createdDate, createdby=userid)
+        _createdDate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate
+        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createdDate, createdby=userid)
         db.session.add(newcomment)
         db.session.commit()               
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    

@@ -23,14 +23,14 @@ class commentservice:
     
     
     @classmethod    
-    def createministryrequestcomment(self, data, userid):
+    def createministryrequestcomment(self, data, userid, type=1):
         version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
-        return FOIRequestComment.savecomment(1, data, version, userid) 
+        return FOIRequestComment.savecomment(type, data, version, userid) 
 
     @classmethod    
-    def createrawrequestcomment(self, data, userid):
-        version = FOIRawRequest.getversionforrequest(data["requestid"])
-        return FOIRawRequestComment.savecomment(1, data, version, userid) 
+    def createrawrequestcomment(self, data, userid, type=1):
+        version = FOIRawRequest.getversionforrequest(data["requestid"])    
+        return FOIRawRequestComment.savecomment(type, data, version, userid) 
     
     @classmethod    
     def disableministryrequestcomment(self, commentid, userid):
@@ -58,7 +58,7 @@ class commentservice:
         data = FOIRawRequestComment.getcomments(requestid)
         return self.preparecomments(data)        
     
-    
+   
 
     @classmethod    
     def copyrequestcomment(self, ministryrequestid, comments, userid):
