@@ -48,7 +48,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);
-    const attachmentFileNameListByCategory = attachmentsArray.filter(_file => _file.category === attachment.category).map(_file => _file.filename);
+    // const attachmentFileNameListByCategory = attachmentsArray.filter(_file => _file.category === attachment.category).map(_file => _file.filename);
 
     useEffect(() => {
       parseFileName(attachment);
@@ -74,7 +74,8 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
 
     const containDuplicate = (fname) => {
       if(attachment.filename !== (fname+"."+extension)) {
-        return attachmentFileNameListByCategory.includes(fname+"."+extension);
+        // return attachmentFileNameListByCategory.includes(fname+"."+extension);
+        return attchmentFileNameList.includes(fname+"."+extension);
       } else {
         return false;
       }
