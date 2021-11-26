@@ -35,25 +35,24 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment }) {
+export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray }) {
 
-  //mimetype, maxfilesize, totalfilesize;
+    const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
+    const maxFileSize = multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
+    const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
-
     const [files, setFiles] = useState([]);
+    const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);    
     const updateFilesCb = (_files, _errorMessage) => {
       setFiles(_files);
     }
     const handleClose = () => {
-        //handleModal(false);
         if (files.length > 0) {
             if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-                // window.location.reload();
                 handleModal(false);
             }
         }
         else {
-            // window.location.reload();
             handleModal(false);
         }
     };
@@ -61,20 +60,25 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const handleSave = () => {
         let fileInfoList = [];
         if (files.length > 0) {
-            let fileStatusTransition = "attachmentlog";    
+          let fileStatusTransition = "";
+          if (modalFor === 'replace') {
+            fileStatusTransition = attachment && attachment.category;
+          }
+          else {
+            fileStatusTransition = "general";
+          }
             fileInfoList = files.map(file => {
             return {
                 ministrycode: "Misc",
                 requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
                 filestatustransition: fileStatusTransition,
-                filename: file.name,
+                filename: file.filename? file.filename : file.name,
             }
             });
         }
         handleModal(true, fileInfoList, files);
     }
     const getMessage = () => {
-      console.log(`modalFor.toLowerCase() === ${modalFor.toLowerCase()}`)
       switch(modalFor.toLowerCase()) { 
         case "add":
           return {title: "Add Attachment", body: ""};
@@ -95,12 +99,10 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.harmsreview.fromState}</b> to <b>{StateTransitionCategories.harmsreview.toState}</b>.</>};
                   break;
                 default:
-                  _message = {title: "", body: ""}                  
+                  _message = {title: "Replace Attachment", body:`This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber}` }                  
                   break;
               }
-              console.log(`message = ${_message}`);
             }
-            console.log(`message out = ${_message}`);
             return _message;
         case "rename":
           return {title: "Rename Attachment", body: ""};
@@ -111,7 +113,6 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
     }
     let message = getMessage();
-    console.log(message);
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -135,7 +136,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   {message.body}                               
                 </span>                
               </div>
-              <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.attachmentLog} maxFileSize={MaxFileSizeInMB.attachmentLog} totalFileSize={MaxFileSizeInMB.totalFileSize} updateFilesCb={updateFilesCb} />                                
+              <FileUpload attachment={attachment}  attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={mimeTypes} maxFileSize={maxFileSize} totalFileSize={totalFileSize} updateFilesCb={updateFilesCb} />
             </DialogContentText>
           </DialogContent>
           <DialogActions>            

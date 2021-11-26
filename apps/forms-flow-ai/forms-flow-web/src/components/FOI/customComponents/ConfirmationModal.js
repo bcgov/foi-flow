@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ConfirmationModal({ openModal, handleModal, state, saveRequestObject, 
-  handleClosingDateChange, handleClosingReasonChange }) {    
+  handleClosingDateChange, handleClosingReasonChange, attachmentsArray }) {    
     const classes = useStyles();    
     const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
     const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries && saveRequestObject.selectedMinistries.length > 0   ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
@@ -134,6 +134,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     }
 
     let message = getMessage(state, requestNumber);
+    const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename); 
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -170,7 +171,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                   : (
                     <>
                     {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id) ?
-                      <FileUpload  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
+                      <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
                       :
                       <>
                         <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">

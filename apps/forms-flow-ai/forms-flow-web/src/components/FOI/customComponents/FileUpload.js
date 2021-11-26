@@ -6,7 +6,9 @@ const FileUpload = ({
     mimeTypes,
     maxFileSize,
     totalFileSize,
-    updateFilesCb
+    updateFilesCb,
+    attchmentFileNameList,
+    attachment
 }) => {
     const fileInputField = useRef(null);
     const fileInputFieldMultiple = useRef(null);
@@ -18,18 +20,39 @@ const FileUpload = ({
         fileInputField.current.click();
       else
         fileInputFieldMultiple.current.click();
-    };    
+    };
+    const countOccurrences = (attchmentFileNameList, fileName) => {
+      return attchmentFileNameList.reduce((count, attachmentName) => (attachmentName.toLowerCase() === fileName.toLowerCase() ? count + 1 : count), 0);
+    }
 
     const addNewFiles = (newFiles) => {
       let _errorMessage = [];
       let _totalFileSizeInMB = 0;
         for (let file of newFiles) {
-          if (mimeTypes.includes(file.type) || (multipleFiles && (file.name.endsWith(".msg") || file.name.endsWith(".eml")))) {
+          file.filename = file.name;
+          if (mimeTypes.includes(file.type) || (multipleFiles && (file.name.endsWith(".msg") || file.name.endsWith(".eml")))) {            
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
             _totalFileSizeInMB += parseFloat(sizeInMB);
             if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
-              if (sizeInMB <= maxFileSize) {             
+              if (sizeInMB <= maxFileSize) {
+                if (attchmentFileNameList) {
+                  const countFileOccurrences = countOccurrences(attchmentFileNameList, file.name);
+                  if (countFileOccurrences > 0 && multipleFiles) {                
+                    _errorMessage.push(`A attachment with this file name ${file.name} already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version. `);                
+                  }
+                  else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename !== file.name))) {
+                    const filename = file.name.split('.');
+                    file.filename = `${filename[0]}(${countFileOccurrences}).${filename[1]}`;
+                    files[file.name] = file;
+                  }
+                  else {
+                    files[file.name] = file;
+                  }
+                }
+                else {
                   files[file.name] = file;
+                }                
+                  
               }
               else {
                 _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `)              
@@ -145,7 +168,7 @@ function FilePreviewContainer({files, removeFile}) {
               <div>
                 <div>
                   <aside>  
-                    <span className="file-name">{file.name}</span>                                       
+                    <span className="file-name">{file.filename ? file.filename : file.name}</span>                                       
                     <i className="fas fa-times-circle foi-file-close" onClick={() => removeFile(fileName)} />
                   </aside>
                 </div>

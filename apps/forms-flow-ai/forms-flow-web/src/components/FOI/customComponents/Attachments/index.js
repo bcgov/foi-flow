@@ -43,6 +43,9 @@ export const AttachmentSection = ({
   const [updateAttachment, setUpdateAttachment] = useState({});
 
   const addAttachments = () => {
+    setModalFor('add');
+    setMultipleFiles(true);
+    setUpdateAttachment({});
     setModal(true);
   }
 
@@ -55,6 +58,7 @@ export const AttachmentSection = ({
           dispatch(replaceFOIRequestAttachment(requestId, ministryId, updateAttachment.foiministrydocumentid, replaceDocumentObject,(err, res) => {
             if (!err) {
               setAttachmentLoading(false);
+              setSuccessCount(0);
             }
           }));
         }
@@ -62,6 +66,7 @@ export const AttachmentSection = ({
         dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
           if (!err) {
             setAttachmentLoading(false);
+            setSuccessCount(0);
           }
         }));
       }
@@ -75,11 +80,11 @@ export const AttachmentSection = ({
     if (value) {
         if (files.length !== 0) {
           setAttachmentLoading(true);
-          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
+          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {
             let _documents = [];
             if (!err) {
               res.map((header, index) => {
-                const _file = files.find(file => file.name === header.filename);
+                const _file = files.find(file => file.filename === header.filename);
                 const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
                 _documents.push(documentDetails);
                 setDocuments(_documents);
@@ -109,7 +114,7 @@ export const AttachmentSection = ({
   for(var i=0; i<attachments.length; i++) {
     attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoList} ministryAssignedToList={ministryList} handleReplace={handleReplace} />);
   }
-  console.log(updateAttachment);
+  
   return (
     <div>
       { isAttachmentLoading ? <Loading /> : 
@@ -120,7 +125,7 @@ export const AttachmentSection = ({
         <div className="addAttachmentBox">
             <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
         </div>
-        <AttachmentModal modalFor={modalFor} openModal={openModal} handleModal={handleContinueModal} multipleFiles={multipleFiles} requestNumber={requestNumber} requestId={requestId} attachment={updateAttachment} />
+        <AttachmentModal modalFor={modalFor} openModal={openModal} handleModal={handleContinueModal} multipleFiles={multipleFiles} requestNumber={requestNumber} requestId={requestId} attachment={updateAttachment} attachmentsArray={attachmentsArray} />
         <div className="displayAttachments">
           {attachmentsList}
         </div>
