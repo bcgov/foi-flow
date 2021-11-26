@@ -46,33 +46,49 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
+    const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);
+    const attachmentFileNameListByCategory = attachmentsArray.filter(_file => _file.category === attachment.category).map(_file => _file.filename);
 
-    let lastIndex = 0;
     useEffect(() => {
-      console.log(attachment);
-      // if(!newFilename) {
-        setNewFilename("");
-        setExtension("");
-        if(attachment && attachment.filename) {
-          lastIndex = attachment.filename.lastIndexOf(".");
-          setNewFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
-          setExtension(lastIndex>0?attachment.filename.substr(lastIndex+1):"");
-        }
-      // }
+      parseFileName(attachment);
     }, [attachment])
 
-    const validateFilename = (str) => {
-      return /^(?!.)(?!com[0-9]$)(?!con$)(?!lpt[0-9]$)(?!nul$)(?!prn$)[^|*?\:<>/$"]*[^.|*?\:<>/$"]+$/i.test(str);
+    const parseFileName = (_attachment) => {
+      setNewFilename("");
+      setExtension("");
+      if(_attachment && _attachment.filename) {
+        var lastIndex = _attachment.filename.lastIndexOf(".");
+        setNewFilename(lastIndex>0?_attachment.filename.substr(0, lastIndex):_attachment.filename);
+        setExtension(lastIndex>0?_attachment.filename.substr(lastIndex+1):"");
+      }
+    }
+
+    const validateFilename = (fname) => {
+      var rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
+      var rg2 = /^\./; // cannot start with dot (.)
+      var rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(.|$)/i; // forbidden file names
+
+      return rg1.test(fname) && !rg2.test(fname) && !rg3.test(fname);
     };
 
-    const updateFilename = (e) => {
-      console.log(e.target.value);
-      console.log(validateFilename(e.target.value));
-      if(!validateFilename(e.target.value)) {
-        setNewFilename(e.target.value);
-        setErrorMessage("");
+    const containDuplicate = (fname) => {
+      if(attachment.filename !== (fname+"."+extension)) {
+        return attachmentFileNameListByCategory.includes(fname+"."+extension);
       } else {
-        setErrorMessage("invalid characters");
+        return false;
+      }
+    }
+
+    const updateFilename = (e) => {
+      if(validateFilename(e.target.value)) {
+        if(!containDuplicate(e.target.value)) {
+          setNewFilename(e.target.value);
+          setErrorMessage("");
+        } else {
+          setErrorMessage("duplicate filename");
+        }
+      } else {
+        setErrorMessage("invalid filename");
       }
     };
 
@@ -80,18 +96,19 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       handleRename(attachment, newFilename+"."+extension);
     };
 
-    const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);    
     const updateFilesCb = (_files, _errorMessage) => {
       setFiles(_files);
     }
     const handleClose = () => {
-        if (files.length > 0) {
+        if (files.length > 0 || attachment.filename !== (newFilename+"."+extension)) {
             if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
                 handleModal(false);
+                parseFileName(attachment);
             }
         }
         else {
             handleModal(false);
+            parseFileName(attachment);
         }
     };
 
