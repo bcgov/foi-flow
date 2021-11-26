@@ -27,6 +27,9 @@ const FileUpload = ({
 
     const addNewFiles = (newFiles) => {
       let _errorMessage = [];
+      let _duplicateFiles = [];
+      let _typeErrorFiles = [];
+      let _overSizedFiles = [];
       let _totalFileSizeInMB = 0;
         for (let file of newFiles) {
           file.filename = file.name;
@@ -37,8 +40,8 @@ const FileUpload = ({
               if (sizeInMB <= maxFileSize) {
                 if (attchmentFileNameList) {
                   const countFileOccurrences = countOccurrences(attchmentFileNameList, file.name);
-                  if (countFileOccurrences > 0 && multipleFiles) {                
-                    _errorMessage.push(`A attachment with this file name ${file.name} already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version. `);                
+                  if (countFileOccurrences > 0 && multipleFiles) {
+                    _duplicateFiles.push(file.name);              
                   }
                   else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename !== file.name))) {
                     const filename = file.name.split('.');
@@ -55,13 +58,22 @@ const FileUpload = ({
                   
               }
               else {
-                _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `)              
+                _overSizedFiles.push(file.name);
               }
             }
           }
           else {
-            _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: ${multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}`);           
+            _typeErrorFiles.push(file.name);
           }
+        }
+        if (_duplicateFiles.length > 0) {
+          _errorMessage.push(<>A attachment with this file name(s) <b>{_duplicateFiles.join(", ")}</b> already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.</>);
+        }
+        if (_overSizedFiles.length > 0) {
+          _errorMessage.push(<>The specified file(s) <b>{_overSizedFiles.join(", ")}</b> could not be uploaded. Only files <b>{maxFileSize}MB</b> or under can be uploaded.</>);
+        }
+        if (_typeErrorFiles.length > 0) {
+          _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}</b></>);
         }
         _totalFileSizeInMB += totalFileSizeCalculated;
         setTotalFileSize(_totalFileSizeInMB);
@@ -145,13 +157,16 @@ const FileUpload = ({
         : null}
         
       </section>
+      <ul className="error-message-ul">
       {errorMessage ? errorMessage.map(error => 
-           <div className="error-message-container">
-             <p>{error}</p>
-           </div>
+           <li>
+            <div className="error-message-container">
+              <p>{error}</p>
+            </div>
+           </li>
            )
       : null}
-     
+     </ul>
     </>
   );
 };
