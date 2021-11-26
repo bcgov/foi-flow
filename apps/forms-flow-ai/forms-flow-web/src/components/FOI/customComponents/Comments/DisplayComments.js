@@ -47,7 +47,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   var commentsDiv = document.getElementById('Comments')
   let canHideEarlierComments = false;
   if (commentsDiv) {
-    canHideEarlierComments = (commentsDiv.scrollHeight - commentsDiv.clientHeight) > 100
+    console.log(`Display comments - commentsDiv.scrollHeight ${commentsDiv.scrollHeight}`)
+    console.log(`Display comments - commentsDiv.clientHeight ${commentsDiv.clientHeight}`)
+    canHideEarlierComments = enableShowMore || (commentsDiv.scrollHeight - commentsDiv.clientHeight) > 100
   }
 
   const showhiddencomments = (e, count) => {
