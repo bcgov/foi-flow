@@ -180,8 +180,8 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
     return userId;
   }
 
-  const handleReplaceClick = (attachment) => {
-    handleReplace(attachment);
+  const handleReplaceClick = (_attachment) => {
+    handleReplace(_attachment);
   }
 
   return (
