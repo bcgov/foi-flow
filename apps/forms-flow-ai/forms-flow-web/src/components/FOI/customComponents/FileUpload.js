@@ -25,14 +25,18 @@ const FileUpload = ({
     const countOccurrences = (fileName) => {
       return attchmentFileNameList.reduce((count, attachmentName) => (attachmentName.toLowerCase() === fileName.toLowerCase() ? count + 1 : count), 0);
     }
-    const generateNewFileName = (newFileName, uploadFileName) => {     
+    const generateNewFileName = (newFileName, uploadFileName, attachedFileName) => {
       let count = countOccurrences(newFileName);      
       let _fileNameArray = uploadFileName.split('.');      
       newFileName = count > 0 ? `${_fileNameArray[0]}(${++countFileNameOccurence}).${_fileNameArray[1]}` : newFileName;      
       if (count > 0) {
-        newFileName = generateNewFileName(newFileName, uploadFileName);
-        return newFileName;
-      }      
+        if (attachedFileName && attachedFileName === newFileName)
+          return attachedFileName;
+        else {
+          newFileName = generateNewFileName(newFileName, uploadFileName, attachedFileName);
+          return newFileName;
+        }
+      }
       return newFileName;
     }
 
@@ -56,7 +60,7 @@ const FileUpload = ({
                   }
                   else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename !== file.name))) {
                     const filename = file.name.split('.');
-                    const newFileName =  generateNewFileName(`${filename[0]}(${countFileOccurrences}).${filename[1]}`, file.name);
+                    const newFileName =  generateNewFileName(`${filename[0]}(${countFileOccurrences}).${filename[1]}`, file.name, attachment && attachment.filename);
                     file.filename = newFileName;
                     files[file.name] = file;
                   }
