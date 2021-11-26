@@ -224,7 +224,10 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div className="attachment-name">
-                {filename}<span class="badge label-primary">{attachment.category}</span>
+                {filename}
+              </div>
+              <div className="attachment-badge">
+                <span class="badge badge-primary">{attachment.category}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
