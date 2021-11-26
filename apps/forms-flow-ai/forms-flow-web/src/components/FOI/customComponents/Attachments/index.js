@@ -217,10 +217,6 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
     return userId;
   }
 
-  // const handlePopupButtonClick = (action, attachment) => {
-  //   handlePopupButtonClick(action, attachment);
-  // }
-
   return (
     <div className="container-fluid">
       <div className="row foi-details-row">

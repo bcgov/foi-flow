@@ -21,7 +21,7 @@ const FileUpload = ({
       else
         fileInputFieldMultiple.current.click();
     };
-    const countOccurrences = (attchmentFileNameList, fileName) => {
+    const countOccurrences = (fileName) => {
       return attchmentFileNameList.reduce((count, attachmentName) => (attachmentName.toLowerCase() === fileName.toLowerCase() ? count + 1 : count), 0);
     }
 
@@ -39,7 +39,7 @@ const FileUpload = ({
             if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
               if (sizeInMB <= maxFileSize) {
                 if (attchmentFileNameList) {
-                  const countFileOccurrences = countOccurrences(attchmentFileNameList, file.name);
+                  const countFileOccurrences = countOccurrences(file.name);
                   if (countFileOccurrences > 0 && multipleFiles) {
                     _duplicateFiles.push(file.name);              
                   }
