@@ -222,7 +222,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
       <div className="row foi-details-row">
         <div className="row foi-details-row">
           <div className="col-sm-12 foi-details-col">
-            <div className="col-sm-5" style={{display:'inline-block',paddingLeft:'0px'}}>
+            <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div style={{display:'inline',paddingRight:15+'px'}}>                      
                 <b>{attachment && attachment.filename}</b>
               </div>
