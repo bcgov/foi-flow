@@ -962,6 +962,52 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
     };
   };
 
+  export const saveNewFilename = (newFilename, documentId, requestId, ministryId, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+
+    let apiUrl = "";
+    if (ministryId !=null) {
+      apiUrl = replaceUrl(
+        API.FOI_RENAME_ATTACHMENTS_MINISTRYREQUEST+'',
+       "<ministryrequestid>", ministryId);
+    }
+    else {
+      apiUrl = replaceUrl(
+        API.FOI_RENAME_ATTACHMENTS_RAWREQUEST,
+        "<requestid>",
+        requestId
+      );
+    }
+    apiUrl = replaceUrl(
+      apiUrl,
+      "<documentid>",
+      documentId
+    );
+
+    return (dispatch) => {
+      const data = {
+        filename: newFilename
+      };
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {          
+          if (res.data) {
+            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+            dispatch(setFOIAttachmentListLoader(false));           
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
+            done("Error Posting Attachments");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
+          done(error);
+        });
+    };
+  };
+
   export const replaceFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
     const done = rest.length ? rest[0] : () => { };
     let apiUrl = "";
