@@ -86,7 +86,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
           setNewFilename(e.target.value);
           setErrorMessage("");
         } else {
-          setErrorMessage(`Filename, ${e.target.value}) already exists`);
+          setErrorMessage(`Filename, ${e.target.value}.${extension}, already exists`);
         }
       } else {
         setErrorMessage(`File name cannot be empty and cannot contain these characters, / : * ? " < > |`);
