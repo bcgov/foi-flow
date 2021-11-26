@@ -961,3 +961,41 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
         });
     };
   };
+
+  export const replaceFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    let apiUrl = "";
+
+    if (ministryId && documentId) {
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST,
+        "<ministryrequestid>",
+        ministryId
+      ), "<documentid>", documentId);
+    } else {
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST,
+        "<requestid>",
+        requestId
+      ), "<documentid>", documentId);      
+    }
+    return (dispatch) => {
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {          
+          if (res.data) {
+            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+            dispatch(setFOIAttachmentListLoader(false));           
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
+            done("Error Posting Attachments");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
+          done(error);
+        });
+    };
+  };

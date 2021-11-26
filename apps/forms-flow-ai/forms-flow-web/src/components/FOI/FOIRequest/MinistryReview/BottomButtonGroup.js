@@ -42,7 +42,8 @@ const BottomButtonGroup = React.memo(({
   unSavedRequest,
   handleSaveRequest,
   currentSelectedStatus,
-  hasStatusRequestSaved
+  hasStatusRequestSaved,
+  attachmentsArray
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -181,7 +182,7 @@ const BottomButtonGroup = React.memo(({
               if (!err) {
                 res.map((header, index) => {
                   const _file = files.find(file => file.name === header.filename);
-                  const documentpath = {documentpath: header.filepath, filename: header.filename, category: 'statetransition'};
+                  const documentpath = {documentpath: header.filepath, filename: header.filename, category: header.filestatustransition};
                   _documents.push(documentpath);
                   setDocuments(_documents);
                   dispatch(saveFilesinS3(header, _file, (err, res) => {
@@ -209,7 +210,7 @@ const BottomButtonGroup = React.memo(({
 
   return (
     <div className={classes.root}>
-      <ConfirmationModal openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveMinistryRequestObject}/>
+      <ConfirmationModal attachmentsArray={attachmentsArray} openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveMinistryRequestObject}/>
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${disableSave ? classes.btndisabled : classes.btnenabled}`} disabled={disableSave} onClick={saveMinistryRequest}>Save</button>
       {/* <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>       */}

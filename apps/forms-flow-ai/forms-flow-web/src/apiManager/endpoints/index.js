@@ -41,6 +41,10 @@ const API = {
   FOI_ATTACHMENTS_RAWREQUEST:`${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>`,
   FOI_ATTACHMENTS_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>`,
 
+  FOI_REPLACE_ATTACHMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>/documentid/<documentid>/replace`,
+  FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>/documentid/<documentid>/replace`,
+ 
+
 };
 
 export default API;

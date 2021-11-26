@@ -6,7 +6,8 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 
 export const AttachmentSection = ({
   requestNumber,
@@ -37,7 +38,14 @@ export const AttachmentSection = ({
   const dispatch = useDispatch();
   const [documents, setDocuments] = useState([]);
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
+  const [multipleFiles, setMultipleFiles] = useState(true);
+  const [modalFor, setModalFor] = useState("add");
+  const [updateAttachment, setUpdateAttachment] = useState({});
+
   const addAttachments = () => {
+    setModalFor('add');
+    setMultipleFiles(true);
+    setUpdateAttachment({});
     setModal(true);
   }
 
@@ -45,11 +53,23 @@ export const AttachmentSection = ({
     if (successCount === fileCount && successCount !== 0) {
         setModal(false);
         const documentsObject = {documents: documents};
+        if (modalFor === 'replace' && updateAttachment) {
+          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};          
+          dispatch(replaceFOIRequestAttachment(requestId, ministryId, updateAttachment.foiministrydocumentid, replaceDocumentObject,(err, res) => {
+            if (!err) {
+              setAttachmentLoading(false);
+              setSuccessCount(0);
+            }
+          }));
+        }
+        else {
         dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
           if (!err) {
             setAttachmentLoading(false);
+            setSuccessCount(0);
           }
         }));
+      }
     }
   },[successCount])
 
@@ -60,12 +80,12 @@ export const AttachmentSection = ({
     if (value) {
         if (files.length !== 0) {
           setAttachmentLoading(true);
-          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
+          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {
             let _documents = [];
             if (!err) {
               res.map((header, index) => {
-                const _file = files.find(file => file.name === header.filename);
-                const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'attachmentlog'};
+                const _file = files.find(file => file.filename === header.filename);
+                const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
                 _documents.push(documentDetails);
                 setDocuments(_documents);
                 dispatch(saveFilesinS3(header, _file, (err, res) => {
@@ -83,12 +103,18 @@ export const AttachmentSection = ({
     }
   }
   }
+  const handleReplace = (_attachment) => {
+    setModal(true);
+    setMultipleFiles(false);
+    setUpdateAttachment(_attachment);
+    setModalFor('replace');
+  }
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoList} ministryAssignedToList={ministryList} />);
+    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoList} ministryAssignedToList={ministryList} handleReplace={handleReplace} />);
   }
-
+  
   return (
     <div>
       { isAttachmentLoading ? <Loading /> : 
@@ -99,7 +125,7 @@ export const AttachmentSection = ({
         <div className="addAttachmentBox">
             <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
         </div>
-        <AttachmentModal openModal={openModal} handleModal={handleContinueModal} multipleFiles={true} requestNumber={requestNumber} requestId={requestId} />
+        <AttachmentModal modalFor={modalFor} openModal={openModal} handleModal={handleContinueModal} multipleFiles={multipleFiles} requestNumber={requestNumber} requestId={requestId} attachment={updateAttachment} attachmentsArray={attachmentsArray} />
         <div className="displayAttachments">
           {attachmentsList}
         </div>
@@ -110,7 +136,7 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedToList}) => {
+const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedToList, handleReplace}) => {
 
   const getfullName = (userId) => {
     let user;
@@ -154,6 +180,10 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
     return userId;
   }
 
+  const handleReplaceClick = (_attachment) => {
+    handleReplace(_attachment);
+  }
+
   return (
     <div className="container-fluid">
       <div className="row foi-details-row">
@@ -161,12 +191,12 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-5" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div style={{display:'inline',paddingRight:15+'px'}}>                      
-                <b>{attachment && attachment.filename ? attachment.filename.split('.').shift() : ""}</b>
+                <b>{attachment && attachment.filename}</b>
               </div>
             </div>
             <div className="col-sm-7" style={{display:'inline-block'}}>
               <div className="col-sm-1" style={{marginLeft:'auto'}}>
-                <AttachmentPopup attachment={attachment} />
+                <AttachmentPopup attachment={attachment} handleReplaceClick={handleReplaceClick}/>
               </div>                      
             </div>
           </div>
@@ -191,8 +221,11 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
   );
 })
 
-const AttachmentPopup = React.memo(({attachment}) => {
+const AttachmentPopup = React.memo(({attachment, handleReplaceClick}) => {
 
+  const handleReplaceButtonClick = () => {
+    handleReplaceClick(attachment);
+  }
   return (
     <Popup
       trigger={
@@ -212,8 +245,8 @@ const AttachmentPopup = React.memo(({attachment}) => {
         <button className="childActionsBtn">
           Rename
         </button>
-        {attachment.category==="statetransition"?
-          <button className="childActionsBtn">
+        {(attachment.category==="statetransition" || attachment.category===StateTransitionCategories.cfrreview.name || attachment.category===StateTransitionCategories.cfrfeeassessed.name || attachment.category===StateTransitionCategories.signoffresponse.name || attachment.category===StateTransitionCategories.harmsreview.name )?
+          <button className="childActionsBtn" onClick={handleReplaceButtonClick}>
             Replace
           </button>
           :
