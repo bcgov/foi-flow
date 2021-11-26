@@ -69,7 +69,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       var rg2 = /^\./; // cannot start with dot (.)
       var rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(.|$)/i; // forbidden file names
 
-      return rg1.test(fname) && !rg2.test(fname) && !rg3.test(fname);
+      return fname && rg1.test(fname) && !rg2.test(fname) && !rg3.test(fname);
     };
 
     const containDuplicate = (fname) => {
@@ -86,10 +86,10 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
           setNewFilename(e.target.value);
           setErrorMessage("");
         } else {
-          setErrorMessage("duplicate filename");
+          setErrorMessage(`Filename, ${e.target.value}) already exists`);
         }
       } else {
-        setErrorMessage("invalid filename");
+        setErrorMessage(`File name cannot be empty and cannot contain these characters, / : * ? " < > |`);
       }
     };
 
