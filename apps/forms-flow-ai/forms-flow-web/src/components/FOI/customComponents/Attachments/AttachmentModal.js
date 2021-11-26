@@ -43,13 +43,22 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
     const [files, setFiles] = useState([]);
-    const [newFilename, setNewFilename] = useState(attachment && attachment.filename ? attachment.filename.split('.').shift():"");
+    const [newFilename, setNewFilename] = useState("");
+    const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
 
+    let lastIndex = 0;
     useEffect(() => {
-      if(!newFilename) {
-        setNewFilename(attachment && attachment.filename ? attachment.filename.split('.').shift():"");
-      }
+      console.log(attachment);
+      // if(!newFilename) {
+        setNewFilename("");
+        setExtension("");
+        if(attachment && attachment.filename) {
+          lastIndex = attachment.filename.lastIndexOf(".");
+          setNewFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
+          setExtension(lastIndex>0?attachment.filename.substr(lastIndex+1):"");
+        }
+      // }
     }, [attachment])
 
     const validateFilename = (str) => {
@@ -68,7 +77,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     };
 
     const saveNewFilename = () => {
-      handleRename(attachment, newFilename);
+      handleRename(attachment, newFilename+"."+extension);
     };
 
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);    
@@ -182,7 +191,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                     />
                   </div>
                   <div class="col-sm-1 extension-name">
-                    .{attachment && attachment.filename ? attachment.filename.split('.').pop() : ""}
+                    .{extension}
                   </div>
                   <div class="col-sm-1"></div>
                 </div>

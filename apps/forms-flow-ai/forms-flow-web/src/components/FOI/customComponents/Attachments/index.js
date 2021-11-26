@@ -166,6 +166,15 @@ export const AttachmentSection = ({
 
 const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedToList, handlePopupButtonClick}) => {
 
+  const [filename, setFilename] = useState("");
+  let lastIndex = 0;
+  useEffect(() => {
+    if(attachment && attachment.filename) {
+      lastIndex = attachment.filename.lastIndexOf(".");
+      setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
+    }
+  }, [attachment])
+
   const getfullName = (userId) => {
     let user;
 
@@ -219,7 +228,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
               <div className="attachment-name">                      
-                {attachment && attachment.filename ? attachment.filename.split('.').shift() : ""}
+                {filename}
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
@@ -251,8 +260,12 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
 
 const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
 
-  const handleButtonClick = (action = '') => {
-    handlePopupButtonClick(action, attachment);
+  const handleRename = () => {
+    handlePopupButtonClick("rename", attachment);
+  }
+
+  const handleReplace = () => {
+    handlePopupButtonClick("replace", attachment);
   }
 
   return (
@@ -271,11 +284,11 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
         <button className="childActionsBtn">
           Download
         </button>
-        <button className="childActionsBtn" onClick={handleButtonClick("rename")}>
+        <button className="childActionsBtn" onClick={handleRename}>
           Rename
         </button>
         {(attachment.category==="statetransition" || attachment.category===StateTransitionCategories.cfrreview.name || attachment.category===StateTransitionCategories.cfrfeeassessed.name || attachment.category===StateTransitionCategories.signoffresponse.name || attachment.category===StateTransitionCategories.harmsreview.name )?
-          <button className="childActionsBtn" onClick={handleButtonClick("replace")}>
+          <button className="childActionsBtn" onClick={handleReplace}>
             Replace
           </button>
           :
