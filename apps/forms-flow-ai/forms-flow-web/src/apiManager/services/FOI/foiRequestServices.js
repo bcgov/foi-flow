@@ -985,9 +985,10 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
     );
 
     return (dispatch) => {
-      data = {
+      const data = {
         filename: newFilename
       };
+      console.log(data);
       httpPOSTRequest(apiUrl, data)
         .then((res) => {          
           if (res.data) {
