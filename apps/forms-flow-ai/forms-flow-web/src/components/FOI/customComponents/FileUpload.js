@@ -67,7 +67,7 @@ const FileUpload = ({
                   if (countFileOccurrences > 0 && multipleFiles) {
                     _duplicateFiles.push(file.name);
                   }
-                  else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename !== file.name))) {
+                  else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename.toLowerCase() !== file.name.toLowerCase()))) {
                     const filename = file.name.split('.');
                     const newFileName =  generateNewFileName(`${filename[0]}(${countFileOccurrences}).${filename[1]}`, file.name, attachment && attachment.filename);
                     file.filename = newFileName;
