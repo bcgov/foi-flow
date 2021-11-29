@@ -547,7 +547,7 @@ class FOIRequestUtil:
         return personalattributesarr
         
     
-    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):               
+    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):                      
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
@@ -580,6 +580,11 @@ class FOIRequestUtil:
             foiministryRequest.assignedministrygroup = requestSchema.get("assignedministrygroup")
         if self.isNotBlankorNone(requestSchema,"assignedministryperson","main") == True:
             foiministryRequest.assignedministryperson = requestSchema.get("assignedministryperson")
+
+        if(ministryId is None and fileNumber is None and status == "Open"):
+            foiministryRequest.assignedto =''
+            foiministryRequest.assignedgroup = 'Flex Team' if requestSchema.get("requestType") == "general" else 'Processing Team'
+
         if ministryId is not None:
             divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
