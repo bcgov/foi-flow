@@ -127,6 +127,15 @@ const BottomButtonGroup = React.memo(({
       if(currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId === undefined || ministryId === null || ministryId === ''))
       {
         saveRequestObject.requeststatusid = StateEnum.open.id;
+        if(saveRequestObject.requestType === "general")
+        {
+          saveRequestObject.assignedTo=""
+          saveRequestObject.assignedGroup = "Flex Team"
+        }
+        else if(saveRequestObject.requestType === "personal"){
+          saveRequestObject.assignedTo=""
+          saveRequestObject.assignedGroup = "Processing Team"
+        }        
         openRequest();
         hasStatusRequestSaved(true, StateEnum.open.name)
       }
