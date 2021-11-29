@@ -547,9 +547,7 @@ class FOIRequestUtil:
         return personalattributesarr
         
     
-    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):
-        print(requestSchema)
-        print("File Number is {0} , ministryid  is {1}, activeversion is {2}".format(fileNumber,ministryId,activeVersion))               
+    def createMinistry(self, requestSchema, ministry, activeVersion, userId, fileNumber=None, ministryId=None):                      
         foiministryRequest = FOIMinistryRequest()
         foiministryRequest.__dict__.update(ministry)
         foiministryRequest.requeststatusid = requestSchema.get("requeststatusid")
