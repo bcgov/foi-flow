@@ -57,6 +57,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const parseFileName = (_attachment) => {
       setNewFilename("");
       setExtension("");
+      setErrorMessage("");
       if(_attachment && _attachment.filename) {
         var lastIndex = _attachment.filename.lastIndexOf(".");
         setNewFilename(lastIndex>0?_attachment.filename.substr(0, lastIndex):_attachment.filename);
@@ -82,20 +83,20 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     }
 
     const updateFilename = (e) => {
-      if(validateFilename(e.target.value)) {
-        if(!containDuplicate(e.target.value)) {
-          setNewFilename(e.target.value);
+      setNewFilename(e.target.value);
+    };
+
+    const saveNewFilename = () => {
+      if(validateFilename(newFilename)) {
+        if(!containDuplicate(newFilename)) {
           setErrorMessage("");
+          handleRename(attachment, newFilename+"."+extension);
         } else {
-          setErrorMessage(`File name "${e.target.value}.${extension}" already exists`);
+          setErrorMessage(`File name "${newFilename}.${extension}" already exists`);
         }
       } else {
         setErrorMessage(`File name cannot be empty and cannot contain these characters, / : * ? " < > |`);
       }
-    };
-
-    const saveNewFilename = () => {
-      handleRename(attachment, newFilename+"."+extension);
     };
 
     const updateFilesCb = (_files, _errorMessage) => {

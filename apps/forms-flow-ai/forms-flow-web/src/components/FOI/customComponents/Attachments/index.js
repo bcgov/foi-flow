@@ -217,6 +217,21 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
     return userId;
   }
 
+  const getCategory = (category) => {
+    switch(category) {
+      case "cfr-review":
+        return "cfr - review";
+      case "cfr-feeassessed":
+        return "cfr - fee estimate";
+      case "signoff-response":
+        return "signoff - response";
+      case "harms-review":
+        return "harms assessment - review";
+      default:
+        return "general";
+    }
+  }
+
   return (
     <div className="container-fluid">
       <div className="row foi-details-row">
@@ -227,7 +242,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
                 {attachment.filename}
               </div>
               <div className="attachment-badge">
-                <span class="badge badge-primary">{attachment.category}</span>
+                <span class="badge badge-primary">{getCategory(attachment.category)}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
