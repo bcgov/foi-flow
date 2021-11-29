@@ -105,7 +105,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
     })
 
-    return returnindex+1;
+    return returnindex;
   }
 
   let limit = dynamicIndexFinder()
