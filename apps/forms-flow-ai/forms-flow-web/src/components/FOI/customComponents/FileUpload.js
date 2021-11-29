@@ -46,6 +46,7 @@ const FileUpload = ({
       let _typeErrorFiles = [];
       let _overSizedFiles = [];
       let _totalFileSizeInMB = 0;
+      let exists = false;
         for (let file of newFiles) {
           file.filename = file.name;
           if (mimeTypes.includes(file.type) || (multipleFiles && (file.name.endsWith(".msg") || file.name.endsWith(".eml")))) {            
@@ -53,10 +54,18 @@ const FileUpload = ({
             _totalFileSizeInMB += parseFloat(sizeInMB);
             if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
               if (sizeInMB <= maxFileSize) {
-                if (attchmentFileNameList) {
+                if (Object.entries(files).length > 0) {
+                  exists = Object.keys(files).some((k) => {
+                    return k.toLowerCase() === file.name.toLowerCase();
+                  });
+                }
+                if (exists) {
+                  _duplicateFiles.push(file.name);
+                }
+                else if (attchmentFileNameList) {
                   let countFileOccurrences = countOccurrences(file.name);
                   if (countFileOccurrences > 0 && multipleFiles) {
-                    _duplicateFiles.push(file.name);              
+                    _duplicateFiles.push(file.name);
                   }
                   else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename !== file.name))) {
                     const filename = file.name.split('.');
