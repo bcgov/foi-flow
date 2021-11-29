@@ -47,7 +47,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
-    const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);
+    const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
     // const attachmentFileNameListByCategory = attachmentsArray.filter(_file => _file.category === attachment.category).map(_file => _file.filename);
 
     useEffect(() => {
@@ -65,6 +65,12 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
     }
 
+    const checkInvalidCharacters = (fname) => {
+      var rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
+
+      return rg1.test(fname);
+    };
+
     const validateFilename = (fname) => {
       var rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
       var rg2 = /^\./; // cannot start with dot (.)
@@ -76,14 +82,18 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const containDuplicate = (fname) => {
       if(attachment.filename !== (fname+"."+extension)) {
         // return attachmentFileNameListByCategory.includes(fname+"."+extension);
-        return attchmentFileNameList.includes(fname+"."+extension);
+        return attchmentFileNameList.includes((fname+"."+extension).toLocaleLowerCase());
       } else {
         return false;
       }
     }
 
     const updateFilename = (e) => {
-      setNewFilename(e.target.value);
+      if(checkInvalidCharacters(e.target.value)) {
+        setNewFilename(e.target.value);
+      } else {
+        setErrorMessage(`File name cannot be empty and cannot contain these characters, / : * ? " < > |`);
+      }
     };
 
     const saveNewFilename = () => {
