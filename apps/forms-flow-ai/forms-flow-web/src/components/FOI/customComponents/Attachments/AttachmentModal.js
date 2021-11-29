@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -6,6 +6,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import TextField from '@material-ui/core/TextField';
 import '../confirmationmodal.scss';
 import './attachmentmodal.scss';
 import FileUpload from '../FileUpload';
@@ -36,25 +37,80 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray }) {
+export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename }) {
 
     const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
     const maxFileSize = multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
     const [files, setFiles] = useState([]);
-    const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);    
+    const [newFilename, setNewFilename] = useState("");
+    const [extension, setExtension] = useState("");
+    const [errorMessage, setErrorMessage] = useState();
+    const attchmentFileNameList = attachmentsArray.map(_file => _file.filename);
+    // const attachmentFileNameListByCategory = attachmentsArray.filter(_file => _file.category === attachment.category).map(_file => _file.filename);
+
+    useEffect(() => {
+      parseFileName(attachment);
+    }, [attachment])
+
+    const parseFileName = (_attachment) => {
+      setNewFilename("");
+      setExtension("");
+      if(_attachment && _attachment.filename) {
+        var lastIndex = _attachment.filename.lastIndexOf(".");
+        setNewFilename(lastIndex>0?_attachment.filename.substr(0, lastIndex):_attachment.filename);
+        setExtension(lastIndex>0?_attachment.filename.substr(lastIndex+1):"");
+      }
+    }
+
+    const validateFilename = (fname) => {
+      var rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
+      var rg2 = /^\./; // cannot start with dot (.)
+      var rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(.|$)/i; // forbidden file names
+
+      return fname && rg1.test(fname) && !rg2.test(fname) && !rg3.test(fname);
+    };
+
+    const containDuplicate = (fname) => {
+      if(attachment.filename !== (fname+"."+extension)) {
+        // return attachmentFileNameListByCategory.includes(fname+"."+extension);
+        return attchmentFileNameList.includes(fname+"."+extension);
+      } else {
+        return false;
+      }
+    }
+
+    const updateFilename = (e) => {
+      if(validateFilename(e.target.value)) {
+        if(!containDuplicate(e.target.value)) {
+          setNewFilename(e.target.value);
+          setErrorMessage("");
+        } else {
+          setErrorMessage(`File name "${e.target.value}.${extension}" already exists`);
+        }
+      } else {
+        setErrorMessage(`File name cannot be empty and cannot contain these characters, / : * ? " < > |`);
+      }
+    };
+
+    const saveNewFilename = () => {
+      handleRename(attachment, newFilename+"."+extension);
+    };
+
     const updateFilesCb = (_files, _errorMessage) => {
       setFiles(_files);
     }
     const handleClose = () => {
-        if (files.length > 0) {
+        if (files.length > 0 || attachment.filename !== (newFilename+"."+extension)) {
             if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
                 handleModal(false);
+                parseFileName(attachment);
             }
         }
         else {
             handleModal(false);
+            parseFileName(attachment);
         }
     };
 
@@ -137,13 +193,43 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   {message.body}                               
                 </span>                
               </div>
-              <FileUpload attachment={attachment}  attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={mimeTypes} maxFileSize={maxFileSize} totalFileSize={totalFileSize} updateFilesCb={updateFilesCb} />
+              {
+                modalFor === 'rename'?
+                <div class="row">
+                  <div class="col-sm-1"></div>
+                  <div class="col-sm-9">
+                    <TextField                            
+                    label="Rename Attachment"
+                    InputLabelProps={{ shrink: true, }}
+                    variant="outlined"
+                    fullWidth
+                    value={newFilename}
+                    onChange={updateFilename}
+                    error={(errorMessage !== undefined && errorMessage !== "")}
+                    helperText={errorMessage}
+                    />
+                  </div>
+                  <div class="col-sm-1 extension-name">
+                    .{extension}
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+                :
+                <FileUpload attachment={attachment}  attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={mimeTypes} maxFileSize={maxFileSize} totalFileSize={totalFileSize} updateFilesCb={updateFilesCb} />
+              }
             </DialogContentText>
           </DialogContent>
-          <DialogActions>            
-            <button className={`btn-bottom btn-save ${ files.length === 0 ? classes.btndisabled : classes.btnenabled }`} disabled={files.length === 0} onClick={handleSave}>
-              Continue
-            </button>
+          <DialogActions>
+            {
+              modalFor === 'rename'?
+              <button className="btn-bottom btn-save" onClick={saveNewFilename}>
+                Save
+              </button>
+              :
+              <button className={`btn-bottom btn-save ${ files.length === 0 ? classes.btndisabled : classes.btnenabled }`} disabled={files.length === 0} onClick={handleSave}>
+                Continue
+              </button>
+            }
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
               Cancel
             </button>

@@ -67,6 +67,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                 <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
               </button>
             }
+            className="comment-popup"
             position='right center'
             nested
             closeOnDocumentClick
@@ -86,6 +87,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                   trigger={
                     <button className="deleteBtn" onClick={closeTooltip}> delete</button>
                   }
+                  className="comment-popup"
                   modal
                   nested
                   closeOnDocumentClick

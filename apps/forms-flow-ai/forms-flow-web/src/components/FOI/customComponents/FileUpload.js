@@ -15,6 +15,7 @@ const FileUpload = ({
     const [files, setFiles] = useState({});
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]);
+    let countFileNameOccurence = 1;
     const handleUploadBtnClick = () => {
       if (fileInputField.current)
         fileInputField.current.click();
@@ -23,6 +24,20 @@ const FileUpload = ({
     };
     const countOccurrences = (fileName) => {
       return attchmentFileNameList.reduce((count, attachmentName) => (attachmentName.toLowerCase() === fileName.toLowerCase() ? count + 1 : count), 0);
+    }
+    const generateNewFileName = (newFileName, uploadFileName, attachedFileName) => {
+      let count = countOccurrences(newFileName);      
+      let _fileNameArray = uploadFileName.split('.');      
+      newFileName = count > 0 ? `${_fileNameArray[0]}(${++countFileNameOccurence}).${_fileNameArray[1]}` : newFileName;      
+      if (count > 0) {
+        if (attachedFileName && attachedFileName === newFileName)
+          return attachedFileName;
+        else {
+          newFileName = generateNewFileName(newFileName, uploadFileName, attachedFileName);
+          return newFileName;
+        }
+      }
+      return newFileName;
     }
 
     const addNewFiles = (newFiles) => {
@@ -39,13 +54,14 @@ const FileUpload = ({
             if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
               if (sizeInMB <= maxFileSize) {
                 if (attchmentFileNameList) {
-                  const countFileOccurrences = countOccurrences(file.name);
+                  let countFileOccurrences = countOccurrences(file.name);
                   if (countFileOccurrences > 0 && multipleFiles) {
                     _duplicateFiles.push(file.name);              
                   }
                   else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename !== file.name))) {
                     const filename = file.name.split('.');
-                    file.filename = `${filename[0]}(${countFileOccurrences}).${filename[1]}`;
+                    const newFileName =  generateNewFileName(`${filename[0]}(${countFileOccurrences}).${filename[1]}`, file.name, attachment && attachment.filename);
+                    file.filename = newFileName;
                     files[file.name] = file;
                   }
                   else {

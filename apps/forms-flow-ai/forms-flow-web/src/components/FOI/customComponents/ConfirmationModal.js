@@ -86,7 +86,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             ministrycode: requestNumber.split("-")[0],
             requestnumber: requestNumber,
             filestatustransition: fileStatusTransition,
-            filename: file.name,
+            filename: file.filename? file.filename : file.name,
           }
         });
       }
