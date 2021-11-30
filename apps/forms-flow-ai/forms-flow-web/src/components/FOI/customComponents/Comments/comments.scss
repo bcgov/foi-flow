@@ -1,9 +1,9 @@
 /* add css module styles here (optional) */
-#Comments{
-  height: 900px;
+#Comments{  
   overflow-y: scroll;
   width: auto;
   background-color:white;
+  height: 100%;
 }
 .section{
   display: flex;
@@ -14,7 +14,7 @@
   .addcommentBox{
     width:99%;
     margin-left:25px;
-    margin-top:25px;
+    margin-top:5px;
     padding-right:25px;
 
     button.addcomment {
@@ -411,3 +411,27 @@ border: 0px!important;
 .commentsection .inputActions {
   width: 100%;
 }
+
+.togglecollapseAll{
+  background-color: #F8F8F8	;
+  padding:5px;
+  color:#003366;
+  font-size: 12px;
+  font-weight: bolder;
+
+}
+.togglecollapseAll span {
+  cursor: pointer;
+}
+
+.foitabbedContainer{
+  height: 900px;
+  }
+
+  .showMoreParentComments{
+    position: static;
+    padding-bottom: 50px;
+  }
+  .btnshowmore {
+    width: 100%!important;   
+  }
