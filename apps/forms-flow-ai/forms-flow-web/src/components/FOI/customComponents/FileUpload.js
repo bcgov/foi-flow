@@ -134,10 +134,39 @@ const FileUpload = ({
         callUpdateFilesCb({ ...files });
         setErrorMessage([]);
     };
+    const dragOver = (e) => {
+      e.preventDefault();
+    }
+  
+    const dragEnter = (e) => {
+        e.preventDefault();
+    }
+    
+    const dragLeave = (e) => {
+        e.preventDefault();
+    }
+    
+    const fileDrop = (e) => {
+        e.preventDefault();        
+        const newFiles = e.dataTransfer.files;
+        const totalNoOfFiles = Object.entries(files).length + newFiles.length;        
+        if (totalNoOfFiles > 10 && multipleFiles) {
+          setErrorMessage(["A maximum of 10 files can be uploaded at one time. Only 10 files have been added this upload window, please upload additional files separately"]);
+        }
+        else if (newFiles.length && multipleFiles) {
+          let updatedFiles = addNewFiles(newFiles);
+          setFiles(updatedFiles);
+          callUpdateFilesCb(updatedFiles);
+      }
+    }
   return (
     <>
       <section className="file-upload-container">       
-        <div className="row file-upload-preview" >
+      <div className="row file-upload-preview" 
+          onDragOver={dragOver}
+          onDragEnter={dragEnter}
+          onDragLeave={dragLeave}
+          onDrop={fileDrop} >
           <div className="file-upload-column">
             {Object.entries(files).length === 0 ?
           
@@ -201,9 +230,11 @@ function FilePreviewContainer({files, removeFile}) {
   return (
     <article className="file-preview-container">     
       <section>
+        <ol className={`${Object.keys(files).length === 1 ? "ol-display-none": ""}`}>
         {Object.keys(files).map((fileName, index) => {
           let file = files[fileName];
           return (
+            <li className={`${Object.keys(files).length === 1 ? "ol-display-none": ""}`}>
             <section key={fileName}>
               <div>
                 <div>
@@ -214,8 +245,10 @@ function FilePreviewContainer({files, removeFile}) {
                 </div>
               </div>
             </section>
+            </li>
           );
         })}
+        </ol>
       </section>
     </article>
   );
