@@ -91,6 +91,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const updateFilename = (e) => {
       if(checkInvalidCharacters(e.target.value)) {
         setNewFilename(e.target.value);
+        setErrorMessage("");
       } else {
         setErrorMessage(`File name cannot be empty and cannot contain these characters, / : * ? " < > |`);
       }
