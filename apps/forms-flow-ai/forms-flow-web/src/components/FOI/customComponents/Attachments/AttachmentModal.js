@@ -67,8 +67,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
 
     const checkInvalidCharacters = (fname) => {
       var rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
-
-      return rg1.test(fname);
+      return !fname || rg1.test(fname);
     };
 
     const validateFilename = (fname) => {
@@ -93,7 +92,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
         setNewFilename(e.target.value);
         setErrorMessage("");
       } else {
-        setErrorMessage(`File name cannot be empty and cannot contain these characters, / : * ? " < > |`);
+        setErrorMessage(`File name cannot contain these characters, / : * ? " < > |`);
       }
     };
 
