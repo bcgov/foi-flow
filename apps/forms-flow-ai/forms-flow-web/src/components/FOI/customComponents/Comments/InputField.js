@@ -30,6 +30,12 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
       if (_unformattedtext.length - 1 <= maxcharacterlimit)
         setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.trim().length - 1 <= maxcharacterlimit ? _unformattedtext.trim().length  : 0))
     }
+    else if(htmlcontent === "<p><br></p>")
+    {
+      setTextLength(1000);
+      setText("")
+      setuftext("")
+    }
   }
 
   const handlekeydown = (event) => {
