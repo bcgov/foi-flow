@@ -6,6 +6,7 @@ import {
   setFOIUpdateLoader,
   setFOILoader,
   setFOIAssignedToListLoader,
+  setFOIAttachmentListLoader,
   setFOIRequestDetail,
   setFOIMinistryViewRequestDetail,
   setFOICategoryList,
@@ -907,19 +908,19 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
               dispatch(setRawRequestAttachments(res.data));
             }
   
-            dispatch(setFOILoader(false));
+            dispatch(setFOIAttachmentListLoader(false));
             done(null, res.data);
             
           } else {
             console.log("Error", res);
             dispatch(serviceActionError(res));
-            dispatch(setFOILoader(false));
+            dispatch(setFOIAttachmentListLoader(false));
           }
         })
         .catch((error) => {
           console.log("Error", error);
           dispatch(serviceActionError(error));
-          dispatch(setFOILoader(false));
+          dispatch(setFOIAttachmentListLoader(false));
           done(error);
         });
     };
@@ -943,15 +944,103 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
     return (dispatch) => {
       httpPOSTRequest(apiUrl, data)
         .then((res) => {          
-          if (res.data) {             
+          if (res.data) {
+            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+            dispatch(setFOIAttachmentListLoader(false));           
             done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
             done("Error Posting Attachments");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
+          done(error);
+        });
+    };
+  };
+
+  export const saveNewFilename = (newFilename, documentId, requestId, ministryId, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+
+    let apiUrl = "";
+    if (ministryId !=null) {
+      apiUrl = replaceUrl(
+        API.FOI_RENAME_ATTACHMENTS_MINISTRYREQUEST+'',
+       "<ministryrequestid>", ministryId);
+    }
+    else {
+      apiUrl = replaceUrl(
+        API.FOI_RENAME_ATTACHMENTS_RAWREQUEST,
+        "<requestid>",
+        requestId
+      );
+    }
+    apiUrl = replaceUrl(
+      apiUrl,
+      "<documentid>",
+      documentId
+    );
+
+    return (dispatch) => {
+      const data = {
+        filename: newFilename
+      };
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {          
+          if (res.data) {
+            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+            dispatch(setFOIAttachmentListLoader(false));           
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
+            done("Error Posting Attachments");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
+          done(error);
+        });
+    };
+  };
+
+  export const replaceFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    let apiUrl = "";
+
+    if (ministryId && documentId) {
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST,
+        "<ministryrequestid>",
+        ministryId
+      ), "<documentid>", documentId);
+    } else {
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST,
+        "<requestid>",
+        requestId
+      ), "<documentid>", documentId);      
+    }
+    return (dispatch) => {
+      httpPOSTRequest(apiUrl, data)
+        .then((res) => {          
+          if (res.data) {
+            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+            dispatch(setFOIAttachmentListLoader(false));           
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            dispatch(setFOIAttachmentListLoader(false));
+            done("Error Posting Attachments");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          dispatch(setFOIAttachmentListLoader(false));
           done(error);
         });
     };
