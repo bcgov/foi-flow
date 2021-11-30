@@ -6,39 +6,99 @@ const FileUpload = ({
     mimeTypes,
     maxFileSize,
     totalFileSize,
-    updateFilesCb
+    updateFilesCb,
+    attchmentFileNameList,
+    attachment
 }) => {
     const fileInputField = useRef(null);
     const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({});
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]);
+    let countFileNameOccurence = 1;
     const handleUploadBtnClick = () => {
       if (fileInputField.current)
         fileInputField.current.click();
       else
         fileInputFieldMultiple.current.click();
-    };    
+    };
+    const countOccurrences = (fileName) => {
+      return attchmentFileNameList.reduce((count, attachmentName) => (attachmentName.toLowerCase() === fileName.toLowerCase() ? count + 1 : count), 0);
+    }
+    const generateNewFileName = (newFileName, uploadFileName, attachedFileName) => {
+      let count = countOccurrences(newFileName);      
+      let _fileNameArray = uploadFileName.split('.');      
+      newFileName = count > 0 ? `${_fileNameArray[0]}(${++countFileNameOccurence}).${_fileNameArray[1]}` : newFileName;      
+      if (count > 0) {
+        if (attachedFileName && attachedFileName === newFileName)
+          return attachedFileName;
+        else {
+          newFileName = generateNewFileName(newFileName, uploadFileName, attachedFileName);
+          return newFileName;
+        }
+      }
+      return newFileName;
+    }
 
     const addNewFiles = (newFiles) => {
       let _errorMessage = [];
+      let _duplicateFiles = [];
+      let _typeErrorFiles = [];
+      let _overSizedFiles = [];
       let _totalFileSizeInMB = 0;
+      let exists = false;
         for (let file of newFiles) {
-          if (mimeTypes.includes(file.type) || (multipleFiles && (file.name.endsWith(".msg") || file.name.endsWith(".eml")))) {
+          file.filename = file.name;
+          if (mimeTypes.includes(file.type) || (multipleFiles && (file.name.endsWith(".msg") || file.name.endsWith(".eml")))) {            
             const sizeInMB = (file.size / (1024*1024)).toFixed(2);
             _totalFileSizeInMB += parseFloat(sizeInMB);
             if (!multipleFiles || (multipleFiles && _totalFileSizeInMB <= totalFileSize)) {
-              if (sizeInMB <= maxFileSize) {             
+              if (sizeInMB <= maxFileSize) {
+                if (Object.entries(files).length > 0) {
+                  exists = Object.keys(files).some((k) => {
+                    return k.toLowerCase() === file.name.toLowerCase();
+                  });
+                }
+                if (exists) {
+                  _duplicateFiles.push(file.name);
+                }
+                else if (attchmentFileNameList) {
+                  let countFileOccurrences = countOccurrences(file.name);
+                  if (countFileOccurrences > 0 && multipleFiles) {
+                    _duplicateFiles.push(file.name);
+                  }
+                  else if (countFileOccurrences > 0 && !multipleFiles && (attachment == null || (attachment && attachment.filename.toLowerCase() !== file.name.toLowerCase()))) {
+                    const filename = file.name.split('.');
+                    const newFileName =  generateNewFileName(`${filename[0]}(${countFileOccurrences}).${filename[1]}`, file.name, attachment && attachment.filename);
+                    file.filename = newFileName;
+                    files[file.name] = file;
+                  }
+                  else {
+                    files[file.name] = file;
+                  }
+                }
+                else {
                   files[file.name] = file;
+                }                
+                  
               }
               else {
-                _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files ${maxFileSize}MB or under can be uploaded. `)              
+                _overSizedFiles.push(file.name);
               }
             }
           }
           else {
-            _errorMessage.push(`The specified file ${file.name} could not be uploaded. Only files with the following extensions are allowed: ${multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}`);           
+            _typeErrorFiles.push(file.name);
           }
+        }
+        if (_duplicateFiles.length > 0) {
+          _errorMessage.push(<>A attachment with this file name(s) <b>{_duplicateFiles.join(", ")}</b> already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.</>);
+        }
+        if (_overSizedFiles.length > 0) {
+          _errorMessage.push(<>The specified file(s) <b>{_overSizedFiles.join(", ")}</b> could not be uploaded. Only files <b>{maxFileSize}MB</b> or under can be uploaded.</>);
+        }
+        if (_typeErrorFiles.length > 0) {
+          _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}</b></>);
         }
         _totalFileSizeInMB += totalFileSizeCalculated;
         setTotalFileSize(_totalFileSizeInMB);
@@ -122,13 +182,16 @@ const FileUpload = ({
         : null}
         
       </section>
+      <ul className="error-message-ul">
       {errorMessage ? errorMessage.map(error => 
-           <div className="error-message-container">
-             <p>{error}</p>
-           </div>
+           <li>
+            <div className="error-message-container">
+              <p>{error}</p>
+            </div>
+           </li>
            )
       : null}
-     
+     </ul>
     </>
   );
 };
@@ -145,7 +208,7 @@ function FilePreviewContainer({files, removeFile}) {
               <div>
                 <div>
                   <aside>  
-                    <span className="file-name">{file.name}</span>                                       
+                    <span className="file-name">{file.filename ? file.filename : file.name}</span>                                       
                     <i className="fas fa-times-circle foi-file-close" onClick={() => removeFile(fileName)} />
                   </aside>
                 </div>

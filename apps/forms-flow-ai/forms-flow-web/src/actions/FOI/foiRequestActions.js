@@ -14,6 +14,13 @@ export const setFOIAssignedToListLoader = (data) => dispatch =>{
     })
 }
 
+export const setFOIAttachmentListLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING,
+        payload:data
+    })
+}
+
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,

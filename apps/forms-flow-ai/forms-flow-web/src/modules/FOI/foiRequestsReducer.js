@@ -3,6 +3,7 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 const initialState = {
   isLoading:true,
   isAssignedToListLoading:true,
+  isAttachmentListLoading:true,
   foiRequestsList:[],
   foiMinistryRequestsList:[],
   foiRequestsCount:0,
@@ -31,6 +32,8 @@ const foiRequests = (state = initialState, action)=> {
       return {...state, isLoading: action.payload};
     case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
       return {...state, isAssignedToListLoading: action.payload};
+    case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
+      return {...state, isAttachmentListLoading: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return {...state, foiRequestsList: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:

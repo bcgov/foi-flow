@@ -174,7 +174,6 @@ class FOIFlowDocumentStorage(Resource):
                 filename = foirequestform.get('filename')
                 filenamesplittext = os.path.splitext(filename)
                 uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
-                print(uniquefilename)
 
                 auth = AWSRequestsAuth(aws_access_key=accesskey,
                         aws_secret_access_key=secretkey,
@@ -189,7 +188,8 @@ class FOIFlowDocumentStorage(Resource):
                 file['authheader']=response.request.headers['Authorization'] 
                 file['amzdate']=response.request.headers['x-amz-date']
                 file['uniquefilename']=uniquefilename
-
+                file['filestatustransition']=filestatustransition
+                
             return json.dumps(requestfilejson) , 200
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

@@ -14,7 +14,9 @@ assignees: ''
 **Assumptions & Scope**	
 What are the assumptions for this story?
 
-What is in and not in scope?
+What is IN scope?
+
+What is NOT in scope?
 
 **Acceptance Criteria**	
 
