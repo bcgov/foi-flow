@@ -149,10 +149,8 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
         }
         handleModal(true, fileInfoList, files);
       }
-    }
-    console.log(`modalFor2 = ${modalFor}`);
+    }  
     const getMessage = () => {
-      console.log(`modalFor GetMessage = ${modalFor}`);
       switch(modalFor.toLowerCase()) { 
         case "add":
           return {title: "Add Attachment", body: ""};
@@ -187,7 +185,6 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
     }
     let message = getMessage();
-    console.log(`modalFor3 = ${modalFor}`);
     return (
       <div className="state-change-dialog">        
         <Dialog
