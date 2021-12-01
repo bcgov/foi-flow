@@ -11,8 +11,10 @@ import os
 from request_api.utils.redispublisher import RedisPublisherService
 import maya
 from request_api.services.workflowservice import workflowservice
+from request_api.exceptions import BusinessException, Error
 
-class rawrequestservice:
+class rawrequestservice:        
+    
     """ FOI Request management service
 
     This service class manages all CRUD operations related to an FOI RAW Request
@@ -34,10 +36,32 @@ class rawrequestservice:
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
 
-    def saverawrequest_foipayment(requestdatajson,notes):        
-        result = FOIRawRequest.saverawrequest_foipayment(_requestrawdata=requestdatajson,notes=notes)       
-        return result    
-
+    def saverawrequest_foipayment(requestdatajson,notes):
+        ispiiredacted = requestdatajson["isPIIRedacted"] if 'isPIIRedacted' in requestdatajson  else False
+        requirespayment = rawrequestservice.doesRequirePayment(requestdatajson)
+        result = FOIRawRequest.saverawrequest_foipayment(_requestrawdata=requestdatajson,notes=notes, requirespayment=requirespayment, ispiiredacted=ispiiredacted)       
+        return result
+    
+    @staticmethod
+    def doesRequirePayment(requestdatajson):
+        if 'requestType' not in requestdatajson or 'requestType' not in requestdatajson['requestType']:
+            raise BusinessException(Error.DATA_NOT_FOUND)
+        if requestdatajson['requestType']['requestType'] == "personal":     
+            return False
+        if 'contactInfo' in requestdatajson:
+            if requestdatajson['requestType']['requestType'] == "general":
+                if requestdatajson['contactInfo']['IGE']:
+                    return False
+                return True
+            elif requestdatajson['requestType']['requestType'] == "personal":
+                return False
+        else:
+            if 'requiresPayment' not in requestdatajson:
+                raise BusinessException(Error.DATA_NOT_FOUND)
+            return requestdatajson['requiresPayment']
+            
+        raise BusinessException(Error.DATA_NOT_FOUND)
+        
     def saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status, userId):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneeGroup, _assignee, status,ispiiredacted, userId)
