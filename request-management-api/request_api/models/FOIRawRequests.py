@@ -27,7 +27,7 @@ class FOIRawRequest(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     sourceofsubmission = db.Column(db.String(120),  nullable=True)
     ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
-    requirespayment = db.Column(db.Boolean, unique=False, nullable=False, default=False)
+    requirespayment = db.Column(db.Boolean, unique=False, nullable=True, default=False)
     
     @classmethod
     def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, requirespayment ,assigneegroup= None,assignee= None)->DefaultMethodResult:                
