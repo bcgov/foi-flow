@@ -5,7 +5,7 @@ import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, enableShowMore }) => {
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
 
   const getfullName = (userId) => {
     let fullName = ''
@@ -42,12 +42,6 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
     return fullName
   }
-
-  //var commentsDiv = document.getElementById('Comments')
-  // let canHideEarlierComments = false;
-  // if (commentsDiv) {
-  //   canHideEarlierComments = enableShowMore || (commentsDiv.scrollHeight - commentsDiv.clientHeight) > 100
-  // }
 
   const showhiddencomments = (e, count) => {
     var hiddencomments = document.getElementsByName('commentsectionhidden')
@@ -114,7 +108,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   return (
     <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
       {comments.map((i, index) => (
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={enableShowMore && index >= limit ? 'commentsectionhidden' : ""} style={enableShowMore && index >= limit ? { display: 'none' } : {}}>
+        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -199,7 +193,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
-      <div id="showMoreParentComments" className="showMoreParentComments" style={enableShowMore && comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
         <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 2)}>Show more comments</button>
       </div>
     </div>

@@ -78,7 +78,6 @@ const FOIRequest = React.memo(({userDetail}) => {
   const [comment, setComment] = useState([]);
   const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
-  const [enableShowMore, setEnableshowmore] = React.useState(false);
 
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""  
   const dispatch = useDispatch();
@@ -106,7 +105,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchClosingReasonList());
     if (bcgovcode)
       dispatch(fetchFOIMinistryAssignedToList(bcgovcode));          
-  },[requestId,ministryId, dispatch,comment, attachments,enableShowMore]);
+  },[requestId,ministryId, dispatch,comment, attachments]);
  
 
   useEffect(() => {  
@@ -613,13 +612,6 @@ const FOIRequest = React.memo(({userDetail}) => {
     document.getElementById(param).style.display = "block";
     evt.currentTarget.className += " active";
     
-    
-  var commentsDiv = document.getElementById('Comments')  
-  if (commentsDiv) {
-    let _enableshowmore = (commentsDiv.scrollHeight - commentsDiv.clientHeight) > 100    
-    setEnableshowmore(_enableshowmore)
-  }
-
   }
   const bottomTextArray = _requestStatus.split('|');
       
@@ -718,7 +710,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
-                    bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber} enableShowMore={enableShowMore} />
+                    bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}  />
                 
                 </> : <Loading />
             }

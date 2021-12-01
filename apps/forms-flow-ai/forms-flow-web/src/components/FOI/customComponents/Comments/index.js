@@ -17,8 +17,7 @@ export const CommentSection = ({
   bcgovcode,
   iaoassignedToList,
   ministryAssignedToList,
-  requestNumber,
-  enableShowMore
+  requestNumber
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)  
   return (
@@ -44,7 +43,7 @@ export const CommentSection = ({
           {<Input add="add" />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} enableShowMore={enableShowMore} />
+          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
         </div>
 
       </div>

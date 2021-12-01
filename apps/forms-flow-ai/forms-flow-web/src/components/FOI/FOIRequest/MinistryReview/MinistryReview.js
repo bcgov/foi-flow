@@ -69,7 +69,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  const [enableShowMore, setEnableshowmore] = React.useState(false);
   //gets the request detail from the store
 
 
@@ -243,13 +242,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
     document.getElementById(param).style.display = "block";
     evt.currentTarget.className += " active";
-
-    var commentsDiv = document.getElementById('Comments')  
-  if (commentsDiv) {
-    let _enableshowmore = (commentsDiv.scrollHeight - commentsDiv.clientHeight) > 100    
-    setEnableshowmore(_enableshowmore)
-  }
-
+    
   }
 
   const pubmindivstagestomain = (divstages) => {
@@ -344,7 +337,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
                     ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
-                    requestNumber={requestNumber} enableShowMore={enableShowMore}/>
+                    requestNumber={requestNumber} />
                 </> : <Loading />}
           </div>
           <div id="Option3" className="tabcontent">
