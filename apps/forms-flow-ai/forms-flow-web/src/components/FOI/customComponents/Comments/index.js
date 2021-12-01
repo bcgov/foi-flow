@@ -19,8 +19,7 @@ export const CommentSection = ({
   ministryAssignedToList,
   requestNumber
 }) => {
-  const [showaddbox, setshowaddbox] = useState(false)
-
+  const [showaddbox, setshowaddbox] = useState(false)  
   return (
     <ActionProvider
       currentUser={currentUser}

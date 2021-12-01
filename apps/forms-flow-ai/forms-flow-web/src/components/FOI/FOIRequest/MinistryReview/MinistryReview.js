@@ -242,7 +242,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
     document.getElementById(param).style.display = "block";
     evt.currentTarget.className += " active";
-
+    
   }
 
   const pubmindivstagestomain = (divstages) => {
@@ -337,7 +337,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
                     ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
-                    requestNumber={requestNumber}/>
+                    requestNumber={requestNumber} />
                 </> : <Loading />}
           </div>
           <div id="Option3" className="tabcontent">

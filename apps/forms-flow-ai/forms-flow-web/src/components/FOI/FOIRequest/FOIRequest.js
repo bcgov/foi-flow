@@ -78,6 +78,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const [comment, setComment] = useState([]);
   const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
+
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""  
   const dispatch = useDispatch();
   useEffect(() => {      
@@ -610,7 +611,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     }
     document.getElementById(param).style.display = "block";
     evt.currentTarget.className += " active";
-
+    
   }
   const bottomTextArray = _requestStatus.split('|');
       
