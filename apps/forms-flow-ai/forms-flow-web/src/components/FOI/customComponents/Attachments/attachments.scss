@@ -10,6 +10,7 @@
   flex-direction: column;
   overflow-x: hidden;;
   background-color: white;
+  margin-bottom: 100px;
       
   .addAttachmentBox{
     width:100%;
@@ -52,12 +53,17 @@
 
 .attachment-popup-content {
   margin-top: -35px;
+  z-index: 1031!important;
 }
 
 [role='tooltip'].attachment-popup-content {
   width: 150px!important;
   border: 1 px solid #d7d7d7!important;
   box-shadow: rgba(0, 0, 0, 0.4) 2px 2px 0px!important;
+}
+
+[data-popup='tooltip'].attachment-popup-overlay {
+  pointer-events: auto!important;
 }
 
 .attachment-name {
