@@ -48,7 +48,6 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
-    // const attachmentFileNameListByCategory = attachmentsArray.filter(_file => _file.category === attachment.category).map(_file => _file.filename);
 
     useEffect(() => {
       parseFileName(attachment);
@@ -113,7 +112,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       setFiles(_files);
     }
     const handleClose = () => {
-        if (files.length > 0 || attachment.filename !== (newFilename+"."+extension)) {
+        if (files.length > 0 || (modalFor === 'rename' && attachment.filename !== (newFilename+"."+extension))) {
             if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
                 handleModal(false);
                 parseFileName(attachment);
@@ -126,6 +125,10 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     };
 
     const handleSave = () => {
+      if (modalFor.toLowerCase() === "delete") {
+        handleModal(true, null, null);
+      }
+      else {
         let fileInfoList = [];
         if (files.length > 0) {
           let fileStatusTransition = "";
@@ -145,8 +148,11 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
             });
         }
         handleModal(true, fileInfoList, files);
+      }
     }
+    console.log(`modalFor2 = ${modalFor}`);
     const getMessage = () => {
+      console.log(`modalFor GetMessage = ${modalFor}`);
       switch(modalFor.toLowerCase()) { 
         case "add":
           return {title: "Add Attachment", body: ""};
@@ -181,6 +187,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
     }
     let message = getMessage();
+    console.log(`modalFor3 = ${modalFor}`);
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -205,7 +212,10 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 </span>                
               </div>
               {
-                modalFor === 'rename'?
+                (['replace','add'].includes(modalFor)) ?
+                <FileUpload attachment={attachment}  attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={mimeTypes} maxFileSize={maxFileSize} totalFileSize={totalFileSize} updateFilesCb={updateFilesCb} /> 
+                :
+                (modalFor === 'rename'?
                 <div class="row">
                   <div class="col-sm-1"></div>
                   <div class="col-sm-9">
@@ -224,9 +234,8 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                     .{extension}
                   </div>
                   <div class="col-sm-1"></div>
-                </div>
-                :
-                <FileUpload attachment={attachment}  attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={mimeTypes} maxFileSize={maxFileSize} totalFileSize={totalFileSize} updateFilesCb={updateFilesCb} />
+                </div>                 
+                : null)
               }
             </DialogContentText>
           </DialogContent>
@@ -237,7 +246,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 Save
               </button>
               :
-              <button className={`btn-bottom btn-save ${ files.length === 0 ? classes.btndisabled : classes.btnenabled }`} disabled={files.length === 0} onClick={handleSave}>
+              <button className={`btn-bottom btn-save ${ (files.length === 0 && modalFor !== 'delete') ? classes.btndisabled : classes.btnenabled }`} disabled={files.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
                 Continue
               </button>
             }
