@@ -8,7 +8,7 @@ import CommentStructure from './CommentStructure'
 const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
 
   const getfullName = (userId) => {
-    let fullName = ''    
+    let fullName = ''
     var _sessionuser = localStorage.getItem(userId)
 
     if (_sessionuser === undefined || _sessionuser === '' || _sessionuser === null) {
@@ -36,20 +36,79 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       }
 
     }
-    else {     
+    else {
       fullName = _sessionuser
     }
 
     return fullName
   }
 
+  const showhiddencomments = (e, count) => {
+    var hiddencomments = document.getElementsByName('commentsectionhidden')
+    if (hiddencomments && Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length > 0) {
+      var cnt = 0
+      hiddencomments.forEach(_com => {
+
+        if (cnt < count && _com.style.display === 'none') {
+          _com.style.display = 'block';
+          cnt++;
+        }
+
+      })
+      hiddencomments = document.getElementsByName('commentsectionhidden')
+      if (Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length === 0) {
+        document.getElementById('showMoreParentComments').style.display = 'none'
+      }
+    }
+    else {
+      document.getElementById('showMoreParentComments').style.display = 'none'
+    }
+
+  }
+
+
+  const dynamicIndexFinder = () => {
+    var _comments = [...comments]
+    _comments = _comments.reverse()
+    var returnindex = 2
+    var totalcharacterCount = 0
+    var reachedLimit = false;
+    
+    _comments.forEach((comment, index) => {
+
+      if (!reachedLimit) {
+        totalcharacterCount += comment.text.length
+
+        if (comment.replies && comment.replies.length > 0) {
+          comment.replies.forEach((reply) => {
+            if (!reachedLimit) {
+              totalcharacterCount += reply.text.length
+              if (totalcharacterCount > 2000) {
+                returnindex = index
+                reachedLimit = true
+              }
+            }
+          })
+        }
+
+        if (totalcharacterCount > 2000) {
+          returnindex = index
+          reachedLimit = true
+        }
+      }
+
+    })
+
+    return returnindex;
+  }
+
+  let limit = dynamicIndexFinder()
+
   const actions = useContext(ActionContext)
   return (
-    <div>
+    <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
       {comments.map((i, index) => (
-
-
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId}>
+        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -63,9 +122,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               <InputField cancellor={i.commentId} value={i.text} edit />
             )
           ) : (
-           
+
             <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.userId)} />
-   
+
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
             (actions.customInput ? (
@@ -134,6 +193,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
+      <div id="showMoreParentComments" className="showMoreParentComments" style={comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
+        <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 2)}>Show more comments</button>
+      </div>
     </div>
   )
 }
