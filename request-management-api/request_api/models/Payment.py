@@ -14,7 +14,7 @@ class Payment(db.Model):
     fee_code_id = db.Column(db.Integer, ForeignKey('FeeCodes.fee_code_id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     total = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), nullable=False)
+    status = db.Column(db.String, nullable=False)
     request_id = db.Column(db.Integer, nullable=False)
     created_on = db.Column(db.DateTime, default=datetime.now(), nullable=False)
     completed_on = db.Column(db.DateTime, default=None, nullable=True)
