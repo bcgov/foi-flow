@@ -102,11 +102,23 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     return returnindex;
   }
 
+  const onfilterchange = (e) => {
+
+  }
+
   let limit = dynamicIndexFinder()
 
   const actions = useContext(ActionContext)
   return (
     <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
+      <div className="filterComments">
+        <input type="radio" id="rballcomments" name="commentsfilter" value="-1" onChange={onfilterchange} />
+        <label for="rballcomments">All Comments</label>
+        <input type="radio" id="rbrequesthistory" name="commentsfilter" value="2" onChange={onfilterchange} />
+        <label for="rbrequesthistory">Request History</label>
+        <input type="radio" id="rbusercomments" name="commentsfilter" value="1" onChange={onfilterchange} />
+        <label for="rbusercomments">User Comments</label>
+      </div>
       {comments.map((i, index) => (
         <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (

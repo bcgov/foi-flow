@@ -19,7 +19,11 @@ export const CommentSection = ({
   ministryAssignedToList,
   requestNumber
 }) => {
-  const [showaddbox, setshowaddbox] = useState(false)  
+  const [showaddbox, setshowaddbox] = useState(false)
+  const [filteredcomments, setfilteredcomments] = useState(commentsArray)
+  
+
+ 
   return (
     <ActionProvider
       currentUser={currentUser}
@@ -33,13 +37,14 @@ export const CommentSection = ({
     >
       <div className="section">
         <div className="foi-request-number-header">
-          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber :`U-00${requestid}`}`}</h1>
-        </div>
-        <div className="addcommentBox">
-            <button type="button" style={ {display: !showaddbox ? 'block':'none'}} className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); }}>+ Add Comment</button>
+          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber : `U-00${requestid}`}`}</h1>
         </div>
 
-        <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
+        <div className="addcommentBox">
+          <button type="button" style={{ display: !showaddbox ? 'block' : 'none' }} className="btn foi-btn-create addcomment" onClick={() => { !showaddbox ? setshowaddbox(true) : setshowaddbox(false); }}>+ Add Comment</button>
+        </div>
+
+        <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add" />}
         </div>
         <div className="displayComments">
