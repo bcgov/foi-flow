@@ -137,8 +137,6 @@ export const fetchFOIFullAssignedToList = (...rest) => {
           let data = foiFullAssignedToList.map((assignedTo) => {
             return { ...assignedTo };
           });
-          console.log("IAO");
-          console.log(data);
           addToFullnameList(data, "IAO");
           dispatch(setFOIFullAssignedToList(data));
           dispatch(setFOIAssignedToListLoader(false));
@@ -175,8 +173,6 @@ export const fetchFOIMinistryAssignedToList = (govCode, ...rest) => {
           let data = foiAssignedToList.map((assignedTo) => {
             return { ...assignedTo };
           });
-          console.log("Ministry");
-          console.log(data);
           addToFullnameList(data, govCode);
           dispatch(setFOIMinistryAssignedToList(data));
           dispatch(setFOILoader(false));

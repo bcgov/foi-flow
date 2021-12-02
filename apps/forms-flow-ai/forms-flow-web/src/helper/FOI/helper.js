@@ -170,4 +170,8 @@ const addToFullnameList = (userArray, team) => {
 	}
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList };
+const getFullnameList = () => {
+	return JSON.parse(sessionStorage.getItem('fullnameList'));
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList };
