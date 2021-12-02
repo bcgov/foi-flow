@@ -114,6 +114,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const handleClose = () => {
         if (files.length > 0 || (modalFor === 'rename' && attachment.filename !== (newFilename+"."+extension))) {
             if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
+                setFiles([]);
                 handleModal(false);
                 parseFileName(attachment);
             }
