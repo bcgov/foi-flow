@@ -24,8 +24,6 @@ const Dashboard = ({userDetail}) => {
 
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
-  console.log("dashboard iao");
-  console.log(assignedToList);
   const fullnameList = getFullnameList();
   console.log("dashboard fullname");
   console.log(fullnameList);
