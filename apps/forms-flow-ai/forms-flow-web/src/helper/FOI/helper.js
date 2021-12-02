@@ -129,4 +129,45 @@ const getMinistryByValue = (userGroups) => {
 	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue };
+const addToFullnameList = (userArray, team) => {
+	if(team) {
+		let currentMember;
+
+		//fullname array for username -> fullname value pairs
+		let fullnameArray = JSON.parse(sessionStorage.getItem('fullnameList'));
+		if(!fullnameArray || !Array.isArray(fullnameArray)) {
+			fullnameArray = [];
+		}
+	
+		//teams saved in fullnameList
+		let fullnameTeamArray = JSON.parse(sessionStorage.getItem('fullnameTeamList'));
+		if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
+			fullnameTeamArray = [];
+		}
+	
+		if(userArray && Array.isArray(userArray)) {
+			userArray.forEach(team => {
+				if(team && team.members && Array.isArray(team.members)) {
+					team.members.forEach(member => {
+						if(!fullnameArray.some(e => e.username === member.username)) {
+							currentMember = {
+								username: member.username,
+								fullname: `${member.lastname}, ${member.firstname}`
+							};
+	
+							fullnameArray.push(currentMember);  
+						}
+					});
+				}
+			});
+	
+			if(!fullnameTeamArray.includes(team)) {
+				fullnameTeamArray.push(team);
+			}
+		}
+	
+		sessionStorage.setItem('fullnameList', JSON.stringify(fullnameArray));
+	}
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList };

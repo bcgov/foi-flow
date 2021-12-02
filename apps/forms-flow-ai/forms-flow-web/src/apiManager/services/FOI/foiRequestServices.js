@@ -29,7 +29,7 @@ import {
   setMinistryRequestAttachments
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
-import { replaceUrl } from "../../../helper/FOI/helper";
+import { replaceUrl, addToFullnameList } from "../../../helper/FOI/helper";
 
 export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => { };
@@ -137,6 +137,9 @@ export const fetchFOIFullAssignedToList = (...rest) => {
           let data = foiFullAssignedToList.map((assignedTo) => {
             return { ...assignedTo };
           });
+          console.log("IAO");
+          console.log(data);
+          addToFullnameList(data, "IAO");
           dispatch(setFOIFullAssignedToList(data));
           dispatch(setFOIAssignedToListLoader(false));
           done(null, res.data);
@@ -172,6 +175,9 @@ export const fetchFOIMinistryAssignedToList = (govCode, ...rest) => {
           let data = foiAssignedToList.map((assignedTo) => {
             return { ...assignedTo };
           });
+          console.log("Ministry");
+          console.log(data);
+          addToFullnameList(data, govCode);
           dispatch(setFOIMinistryAssignedToList(data));
           dispatch(setFOILoader(false));
           done(null, res.data);
