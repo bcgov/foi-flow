@@ -164,6 +164,9 @@ const addToFullnameList = (userArray, team) => {
 	
 			if(!fullnameTeamArray.includes(_team)) {
 				fullnameTeamArray.push(_team);
+
+				//save for assignedto or ministryassignto dropdown
+				sessionStorage.setItem(`${_team}AssignToList`, JSON.stringify(userArray));
 			}
 		}
 	
