@@ -131,6 +131,7 @@ const getMinistryByValue = (userGroups) => {
 
 const addToFullnameList = (userArray, team) => {
 	if(team) {
+		const _team = team.toLowerCase();
 		let currentMember;
 
 		//fullname array for username -> fullname value pairs
@@ -161,8 +162,8 @@ const addToFullnameList = (userArray, team) => {
 				}
 			});
 	
-			if(!fullnameTeamArray.includes(team)) {
-				fullnameTeamArray.push(team);
+			if(!fullnameTeamArray.includes(_team)) {
+				fullnameTeamArray.push(_team);
 			}
 		}
 	
@@ -174,4 +175,8 @@ const getFullnameList = () => {
 	return JSON.parse(sessionStorage.getItem('fullnameList'));
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList };
+const getAssignToList = (team) => {
+	return JSON.parse(sessionStorage.getItem(`${team.toLowerCase()}AssignToList`));
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList, getAssignToList };
