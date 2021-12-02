@@ -6,7 +6,7 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 
 export const AttachmentSection = ({
@@ -54,8 +54,9 @@ export const AttachmentSection = ({
         setModal(false);
         const documentsObject = {documents: documents};
         if (modalFor === 'replace' && updateAttachment) {
-          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};          
-          dispatch(replaceFOIRequestAttachment(requestId, ministryId, updateAttachment.foiministrydocumentid, replaceDocumentObject,(err, res) => {
+          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
+          const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
+          dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
             if (!err) {
               setAttachmentLoading(false);
               setSuccessCount(0);
@@ -75,7 +76,11 @@ export const AttachmentSection = ({
 
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
-    if (files) {
+    if (modalFor === 'delete' && value) { 
+      const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+      dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
+    }
+    else if (files) {
     setFileCount(files.length);
     if (value) {
         if (files.length !== 0) {
@@ -106,23 +111,23 @@ export const AttachmentSection = ({
 
   const handlePopupButtonClick = (action, _attachment) => {
     setUpdateAttachment();
+    setUpdateAttachment(_attachment);
+    setMultipleFiles(false);
     switch(action) {
-      case 'replace':
-        setUpdateAttachment(_attachment);
-        setMultipleFiles(false);
-        setModalFor('replace');
-        setModal(true);
+      case 'replace':        
+        setModalFor('replace');        
         break;
-      case 'rename':
-        setUpdateAttachment(_attachment);
-        setMultipleFiles(false);
-        setModalFor('rename');
-        setModal(true);
+      case 'rename':        
+        setModalFor('rename');        
+        break;
+      case 'delete':        
+        setModalFor('delete');        
         break;
       default:
         setModal(false);
         break;
     }
+    setModal(true);
   }
 
   const handleRename = (_attachment, newFilename) => {
@@ -282,6 +287,10 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
     handlePopupButtonClick("replace", attachment);
   }
 
+  const handleDelete = () => {
+    handlePopupButtonClick("delete", attachment);
+  }
+
   return (
     <Popup
       role='tooltip'
@@ -307,7 +316,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
             Replace
           </button>
           :
-          <button className="childActionsBtn">
+          <button className="childActionsBtn" onClick={handleDelete}>
             Delete
           </button>
         }

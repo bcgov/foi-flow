@@ -615,9 +615,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   }
   const bottomTextArray = _requestStatus.split('|');
       
-  const userId = userDetail.preferred_username
+  const userId = userDetail && userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const name = `${userDetail.family_name}, ${userDetail.given_name}`
+  const name = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
@@ -643,7 +643,7 @@ const FOIRequest = React.memo(({userDetail}) => {
         <div className="tab">          
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments && requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
           }
           {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div> : null
@@ -695,7 +695,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div> 
           <div id="Attachments" className="tabcontent">
             {
-             !isAttachmentListLoading && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
+             !isAttachmentListLoading && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
                 <>
                 <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
