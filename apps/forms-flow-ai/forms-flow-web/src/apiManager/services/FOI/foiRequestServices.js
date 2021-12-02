@@ -1,4 +1,10 @@
-import { httpPOSTRequest, httpGETRequest, httpOSSPUTRequest, httpPUTRequest } from "../../httpRequestHandler";
+import {
+  httpPOSTRequest,
+  httpGETRequest,
+  httpOSSPUTRequest,
+  httpOSSGETRequest,
+  httpPUTRequest,
+} from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -697,6 +703,36 @@ export const saveFilesinS3 = (headerDetails, file, ...rest) => {
   };
 };
 
+export const getFileFromS3 = (headerDetails, file, ...rest) => {
+  console.log("A")
+  const done = rest.length ? rest[0] : () => {};
+  var requestOptions = {
+    headers: {
+      "X-Amz-Date": headerDetails.amzdate,
+      Authorization: headerDetails.authheader,
+    },
+  };
+  console.log("B")
+  return (dispatch) => {
+    console.log("C")
+    console.log(file.documentpath)
+    httpOSSGETRequest(file.documentpath, requestOptions)
+      .then((res) => {
+        console.log(res);
+        if (res) {
+          done(null, res.status);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
 
 export const saveRawRequestNote = (data, requestid, ...rest) => {
   const done = rest.length ? rest[0] : () => { };
