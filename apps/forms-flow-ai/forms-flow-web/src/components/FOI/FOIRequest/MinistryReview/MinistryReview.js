@@ -76,7 +76,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
-  const [comment, setComment] = useState([])
+  const [comment, setComment] = useState([]);
+  const [quillChange, setQuillChange] = useState(false);
+  const [removeComment, setRemoveComment] = useState(false);
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -227,7 +229,24 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }
 
   const tabclick = (evt, param) => {
-
+    let clickedOk = true;
+    if (quillChange && param !== 'Comments') {
+      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
+        clickedOk = true;
+        setQuillChange(false);
+        setRemoveComment(true);
+      }
+      else {
+        clickedOk = false;
+        param = 'Comments';
+        document.getElementById(param).className += " active";
+        const elementsByName = document.getElementsByName(param);
+        var i;
+        for (i = 0; i < elementsByName.length; i++) {          
+            elementsByName[i].className += " active";        
+        }
+      }
+    }
     var i, tabcontent, tablinks;
 
     tabcontent = document.getElementsByClassName("tabcontent");
@@ -241,7 +260,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
     document.getElementById(param).style.display = "block";
-    evt.currentTarget.className += " active";
+    if (clickedOk)
+      evt.currentTarget.className += " active";
     
   }
 
@@ -264,7 +284,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   const isAttachmentListLoading = useSelector(state=> state.foiRequests.isAttachmentListLoading);
 
-  const requestNumber = requestDetails && requestDetails.idNumber;
+  const requestNumber = requestDetails && requestDetails.idNumber; 
   
   return (
 
@@ -337,7 +357,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
                     ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
-                    requestNumber={requestNumber} />
+                    requestNumber={requestNumber} setQuillChange={setQuillChange} removeComment={removeComment} />
                 </> : <Loading />}
           </div>
           <div id="Option3" className="tabcontent">

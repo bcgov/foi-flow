@@ -8,17 +8,16 @@ import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 
 
-const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
+const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQuillChange, removeComment }) => {
 
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(maxcharacterlimit)
 
-  const handleQuillChange = (htmlcontent, delta, source, editor) => {
+  const handleQuillChange = (htmlcontent, delta, source, editor) => {    
     let _unformattedtext = editor.getText()
-    if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {
-
+    if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {      
       if (_unformattedtext.trim().length - 1 <= maxcharacterlimit) {
         setText(htmlcontent)
 
@@ -29,6 +28,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
       setuftext(_unformattedtext.trim())
       if (_unformattedtext.length - 1 <= maxcharacterlimit)
         setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.trim().length - 1 <= maxcharacterlimit ? _unformattedtext.trim().length  : 0))
+      
+      setQuillChange(true);
     }
     else if(htmlcontent === "<p><br></p>")
     {
@@ -47,7 +48,9 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
   useEffect(() => {
     setText(value)
     setuftext(value)
-  }, [value])
+    if (removeComment)
+      setText("");
+  }, [value, removeComment])
 
 
   const cancel = (e) => {
