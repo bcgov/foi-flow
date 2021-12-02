@@ -29,6 +29,11 @@ class FOIRawRequestComment(db.Model):
     
     @classmethod
     def savecomment(cls, commenttypeid, foirequestcomment, version, userid)->DefaultMethodResult:   
+        print('in model')
+        print(commenttypeid)
+        print(foirequestcomment)
+        print(version)
+        print(userid)
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
         newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=datetime.now(), createdby=userid)
         db.session.add(newcomment)
@@ -61,7 +66,7 @@ class FOIRawRequestComment(db.Model):
     def getcomments(cls, requestid)->DefaultMethodResult:   
         comment_schema = FOIRawRequestCommentSchema(many=True)
         query = db.session.query(FOIRawRequestComment).filter_by(requestid=requestid, isactive = True).order_by(FOIRawRequestComment.commentid.asc()).all()
-        return comment_schema.dump(query)   
+        return comment_schema.dump(query)  
     
 class FOIRawRequestCommentSchema(ma.Schema):
     class Meta:

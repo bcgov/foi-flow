@@ -19,6 +19,7 @@ from flask_restx import Namespace, Resource
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
+from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships,getgroupsfromtoken
 from request_api.exceptions import BusinessException, Error
@@ -83,7 +84,7 @@ class FOIRequests(Resource):
             fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)       
             assignedGroup = request_json['assignedGroup'] if 'assignedGroup' in fOIRequestsSchema  else None
             assignedTo = request_json['assignedTo'] if 'assignedTo' in fOIRequestsSchema  else None
-            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open In Progress",AuthHelper.getUserId())               
+            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open",AuthHelper.getUserId())               
             if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
@@ -117,6 +118,9 @@ class FOIRequestsById(Resource):
             fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                    
             result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid,AuthHelper.getUserId())
             if result.success == True:
+                print('before posting event')
+                eventservice().postevent(foiministryrequestid,"ministryrequest")
+                print('success')
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
                 requestservice().postEventToWorkflow(fOIRequestsSchema, json.loads(metadata))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
@@ -149,6 +153,7 @@ class FOIRequestsByIdAndType(Resource):
             ministryrequestschema = FOIRequestMinistrySchema().load(request_json)    
             result = requestservice().saveMinistryRequestVersion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getUserId(), usertype)
             if result.success == True:
+                eventservice().postevent(foiministryrequestid,"ministryrequest")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404
