@@ -83,9 +83,13 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               ref={ref}
               role='tooltip'
               trigger={
+                i.commentTypeId === 1 ?
                 <button className="actionsBtn">
                   <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
-                </button>
+                </button> :
+                <button className="actionsBtn" disabled>
+                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='grey' />
+              </button>
               }
               position='right center'
               nested
