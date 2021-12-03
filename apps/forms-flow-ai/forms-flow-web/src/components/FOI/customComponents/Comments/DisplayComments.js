@@ -63,7 +63,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     var returnindex = 2
     var totalcharacterCount = 0
     var reachedLimit = false;
-    
+
     _comments.forEach((comment, index) => {
 
       if (!reachedLimit) {
@@ -113,7 +113,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
             )
           ) : (
 
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.userId)} />
+            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={i.commentTypeId === 1 ? getfullName(i.userId) : "FOI App"} />
 
           )}
           {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
@@ -157,7 +157,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                       i={a}
                       reply
                       parentId={i.commentId}
-                      handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={getfullName(a.userId)}
+                      handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={a.commentTypeId === 1 ? getfullName(a.userId) : "FOI App"}
                     />
                   )}
                   {actions.replies.filter((id) => id === a.commentId).length !==
