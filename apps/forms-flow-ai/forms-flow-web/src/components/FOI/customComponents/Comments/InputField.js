@@ -8,14 +8,13 @@ import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 
 
-const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQuillChange, removeComment }) => {
-
+const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQuillChange, removeComment, setRemoveComment }) => {
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(maxcharacterlimit)
 
-  const handleQuillChange = (htmlcontent, delta, source, editor) => {    
+  const handleQuillChange = (htmlcontent, delta, source, editor) => {
     let _unformattedtext = editor.getText()
     if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {      
       if (_unformattedtext.trim().length - 1 <= maxcharacterlimit) {
@@ -36,6 +35,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
       setTextLength(1000);
       setText("")
       setuftext("")
+      setQuillChange(false);
     }
   }
 
@@ -47,10 +47,20 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
 
   useEffect(() => {
     setText(value)
-    setuftext(value)
-    if (removeComment)
-      setText("");
-  }, [value, removeComment])
+    setuftext(value)    
+  }, [value])
+
+  useEffect(() => {
+    if (removeComment) {
+      if (add) {
+        setText("");
+      }
+      else {
+        cancel("");
+      }
+      setRemoveComment(false);
+    }
+  })
 
 
   const cancel = (e) => {
@@ -59,8 +69,9 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
     edit
       ? actions.handleCancel(cancellor, edit)
       : actions.handleCancel(cancellor)
-
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
   }
 
   const post = () => {

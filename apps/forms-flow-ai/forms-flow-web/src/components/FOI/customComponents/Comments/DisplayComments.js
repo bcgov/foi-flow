@@ -5,7 +5,7 @@ import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, setQuillChange, removeComment, setRemoveComment }) => {
 
   const getfullName = (userId) => {
     let fullName = ''
@@ -119,7 +119,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 edit: true
               })
             ) : (
-              <InputField cancellor={i.commentId} value={i.text} edit />
+              <InputField cancellor={i.commentId} value={i.text} edit setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
             )
           ) : (
 
@@ -136,7 +136,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 edit: false
               })
             ) : (
-              <InputField cancellor={i.commentId} parentId={i.commentId} />
+              <InputField cancellor={i.commentId} parentId={i.commentId} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
             ))}
           <div className="replySection">
             {
@@ -160,6 +160,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                         value={a.text}
                         edit
                         parentId={i.commentId}
+                        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                       />
                     )
                   ) : (
@@ -186,6 +187,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                         cancellor={a.commentId}
                         parentId={i.commentId}
                         child
+                        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                       />
                     ))}
                 </div>

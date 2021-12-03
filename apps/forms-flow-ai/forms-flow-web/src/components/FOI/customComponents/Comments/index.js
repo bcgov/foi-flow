@@ -19,7 +19,8 @@ export const CommentSection = ({
   ministryAssignedToList,
   requestNumber,
   setQuillChange,
-  removeComment
+  removeComment,
+  setRemoveComment
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)  
   return (
@@ -34,6 +35,7 @@ export const CommentSection = ({
       ministryId={ministryId}
       setQuillChange={setQuillChange}
       removeComment={removeComment}
+      setRemoveComment={setRemoveComment}
     >
       <div className="section">
         <div className="foi-request-number-header">
@@ -44,10 +46,10 @@ export const CommentSection = ({
         </div>
 
         <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
-          {<Input add="add" setQuillChange={setQuillChange} removeComment={removeComment} />}
+          {<Input add="add" setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
 
       </div>

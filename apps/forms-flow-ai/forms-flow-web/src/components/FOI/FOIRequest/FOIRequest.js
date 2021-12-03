@@ -106,7 +106,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
     if (bcgovcode)
-      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));          
+      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   },[requestId,ministryId, dispatch,comment, attachments]);
  
 
@@ -606,6 +606,8 @@ const FOIRequest = React.memo(({userDetail}) => {
         setRemoveComment(true);
       }
       else {
+        setQuillChange(true);
+        setRemoveComment(false);
         clickedOk = false;
         param = 'Comments';
         document.getElementById(param).className += " active";
@@ -615,6 +617,9 @@ const FOIRequest = React.memo(({userDetail}) => {
             elementsByName[i].className += " active";        
         }
       }
+    }
+    else {
+      setRemoveComment(false);
     }
     var i, tabcontent, tablinks;
 
@@ -650,7 +655,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   return (
 
     <div className="foiformcontent">
-      <div className="foitabbedContainer">
+      <div className="foitabbedContainer">  
 
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
@@ -731,7 +736,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
                     bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}  
-                    setQuillChange={setQuillChange} removeComment={removeComment}/>
+                    setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 
                 </> : <Loading />
             }
