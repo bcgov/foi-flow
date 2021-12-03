@@ -150,15 +150,12 @@ const saveSessionData = (key, data) => {
 		expiresAt: new Date(expiresInMilliseconds),
 		sessionData: data
 	}
-	console.log(`save session ${key}`);
-	console.log(sessionObject);
+
 	sessionStorage.setItem(key, encrypt(sessionObject));
 };
 
 const getSessionData = (key) => {
 	var sessionObject = decrypt(sessionStorage.getItem(key));
-	console.log(`get session ${key}`);
-	console.log(sessionObject);
 
 	if(sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
 		var currentDate = new Date();
