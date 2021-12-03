@@ -157,10 +157,20 @@ class FOIMinistryRequest(db.Model):
         for row in rs:
             summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
         return summary      
-        
+
+      
     @classmethod
     def getversionforrequest(cls,ministryrequestid):   
-       return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
+        return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
+
+    @classmethod
+    def getstatenavigation(cls, ministryrequestid):
+        _session = db.session
+        _requeststates = _session.query(FOIMinistryRequest.requeststatusid).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).limit(2)
+        requeststates = []
+        for _requeststate in _requeststates:
+            requeststates.append(_requeststate[0])
+        return requeststates
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

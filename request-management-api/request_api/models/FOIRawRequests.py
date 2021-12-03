@@ -109,6 +109,7 @@ class FOIRawRequest(db.Model):
 
         return requests
     
+
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
         sql = """select CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
@@ -139,7 +140,19 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getversionforrequest(cls,requestid):   
-       return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        print(requestid)
+        return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+
+
+    @classmethod
+    def getstatenavigation(cls, requestid):
+        _session = db.session
+        _requeststates = _session.query(FOIRawRequest.status).filter(FOIRawRequest.requestid == requestid).order_by(FOIRawRequest.version.desc()).limit(2)
+        requeststates = []
+        for _requeststate in _requeststates:
+            requeststates.append(_requeststate[0])
+        return requeststates    
+    
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

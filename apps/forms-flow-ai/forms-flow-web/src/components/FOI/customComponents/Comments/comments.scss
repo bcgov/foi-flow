@@ -227,7 +227,7 @@
 }
 
 button[disabled]{
-  cursor: none!important;
+  cursor:not-allowed!important ;
 }
 
 .signBox{
@@ -431,4 +431,9 @@ border: 0px!important;
   }
   .btnshowmore {
     width: 100%!important;   
+  }
+
+
+  button.actionsBtn[disabled]{
+    cursor:not-allowed!important ;
   }
