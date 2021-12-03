@@ -56,22 +56,31 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
         setText("");
       }
       else {
-        cancel("");
+        closeX();
       }
       setRemoveComment(false);
     }
   })
 
-
-  const cancel = (e) => {
+  const closeX = () => {
     setText('')
     setuftext('')
     edit
       ? actions.handleCancel(cancellor, edit)
       : actions.handleCancel(cancellor)
-    if (e) {
-      e.preventDefault()
+  }
+
+
+  const cancel = (e) => {
+    if (text) {
+      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
+        closeX();
+      }
     }
+    else {
+      closeX();
+    }
+    e.preventDefault(); 
   }
 
   const post = () => {
