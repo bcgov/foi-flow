@@ -72,6 +72,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
         ? actions.submit(cancellor, text, parentId, true, setText)
         : actions.submit(cancellor, text, parentId, false, setText)
     }
+    setQuillChange(false);
 
   }
 
