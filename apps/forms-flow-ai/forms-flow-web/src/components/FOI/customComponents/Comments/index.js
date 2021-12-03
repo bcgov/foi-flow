@@ -20,10 +20,7 @@ export const CommentSection = ({
   requestNumber
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)
-  const [filteredcomments, setfilteredcomments] = useState(commentsArray)
   
-
- 
   return (
     <ActionProvider
       currentUser={currentUser}
