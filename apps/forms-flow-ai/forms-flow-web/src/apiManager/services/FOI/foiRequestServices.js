@@ -29,7 +29,7 @@ import {
   setMinistryRequestAttachments
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
-import { replaceUrl } from "../../../helper/FOI/helper";
+import { replaceUrl, addToFullnameList, getAssignToList, getFullnameTeamList } from "../../../helper/FOI/helper";
 
 export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => { };
@@ -127,67 +127,97 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
 };
 
 export const fetchFOIFullAssignedToList = (...rest) => {
-  const done = rest.length ? rest[0] : () => { };
+  let fullnameTeamArray = getFullnameTeamList();
+  if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
+    fullnameTeamArray = [];
+  }
 
-  return (dispatch) => {
-    httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          const foiFullAssignedToList = res.data;
-          let data = foiFullAssignedToList.map((assignedTo) => {
-            return { ...assignedTo };
-          });
-          dispatch(setFOIFullAssignedToList(data));
+	if(fullnameTeamArray.includes("iao")) {
+    return (dispatch) => {
+      dispatch(setFOIFullAssignedToList(getAssignToList("iao")));
+      dispatch(setFOIAssignedToListLoader(false));
+    };
+
+	} else {
+    const done = rest.length ? rest[0] : () => { };
+
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiFullAssignedToList = res.data;
+            let data = foiFullAssignedToList.map((assignedTo) => {
+              return { ...assignedTo };
+            });
+            addToFullnameList(data, "iao");
+            dispatch(setFOIFullAssignedToList(data));
+            dispatch(setFOIAssignedToListLoader(false));
+            done(null, res.data);
+          } else {
+            console.log("Error", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOIAssignedToListLoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error", error);
+          dispatch(serviceActionError(error));
           dispatch(setFOIAssignedToListLoader(false));
-          done(null, res.data);
-        } else {
-          console.log("Error", res);
-          dispatch(serviceActionError(res));
-          dispatch(setFOIAssignedToListLoader(false));
-        }
-      })
-      .catch((error) => {
-        console.log("Error", error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOIAssignedToListLoader(false));
-        done(error);
-      });
-  };
+          done(error);
+        });
+    };
+
+  }
 };
 
 export const fetchFOIMinistryAssignedToList = (govCode, ...rest) => {
-  const done = rest.length ? rest[0] : () => { };
 
-  const apiUrlGETAssignedToList = replaceUrl(
-    API.FOI_GET_ASSIGNEDTO_MINISTRYGROUP_LIST_API,
-    "<govcode>",
-    govCode
-  );
+  let fullnameTeamArray = getFullnameTeamList();
+  if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
+    fullnameTeamArray = [];
+  }
 
-  return (dispatch) => {
-    httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          const foiAssignedToList = res.data;
-          let data = foiAssignedToList.map((assignedTo) => {
-            return { ...assignedTo };
-          });
-          dispatch(setFOIMinistryAssignedToList(data));
+	if(fullnameTeamArray.includes(govCode.toLowerCase())) {
+    return (dispatch) => {
+      dispatch(setFOIMinistryAssignedToList(getAssignToList(govCode)));
+      dispatch(setFOILoader(false));
+    };
+
+	} else {
+    const done = rest.length ? rest[0] : () => { };
+
+    const apiUrlGETAssignedToList = replaceUrl(
+      API.FOI_GET_ASSIGNEDTO_MINISTRYGROUP_LIST_API,
+      "<govcode>",
+      govCode
+    );
+  
+    return (dispatch) => {
+      httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiAssignedToList = res.data;
+            let data = foiAssignedToList.map((assignedTo) => {
+              return { ...assignedTo };
+            });
+            addToFullnameList(data, govCode);
+            dispatch(setFOIMinistryAssignedToList(data));
+            dispatch(setFOILoader(false));
+            done(null, res.data);
+          } else {
+            console.log("Error", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error", error);
+          dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(null, res.data);
-        } else {
-          console.log("Error", res);
-          dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
-        }
-      })
-      .catch((error) => {
-        console.log("Error", error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
-      });
-  };
+          done(error);
+        });
+    };
+  }
 };
 
 export const fetchFOIDeliveryModeList = (...rest) => {
