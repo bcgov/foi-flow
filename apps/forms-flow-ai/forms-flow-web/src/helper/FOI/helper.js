@@ -178,7 +178,7 @@ const addToFullnameList = (userArray, team) => {
 		const _team = team.toLowerCase();
 		let currentMember;
 
-		//fullname array for username -> fullname value pairs
+		//fullname array (all teams) -> fullname value pairs
 		let fullnameArray = getSessionData('fullnameList');
 		if(!fullnameArray || !Array.isArray(fullnameArray)) {
 			fullnameArray = [];
@@ -190,6 +190,7 @@ const addToFullnameList = (userArray, team) => {
 			fullnameTeamArray = [];
 		}
 	
+		//extract fullname and append to the array
 		if(userArray && Array.isArray(userArray)) {
 			userArray.forEach(team => {
 				if(team && team.members && Array.isArray(team.members)) {
@@ -206,6 +207,7 @@ const addToFullnameList = (userArray, team) => {
 				}
 			});
 	
+			//save team name
 			if(!fullnameTeamArray.includes(_team)) {
 				fullnameTeamArray.push(_team);
 				saveSessionData(`fullnameTeamList`, fullnameTeamArray);
