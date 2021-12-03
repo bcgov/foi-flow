@@ -5,7 +5,7 @@ import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
 import { fetchFOIRequestList, fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiRequestServices";
-import { formatDate, addBusinessDays, businessDay, getFullnameList } from "../../../helper/FOI/helper";
+import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
 
@@ -24,9 +24,6 @@ const Dashboard = ({userDetail}) => {
 
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
-  const fullnameList = getFullnameList();
-  console.log("dashboard fullname");
-  console.log(fullnameList);
 
   function getFullName(params) {    
     return `${params.row.lastName || ''}, ${
