@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext,useState } from 'react'
 import './comments.scss'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
@@ -66,15 +66,18 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
   }
 
+  const [filterValue, setfilterValue] = useState(-1)
+  var _comments = [...comments]
+  _comments = parseInt(filterValue) === -1 ? _comments : _comments.filter(c=>c.commentTypeId === parseInt(filterValue))
 
   const dynamicIndexFinder = () => {
-    var _comments = [...comments]
-    _comments = _comments.reverse()
+    var _commentscopy = [..._comments]
+    _commentscopy = _commentscopy.reverse()
     var returnindex = 2
     var totalcharacterCount = 0
     var reachedLimit = false;
 
-    _comments.forEach((comment, index) => {
+    _commentscopy.forEach((comment, index) => {
 
       if (!reachedLimit) {
         totalcharacterCount += comment.text.length
@@ -99,7 +102,11 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
     })
 
-    return returnindex;
+    return returnindex+1;
+  }
+
+  const onfilterchange = (e) => {    
+    setfilterValue(e.target.value)
   }
 
   let limit = dynamicIndexFinder()
@@ -107,7 +114,20 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   const actions = useContext(ActionContext)
   return (
     <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
-      {comments.map((i, index) => (
+      <div className="filterComments" >
+        { filterValue !== -1 ?
+        <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange}   />
+          : <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange}  checked />
+        }
+        <label for="rballcomments">All Comments</label>
+        <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
+        <label for="rbrequesthistory">Request History</label>
+        <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
+        <label for="rbusercomments">User Comments</label>
+      </div>
+      {
+      _comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
+      _comments.map((i, index) => (
         <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
@@ -193,7 +213,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
-      <div id="showMoreParentComments" className="showMoreParentComments" style={comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={_comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
         <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 2)}>Show more comments</button>
       </div>
     </div>
