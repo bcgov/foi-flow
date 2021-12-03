@@ -102,7 +102,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
     })
 
-    return returnindex+1;
+    return returnindex;
   }
 
   const onfilterchange = (e) => {    
