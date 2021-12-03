@@ -182,4 +182,8 @@ const getAssignToList = (team) => {
 	return JSON.parse(sessionStorage.getItem(`${team.toLowerCase()}AssignToList`));
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList, getAssignToList };
+const getFullnameTeamList = () => {
+	return JSON.parse(sessionStorage.getItem('fullnameTeamList'));
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList, getAssignToList, getFullnameTeamList };

@@ -29,7 +29,7 @@ import {
   setMinistryRequestAttachments
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
-import { replaceUrl, addToFullnameList, getAssignToList } from "../../../helper/FOI/helper";
+import { replaceUrl, addToFullnameList, getAssignToList, getFullnameTeamList } from "../../../helper/FOI/helper";
 
 export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => { };
@@ -127,7 +127,7 @@ export const fetchFOIAssignedToList = (urlIndexCreateRequest, requestType, statu
 };
 
 export const fetchFOIFullAssignedToList = (...rest) => {
-  let fullnameTeamArray = JSON.parse(sessionStorage.getItem('fullnameTeamList'));
+  let fullnameTeamArray = getFullnameTeamList();
   if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
     fullnameTeamArray = [];
   }
@@ -173,7 +173,7 @@ export const fetchFOIFullAssignedToList = (...rest) => {
 
 export const fetchFOIMinistryAssignedToList = (govCode, ...rest) => {
 
-  let fullnameTeamArray = JSON.parse(sessionStorage.getItem('fullnameTeamList'));
+  let fullnameTeamArray = getFullnameTeamList();
   if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
     fullnameTeamArray = [];
   }
