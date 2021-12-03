@@ -3,7 +3,7 @@ import DateHolidayjs from 'date-holidays';
 import dayjsBusinessDays from 'dayjs-business-days';
 import { format, utcToZonedTime } from 'date-fns-tz';
 import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
-import { SECURITY_KEY } from "../../constants/constants";
+import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constants";
 var isBetween = require('dayjs/plugin/isBetween')
 var utc = require("dayjs/plugin/utc")
 var timezone = require("dayjs/plugin/timezone")
@@ -132,15 +132,47 @@ const getMinistryByValue = (userGroups) => {
 }
 
 const encrypt = (obj) => {
-	return CryptoJS.AES.encrypt(JSON.stringify(obj), SECURITY_KEY).toString();
+	return CryptoJS.AES.encrypt(JSON.stringify(obj), SESSION_SECURITY_KEY).toString();
 };
 
 const decrypt = (encrypted) => {
 	if(encrypted) {
-		var bytes  = CryptoJS.AES.decrypt(encrypted, SECURITY_KEY);
+		var bytes  = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
 		return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 	} else {
-		return [];
+		return {};
+	}
+};
+
+const saveSessionData = (key, data) => {
+	var expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
+	var sessionObject = {
+		expiresAt: new Date(expiresInMilliseconds),
+		sessionData: data
+	}
+	console.log(`save session ${key}`);
+	console.log(sessionObject);
+	sessionStorage.setItem(key, encrypt(sessionObject));
+};
+
+const getSessionData = (key) => {
+	var sessionObject = decrypt(sessionStorage.getItem(key));
+	console.log(`get session ${key}`);
+	console.log(sessionObject);
+
+	if(sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
+		var currentDate = new Date();
+		var expirationDate = sessionObject.expiresAt;
+
+		if(Date.parse(currentDate) < Date.parse(expirationDate)) {
+			return sessionObject.sessionData;
+		} else {
+			sessionStorage.removeItem(key);
+			console.log(`${key} session expired`);
+			return null;
+		}
+	} else {
+		return null;
 	}
 };
 
@@ -150,13 +182,13 @@ const addToFullnameList = (userArray, team) => {
 		let currentMember;
 
 		//fullname array for username -> fullname value pairs
-		let fullnameArray = decrypt(sessionStorage.getItem('fullnameList'));
+		let fullnameArray = getSessionData('fullnameList');
 		if(!fullnameArray || !Array.isArray(fullnameArray)) {
 			fullnameArray = [];
 		}
 	
 		//teams saved in fullnameList
-		let fullnameTeamArray = decrypt(sessionStorage.getItem('fullnameTeamList'));
+		let fullnameTeamArray = getSessionData('fullnameTeamList');
 		if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
 			fullnameTeamArray = [];
 		}
@@ -179,26 +211,27 @@ const addToFullnameList = (userArray, team) => {
 	
 			if(!fullnameTeamArray.includes(_team)) {
 				fullnameTeamArray.push(_team);
+				saveSessionData(`fullnameTeamList`, fullnameTeamArray);
 
 				//save for assignedto or ministryassignto dropdown
-				sessionStorage.setItem(`${_team}AssignToList`, encrypt(userArray));
+				saveSessionData(`${_team}AssignToList`, userArray);
 			}
 		}
 	
-		sessionStorage.setItem('fullnameList', encrypt(fullnameArray));
+		saveSessionData('fullnameList', fullnameArray);
 	}
 }
 
 const getFullnameList = () => {
-	return decrypt(sessionStorage.getItem('fullnameList'));
+	return getSessionData('fullnameList');
 }
 
 const getAssignToList = (team) => {
-	return decrypt(sessionStorage.getItem(`${team.toLowerCase()}AssignToList`));
+	return getSessionData(`${team.toLowerCase()}AssignToList`);
 }
 
 const getFullnameTeamList = () => {
-	return decrypt(sessionStorage.getItem('fullnameTeamList'));
+	return getSessionData('fullnameTeamList');
 }
 
 export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList, getAssignToList, getFullnameTeamList };

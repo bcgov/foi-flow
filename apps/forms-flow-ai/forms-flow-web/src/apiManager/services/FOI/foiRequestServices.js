@@ -133,13 +133,12 @@ export const fetchFOIFullAssignedToList = (...rest) => {
   }
 
 	if(fullnameTeamArray.includes("iao")) {
-
     return (dispatch) => {
       dispatch(setFOIFullAssignedToList(getAssignToList("iao")));
+      dispatch(setFOIAssignedToListLoader(false));
     };
 
 	} else {
-
     const done = rest.length ? rest[0] : () => { };
 
     return (dispatch) => {
@@ -179,9 +178,9 @@ export const fetchFOIMinistryAssignedToList = (govCode, ...rest) => {
   }
 
 	if(fullnameTeamArray.includes(govCode.toLowerCase())) {
-
     return (dispatch) => {
       dispatch(setFOIMinistryAssignedToList(getAssignToList(govCode)));
+      dispatch(setFOILoader(false));
     };
 
 	} else {
