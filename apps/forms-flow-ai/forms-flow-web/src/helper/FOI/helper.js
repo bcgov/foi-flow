@@ -173,9 +173,9 @@ const getSessionData = (key) => {
 	}
 };
 
-const addToFullnameList = (userArray, team) => {
-	if(team) {
-		const _team = team.toLowerCase();
+const addToFullnameList = (userArray, foiteam) => {
+	if(foiteam) {
+		const _team = foiteam.toLowerCase();
 		let currentMember;
 
 		//fullname array (all teams) -> fullname value pairs
