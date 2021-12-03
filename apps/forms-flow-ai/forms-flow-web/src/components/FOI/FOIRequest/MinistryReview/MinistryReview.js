@@ -237,6 +237,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
         setRemoveComment(true);
       }
       else {
+        setQuillChange(true);
+        setRemoveComment(false);
         clickedOk = false;
         param = 'Comments';
         document.getElementById(param).className += " active";
@@ -246,6 +248,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
             elementsByName[i].className += " active";        
         }
       }
+    }
+    else {
+      setRemoveComment(false);
     }
     var i, tabcontent, tablinks;
 
@@ -357,7 +362,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
                     ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
-                    requestNumber={requestNumber} setQuillChange={setQuillChange} removeComment={removeComment} />
+                    requestNumber={requestNumber} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 </> : <Loading />}
           </div>
           <div id="Option3" className="tabcontent">
