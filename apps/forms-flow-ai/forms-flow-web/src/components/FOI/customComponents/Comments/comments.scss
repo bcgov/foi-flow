@@ -437,3 +437,29 @@ border: 0px!important;
   button.actionsBtn[disabled]{
     cursor:not-allowed!important ;
   }
+
+  div.filterComments{
+    display: inline-flex;
+    margin-left: 15px;
+    margin-top: 5%;
+    margin-bottom: 15px;
+    width: 100%;
+    label {
+      padding-right: 5%;
+      color:#68686d;
+      font-weight: 600;
+    }
+    input[type="radio"]{
+      margin-top: 4px;
+      margin-right: 3px;
+      color:#313132
+    }
+  }
+
+  div.nofiltermessage{
+
+    padding: 15px;
+    font-size: 15px;
+    font-style: italic;
+
+  }
