@@ -140,8 +140,6 @@ export const AttachmentSection = ({
     }
   }
 
-  console.log("attachment fullname");
-  console.log(fullnameList);
   const getFullname = (userId) => {
     let user;
 

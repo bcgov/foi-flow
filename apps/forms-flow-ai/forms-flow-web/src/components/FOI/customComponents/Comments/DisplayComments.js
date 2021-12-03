@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import './comments.scss'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
