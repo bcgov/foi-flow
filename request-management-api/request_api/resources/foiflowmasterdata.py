@@ -166,47 +166,31 @@ class FOIFlowDocumentStorage(Resource):
 
             requestfilejson = request.get_json()
 
-            for file in requestfilejson:
-                foirequestform = FOIRequestsFormsList().load(file)
-                             
+            for file in requestfilejson:                
+                foirequestform = FOIRequestsFormsList().load(file)                
+                ministrycode = foirequestform.get('ministrycode')
+                requestnumber = foirequestform.get('requestnumber')
+                filestatustransition = foirequestform.get('filestatustransition')
+                filename = foirequestform.get('filename')
+                s3souceuri = foirequestform.get('s3souceuri')
+                filenamesplittext = os.path.splitext(filename)
+                uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])                
                 auth = AWSRequestsAuth(aws_access_key=accesskey,
                         aws_secret_access_key=secretkey,
                         aws_host=s3host,
                         aws_region=s3region,
                         aws_service=s3service) 
+
+                s3uri = s3souceuri if s3souceuri is not None else 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)        
                 
-                existings3uri = foirequestform.get('filepath')
-                print(existings3uri)
-                if existings3uri:
-                    response = requests.put(
-                        existings3uri,
-                        data=None,
-                        auth=auth
-                    )
-                    file['authheader']=response.request.headers['Authorization'] 
-                    file['amzdate']=response.request.headers['x-amz-date']
-                    
-                else:                   
-                
-                    ministrycode = foirequestform.get('ministrycode')
-                    requestnumber = foirequestform.get('requestnumber')
-                    filestatustransition = foirequestform.get('filestatustransition')
-                    filename = foirequestform.get('filename')
-                    filenamesplittext = os.path.splitext(filename)
-                    uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
+                response = requests.put(s3uri,data=None,auth=auth) if s3souceuri is None  else requests.get(s3uri,auth=auth)
 
 
-                    s3uri = 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)        
-                    response = requests.put(
-                        s3uri,
-                        data=None,
-                        auth=auth
-                    )
-                    file['filepath']=s3uri
-                    file['authheader']=response.request.headers['Authorization'] 
-                    file['amzdate']=response.request.headers['x-amz-date']
-                    file['uniquefilename']=uniquefilename
-                    file['filestatustransition']=filestatustransition
+                file['filepath']=s3uri
+                file['authheader']=response.request.headers['Authorization'] 
+                file['amzdate']=response.request.headers['x-amz-date']
+                file['uniquefilename']=uniquefilename if s3souceuri is None else ''
+                file['filestatustransition']=filestatustransition  if s3souceuri is None else ''
                 
             return json.dumps(requestfilejson) , 200
         except BusinessException as exception:            
