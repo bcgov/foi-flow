@@ -49,15 +49,13 @@ class rawrequestservice:
 
    
     def updateworkflowinstance(wfinstanceid, requestid, userId):
-        result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userId)
-        return result
+        return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userId)
 
     def updateworkflowinstancewithstatus(wfinstanceid, requestid,status,notes, userId):
-        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userId)
-        return result    
+        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userId)    
     
     def postEventToWorkflow(self, id, wfinstanceid, requestsschema, status):
-        return workflowservice().postintakeevent(id, wfinstanceid, requestsschema, status)
+        return workflowservice().postunopenedevent(id, wfinstanceid, requestsschema, status)
 
     def getrawrequests():
         requests = FOIRawRequest.getrequests()        

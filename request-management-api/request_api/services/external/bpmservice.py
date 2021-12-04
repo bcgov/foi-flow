@@ -17,19 +17,35 @@ class bpmservice(camundaservice):
     
      
     @classmethod
-    def unopenedClaim(self,processinstanceid, userid, token=None):
+    def unopenedevent(self,processinstanceid, userid, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
-                                              "messageName": MessageType.intakeclaim.value, 
+                                              "messageName": messagetype, 
                                               "processVariables":{
                                                   "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userid})
                                                   }
                                               })
-            return requests.post(self._getUrl_(MessageType.intakeclaim.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return
+
+
     @classmethod
-    def openedclaim(self, filenumber, groupname, userid, messagetype, token=None):
+    def unopenedcomplete(self,processinstanceid, data, messagetype, token=None): 
+        if self.bpmEngineRestUrl is not None:
+            messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
+                                              "messageName": messagetype, 
+                                              "processVariables":{
+                                                  "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
+                                                  }
+                                              })
+            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+        else:
+            return
+        
+        
+    @classmethod
+    def openedevent(self, filenumber, groupname, userid, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
                                               "localCorrelationKeys":{
@@ -43,7 +59,8 @@ class bpmservice(camundaservice):
                                               })
             return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
-            return     
+            return   
+ 
         
     @classmethod
     def openedcomplete(self,filenumber, data, messagetype, token=None):
@@ -59,18 +76,11 @@ class bpmservice(camundaservice):
         else:
             return    
  
+
     @classmethod
-    def complete(self,processinstanceid, data, messagetype, token=None): 
-        if self.bpmEngineRestUrl is not None:
-            messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
-                                              "messageName": messagetype, 
-                                              "processVariables":{
-                                                  "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
-                                                  }
-                                              })
-            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
-        else:
-            return
+    def reopenevent(self,processinstanceid, data, messagetype, token=None): 
+        return self.unopenedcomplete(processinstanceid, data, messagetype, token)
+
 
     @classmethod
     def _getUrl_(self, messagetype):
@@ -97,8 +107,13 @@ class bpmservice(camundaservice):
 class MessageType(Enum):
     intakeclaim = "foi-intake-assignment"    
     intakecomplete = "foi-intake-complete"
+    intakereopen = "foi-intake-reopen"
+    iaoopenclaim = "foi-iao-open-assignment"
+    iaoopencomplete = "foi-iao-open-complete"  
     iaoclaim = "foi-iao-assignment"
-    iaocomplete = "foi-iao-complete"    
+    iaocomplete = "foi-iao-complete" 
+    iaoreopen = "foi-iao-reopen"  
     ministryclaim = "foi-ministry-assignment"
-    ministrycomplete = "foi-ministry-complete"             
+    ministrycomplete = "foi-ministry-complete"   
+              
      

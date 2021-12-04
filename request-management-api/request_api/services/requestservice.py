@@ -196,14 +196,14 @@ class requestservice:
                         updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
             return FOIRequest.updateStatus(foirequestid, updatedMinistries, userId)
     
-    def postEventToWorkflow(self, requestschema, data):        
+    def postEventToWorkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
         if requeststatusid is not None:
             status = FOIRequestUtil().getStatusName(requeststatusid)
-            workflowservice.postministryevent(requestschema, data, status)
+            workflowservice.postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
             
     def postOpeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
-        workflowservice.postintakeevent(id, wfinstanceid, requestschema, "Open", ministries)
+        workflowservice.postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)
        
     def copywatchers(self, rawrequestid, ministries, userid):
         watchers = watcherservice().getrawrequestwatchers(int(rawrequestid))
