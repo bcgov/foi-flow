@@ -6,14 +6,7 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import {
-  getOSSHeaderDetails,
-  saveFilesinS3,
-  getFileFromS3,
-  saveFOIRequestAttachmentsList,
-  replaceFOIRequestAttachment,
-  saveNewFilename,
-} from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 
 export const AttachmentSection = ({
@@ -157,6 +150,8 @@ export const AttachmentSection = ({
       case "download":
         downloadDocument(_attachment);
         break;
+      case "delete":
+        setModalFor("delete")
       default:
         setModal(false);
         break;
@@ -325,6 +320,10 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
   const handleDownload = () =>{
     handlePopupButtonClick("download", attachment);
   }
+
+  const handleDelete = () => {
+    handlePopupButtonClick("delete", attachment);
+  };
 
   return (
     <Popup
