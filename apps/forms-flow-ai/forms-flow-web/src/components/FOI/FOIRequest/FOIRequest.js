@@ -599,7 +599,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const alertUser = e => {
     if (quillChange) {     
-      e.returnValue = confirmationMessage;
+      e.returnValue = '';
       e.preventDefault();
     }
   }
