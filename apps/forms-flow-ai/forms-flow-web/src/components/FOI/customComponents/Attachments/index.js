@@ -6,8 +6,9 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
+import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 export const AttachmentSection = ({
   requestNumber,
@@ -41,6 +42,7 @@ export const AttachmentSection = ({
   const [multipleFiles, setMultipleFiles] = useState(true);
   const [modalFor, setModalFor] = useState("add");
   const [updateAttachment, setUpdateAttachment] = useState({});
+  const [fullnameList, setFullnameList] = useState(getFullnameList);
 
   const addAttachments = () => {
     setModalFor('add');
@@ -54,8 +56,9 @@ export const AttachmentSection = ({
         setModal(false);
         const documentsObject = {documents: documents};
         if (modalFor === 'replace' && updateAttachment) {
-          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};          
-          dispatch(replaceFOIRequestAttachment(requestId, ministryId, updateAttachment.foiministrydocumentid, replaceDocumentObject,(err, res) => {
+          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
+          const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
+          dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
             if (!err) {
               setAttachmentLoading(false);
               setSuccessCount(0);
@@ -75,7 +78,11 @@ export const AttachmentSection = ({
 
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
-    if (files) {
+    if (modalFor === 'delete' && value) { 
+      const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+      dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
+    }
+    else if (files) {
     setFileCount(files.length);
     if (value) {
         if (files.length !== 0) {
@@ -106,23 +113,23 @@ export const AttachmentSection = ({
 
   const handlePopupButtonClick = (action, _attachment) => {
     setUpdateAttachment();
+    setUpdateAttachment(_attachment);
+    setMultipleFiles(false);
     switch(action) {
-      case 'replace':
-        setUpdateAttachment(_attachment);
-        setMultipleFiles(false);
-        setModalFor('replace');
-        setModal(true);
+      case 'replace':        
+        setModalFor('replace');        
         break;
-      case 'rename':
-        setUpdateAttachment(_attachment);
-        setMultipleFiles(false);
-        setModalFor('rename');
-        setModal(true);
+      case 'rename':        
+        setModalFor('rename');        
+        break;
+      case 'delete':        
+        setModalFor('delete');        
         break;
       default:
         setModal(false);
         break;
     }
+    setModal(true);
   }
 
   const handleRename = (_attachment, newFilename) => {
@@ -138,9 +145,32 @@ export const AttachmentSection = ({
     }
   }
 
+  const getFullname = (userId) => {
+    let user;
+
+    if(fullnameList) {
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
+    } else {
+
+      if(iaoassignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, "iao");
+        setFullnameList(getFullnameList());
+      }
+  
+      if(ministryAssignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, bcgovcode);
+        setFullnameList(getFullnameList());
+      }
+  
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
+    }
+  };
+
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} iaoassignedToList={iaoList} ministryAssignedToList={ministryList} handlePopupButtonClick={handlePopupButtonClick} />);
+    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} handlePopupButtonClick={handlePopupButtonClick} getFullname={getFullname} />);
   }
   
   return (
@@ -164,7 +194,7 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedToList, handlePopupButtonClick}) => {
+const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}) => {
 
   const [filename, setFilename] = useState("");
   let lastIndex = 0;
@@ -174,48 +204,6 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
       setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
     }
   }, [attachment])
-
-  const getfullName = (userId) => {
-    let user;
-
-    if(iaoassignedToList.length > 0) {
-      iaoassignedToList.forEach(function (obj) {
-        var groupmembers = obj.members
-        var iao_user = groupmembers.find(m => m["username"] === userId)
-        if (iao_user && iao_user != undefined) {
-          user = iao_user;
-        }
-      })
-  
-      if(user && user != undefined) {
-        if(user["lastname"] && user["firstname"]) {
-          return `${user["lastname"]}, ${user["firstname"]}`;
-        } else {
-          return userId;
-        }
-      }
-    }
-
-    if(ministryAssignedToList.length > 0 && !user) {
-      ministryAssignedToList.forEach(function (obj) {
-        var groupmembers = obj.members
-        var ministry_user = groupmembers.find(m => m["username"] === userId)
-        if (ministry_user && ministry_user != undefined) {
-          user = ministry_user;
-        }
-      })
-
-      if(user && user != undefined) {
-        if(user["lastname"] && user["firstname"]) {
-          return `${user["lastname"]}, ${user["firstname"]}`;
-        } else {
-          return userId;
-        }
-      }
-    }
-
-    return userId;
-  }
 
   const getCategory = (category) => {
     switch(category) {
@@ -259,7 +247,7 @@ const Attachment = React.memo(({attachment, iaoassignedToList, ministryAssignedT
         </div>
         <div className="row foi-details-row">
           <div className="col-sm-12 foi-details-col attachment-owner">                      
-            {getfullName(attachment.createdby)}
+            {getFullname(attachment.createdby)}
           </div>
         </div>
         <div className="row foi-details-row">
@@ -282,8 +270,13 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
     handlePopupButtonClick("replace", attachment);
   }
 
+  const handleDelete = () => {
+    handlePopupButtonClick("delete", attachment);
+  }
+
   return (
     <Popup
+      role='tooltip'
       trigger={
         <button className="actionsBtn">
           <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
@@ -306,7 +299,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
             Replace
           </button>
           :
-          <button className="childActionsBtn">
+          <button className="childActionsBtn" onClick={handleDelete}>
             Delete
           </button>
         }
