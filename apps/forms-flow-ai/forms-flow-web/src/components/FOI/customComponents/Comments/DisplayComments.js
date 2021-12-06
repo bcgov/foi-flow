@@ -66,13 +66,12 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
   }
 
-  const [filterValue, setfilterValue] = useState(-1)
-  var _comments = [...comments]
-  _comments = parseInt(filterValue) === -1 ? _comments : _comments.filter(c=>c.commentTypeId === parseInt(filterValue))
+  
+  
 
   const dynamicIndexFinder = () => {
-    var _commentscopy = [..._comments]
-    _commentscopy = _commentscopy.reverse()
+    var _commentscopy = comments
+    //_commentscopy = _commentscopy.reverse()
     var returnindex = 2
     var totalcharacterCount = 0
     var reachedLimit = false;
@@ -105,30 +104,18 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     return returnindex;
   }
 
-  const onfilterchange = (e) => {    
-    setfilterValue(e.target.value)
-  }
-
+ 
   let limit = dynamicIndexFinder()
 
   const actions = useContext(ActionContext)
+
   return (
     <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
-      <div className="filterComments" >
-        { filterValue !== -1 ?
-        <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange}   />
-          : <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange}  checked />
-        }
-        <label for="rballcomments">All Comments</label>
-        <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
-        <label for="rbrequesthistory">Request History</label>
-        <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
-        <label for="rbusercomments">User Comments</label>
-      </div>
+   
       {
-      _comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
-      _comments.map((i, index) => (
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {}}>
+      comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
+      comments.map((i, index) => (
+        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {display: 'block'}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -213,7 +200,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
-      <div id="showMoreParentComments" className="showMoreParentComments" style={_comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
         <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 2)}>Show more comments</button>
       </div>
     </div>
