@@ -20,12 +20,27 @@ export const CommentSection = ({
   requestNumber
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)
+  const [comments, setcomments] = useState([])
+  const [filterValue, setfilterValue] = useState(-1)
+  useEffect(() => {
+    var _comments = parseInt(filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    setcomments(_comments)  
+  }, [filterValue,commentsArray])
+
   
+ 
+  const onfilterchange = (e) => {
+    var _filterValue = parseInt(e.target.value)        
+    setcomments([])
+    setfilterValue(_filterValue)
+
+  }
+ 
   return (
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
-      comments={commentsArray}
+      comments={comments}
       signinUrl={signinUrl}
       signupUrl={signupUrl}
       customInput={customInput}
@@ -45,7 +60,15 @@ export const CommentSection = ({
           {<Input add="add" />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+          <div className="filterComments" >
+            <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange} checked={filterValue === -1 ? true:false} />
+            <label htmlFor="rballcomments">All Comments</label>
+            <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
+            <label htmlFor="rbrequesthistory">Request History</label>
+            <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
+            <label htmlFor="rbusercomments">User Comments</label>
+          </div>
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
         </div>
 
       </div>

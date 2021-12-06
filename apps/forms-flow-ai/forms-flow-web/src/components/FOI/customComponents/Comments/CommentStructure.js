@@ -33,7 +33,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const [toggleIcon, settoggleIcon] = useState(faCaretDown)
 
   const ref = useRef();
-  const closeTooltip = () => ref.current.close();
+  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
   const toggleCollapse = (e, parentId) => {
 
@@ -117,7 +117,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                     {(close) => (
                       <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
 
-                        <div className='header' style={modalHeader}>
+                        <div className='header' style={modalHeader} >
                           {' '}
                           Delete Comment{' '}
                         </div>
