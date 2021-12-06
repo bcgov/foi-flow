@@ -1,46 +1,36 @@
-import React, { useContext,useState } from 'react'
+import React, { useContext,useState,useEffect } from 'react'
 import './comments.scss'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
+import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
 
+  const [fullnameList, setFullnameList] = useState(getFullnameList);
+
   const getfullName = (userId) => {
-    let fullName = ''
-    var _sessionuser = localStorage.getItem(userId)
+    let user;
 
-    if (_sessionuser === undefined || _sessionuser === '' || _sessionuser === null) {
+    if(fullnameList) {
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
+    } else {
 
-      iaoassignedToList.forEach(function (obj) {
-        var groupmembers = obj.members
-        var user = groupmembers.find(m => m["username"] === userId)
-        if (user && user != undefined) {
-          fullName = `${user["lastname"]}, ${user["firstname"]}`
-          localStorage.setItem(userId, fullName)
-          return true;
-        }
-      })
-
-      if (fullName === '') {
-        ministryAssignedToList.forEach(function (obj) {
-          var groupmembers = obj.members
-          var user = groupmembers.find(m => m["username"] === userId)
-          if (user && user != undefined) {
-            fullName = `${user["lastname"]}, ${user["firstname"]}`
-            localStorage.setItem(userId, fullName)
-            return true;
-          }
-        })
+      if(iaoassignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, "iao");
+        setFullnameList(getFullnameList());
       }
-
+  
+      if(ministryAssignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, bcgovcode);
+        setFullnameList(getFullnameList());
+      }
+  
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
     }
-    else {
-      fullName = _sessionuser
-    }
-
-    return fullName
   }
 
   const showhiddencomments = (e, count) => {
@@ -58,6 +48,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       hiddencomments = document.getElementsByName('commentsectionhidden')
       if (Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length === 0) {
         document.getElementById('showMoreParentComments').style.display = 'none'
+        setshowmorehidden(true)
       }
     }
     else {
@@ -66,14 +57,12 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
   }
 
-  const [filterValue, setfilterValue] = useState(-1)
-  var _comments = [...comments]
-  _comments = parseInt(filterValue) === -1 ? _comments : _comments.filter(c=>c.commentTypeId === parseInt(filterValue))
+  
+  const [showmorehidden, setshowmorehidden] = useState(false)
 
   const dynamicIndexFinder = () => {
-    var _commentscopy = [..._comments]
-    _commentscopy = _commentscopy.reverse()
-    var returnindex = 2
+    var _commentscopy = [...comments]    
+    var returnindex = 3
     var totalcharacterCount = 0
     var reachedLimit = false;
 
@@ -86,7 +75,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           comment.replies.forEach((reply) => {
             if (!reachedLimit) {
               totalcharacterCount += reply.text.length
-              if (totalcharacterCount > 2000) {
+              if (totalcharacterCount > 2000  && index > 3) {
                 returnindex = index
                 reachedLimit = true
               }
@@ -94,7 +83,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           })
         }
 
-        if (totalcharacterCount > 2000) {
+        if (totalcharacterCount > 2000 && index > 3) {
           returnindex = index
           reachedLimit = true
         }
@@ -105,30 +94,24 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     return returnindex;
   }
 
-  const onfilterchange = (e) => {    
-    setfilterValue(e.target.value)
-  }
-
+ 
   let limit = dynamicIndexFinder()
+  
+  useEffect(() => {    
+    // if(!showmorehidden)
+    //   {setshowmorehidden(comments.length < 3)}
+  }, [comments])
 
   const actions = useContext(ActionContext)
+  
+
   return (
     <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
-      <div className="filterComments" >
-        { filterValue !== -1 ?
-        <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange}   />
-          : <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange}  checked />
-        }
-        <label for="rballcomments">All Comments</label>
-        <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
-        <label for="rbrequesthistory">Request History</label>
-        <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
-        <label for="rbusercomments">User Comments</label>
-      </div>
+   
       {
-      _comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
-      _comments.map((i, index) => (
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {}}>
+      comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
+      comments.map((i, index) => (
+        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit && !showmorehidden ? { display: 'none' } : {display: 'block'}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -213,8 +196,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
-      <div id="showMoreParentComments" className="showMoreParentComments" style={_comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
-        <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 2)}>Show more comments</button>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={!showmorehidden && comments.length > 3 ? { display: 'block' } : { display: 'none' }}>
+        <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 5)}>Show more comments</button>
       </div>
     </div>
   )
