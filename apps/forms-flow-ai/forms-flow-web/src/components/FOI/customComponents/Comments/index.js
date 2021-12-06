@@ -30,9 +30,10 @@ export const CommentSection = ({
   
  
   const onfilterchange = (e) => {
-    var _filterValue = parseInt(e.target.value)        
+    var _filterValue = parseInt(e.target.value) 
+    setfilterValue(_filterValue)       
     setcomments([])
-    setfilterValue(_filterValue)
+    
 
   }
  

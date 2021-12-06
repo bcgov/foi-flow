@@ -107,10 +107,10 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
  
   let limit = dynamicIndexFinder()
   
-  useEffect(() => {
-    
-    setshowmorehidden(comments.length > 3)
-  }, [showmorehidden])
+  useEffect(() => {    
+    // if(!showmorehidden)
+    //   {setshowmorehidden(comments.length < 3)}
+  }, [comments])
 
   const actions = useContext(ActionContext)
   
@@ -121,7 +121,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       {
       comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
       comments.map((i, index) => (
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index > limit ? 'commentsectionhidden' : ""} style={index > limit && !showmorehidden ? { display: 'none' } : {display: 'block'}}>
+        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit && !showmorehidden ? { display: 'none' } : {display: 'block'}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -206,7 +206,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
-      <div id="showMoreParentComments" className="showMoreParentComments" style={!showmorehidden ? { display: 'block' } : { display: 'none' }}>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={!showmorehidden && comments.length > 3 ? { display: 'block' } : { display: 'none' }}>
         <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 5)}>Show more comments</button>
       </div>
     </div>
