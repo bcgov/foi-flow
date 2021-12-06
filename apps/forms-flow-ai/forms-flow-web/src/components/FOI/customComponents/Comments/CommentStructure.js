@@ -33,7 +33,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const [toggleIcon, settoggleIcon] = useState(faCaretDown)
 
   const ref = useRef();
-  const closeTooltip = () => ref.current.close();
+  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
   const toggleCollapse = (e, parentId) => {
 

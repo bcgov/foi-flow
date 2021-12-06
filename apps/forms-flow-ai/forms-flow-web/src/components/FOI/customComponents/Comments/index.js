@@ -25,14 +25,13 @@ export const CommentSection = ({
   useEffect(() => {
     var _comments = parseInt(filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
     setcomments(_comments)  
-  }, [commentsArray])
+  }, [filterValue,commentsArray])
 
   
  
   const onfilterchange = (e) => {
-    var _filterValue = parseInt(e.target.value)    
-    var _comments = parseInt(_filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(_filterValue))
-    setcomments(_comments)
+    var _filterValue = parseInt(e.target.value)        
+    setcomments([])
     setfilterValue(_filterValue)
 
   }
