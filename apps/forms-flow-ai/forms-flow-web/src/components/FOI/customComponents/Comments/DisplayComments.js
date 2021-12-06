@@ -1,4 +1,4 @@
-import React, { useContext,useState } from 'react'
+import React, { useContext,useState,useEffect } from 'react'
 import './comments.scss'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
@@ -58,6 +58,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       hiddencomments = document.getElementsByName('commentsectionhidden')
       if (Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length === 0) {
         document.getElementById('showMoreParentComments').style.display = 'none'
+        setshowmorehidden(true)
       }
     }
     else {
@@ -67,11 +68,10 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   }
 
   
-  
+  const [showmorehidden, setshowmorehidden] = useState(false)
 
   const dynamicIndexFinder = () => {
-    var _commentscopy = comments
-    //_commentscopy = _commentscopy.reverse()
+    var _commentscopy = [...comments]    
     var returnindex = 3
     var totalcharacterCount = 0
     var reachedLimit = false;
@@ -85,7 +85,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           comment.replies.forEach((reply) => {
             if (!reachedLimit) {
               totalcharacterCount += reply.text.length
-              if (totalcharacterCount > 2000) {
+              if (totalcharacterCount > 2000  && index > 3) {
                 returnindex = index
                 reachedLimit = true
               }
@@ -93,7 +93,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           })
         }
 
-        if (totalcharacterCount > 2000) {
+        if (totalcharacterCount > 2000 && index > 3) {
           returnindex = index
           reachedLimit = true
         }
@@ -106,8 +106,14 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
  
   let limit = dynamicIndexFinder()
+  
+  useEffect(() => {
+    
+    setshowmorehidden(comments.length > 3)
+  }, [showmorehidden])
 
   const actions = useContext(ActionContext)
+  
 
   return (
     <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
@@ -115,7 +121,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       {
       comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
       comments.map((i, index) => (
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit ? { display: 'none' } : {display: 'block'}}>
+        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index > limit ? 'commentsectionhidden' : ""} style={index > limit && !showmorehidden ? { display: 'none' } : {display: 'block'}}>
           {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
             actions.customInput ? (
               actions.customInput({
@@ -200,7 +206,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
-      <div id="showMoreParentComments" className="showMoreParentComments" style={comments.length > 3 ? { display: 'block' } : { display: 'none' }}>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={!showmorehidden ? { display: 'block' } : { display: 'none' }}>
         <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 5)}>Show more comments</button>
       </div>
     </div>
