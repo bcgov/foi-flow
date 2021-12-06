@@ -228,6 +228,46 @@ const MinistryReview = React.memo(({ userDetail }) => {
       break;
   }
 
+  const alertUser = e => {    
+    if (quillChange) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  }
+
+  const handleOnHashChange = (e) => {    
+    let clickedOk = true;
+    if (!quillChange || (quillChange && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+      e.preventDefault();
+      window.removeEventListener('beforeunload', alertUser);
+      clickedOk = true;
+      setQuillChange(false);
+      setRemoveComment(true);
+    }
+    else {
+        setQuillChange(true);
+        setRemoveComment(false);
+        clickedOk = false;
+        const param = 'Comments';
+        document.getElementById(param).className += " active";
+        const elementsByName = document.getElementsByName(param);
+        var i;
+        for (i = 0; i < elementsByName.length; i++) {          
+            elementsByName[i].className += " active";        
+        }
+    }
+  };
+
+  React.useEffect(() => {    
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener('popstate', handleOnHashChange);
+    window.addEventListener('beforeunload', alertUser);
+    return () => {
+      window.removeEventListener('popstate', handleOnHashChange);
+      window.removeEventListener('beforeunload', alertUser);
+    }
+  });
+
   const tabclick = (evt, param) => {
     let clickedOk = true;
     if (quillChange && param !== 'Comments') {
