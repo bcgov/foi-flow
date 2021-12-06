@@ -117,7 +117,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                     {(close) => (
                       <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
 
-                        <div className='header' style={modalHeader}>
+                        <div className='header' style={modalHeader} >
                           {' '}
                           Delete Comment{' '}
                         </div>
