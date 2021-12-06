@@ -43,7 +43,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     })
     let _toggleIcon = e.target.innerText === "Show more comments" ? faCaretUp : faCaretDown
     settoggleIcon(_toggleIcon)
-    e.target.innerText === "See few comments" ? e.target.innerText = "Show more comments" : e.target.innerText = "See few comments"
+    e.target.innerText === "Show fewer comments" ? e.target.innerText = "Show more comments" : e.target.innerText = "Show fewer comments"
 
   }
 
