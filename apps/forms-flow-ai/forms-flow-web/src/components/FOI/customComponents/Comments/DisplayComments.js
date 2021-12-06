@@ -4,43 +4,33 @@ import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
+import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
 
+  const [fullnameList, setFullnameList] = useState(getFullnameList);
+
   const getfullName = (userId) => {
-    let fullName = ''
-    var _sessionuser = localStorage.getItem(userId)
+    let user;
 
-    if (_sessionuser === undefined || _sessionuser === '' || _sessionuser === null) {
+    if(fullnameList) {
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
+    } else {
 
-      iaoassignedToList.forEach(function (obj) {
-        var groupmembers = obj.members
-        var user = groupmembers.find(m => m["username"] === userId)
-        if (user && user != undefined) {
-          fullName = `${user["lastname"]}, ${user["firstname"]}`
-          localStorage.setItem(userId, fullName)
-          return true;
-        }
-      })
-
-      if (fullName === '') {
-        ministryAssignedToList.forEach(function (obj) {
-          var groupmembers = obj.members
-          var user = groupmembers.find(m => m["username"] === userId)
-          if (user && user != undefined) {
-            fullName = `${user["lastname"]}, ${user["firstname"]}`
-            localStorage.setItem(userId, fullName)
-            return true;
-          }
-        })
+      if(iaoassignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, "iao");
+        setFullnameList(getFullnameList());
       }
-
+  
+      if(ministryAssignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, bcgovcode);
+        setFullnameList(getFullnameList());
+      }
+  
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
     }
-    else {
-      fullName = _sessionuser
-    }
-
-    return fullName
   }
 
   const showhiddencomments = (e, count) => {
