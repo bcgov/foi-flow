@@ -62,7 +62,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   const dynamicIndexFinder = () => {
     var _commentscopy = comments
     //_commentscopy = _commentscopy.reverse()
-    var returnindex = 2
+    var returnindex = 3
     var totalcharacterCount = 0
     var reachedLimit = false;
 
@@ -190,8 +190,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           </div>
         </div>
       ))}
-      <div id="showMoreParentComments" className="showMoreParentComments" style={comments.length > 2 ? { display: 'block' } : { display: 'none' }}>
-        <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 2)}>Show more comments</button>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={comments.length > 3 ? { display: 'block' } : { display: 'none' }}>
+        <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 5)}>Show more comments</button>
       </div>
     </div>
   )
