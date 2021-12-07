@@ -144,12 +144,14 @@ class FOIRawRequest(db.Model):
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
     @classmethod
-    def getpreclosurestate(cls,requestid):
-        sql = """select status from "FOIRawRequests" 
-                    where requestid = :requestid and status != 'Closed'
-                    order by version desc limit 1;"""
+    def getstatesummary(cls, requestid):                
+        sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
+        where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
         rs = db.session.execute(text(sql), {'requestid': requestid})
-        return [row[0] for row in rs][0]
+        transitions = []
+        for row in rs:
+            transitions.append({"status": row["status"], "version": row["version"]})
+        return transitions
 
     @classmethod
     def getstatenavigation(cls, requestid):
