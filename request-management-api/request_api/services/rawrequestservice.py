@@ -139,6 +139,10 @@ class rawrequestservice:
                                'selectedMinistries': requestrawdata['ministry']['selectedMinistry'],
                                'lastStatusUpdateDate': FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
                                }
+            
+            if request['status'] == 'Closed':
+                baserequestInfo['preclosurestate']= FOIRawRequest.getpreclosurestate(requestid)
+
             if ispersonal:
                 childInformation = requestrawdata.get('childInformation')
                 anotherpersonInformation = requestrawdata.get(
@@ -179,6 +183,8 @@ class rawrequestservice:
             requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
+            if request['status'] == 'Closed':
+                request['requestrawdata']['preclosurestate']= FOIRawRequest.getpreclosurestate(requestid)
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":            
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
@@ -186,6 +192,8 @@ class rawrequestservice:
             requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
+            if request['status'] == 'Closed':
+                request['requestrawdata']['preclosurestate']= FOIRawRequest.getpreclosurestate(requestid)
             return request['requestrawdata']
         else:
             return None
