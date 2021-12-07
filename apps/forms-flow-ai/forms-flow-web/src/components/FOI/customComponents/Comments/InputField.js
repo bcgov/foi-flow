@@ -82,6 +82,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add,
     if (text) {
       if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
         closeX();
+        setQuillChange(false);
       }
     }
     else {
