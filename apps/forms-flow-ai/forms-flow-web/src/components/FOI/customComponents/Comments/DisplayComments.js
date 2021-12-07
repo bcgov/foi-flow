@@ -122,7 +122,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 edit: true
               })
             ) : (
-              <InputField cancellor={i.commentId} value={i.text} edit setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+              <InputField cancellor={i.commentId} value={i.text} edit 
+               //Handles Navigate Away
+              setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
             )
           ) : (
 
@@ -139,7 +141,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 edit: false
               })
             ) : (
-              <InputField cancellor={i.commentId} parentId={i.commentId} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+              <InputField cancellor={i.commentId} parentId={i.commentId} 
+               //Handles Navigate Away
+              setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
             ))}
           <div className="replySection">
             {
@@ -163,6 +167,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                         value={a.text}
                         edit
                         parentId={i.commentId}
+                         //Handles Navigate Away
                         setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                       />
                     )
@@ -190,6 +195,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                         cancellor={a.commentId}
                         parentId={i.commentId}
                         child
+                         //Handles Navigate Away
                         setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                       />
                     ))}

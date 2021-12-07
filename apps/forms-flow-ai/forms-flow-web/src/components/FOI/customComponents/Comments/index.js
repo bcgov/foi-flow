@@ -18,6 +18,7 @@ export const CommentSection = ({
   iaoassignedToList,
   ministryAssignedToList,
   requestNumber,
+  //Handles Navigate Away
   setQuillChange,
   removeComment,
   setRemoveComment
@@ -50,6 +51,7 @@ export const CommentSection = ({
       customInput={customInput}
       requestid={requestid}
       ministryId={ministryId}
+      //Handles Navigate Away
       setQuillChange={setQuillChange}
       removeComment={removeComment}
       setRemoveComment={setRemoveComment}
@@ -64,7 +66,9 @@ export const CommentSection = ({
         </div>
 
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
-        {<Input add="add" setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />}
+        {<Input add="add" 
+        //Handles Navigate Away
+        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />}
         </div>
         <div className="displayComments">
           <div className="filterComments" >
@@ -75,7 +79,9 @@ export const CommentSection = ({
             <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
             <label htmlFor="rbusercomments">User Comments</label>
           </div>
-          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
+          //Handles Navigate Away
+          setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
 
       </div>

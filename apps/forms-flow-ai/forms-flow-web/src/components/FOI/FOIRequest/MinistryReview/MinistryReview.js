@@ -77,8 +77,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
   const [comment, setComment] = useState([]);
+
+  //quillChange and removeComment added to handle Navigate away from Comments tabs
   const [quillChange, setQuillChange] = useState(false);
   const [removeComment, setRemoveComment] = useState(false);
+
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -228,34 +231,23 @@ const MinistryReview = React.memo(({ userDetail }) => {
       break;
   }
 
-  const alertUser = e => {    
-    if (quillChange) {
-      e.preventDefault();
+  /*******
+   * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
+   */
+  //Below function will handle beforeunload event
+  const alertUser = e => {
+    if (quillChange) {     
       e.returnValue = '';
+      e.preventDefault();
     }
   }
 
-  const handleOnHashChange = (e) => {    
-    let clickedOk = true;
+  //Below function will handle popstate event
+  const handleOnHashChange = (e) => {
     if (!quillChange || (quillChange && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
       e.preventDefault();
-      window.removeEventListener('beforeunload', alertUser);
-      clickedOk = true;
-      setQuillChange(false);
-      setRemoveComment(true);
-    }
-    else {
-        setQuillChange(true);
-        setRemoveComment(false);
-        clickedOk = false;
-        const param = 'Comments';
-        document.getElementById(param).className += " active";
-        const elementsByName = document.getElementsByName(param);
-        var i;
-        for (i = 0; i < elementsByName.length; i++) {          
-            elementsByName[i].className += " active";        
-        }
-    }
+      window.removeEventListener('beforeunload', alertUser);      
+    }    
   };
 
   React.useEffect(() => {    
@@ -402,7 +394,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
                     ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
-                    requestNumber={requestNumber} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+                    requestNumber={requestNumber}
+                    //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+                    setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 </> : <Loading />}
           </div>
           <div id="Option3" className="tabcontent">

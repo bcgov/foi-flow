@@ -8,7 +8,10 @@ import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 
 
-const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQuillChange, removeComment, setRemoveComment }) => {
+const InputField = ({ cancellor, parentId, child, value, edit, main, add,
+  //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+  setQuillChange, removeComment, setRemoveComment 
+  }) => {
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
   const [uftext, setuftext] = useState('')
@@ -28,6 +31,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
       if (_unformattedtext.length - 1 <= maxcharacterlimit)
         setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.trim().length - 1 <= maxcharacterlimit ? _unformattedtext.trim().length  : 0))
       
+      //Handles Navigate Away
       setQuillChange(true);
     }
     else if(htmlcontent === "<p><br></p>")
@@ -35,6 +39,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
       setTextLength(1000);
       setText("")
       setuftext("")
+      //Handles Navigate Away
       setQuillChange(false);
     }
   }
@@ -50,6 +55,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
     setuftext(value)    
   }, [value])
 
+  //Handles Navigate Away
   useEffect(() => {
     if (removeComment) {
       if (add) {
@@ -62,6 +68,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
     }
   })
 
+  //Handles Navigate Away
   const closeX = () => {
     setText('')
     setuftext('')
@@ -92,6 +99,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, setQui
         ? actions.submit(cancellor, text, parentId, true, setText)
         : actions.submit(cancellor, text, parentId, false, setText)
     }
+    //Handles Navigate Away
     setQuillChange(false);
 
   }
