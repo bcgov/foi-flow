@@ -36,6 +36,7 @@ import {
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
+import { saveAs } from "file-saver";
 
 export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => { };
@@ -703,22 +704,20 @@ export const saveFilesinS3 = (headerDetails, file, ...rest) => {
   };
 };
 
-export const getFileFromS3 = (headerDetails, file, ...rest) => {
-  console.log("A")
+export const getFileFromS3 = (headerDetails, file, ...rest) => {  
   const done = rest.length ? rest[0] : () => {};
   var requestOptions = {
     headers: {
       "X-Amz-Date": headerDetails.amzdate,
-      Authorization: headerDetails.authheader,
+      Authorization: headerDetails.authheader,     
     },
-  };
-  console.log("B")
-  return (dispatch) => {
-    console.log("C")
-    console.log(file.documentpath)
-    httpOSSGETRequest(file.documentpath, requestOptions)
-      .then((res) => {
-        console.log(res);
+    responseType: 'blob'
+  };  
+  return (dispatch) => {    
+    httpOSSGETRequest(headerDetails.filepath, requestOptions)
+    .then((res) => {
+        var blob = new Blob([res.data], {type: "application/octet-stream"});
+        saveAs(blob, file.filename)
         if (res) {
           done(null, res.status);
         } else {

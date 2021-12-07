@@ -172,7 +172,7 @@ class FOIFlowDocumentStorage(Resource):
                 requestnumber = foirequestform.get('requestnumber')
                 filestatustransition = foirequestform.get('filestatustransition')
                 filename = foirequestform.get('filename')
-                s3souceuri = foirequestform.get('s3souceuri')
+                s3sourceuri = foirequestform.get('s3sourceuri')
                 filenamesplittext = os.path.splitext(filename)
                 uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])                
                 auth = AWSRequestsAuth(aws_access_key=accesskey,
@@ -181,16 +181,17 @@ class FOIFlowDocumentStorage(Resource):
                         aws_region=s3region,
                         aws_service=s3service) 
 
-                s3uri = s3souceuri if s3souceuri is not None else 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)        
+                s3uri = s3sourceuri if s3sourceuri is not None else 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)        
                 
-                response = requests.put(s3uri,data=None,auth=auth) if s3souceuri is None  else requests.get(s3uri,auth=auth)
+                response = requests.put(s3uri,data=None,auth=auth) if s3sourceuri is None  else requests.get(s3uri,auth=auth)
 
 
                 file['filepath']=s3uri
                 file['authheader']=response.request.headers['Authorization'] 
                 file['amzdate']=response.request.headers['x-amz-date']
-                file['uniquefilename']=uniquefilename if s3souceuri is None else ''
-                file['filestatustransition']=filestatustransition  if s3souceuri is None else ''
+                file['uniquefilename']=uniquefilename if s3sourceuri is None else ''
+                file['filestatustransition']=filestatustransition  if s3sourceuri is None else ''
+                
                 
             return json.dumps(requestfilejson) , 200
         except BusinessException as exception:            

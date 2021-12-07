@@ -116,7 +116,7 @@ export const AttachmentSection = ({
         requestnumber: `U-00${requestId}`,
         filestatustransition: file.category,
         filename: file.filename,
-        filepath: file.documentpath
+        s3sourceuri: file.documentpath
       },
     ];
     dispatch(
@@ -149,6 +149,8 @@ export const AttachmentSection = ({
         break;
       case "download":
         downloadDocument(_attachment);
+        setModalFor("download");
+        setModal(false);
         break;
       case "delete":
         setModalFor("delete")
@@ -156,7 +158,6 @@ export const AttachmentSection = ({
         setModal(false);
         break;
     }
-    setModal(true);
   }
 
   const handleRename = (_attachment, newFilename) => {
