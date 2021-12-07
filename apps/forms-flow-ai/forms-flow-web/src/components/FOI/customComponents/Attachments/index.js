@@ -135,17 +135,14 @@ export const AttachmentSection = ({
   }
 
   const handlePopupButtonClick = (action, _attachment) => {
-    setUpdateAttachment();
+    setUpdateAttachment(_attachment);
+    setMultipleFiles(false);
     switch (action) {
       case "replace":
-        setUpdateAttachment(_attachment);
-        setMultipleFiles(false);
         setModalFor("replace");
         setModal(true);
         break;
       case "rename":
-        setUpdateAttachment(_attachment);
-        setMultipleFiles(false);
         setModalFor("rename");
         setModal(true);
         break;
@@ -156,6 +153,8 @@ export const AttachmentSection = ({
         break;
       case "delete":
         setModalFor("delete")
+        setModal(true)
+        break;
       default:
         setModal(false);
         break;
