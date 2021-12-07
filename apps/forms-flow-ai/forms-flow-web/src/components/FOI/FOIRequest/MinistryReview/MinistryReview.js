@@ -243,11 +243,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }
 
   //Below function will handle popstate event
-  const handleOnHashChange = (e) => {
-    if (!quillChange || (quillChange && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
-      e.preventDefault();
-      window.removeEventListener('beforeunload', alertUser);      
-    }    
+  const handleOnHashChange = (e) => {   
+    e.preventDefault();
+    window.removeEventListener('beforeunload', alertUser);
   };
 
   React.useEffect(() => {    
