@@ -226,7 +226,6 @@ export const AttachmentSection = ({
 
 const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}) => {
 
-  console.log(attachment)
   const [filename, setFilename] = useState("");
   let lastIndex = 0;
   useEffect(() => {
