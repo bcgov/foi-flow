@@ -76,6 +76,11 @@ const FOIRequest = React.memo(({userDetail}) => {
   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   const [comment, setComment] = useState([]);
+
+  //quillChange and removeComment added to handle Navigate away from Comments tabs
+  const [quillChange, setQuillChange] = useState(false);
+  const [removeComment, setRemoveComment] = useState(false);
+
   const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
 
@@ -104,7 +109,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
     if (bcgovcode)
-      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));          
+      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   },[requestId,ministryId, dispatch,comment, attachments]);
  
 
@@ -595,22 +600,72 @@ const FOIRequest = React.memo(({userDetail}) => {
       break;      
   }
 
-  const tabclick =(evt,param)=>{
-   
+  /*******
+   * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
+   */
+  //Below function will handle beforeunload event
+  const alertUser = e => {
+    if (quillChange) {     
+      e.returnValue = '';
+      e.preventDefault();
+    }
+  }
+
+  //Below function will handle popstate event
+  const handleOnHashChange = (e) => {   
+    e.preventDefault();
+    window.removeEventListener('beforeunload', alertUser);
+  };
+
+  React.useEffect(() => {    
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener('popstate', handleOnHashChange);
+    window.addEventListener('beforeunload', alertUser);
+    return () => {
+      window.removeEventListener('popstate', handleOnHashChange);
+      window.removeEventListener('beforeunload', alertUser);
+    }
+  });
+
+  const tabclick = (evt, param) => {
+    let clickedOk = true;
+    if (quillChange && param !== 'Comments') {
+      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
+        clickedOk = true;
+        setQuillChange(false);
+        setRemoveComment(true);
+      }
+      else {
+        setQuillChange(true);
+        setRemoveComment(false);
+        clickedOk = false;
+        param = 'Comments';
+        document.getElementById(param).className += " active";
+        const elementsByName = document.getElementsByName(param);
+        var i;
+        for (i = 0; i < elementsByName.length; i++) {          
+            elementsByName[i].className += " active";        
+        }
+      }
+    }
+    else {
+      setRemoveComment(false);
+    }
     var i, tabcontent, tablinks;
-    
+
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
-      tabcontent[i].className = tabcontent[i].className.replace(" active", "");    
+      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
     }
-   
+
     tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
     document.getElementById(param).style.display = "block";
-    evt.currentTarget.className += " active";
+    if (clickedOk)
+      evt.currentTarget.className += " active";
     
   }
   const bottomTextArray = _requestStatus.split('|');
@@ -630,7 +685,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   return (
 
     <div className="foiformcontent">
-      <div className="foitabbedContainer">
+      <div className="foitabbedContainer">  
 
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
@@ -710,7 +765,9 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
-                    bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}  />
+                    bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}
+                    //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+                    setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 
                 </> : <Loading />
             }

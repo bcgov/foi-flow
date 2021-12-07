@@ -8,8 +8,10 @@ import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 
 
-const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
-
+const InputField = ({ cancellor, parentId, child, value, edit, main, add,
+  //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+  setQuillChange, removeComment, setRemoveComment 
+  }) => {
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
   const [uftext, setuftext] = useState('')
@@ -17,8 +19,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
 
   const handleQuillChange = (htmlcontent, delta, source, editor) => {
     let _unformattedtext = editor.getText()
-    if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {
-
+    if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {      
       if (_unformattedtext.trim().length - 1 <= maxcharacterlimit) {
         setText(htmlcontent)
 
@@ -29,12 +30,17 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
       setuftext(_unformattedtext.trim())
       if (_unformattedtext.length - 1 <= maxcharacterlimit)
         setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.trim().length - 1 <= maxcharacterlimit ? _unformattedtext.trim().length  : 0))
+      
+      //Handles Navigate Away
+      setQuillChange(true);
     }
     else if(htmlcontent === "<p><br></p>")
     {
       setTextLength(1000);
       setText("")
       setuftext("")
+      //Handles Navigate Away
+      setQuillChange(false);
     }
   }
 
@@ -46,18 +52,42 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
 
   useEffect(() => {
     setText(value)
-    setuftext(value)
+    setuftext(value)    
   }, [value])
 
+  //Handles Navigate Away
+  useEffect(() => {
+    if (removeComment) {
+      if (add) {
+        setText("");
+      }
+      else {
+        closeX();
+      }
+      setRemoveComment(false);
+    }
+  })
 
-  const cancel = (e) => {
+  //Handles Navigate Away
+  const closeX = () => {
     setText('')
     setuftext('')
     edit
       ? actions.handleCancel(cancellor, edit)
       : actions.handleCancel(cancellor)
+  }
 
-    e.preventDefault()
+
+  const cancel = (e) => {
+    if (text) {
+      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
+        closeX();
+      }
+    }
+    else {
+      closeX();
+    }
+    e.preventDefault(); 
   }
 
   const post = () => {
@@ -69,6 +99,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
         ? actions.submit(cancellor, text, parentId, true, setText)
         : actions.submit(cancellor, text, parentId, false, setText)
     }
+    //Handles Navigate Away
+    setQuillChange(false);
 
   }
 
