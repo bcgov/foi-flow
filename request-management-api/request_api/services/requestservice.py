@@ -238,7 +238,7 @@ class requestservice:
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
-        requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
+        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         #requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
         _receivedDate = parse(request['receiveddate'])
         
@@ -349,7 +349,7 @@ class requestservice:
     def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authMembershipgroups):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        requestministrydivisions = FOIMinistryRequestDivision.getrequest(foiministryrequestid,requestministry['version'])
+        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         #requestministrydocuments = FOIMinistryRequestDocument.getdocuments(foiministryrequestid)
         baserequestInfo = {}
         if requestministry["assignedministrygroup"] in authMembershipgroups:
@@ -432,7 +432,7 @@ class FOIRequestUtil:
         if 'divisions' in requestschema:
             foiministryrequest.divisions = FOIRequestUtil().createFOIRequestDivision(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
         else:
-            divisions = FOIMinistryRequestDivision().getrequest(ministryschema["foiministryrequestid"] ,ministryschema["version"])
+            divisions = FOIMinistryRequestDivision().getdivisions(ministryschema["foiministryrequestid"] ,ministryschema["version"])
             foiministryrequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
         foiministryrequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)       
         foiministryrequest.closedate = requestschema['closedate'] if 'closedate' in requestschema  else None
@@ -586,7 +586,7 @@ class FOIRequestUtil:
             foiministryRequest.assignedgroup = 'Flex Team' if requestSchema.get("requestType") == "general" else 'Processing Team'
 
         if ministryId is not None:
-            divisions = FOIMinistryRequestDivision().getrequest(ministryId , activeVersion-1)
+            divisions = FOIMinistryRequestDivision().getdivisions(ministryId , activeVersion-1)
             foiministryRequest.divisions = FOIRequestUtil().createFOIRequestDivisionFromObject(divisions, ministryId, activeVersion, userId)  
             foiministryRequest.documents = FOIRequestUtil().createFOIRequestDocuments(requestSchema,ministryId , activeVersion , userId)       
         foiministryRequest.version = activeVersion
