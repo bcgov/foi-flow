@@ -290,26 +290,33 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
 })
 
 const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
+  const ref = React.useRef();
+  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
   const handleRename = () => {
+    closeTooltip(); 
     handlePopupButtonClick("rename", attachment);
   }
 
   const handleReplace = () => {
+    closeTooltip(); 
     handlePopupButtonClick("replace", attachment);
   }
 
   const handleDownload = () =>{
+    closeTooltip();   
     handlePopupButtonClick("download", attachment);
   }
 
   const handleDelete = () => {
+    closeTooltip(); 
     handlePopupButtonClick("delete", attachment);
   };
 
   return (
     <Popup
       role='tooltip'
+      ref={ref}
       trigger={
         <button className="actionsBtn">
           <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
