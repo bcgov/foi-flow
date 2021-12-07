@@ -3,9 +3,11 @@ import DateHolidayjs from 'date-holidays';
 import dayjsBusinessDays from 'dayjs-business-days';
 import { format, utcToZonedTime } from 'date-fns-tz';
 import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
+import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constants";
 var isBetween = require('dayjs/plugin/isBetween')
 var utc = require("dayjs/plugin/utc")
 var timezone = require("dayjs/plugin/timezone")
+var CryptoJS = require("crypto-js");
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -129,4 +131,106 @@ const getMinistryByValue = (userGroups) => {
 	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue };
+const encrypt = (obj) => {
+	return CryptoJS.AES.encrypt(JSON.stringify(obj), SESSION_SECURITY_KEY).toString();
+};
+
+const decrypt = (encrypted) => {
+	if(encrypted) {
+		var bytes  = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
+		return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+	} else {
+		return {};
+	}
+};
+
+const saveSessionData = (key, data) => {
+	var expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
+	var sessionObject = {
+		expiresAt: new Date(expiresInMilliseconds),
+		sessionData: data
+	}
+
+	sessionStorage.setItem(key, encrypt(sessionObject));
+};
+
+const getSessionData = (key) => {
+	var sessionObject = decrypt(sessionStorage.getItem(key));
+
+	if(sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
+		var currentDate = new Date();
+		var expirationDate = sessionObject.expiresAt;
+
+		if(Date.parse(currentDate) < Date.parse(expirationDate)) {
+			return sessionObject.sessionData;
+		} else {
+			sessionStorage.removeItem(key);
+			console.log(`${key} session expired`);
+			return null;
+		}
+	} else {
+		return null;
+	}
+};
+
+const addToFullnameList = (userArray, foiteam) => {
+	if(foiteam) {
+		const _team = foiteam.toLowerCase();
+		let currentMember;
+
+		//fullname array (all teams) -> fullname value pairs
+		let fullnameArray = getSessionData('fullnameList');
+		if(!fullnameArray || !Array.isArray(fullnameArray)) {
+			fullnameArray = [];
+		}
+	
+		//teams saved in fullnameList
+		let fullnameTeamArray = getSessionData('fullnameTeamList');
+		if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
+			fullnameTeamArray = [];
+		}
+	
+		//extract fullname and append to the array
+		if(userArray && Array.isArray(userArray)) {
+			userArray.forEach(team => {
+				if(team && team.members && Array.isArray(team.members)) {
+					team.members.forEach(member => {
+						if(!fullnameArray.some(e => e.username === member.username)) {
+							currentMember = {
+								username: member.username,
+								fullname: `${member.lastname}, ${member.firstname}`
+							};
+	
+							fullnameArray.push(currentMember);  
+						}
+					});
+				}
+			});
+	
+			//save team name
+			if(!fullnameTeamArray.includes(_team)) {
+				fullnameTeamArray.push(_team);
+				saveSessionData(`fullnameTeamList`, fullnameTeamArray);
+
+				//save for assignedto or ministryassignto dropdown
+				saveSessionData(`${_team}AssignToList`, userArray);
+			}
+		}
+	
+		saveSessionData('fullnameList', fullnameArray);
+	}
+}
+
+const getFullnameList = () => {
+	return getSessionData('fullnameList');
+}
+
+const getAssignToList = (team) => {
+	return getSessionData(`${team.toLowerCase()}AssignToList`);
+}
+
+const getFullnameTeamList = () => {
+	return getSessionData('fullnameTeamList');
+}
+
+export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList, getAssignToList, getFullnameTeamList };
