@@ -22,12 +22,29 @@ export const CommentSection = ({
   removeComment,
   setRemoveComment
 }) => {
-  const [showaddbox, setshowaddbox] = useState(false)  
+  const [showaddbox, setshowaddbox] = useState(false)
+  const [comments, setcomments] = useState([])
+  const [filterValue, setfilterValue] = useState(-1)
+  useEffect(() => {
+    var _comments = parseInt(filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    setcomments(_comments)  
+  }, [filterValue,commentsArray])
+
+  
+ 
+  const onfilterchange = (e) => {
+    var _filterValue = parseInt(e.target.value) 
+    setfilterValue(_filterValue)       
+    setcomments([])
+    
+
+  }
+ 
   return (
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
-      comments={commentsArray}
+      comments={comments}
       signinUrl={signinUrl}
       signupUrl={signupUrl}
       customInput={customInput}
@@ -39,17 +56,26 @@ export const CommentSection = ({
     >
       <div className="section">
         <div className="foi-request-number-header">
-          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber :`U-00${requestid}`}`}</h1>
-        </div>
-        <div className="addcommentBox">
-            <button type="button" style={ {display: !showaddbox ? 'block':'none'}} className="btn foi-btn-create addcomment" onClick={()=>{!showaddbox ? setshowaddbox(true):setshowaddbox(false); }}>+ Add Comment</button>
+          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber : `U-00${requestid}`}`}</h1>
         </div>
 
-        <div className="inputBox" style={ {display: showaddbox ? 'block':'none'}}>
-          {<Input add="add" setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />}
+        <div className="addcommentBox">
+          <button type="button" style={{ display: !showaddbox ? 'block' : 'none' }} className="btn foi-btn-create addcomment" onClick={() => { !showaddbox ? setshowaddbox(true) : setshowaddbox(false); }}>+ Add Comment</button>
+        </div>
+
+        <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
+        {<Input add="add" setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+          <div className="filterComments" >
+            <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange} checked={filterValue === -1 ? true:false} />
+            <label htmlFor="rballcomments">All Comments</label>
+            <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
+            <label htmlFor="rbrequesthistory">Request History</label>
+            <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
+            <label htmlFor="rbusercomments">User Comments</label>
+          </div>
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
 
       </div>
