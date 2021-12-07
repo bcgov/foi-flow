@@ -6,7 +6,7 @@ import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, setQuillChange, removeComment, setRemoveComment }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
@@ -122,7 +122,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 edit: true
               })
             ) : (
-              <InputField cancellor={i.commentId} value={i.text} edit />
+              <InputField cancellor={i.commentId} value={i.text} edit 
+               //Handles Navigate Away
+              setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
             )
           ) : (
 
@@ -139,7 +141,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 edit: false
               })
             ) : (
-              <InputField cancellor={i.commentId} parentId={i.commentId} />
+              <InputField cancellor={i.commentId} parentId={i.commentId} 
+               //Handles Navigate Away
+              setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
             ))}
           <div className="replySection">
             {
@@ -163,6 +167,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                         value={a.text}
                         edit
                         parentId={i.commentId}
+                         //Handles Navigate Away
+                        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                       />
                     )
                   ) : (
@@ -189,6 +195,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                         cancellor={a.commentId}
                         parentId={i.commentId}
                         child
+                         //Handles Navigate Away
+                        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                       />
                     ))}
                 </div>
