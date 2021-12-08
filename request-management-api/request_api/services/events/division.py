@@ -17,7 +17,9 @@ class divisionevent:
 
     """
     @classmethod    
-    def createdivisionevent(self, requestid):
+    def createdivisionevent(self, requestid, requesttype):
+        if requesttype != "ministryrequest":
+            return DefaultMethodResult(True,'No division required',requestid)
         version = FOIMinistryRequest.getversionforrequest(requestid)
         curdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version)
         prevdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version[0]-1)
