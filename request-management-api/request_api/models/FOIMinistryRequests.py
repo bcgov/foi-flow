@@ -164,6 +164,17 @@ class FOIMinistryRequest(db.Model):
         return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
 
     @classmethod
+    def getstatesummary(cls, ministryrequestid):                
+        sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+        where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
+ 
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        transitions = []
+        for row in rs:
+            transitions.append({"status": row["status"], "version": row["version"]})
+        return transitions
+
+    @classmethod
     def getstatenavigation(cls, ministryrequestid):
         _session = db.session
         _requeststates = _session.query(FOIMinistryRequest.requeststatusid).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).limit(2)

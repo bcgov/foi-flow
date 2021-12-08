@@ -142,7 +142,16 @@ class FOIRawRequest(db.Model):
     def getversionforrequest(cls,requestid):   
         print(requestid)
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
-
+    
+    @classmethod
+    def getstatesummary(cls, requestid):                
+        sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
+        where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
+        rs = db.session.execute(text(sql), {'requestid': requestid})
+        transitions = []
+        for row in rs:
+            transitions.append({"status": row["status"], "version": row["version"]})
+        return transitions
 
     @classmethod
     def getstatenavigation(cls, requestid):
