@@ -15,7 +15,7 @@ class eventservice:
     @classmethod    
     def postevent(self, requestid, requesttype):
         stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype)
-        divisioneventresponse = divisionevent().createdivisionevent(requestid)
+        divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype)
         if stateeventresponse.success == True and divisioneventresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
