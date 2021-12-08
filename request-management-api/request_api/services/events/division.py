@@ -23,22 +23,20 @@ class divisionevent:
         version = FOIMinistryRequest.getversionforrequest(requestid)
         curdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version)
         prevdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version[0]-1)
-        divsisionsummary = []        
         divsisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions) 
-        message =  self.__preparemessage(divsisionsummary)
+        
         try:
-            self.createcomment(requestid,message['add'])
-            self.createcomment(requestid,message['edit'])  
-            self.createcomment(requestid,message['delete'])  
+            for division in divsisionsummary:  
+                self.createcomment(requestid, division['division'], division['stage'], division['event'])
             return DefaultMethodResult(True,'Comment posted',requestid)
         except BusinessException as exception:
             return DefaultMethodResult(False,'unable to post comment - '+exception.message,requestid)   
                 
         
     @classmethod    
-    def createcomment(self, requestid, comment):
-        if comment is not None: 
-            commentservice().createministryrequestcomment(self.__preparecomment(requestid,comment), AuthHelper.getUserId(), 2)
+    def createcomment(self, requestid, division, stage, event):
+        comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division, stage, event)}
+        commentservice().createministryrequestcomment(comment, AuthHelper.getUserId(), 2)
 
     
     @classmethod    
@@ -79,30 +77,9 @@ class divisionevent:
         return {'division': division['division.name'], 'stage': division['stage.name'], 'event': event}
         
 
-    @classmethod            
-    def __preparecomment(self, requestid, message):
-        return {"ministryrequestid": requestid, "comment": message}
-
     @classmethod                
-    def __preparemessage(self, divisions):
-        if not divisions:
-            return None
-        add, edit, delete = [], [], []
-        for division in divisions:
-            if division['event'] == EventType.add.value:
-                add.append(division['division']+' stage selected '+ division['stage'])
-            elif  division['event'] == EventType.modify.value:
-                edit.append(division['division']+' stage selected '+ division['stage'])
-            else:
-                delete.append(division['division'])
-        return {"add": self.__formatmessage(add,EventType.add.value), "edit": self.__formatmessage(edit,EventType.modify.value), "delete": self.__formatmessage(delete,EventType.delete.value)}
-    
-    @classmethod                
-    def __formatmessage(self, divisions, event): 
-        if not divisions:
-            return None
-        else:
-            return ",".join(divisions) + self.__messagesuffix(event)
+    def __preparemessage(self, division, stage, event): 
+        return division+' with stage selected '+ stage + self.__messagesuffix(event)
         
     @classmethod                
     def __messagesuffix(self, event): 
