@@ -26,7 +26,6 @@ def factory_user_auth_header(app, client):
 def factory_ministryuser_auth_header(app, client):
     url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(os.getenv('KEYCLOAK_ADMIN_HOST'),os.getenv('KEYCLOAK_ADMIN_REALM'))        
     x = requests.post(url, TEST_MINISTRYUSER_PAYLOAD, verify=True).content.decode('utf-8')
-    print(x)       
     return {'Authorization': 'Bearer ' + str(ast.literal_eval(x)['access_token'])}     
 
 TEST_JWT_HEADER = {
@@ -365,7 +364,13 @@ def test_post_foirequest_general_cfr_document(app, client):
     "assignedministrygroup":"EDUC Ministry Team",
     "assignedministryperson": "foiedu@idir",
     "requeststatusid": 2,
-    "documents": [{"documentpath":"/dummy/1"},{"documentpath":"/dummy/2"}]
+    "documents":  [
+        {
+            "category": "cfr-feeassessed",
+            "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
+            "filename":"test.docx"
+        }
+        ]
     }
     foicfrdivisionresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foidivisionrequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     assert foiministryreqResponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foiministryreqResponse.status_code == 200 and foicfrdivisionresponse.status_code == 200
@@ -398,22 +403,13 @@ def test_post_foirequest_general_close(app, client):
 def test_get_foirequestqueue(app, client):
   response = client.get('/api/dashboard', headers=factory_user_auth_header(app, client), content_type='application/json')
   jsondata = json.loads(response.data)  
-  if jsondata is not None and len(jsondata) > 0 :    
-    assert jsondata[0]['watchers']
-  assert response.status_code == 200  
+  assert response.status_code == 200  and len(jsondata) > 0 
 
 def test_get_foiministryrequestqueue(app, client):
   response = client.get('/api/dashboard/ministry', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
   jsondata = json.loads(response.data)
-  if jsondata is not None and len(jsondata) > 0 :    
-    assert jsondata[0]['watchers']
-  assert response.status_code == 200    
+  assert response.status_code == 200  and len(jsondata) > 0   
 
-
-def test_get_foiministryrequestqueue(app, client):
-  response = client.get('/api/dashboard/all', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
-  assert response.status_code == 200       
-  
 
 def test_get_foirequestqueuewithoutheader(app, client):    
   response = client.get('/api/dashboard', content_type='application/json')    
