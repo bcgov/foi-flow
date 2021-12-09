@@ -84,7 +84,7 @@ class FOIRequests(Resource):
             fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)       
             assignedGroup = request_json['assignedGroup'] if 'assignedGroup' in fOIRequestsSchema  else None
             assignedTo = request_json['assignedTo'] if 'assignedTo' in fOIRequestsSchema  else None
-            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open",AuthHelper.getUserId())               
+            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Archived",AuthHelper.getUserId())               
             if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
