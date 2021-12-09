@@ -51,19 +51,19 @@ def test_foiministrydocument_list(app, client):
     foiministryrequest["id"] = str(foijsondata["id"])
     foiministryrequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest["requeststatusid"] = 2
-    foiministryrequest["documents"] = []
     foiministryresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
     foiministryrequest2 = generalministryrequestjson
     foiministryrequest2["id"] = str(foijsondata["id"])
     foiministryrequest2["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest2["documents"] = [
         {
+            "category": "cfr-feeassessed",
             "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
             "filename":"test.docx"
         }
         ]
     foiministryrequest2["requeststatusid"] = 7
-    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest2), headers=factory_intake_auth_header(app, client), content_type='application/json')
     getdocumentsresponse = client.get('/api/foidocument/ministryrequest/'+str(foijsondata["id"]), headers=factory_ministry_auth_header(app, client), content_type='application/json')
     assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiministryresponse.status_code == 200 and foiministryresponse2.status_code == 200 and getdocumentsresponse.status_code == 200
 
@@ -86,19 +86,19 @@ def test_foiministrydocument_rename(app, client):
     foiministryrequest["id"] = str(foijsondata["id"])
     foiministryrequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest["requeststatusid"] = 2
-    foiministryrequest["documents"] = []
     foiministryresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
     foiministryrequest2 = generalministryrequestjson
     foiministryrequest2["id"] = str(foijsondata["id"])
     foiministryrequest2["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest2["documents"] = [
         {
+            "category": "cfr-feeassessed",
             "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
-            "filename":"test.docx"
+            "filename":"test2.docx"
         }
         ]
     foiministryrequest2["requeststatusid"] = 7
-    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest2), headers=factory_intake_auth_header(app, client), content_type='application/json')
     getdocumentsresponse = client.get('/api/foidocument/ministryrequest/'+str(foijsondata["id"]), headers=factory_ministry_auth_header(app, client), content_type='application/json')
     getdocumentsresponsejsondata = json.loads(getdocumentsresponse.data) 
     renamedocumentjson = {
@@ -126,22 +126,23 @@ def test_foiministrydocument_replace(app, client):
     foiministryrequest["id"] = str(foijsondata["id"])
     foiministryrequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest["requeststatusid"] = 2
-    foiministryrequest["documents"] = []
     foiministryresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
     foiministryrequest2 = generalministryrequestjson
     foiministryrequest2["id"] = str(foijsondata["id"])
     foiministryrequest2["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest2["documents"] = [
         {
+            "category": "cfr-feeassessed",
             "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
-            "filename":"test.docx"
+            "filename":"test3.docx"
         }
         ]
     foiministryrequest2["requeststatusid"] = 7
-    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
-    getdocumentsresponse = client.get('/api/foidocument/ministryrequest/'+str(foijsondata["id"]), headers=factory_ministry_auth_header(app, client), content_type='application/json')
+    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest2), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    getdocumentsresponse = client.get('/api/foidocument/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]), headers=factory_ministry_auth_header(app, client), content_type='application/json')
     getdocumentsresponsejsondata = json.loads(getdocumentsresponse.data) 
     replacedocumentjson = {
+        "category": "cfr-feeassessed",
         "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/testnew.docx",
         "filename":"testnew.docx"
     }
@@ -167,19 +168,19 @@ def test_foiministrydocument_delete(app, client):
     foiministryrequest["id"] = str(foijsondata["id"])
     foiministryrequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest["requeststatusid"] = 2
-    foiministryrequest["documents"] = []
     foiministryresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
     foiministryrequest2 = generalministryrequestjson
     foiministryrequest2["id"] = str(foijsondata["id"])
     foiministryrequest2["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiministryrequest2["documents"] = [
         {
+            "category": "cfr-feeassessed",
             "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
             "filename":"test.docx"
         }
         ]
     foiministryrequest2["requeststatusid"] = 7
-    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest), headers=factory_intake_auth_header(app, client), content_type='application/json')
+    foiministryresponse2 = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiministryrequest2), headers=factory_intake_auth_header(app, client), content_type='application/json')
     getdocumentsresponse = client.get('/api/foidocument/ministryrequest/'+str(foijsondata["id"]), headers=factory_ministry_auth_header(app, client), content_type='application/json')
     getdocumentsresponsejsondata = json.loads(getdocumentsresponse.data) 
     deletedocumentresponse = client.post('/api/foidocument/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/documentid/'+str(getdocumentsresponsejsondata[0]['foiministrydocumentid'])+'/delete', headers=factory_ministry_auth_header(app, client), content_type='application/json')
