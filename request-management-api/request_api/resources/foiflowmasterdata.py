@@ -51,7 +51,7 @@ class FOIFlowApplicantCategories(Resource):
     @request_api.cache.cached(key_prefix="applicantcategories")
     def get():
         try:
-            data = applicantcategoryservice.getapplicantcategories()
+            data = applicantcategoryservice().getapplicantcategories()
             jsondata = json.dumps(data)
             return jsondata , 200
         except:
@@ -69,7 +69,7 @@ class FOIFlowProgramAreas(Resource):
     @request_api.cache.cached(key_prefix="programareas")
     def get():
         try:
-            data = programareaservice.getprogramareas()
+            data = programareaservice().getprogramareas()
             jsondata = json.dumps(data)
             return jsondata , 200
         except:
@@ -86,7 +86,7 @@ class FOIFlowDeliveryModes(Resource):
     @request_api.cache.cached(key_prefix="deliverymodes")
     def get():
         try:
-            data = deliverymodeservice.getdeliverymodes()
+            data = deliverymodeservice().getdeliverymodes()
             jsondata = json.dumps(data)
             return jsondata , 200
         except:
@@ -103,7 +103,7 @@ class FOIFlowReceivedModes(Resource):
     @request_api.cache.cached(key_prefix="receivedmodes")
     def get():
         try:
-            data = receivedmodeservice.getreceivedmodes()
+            data = receivedmodeservice().getreceivedmodes()
             jsondata = json.dumps(data)
             return jsondata , 200
         except:
@@ -136,7 +136,7 @@ class FOIFlowCloseReasons(Resource):
     @request_api.cache.cached(key_prefix="closereasons")
     def get():
         try:
-            data = closereasonservice.getclosereasons()
+            data = closereasonservice().getclosereasons()
             jsondata = json.dumps(data)
             return jsondata , 200
         except:
