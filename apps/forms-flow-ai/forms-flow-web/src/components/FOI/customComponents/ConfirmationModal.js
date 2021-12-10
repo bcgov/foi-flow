@@ -95,7 +95,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     }   
     const getMessage = (_state, _requestNumber) => {
       if ((currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
-        return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request #{_requestNumber}? <br/> <span className="close-message"> The request will be re-opened to the previous state: {_state}</span> </>}; 
+        return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request #{_requestNumber}? <br/> <span className="confirm-message-2"> The request will be re-opened to the previous state: {_state}</span> </>}; 
       }
       switch(_state.toLowerCase()) {
         case StateEnum.intakeinprogress.name.toLowerCase():
@@ -126,7 +126,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.harms.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};       
         case StateEnum.onhold.name.toLowerCase():
-            return {title: "Hold Request", body: `Are you sure you want to change Request #${_requestNumber} to on hold?`};
+            return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <span className="confirm-message-2">This will <b>stop</b> the clock and assign to Processing Team </span> </>};
         case StateEnum.response.name.toLowerCase():
           if (saveRequestObject.requeststatusid === StateEnum.signoff.id)
             return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
@@ -160,23 +160,14 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-            {state.toLowerCase() === StateEnum.onhold.name.toLowerCase() ?
-              <div className="modal-message">
-                <span className="confirmation-message">
-                  {message.body}
-                  <br/>This will <b>stop</b> the clock and assign to Processing Team             
-                </span>                
-              </div>
-            : 
             <span className="confirmation-message">
                 {message.body}
-              </span> 
-              }
+              </span>
               {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ?              
                   <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
                   : (
                     <>
-                    {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id) ?
+                    {(currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)) ?
                       <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
                       :
                       <>
@@ -189,7 +180,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                             </tr>
                           </tbody>
                         </table> : null}
-                        {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 
+                        {[StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase()) ? 
                           <table className="table table-bordered table-assignedto">
                             <tbody>
                               <tr>
