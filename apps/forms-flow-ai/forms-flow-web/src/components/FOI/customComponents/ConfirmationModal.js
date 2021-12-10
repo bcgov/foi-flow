@@ -13,7 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate } from "../../../helper/FOI/helper";
+import { formatDate, calculateDaysRemaining } from "../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
 import { MimeTypeList, MaxFileSizeInMB } from "../../../constants/FOI/enum";
 
@@ -47,7 +47,8 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries && saveRequestObject.selectedMinistries.length > 0   ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
     const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
     const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
-
+    const currentState = saveRequestObject && saveRequestObject.currentState;
+    const daysRemainingLDD = calculateDaysRemaining(saveRequestObject && saveRequestObject.dueDate);
     const multipleFiles = false;
     const [files, setFiles] = useState([]);
     const updateFilesCb = (_files) => {
@@ -93,13 +94,16 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
       handleModal(true, fileInfoList, files);
     }   
     const getMessage = (_state, _requestNumber) => {
-      switch(_state.toLowerCase()) {     
+      if ((currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
+        return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request #{_requestNumber}? <br/> <span className="close-message"> The request will be re-opened to the previous state: {_state}</span> </>}; 
+      }
+      switch(_state.toLowerCase()) {
         case StateEnum.intakeinprogress.name.toLowerCase():
             return {title: "Changing the state", body: "Are you sure you want to change the state to Intake in Progress?"};
         case StateEnum.open.name.toLowerCase():
             return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
         case StateEnum.closed.name.toLowerCase():
-            return {title: "Close Request", body: ""}; 
+          return {title: "Close Request", body: ""}; 
         case StateEnum.redirect.name.toLowerCase():
             return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};  
         case StateEnum.callforrecords.name.toLowerCase():
@@ -148,6 +152,8 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
               <h2 className="state-change-header">{message.title}</h2>
+              {currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() ? 
+              <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>: null}
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
@@ -174,6 +180,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                       <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
                       :
                       <>
+                      {currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?
                         <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
                           <tbody>
                             <tr>
@@ -181,7 +188,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
                               <td>{assignedTo}</td>
                             </tr>
                           </tbody>
-                        </table>
+                        </table> : null}
                         {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 
                           <table className="table table-bordered table-assignedto">
                             <tbody>

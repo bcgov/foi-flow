@@ -20,9 +20,8 @@
 }
 
 #state-change-dialog-title {
-    font-family: "BCSans-Bold", sans-serif!important;
-    color: #036 ;
-    padding: 30px 26px 0px 30px;
+    font-family: "BCSans-Bold", sans-serif!important; 
+    padding: 30px 26px 30px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -30,6 +29,7 @@
 
 .state-change-header {
     margin-left: 30px;
+    color: #036 ;
     font-size: xx-large;
     font-weight: bold;
     font-family: "BCSans-Bold", sans-serif !important;
@@ -92,4 +92,8 @@
 .modal-message {
     margin-left: 50px;
     margin-bottom: 20px;
+}
+
+.close-message {
+    padding-left: 50px;
 }
