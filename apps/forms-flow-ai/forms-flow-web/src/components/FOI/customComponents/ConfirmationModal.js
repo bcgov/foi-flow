@@ -138,7 +138,16 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     }
 
     let message = getMessage(state, requestNumber);
-    const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename); 
+    const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename);
+
+    const getDaysRemaining = () => {
+      if (currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
+        return (
+          <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>
+        );
+      }
+    }
+
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -152,8 +161,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
               <h2 className="state-change-header">{message.title}</h2>
-              {currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() ? 
-              <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>: null}
+                {getDaysRemaining()}
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
