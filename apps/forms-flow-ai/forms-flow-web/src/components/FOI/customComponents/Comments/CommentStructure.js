@@ -18,7 +18,6 @@ import { fetchFOIFullAssignedToList, fetchFOIMinistryAssignedToList } from '../.
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
 
   const actions = useContext(ActionContext)
@@ -61,9 +60,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
 
           </div>
-          <div className="commenttext">
-
-            <ReactQuill value={i.text} readOnly={true} theme={"bubble"} />
+          <div className="commenttext" dangerouslySetInnerHTML={{__html:i.text}}>
           </div>
 
           <div>
