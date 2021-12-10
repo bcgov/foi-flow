@@ -64,13 +64,13 @@ class stateevent:
         return self.__notificationmessage(state)
 
     @classmethod
-    def __getstatusname(self,requesttype, status):
+    def __getstatusname(self,requesttype, input):
         if requesttype == "rawrequest":
-            return "Open" if status == "Archived" else status
+            return "Open" if input == "Archived" else input
         else:
             allstatus = FOIRequestStatus().getrequeststatuses()
             for status in allstatus:
-                if status["requeststatusid"] == status:
+                if status["requeststatusid"] == input:
                     return status["name"]
         return None; 
         
