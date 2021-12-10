@@ -148,6 +148,45 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
       }
     }
 
+    const addorUpdateConfirmationModal = () => {
+      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase()) {
+        return (
+          <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} /> 
+        );
+      }
+      else if ((currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id))) {
+        return (
+          <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
+        );
+      }
+      else {
+
+        return (
+          <>
+          {(currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ? 
+            <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
+              <tbody>
+                <tr>
+                  <th scope="row">IAO Assigned To</th>
+                  <td>{assignedTo}</td>
+                </tr>
+              </tbody>
+          </table> : null }
+        {([StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ? 
+          <table className="table table-bordered table-assignedto">
+            <tbody>
+              <tr>
+                <th scope="row">Ministry Assigned To</th>
+                <td>{selectedMinistryAssignedTo}</td>
+              </tr>
+            </tbody>
+          </table> : null }
+          </>
+        );
+       
+      }
+    }
+
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -171,38 +210,8 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
             <span className="confirmation-message">
                 {message.body}
               </span>
-              {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ?              
-                  <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
-                  : (
-                    <>
-                    {(currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)) ?
-                      <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
-                      :
-                      <>
-                      {currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?
-                        <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
-                          <tbody>
-                            <tr>
-                              <th scope="row">IAO Assigned To</th>
-                              <td>{assignedTo}</td>
-                            </tr>
-                          </tbody>
-                        </table> : null}
-                        {[StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase()) ? 
-                          <table className="table table-bordered table-assignedto">
-                            <tbody>
-                              <tr>
-                                <th scope="row">Ministry Assigned To</th>
-                                <td>{selectedMinistryAssignedTo}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        : null}
-                      </>
-                    }
-                    </>
-                  )
-              }                      
+              { addorUpdateConfirmationModal()           
+              }
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
