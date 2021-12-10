@@ -8,7 +8,6 @@ import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
-import './editorStyles.scss';
 import draftToHtml from 'draftjs-to-html';
 import {
   ItalicButton,
