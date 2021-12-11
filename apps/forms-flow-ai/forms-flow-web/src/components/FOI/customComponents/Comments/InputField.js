@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'
+import React, { useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -7,45 +7,88 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
+
+
+import { convertToRaw, convertFromHTML, ContentState, EditorState } from "draft-js";
+
+
+
+import createMentionPlugin, {
+  defaultSuggestionsFilter
+} from '@draft-js-plugins/mention';
+
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
 import draftToHtml from 'draftjs-to-html';
 import {
   ItalicButton,
   BoldButton,
   UnderlineButton,
-  CodeButton,
-  HeadlineOneButton,
-  HeadlineTwoButton,
-  HeadlineThreeButton,
   UnorderedListButton,
   OrderedListButton,
-  BlockquoteButton,
-  CodeBlockButton,
+
 } from '@draft-js-plugins/buttons';
 
-import { convertToRaw, convertFromHTML, ContentState, EditorState } from "draft-js";
+import mentions from "./mentions";
+import { set } from 'date-fns'
+
 
 const staticToolbarPlugin = createToolbarPlugin();
+const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
-const plugins = [staticToolbarPlugin];
+const { MentionSuggestions } = mentionPlugin
+const plugins = [staticToolbarPlugin, mentionPlugin];
+
 
 const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
-  const editor = React.useRef(null)
+
+ console.log(`add ${add} , edit ${edit} , main ${main}`)
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
+  const [open, setOpen] = useState(false);
 
 
+  const [suggestions, setSuggestions] = useState(mentions);
 
-  const [editorState, setEditorState] = useState(() => createEditorStateWithText(''))
+  
 
+  const onOpenChange = (_open) => {    
+    setOpen(_open);
+  }
+
+  // Check editor text for mentions
+  const onSearchChange = ({ value }) => {    
+    setSuggestions(defaultSuggestionsFilter(value, mentions))
+  }
+
+  const getEditorState =(value)=>{
+    const blocksFromHTML = convertFromHTML(value);
+    const state = ContentState.createFromBlockArray(
+      blocksFromHTML.contentBlocks,
+      blocksFromHTML.entityMap,
+    );
+    const contentstate = EditorState.createWithContent(state)        
+    return contentstate
+}
+  const [editorState, setEditorState] = useState(value === '' || value === undefined ? EditorState.createEmpty():getEditorState(value))
+  
 
   const _handleChange = (editorState) => {
     const rawContentState = convertToRaw(editorState.getCurrentContent());
     const markup = draftToHtml(
       rawContentState
     );
+    const commentmentions = [];
+    const entityMap = rawContentState.entityMap;
+    Object.values(entityMap).forEach(entity => {
+      
+      if (entity.type === 'mention') {
+                
+        commentmentions.push(entity.data.mention.name);
+      }
+    });
+   
     setText(markup)
     setEditorState(editorState);
   }
@@ -94,15 +137,11 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
-    console.log(`_handleKeyCommand : e ${e} | currentContentLength:${currentContentLength} | selectedTextLength${selectedTextLength} `)
     if ((e === 'backspace' || e === 'delete') && currentContentLength - 1 >= 0) {
-
       setTextLength((maxcharacterlimit) - (currentContentLength - 1))
     }
 
     if ((e === 'backspace' || e === 'delete') && selectedTextLength > 0) {
-
-      console.log(`maxcharacterlimit - selectedTextLength is ${maxcharacterlimit - selectedTextLength}`)
       setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
     }
   }
@@ -130,35 +169,33 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
       setTextLength((maxcharacterlimit) - (currentContentLength + pastedText.length - selectedTextLength))
     }
   }
-    ;
+
+ 
 
   useEffect(() => {
 
-    if (value !== undefined) {      
-      focusEditor()
-      const blocksFromHTML = convertFromHTML(value);
-      const state = ContentState.createFromBlockArray(
-        blocksFromHTML.contentBlocks,
-        blocksFromHTML.entityMap,
-      );
-      const contentstate = EditorState.createWithContent(state)
-      const currentContent = contentstate.getCurrentContent();      
-      setEditorState(contentstate)
-      setText(value)
-      setuftext(value)
-      setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
+    
+      if (value !== undefined) {
+        
+        const blocksFromHTML = convertFromHTML(value);
+        const state = ContentState.createFromBlockArray(
+          blocksFromHTML.contentBlocks,
+          blocksFromHTML.entityMap,
+        );
+        const contentstate = EditorState.createWithContent(state)
+        const currentContent = contentstate.getCurrentContent();
+        //setEditorState(state)
+        
+        setText(value)
+        setuftext(value)
+        setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
 
-    }
-    else {
-
-      focusEditor()
-    }
-
+      }
 
   }, [value])
 
 
-  const cancel = (e) => {  
+  const cancel = (e) => {
     setText('')
     setuftext('')
     edit
@@ -169,9 +206,9 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
   }
 
   const post = () => {
-
+    
     setEditorState(createEditorStateWithText(''))
-    setTextLength(1000);
+    setTextLength(1000);    
     if (text !== '<p></p>') {
       setFOILoader(true)
       edit === true
@@ -188,11 +225,9 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
 
   const actions = useContext(ActionContext)
 
-  function focusEditor() {
-    if (editor !== undefined && editor.current !== null) { editor.current.focus() }
-  }
+  
 
- 
+
   return (
     <>
       <form
@@ -201,30 +236,29 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
         <div className="row cancelrow">
           <div className="col-lg-12" style={{ height: '0px' }}>
             {(!main) ? (
-            <button
-              className="cancelBtn"
-              onClick={cancel}
-            >
-              <FontAwesomeIcon icon={faTimes} size='2x' color={'#a5a5a5'} />
-            </button>
-             ) : null} 
+              <button
+                className="cancelBtn"
+                onClick={cancel}
+              >
+                <FontAwesomeIcon icon={faTimes} size='2x' color={'#a5a5a5'} />
+              </button>
+            ) : null}
           </div>
         </div>
         <Toolbar>
-            {             
-              (externalProps) => (
-                <div>
-                  <BoldButton {...externalProps} />
-                  <ItalicButton {...externalProps} />
-                  <UnderlineButton {...externalProps} />                                 
-                  <UnorderedListButton {...externalProps} />
-                  <OrderedListButton {...externalProps} />                                    
-                </div>
-              )
-            }
-          </Toolbar>
-        <Editor
-          ref={editor}
+          {
+            (externalProps) => (
+              <div>
+                <BoldButton {...externalProps} />
+                <ItalicButton {...externalProps} />
+                <UnderlineButton {...externalProps} />
+                <UnorderedListButton {...externalProps} />
+                <OrderedListButton {...externalProps} />
+              </div>
+            )
+          }
+        </Toolbar>
+        <Editor          
           editorState={editorState}
           onChange={_handleChange}
           handleBeforeInput={_handleBeforeInput}
@@ -232,7 +266,17 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
           handleKeyCommand={_handleKeyCommand}
           plugins={plugins}
         />
-        
+        <MentionSuggestions
+          open={open}
+          onOpenChange={onOpenChange}
+          suggestions={suggestions}
+          onSearchChange={onSearchChange}
+          onAddMention={(_mentions) => {
+           
+            // get the mention object selected
+          }}
+        />
+
       </form>
       <div className="inputActions">
         <div className={'col-lg-11'}>
