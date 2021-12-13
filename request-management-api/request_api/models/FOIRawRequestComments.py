@@ -25,8 +25,7 @@ class FOIRawRequestComment(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     commenttypeid = db.Column(db.Integer, unique=False, nullable=False)
-    #commenttype =  relationship("CommentType",backref=backref("CommentTypes"),uselist=False)
-    
+
     @classmethod
     def savecomment(cls, commenttypeid, foirequestcomment, version, userid)->DefaultMethodResult:   
         print('in model')
