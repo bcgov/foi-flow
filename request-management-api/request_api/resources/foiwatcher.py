@@ -34,7 +34,7 @@ TRACER = Tracer.get_instance()
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiwatcher/rawrequest/<requestid>')
 class FOIRawRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Retrieve watchers for unopened request"""
 
        
     @staticmethod
@@ -55,7 +55,7 @@ class FOIRawRequestWatcher(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiwatcher/rawrequest')
 class CreateFOIRawRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Create watcher for unopened request"""
 
        
     @staticmethod
@@ -76,7 +76,7 @@ class CreateFOIRawRequestWatcher(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiwatcher/rawrequest/disable/<requestid>')
 class DisableFOIRawRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Disable watcher for unopened request"""
 
        
     @staticmethod
@@ -95,7 +95,7 @@ class DisableFOIRawRequestWatcher(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiwatcher/ministryrequest/<ministryrequestid>')
 class FOIRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Retrieve watchers for opened request"""
 
        
     @staticmethod
@@ -114,7 +114,7 @@ class FOIRequestWatcher(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiwatcher/ministryrequest')
 class CreateFOIRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Create watcher for opened request"""
 
        
     @staticmethod
@@ -135,7 +135,7 @@ class CreateFOIRequestWatcher(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiwatcher/ministryrequest/disable/<ministryrequestid>')
 class DisableFOIRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Disable watcher for opened request"""
 
        
     @staticmethod
