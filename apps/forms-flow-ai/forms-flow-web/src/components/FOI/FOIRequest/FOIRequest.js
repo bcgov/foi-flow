@@ -115,10 +115,22 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   useEffect(() => {  
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
-    setSaveRequestObject(requestDetailsValue); 
-    let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+    setSaveRequestObject(requestDetailsValue);
+
+    const assignedTo = getAssignedTo();
+
     setAssignedToValue(assignedTo); 
   },[requestDetails]);
+
+  const getAssignedTo = () => {
+    if(!requestDetails.assignedGroup || requestDetails === "Unassigned") {
+      return "|Unassigned"
+    }
+
+    return requestDetails.assignedTo
+      ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}`
+      : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
+  }
   
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -169,9 +181,6 @@ const FOIRequest = React.memo(({userDetail}) => {
   const handleRequestDetailsInitialValue = React.useCallback((value) => {
     setRequiredRequestDetailsValues(value);
   },[])
-  const handleAssignedToInitialValue = React.useCallback((value) => {    
-    setAssignedToValue(value);
-  },[]) 
   const handleApplicantDetailsInitialValue = React.useCallback((value) => {    
     setRequiredApplicantDetails(value);
   },[])
@@ -274,9 +283,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   //to get the updated program area list with isChecked=true/false
   const [programAreaList, setProgramAreaList] = React.useState([]);
   
-  const handleUpdatedProgramAreaList = (programAreaList) => {    
+  const handleUpdatedProgramAreaList = (_programAreaList) => {    
     //get the updated program area list with isChecked=true/false
-    setProgramAreaList(programAreaList); 
+    setProgramAreaList(_programAreaList); 
   } 
 
   const contactDetailsNotGiven = ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
@@ -382,18 +391,18 @@ const FOIRequest = React.memo(({userDetail}) => {
       requestObject.deliveryMode = value.deliveryMode;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
-      const assignedToValue = value.split("|");
-      if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => (groupName === assignedToValue[0] && groupName === assignedToValue[1]))) {
-        requestObject.assignedGroup = assignedToValue[0];
+      const assignedTo = value.split("|");
+      if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => (groupName === assignedTo[0] && groupName === assignedTo[1]))) {
+        requestObject.assignedGroup = assignedTo[0];
         requestObject.assignedTo = "";
       }
-      else if (assignedToValue.length > 1) {
-        requestObject.assignedGroup = assignedToValue[0];
-        requestObject.assignedTo = assignedToValue[1];
+      else if (assignedTo.length > 1) {
+        requestObject.assignedGroup = assignedTo[0];
+        requestObject.assignedTo = assignedTo[1];
       }
       else {
         requestObject.assignedGroup = "Unassigned";
-        requestObject.assignedTo = assignedToValue[0];
+        requestObject.assignedTo = assignedTo[0];
       }   
       requestObject.assignedToName = value2;      
     }
@@ -515,13 +524,31 @@ const FOIRequest = React.memo(({userDetail}) => {
     setUnSavedRequest(_unSaved);
     if (!_unSaved) {      
       setTimeout(() => 
-      { 
-        ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}/${_state}` : dispatch(push(`/foi/reviewrequest/${id}/${_state}`)) 
+      {
+        const redirectUrl = getRedirectAfterSaveUrl();
+        
+        if(redirectUrl) {
+          window.location.href = redirectUrl
+        } else {
+          dispatch(push(`/foi/reviewrequest/${id}/${_state}`))
+        }
+
       }
       , 1000);
-      // setTimeout(() => { requestId ? window.location.reload()  : window.location.href = `/foi/reviewrequest/${id}/${value}` }, 1000);
     }
   }
+
+  const getRedirectAfterSaveUrl = (_state) => {
+    if(ministryId) {
+      return `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}`;
+    }
+
+    if(requestId) {
+      return `/foi/reviewrequest/${requestId}/${_state}`;
+    }
+
+    return null;
+  };
 
   const handleOpenRequest = (parendId, ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
@@ -540,9 +567,39 @@ const FOIRequest = React.memo(({userDetail}) => {
     }
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-    const bottomText = (_status === StateEnum.open.name || _status === StateEnum.review.name || _status === StateEnum.redirect.name || _status === StateEnum.consult.name || _status === StateEnum.signoff.name || _status === StateEnum.response.name || _status === StateEnum.closed.name) ? _daysRemainingText : (_status === StateEnum.callforrecords.name || _status === StateEnum.feeassessed.name || _status === StateEnum.deduplication.name || _status === StateEnum.harms.name) ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
+    const bottomText = getTabBottomText({
+      _daysRemainingText,
+      _cfrDaysRemainingText,
+      _status
+    });
+    
     setRequestStatus(bottomText);
   }
+
+  const getTabBottomText = ({ _daysRemainingText, _cfrDaysRemainingText, _status }) => {
+    if (
+      _status === StateEnum.open.name ||
+      _status === StateEnum.review.name ||
+      _status === StateEnum.redirect.name ||
+      _status === StateEnum.consult.name ||
+      _status === StateEnum.signoff.name ||
+      _status === StateEnum.response.name ||
+      _status === StateEnum.closed.name
+    ) {
+      return _daysRemainingText;
+    }
+
+    if (
+      _status === StateEnum.callforrecords.name ||
+      _status === StateEnum.feeassessed.name ||
+      _status === StateEnum.deduplication.name ||
+      _status === StateEnum.harms.name
+    ) {
+      return `${_cfrDaysRemainingText}|${_daysRemainingText}`;
+    }
+
+    return _status;
+  };
 
   const hasStatusRequestSaved =(issavecompleted,state)=>{
     if(issavecompleted)
@@ -631,7 +688,6 @@ const FOIRequest = React.memo(({userDetail}) => {
     let clickedOk = true;
     if (quillChange && param !== 'Comments') {
       if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-        clickedOk = true;
         setQuillChange(false);
         setRemoveComment(true);
       }
@@ -641,11 +697,10 @@ const FOIRequest = React.memo(({userDetail}) => {
         clickedOk = false;
         param = 'Comments';
         document.getElementById(param).className += " active";
-        const elementsByName = document.getElementsByName(param);
-        var i;
-        for (i = 0; i < elementsByName.length; i++) {          
-            elementsByName[i].className += " active";        
-        }
+        document.getElementsByName(param)
+          .forEach((element) => {
+            element.className += " active";
+          });
       }
     }
     else {
@@ -672,7 +727,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       
   const userId = userDetail && userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const name = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name}`
+  const fullName = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
@@ -698,23 +753,41 @@ const FOIRequest = React.memo(({userDetail}) => {
         <div className="tab">          
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments && requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
+              && 
+                <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>
+                  Attachments{
+                    requestAttachments && requestAttachments.length > 0 
+                    ? ` (${requestAttachments.length})`
+                    : ''
+                  }
+                </div>
           }
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
+              && <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>
+                  Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}
+                </div>
           }
           <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
         </div>
        
         <div className="foileftpanelstatus">
-        {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) ?
+        {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) &&
         <>
-          <h4>{_tabStatus && (_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()) ? "" : bottomTextArray[0]}</h4>
-          {bottomTextArray.length > 1  ?
-          <h4>{bottomTextArray[1]}</h4>
-          : null }
+          <h4>
+            {
+            _tabStatus 
+              && 
+                (_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
+                  ? "" 
+                  : bottomTextArray[0]
+            }
+          </h4>
+          {
+            bottomTextArray.length > 1 && <h4>{bottomTextArray[1]}</h4>
+          }
           </>
-          : null
           }
         </div>
         
@@ -729,16 +802,44 @@ const FOIRequest = React.memo(({userDetail}) => {
                   {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> 
-                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null}
-                      {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null}
+                      
+                      <ApplicantDetails
+                        requestDetails={requestDetails} 
+                        contactDetailsNotGiven={contactDetailsNotGiven} 
+                        handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} 
+                        handleEmailValidation={handleEmailValidation} 
+                        handleApplicantDetailsValue={handleApplicantDetailsValue} 
+                        createSaveRequestObject={createSaveRequestObject} 
+                        disableInput={disableInput} 
+                      />
+                       {
+                        requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                          <ChildDetails 
+                            additionalInfo={requestDetails.additionalPersonalInfo} 
+                            createSaveRequestObject={createSaveRequestObject} 
+                            disableInput={disableInput}
+                          />
+                        }
+
+                        {
+                          requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                            <OnBehalfOfDetails 
+                              additionalInfo={requestDetails.additionalPersonalInfo} 
+                              createSaveRequestObject={createSaveRequestObject} 
+                              disableInput={disableInput} 
+                            />
+                        }
                        <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} disableInput={disableInput} />
                       <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails={requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
-                      {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
+                        {
+                          requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                            <AdditionalApplicantDetails 
+                              requestDetails={requestDetails} 
+                              createSaveRequestObject={createSaveRequestObject} 
+                              disableInput={disableInput} 
+                            />
+                        } 
                       <RequestNotes />
 
                       <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
@@ -763,7 +864,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             {
              !isLoading && requestNotes && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
                 <>
-                <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
+                <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: fullName }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
                     bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}
                     //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
