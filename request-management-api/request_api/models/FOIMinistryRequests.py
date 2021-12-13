@@ -175,13 +175,16 @@ class FOIMinistryRequest(db.Model):
         return transitions
 
     @classmethod
-    def getstatenavigation(cls, ministryrequestid):
-        _session = db.session
-        _requeststates = _session.query(FOIMinistryRequest.requeststatusid).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).limit(2)
+    def getstatenavigation(cls, ministryrequestid):                
+        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+        where foiministryrequestid=:ministryrequestid  order by version desc limit  2"""
+ 
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         requeststates = []
-        for _requeststate in _requeststates:
-            requeststates.append(_requeststate[0])
+        for row in rs:
+            requeststates.append(row["status"])
         return requeststates
+
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
