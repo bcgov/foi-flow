@@ -9,7 +9,7 @@ import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 
-export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator, isValidationError}) {
+export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition}) {
 
     const {requestState} = useParams();
 
@@ -27,6 +27,19 @@ export default function StateDropDown({requestStatus, handleStateChange, isMinis
         handleStateChange(event.target.value); 
     };
 
+    const getClosedList = () => {
+        const stateArray = [...new Set(stateTransition && stateTransition.map(_state => JSON.stringify({status: _state.status})))].map(s => JSON.parse(s));
+        const isCFR = stateArray.some(_state => _state.status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase());
+        let resultArray = [];
+        if (isCFR) {
+            resultArray = stateArray.filter(_state => _state.status.toLowerCase() !== StateEnum.open.name.toLowerCase());
+        }
+        else {
+            resultArray = stateArray;
+        }
+        return resultArray;
+    }
+
     const getStatusList = (_status) => {        
         let  _state =  requestState ? requestState : requestStatus.toLowerCase().includes("days")? "Open": requestStatus;
         let _stateList = StateList;
@@ -41,7 +54,7 @@ export default function StateDropDown({requestStatus, handleStateChange, isMinis
             case StateEnum.open.name.toLowerCase():
                 return _stateList.open;
             case StateEnum.closed.name.toLowerCase():
-                return _stateList.closed; 
+                return getClosedList(); 
             case StateEnum.redirect.name.toLowerCase():
                 return _stateList.redirect; 
             case StateEnum.callforrecords.name.toLowerCase():
