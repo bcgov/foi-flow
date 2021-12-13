@@ -42,7 +42,7 @@ class workflowservice:
                     oldstatus = self.getministrystatus(filenumber, ministry["version"])
                     activity = self.getministryactivity(oldstatus,newstatus)
                     metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"]})
-                    messagename = self.messagename(id, oldstatus, activity, usertype)    
+                    messagename = self.messagename(id, oldstatus, activity, usertype)
                     if activity == Activity.complete.value:
                         if self.__hasreopened(id, "ministryrequest") == True:
                             bpmservice.reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
