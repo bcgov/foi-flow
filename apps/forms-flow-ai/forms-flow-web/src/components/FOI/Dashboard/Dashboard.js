@@ -34,7 +34,7 @@ const Dashboard = ({userDetail}) => {
   function getAssigneeValue(row) {
     const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";
     const assignedTo = row.assignedTo ? row.assignedTo : groupName;
-    if (assignedToList.length > 0) {
+    if (assignedToList && assignedToList.length > 0) {
       const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
       const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
       if (groupName === assignedTo) {

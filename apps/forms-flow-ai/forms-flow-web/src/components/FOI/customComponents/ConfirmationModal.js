@@ -13,7 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate } from "../../../helper/FOI/helper";
+import { formatDate, calculateDaysRemaining } from "../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
 import { MimeTypeList, MaxFileSizeInMB } from "../../../constants/FOI/enum";
 
@@ -47,7 +47,8 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : saveRequestObject.selectedMinistries && saveRequestObject.selectedMinistries.length > 0   ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
     const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;
     const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : "";
-
+    const currentState = saveRequestObject && saveRequestObject.currentState;
+    const daysRemainingLDD = calculateDaysRemaining(saveRequestObject && saveRequestObject.dueDate);
     const multipleFiles = false;
     const [files, setFiles] = useState([]);
     const updateFilesCb = (_files) => {
@@ -93,13 +94,16 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
       handleModal(true, fileInfoList, files);
     }   
     const getMessage = (_state, _requestNumber) => {
-      switch(_state.toLowerCase()) {     
+      if ((currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
+        return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request #{_requestNumber}? <br/> <span className="confirm-message-2"> The request will be re-opened to the previous state: {_state}</span> </>}; 
+      }
+      switch(_state.toLowerCase()) {
         case StateEnum.intakeinprogress.name.toLowerCase():
             return {title: "Changing the state", body: "Are you sure you want to change the state to Intake in Progress?"};
         case StateEnum.open.name.toLowerCase():
             return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
         case StateEnum.closed.name.toLowerCase():
-            return {title: "Close Request", body: ""}; 
+          return {title: "Close Request", body: ""}; 
         case StateEnum.redirect.name.toLowerCase():
             return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};  
         case StateEnum.callforrecords.name.toLowerCase():
@@ -122,7 +126,7 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         case StateEnum.harms.name.toLowerCase():
             return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};       
         case StateEnum.onhold.name.toLowerCase():
-            return {title: "Hold Request", body: `Are you sure you want to change Request #${_requestNumber} to on hold?`};
+            return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <span className="confirm-message-2">This will <b>stop</b> the clock and assign to Processing Team </span> </>};
         case StateEnum.response.name.toLowerCase():
           if (saveRequestObject.requeststatusid === StateEnum.signoff.id)
             return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
@@ -134,7 +138,55 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
     }
 
     let message = getMessage(state, requestNumber);
-    const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename); 
+    const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename);
+
+    const getDaysRemaining = () => {
+      if (currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
+        return (
+          <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>
+        );
+      }
+    }
+
+    const addorUpdateConfirmationModal = () => {
+      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase()) {
+        return (
+          <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} /> 
+        );
+      }
+      else if ((currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id))) {
+        return (
+          <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
+        );
+      }
+      else {
+
+        return (
+          <>
+          {(currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ? 
+            <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
+              <tbody>
+                <tr>
+                  <th scope="row">IAO Assigned To</th>
+                  <td>{assignedTo}</td>
+                </tr>
+              </tbody>
+          </table> : null }
+        {([StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ? 
+          <table className="table table-bordered table-assignedto">
+            <tbody>
+              <tr>
+                <th scope="row">Ministry Assigned To</th>
+                <td>{selectedMinistryAssignedTo}</td>
+              </tr>
+            </tbody>
+          </table> : null }
+          </>
+        );
+       
+      }
+    }
+
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -148,55 +200,18 @@ export default function ConfirmationModal({ openModal, handleModal, state, saveR
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
               <h2 className="state-change-header">{message.title}</h2>
+                {getDaysRemaining()}
               <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-description" component={'span'}>
-            {state.toLowerCase() === StateEnum.onhold.name.toLowerCase() ?
-              <div className="modal-message">
-                <span className="confirmation-message">
-                  {message.body}
-                  <br/>This will <b>stop</b> the clock and assign to Processing Team             
-                </span>                
-              </div>
-            : 
             <span className="confirmation-message">
                 {message.body}
-              </span> 
+              </span>
+              { addorUpdateConfirmationModal()           
               }
-              {state.toLowerCase() === StateEnum.closed.name.toLowerCase() ?              
-                  <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
-                  : (
-                    <>
-                    {(state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id) ?
-                      <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
-                      :
-                      <>
-                        <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
-                          <tbody>
-                            <tr>
-                              <th scope="row">IAO Assigned To</th>
-                              <td>{assignedTo}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        {state.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() || state.toLowerCase() === StateEnum.consult.name.toLowerCase() || state.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 
-                          <table className="table table-bordered table-assignedto">
-                            <tbody>
-                              <tr>
-                                <th scope="row">Ministry Assigned To</th>
-                                <td>{selectedMinistryAssignedTo}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        : null}
-                      </>
-                    }
-                    </>
-                  )
-              }                      
             </DialogContentText>
           </DialogContent>
           <DialogActions>            

@@ -6,7 +6,7 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
@@ -111,25 +111,54 @@ export const AttachmentSection = ({
   }
   }
 
+  const downloadDocument = (file) => {
+    const fileInfoList = [
+      {
+        ministrycode: "Misc",
+        requestnumber: `U-00${requestId}`,
+        filestatustransition: file.category,
+        filename: file.filename,
+        s3sourceuri: file.documentpath
+      },
+    ];
+    dispatch(
+      getOSSHeaderDetails(fileInfoList, (err, res) => {
+        if (!err) {
+          res.map((header, index) => {
+            dispatch(
+              getFileFromS3(header, file, (err, res) => {
+              })
+            );
+          });
+        }
+      }));
+  }
+
   const handlePopupButtonClick = (action, _attachment) => {
-    setUpdateAttachment();
     setUpdateAttachment(_attachment);
     setMultipleFiles(false);
-    switch(action) {
-      case 'replace':        
-        setModalFor('replace');        
+    switch (action) {
+      case "replace":
+        setModalFor("replace");
+        setModal(true);
         break;
-      case 'rename':        
-        setModalFor('rename');        
+      case "rename":
+        setModalFor("rename");
+        setModal(true);
         break;
-      case 'delete':        
-        setModalFor('delete');        
+      case "download":
+        downloadDocument(_attachment);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "delete":
+        setModalFor("delete")
+        setModal(true)
         break;
       default:
         setModal(false);
         break;
     }
-    setModal(true);
   }
 
   const handleRename = (_attachment, newFilename) => {
@@ -261,22 +290,33 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
 })
 
 const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
+  const ref = React.useRef();
+  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
   const handleRename = () => {
+    closeTooltip(); 
     handlePopupButtonClick("rename", attachment);
   }
 
   const handleReplace = () => {
+    closeTooltip(); 
     handlePopupButtonClick("replace", attachment);
   }
 
-  const handleDelete = () => {
-    handlePopupButtonClick("delete", attachment);
+  const handleDownload = () =>{
+    closeTooltip();   
+    handlePopupButtonClick("download", attachment);
   }
+
+  const handleDelete = () => {
+    closeTooltip(); 
+    handlePopupButtonClick("delete", attachment);
+  };
 
   return (
     <Popup
       role='tooltip'
+      ref={ref}
       trigger={
         <button className="actionsBtn">
           <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
@@ -288,7 +328,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
       // keepTooltipInside=".tooltipBoundary"
     >
       <div>
-        <button className="childActionsBtn">
+        <button className="childActionsBtn" onClick={handleDownload}>
           Download
         </button>
         <button className="childActionsBtn" onClick={handleRename}>

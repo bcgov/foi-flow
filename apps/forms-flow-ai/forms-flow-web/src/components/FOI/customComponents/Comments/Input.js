@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 
-const Input = ({add}) => {
+const Input = ({add, setQuillChange, removeComment, setRemoveComment}) => {
   
   const action = useContext(ActionContext)
   return action.customInput ? (
@@ -13,7 +13,7 @@ const Input = ({add}) => {
       submit: action.submit
     })
   ) : (
-    <InputField authorImg={action.userImg} main add={add}/>
+    <InputField authorImg={action.userImg} main add={add} setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
   )
 }
 
