@@ -40,7 +40,7 @@ class stateevent:
     
     @classmethod
     def __createcomment(self, requestid, state, requesttype):
-        comment = self.__preparecomment(requestid, self.__getstatusname(requesttype, state),requesttype)
+        comment = self.__preparecomment(requestid, state, requesttype)
         if requesttype == "ministryrequest":
             return commentservice().createministryrequestcomment(comment, AuthHelper.getUserId(), 2)
         else:
@@ -63,16 +63,7 @@ class stateevent:
     def __preparenotification(self, state):
         return self.__notificationmessage(state)
 
-    @classmethod
-    def __getstatusname(self,requesttype, input):
-        if requesttype == "rawrequest":
-            return "Open" if input == "Archived" else input
-        else:
-            allstatus = FOIRequestStatus().getrequeststatuses()
-            for status in allstatus:
-                if status["requeststatusid"] == input:
-                    return status["name"]
-        return None; 
+    
         
     @classmethod            
     def __commentmessage(self, state):
