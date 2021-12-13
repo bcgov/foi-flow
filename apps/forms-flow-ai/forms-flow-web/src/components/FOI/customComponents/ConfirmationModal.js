@@ -51,6 +51,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const currentState = saveRequestObject && saveRequestObject.currentState;
     const daysRemainingLDD = calculateDaysRemaining(saveRequestObject && saveRequestObject.dueDate);
     const multipleFiles = false;
+    const reOpenRequest = currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() ? true : false;
     const [files, setFiles] = useState([]);
     const updateFilesCb = (_files) => {
       setFiles(_files);
@@ -206,7 +207,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
-          <DialogContent className={`${state.toLowerCase() === StateEnum.closed.name.toLowerCase() ? 'dialog-content-nomargin': 'dialog-content'}`}>
+          <DialogContent className={`${reOpenRequest ? 'dialog-content': 'dialog-content-nomargin'}`}>
             <DialogContentText id="state-change-description" component={'span'}>
             <span className="confirmation-message">
                 {message.body}
