@@ -4,6 +4,8 @@
     border-radius: 3px;
     font-size: small;
     height: 30px;
+    
+    flex-basis: 50% 
 }
 
 .btn-save:disabled {
@@ -17,12 +19,14 @@
     border-radius: 3px;
     font-size: small;
     height: 30px;
+    flex-basis: 50%;
 }
 
 #state-change-dialog-title {
     font-family: "BCSans-Bold", sans-serif!important; 
     padding: 30px 26px 30px 30px;
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
@@ -33,7 +37,18 @@
     font-size: xx-large;
     font-weight: bold;
     font-family: "BCSans-Bold", sans-serif !important;
+    flex-direction: column;
+    flex-basis: 70% 
 }
+
+.title-col2 {
+    flex-basis: 25%
+}
+
+.title-col3 {
+    flex-basis: 5% !important
+}
+
 
 #state-change-dialog-title .MuiIconButton-root {
     background-color: #036 ;
@@ -46,7 +61,7 @@
 
 #state-change-description {
     padding-left: 50px;
-    color: black;
+    color: black; 
 }
 
 .confirmation-message {
@@ -60,7 +75,7 @@
 }
 
 .table-assignedto th {
-    width: 30%;
+    width: 40%;
 }
 
 .MuiDialogActions-root {
@@ -96,4 +111,17 @@
 
 .confirm-message-2 {
     padding-left: 50px;
+}
+
+
+.dialog-content {
+    margin: auto;
+}
+
+.dialog-content-nomargin {
+    margin: initial;
+}
+
+.MuiDialogActions-root {
+    flex-direction: row;
 }
