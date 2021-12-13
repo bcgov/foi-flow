@@ -17,10 +17,9 @@ import maya
 
 
 class commentservice:
-    """ FOI watcher management service
-
+    """ FOI comment management service
+    Supports creation, update and delete of comments for both unopened(raw) and opened(ministry) request
     """
-    
     
     def createministryrequestcomment(self, data, userid, type=1):
         version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
@@ -57,7 +56,7 @@ class commentservice:
             _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
                 for reply in comment['replies']:
-                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
+                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.__copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
         return _comments
     
@@ -67,7 +66,7 @@ class commentservice:
             "comment": entry['text']
             }
     
-    def copyreplycomment(self, ministryrequestid, entry, parentcommentid):
+    def __copyreplycomment(self, ministryrequestid, entry, parentcommentid):
         return {
             "ministryrequestid": ministryrequestid,
             "comment": entry['text'],
