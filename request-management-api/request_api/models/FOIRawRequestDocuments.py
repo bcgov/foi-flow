@@ -6,7 +6,6 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
-from dateutil.parser import *
 
 class FOIRawRequestDocument(db.Model):
     # Name of the table in our database
