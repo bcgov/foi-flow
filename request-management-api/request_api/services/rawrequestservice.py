@@ -49,15 +49,13 @@ class rawrequestservice:
 
    
     def updateworkflowinstance(wfinstanceid, requestid, userId):
-        result = FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userId)
-        return result
+        return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userId)
 
     def updateworkflowinstancewithstatus(wfinstanceid, requestid,status,notes, userId):
-        result = FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userId)
-        return result    
+        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userId)    
     
     def postEventToWorkflow(self, id, wfinstanceid, requestsschema, status):
-        return workflowservice().postintakeevent(id, wfinstanceid, requestsschema, status)
+        return workflowservice().postunopenedevent(id, wfinstanceid, requestsschema, status)
 
     def getrawrequests():
         requests = FOIRawRequest.getrequests()        
@@ -139,8 +137,10 @@ class rawrequestservice:
                                'publicServiceEmployeeNumber': decriptionTimeframe['publicServiceEmployeeNumber'],
                                'topic': decriptionTimeframe['topic'],
                                'selectedMinistries': requestrawdata['ministry']['selectedMinistry'],
-                               'lastStatusUpdateDate': FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
+                               'lastStatusUpdateDate': FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d'),
+                               'stateTransition': FOIRawRequest.getstatesummary(requestid)
                                }
+            
             if ispersonal:
                 childInformation = requestrawdata.get('childInformation')
                 anotherpersonInformation = requestrawdata.get(
@@ -181,6 +181,8 @@ class rawrequestservice:
             requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
+            if request['status'] == 'Closed':
+                request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":            
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
@@ -188,6 +190,7 @@ class rawrequestservice:
             requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime('%Y-%m-%d')
+            request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             return request['requestrawdata']
         else:
             return None
