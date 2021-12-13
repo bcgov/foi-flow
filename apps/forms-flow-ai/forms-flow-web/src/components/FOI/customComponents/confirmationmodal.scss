@@ -81,6 +81,7 @@
 .MuiDialogActions-root {
     padding: 20px 20px 30px !important;
     justify-content: center !important;
+    flex-direction: row;
 }
 
 .table th, .table td {
@@ -120,8 +121,4 @@
 
 .dialog-content-nomargin {
     margin: initial;
-}
-
-.MuiDialogActions-root {
-    flex-direction: row;
 }
