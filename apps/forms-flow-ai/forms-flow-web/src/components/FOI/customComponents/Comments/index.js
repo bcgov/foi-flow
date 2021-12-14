@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import './comments.scss'
 import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
-import SignField from './SignField'
 import Input from './Input'
 
 export const CommentSection = ({

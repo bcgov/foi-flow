@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import InputField from './InputField'
+import AddCommentField from './AddCommentField'
 import { ActionContext } from './ActionContext'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
@@ -29,7 +29,7 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList }) =>
       submit: action.submit
     })
   ) : (
-    <InputField authorImg={action.userImg} main add={add} fullnameList={fullnameList} />
+    <AddCommentField authorImg={action.userImg} main add={add} fullnameList={fullnameList} />
   )
 }
 
