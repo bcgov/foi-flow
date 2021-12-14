@@ -17,7 +17,7 @@ class FOIRawRequestCommentSchema(Schema):
     comment = fields.Str(data_key="comment")
     parentcommentid = fields.Int(data_key="parentcommentid",allow_none=True)
     isactive = fields.Bool(data_key="isactive",allow_none=True)
-
+    taggedusers = fields.Str(data_key="taggedusers")
 
 class FOIMinistryRequestCommentSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -28,7 +28,7 @@ class FOIMinistryRequestCommentSchema(Schema):
     comment = fields.Str(data_key="comment")
     parentcommentid = fields.Int(data_key="parentcommentid",allow_none=True)
     isactive = fields.Bool(data_key="isactive",allow_none=True)
-    
+    taggedusers = fields.Str(data_key="taggedusers")
     
 class EditFOIRawRequestCommentSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

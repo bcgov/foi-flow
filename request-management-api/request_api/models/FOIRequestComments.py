@@ -16,7 +16,8 @@ class FOIRequestComment(db.Model):
     commentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     ministryrequestid =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
-    comment = db.Column(db.Text, unique=False, nullable=True)  
+    comment = db.Column(db.Text, unique=False, nullable=True)
+    taggedusers = db.Column(JSON, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime2.now())
@@ -29,10 +30,10 @@ class FOIRequestComment(db.Model):
  
     
     @classmethod
-    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None)->DefaultMethodResult: 
+    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None,taggedusers=None)->DefaultMethodResult: 
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
         _createdDate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate
-        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createdDate, createdby=userid)
+        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createdDate, createdby=userid,taggedusers=taggedusers)
         db.session.add(newcomment)
         db.session.commit()               
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
@@ -49,11 +50,11 @@ class FOIRequestComment(db.Model):
             return DefaultMethodResult(True,'No Comment found',commentid)  
         
     @classmethod
-    def updatecomment(cls, commentid, foirequestcomment, userid):   
+    def updatecomment(cls, commentid, foirequestcomment, userid,taggedusers=None):   
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
         if(comment.count() > 0) :             
-            comment.update({FOIRequestComment.isactive:True, FOIRequestComment.comment:foirequestcomment["comment"], FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now()}, synchronize_session = False)
+            comment.update({FOIRequestComment.isactive:True, FOIRequestComment.comment:foirequestcomment["comment"], FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now(),FOIRequestComment.taggedusers:taggedusers}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Comment updated',commentid)
         else:

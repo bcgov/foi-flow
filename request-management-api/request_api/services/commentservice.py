@@ -23,14 +23,14 @@ class commentservice:
     
     
     @classmethod    
-    def createministryrequestcomment(self, data, userid, type=1):
+    def createministryrequestcomment(self, data, userid, type=1,taggedusers=None):
         version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
-        return FOIRequestComment.savecomment(type, data, version, userid) 
+        return FOIRequestComment.savecomment(type, data, version, userid,taggedusers=taggedusers) 
 
     @classmethod    
-    def createrawrequestcomment(self, data, userid, type=1):
+    def createrawrequestcomment(self, data, userid, type=1,taggedusers=None):
         version = FOIRawRequest.getversionforrequest(data["requestid"])    
-        return FOIRawRequestComment.savecomment(type, data, version, userid) 
+        return FOIRawRequestComment.savecomment(type, data, version, userid,taggedusers=taggedusers) 
     
     @classmethod    
     def disableministryrequestcomment(self, commentid, userid):
@@ -41,12 +41,12 @@ class commentservice:
         return FOIRawRequestComment.disablecomment(commentid, userid)     
         
     @classmethod    
-    def updateministryrequestcomment(self, commentid, data, userid):
-        return FOIRequestComment.updatecomment(commentid, data, userid) 
+    def updateministryrequestcomment(self, commentid, data, userid,taggedusers=None):
+        return FOIRequestComment.updatecomment(commentid, data, userid,taggedusers=taggedusers) 
 
     @classmethod    
-    def updaterawrequestcomment(self, commentid, data, userid):
-        return FOIRawRequestComment.updatecomment(commentid, data, userid)          
+    def updaterawrequestcomment(self, commentid, data, userid,taggedusers=None):
+        return FOIRawRequestComment.updatecomment(commentid, data, userid,taggedusers=taggedusers)          
         
     @classmethod    
     def getministryrequestcomments(self, ministryrequestid):
