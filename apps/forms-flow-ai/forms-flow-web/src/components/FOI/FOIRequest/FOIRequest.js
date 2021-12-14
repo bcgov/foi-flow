@@ -519,7 +519,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     setSaveRequestObject(requestObject);
   }
 
-  const handleSaveRequest = (_state, _unSaved, id) => {
+  const handleSaveRequest = (_state, _unSaved, id) => {    
     setHeader(_state);
     setUnSavedRequest(_unSaved);
     if (!_unSaved) {      
@@ -737,6 +737,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   const isAttachmentListLoading = useSelector(state=> state.foiRequests.isAttachmentListLoading);
+
+  const stateTransition = requestDetails && requestDetails.stateTransition;
+
   return (
 
     <div className="foiformcontent">
@@ -747,7 +750,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
+            <StateDropDown stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">          
@@ -862,7 +865,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div> 
           <div id="Comments" className="tabcontent">
             {
-             !isLoading && requestNotes && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
+             !isLoading && requestNotes && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: fullName }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 

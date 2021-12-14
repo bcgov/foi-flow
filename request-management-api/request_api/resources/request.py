@@ -45,10 +45,10 @@ class FOIRawRequest(Resource):
     def get(requestid=None):
         try : 
             jsondata = {}
-            requestidisInteger = int(requestid)
-            if requestidisInteger :                
-                baserequestInfo = rawrequestservice.getrawrequest(requestid)                                    
-                jsondata = json.dumps(baserequestInfo)
+            requestidisinteger = int(requestid)
+            if requestidisinteger :                
+                baserequestinfo = rawrequestservice.getrawrequest(requestid)                                    
+                jsondata = json.dumps(baserequestinfo)
             return jsondata , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -76,12 +76,12 @@ class FOIRawRequest(Resource):
                 except  KeyError:
                     print("Key Error on requeststatusid, ignore will be intake in Progress")    
                 
-                rawRequest = rawrequestservice.getrawrequest(requestid)     
-                assigneeGroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
+                rawrequest = rawrequestservice.getrawrequest(requestid)     
+                assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneeGroup, assignee,status,AuthHelper.getUserId())                
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getUserId())                
                 if result.success == True:   
-                    rawrequestservice().postEventToWorkflow(result.identifier, rawRequest['wfinstanceid'], updaterequest, status)
+                    rawrequestservice().postEventToWorkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getUserId())               
@@ -112,7 +112,7 @@ class FOIRawRequestBPMProcess(Resource):
                     return {'status': result.success, 'message':result.message}, 200
                 else:
                     return {'status': result.success, 'message':result.message}, 404
-            except KeyError as keyexception:
+            except KeyError:
                 return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
             except ValueError as valuexception:
                 return {'status': "BAD Request", 'message': str(valuexception)}, 500           
