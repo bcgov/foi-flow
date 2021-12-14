@@ -25,8 +25,10 @@ from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.dashboardservice import dashboardservice
 from request_api.services.external.bpmservice import bpmservice
+from request_api.services.documentservice import documentservice
+from request_api.schemas.foidocument import CreateDocumentSchema
 import json
-import uuid
+import base64
 from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
@@ -131,8 +133,35 @@ class FOIRawRequests(Resource):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestData']           
+            requestdatajson = request_json['requestData']
+            #get attachments
+            attachments = requestdatajson['Attachments'] if requestdatajson.get('Attachments') != None else None
+
+            #save request
+            requestdatajson.pop('Attachments')
             result = rawrequestservice.saverawrequest(requestdatajson,"onlineform",None)
+            requestId = result.identifier
+
+            #upload attachments
+            attachmentList = []
+            if attachments:
+                for attachment in attachments:
+                    attachment['filestatustransition'] = 'personal'
+                    attachment['ministrycode'] = 'Misc'
+                    attachment['requestnumber'] = str(requestId)
+
+                    attachment['file'] = base64.b64decode(attachment['base64data'])
+                    attachment.pop('base64data')
+
+                    attachmentObj = documentservice().uploadToS3(attachment)
+                    attachmentList.append(attachmentObj)
+                
+                documentschema = CreateDocumentSchema().load({'documents': attachmentList})
+                # result1 = documentservice().createrequestdocument(requestId, documentschema, AuthHelper.getUserId(), "rawrequest")
+                result1 = documentservice().createrequestdocument(requestId, documentschema, None, "rawrequest")
+                print("save to db")
+                print(result1)
+
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
