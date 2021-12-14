@@ -62,13 +62,13 @@ class commentservice:
 
     @classmethod    
     def copyrequestcomment(self, ministryrequestid, comments, userid):
-        _comments = []        
-        for comment in comments:
-            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF']) 
+        _comments = []                
+        for comment in comments:            
+            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF'],comment['taggedusers']) 
             _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
                 for reply in comment['replies']:
-                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
+                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'],reply['taggedusers'])      
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
         return _comments
     
@@ -91,7 +91,7 @@ class commentservice:
         return {
             "ministryrequestid": ministryrequestid,
             "comment": entry['text'],
-            "parentcommentid":parentcommentid
+            "parentcommentid":parentcommentid            
         }
     
     @classmethod  
@@ -126,5 +126,6 @@ class commentservice:
                 "dateUF":comment["created_at"],
                 "date":  commentcreatedDate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
-                "commentTypeId":comment['commenttypeid']
+                "commentTypeId":comment['commenttypeid'],
+                "taggedusers" : comment['taggedusers']              
         }     

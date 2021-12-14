@@ -75,4 +75,4 @@ class FOIRawRequestComment(db.Model):
 class FOIRawRequestCommentSchema(ma.Schema):
     class Meta:
         fields = ('commentid', 'requestid', 'parentcommentid', 'comment', 'commenttypeid',
-                  'commenttype', 'isactive', 'created_at', 'createdby', 'updated_at', 'updatedby')
+                  'commenttype', 'isactive', 'created_at', 'createdby', 'updated_at', 'updatedby','taggedusers')

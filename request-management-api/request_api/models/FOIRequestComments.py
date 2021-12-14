@@ -68,4 +68,4 @@ class FOIRequestComment(db.Model):
     
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
-        fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby') 
+        fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby','taggedusers') 
