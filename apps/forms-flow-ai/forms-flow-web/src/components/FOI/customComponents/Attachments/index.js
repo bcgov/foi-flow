@@ -226,11 +226,13 @@ export const AttachmentSection = ({
 const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}) => {
 
   const [filename, setFilename] = useState("");
+  const [disabled, setDisabled] = useState(attachment.category == 'personal');
   let lastIndex = 0;
   useEffect(() => {
     if(attachment && attachment.filename) {
       lastIndex = attachment.filename.lastIndexOf(".");
       setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
+      setDisabled(attachment.category == 'personal');
     }
   }, [attachment])
 
@@ -266,7 +268,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
               <div className="col-sm-1" style={{marginLeft:'auto'}}>
-                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick}/>
+                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick} disabled={disabled} />
               </div>                      
             </div>
           </div>
@@ -291,7 +293,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
   );
 })
 
-const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
+const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disabled}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
@@ -327,6 +329,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
       className="attachment-popup"
       position={'bottom right'}
       closeOnDocumentClick
+      disabled={disabled}
       // keepTooltipInside=".tooltipBoundary"
     >
       <div>

@@ -159,10 +159,7 @@ class FOIRawRequests(Resource):
                 documentschema = CreateDocumentSchema().load({'documents': attachmentList})
                 # result1 = documentservice().createrequestdocument(requestId, documentschema, AuthHelper.getUserId(), "rawrequest")
                 result1 = documentservice().createrequestdocument(requestId, documentschema, None, "rawrequest")
-                print("save to db")
-                print(result1)
-
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            

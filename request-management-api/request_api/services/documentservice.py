@@ -14,6 +14,7 @@ import requests
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
+import mimetypes
 
 class documentservice:
     """ FOI Document management service
@@ -156,7 +157,7 @@ class documentservice:
         header = {
             'X-Amz-Date': response.request.headers['x-amz-date'],
             'Authorization': response.request.headers['Authorization'],
-            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            'Content-Type': mimetypes.MimeTypes().guess_type(filename)[0]
         }
 
         #upload to S3
