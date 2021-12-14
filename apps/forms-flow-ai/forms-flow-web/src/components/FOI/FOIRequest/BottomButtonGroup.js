@@ -136,8 +136,7 @@ const BottomButtonGroup = React.memo(({
           saveRequestObject.assignedTo=""
           saveRequestObject.assignedGroup = "Processing Team"
         }
-        openRequest();
-        hasStatusRequestSaved(true, StateEnum.open.name)
+        openRequest();        
       }
       else if(stateChanged && currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId !== undefined || ministryId !== null || ministryId !== ''))
       {
@@ -211,7 +210,8 @@ const BottomButtonGroup = React.memo(({
               });
             handleOpenRequest("","",true);
           }
-        })); 
+        }));
+        hasStatusRequestSaved(true, StateEnum.open.name) 
       }
       else {
         handleOpenRequest("", "", true);

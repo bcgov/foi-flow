@@ -601,7 +601,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       }
       else {
         setUpdateStateDropdown(!updateStateDropDown);
-        setcurrentrequestStatus(StateEnum.intakeinprogress.name); // should be revisited
+        setcurrentrequestStatus(requestState); // should be revisited
       }
   }
   
