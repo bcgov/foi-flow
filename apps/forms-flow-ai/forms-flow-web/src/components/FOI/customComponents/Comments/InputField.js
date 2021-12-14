@@ -10,7 +10,6 @@ import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
-import draftToHtml from 'draftjs-to-html';
 import {
   ItalicButton,
   BoldButton,
@@ -26,8 +25,7 @@ const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
 const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullnameList }) => {
-  let maxcharacterlimit = 1000
-  const [text, setText] = useState('')
+  let maxcharacterlimit = 1000  
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
@@ -37,7 +35,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     ful.name = ful.fullname;
   })
 
-  const mentionList = fulluserlist
+  const mentionList = fulluserlist.sort()
 
   const [suggestions, setSuggestions] = useState(mentionList);
 
@@ -71,12 +69,16 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     return commentmentions;
   }
 
-  const _handleChange = (editorState) => {
-    const rawContentState = convertToRaw(editorState.getCurrentContent());
-    let markup = draftToHtml(
-      rawContentState
-    );
-    setText(markup)
+  const _handleChange = (editorState) => {    
+    const currentContent = editorState.getCurrentContent();
+    const rawContentState = convertToRaw(currentContent);    
+    const currentContentLength = currentContent.getPlainText('').length;
+    const selectedTextLength = _getLengthOfSelectedText();
+    let _textLength = maxcharacterlimit - (currentContentLength - selectedTextLength)
+    if(_textLength > 0)
+      {setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))}
+  
+    setuftext(currentContent.getPlainText(''))
     setEditorState(editorState);
   }
 
@@ -119,8 +121,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     return length;
   }
 
-  const _handleKeyCommand = (e) => {
-
+  const _handleKeyCommand = (e) => {   
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -131,9 +132,10 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     if ((e === 'backspace' || e === 'delete') && selectedTextLength > 0) {
       setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
     }
+    setuftext(currentContent.getPlainText(''))
   }
 
-  const _handleBeforeInput = () => {
+  const _handleBeforeInput = () => {   
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -143,9 +145,10 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     else {
       setTextLength((maxcharacterlimit - 1) - (currentContentLength - selectedTextLength))
     }
+    setuftext(currentContent.getPlainText(''))
   }
 
-  const _handlePastedText = (pastedText) => {
+  const _handlePastedText = (pastedText) => {    
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -155,34 +158,23 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     else {
       setTextLength((maxcharacterlimit) - (currentContentLength + pastedText.length - selectedTextLength))
     }
+    setuftext(currentContent.getPlainText(''))
   }
 
 
 
   useEffect(() => {
-
-
-    if (value !== undefined) {
-
-      const blocksFromHTML = convertFromHTML(value);
-      const state = ContentState.createFromBlockArray(
-        blocksFromHTML.contentBlocks,
-        blocksFromHTML.entityMap,
-      );
-      const contentstate = EditorState.createWithContent(state)
-      const currentContent = contentstate.getCurrentContent();
-
-      setText(value)
-      setuftext(value)
+    if (value !== undefined) {      
+      const contentstate = getEditorState(value)
+      const currentContent = contentstate.getCurrentContent();      
+      setuftext(currentContent.getPlainText(''))      
       setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
-
     }
 
   }, [value])
 
 
-  const cancel = (e) => {
-    setText('')
+  const cancel = (e) => {   
     setuftext('')
     edit
       ? actions.handleCancel(cancellor, edit)
@@ -192,14 +184,13 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
   }
 
   const post = () => {
-
-    if (text !== '<p></p>') {
+    if (uftext !== '' && uftext.trim().length > 0) {
       const _mentions = getMentionsOnComment()
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)
       edit === true
-        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true, setText)
-        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false, setText)
+        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true)
+        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
 
       setEditorState(createEditorStateWithText(''))
       setTextLength(1000);
@@ -273,10 +264,10 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
             className="postBtn"
             onClick={post}
             type='button'
-            disabled={text === '<p></p>'}
+            disabled={uftext.trim().length === 0}
           >
             {' '}
-            <FontAwesomeIcon disabled={textlength === 0 || text === "<p></p>"} icon={faPaperPlane} size='2x' color={text === undefined || text.length === 0 || textlength === maxcharacterlimit || text === "<p></p>" ? '#a5a5a5' : 'darkblue'} />
+            <FontAwesomeIcon disabled={uftext.trim().length === 0} icon={faPaperPlane} size='2x' color={ uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'} />
           </button>
         </div>
       </div>

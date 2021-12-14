@@ -180,15 +180,15 @@ export const ActionProvider = ({
     }
   }
 
-  const submit = (cancellor, text,taggedusers, parentId, edit, setText, child) => {
+  const submit = (cancellor, text,taggedusers, parentId, edit, child) => {
     if (edit) {
       editText(cancellor, text, parentId,taggedusers)
       handleCancel(cancellor, edit)
-      setText('')
+      
     } else {
       onSubmit(text, parentId, child,taggedusers)
       handleCancel(cancellor)
-      setText('')
+      
     }
   }
 
