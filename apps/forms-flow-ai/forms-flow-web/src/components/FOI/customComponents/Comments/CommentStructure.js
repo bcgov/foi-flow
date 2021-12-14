@@ -16,7 +16,7 @@ import {
 import { ActionContext } from './ActionContext'
 import 'react-quill/dist/quill.snow.css';
 import draftToHtml from 'draftjs-to-html';
-import { convertToRaw,convertFromRaw,  EditorState } from "draft-js";
+import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
@@ -33,7 +33,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const [toggleIcon, settoggleIcon] = useState(faCaretDown)
 
   const ref = useRef();
-  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
+  const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
   const toggleCollapse = (e, parentId) => {
 
@@ -47,15 +47,21 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   }
 
-  const getHtmlfromRawContent =()=>{
+  const getHtmlfromRawContent = () => {
+    let markup = null
+    if (i.commentTypeId === 1) {
+      console.log(i.text)
+      const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
+      let initialEditorState = EditorState.createWithContent(rawContentFromStore);
 
-    const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
-    let initialEditorState = EditorState.createWithContent(rawContentFromStore);
-    
-    const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
-    let markup = draftToHtml(
-      rawContentState
-    );  
+      const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
+      markup = draftToHtml(
+        rawContentState
+      );
+    }
+    else {
+      markup = `<p>${i.text}</p>`
+    }
 
     return markup
   }
@@ -72,8 +78,8 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
 
           </div>
-          <div className="commenttext" dangerouslySetInnerHTML={{__html:getHtmlfromRawContent()}} >
-          
+          <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
+
           </div>
 
           <div>
@@ -94,12 +100,12 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               role='tooltip'
               trigger={
                 i.commentTypeId === 1 ?
-                <button className="actionsBtn">
-                  <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
-                </button> :
-                <button className="actionsBtn" disabled>
-                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='grey' />
-              </button>
+                  <button className="actionsBtn">
+                    <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
+                  </button> :
+                  <button className="actionsBtn" disabled>
+                    <FontAwesomeIcon icon={faEllipsisH} size='1x' color='grey' />
+                  </button>
               }
               position='right center'
               nested
