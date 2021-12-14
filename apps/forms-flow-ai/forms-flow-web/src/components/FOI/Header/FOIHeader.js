@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
@@ -7,6 +7,8 @@ import { Container } from "@material-ui/core";
 import UserService from "../../../services/UserService";
 import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
+import Popup from 'reactjs-popup';
+import NotificationPopup from "./NotificationPopup/NotificationPopup";
 
 
 const FOIHeader = React.memo(() => { 
@@ -20,11 +22,28 @@ const FOIHeader = React.memo(() => {
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
 
+const [open, setOpen] = useState(false);
+const closeModal = () => setOpen(false);
+const openModal = () => {
+  // console.log(`Before setting=${open}`);
+  setOpen(!open);
+}
+
+const triggerPopup = () => {
+  return(
+    <> 
+    <Badge badgeContent={6} color="secondary">
+      <i style={{color: open==true ? "#003366" : "white",cursor: "pointer"}}  onClick={openModal} className="fa fa-bell-o foi-bell"></i>
+    </Badge>
+   </>
+  )
+}
+
   return (
     <div>
     <div className="row ">
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark" style={{borderBottom: "2px solid #fcba19"}}>
-      <Container className="foiContainer">
+      <Container className="foiContainer" style={{maxHeight: "45px"}}>
         <Nav className="ml-auto">  
         <div className="col-md-12 col-sm-12">
           <div className="col-md-3 col-sm-4 foiheaderLogosection">
@@ -47,11 +66,22 @@ const user = useSelector((state) => state.user.userDetail);
                       <li className="nav-item username foinavitem">
                           <span className="navbar-text">  {user.name || user.preferred_username || ""} </span>
                       </li>
-                      <li className="nav-item bell-icon foinavitem">
-                      <Badge color="secondary" badgeContent=" " variant="dot">
-                          <i className="fa fa-bell-o foi-bell"></i>
-                      </Badge>
-                        
+                      <li className="bell-icon foinavitem" >
+                      <div className={`drawer-div ${open == true ? 'notification-popup-drawer' : ''}`}>
+                        <Popup className="notification-popup" 
+                        role='tooltip'
+                        open={open} 
+                        onClose={closeModal}
+                        trigger={
+                          triggerPopup
+                        }
+                        nested
+                        closeOnDocumentClick 
+                        position={'bottom right'}
+                        >
+                        <NotificationPopup></NotificationPopup>
+                        </Popup>
+                      </div>
                       </li>
                       <li className="nav-item foinavitem">
                         <button type="button" className="btn btn-primary signout-btn" onClick={signout}>Sign Out</button>
