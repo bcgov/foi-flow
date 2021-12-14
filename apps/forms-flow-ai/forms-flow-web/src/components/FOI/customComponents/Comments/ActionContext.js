@@ -77,6 +77,7 @@ export const ActionProvider = ({
           {
             userId: currentUser.userId,
             commentId: maxId + 1,
+            commentTypeId: 1,
             avatarUrl: currentUser.avatarUrl,
             fullName: currentUser.name,
             text: text
@@ -89,6 +90,7 @@ export const ActionProvider = ({
         newList[index].replies.push({
           userId: currentUser.userId,
           commentId: uuid(),
+          commentTypeId: 1,
           avatarUrl: currentUser.avatarUrl,
           fullName: currentUser.name,
           text: text
@@ -104,6 +106,7 @@ export const ActionProvider = ({
         newReplies.push({
           userId: currentUser.userId,
           commentId: uuid(),
+          commentTypeId: 1,
           avatarUrl: currentUser.avatarUrl,
           fullName: currentUser.name,
           text: text
