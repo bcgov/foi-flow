@@ -8,7 +8,7 @@ from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from enum import Enum
 import datetime 
-import random
+import secrets
 
 class requestserviceconfigurator:
     """This class consolidates helper fiunctions and constants
@@ -40,10 +40,8 @@ class requestserviceconfigurator:
 
     def generatefilenumber(self, code, id):
         tmp = str(id)
-        cursize = len(tmp)
-        N = 5 - cursize
-        randomnum = random.randint(pow(10, N-1), pow(10, N) - 1)
-        return code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomnum)
+        randomnum = secrets.randbits(32)
+        return code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomnum)[:5]
     
     def contacttypemapping(self):
         return [{"name": ContactType.email.value, "key" : "email"},
