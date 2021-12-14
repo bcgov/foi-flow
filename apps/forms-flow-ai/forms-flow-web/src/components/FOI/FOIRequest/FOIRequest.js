@@ -591,7 +591,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     return null;
   };
 
-  const handleOpenRequest = (parendId, ministryId, unSaved) => {
+  const handleOpenRequest = (parendId, _ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
       if (!unSaved) {
         setStateChanged(false);
