@@ -11,7 +11,7 @@ import datetime
 import random
 
 class requestserviceconfigurator:
-    """
+    """This class consolidates helper fiunctions and constants
     """
     
     def getstatusname(self,requeststatusid):
