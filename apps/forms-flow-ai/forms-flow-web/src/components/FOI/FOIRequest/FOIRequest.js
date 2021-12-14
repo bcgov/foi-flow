@@ -38,6 +38,7 @@ import { StateEnum } from '../../../constants/FOI/statusEnum';
 import {CommentSection} from '../customComponents/Comments';
 import {AttachmentSection} from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
+import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,7 +54,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop:'30px',
     color: "#000000",
   },
- 
+  displayed: {
+    display: "block"
+  },
+  hidden: {
+    display: "none"
+  }
 }));
 
 const FOIRequest = React.memo(({userDetail}) => {
@@ -79,6 +85,33 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   //quillChange and removeComment added to handle Navigate away from Comments tabs
   const [quillChange, setQuillChange] = useState(false);
+
+  const initialStatuses = {
+    Request: {
+      display: false,
+      active: false,
+    },
+    Comments: {
+      display: false,
+      active: false,
+    },
+    Attachments: {
+      display: false,
+      active: false,
+    },
+    Option4: {
+      display: false,
+      active: false
+    }
+  };
+
+  const [tabLinksStatuses, setTabLinksStatuses] = useState({
+    ...initialStatuses,
+    Request: {
+      display: true,
+      active: true
+    },
+  })
   const [removeComment, setRemoveComment] = useState(false);
 
   const [attachments, setAttachments] = useState(requestAttachments);
@@ -115,10 +148,22 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   useEffect(() => {  
     const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
-    setSaveRequestObject(requestDetailsValue); 
-    let assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
+    setSaveRequestObject(requestDetailsValue);
+
+    const assignedTo = getAssignedTo();
+
     setAssignedToValue(assignedTo); 
   },[requestDetails]);
+
+  const getAssignedTo = () => {
+    if(!requestDetails.assignedGroup || requestDetails === "Unassigned") {
+      return "|Unassigned"
+    }
+
+    return requestDetails.assignedTo
+      ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}`
+      : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
+  }
   
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -169,9 +214,6 @@ const FOIRequest = React.memo(({userDetail}) => {
   const handleRequestDetailsInitialValue = React.useCallback((value) => {
     setRequiredRequestDetailsValues(value);
   },[])
-  const handleAssignedToInitialValue = React.useCallback((value) => {    
-    setAssignedToValue(value);
-  },[]) 
   const handleApplicantDetailsInitialValue = React.useCallback((value) => {    
     setRequiredApplicantDetails(value);
   },[])
@@ -274,9 +316,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   //to get the updated program area list with isChecked=true/false
   const [programAreaList, setProgramAreaList] = React.useState([]);
   
-  const handleUpdatedProgramAreaList = (programAreaList) => {    
+  const handleUpdatedProgramAreaList = (_programAreaList) => {    
     //get the updated program area list with isChecked=true/false
-    setProgramAreaList(programAreaList); 
+    setProgramAreaList(_programAreaList); 
   } 
 
   const contactDetailsNotGiven = ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
@@ -298,8 +340,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     || (requiredRequestDetailsValues.requestStartDate === undefined || requiredRequestDetailsValues.requestStartDate === "")
     );
 
-  const classes = useStyles();
- 
+  const classes = useStyles(); 
 
   const updateAdditionalInfo = (name, value, requestObject) => {
     if (requestObject.additionalPersonalInfo === undefined) {
@@ -382,18 +423,18 @@ const FOIRequest = React.memo(({userDetail}) => {
       requestObject.deliveryMode = value.deliveryMode;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
-      const assignedToValue = value.split("|");
-      if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => (groupName === assignedToValue[0] && groupName === assignedToValue[1]))) {
-        requestObject.assignedGroup = assignedToValue[0];
+      const assignedTo = value.split("|");
+      if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => (groupName === assignedTo[0] && groupName === assignedTo[1]))) {
+        requestObject.assignedGroup = assignedTo[0];
         requestObject.assignedTo = "";
       }
-      else if (assignedToValue.length > 1) {
-        requestObject.assignedGroup = assignedToValue[0];
-        requestObject.assignedTo = assignedToValue[1];
+      else if (assignedTo.length > 1) {
+        requestObject.assignedGroup = assignedTo[0];
+        requestObject.assignedTo = assignedTo[1];
       }
       else {
         requestObject.assignedGroup = "Unassigned";
-        requestObject.assignedTo = assignedToValue[0];
+        requestObject.assignedTo = assignedTo[0];
       }   
       requestObject.assignedToName = value2;      
     }
@@ -519,8 +560,15 @@ const FOIRequest = React.memo(({userDetail}) => {
       setcurrentrequestStatus(_state);
       
       setTimeout(() => 
-      { 
-        ministryId ? window.location.href = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}` : requestId ? window.location.href = `/foi/reviewrequest/${requestId}/${_state}` : dispatch(push(`/foi/reviewrequest/${id}/${_state}`)) 
+      {
+        const redirectUrl = getRedirectAfterSaveUrl();
+        
+        if(redirectUrl) {
+          window.location.href = redirectUrl
+        } else {
+          dispatch(push(`/foi/reviewrequest/${id}/${_state}`))
+        }
+
       }
       , 1000);
     }
@@ -530,7 +578,20 @@ const FOIRequest = React.memo(({userDetail}) => {
     }
   }
 
-  const handleOpenRequest = (parendId, _ministryId, unSaved) => {
+
+  const getRedirectAfterSaveUrl = (_state) => {
+    if(ministryId) {
+      return `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}`;
+    }
+
+    if(requestId) {
+      return `/foi/reviewrequest/${requestId}/${_state}`;
+    }
+
+    return null;
+  };
+
+  const handleOpenRequest = (parendId, ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
       if (!unSaved) {
         setStateChanged(false);
@@ -555,9 +616,39 @@ const FOIRequest = React.memo(({userDetail}) => {
     }
     const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
     const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-    const bottomText = (_status === StateEnum.open.name || _status === StateEnum.review.name || _status === StateEnum.redirect.name || _status === StateEnum.consult.name || _status === StateEnum.signoff.name || _status === StateEnum.response.name || _status === StateEnum.closed.name) ? _daysRemainingText : (_status === StateEnum.callforrecords.name || _status === StateEnum.feeassessed.name || _status === StateEnum.deduplication.name || _status === StateEnum.harms.name) ? `${_cfrDaysRemainingText}|${_daysRemainingText}`: _status;
+    const bottomText = getTabBottomText({
+      _daysRemainingText,
+      _cfrDaysRemainingText,
+      _status
+    });
+    
     setRequestStatus(bottomText);
   }
+
+  const getTabBottomText = ({ _daysRemainingText, _cfrDaysRemainingText, _status }) => {
+    if (
+      _status === StateEnum.open.name ||
+      _status === StateEnum.review.name ||
+      _status === StateEnum.redirect.name ||
+      _status === StateEnum.consult.name ||
+      _status === StateEnum.signoff.name ||
+      _status === StateEnum.response.name ||
+      _status === StateEnum.closed.name
+    ) {
+      return _daysRemainingText;
+    }
+
+    if (
+      _status === StateEnum.callforrecords.name ||
+      _status === StateEnum.feeassessed.name ||
+      _status === StateEnum.deduplication.name ||
+      _status === StateEnum.harms.name
+    ) {
+      return `${_cfrDaysRemainingText}|${_daysRemainingText}`;
+    }
+
+    return _status;
+  };
 
   const hasStatusRequestSaved =(issavecompleted,state)=>{
     if(issavecompleted)
@@ -642,52 +733,61 @@ const FOIRequest = React.memo(({userDetail}) => {
     }
   });
 
-  const tabclick = (evt, param) => {
-    let clickedOk = true;
-    if (quillChange && param !== 'Comments') {
-      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-        clickedOk = true;
-        setQuillChange(false);
-        setRemoveComment(true);
-      }
-      else {
-        setQuillChange(true);
-        setRemoveComment(false);
-        clickedOk = false;
-        param = 'Comments';
-        document.getElementById(param).className += " active";
-        const elementsByName = document.getElementsByName(param);
-        var i;
-        for (i = 0; i < elementsByName.length; i++) {          
-            elementsByName[i].className += " active";        
-        }
-      }
-    }
-    else {
+  const tabclick = (param) => {
+    if(param === 'Comments') {
       setRemoveComment(false);
+      changeTabLinkStatuses(param);
+      return;
     }
-    var i, tabcontent, tablinks;
-
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
-    }
-
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    document.getElementById(param).style.display = "block";
-    if (clickedOk)
-      evt.currentTarget.className += " active";
     
+    if(quillChange) {
+      confirmChangesLost(
+        () => {
+          setQuillChange(false);
+          setRemoveComment(true);
+          changeTabLinkStatuses(param);
+        },
+        () => {
+          setQuillChange(true);
+          setRemoveComment(false);          
+        }
+      )
+    } else {
+
+      changeTabLinkStatuses(param);
+      
+    }
+
   }
+
+  const changeTabLinkStatuses = (param) => {
+    setTabLinksStatuses({
+      ...initialStatuses,
+      [param]: {
+        ...tabLinksStatuses[param],
+        active: true,
+        display: true,
+      },
+    });
+  }
+
+  const confirmChangesLost = (positiveCallback, negativeCallback) => {
+    if (
+      window.confirm(
+        "Are you sure you want to leave? Your changes will be lost."
+      )
+    ) {
+      positiveCallback();
+    } else {
+      negativeCallback();
+    }
+  };
+
   const bottomTextArray = _requestStatus.split('|');
       
   const userId = userDetail && userDetail.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const name = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name}`
+  const fullName = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
@@ -713,33 +813,86 @@ const FOIRequest = React.memo(({userDetail}) => {
             <StateDropDown updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
-        <div className="tab">
-          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+        <div className="tab">          
+          <div 
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Request.active
+            })}
+            name="Request" 
+            onClick={() => tabclick('Request')}>
+              Request
+          </div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments && requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
+              && 
+                <div
+                  className={clsx("tablinks", {
+                    "active": tabLinksStatuses.Attachments.active
+                  })}
+                  name="Attachments" 
+                  onClick={() => tabclick('Attachments')}
+                >
+                  Attachments{
+                    requestAttachments && requestAttachments.length > 0 
+                    ? ` (${requestAttachments.length})`
+                    : ''
+                  }
+                </div>
           }
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ? <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div> : null
+            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
+              && <div 
+                  className={clsx("tablinks", {
+                    "active": tabLinksStatuses.Comments.active
+                  })}
+                  name="Comments" 
+                  onClick={() => tabclick('Comments')}
+                 >
+                  Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}
+                </div>
           }
-          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
+          <div 
+            className="tablinks" 
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Option4.active
+            })}
+            name="Option4" 
+            onClick={() => tabclick('Option4')}
+          >
+            Option 4
+          </div>
         </div>
        
         <div className="foileftpanelstatus">
-        {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) ?
+        {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) &&
         <>
-          <h4>{_tabStatus && (_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()) ? "" : bottomTextArray[0]}</h4>
-          {bottomTextArray.length > 1  ?
-          <h4>{bottomTextArray[1]}</h4>
-          : null }
+          <h4>
+            {
+            _tabStatus 
+              && 
+                (_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
+                  ? "" 
+                  : bottomTextArray[0]
+            }
+          </h4>
+          {
+            bottomTextArray.length > 1 && <h4>{bottomTextArray[1]}</h4>
+          }
           </>
-          : null
           }
         </div>
         
 
         </div>
         <div className="foitabpanelcollection"> 
-          <div id="Request" className="tabcontent active">                                
+          <div 
+            id="Request" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Request.active,
+              [classes.displayed]: tabLinksStatuses.Request.display,
+              [classes.hidden]: !tabLinksStatuses.Request.display,
+            })}
+          >                                
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -747,16 +900,44 @@ const FOIRequest = React.memo(({userDetail}) => {
                   {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      <ApplicantDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} handleEmailValidation={handleEmailValidation} handleApplicantDetailsValue={handleApplicantDetailsValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> 
-                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <ChildDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null}
-                      {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <OnBehalfOfDetails additionalInfo={requestDetails.additionalPersonalInfo} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null}
+                      
+                      <ApplicantDetails
+                        requestDetails={requestDetails} 
+                        contactDetailsNotGiven={contactDetailsNotGiven} 
+                        handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue} 
+                        handleEmailValidation={handleEmailValidation} 
+                        handleApplicantDetailsValue={handleApplicantDetailsValue} 
+                        createSaveRequestObject={createSaveRequestObject} 
+                        disableInput={disableInput} 
+                      />
+                       {
+                        requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                          <ChildDetails 
+                            additionalInfo={requestDetails.additionalPersonalInfo} 
+                            createSaveRequestObject={createSaveRequestObject} 
+                            disableInput={disableInput}
+                          />
+                        }
+
+                        {
+                          requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                            <OnBehalfOfDetails 
+                              additionalInfo={requestDetails.additionalPersonalInfo} 
+                              createSaveRequestObject={createSaveRequestObject} 
+                              disableInput={disableInput} 
+                            />
+                        }
                        <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} disableInput={disableInput} />
                       <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails={requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
-                      {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
-                        <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
+                        {
+                          requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                            <AdditionalApplicantDetails 
+                              requestDetails={requestDetails} 
+                              createSaveRequestObject={createSaveRequestObject} 
+                              disableInput={disableInput} 
+                            />
+                        } 
                       <RequestNotes />
 
                       <BottomButtonGroup stateChanged={stateChanged} isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
@@ -766,7 +947,14 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
-          <div id="Attachments" className="tabcontent">
+          <div 
+            id="Attachments" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Attachments.active,
+              [classes.displayed]: tabLinksStatuses.Attachments.display,
+              [classes.hidden]: !tabLinksStatuses.Attachments.display,
+            })}
+          >
             {
              !isAttachmentListLoading && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
                 <>
@@ -777,11 +965,18 @@ const FOIRequest = React.memo(({userDetail}) => {
                 </> : <Loading />
             }
           </div> 
-          <div id="Comments" className="tabcontent">
+          <div 
+            id="Comments" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Comments.active,
+              [classes.displayed]: tabLinksStatuses.Comments.display,
+              [classes.hidden]: !tabLinksStatuses.Comments.display,
+            })}
+          >
             {
              !isLoading && requestNotes && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
                 <>
-                <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
+                <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: fullName }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
                     bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}
                     //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
