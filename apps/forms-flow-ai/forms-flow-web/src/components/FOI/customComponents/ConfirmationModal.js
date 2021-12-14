@@ -142,7 +142,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
-      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
+      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) {
         return (
           <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>
         );
@@ -173,7 +173,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 </tr>
               </tbody>
           </table> : null }
-        {([StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ? 
+        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ? 
           <table className="table table-bordered table-assignedto">
             <tbody>
               <tr>
