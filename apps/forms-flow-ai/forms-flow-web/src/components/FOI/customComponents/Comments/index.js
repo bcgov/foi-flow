@@ -17,20 +17,44 @@ export const CommentSection = ({
   bcgovcode,
   iaoassignedToList,
   ministryAssignedToList,
-  requestNumber
+  requestNumber,
+  //Handles Navigate Away
+  setQuillChange,
+  removeComment,
+  setRemoveComment
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)
+  const [comments, setcomments] = useState([])
+  const [filterValue, setfilterValue] = useState(-1)
+  useEffect(() => {
+    var _comments = parseInt(filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    setcomments(_comments)  
+  }, [filterValue,commentsArray])
+
   
+ 
+  const onfilterchange = (e) => {
+    var _filterValue = parseInt(e.target.value) 
+    setfilterValue(_filterValue)       
+    setcomments([])
+    
+
+  }
+ 
   return (
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
-      comments={commentsArray}
+      comments={comments}
       signinUrl={signinUrl}
       signupUrl={signupUrl}
       customInput={customInput}
       requestid={requestid}
       ministryId={ministryId}
+      //Handles Navigate Away
+      setQuillChange={setQuillChange}
+      removeComment={removeComment}
+      setRemoveComment={setRemoveComment}
     >
       <div className="section">
         <div className="foi-request-number-header">
@@ -42,10 +66,22 @@ export const CommentSection = ({
         </div>
 
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
-          {<Input add="add" />}
+        {<Input add="add" 
+        //Handles Navigate Away
+        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />}
         </div>
         <div className="displayComments">
-          <DisplayComments comments={commentsArray} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+          <div className="filterComments" >
+            <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange} checked={filterValue === -1 ? true:false} />
+            <label htmlFor="rballcomments">All Comments</label>
+            <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
+            <label htmlFor="rbrequesthistory">Request History</label>
+            <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
+            <label htmlFor="rbusercomments">User Comments</label>
+          </div>
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
+          //Handles Navigate Away
+          setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
 
       </div>

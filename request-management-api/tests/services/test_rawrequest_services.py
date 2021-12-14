@@ -19,14 +19,6 @@ def test_save_rawrequest(session):
     wfupdateresponse = rawrequestservice.updateworkflowinstance(str(uuid.uuid4()),requestid,'service-account-forms-flow-bpm')
     assert response.success == True and wfupdateresponse.success == True
 
-def test_save_rawrequestversion(session):
-    request = rawrequestservice.getrawrequests().pop()
-    print("Raw Request id {0}".format(request['id']))
-    #_assigneeGroup, _assignee,status
-    response = rawrequestservice.saverawrequestversion(requestjson,request['id'],"testuser@idir",_assignee="testassigne",status='intake in progress',userId="unittest")
-    requestid = response.identifier    
-    assert response.success == True  
-
 def test_get_rawrequests(session):
     response = rawrequestservice.getrawrequests()
     assert response
