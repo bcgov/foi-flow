@@ -3,20 +3,12 @@ import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
-
-
-import { convertToRaw, convertFromHTML, ContentState, EditorState } from "draft-js";
-
-
-
+import { convertToRaw, convertFromRaw, convertFromHTML, ContentState, EditorState } from "draft-js";
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
-
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
 import draftToHtml from 'draftjs-to-html';
 import {
@@ -28,67 +20,62 @@ import {
 
 } from '@draft-js-plugins/buttons';
 
-import mentions from "./mentions";
-import { set } from 'date-fns'
-
-
 const staticToolbarPlugin = createToolbarPlugin();
 const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
-
-
-const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
-
- console.log(`add ${add} , edit ${edit} , main ${main}`)
+const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullnameList }) => {
   let maxcharacterlimit = 1000
   const [text, setText] = useState('')
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
 
+  let fulluserlist = [...fullnameList]
+  fulluserlist.forEach(ful => {
+    ful.name = ful.fullname;
+  })
 
-  const [suggestions, setSuggestions] = useState(mentions);
+  const mentionList = fulluserlist
 
-  
+  const [suggestions, setSuggestions] = useState(mentionList);
 
-  const onOpenChange = (_open) => {    
+  const onOpenChange = (_open) => {
     setOpen(_open);
   }
 
   // Check editor text for mentions
-  const onSearchChange = ({ value }) => {    
-    setSuggestions(defaultSuggestionsFilter(value, mentions))
+  const onSearchChange = ({ value }) => {
+    setSuggestions(defaultSuggestionsFilter(value, mentionList))
   }
 
-  const getEditorState =(value)=>{
-    const blocksFromHTML = convertFromHTML(value);
-    const state = ContentState.createFromBlockArray(
-      blocksFromHTML.contentBlocks,
-      blocksFromHTML.entityMap,
-    );
-    const contentstate = EditorState.createWithContent(state)        
-    return contentstate
-}
-  const [editorState, setEditorState] = useState(value === '' || value === undefined ? EditorState.createEmpty():getEditorState(value))
-  
+  const getEditorState = (value) => {
+    const rawContentFromStore = convertFromRaw(JSON.parse(value))
+    let initialEditorState = EditorState.createWithContent(rawContentFromStore);
+    return initialEditorState
+  }
+  const [editorState, setEditorState] = useState(value === '' || value === undefined ? EditorState.createEmpty() : getEditorState(value))
 
-  const _handleChange = (editorState) => {
+  const getMentionsOnComment = () => {
     const rawContentState = convertToRaw(editorState.getCurrentContent());
-    const markup = draftToHtml(
-      rawContentState
-    );
     const commentmentions = [];
     const entityMap = rawContentState.entityMap;
     Object.values(entityMap).forEach(entity => {
-      
+
       if (entity.type === 'mention') {
-                
-        commentmentions.push(entity.data.mention.name);
+        commentmentions.push({ username: entity.data.mention.username, name: entity.data.mention.name });
       }
     });
-   
+
+    return commentmentions;
+  }
+
+  const _handleChange = (editorState) => {
+    const rawContentState = convertToRaw(editorState.getCurrentContent());
+    let markup = draftToHtml(
+      rawContentState
+    );
     setText(markup)
     setEditorState(editorState);
   }
@@ -170,27 +157,26 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
     }
   }
 
- 
+
 
   useEffect(() => {
 
-    
-      if (value !== undefined) {
-        
-        const blocksFromHTML = convertFromHTML(value);
-        const state = ContentState.createFromBlockArray(
-          blocksFromHTML.contentBlocks,
-          blocksFromHTML.entityMap,
-        );
-        const contentstate = EditorState.createWithContent(state)
-        const currentContent = contentstate.getCurrentContent();
-        //setEditorState(state)
-        
-        setText(value)
-        setuftext(value)
-        setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
 
-      }
+    if (value !== undefined) {
+
+      const blocksFromHTML = convertFromHTML(value);
+      const state = ContentState.createFromBlockArray(
+        blocksFromHTML.contentBlocks,
+        blocksFromHTML.entityMap,
+      );
+      const contentstate = EditorState.createWithContent(state)
+      const currentContent = contentstate.getCurrentContent();
+
+      setText(value)
+      setuftext(value)
+      setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
+
+    }
 
   }, [value])
 
@@ -206,14 +192,17 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
   }
 
   const post = () => {
-    
-    setEditorState(createEditorStateWithText(''))
-    setTextLength(1000);    
+
     if (text !== '<p></p>') {
+      const _mentions = getMentionsOnComment()
+      const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)
       edit === true
-        ? actions.submit(cancellor, text, parentId, true, setText)
-        : actions.submit(cancellor, text, parentId, false, setText)
+        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true, setText)
+        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false, setText)
+
+      setEditorState(createEditorStateWithText(''))
+      setTextLength(1000);
     }
 
   }
@@ -224,9 +213,6 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
   formclass = (add === undefined && main === undefined && edit === undefined) ? `${formclass} addform newreply` : formclass
 
   const actions = useContext(ActionContext)
-
-  
-
 
   return (
     <>
@@ -258,7 +244,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
             )
           }
         </Toolbar>
-        <Editor          
+        <Editor
           editorState={editorState}
           onChange={_handleChange}
           handleBeforeInput={_handleBeforeInput}
@@ -272,7 +258,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add }) => {
           suggestions={suggestions}
           onSearchChange={onSearchChange}
           onAddMention={(_mentions) => {
-           
+            console.log('onAddMention')
             // get the mention object selected
           }}
         />

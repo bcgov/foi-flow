@@ -1,9 +1,25 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
+import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
-const Input = ({add}) => {
-  
+const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList }) => {
+
+  const [fullnameList, setFullnameList] = useState(getFullnameList);
+
+  if (!fullnameList) {
+    if (iaoassignedToList.length > 0) {
+      addToFullnameList(iaoassignedToList, "iao");
+      setFullnameList(getFullnameList());
+    }
+
+    if (ministryAssignedToList.length > 0) {
+      addToFullnameList(ministryAssignedToList, bcgovcode);
+      setFullnameList(getFullnameList());
+    }
+  }
+
+
   const action = useContext(ActionContext)
   return action.customInput ? (
     action.customInput({
@@ -13,7 +29,7 @@ const Input = ({add}) => {
       submit: action.submit
     })
   ) : (
-    <InputField authorImg={action.userImg} main add={add}/>
+    <InputField authorImg={action.userImg} main add={add} fullnameList={fullnameList} />
   )
 }
 

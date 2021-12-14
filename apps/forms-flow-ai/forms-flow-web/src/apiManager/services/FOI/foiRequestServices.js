@@ -770,7 +770,7 @@ export const editRawRequestNote = (data, commentid, requestid, ...rest) => {
       });
   };
 };
-export const editMinistryRequestNote = (data, commentid,  ministryId, ...rest) => {
+export const editMinistryRequestNote = (data, commentid,  ministryId, ...rest) => {  
   const done = rest.length ? rest[0] : () => { };
   let apiUrl = replaceUrl(replaceUrl(
     API.FOI_PUT_COMMENT_MINISTRYREQUEST,

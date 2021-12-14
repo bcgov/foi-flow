@@ -14,9 +14,10 @@ import {
   modalDelBtn
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
-import { fetchFOIFullAssignedToList, fetchFOIMinistryAssignedToList } from '../../../../apiManager/services/FOI/foiRequestServices'
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import draftToHtml from 'draftjs-to-html';
+import { convertToRaw,convertFromRaw,  EditorState } from "draft-js";
+
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
 
@@ -46,7 +47,18 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   }
 
-  
+  const getHtmlfromRawContent =()=>{
+
+    const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
+    let initialEditorState = EditorState.createWithContent(rawContentFromStore);
+    
+    const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
+    let markup = draftToHtml(
+      rawContentState
+    );  
+
+    return markup
+  }
 
   return (
     <>
@@ -60,7 +72,8 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
 
           </div>
-          <div className="commenttext" dangerouslySetInnerHTML={{__html:i.text}}>
+          <div className="commenttext" dangerouslySetInnerHTML={{__html:getHtmlfromRawContent()}} >
+          
           </div>
 
           <div>
