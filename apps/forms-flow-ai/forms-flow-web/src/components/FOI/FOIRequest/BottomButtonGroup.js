@@ -173,8 +173,7 @@ const BottomButtonGroup = React.memo(({
     }
 
     const handleModal = (value, fileInfoList) => {     
-      setOpenModal(false);
-      
+      setOpenModal(false);      
       if (value) {
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
@@ -320,8 +319,12 @@ const BottomButtonGroup = React.memo(({
 
   return (
     <div className={classes.root}>
-      <ConfirmationModal requestId={requestId} openModal={openModal} handleModal={handleModal} state={StateEnum.open.name} saveRequestObject={saveRequestObject} />  
+      {openModal ? 
+      <ConfirmationModal requestId={requestId} openModal={openModal} handleModal={handleModal} state={StateEnum.open.name} saveRequestObject={saveRequestObject} /> 
+      : null}
+      {opensaveModal ? 
       <ConfirmationModal requestId={requestId} openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
+      : null}
       <div className="foi-bottom-button-group">
       <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError || disableInput} onClick={saveRequest}>Save</button>
       <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      

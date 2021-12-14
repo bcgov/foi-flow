@@ -575,6 +575,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     else {
       setUpdateStateDropdown(!updateStateDropDown);
       setcurrentrequestStatus(_state);
+      setStateChanged(false);
     }
   }
 
