@@ -97,6 +97,7 @@ const BottomButtonGroup = React.memo(({
             });
             const _state = currentSelectedStatus ? currentSelectedStatus : ((requestState && requestState === StateEnum.unopened.name && saveRequestObject.sourceOfSubmission === 'onlineform') || urlIndexCreateRequest > -1 ? StateEnum.intakeinprogress.name : requestState);
             handleSaveRequest(_state, false, res.id);
+            hasStatusRequestSaved(true, currentSelectedStatus);
         } else {
           toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
             position: "top-right",
@@ -107,7 +108,7 @@ const BottomButtonGroup = React.memo(({
             draggable: true,
             progress: undefined,
             });
-            handleSaveRequest(currentSelectedStatus, true, "");
+            handleSaveRequest(requestState, true, "");
         }
       }));      
     }
@@ -196,6 +197,7 @@ const BottomButtonGroup = React.memo(({
             });
             const firstMinistry = res.ministryRequests[0];
             handleOpenRequest(parentRequestId, firstMinistry.id, false);
+            hasStatusRequestSaved(true, StateEnum.open.name);
           }
           else {
             toast.error('Temporarily unable to open your request. Please try again in a few minutes.', {
@@ -210,7 +212,7 @@ const BottomButtonGroup = React.memo(({
             handleOpenRequest("","",true);
           }
         }));
-        hasStatusRequestSaved(true, StateEnum.open.name) 
+        
       }
       else {
         handleOpenRequest("", "", true);
@@ -226,7 +228,7 @@ const BottomButtonGroup = React.memo(({
           saveRequestObject.closedate = closingDate;
           saveRequestObject.closereasonid = closingReasonId;
           saveRequest();
-          hasStatusRequestSaved(true, currentSelectedStatus)
+          // hasStatusRequestSaved(true, currentSelectedStatus)
         }
         else if(currentSelectedStatus === StateEnum.callforrecords.name && !isValidationError)
         {
@@ -243,73 +245,73 @@ const BottomButtonGroup = React.memo(({
             saveRequestObject.dueDate = calculatedRequestDueDate;
           }
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }  
         else if(currentSelectedStatus == StateEnum.redirect.name && !isValidationError)
         {        
           saveRequestObject.requeststatusid = StateEnum.redirect.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.open.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.open.id; // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.intakeinprogress.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.review.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.onhold.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.onhold.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.signoff.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.feeassessed.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.consult.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.consult.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.deduplication.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.harms.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.harms.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.response.id;
           saveRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus)
+          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
       }
       else {
