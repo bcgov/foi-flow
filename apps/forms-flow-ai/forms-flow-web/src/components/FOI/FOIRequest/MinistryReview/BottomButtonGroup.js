@@ -43,7 +43,8 @@ const BottomButtonGroup = React.memo(({
   handleSaveRequest,
   currentSelectedStatus,
   hasStatusRequestSaved,
-  attachmentsArray
+  attachmentsArray,
+  stateChanged
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -107,25 +108,26 @@ const BottomButtonGroup = React.memo(({
 
     React.useEffect(() => {
 
-      if (currentSelectedStatus !== "" && !isValidationError){
+      if (stateChanged && currentSelectedStatus !== "" && !isValidationError){
         saveRequestModal();
-      }
+      }     
+    }, [currentSelectedStatus, stateChanged]);
 
+    React.useEffect(() => {
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
       window.addEventListener('beforeunload', alertUser);
-      // window.addEventListener('unload', handleOnHashChange);   
       
       return () => {
         window.removeEventListener('popstate', handleOnHashChange);
         window.removeEventListener('beforeunload', alertUser);
-        // window.removeEventListener('unload', handleOnHashChange);
       }
     });
     
    
     const saveRequestModal =()=>{
-      setsaveModal(true);
+      if (currentSelectedStatus !== saveMinistryRequestObject?.currentState)
+        setsaveModal(true);
     }
 
     const [successCount, setSuccessCount] = useState(0);
@@ -172,22 +174,22 @@ const BottomButtonGroup = React.memo(({
 
     const handleSaveModal = (value, fileInfoList, files) => {
       setsaveModal(false);
-      setFileCount(files.length);
+      setFileCount(files?.length);
       if (value) {
         if(!isValidationError)
         {
-          if (files.length !== 0) {
+          if (files?.length !== 0) {
             dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
               let _documents = [];
               if (!err) {
                 res.map((header, index) => {
-                  const _file = files.find(file => file.name === header.filename);
+                  const _file = files?.find(file => file.name === header.filename);
                   const documentpath = {documentpath: header.filepath, filename: header.filename, category: header.filestatustransition};
                   _documents.push(documentpath);
                   setDocuments(_documents);
-                  dispatch(saveFilesinS3(header, _file, (err, res) => {
+                  dispatch(saveFilesinS3(header, _file, (_err, _res) => {
 
-                    if (res === 200) {
+                    if (_res === 200) {
 
                       setSuccessCount(index+1);
                     }
@@ -205,6 +207,9 @@ const BottomButtonGroup = React.memo(({
             hasStatusRequestSaved(true,currentSelectedStatus)
           }
         }
+      }
+      else {
+        handleSaveRequest(requestState, true, "");
       }
     }
 

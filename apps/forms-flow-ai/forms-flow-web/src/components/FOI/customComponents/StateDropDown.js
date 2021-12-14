@@ -9,7 +9,7 @@ import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 
-export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition}) {
+export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition, updateStateDropDown}) {
 
     const {requestState} = useParams();
 
@@ -20,7 +20,7 @@ export default function StateDropDown({requestStatus, handleStateChange, isMinis
     const [status, setStatus] = React.useState(requestState ? requestState : StateEnum.unopened.name);
     useEffect (() => {
         setStatus(requestState ? requestState : StateEnum.unopened.name);
-    },[requestState])
+    },[requestState, updateStateDropDown])
     
     const handleChange = (event) => {
         setStatus(event.target.value);

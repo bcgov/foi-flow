@@ -68,8 +68,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const handleClose = () => {
-      //handleModal(false);
-      window.location.reload()
+      handleModal(false);
     };
 
     const handleSave = () => {
@@ -151,7 +150,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const addorUpdateConfirmationModal = () => {
-      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase()) {
+      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
         return (
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} /> 
         );

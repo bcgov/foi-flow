@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
-import {push} from "connected-react-router";
 import {saveRequestDetails, openRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
@@ -46,7 +45,8 @@ const BottomButtonGroup = React.memo(({
   handleOpenRequest,
   currentSelectedStatus,
   hasStatusRequestSaved,
-  disableInput
+  disableInput,
+  stateChanged
   }) => {
   /**
    * Bottom Button Group of Review request Page
@@ -121,10 +121,10 @@ const BottomButtonGroup = React.memo(({
 
     const handleOnHashChange = (e) => {       
       returnToQueue(e);
-    };  
+    };
 
     React.useEffect(() => {
-      if(currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId === undefined || ministryId === null || ministryId === ''))
+      if(stateChanged && currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId === undefined || ministryId === null || ministryId === ''))
       {
         saveRequestObject.requeststatusid = StateEnum.open.id;
         if(saveRequestObject.requestType === "general")
@@ -135,32 +135,28 @@ const BottomButtonGroup = React.memo(({
         else if(saveRequestObject.requestType === "personal"){
           saveRequestObject.assignedTo=""
           saveRequestObject.assignedGroup = "Processing Team"
-        }        
+        }
         openRequest();
         hasStatusRequestSaved(true, StateEnum.open.name)
       }
-      else if(currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId !== undefined || ministryId !== null || ministryId !== ''))
+      else if(stateChanged && currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId !== undefined || ministryId !== null || ministryId !== ''))
       {
-        console.log("Entered Open!")
         saveRequestObject.requeststatusid = StateEnum.open.id;        
         saveRequestModal();
       }
-      else if (currentSelectedStatus !== "" && currentSelectedStatus !== undefined && (saveRequestObject.requeststatusid != undefined && saveRequestObject.currentState) && !isValidationError){
+      else if (stateChanged && currentSelectedStatus !== "" && currentSelectedStatus !== undefined && (saveRequestObject.requeststatusid != undefined && saveRequestObject.currentState) && !isValidationError){
         saveRequestModal();
       }
-      
-      
-      
+    }, [currentSelectedStatus, stateChanged]);
 
+    React.useEffect(() => {
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
-      window.addEventListener('beforeunload', alertUser);
-      //window.addEventListener('unload', handleOnHashChange);   
+      window.addEventListener('beforeunload', alertUser);   
       
       return () => {
         window.removeEventListener('popstate', handleOnHashChange);
         window.removeEventListener('beforeunload', alertUser);
-        //window.removeEventListener('unload', handleOnHashChange);
         
       }
     });
@@ -173,10 +169,13 @@ const BottomButtonGroup = React.memo(({
     }
 
     const saveRequestModal =()=>{
-      setsaveModal(true);
+      if (currentSelectedStatus !== saveRequestObject?.currentState)
+        setsaveModal(true);
     }
 
-    const handleModal = (value, fileInfoList) => {
+    const handleModal = (value, fileInfoList) => {     
+      setOpenModal(false);
+      
       if (value) {
         dispatch(openRequestDetails(saveRequestObject, (err, res) => {
           if(!err) {
@@ -214,11 +213,13 @@ const BottomButtonGroup = React.memo(({
           }
         })); 
       }
-      setOpenModal(false);
+      else {
+        handleOpenRequest("", "", true);
+      }      
     }
 
-    const handleSaveModal = (value, fileInfoList) => {      
-      setsaveModal(false);      
+    const handleSaveModal = (value, fileInfoList) => {
+      setsaveModal(false);
       if (value) {
         if(currentSelectedStatus == StateEnum.closed.name && !isValidationError)
         {
@@ -311,6 +312,9 @@ const BottomButtonGroup = React.memo(({
           saveRequest();
           hasStatusRequestSaved(true,currentSelectedStatus)
         }
+      }
+      else {
+        handleSaveRequest(requestState, true, "");
       }
     }
 

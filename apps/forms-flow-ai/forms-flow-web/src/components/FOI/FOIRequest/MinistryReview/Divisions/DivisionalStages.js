@@ -193,7 +193,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                 divisionList!=undefined &&  divisionList.length > stageIterator.length ?
                 <div className="row foi-details-row">
                 <div className="col-lg-7 foi-details-col">
-                    <i class="fa fa-plus-circle fa-3 foi-add" aria-hidden="true"></i>  <a href="#" onClick={addDivisionalStage}>Add division to track</a>
+                    <i className="fa fa-plus-circle fa-3 foi-add" aria-hidden="true"></i>  <a href="#" onClick={addDivisionalStage}>Add division to track</a>
                 </div>
             </div> : <span/>
 
