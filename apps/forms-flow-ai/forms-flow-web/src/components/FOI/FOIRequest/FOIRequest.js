@@ -561,7 +561,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       
       setTimeout(() => 
       {
-        const redirectUrl = getRedirectAfterSaveUrl();
+        const redirectUrl = getRedirectAfterSaveUrl(_state);
         
         if(redirectUrl) {
           window.location.href = redirectUrl
