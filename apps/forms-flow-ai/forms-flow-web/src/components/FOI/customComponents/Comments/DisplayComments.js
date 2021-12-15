@@ -7,7 +7,7 @@ import CommentStructure from './CommentStructure'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList }) => {
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList,setEditorChange, removeComment, setRemoveComment }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
@@ -122,7 +122,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                     edit: true
                   })
                 ) : (
-                  <InputField cancellor={i.commentId} value={i.text} edit fullnameList={fullnameList} />
+                  <InputField cancellor={i.commentId} value={i.text} edit fullnameList={fullnameList} //Handles Navigate Away
+                  setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 )
               ) : (
 
@@ -139,7 +140,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                     edit: false
                   })
                 ) : (
-                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} />
+                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} //Handles Navigate Away
+                  setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 ))}
               <div className="replySection">
                 {
@@ -164,6 +166,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                             edit
                             parentId={i.commentId}
                             fullnameList={fullnameList}
+                            //Handles Navigate Away
+                            setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                           />
                         )
                       ) : (
@@ -191,6 +195,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                             parentId={i.commentId}
                             child
                             fullnameList={fullnameList}
+                            //Handles Navigate Away
+                            setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
                           />
                         ))}
                     </div>

@@ -24,8 +24,11 @@ const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
-const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullnameList }) => {
-  let maxcharacterlimit = 1000  
+const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullnameList,
+  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+  setEditorChange, removeComment, setRemoveComment
+}) => {
+  let maxcharacterlimit = 1000
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
@@ -69,17 +72,22 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     return commentmentions;
   }
 
-  const _handleChange = (editorState) => {    
+  const _handleChange = (editorState) => {
     const currentContent = editorState.getCurrentContent();
-    const rawContentState = convertToRaw(currentContent);    
+    const rawContentState = convertToRaw(currentContent);
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
     let _textLength = maxcharacterlimit - (currentContentLength - selectedTextLength)
-    if(_textLength > 0)
-      {setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))}
-  
+    if (_textLength > 0) 
+    { 
+      setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
+       
+    }
+    
+
     setuftext(currentContent.getPlainText(''))
     setEditorState(editorState);
+    setEditorChange(currentContentLength > 0)
   }
 
   const _getLengthOfSelectedText = () => {
@@ -121,7 +129,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     return length;
   }
 
-  const _handleKeyCommand = (e) => {   
+  const _handleKeyCommand = (e) => {
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -135,7 +143,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     setuftext(currentContent.getPlainText(''))
   }
 
-  const _handleBeforeInput = () => {   
+  const _handleBeforeInput = () => {
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -148,7 +156,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     setuftext(currentContent.getPlainText(''))
   }
 
-  const _handlePastedText = (pastedText) => {    
+  const _handlePastedText = (pastedText) => {
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -164,23 +172,51 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
 
 
   useEffect(() => {
-    if (value !== undefined) {      
+    if (value !== undefined) {
       const contentstate = getEditorState(value)
-      const currentContent = contentstate.getCurrentContent();      
-      setuftext(currentContent.getPlainText(''))      
+      const currentContent = contentstate.getCurrentContent();
+      setuftext(currentContent.getPlainText(''))
       setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
     }
 
   }, [value])
 
-
-  const cancel = (e) => {   
+  //Handles Navigate Away
+  const closeX = () => {
+    setEditorState(EditorState.createEmpty())
     setuftext('')
     edit
       ? actions.handleCancel(cancellor, edit)
       : actions.handleCancel(cancellor)
+  }
 
-    e.preventDefault()
+  //Handles Navigate Away
+  useEffect(() => {
+    if (removeComment) {
+      if (add) {
+        setEditorState(EditorState.createEmpty())
+        setuftext('')
+      }
+      else {
+        closeX();
+      }
+      setRemoveComment(false);
+    }
+  })
+
+  
+
+  const cancel = (e) => {
+    if (uftext) {
+      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
+        closeX();
+        setEditorChange(false);
+      }
+    }
+    else {
+      closeX();
+    }
+    e.preventDefault();
   }
 
   const post = () => {
@@ -193,6 +229,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
         : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
 
       setEditorState(createEditorStateWithText(''))
+      setEditorChange(false)
       setTextLength(1000);
     }
 
@@ -267,7 +304,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
             disabled={uftext.trim().length === 0}
           >
             {' '}
-            <FontAwesomeIcon disabled={uftext.trim().length === 0} icon={faPaperPlane} size='2x' color={ uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'} />
+            <FontAwesomeIcon disabled={uftext.trim().length === 0} icon={faPaperPlane} size='2x' color={uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'} />
           </button>
         </div>
       </div>

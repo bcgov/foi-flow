@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react'
 import AddCommentField from './AddCommentField'
+import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
-const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList }) => {
+const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setEditorChange, removeComment, setRemoveComment }) => {
   
   const [fullnameList, setFullnameList] = useState(getFullnameList());
 
@@ -22,7 +23,7 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList }) =>
 
   const action = useContext(ActionContext)
   return  (
-    fullnameList && fullnameList.length > 0 ? <AddCommentField authorImg={action.userImg} main add={add} fullnameList={fullnameList} /> :null
+    fullnameList && fullnameList.length > 0 ? <InputField authorImg={action.userImg} main add={add} fullnameList={fullnameList} setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} /> :null
   )
 }
 

@@ -100,7 +100,7 @@ class FOIRawRequest(db.Model):
     def getrequests(cls):
         request_schema = FOIRawRequestSchema(many=True)
         _session = db.session
-        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived', 'Closed'])).all()
+        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived'])).all()
         _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedRequestids)).all()
         requests = []
         for _requestid in _requestids:
@@ -142,7 +142,16 @@ class FOIRawRequest(db.Model):
     def getversionforrequest(cls,requestid):   
         print(requestid)
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
-
+    
+    @classmethod
+    def getstatesummary(cls, requestid):                
+        sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
+        where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
+        rs = db.session.execute(text(sql), {'requestid': requestid})
+        transitions = []
+        for row in rs:
+            transitions.append({"status": row["status"], "version": row["version"]})
+        return transitions
 
     @classmethod
     def getstatenavigation(cls, requestid):
