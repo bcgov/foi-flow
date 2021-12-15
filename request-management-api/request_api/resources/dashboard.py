@@ -34,9 +34,9 @@ class Dashboard(Resource):
             ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
             statuscode = 200                        
             if (UserGroup.intake.value() in groups or UserGroup.flex.value() in groups or UserGroup.processing.value() in groups) and (queuetype is None or queuetype == "all"):                                                                                           
-                requestqueue = dashboardservice.getrequestqueue(groups)                                                              
+                requestqueue = dashboardservice().getrequestqueue(groups)                                                              
             elif  queuetype is not None and queuetype == "ministry" and len(ministrygroups) > 0:                                                 
-                requestqueue = dashboardservice.getministryrequestqueue(ministrygroups)                
+                requestqueue = dashboardservice().getministryrequestqueue(ministrygroups)                
             else:
                 if len(ministrygroups) == 0 :
                   statuscode = 401           
