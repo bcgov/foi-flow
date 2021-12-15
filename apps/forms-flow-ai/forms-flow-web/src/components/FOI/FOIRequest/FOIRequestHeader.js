@@ -159,7 +159,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
-                </TextField> XXXXXXXXXXXXXXxx
+                </TextField>
                 </div>
 
                 {showMinistryAssignedTo ? (
