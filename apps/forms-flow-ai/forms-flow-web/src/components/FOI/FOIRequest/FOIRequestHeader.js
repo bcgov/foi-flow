@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
@@ -9,9 +9,8 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining, isMinistryCoordinator } from "../../../helper/FOI/helper";
+import { calculateDaysRemaining } from "../../../helper/FOI/helper";
 import MinistryAssignToDropdown from './MinistryAssignToDropdown';
-import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { Watcher } from '../customComponents'
 
 const useStyles = makeStyles((theme) => ({
@@ -35,8 +34,6 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
      */ 
     const classes = useStyles();
     const {requestId, ministryId} = useParams();
-    const user = useSelector((state) => state.user.userDetail);
-    const dispatch = useDispatch();
 
     let _isMinistryCoordinator = false;
 
@@ -48,16 +45,31 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     React.useEffect(() => {
                 
         let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
-        let _status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
+        let _status = getStatus()
         const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';        
         handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
 
     },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
-   
-    //local state management for assignedTo
-    const assignedTo = requestDetails.assignedTo ? (requestDetails.assignedGroup && requestDetails.assignedGroup !== "Unassigned" ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}` : "|Unassigned") : (requestDetails.assignedGroup ? `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`: "|Unassigned");
-    
-    const [selectedAssignedTo, setAssignedTo] = React.useState(assignedTo);
+
+    const getStatus = () => {
+        if(headerValue) return headerValue
+
+        if(requestDetails.currentState) return requestDetails.currentState
+
+        return StateEnum.unopened.name
+    }
+       
+    const getAssignedTo = () => {
+      if (!requestDetails.assignedGroup || requestDetails === "Unassigned") {
+        return "|Unassigned";
+      }
+
+      return requestDetails.assignedTo
+        ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}`
+        : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
+    };
+
+    const [selectedAssignedTo, setAssignedTo] = React.useState(getAssignedTo);
 
     const getFullName = (lastName, firstName, username) => {
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
@@ -94,10 +106,20 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
         //place holder - do nothing here
     }
 
-    const hearderText = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? FOI_COMPONENT_CONSTANTS.ADD_REQUEST : (!!requestDetails.idNumber && ministryId ? requestDetails.idNumber : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST);
-    const daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
-    const hideDaysRemaining = ministryId && daysRemaining ? false: true;
-    const status = headerValue ? headerValue : (!!requestDetails.currentState ? requestDetails.currentState: StateEnum.unopened.name);
+    const getHeaderText = () => {
+        if(window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDREQUEST)) {
+            return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
+        }
+        
+        if(requestDetails.idNumber && ministryId) {
+            return requestDetails.idNumber;
+        }
+
+        return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    }
+
+    const hearderText = getHeaderText();
+    const status = getStatus();
     const showMinistryAssignedTo = status.toLowerCase()===StateEnum.callforrecords.name.toLowerCase() || status.toLowerCase()===StateEnum.closed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
                                         || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
@@ -137,7 +159,7 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
                     error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
                 >            
                     {getMenuItems()}
-                </TextField> 
+                </TextField> XXXXXXXXXXXXXXxx
                 </div>
 
                 {showMinistryAssignedTo ? (
