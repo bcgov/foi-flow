@@ -234,7 +234,6 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
       lastIndex = attachment.filename.lastIndexOf(".");
       setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
       setDisabled(isMinistryCoordinator && attachment.category == 'personal')
-      console.log(attachment)
     }
   }, [attachment])
 
