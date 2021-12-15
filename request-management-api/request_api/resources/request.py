@@ -153,7 +153,7 @@ class FOIRawRequests(Resource):
                     attachment['file'] = base64.b64decode(attachment['base64data'])
                     attachment.pop('base64data')
 
-                    attachmentObj = documentservice().uploadToS3(attachment)
+                    attachmentObj = documentservice().uploadtos3(attachment)
                     attachmentList.append(attachmentObj)
                 
                 documentschema = CreateDocumentSchema().load({'documents': attachmentList})

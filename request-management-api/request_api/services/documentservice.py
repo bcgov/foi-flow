@@ -133,7 +133,7 @@ class documentservice:
         return self.createrawrequestdocument(requestid, {"documents": documentarr}, None)
       
     @classmethod  
-    def uploadToS3(self, attachment):
+    def uploadtos3(self, attachment):
         # print(attachment)
 
         #get S3 auth
