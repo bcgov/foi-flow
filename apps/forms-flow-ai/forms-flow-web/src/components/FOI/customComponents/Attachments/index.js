@@ -234,19 +234,20 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
       lastIndex = attachment.filename.lastIndexOf(".");
       setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
       setDisabled(isMinistryCoordinator && attachment.category == 'personal')
+      console.log(attachment)
     }
   }, [attachment])
 
   const getCategory = (category) => {
     switch(category) {
       case "cfr-review":
-        return "cfr > review";
+        return "cfr - review";
       case "cfr-feeassessed":
-        return "cfr > fee estimate";
+        return "cfr - fee estimate";
       case "signoff-response":
         return "signoff > response";
       case "harms-review":
-        return "harms assessment > review";
+        return "harms assessment - review";
       case "personal":
         return "personal";
       default:
