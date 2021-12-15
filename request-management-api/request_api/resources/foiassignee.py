@@ -36,7 +36,7 @@ TRACER = Tracer.get_instance()
 @API.route('/foiassignees/<requestype>/<status>')
 @API.route('/foiassignees/<requestype>/<status>/<bcgovcode>')
 class FOIAssigneesByTypeAndStatus(Resource):
-    """Resource for managing FOI requests."""
+    """Resource for retriving FOI assignees based on status."""
 
     @staticmethod
     @TRACER.trace()
@@ -46,7 +46,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
         if requestype is not None and (requestype != "personal" and requestype != "general"):
             return {'status': False, 'message':'Bad Request'}, 400   
         try:
-            result = assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status, bcgovcode)
+            result = assigneeservice().getgroupsandmembersbytypeandstatus(requestype, status, bcgovcode)
             if result is not None:
                 return json.dumps(result), 200
             else:
@@ -58,7 +58,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiassignees/group/<groupname>')
 class FOIAssigneesByTypeAndStatus(Resource):
-    """Resource for managing FOI requests."""
+    """esource for retriving FOI assignees based on group."""
 
     @staticmethod
     @TRACER.trace()
@@ -67,7 +67,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
     def get(groupname):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            result = assigneeservice().getMembersByGroupName(groupname)
+            result = assigneeservice().getmembersbygrouname(groupname)
             if result is not None:
                 return json.dumps(result), 200
             else:

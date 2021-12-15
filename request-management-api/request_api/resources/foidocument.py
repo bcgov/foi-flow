@@ -49,8 +49,6 @@ class GetFOIDocument(Resource):
         try:
             result = documentservice().getrequestdocuments(requestid, requesttype)
             return json.dumps(result), 200
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -76,8 +74,6 @@ class CreateFOIDocument(Resource):
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -102,8 +98,6 @@ class RenameFOIDocument(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -127,8 +121,6 @@ class ReplaceFOIDocument(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -149,8 +141,6 @@ class DeleteFOIDocument(Resource):
         try:
             result = documentservice().deleterequestdocument(requestid, documentid, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
