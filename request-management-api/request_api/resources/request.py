@@ -21,10 +21,8 @@ from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedOrigins
-from request_api.exceptions import BusinessException, Error
+from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
-from request_api.services.dashboardservice import dashboardservice
-from request_api.services.external.bpmservice import bpmservice
 import json
 import uuid
 from jose import jwt as josejwt
@@ -37,6 +35,7 @@ with open('request_api/schemas/schemas/rawrequest.json') as f:
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
 class FOIRawRequest(Resource):
+    """Consolidates create and retrival of raw request"""
 
     @staticmethod
     @TRACER.trace()
@@ -61,21 +60,9 @@ class FOIRawRequest(Resource):
     @auth.require
     def post(requestid=None):
         try :                        
-            updaterequest = request.get_json()
-                        
+            updaterequest = request.get_json()                        
             if int(requestid) and str(requestid) != "-1" :
-                status = 'Intake in Progress' 
-                
-                try:
-                    #TODO:Need to refine this logic from ENUM
-                    if(updaterequest["requeststatusid"] is not None and updaterequest["requeststatusid"] == 4):                    
-                        status = 'Redirect'
-
-                    if(updaterequest["requeststatusid"] is not None and updaterequest["requeststatusid"] == 3):                    
-                        status = 'Closed'    
-                except  KeyError:
-                    print("Key Error on requeststatusid, ignore will be intake in Progress")    
-                
+                status = rawrequestservice().getstatus(updaterequest["requeststatusid"])
                 rawrequest = rawrequestservice.getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
@@ -90,11 +77,12 @@ class FOIRawRequest(Resource):
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-
+        
 @cors_preflight('GET,POST,PUT,OPTIONS')
 @API.route('/foirawrequestbpm/addwfinstanceid/<_requestid>')
 class FOIRawRequestBPMProcess(Resource):
-
+    """Updates raw request"""
+    
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
@@ -120,9 +108,8 @@ class FOIRawRequestBPMProcess(Resource):
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequests')
 class FOIRawRequests(Resource):
-    """Resource for managing FOI Raw requests."""
-    
-    
+    """Resource for retriving all raw requests."""
+     
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
