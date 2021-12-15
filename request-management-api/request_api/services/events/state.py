@@ -53,8 +53,16 @@ class stateevent:
     def __formatstate(self, state):
         return "Open" if state == "Archived" else state
 
+    @classmethod
+    def __formatstate(self, state):
+        return "Open" if state == "Archived" else state    
+        
+    @classmethod            
     def __commentmessage(self, state):
         return  AuthHelper.getUserName()+' changed the state of the request to '+self.__formatstate(state)
-
+    
+    @classmethod   
+    def __notificationmessage(self, state):
+        return  'Moved to '+state+ ' state'
         
             
