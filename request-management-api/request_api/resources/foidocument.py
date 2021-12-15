@@ -47,7 +47,7 @@ class GetFOIDocument(Resource):
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
             return {'status': False, 'message':'Bad Request'}, 400          
         try:
-            result = documentservice().getrequestdocuments(requestid, requesttype)
+            result = documentservice().getrequestdocumentsbyrole(requestid, requesttype, AuthHelper.isMinistryMember())
             return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500

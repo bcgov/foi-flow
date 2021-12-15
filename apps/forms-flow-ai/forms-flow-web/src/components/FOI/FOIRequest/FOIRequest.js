@@ -758,7 +758,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
                   requestNumber={requestNumber} requestState={requestState}
-                  iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+                  iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} isMinistryCoordinator={false} />
                 </> : <Loading />
             }
           </div> 
