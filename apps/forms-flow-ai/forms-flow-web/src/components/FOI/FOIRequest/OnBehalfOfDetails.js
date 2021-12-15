@@ -13,27 +13,40 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
      *  On Behalf of details box in the UI
      *  No mandatory fields here
      */ 
+
+       const getFirstName = (request) =>{
+        return !!request.anotherFirstName ? request.anotherFirstName : "";
+       }
+       const getMiddleName = (request) =>{
+        return !!request.anotherMiddleName ? request.anotherMiddleName : "";
+       }
+       const getLastName =(request) =>{
+        return !!request.anotherLastName ? request.anotherLastName : "";
+       }
+       const getNickName = (request) =>{
+        return !!request.anotherAlsoKnownAs ? request.anotherAlsoKnownAs : "";
+       }
+       const getDOB = (request) =>{
+        return !!request.anotherBirthDate ? formatDate(request.anotherBirthDate) : "";
+       }
+
+
       const validateFields = (request, name) => {
         if (request !== undefined) {
-          if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME) {
-            return !!request.anotherFirstName ? request.anotherFirstName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME) {
-            return !!request.anotherMiddleName ? request.anotherMiddleName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME) {
-            return !!request.anotherLastName ? request.anotherLastName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME) {
-            return !!request.anotherAlsoKnownAs ? request.anotherAlsoKnownAs : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_DOB) {
-            return !!request.anotherBirthDate ? formatDate(request.anotherBirthDate) : "";
-          }
+          switch(name){
+            case (FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME):
+              return getFirstName(request);
+            case (FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME):
+              return getMiddleName(request);
+            case (FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME):
+              return getLastName(request);
+            case (FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME):
+              return getNickName(request);
+            case (FOI_COMPONENT_CONSTANTS.ANOTHER_DOB):
+              return getDOB(request);
+         }
         }
-        else {
-          return "";
-        }
+        return "";
       }
 
     //local states for Another person FirstName, MiddleName, LastName, NickName and DOB

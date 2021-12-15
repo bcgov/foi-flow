@@ -13,28 +13,39 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
      *  Child details box in the UI
      *  No mandatory fields here
      */ 
+
+     const getFirstName = (request) =>{
+      return !!request.childFirstName ? request.childFirstName : "";
+     }
+     const getMiddleName = (request) =>{
+      return !!request.childMiddleName ? request.childMiddleName : "";
+     }
+     const getLastName =(request) =>{
+      return !!request.childLastName ? request.childLastName : "";
+     }
+     const getNickName = (request) =>{
+      return !!request.childAlsoKnownAs ? request.childAlsoKnownAs : "";
+     }
+     const getDOB = (request) =>{
+      return !!request.childBirthDate ? formatDate(request.childBirthDate) : "";
+     }
     
       const validateFields = (request, name) => {
         if (request !== undefined) {
-          if (name === FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME) {
-            return !!request.childFirstName ? request.childFirstName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME) {
-            return !!request.childMiddleName ? request.childMiddleName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME) {
-            return !!request.childLastName ? request.childLastName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME) {
-            return !!request.childAlsoKnownAs ? request.childAlsoKnownAs : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_DOB) {
-            return !!request.childBirthDate ? formatDate(request.childBirthDate) : "";
+          switch(name){
+            case (FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME):
+              return getFirstName(request);
+            case (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME):
+              return getMiddleName(request);
+            case (FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME):
+              return getLastName(request);
+            case (FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME):
+              return getNickName(request);
+            case (FOI_COMPONENT_CONSTANTS.CHILD_DOB):
+              return getDOB(request);
           }
         }
-        else {
-          return "";
-        }
+        return "";
       }
 
     //local states for Child FirstName, MiddleName, LastName, NickName and DOB

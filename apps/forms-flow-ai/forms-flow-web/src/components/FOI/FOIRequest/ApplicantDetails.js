@@ -16,31 +16,43 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
 
     //gets the category list master data
     const category = useSelector(state=> state.foiRequests.foiCategoryList);
-    
+    const getFirstName = (request) =>{
+        return request.firstName? requestDetails.firstName: "";
+    }
+    const getMiddleName = (request) =>{
+        return request.middleName? requestDetails.middleName: ""
+    }
+    const getLastName =(request) =>{
+        return request.lastName? requestDetails.lastName: ""
+    }
+    const getBusinessName = (request) =>{
+        return request.businessName? requestDetails.businessName: ""
+    }
+    const getEmail = (request) =>{
+        return request.email? requestDetails.email: ""
+    }
+    const getCategory = () =>{
+        return requestDetails.category !== undefined? requestDetails.category:"Select Category";
+    }
+
     const validateFields = (request, name) => {
         if (request !== undefined) {
-            if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {
-              return request.firstName? requestDetails.firstName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {
-                return request.middleName? requestDetails.middleName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
-                return request.lastName? requestDetails.lastName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
-                return request.businessName? requestDetails.businessName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
-                return request.email? requestDetails.email: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
-              return requestDetails.category !== undefined? requestDetails.category:"Select Category";
-            }            
-          }
-          else {
-            return "";
-          }
+            switch(name){
+                case(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME):
+                    return getFirstName(request);
+                case(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME):
+                    return getMiddleName(request);
+                case(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME):
+                    return getLastName(request);
+                case(FOI_COMPONENT_CONSTANTS.ORGANIZATION):
+                    return getBusinessName(request);
+                case(FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL):
+                    return getEmail(request);
+                case(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY):
+                    return getCategory();
+            }     
+        }
+        return "";
     }
     //state management of Applicant FirstName, MiddleName, LastName, Organization, Email and Category
     const [applicantFirstNameText, setApplicantFirstName] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME));
