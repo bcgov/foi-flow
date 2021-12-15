@@ -23,7 +23,7 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
 
   const action = useContext(ActionContext)
   return  (
-    fullnameList && fullnameList.length > 0 ? <InputField authorImg={action.userImg} main add={add} fullnameList={fullnameList} setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} /> :null
+    fullnameList && fullnameList.length > 0 ? <AddCommentField authorImg={action.userImg} main add={add} fullnameList={fullnameList} setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} /> :null
   )
 }
 

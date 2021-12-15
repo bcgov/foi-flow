@@ -77,8 +77,8 @@ const FOIRequest = React.memo(({userDetail}) => {
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   const [comment, setComment] = useState([]);
 
-  //quillChange and removeComment added to handle Navigate away from Comments tabs
-  const [quillChange, setEditorChange] = useState(false);
+  //editorChange and removeComment added to handle Navigate away from Comments tabs
+  const [editorChange, setEditorChange] = useState(false);
   const [removeComment, setRemoveComment] = useState(false);
 
   const [attachments, setAttachments] = useState(requestAttachments);
@@ -605,7 +605,7 @@ const FOIRequest = React.memo(({userDetail}) => {
    */
   //Below function will handle beforeunload event
   const alertUser = e => {
-    if (quillChange) {     
+    if (editorChange) {     
       e.returnValue = '';
       e.preventDefault();
     }
@@ -629,7 +629,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const tabclick = (evt, param) => {
     let clickedOk = true;
-    if (quillChange && param !== 'Comments') {
+    if (editorChange && param !== 'Comments') {
       if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
         clickedOk = true;
         setEditorChange(false);

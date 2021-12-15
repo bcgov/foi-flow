@@ -78,8 +78,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
   const [comment, setComment] = useState([]);
 
-  //quillChange and removeComment added to handle Navigate away from Comments tabs
-  const [quillChange, setEditorChange] = useState(false);
+  //editorChange and removeComment added to handle Navigate away from Comments tabs
+  const [editorChange, setEditorChange] = useState(false);
   const [removeComment, setRemoveComment] = useState(false);
 
   const [attachments, setAttachments] = useState(requestAttachments);
@@ -236,7 +236,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
    */
   //Below function will handle beforeunload event
   const alertUser = e => {
-    if (quillChange) {     
+    if (editorChange) {     
       e.returnValue = '';
       e.preventDefault();
     }
@@ -260,7 +260,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const tabclick = (evt, param) => {
     let clickedOk = true;
-    if (quillChange && param !== 'Comments') {
+    if (editorChange && param !== 'Comments') {
       if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
         clickedOk = true;
         setEditorChange(false);

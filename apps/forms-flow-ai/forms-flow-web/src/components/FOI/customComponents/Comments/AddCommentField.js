@@ -24,7 +24,8 @@ const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
-const AddCommentField = ({ cancellor, parentId, add, fullnameList }) => {
+const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+  setEditorChange, removeComment, setRemoveComment }) => {
   let maxcharacterlimit = 1000  
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
@@ -71,6 +72,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList }) => {
   
     setuftext(currentContent.getPlainText(''))
     setEditorState(editorState);
+    setEditorChange(currentContentLength > 0)
   }
 
   const _getLengthOfSelectedText = () => {
@@ -160,10 +162,24 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList }) => {
       setFOILoader(true)    
       actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
       setEditorState(createEditorStateWithText(''))
+      setEditorChange(false)
       setTextLength(1000);
     }
 
   }
+
+
+  //Handles Navigate Away
+  useEffect(() => {
+    if (removeComment) {
+      if (add) {
+        setEditorState(EditorState.createEmpty())
+        setuftext('')
+      }
+      
+      setRemoveComment(false);
+    }
+  })
 
   let formclass = !parentId ? "parentform form" : "form"
   formclass = add ? `${formclass} addform` : formclass

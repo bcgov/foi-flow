@@ -36,6 +36,7 @@ class EditFOIRawRequestCommentSchema(Schema):
 
         unknown = EXCLUDE    
     comment = fields.Str(data_key="comment")
+    taggedusers = fields.Str(data_key="taggedusers")
 
 
 
@@ -45,4 +46,5 @@ class EditFOIMinistryRequestCommentSchema(Schema):
 
         unknown = EXCLUDE    
     comment = fields.Str(data_key="comment")
+    taggedusers = fields.Str(data_key="taggedusers")
     
