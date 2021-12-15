@@ -227,11 +227,13 @@ export const AttachmentSection = ({
 const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
 
   const [filename, setFilename] = useState("");
+  const [disabled, setDisabled] = useState(isMinistryCoordinator && attachment.category == 'personal');
   let lastIndex = 0;
   useEffect(() => {
     if(attachment && attachment.filename) {
       lastIndex = attachment.filename.lastIndexOf(".");
       setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
+      setDisabled(isMinistryCoordinator && attachment.category == 'personal')
     }
   }, [attachment])
 
@@ -258,27 +260,27 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
         <div className="row foi-details-row">
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
-              <div className={`attachment-name ${isMinistryCoordinator? "attachment-disabled":""}`}>
+              <div className={`attachment-name ${disabled? "attachment-disabled":""}`}>
                 {attachment.filename}
               </div>
               <div className="attachment-badge">
-                <span class={`badge ${isMinistryCoordinator? "badge-secondary":"badge-primary"}`}>{getCategory(attachment.category)}</span>
+                <span class={`badge ${disabled? "badge-secondary":"badge-primary"}`}>{getCategory(attachment.category)}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
               <div className="col-sm-1" style={{marginLeft:'auto'}}>
-                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick} disabled={isMinistryCoordinator} />
+                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick} disabled={disabled} />
               </div>                      
             </div>
           </div>
         </div>
         <div className="row foi-details-row">
-          <div className={`col-sm-12 foi-details-col attachment-time ${isMinistryCoordinator? "attachment-disabled":""}`}>                      
+          <div className={`col-sm-12 foi-details-col attachment-time ${disabled? "attachment-disabled":""}`}>                      
             {attachment.created_at}
           </div>
         </div>
         <div className="row foi-details-row">
-          <div className={`col-sm-12 foi-details-col attachment-owner ${isMinistryCoordinator? "attachment-disabled":""}`}>                      
+          <div className={`col-sm-12 foi-details-col attachment-owner ${disabled? "attachment-disabled":""}`}>                      
             {getFullname(attachment.createdby)}
           </div>
         </div>
