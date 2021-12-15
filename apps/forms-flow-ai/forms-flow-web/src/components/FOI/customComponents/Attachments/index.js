@@ -318,6 +318,18 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
     handlePopupButtonClick("delete", attachment);
   };
 
+  const transitionStates = [
+    "statetransition",
+    StateTransitionCategories.cfrreview.name,
+    StateTransitionCategories.cfrfeeassessed.name,
+    StateTransitionCategories.signoffresponse.name,
+    StateTransitionCategories.harmsreview.name
+  ];
+
+  const showReplace = (category) => {
+    return transitionStates.includes(category.toLowerCase());
+  }
+
   return (
     <Popup
       role='tooltip'
@@ -341,7 +353,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
           Rename
         </button>
         {attachment.category === "personal"?"":
-          (attachment.category==="statetransition" || attachment.category===StateTransitionCategories.cfrreview.name || attachment.category===StateTransitionCategories.cfrfeeassessed.name || attachment.category===StateTransitionCategories.signoffresponse.name || attachment.category===StateTransitionCategories.harmsreview.name )?
+          showReplace(attachment.category)?
             <button className="childActionsBtn" onClick={handleReplace}>
               Replace
             </button>
