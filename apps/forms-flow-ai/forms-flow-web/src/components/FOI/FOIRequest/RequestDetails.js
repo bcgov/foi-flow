@@ -24,8 +24,16 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.requestType ? request.requestType : "Select Request Type";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
+          if(request.receivedMode) {
+            return request.receivedMode;
+          }
+
           const source = requestDetails.sourceOfSubmission ? requestDetails.sourceOfSubmission : "";
-          return !!request.receivedMode ? request.receivedMode : source === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.replace(/\s/g, '').toLowerCase() ? FOI_COMPONENT_CONSTANTS.ONLINE_FORM : "Select Received Mode";
+          if(source === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.replace(/\s/g, '').toLowerCase()) {
+            return FOI_COMPONENT_CONSTANTS.ONLINE_FORM;
+          }
+
+          return "Select Received Mode";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
           return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
@@ -34,17 +42,30 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
           return !!request.receivedDateUF ? request.receivedDateUF : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-                 
-          return startDate && startDate >= formatDate(value)  ? startDate : value ? value : "";
+          
+          if(startDate && startDate >= formatDate(value)) {
+            return startDate
+          }
+
+          return value || "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DUE_DATE) {
-          return request.dueDate ?  request.dueDate : value ? dueDateCalculation(value) : "";
+          if(request.dueDate) {
+            return request.dueDate
+          }
+
+          if(value) {
+            return dueDateCalculation(value);
+          }
+
+          return "";
         }
       }
       else {
         return "";
       }
     }
+
     //get the RequestType, ReceivedMode and DeliveryMode master data
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
@@ -76,15 +97,27 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
   },[requestDetails, handleRequestDetailsInitialValue])
 
-    //local state management for received date and start date
-    let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
-    receivedDate = calculateReceivedDate(receivedDate);
-    receivedDate = receivedDate ? formatDate(receivedDate): "";
-    let processStartDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
-    processStartDate = processStartDate ? formatDate(processStartDate): "";
+    const getReceivedDateForLocalState = () => {
+      let receivedDate = validateFields(
+        requestDetails,
+        FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF
+      );
+      receivedDate = calculateReceivedDate(receivedDate);
+      receivedDate = receivedDate ? formatDate(receivedDate) : "";
+      return receivedDate;
+    }
 
-    const [receivedDateText, setReceivedDate] = React.useState(receivedDate);
-    const [startDateText, setStartDate] = React.useState(processStartDate);
+    const getProcessStartDateForLocalState = () => {
+      let processStartDate = validateFields(
+        requestDetails,
+        FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE,
+        getReceivedDateForLocalState()
+      );
+      processStartDate = processStartDate ? formatDate(processStartDate) : "";
+      return processStartDate;
+    }
+    const [receivedDateText, setReceivedDate] = React.useState(getReceivedDateForLocalState);
+    const [startDateText, setStartDate] = React.useState(getProcessStartDateForLocalState);
     
 
     //due date calculation
@@ -92,7 +125,7 @@ const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, h
       return dateText? addBusinessDays(dateText, 30) : "";
     }    
 
-    const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, processStartDate));
+    const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
     const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
