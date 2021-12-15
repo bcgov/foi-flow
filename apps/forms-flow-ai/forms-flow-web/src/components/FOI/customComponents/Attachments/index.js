@@ -20,7 +20,8 @@ export const AttachmentSection = ({
   ministryId,
   bcgovcode,
   iaoassignedToList,
-  ministryAssignedToList
+  ministryAssignedToList,
+  isMinistryCoordinator
 }) => {
   const [attachments, setAttachments] = useState(attachmentsArray)
   const [iaoList, setIaoList] = useState(iaoassignedToList)
@@ -199,7 +200,7 @@ export const AttachmentSection = ({
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} handlePopupButtonClick={handlePopupButtonClick} getFullname={getFullname} />);
+    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} handlePopupButtonClick={handlePopupButtonClick} getFullname={getFullname} isMinistryCoordinator={isMinistryCoordinator} />);
   }
   
   return (
@@ -223,29 +224,27 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}) => {
+const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
 
   const [filename, setFilename] = useState("");
-  const [disabled, setDisabled] = useState(attachment.category == 'personal');
   let lastIndex = 0;
   useEffect(() => {
     if(attachment && attachment.filename) {
       lastIndex = attachment.filename.lastIndexOf(".");
       setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
-      setDisabled(attachment.category == 'personal');
     }
   }, [attachment])
 
   const getCategory = (category) => {
     switch(category) {
       case "cfr-review":
-        return "cfr - review";
+        return "cfr > review";
       case "cfr-feeassessed":
-        return "cfr - fee estimate";
+        return "cfr > fee estimate";
       case "signoff-response":
-        return "signoff - response";
+        return "signoff > response";
       case "harms-review":
-        return "harms assessment - review";
+        return "harms assessment > review";
       case "personal":
         return "personal";
       default:
@@ -259,27 +258,27 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
         <div className="row foi-details-row">
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
-              <div className="attachment-name">
+              <div className={`attachment-name ${isMinistryCoordinator? "attachment-disabled":""}`}>
                 {attachment.filename}
               </div>
               <div className="attachment-badge">
-                <span class="badge badge-primary">{getCategory(attachment.category)}</span>
+                <span class={`badge ${isMinistryCoordinator? "badge-secondary":"badge-primary"}`}>{getCategory(attachment.category)}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
               <div className="col-sm-1" style={{marginLeft:'auto'}}>
-                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick} disabled={disabled} />
+                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick} disabled={isMinistryCoordinator} />
               </div>                      
             </div>
           </div>
         </div>
         <div className="row foi-details-row">
-          <div className="col-sm-12 foi-details-col attachment-time">                      
+          <div className={`col-sm-12 foi-details-col attachment-time ${isMinistryCoordinator? "attachment-disabled":""}`}>                      
             {attachment.created_at}
           </div>
         </div>
         <div className="row foi-details-row">
-          <div className="col-sm-12 foi-details-col attachment-owner">                      
+          <div className={`col-sm-12 foi-details-col attachment-owner ${isMinistryCoordinator? "attachment-disabled":""}`}>                      
             {getFullname(attachment.createdby)}
           </div>
         </div>

@@ -29,6 +29,16 @@ class documentservice:
         else:
             documents = FOIRawRequestDocument.getdocuments(requestid, requestversion)
             return self.formatcreateddateforall(documents)
+
+    @classmethod    
+    def getrequestdocumentsbyrole(self, requestid, requesttype, isministrymember):
+        documents = self.getrequestdocuments(requestid, requesttype)
+        if isministrymember:
+            for document in documents:
+                if document["category"] == "personal":
+                    document["documentpath"] = ""
+        
+        return documents
             
     @classmethod    
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
