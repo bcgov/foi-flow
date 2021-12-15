@@ -1,7 +1,9 @@
 
 from os import stat
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
-import json
+from request_api.utils.enums import UserGroup
+
+
 class assigneeservice:
     """ FOI Assignee management service
 
@@ -9,25 +11,25 @@ class assigneeservice:
 
     """
     
-    def getGroupsAndMembersByTypeAndStatus(self, requesttype, status, bcgovcode=None):
+    def getgroupsandmembersbytypeandstatus(self, requesttype, status, bcgovcode=None):
         if requesttype is None and status is None:
-           return KeycloakAdminService().getgroupsandmembers(self.getgroupsbytype(requesttype, bcgovcode)) 
+           return KeycloakAdminService().getgroupsandmembers(self.__getgroupsbytype(requesttype, bcgovcode)) 
         else:
             if status is None:
                 return self.getgroupsandmembersbytype(requesttype,bcgovcode)
             else:
-                filteredgroups = self.getgroups(requesttype, status, bcgovcode)
+                filteredgroups = self.__getgroups(requesttype, status, bcgovcode)
                 if filteredgroups is not None:
                     return KeycloakAdminService().getgroupsandmembers(filteredgroups)
             return None
             
-    def getMembersByGroupName(self, groupname):
+    def getmembersbygroupname(self, groupname):
         return KeycloakAdminService().getgroupsandmembers([groupname]) 
     
     def getgroupsandmembersbytype(self, requesttype,bcgovcode):  
         groups = []
-        groupmappings = self.getgroupmappings(requesttype,bcgovcode)
-        groupmembers = KeycloakAdminService().getgroupsandmembers(self.getgroups(requesttype, bcgovcode))   
+        groupmappings = self.__getgroupmappings(requesttype,bcgovcode)
+        groupmembers = KeycloakAdminService().getgroupsandmembers(self.__getgroups(requesttype, bcgovcode))   
         for groupmapping in groupmappings:
             groupentry = {}
             groupentry["status"] = groupmapping["status"]
@@ -39,91 +41,91 @@ class assigneeservice:
             groups.append(groupentry)    
         return groups    
 
-    def getgroups(self,requesttype, status=None, bcgovcode=None):
+    def __getgroups(self,requesttype, status=None, bcgovcode=None):
         if status is None:
-            return self.getgroupsbytype(requesttype, bcgovcode)
+            return self.__getgroupsbytype(requesttype, bcgovcode)
         else:
-            for groupmapping in self.getgroupmappings(requesttype, bcgovcode):
-                if self.formatinput(groupmapping.get("status")) == status: 
+            for groupmapping in self.__getgroupmappings(requesttype, bcgovcode):
+                if self.__formatinput(groupmapping.get("status")) == status: 
                     return groupmapping.get("groups")
                 
              
-    def getgroupsbytype(self, requesttype=None, bcgovcode=None):
+    def __getgroupsbytype(self, requesttype=None, bcgovcode=None):
         groups = []
-        for groupmapping in self.getgroupmappings(requesttype, bcgovcode):
+        for groupmapping in self.__getgroupmappings(requesttype, bcgovcode):
             for group in groupmapping["groups"]:
                     if group not in groups :
                         groups.append(group)
         return groups
             
-    def getgroupmappings(self, requesttype, bcgovcode=None):
+    def __getgroupmappings(self, requesttype, bcgovcode=None):
         if requesttype is None:
-            return self.personalgroupmappings(bcgovcode) + self.generalgroupmappings(bcgovcode)
+            return self.__personalgroupmappings(bcgovcode) + self.__generalgroupmappings(bcgovcode)
         else:
             if requesttype == "personal":
-                return self.personalgroupmappings(bcgovcode)
+                return self.__personalgroupmappings(bcgovcode)
             else:
-                return self.generalgroupmappings(bcgovcode)
+                return self.__generalgroupmappings(bcgovcode)
    
-    def formatinput(self, input):
-        input = input.lower()
-        input = input.replace(' ', '')
-        return input
+    def __formatinput(self, input):
+        return input.lower().replace(' ', '')
         
-    def generalgroupmappings(self, bcgovcode=None):  
+    def __generalgroupmappings(self, bcgovcode=None):  
         groups = []      
-        allgroups = [{"status":"Unopened", "groups":["Intake Team"]},
-                {"status":"Intake In Progress","groups":["Intake Team"]},
-                {"status":"Open","groups":["Intake Team","Flex Team"]},
-                {"status":"Closed","groups":["Intake Team","Flex Team"]},
-                {"status":"Call For Records","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Fee Estimate","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Deduplication","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"On Hold","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Harms Assessment","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Records Review","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Consult","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Ministry Sign Off","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Response","groups":["Intake Team","Flex Team","@bcgovcode Ministry Team"]},
-                {"status":"Redirect","groups":["Intake Team","Flex Team"]},
+        allgroups = [{"status":"Unopened", "groups":[UserGroup.intake.value()]},
+                {"status":"Intake In Progress","groups":[UserGroup.intake.value()]},
+                {"status":"Open","groups":[UserGroup.intake.value(),UserGroup.flex.value()]},
+                {"status":"Closed","groups":[UserGroup.intake.value(),UserGroup.flex.value()]},
+                {"status":"Call For Records","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Fee Estimate","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Deduplication","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"On Hold","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Harms Assessment","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Records Review","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Consult","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Ministry Sign Off","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Response","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
+                {"status":"Redirect","groups":[UserGroup.intake.value(),UserGroup.flex.value()]},
             ]
         
         for entry in allgroups:
-            groups.append({"status": entry["status"], "groups": self.formatgroups(entry["groups"], bcgovcode)})
+            groups.append({"status": entry["status"], "groups": self.__formatgroups(entry["groups"], bcgovcode)})
         
         return groups
       
        
-    def personalgroupmappings(self, bcgovcode=None):        
+    def __personalgroupmappings(self, bcgovcode=None):        
         groups = []      
-        allgroups =  [{"status":"Unopened", "groups":["Intake Team"]},
-                {"status":"Intake In Progress","groups":["Intake Team"]},
-                {"status":"Open","groups":["Intake Team","Processing Team"]},
-                {"status":"Closed","groups":["Intake Team","Processing Team"]},
-                {"status":"Call For Records","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Fee Estimate","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Deduplication","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"On Hold","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Harms Assessment","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Records Review","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Consult","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Ministry Sign Off","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Response","groups":["Intake Team","Processing Team","@bcgovcode Ministry Team"]},
-                {"status":"Redirect","groups":["Intake Team","Processing Team"]},
+        allgroups =  [{"status":"Unopened", "groups":[UserGroup.intake.value()]},
+                {"status":"Intake In Progress","groups":[UserGroup.intake.value()]},
+                {"status":"Open","groups":[UserGroup.intake.value(),UserGroup.processing.value()]},
+                {"status":"Closed","groups":[UserGroup.intake.value(),UserGroup.processing.value()]},
+                {"status":"Call For Records","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Fee Estimate","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Deduplication","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"On Hold","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Harms Assessment","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Records Review","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Consult","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Ministry Sign Off","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Response","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
+                {"status":"Redirect","groups":[UserGroup.intake.value(),UserGroup.processing.value()]},
             ]
         for entry in allgroups:
-            groups.append({"status": entry["status"], "groups": self.formatgroups(entry["groups"], bcgovcode)})
+            groups.append({"status": entry["status"], "groups": self.__formatgroups(entry["groups"], bcgovcode)})
         
         return groups
         
-    def formatgroups(self, groups, bcgovcode):
+    def __formatgroups(self, groups, bcgovcode):
         formattedgroups = []
         for group in groups:
-            formattedgroup = group if group.find('@bcgovcode') == -1 else self.getministrygroupname(group, bcgovcode)
+            formattedgroup = group if group.find('@bcgovcode') == -1 else self.__getministrygroupname(group, bcgovcode)
             if formattedgroup is not None:
                 formattedgroups.append(formattedgroup)    
         return formattedgroups
     
-    def getministrygroupname(self, group, bcgovcode):
+    def __getministrygroupname(self, group, bcgovcode):
         return group.replace('@bcgovcode', bcgovcode) if bcgovcode is not None else None
                   
+         
+    
