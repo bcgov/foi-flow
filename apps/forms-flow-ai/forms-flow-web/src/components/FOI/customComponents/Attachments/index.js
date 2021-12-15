@@ -340,14 +340,15 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
         <button className="childActionsBtn" onClick={handleRename}>
           Rename
         </button>
-        {(attachment.category==="statetransition" || attachment.category===StateTransitionCategories.cfrreview.name || attachment.category===StateTransitionCategories.cfrfeeassessed.name || attachment.category===StateTransitionCategories.signoffresponse.name || attachment.category===StateTransitionCategories.harmsreview.name )?
-          <button className="childActionsBtn" onClick={handleReplace}>
-            Replace
-          </button>
-          :
-          <button className="childActionsBtn" onClick={handleDelete}>
-            Delete
-          </button>
+        {attachment.category === "personal"?"":
+          (attachment.category==="statetransition" || attachment.category===StateTransitionCategories.cfrreview.name || attachment.category===StateTransitionCategories.cfrfeeassessed.name || attachment.category===StateTransitionCategories.signoffresponse.name || attachment.category===StateTransitionCategories.harmsreview.name )?
+            <button className="childActionsBtn" onClick={handleReplace}>
+              Replace
+            </button>
+            :
+            <button className="childActionsBtn" onClick={handleDelete}>
+              Delete
+            </button>
         }
       </div>
     </Popup>
