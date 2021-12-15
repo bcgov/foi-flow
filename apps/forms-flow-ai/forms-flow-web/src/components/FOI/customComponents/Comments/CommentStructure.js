@@ -49,8 +49,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const getHtmlfromRawContent = () => {
     let markup = null
-    if (i.commentTypeId === 1) {
-      console.log(i.text)
+    if (i.commentTypeId === 1) {     
       const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
       let initialEditorState = EditorState.createWithContent(rawContentFromStore);
 

@@ -4,8 +4,8 @@ import { ActionContext } from './ActionContext'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList }) => {
-
-  const [fullnameList, setFullnameList] = useState(getFullnameList);
+  
+  const [fullnameList, setFullnameList] = useState(getFullnameList());
 
   if (!fullnameList) {
     if (iaoassignedToList.length > 0) {
@@ -21,15 +21,8 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList }) =>
 
 
   const action = useContext(ActionContext)
-  return action.customInput ? (
-    action.customInput({
-      authorImg: action.userImg,
-      main: true,
-      handleCancel: action.handleCancel,
-      submit: action.submit
-    })
-  ) : (
-    <AddCommentField authorImg={action.userImg} main add={add} fullnameList={fullnameList} />
+  return  (
+    fullnameList && fullnameList.length > 0 ? <AddCommentField authorImg={action.userImg} main add={add} fullnameList={fullnameList} /> :null
   )
 }
 
