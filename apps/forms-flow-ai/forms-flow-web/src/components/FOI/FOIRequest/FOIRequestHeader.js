@@ -26,39 +26,52 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssignedToInitialValue, handleAssignedToValue, createSaveRequestObject, handlestatusudpate, userDetail, disableInput}) => {
-   
-     /**
+const FOIRequestHeader = React.memo(
+  ({
+    headerValue,
+    requestDetails,
+    handleAssignedToInitialValue,
+    handleAssignedToValue,
+    createSaveRequestObject,
+    handlestatusudpate,
+    userDetail,
+    disableInput,
+  }) => {
+    /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
-     */ 
+     */
     const classes = useStyles();
-    const {requestId, ministryId} = useParams();
+    const { requestId, ministryId } = useParams();
 
     let _isMinistryCoordinator = false;
 
     //get the assignedTo master data
-    const assignedToList = useSelector(state=> state.foiRequests.foiAssignedToList);
-    const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
-    
+    const assignedToList = useSelector(
+      (state) => state.foiRequests.foiAssignedToList
+    );
+    const ministryAssignedToList = useSelector(
+      (state) => state.foiRequests.foiMinistryAssignedToList
+    );
+
     //handle default value for the validation of required fields
     React.useEffect(() => {
-                
-        let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
-        let _status = getStatus()
-        const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate): '';        
-        handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
-
-    },[requestDetails, handleAssignedToInitialValue, handlestatusudpate])
+      let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
+      let _status = getStatus();
+      const _cfrDaysRemaining = requestDetails.cfrDueDate
+        ? calculateDaysRemaining(requestDetails.cfrDueDate)
+        : "";
+      handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
+    }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
 
     const getStatus = () => {
-        if(headerValue) return headerValue
+      if (headerValue) return headerValue;
 
-        if(requestDetails.currentState) return requestDetails.currentState
+      if (requestDetails.currentState) return requestDetails.currentState;
 
-        return StateEnum.unopened.name
-    }
-       
+      return StateEnum.unopened.name;
+    };
+
     const getAssignedTo = () => {
       if (!requestDetails.assignedGroup || requestDetails === "Unassigned") {
         return "|Unassigned";
@@ -72,104 +85,165 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const [selectedAssignedTo, setAssignedTo] = React.useState(getAssignedTo);
 
     const getFullName = (lastName, firstName, username) => {
-         return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
-    }
-    
-    //creates the grouped menu items for assignedTo combobox    
+      return firstName !== "" ? `${lastName}, ${firstName}` : username;
+    };
+
+    //creates the grouped menu items for assignedTo combobox
     const getMenuItems = () => {
-        var menuItems = [];
-        var i = 1;
-        menuItems.push(<MenuItem className={classes.group} key={0} value={'|'}>{}</MenuItem>);
-        menuItems.push(<MenuItem key={0} className={classes.item} value={selectedAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
-        if (assignedToList && assignedToList.length > 0) {
-            for (var group of assignedToList) {
-                menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`}>{group.name}</MenuItem>);
-                for (var assignee of group.members) {
-                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} >{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
-                }
-            }
-        }
+      var menuItems = [];
+      menuItems.push(
+        <MenuItem className={classes.group} key={0} value={"|"}>
+          {}
+        </MenuItem>
+      );
+      menuItems.push(
+        <MenuItem
+          key={0}
+          className={classes.item}
+          value={selectedAssignedTo}
+          disabled={true}
+        >
+          {"Unassigned"}
+        </MenuItem>
+      );
+      
+      if (assignedToList && assignedToList.length < 1) {
         return menuItems;
-    }
-    
+      }
+
+      assignedToList.forEach(group => {
+          const groupItem = (
+            <MenuItem
+              className={classes.group}
+              key={group.id}
+              value={`${group.name}|${group.name}`}
+            >
+              {group.name}
+            </MenuItem>
+          );
+          menuItems.push(groupItem)
+
+          const assigneeItems = group.members.map((assignee) => (
+            <MenuItem
+              key={`${assignee.id}`}
+              className={classes.item}
+              value={`${group.name}|${assignee.username}`}
+            >
+              {getFullName(
+                assignee.lastname,
+                assignee.firstname,
+                assignee.username
+              )}
+            </MenuItem>
+          ));
+
+          menuItems.concat(assigneeItems)
+      })
+
+      return menuItems;
+    };
+
     const preventDefault = (event) => event.preventDefault();
-    
+
     //handle onChange event for assigned To
     const handleAssignedToOnChange = (event) => {
-        setAssignedTo(event.target.value);
-        //event bubble up - to validate required fields
-        handleAssignedToValue(event.target.value);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, event.target.value, event.target.name);        
-    }
+      setAssignedTo(event.target.value);
+      //event bubble up - to validate required fields
+      handleAssignedToValue(event.target.value);
+      createSaveRequestObject(
+        FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+        event.target.value,
+        event.target.name
+      );
+    };
 
     const handleMinistryAssignedToValue = (value) => {
-        //place holder - do nothing here
-    }
+      //place holder - do nothing here
+    };
 
     const getHeaderText = () => {
-        if(window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDREQUEST)) {
-            return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
-        }
-        
-        if(requestDetails.idNumber && ministryId) {
-            return requestDetails.idNumber;
-        }
+      if (window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDREQUEST)) {
+        return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
+      }
 
-        return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
-    }
+      if (requestDetails.idNumber && ministryId) {
+        return requestDetails.idNumber;
+      }
+
+      return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    };
 
     const hearderText = getHeaderText();
     const status = getStatus();
-    const showMinistryAssignedTo = status.toLowerCase()===StateEnum.callforrecords.name.toLowerCase() || status.toLowerCase()===StateEnum.closed.name.toLowerCase()
-                                        || status.toLowerCase()===StateEnum.review.name.toLowerCase() || status.toLowerCase()===StateEnum.feeassessed.name.toLowerCase()
-                                        || status.toLowerCase()===StateEnum.consult.name.toLowerCase() || status.toLowerCase()===StateEnum.signoff.name.toLowerCase()
-                                        || status.toLowerCase()===StateEnum.onhold.name.toLowerCase() || status.toLowerCase()===StateEnum.response.name.toLowerCase();
+    const showMinistryAssignedTo =
+      status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.closed.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.review.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.consult.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.signoff.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.onhold.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.response.name.toLowerCase();
 
     return (
-        <div className="foi-request-review-header-row1">
-            <div className="foi-request-review-header-col1">
-                <div className="foi-request-review-header-col1-row">
-                    <Link href="#" onClick={preventDefault}>
-                        <h3 className="foi-review-request-text">{hearderText}</h3>
-                    </Link>
-                </div>
-                { window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 ?
-                <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                   
-                    <Watcher watcherFullList={assignedToList} requestId={requestId} ministryId={ministryId} userDetail={userDetail} disableInput={disableInput} />
-                   
-                </div>
-                : null}
+      <div className="foi-request-review-header-row1">
+        <div className="foi-request-review-header-col1">
+          <div className="foi-request-review-header-col1-row">
+            <Link href="#" onClick={preventDefault}>
+              <h3 className="foi-review-request-text">{hearderText}</h3>
+            </Link>
+          </div>
+          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 && (
+            <div
+              className="foi-request-review-header-col1-row"
+              style={{ marginTop: 5 + "px", display: "block" }}
+            >
+              <Watcher
+                watcherFullList={assignedToList}
+                requestId={requestId}
+                ministryId={ministryId}
+                userDetail={userDetail}
+                disableInput={disableInput}
+              />
             </div>
-            
-            <div className="foi-assigned-to-container">
-                <div className="foi-assigned-to-inner-container">
-                <TextField
-                    id="assignedTo"
-                    label={showMinistryAssignedTo?"IAO Assigned To":"Assigned To"}
-                    InputLabelProps={{ shrink: true, }}          
-                    select
-                    value={selectedAssignedTo}
-                    onChange={handleAssignedToOnChange}
-                    input={<Input />} 
-                    variant="outlined"
-                    fullWidth
-                    required
-                    disabled = {disableInput}
-                    error={selectedAssignedTo.toLowerCase().includes("unassigned")}                    
-                >            
-                    {getMenuItems()}
-                </TextField>
-                </div>
-
-                {showMinistryAssignedTo ? (
-                    <>
-                      <MinistryAssignToDropdown requestDetails={requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createSaveRequestObject} isMinistryCoordinator={_isMinistryCoordinator} />
-                    </>
-                ) : null}
-            </div>
+          )}
         </div>
+
+        <div className="foi-assigned-to-container">
+          <div className="foi-assigned-to-inner-container">
+            <TextField
+              id="assignedTo"
+              label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+              InputLabelProps={{ shrink: true }}
+              select
+              value={selectedAssignedTo}
+              onChange={handleAssignedToOnChange}
+              input={<Input />}
+              variant="outlined"
+              fullWidth
+              required
+              disabled={disableInput}
+              error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+            >
+              {getMenuItems()}
+            </TextField>
+          </div>
+
+          {showMinistryAssignedTo && (
+            <>
+              <MinistryAssignToDropdown
+                requestDetails={requestDetails}
+                ministryAssignedToList={ministryAssignedToList}
+                handleMinistryAssignedToValue={handleMinistryAssignedToValue}
+                createSaveRequestObject={createSaveRequestObject}
+                isMinistryCoordinator={_isMinistryCoordinator}
+              />
+            </>
+          )}
+        </div>
+      </div>
     );
-  });
+  }
+);
 
 export default FOIRequestHeader;
