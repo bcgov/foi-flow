@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import './comments.scss'
 import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
-import SignField from './SignField'
 import Input from './Input'
 
 export const CommentSection = ({
@@ -19,7 +18,7 @@ export const CommentSection = ({
   ministryAssignedToList,
   requestNumber,
   //Handles Navigate Away
-  setQuillChange,
+  setEditorChange,
   removeComment,
   setRemoveComment
 }) => {
@@ -37,8 +36,6 @@ export const CommentSection = ({
     var _filterValue = parseInt(e.target.value) 
     setfilterValue(_filterValue)       
     setcomments([])
-    
-
   }
  
   return (
@@ -52,7 +49,7 @@ export const CommentSection = ({
       requestid={requestid}
       ministryId={ministryId}
       //Handles Navigate Away
-      setQuillChange={setQuillChange}
+      setEditorChange={setEditorChange}
       removeComment={removeComment}
       setRemoveComment={setRemoveComment}
     >
@@ -66,9 +63,8 @@ export const CommentSection = ({
         </div>
 
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
-        {<Input add="add" 
-        //Handles Navigate Away
-        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />}
+          {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}/>}
         </div>
         <div className="displayComments">
           <div className="filterComments" >
@@ -81,7 +77,7 @@ export const CommentSection = ({
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
           //Handles Navigate Away
-          setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
 
       </div>

@@ -23,14 +23,14 @@ class commentservice:
     
     
     @classmethod    
-    def createministryrequestcomment(self, data, userid, type=1):
+    def createministryrequestcomment(self, data, userid, type=1,taggedusers=None):
         version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
-        return FOIRequestComment.savecomment(type, data, version, userid) 
+        return FOIRequestComment.savecomment(type, data, version, userid,taggedusers=taggedusers) 
 
     @classmethod    
-    def createrawrequestcomment(self, data, userid, type=1):
+    def createrawrequestcomment(self, data, userid, type=1,taggedusers=None):
         version = FOIRawRequest.getversionforrequest(data["requestid"])    
-        return FOIRawRequestComment.savecomment(type, data, version, userid) 
+        return FOIRawRequestComment.savecomment(type, data, version, userid,taggedusers=taggedusers) 
     
     @classmethod    
     def disableministryrequestcomment(self, commentid, userid):
@@ -41,12 +41,12 @@ class commentservice:
         return FOIRawRequestComment.disablecomment(commentid, userid)     
         
     @classmethod    
-    def updateministryrequestcomment(self, commentid, data, userid):
-        return FOIRequestComment.updatecomment(commentid, data, userid) 
+    def updateministryrequestcomment(self, commentid, data, userid,taggedusers=None):
+        return FOIRequestComment.updatecomment(commentid, data, userid,taggedusers=taggedusers) 
 
     @classmethod    
-    def updaterawrequestcomment(self, commentid, data, userid):
-        return FOIRawRequestComment.updatecomment(commentid, data, userid)          
+    def updaterawrequestcomment(self, commentid, data, userid,taggedusers=None):
+        return FOIRawRequestComment.updatecomment(commentid, data, userid,taggedusers=taggedusers)          
         
     @classmethod    
     def getministryrequestcomments(self, ministryrequestid):
@@ -62,13 +62,13 @@ class commentservice:
 
     @classmethod    
     def copyrequestcomment(self, ministryrequestid, comments, userid):
-        _comments = []        
-        for comment in comments:
-            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF']) 
+        _comments = []                
+        for comment in comments:            
+            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF'],comment['taggedusers']) 
             _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
                 for reply in comment['replies']:
-                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
+                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'],reply['taggedusers'])      
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
         return _comments
     
@@ -91,7 +91,7 @@ class commentservice:
         return {
             "ministryrequestid": ministryrequestid,
             "comment": entry['text'],
-            "parentcommentid":parentcommentid
+            "parentcommentid":parentcommentid            
         }
     
     @classmethod  
@@ -126,5 +126,6 @@ class commentservice:
                 "dateUF":comment["created_at"],
                 "date":  commentcreatedDate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
-                "commentTypeId":comment['commenttypeid']
+                "commentTypeId":comment['commenttypeid'],
+                "taggedusers" : comment['taggedusers']              
         }     
