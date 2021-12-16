@@ -9,6 +9,7 @@ import { convertToRaw, convertFromRaw, convertFromHTML, ContentState, EditorStat
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
+import {namesort,suggestionList } from './commentutils'
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
 import {
   ItalicButton,
@@ -33,12 +34,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
 
-  let fulluserlist = [...fullnameList]
-  fulluserlist.forEach(ful => {
-    ful.name = ful.fullname;
-  })
-
-  const mentionList = fulluserlist.sort()
+  let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
+  const mentionList = fulluserlist;
 
   const [suggestions, setSuggestions] = useState(mentionList);
 
@@ -48,7 +45,10 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
 
   // Check editor text for mentions
   const onSearchChange = ({ value }) => {
-    setSuggestions(defaultSuggestionsFilter(value, mentionList))
+    var filterlist = mentionList.filter(function(item){
+      return (item.firstname.indexOf(value.toLowerCase()) === 0 || item.lastname.indexOf(value.toLowerCase()) === 0)
+    }).sort(namesort)    
+    setSuggestions(defaultSuggestionsFilter(value, filterlist))
   }
 
   const getEditorState = (value) => {

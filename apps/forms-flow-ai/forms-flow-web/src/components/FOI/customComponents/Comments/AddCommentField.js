@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
-import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
+import { convertToRaw, EditorState } from "draft-js";
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
@@ -18,6 +18,8 @@ import {
   OrderedListButton,
 
 } from '@draft-js-plugins/buttons';
+import {namesort,suggestionList } from './commentutils'
+
 
 const staticToolbarPlugin = createToolbarPlugin();
 const mentionPlugin = createMentionPlugin();
@@ -30,11 +32,9 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditor
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
-  let fulluserlist = [...fullnameList]
-  fulluserlist.forEach(ful => {
-    ful.name = ful.fullname;
-  })
-  const mentionList = fulluserlist.sort()
+  
+  let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
+  const mentionList = fulluserlist;
   const [suggestions, setSuggestions] = useState(mentionList);
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
@@ -44,7 +44,10 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditor
 
   // Check editor text for mentions
   const onSearchChange = ({ value }) => {
-    setSuggestions(defaultSuggestionsFilter(value, mentionList))
+    var filterlist = mentionList.filter(function(item){
+      return (item.firstname.indexOf(value.toLowerCase()) === 0 || item.lastname.indexOf(value.toLowerCase()) === 0)
+    }).sort(namesort)    
+    setSuggestions(defaultSuggestionsFilter(value, filterlist))
   }
 
   const getMentionsOnComment = () => {
