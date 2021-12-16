@@ -35,7 +35,6 @@ from .foirequest import API as FOIREQUEST_API
 from .foiflowmasterdata import API as FOIFLOWMASTERDATA_API
 from .dashboard import API as DASHBOARD_API
 from .foiassignee import API as FOIASSIGNEE_API
-from .foiaction import API as FOIACTION_API
 from .foiaudit import API as FOIAUDTI_API
 from .foiwatcher import API as FOIWATCHER_API
 from .foicomment import API as FOICOMMENT_API
