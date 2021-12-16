@@ -542,3 +542,14 @@ button.bc4rxid {
     -webkit-text-decoration: none;
     text-decoration: none;
 }
+
+strong {
+  font-family: "BCSans-Bold"!important;
+}
+
+span[style="font-weight: bold;"] > span  {
+  font-family: "BCSans-Bold"!important;
+}
+span[style="font-weight: bold;"] > *  {
+  font-family: "BCSans-Bold"!important;
+}
