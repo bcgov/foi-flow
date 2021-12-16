@@ -76,5 +76,3 @@ class UserGroup(Enum):
     processing = "Processing Team"
     ministry = "@bcgovcode Ministry Team" 
     
-class FOIStatus(Enum):
-    

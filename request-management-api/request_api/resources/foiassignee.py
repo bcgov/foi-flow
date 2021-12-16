@@ -67,7 +67,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
     def get(groupname):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            result = assigneeservice().getmembersbygrouname(groupname)
+            result = assigneeservice().getmembersbygroupname(groupname)
             if result is not None:
                 return json.dumps(result), 200
             else:
