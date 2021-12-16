@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
 import json
@@ -39,7 +39,7 @@ class FOIRawRequest(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())       
+    @cross_origin(origins=allowedorigins())       
     @auth.require
     def get(requestid=None):
         try : 
@@ -56,7 +56,7 @@ class FOIRawRequest(Resource):
 
     @staticmethod
     #@Tracer.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post(requestid=None):
         try :                        
@@ -66,12 +66,12 @@ class FOIRawRequest(Resource):
                 rawrequest = rawrequestservice.getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getUserId())                
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid())                
                 if result.success == True:   
                     rawrequestservice().postEventToWorkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getUserId())               
+                result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getuserid())               
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -85,7 +85,7 @@ class FOIRawRequestBPMProcess(Resource):
     
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def put(_requestid=None):
             request_json = request.get_json()
@@ -95,7 +95,7 @@ class FOIRawRequestBPMProcess(Resource):
                 status = request_json['status'] if request_json.get('status') is not None else 'Unopened'
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
-                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getUserId())
+                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getuserid())
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200
                 else:
@@ -112,7 +112,7 @@ class FOIRawRequests(Resource):
      
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""

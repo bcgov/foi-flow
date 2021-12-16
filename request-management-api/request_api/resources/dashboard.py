@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedOrigins,getrequiredmemberships
+from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins,getrequiredmemberships
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, UserGroup
 from request_api.auth import auth
 from request_api.tracer import Tracer
@@ -23,7 +23,7 @@ class Dashboard(Resource):
     """
     @staticmethod
     @TRACER.trace()    
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @cors_preflight('GET,POST,OPTIONS') 
     @auth.ismemberofgroups(getrequiredmemberships())

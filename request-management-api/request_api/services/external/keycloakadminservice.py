@@ -93,9 +93,7 @@ class KeycloakAdminService:
         }  
     
     def formatgroupname(self,input):
-        input = input.lower()
-        input = input.replace(' ', '')
-        return input  
+        return input.lower().replace(' ', '')  
         
     def getcachename(self,groupname):
         return "kc_"+groupname.replace(' ','').lower()+"_cache"

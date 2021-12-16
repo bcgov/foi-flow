@@ -21,7 +21,7 @@ from request_api.auth import auth
 
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.programareaservice import programareaservice
@@ -47,7 +47,7 @@ class FOIFlowApplicantCategories(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())      
+    @cross_origin(origins=allowedorigins())      
     @auth.require
     @request_api.cache.cached(key_prefix="applicantcategories")
     def get():
@@ -66,7 +66,7 @@ class FOIFlowProgramAreas(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())      
+    @cross_origin(origins=allowedorigins())      
     @auth.require
     @request_api.cache.cached(key_prefix="programareas")
     def get():
@@ -84,7 +84,7 @@ class FOIFlowDeliveryModes(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())       
+    @cross_origin(origins=allowedorigins())       
     @auth.require
     @request_api.cache.cached(key_prefix="deliverymodes")
     def get():
@@ -102,7 +102,7 @@ class FOIFlowReceivedModes(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())       
+    @cross_origin(origins=allowedorigins())       
     @auth.require
     @request_api.cache.cached(key_prefix="receivedmodes")
     def get():
@@ -120,7 +120,7 @@ class FOIFlowDivisions(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())       
+    @cross_origin(origins=allowedorigins())       
     @auth.require
     def get(bcgovcode):
         try:
@@ -137,7 +137,7 @@ class FOIFlowCloseReasons(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())       
+    @cross_origin(origins=allowedorigins())       
     @auth.require
     @request_api.cache.cached(key_prefix="closereasons")
     def get():
@@ -155,7 +155,7 @@ class FOIFlowDocumentStorage(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())       
+    @cross_origin(origins=allowedorigins())       
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
     def post():

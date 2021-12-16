@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedOrigins
+from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.auditservice import auditservice
 import json
@@ -37,23 +37,17 @@ class FOIAuditByField(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def get(type, id, field):
         """ GET Method for auditing of FOI request field"""
         
-        if type is None or id is None or field is None:
-                return {'status': False, 'message':'Bad Request'}, 400
-        if type is not None:
-            if type != "rawrequest" and type != "ministryrequest":
-                return {'status': False, 'message':'Bad Request'}, 400
-        if field is not None:
-            if field != "description" :
-                return {'status': False, 'message':'Bad Request'}, 400  
-         
+        if (type is None or id is None or field is None) or ((type is not None and type != "rawrequest" and type != "ministryrequest") or (field is not None and field != "description")):
+            return {'status': False, 'message':'Bad Request'}, 400
+
         try:
-            isAll = False if request.url.endswith('summary') else True      
-            result = auditservice().getAuditforField(type, id, field, getgroupsfromtoken(),isAll)
+            isall = False if request.url.endswith('summary') else True      
+            result = auditservice().getauditforfield(type, id, field, getgroupsfromtoken(),isall)
             if result is not None:
                 return {"audit": result}, 200
             else:

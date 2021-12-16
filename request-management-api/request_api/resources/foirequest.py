@@ -21,7 +21,7 @@ from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins, getrequiredmemberships,getgroupsfromtoken
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,getgroupsfromtoken
 from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
@@ -44,7 +44,7 @@ class FOIRequest(Resource):
     
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
     def get(foirequestid,foiministryrequestid,usertype = None):
@@ -76,7 +76,7 @@ class FOIRequests(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post():
         """ POST Method for capturing FOI requests before processing"""
@@ -85,13 +85,13 @@ class FOIRequests(Resource):
             foirequestschema = FOIRequestWrapperSchema().load(request_json)       
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
-            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getUserId())               
+            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid())               
             if rawresult.success == True:   
-                result = requestservice().saverequest(foirequestschema,AuthHelper.getUserId())
+                result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:
-                    requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getUserId())
-                    requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getUserId())
-                    requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getUserId())
+                    requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
+                    requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
+                    requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().postopeneventtoworkflow(result.identifier, rawresult.args[0],request_json,result.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
@@ -108,14 +108,14 @@ class FOIRequestsById(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()            
             foirequestschema = FOIRequestWrapperSchema().load(request_json)                                    
-            result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getUserId())
+            result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 eventservice().postevent(foiministryrequestid,"ministryrequest")
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
@@ -137,7 +137,7 @@ class FOIRequestsByIdAndType(Resource):
 
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post(foirequestid,foiministryrequestid,usertype):
         """ POST Method for capturing FOI requests before processing"""
@@ -146,7 +146,7 @@ class FOIRequestsByIdAndType(Resource):
                 return {'status': False, 'message':'Bad Request'}, 400   
             request_json = request.get_json()    
             ministryrequestschema = FOIRequestMinistrySchema().load(request_json)    
-            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getUserId(), usertype)
+            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid, result.args[1], ministryrequestschema, json.loads(metadata),"ministry")
@@ -168,14 +168,14 @@ class FOIRequestUpdateById(Resource):
         
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def put(foirequestid):
         """ PUT Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
             foirequestschema = EditableFOIRequestWrapperSchema().load(request_json)
-            result = requestservice().updaterequest(foirequestschema, foirequestid,AuthHelper.getUserId())
+            result = requestservice().updaterequest(foirequestschema, foirequestid,AuthHelper.getuserid())
             if result != {}:
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
             else:
