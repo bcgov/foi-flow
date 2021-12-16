@@ -814,8 +814,8 @@ const FOIRequest = React.memo(({userDetail}) => {
             <StateDropDown updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
-        <div className="tab">          
-          <div 
+        <div className="tab">
+          <div
             className={clsx("tablinks", {
               "active": tabLinksStatuses.Request.active
             })}
@@ -988,7 +988,14 @@ const FOIRequest = React.memo(({userDetail}) => {
 
           
               </div> 
-          <div id="Option4" className="tabcontent">
+          <div 
+            id="Option4" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Option4.active,
+              [classes.displayed]: tabLinksStatuses.Option4.display,
+              [classes.hidden]: !tabLinksStatuses.Option4.display,
+            })}
+          >
            <h3>Option 4</h3>
           </div>        
         </div>

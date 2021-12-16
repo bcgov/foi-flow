@@ -28,6 +28,7 @@ import {CommentSection} from '../../customComponents/Comments';
 import {AttachmentSection} from '../../customComponents/Attachments';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../../containers/Loading";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,6 +80,33 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   //quillChange and removeComment added to handle Navigate away from Comments tabs
   const [quillChange, setQuillChange] = useState(false);
+
+  const initialStatuses = {
+    Request: {
+      display: false,
+      active: false,
+    },
+    Comments: {
+      display: false,
+      active: false,
+    },
+    Attachments: {
+      display: false,
+      active: false,
+    },
+    Option4: {
+      display: false,
+      active: false,
+    },
+  };
+
+  const [tabLinksStatuses, setTabLinksStatuses] = useState({
+    ...initialStatuses,
+    Request: {
+      display: true,
+      active: true,
+    },
+  });
   const [removeComment, setRemoveComment] = useState(false);
 
   const [attachments, setAttachments] = useState(requestAttachments);
@@ -267,46 +295,52 @@ const MinistryReview = React.memo(({ userDetail }) => {
   });
 
   const tabclick = (evt, param) => {
-    let clickedOk = true;
-    if (quillChange && param !== 'Comments') {
-      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-        clickedOk = true;
-        setQuillChange(false);
-        setRemoveComment(true);
-      }
-      else {
-        setQuillChange(true);
-        setRemoveComment(false);
-        clickedOk = false;
-        param = 'Comments';
-        document.getElementById(param).className += " active";
-        const elementsByName = document.getElementsByName(param);
-        var i;
-        for (i = 0; i < elementsByName.length; i++) {          
-            elementsByName[i].className += " active";        
-        }
-      }
-    }
-    else {
+    if (param === "Comments") {
       setRemoveComment(false);
-    }
-    var i, tabcontent, tablinks;
-
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+      changeTabLinkStatuses(param);
+      return;
     }
 
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    if (quillChange) {
+      confirmChangesLost(
+        () => {
+          setQuillChange(false);
+          setRemoveComment(true);
+          changeTabLinkStatuses(param);
+        },
+        () => {
+          setQuillChange(true);
+          setRemoveComment(false);
+        }
+      );
+    } else {
+      changeTabLinkStatuses(param);
     }
-    document.getElementById(param).style.display = "block";
-    if (clickedOk)
-      evt.currentTarget.className += " active";
-    
+
   }
+
+  const changeTabLinkStatuses = (param) => {
+    setTabLinksStatuses({
+      ...initialStatuses,
+      [param]: {
+        ...tabLinksStatuses[param],
+        active: true,
+        display: true,
+      },
+    });
+  };
+
+  const confirmChangesLost = (positiveCallback, negativeCallback) => {
+    if (
+      window.confirm(
+        "Are you sure you want to leave? Your changes will be lost."
+      )
+    ) {
+      positiveCallback();
+    } else {
+      negativeCallback();
+    }
+  };
 
   const pubmindivstagestomain = (divstages) => {
 
@@ -343,10 +377,46 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div>
           
         <div className="tab">
-          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
-          <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>Attachments{requestAttachments && requestAttachments.length > 0 ? ` (${requestAttachments.length})`: ''}</div>
-          <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}</div>
-          <div className="tablinks" name="Option4" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
+          <div
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Request.active
+            })}
+            name="Request" 
+            onClick={() => tabclick('Request')}>
+              Request
+          </div>
+          <div
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Attachments.active
+            })}
+            name="Attachments" 
+            onClick={() => tabclick('Attachments')}
+          >
+            Attachments{
+              requestAttachments && requestAttachments.length > 0 
+              ? ` (${requestAttachments.length})`
+              : ''
+            }
+          </div> 
+          <div 
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Comments.active
+            })}
+            name="Comments" 
+            onClick={() => tabclick('Comments')}
+            >
+            Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}
+          </div>
+          <div 
+            className="tablinks" 
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Option4.active
+            })}
+            name="Option4" 
+            onClick={() => tabclick('Option4')}
+          >
+            Option 4
+          </div>
         </div>
         
         <div className="foileftpanelstatus">
@@ -362,7 +432,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
      
         </div>
         <div className="foitabpanelcollection">
-          <div id="Request" className="tabcontent active">
+          <div 
+            id="Request" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Request.active,
+              [classes.displayed]: tabLinksStatuses.Request.display,
+              [classes.hidden]: !tabLinksStatuses.Request.display,
+            })}
+          >
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -381,8 +458,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 </form>
               </div>
             </div>
-          </div> 
-          <div id="Attachments" className="tabcontent">
+          </div>  
+          <div 
+            id="Attachments" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Attachments.active,
+              [classes.displayed]: tabLinksStatuses.Attachments.display,
+              [classes.hidden]: !tabLinksStatuses.Attachments.display,
+            })}
+          >
             {
              !isAttachmentListLoading && iaoassignedToList && iaoassignedToList.length > 0 && ministryAssignedToList && ministryAssignedToList.length > 0 ?
                 <>
@@ -393,7 +477,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 </> : <Loading />
             }
           </div> 
-          <div id="Comments" className="tabcontent">
+          <div 
+            id="Comments" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Comments.active,
+              [classes.displayed]: tabLinksStatuses.Comments.display,
+              [classes.hidden]: !tabLinksStatuses.Comments.display,
+            })}
+          >
             {
              !isLoading && requestNotes && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
                 <>
@@ -405,8 +496,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
                     setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 </> : <Loading />}
           </div>
-          <div id="Option3" className="tabcontent">
-            <h3>Option 3</h3>
+          <div 
+            id="Option4" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Option4.active,
+              [classes.displayed]: tabLinksStatuses.Option4.display,
+              [classes.hidden]: !tabLinksStatuses.Option4.display,
+            })}
+          >
+            <h3>Option 4</h3>
           </div>
         </div>
       </div>
