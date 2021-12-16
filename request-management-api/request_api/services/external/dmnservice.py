@@ -14,48 +14,45 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 class dmnservice(camundaservice):
     
  
-    @classmethod
-    def evaluateAction(self, requestType, status, token=None):
+    def evaluateAction(self, requesttype, status, token=None):
         if self.bpmEngineRestUrl is not None:
-            dataSchema = VariableMessageSchema().dump({ 
+            dataschema = VariableMessageSchema().dump({ 
                                               "variables":{
-                                                  "category": VariableSchema().dump({"type" : VariableType.String.value, "value": requestType}),
+                                                  "category": VariableSchema().dump({"type" : VariableType.String.value, "value": requesttype}),
                                                   "status": VariableSchema().dump({"type" : VariableType.String.value, "value": status})
                                                   }
                                               })
-            response = requests.post(self._getUrl_(self, BusinessRuleType.stateTransition.value), data=json.dumps(dataSchema), headers = self._getHeaders_(self,token))
+            response = requests.post(self._getUrl_(self, BusinessRuleType.stateTransition.value), data=json.dumps(dataschema), headers = self._getHeaders_(self,token))
             content =  response.content.decode('utf-8')
             if response.status_code == 200 and content != "[]":  
                 result = json.loads(content)             
-                return self.responseFormatter(self,result[0]["output"]["value"])
+                return self.__responseformatter(result[0]["output"]["value"])
             else:
                 return None
-        return
     
      
         
-    @classmethod
-    def evaluateGroup(self, requestType, status, token=None):
+    def evaluateGroup(self, requesttype, status, token=None):
         if self.bpmEngineRestUrl is not None:
-            dataSchema = VariableMessageSchema().dump({ 
+            dataschema = VariableMessageSchema().dump({ 
                                               "variables":{
-                                                  "category": VariableSchema().dump({"type" : VariableType.String.value, "value": requestType}),
+                                                  "category": VariableSchema().dump({"type" : VariableType.String.value, "value": requesttype}),
                                                   "status": VariableSchema().dump({"type" : VariableType.String.value, "value": status})
                                                   }
                                               })
-            return requests.post(self._getUrl_(self, BusinessRuleType.groupMapping.value), data=json.dumps(dataSchema), headers = self._getHeaders_(self,token))
+            return requests.post(self._getUrl_(self, BusinessRuleType.groupMapping.value), data=json.dumps(dataschema), headers = self._getHeaders_(self,token))
         else:
             return
 
 
-    def _getUrl_(self, ruleType, skip = True):
+    def _getUrl_(self, ruletype, skip = True):
         if skip == False:
-             return self.bpmEngineRestUrl+"/decision-definition/key/"+ruleType+"/xml"
+             return self.bpmEngineRestUrl+"/decision-definition/key/"+ruletype+"/xml"
         else:
-            return self.bpmEngineRestUrl+"/decision-definition/key/"+ruleType+"/evaluate"
+            return self.bpmEngineRestUrl+"/decision-definition/key/"+ruletype+"/evaluate"
     
     
-    def responseFormatter(self, data):
+    def __responseformatter(self, data):
         return data.replace("\n","").replace('"','').replace("'",'"')
     
 class BusinessRuleType(Enum):

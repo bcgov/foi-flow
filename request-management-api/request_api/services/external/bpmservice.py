@@ -16,7 +16,6 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 class bpmservice(camundaservice):
     
      
-    @classmethod
     def unopenedevent(self,processinstanceid, userid, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
@@ -30,7 +29,6 @@ class bpmservice(camundaservice):
             return
 
 
-    @classmethod
     def unopenedcomplete(self,processinstanceid, data, messagetype, token=None): 
         if self.bpmEngineRestUrl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
@@ -44,7 +42,6 @@ class bpmservice(camundaservice):
             return
         
         
-    @classmethod
     def openedevent(self, filenumber, groupname, userid, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
@@ -62,7 +59,6 @@ class bpmservice(camundaservice):
             return   
  
         
-    @classmethod
     def openedcomplete(self,filenumber, data, messagetype, token=None):
         if self.bpmEngineRestUrl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
@@ -77,24 +73,20 @@ class bpmservice(camundaservice):
             return    
  
 
-    @classmethod
     def reopenevent(self,processinstanceid, data, messagetype, token=None): 
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
 
-    @classmethod
     def _getUrl_(self, messagetype):
         if messagetype is not None:
             return self.bpmEngineRestUrl+"/message"
         return self.bpmEngineRestUrl
     
-    @classmethod
     def _getserviceaccounttoken_(self):
         auth_response = requests.post(self.bpmTokenUrl, auth=(self.bpmClientId, self.bpmClientSecret), headers={
             'Content-Type': 'application/x-www-form-urlencoded'}, data='grant_type=client_credentials')
         return auth_response.json().get('access_token')
     
-    @classmethod
     def _getHeaders_(self, token):
         """Generate headers."""
         if token is None:

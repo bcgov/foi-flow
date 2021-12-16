@@ -33,7 +33,7 @@ TRACER = Tracer.get_instance()
 @API.route('/foiaudit/<type>/<id>/<field>')
 @API.route('/foiaudit/<type>/<id>/<field>/summary')
 class FOIAuditByField(Resource):
-    """Resource for managing FOI requests."""
+    """Resource for managing audit of FOI data."""
 
     @staticmethod
     @TRACER.trace()
