@@ -1,17 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from '@material-ui/core/Link';
 import { useSelector } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
+import { getMenuItems, getHeaderText, getAssignedTo, getStatus, } from "./utils";
 import Input from '@material-ui/core/Input';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-import { StateEnum } from '../../../constants/FOI/statusEnum';
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
+import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining } from "../../../helper/FOI/helper";
-import MinistryAssignToDropdown from './MinistryAssignToDropdown';
-import { Watcher } from '../customComponents'
+import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
+import { Watcher } from '../../customComponents'
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -57,93 +57,23 @@ const FOIRequestHeader = React.memo(
     //handle default value for the validation of required fields
     React.useEffect(() => {
       let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
-      let _status = getStatus();
+      let _status = getStatus({ headerValue, requestDetails });
       const _cfrDaysRemaining = requestDetails.cfrDueDate
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
 
-    const getStatus = () => {
-      if (headerValue) return headerValue;
-
-      if (requestDetails.currentState) return requestDetails.currentState;
-
-      return StateEnum.unopened.name;
-    };
-
-    const getAssignedTo = () => {
-      if (!requestDetails.assignedGroup || requestDetails === "Unassigned") {
-        return "|Unassigned";
-      }
-
-      return requestDetails.assignedTo
-        ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}`
-        : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
-    };
-
-    const [selectedAssignedTo, setAssignedTo] = React.useState(getAssignedTo);
-
-    const getFullName = (lastName, firstName, username) => {
-      return firstName !== "" ? `${lastName}, ${firstName}` : username;
-    };
-
-    //creates the grouped menu items for assignedTo combobox
-    const getMenuItems = () => {
-      var menuItems = [];
-      menuItems.push(
-        <MenuItem className={classes.group} key={0} value={"|"}>
-          {}
-        </MenuItem>
-      );
-      menuItems.push(
-        <MenuItem
-          key={0}
-          className={classes.item}
-          value={selectedAssignedTo}
-          disabled={true}
-        >
-          {"Unassigned"}
-        </MenuItem>
-      );
-      
-      if (assignedToList && assignedToList.length < 1) {
-        return menuItems;
-      }
-
-      assignedToList.forEach(group => {
-          const groupItem = (
-            <MenuItem
-              className={classes.group}
-              key={group.id}
-              value={`${group.name}|${group.name}`}
-            >
-              {group.name}
-            </MenuItem>
-          );
-          menuItems.push(groupItem)
-
-          const assigneeItems = group.members.map((assignee) => (
-            <MenuItem
-              key={`${assignee.id}`}
-              className={classes.item}
-              value={`${group.name}|${assignee.username}`}
-            >
-              {getFullName(
-                assignee.lastname,
-                assignee.firstname,
-                assignee.username
-              )}
-            </MenuItem>
-          ));
-
-          menuItems.concat(assigneeItems)
-      })
-
-      return menuItems;
-    };
+    const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(requestDetails));
+    const [menuItems, setMenuItems] = useState([])
 
     const preventDefault = (event) => event.preventDefault();
+
+    useEffect(() => {
+      setMenuItems(
+        getMenuItems({ classes, assignedToList, selectedAssignedTo })
+      );
+    }, [selectedAssignedTo, assignedToList]);
 
     //handle onChange event for assigned To
     const handleAssignedToOnChange = (event) => {
@@ -161,20 +91,8 @@ const FOIRequestHeader = React.memo(
       //place holder - do nothing here
     };
 
-    const getHeaderText = () => {
-      if (window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDREQUEST)) {
-        return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
-      }
-
-      if (requestDetails.idNumber && ministryId) {
-        return requestDetails.idNumber;
-      }
-
-      return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
-    };
-
-    const hearderText = getHeaderText();
-    const status = getStatus();
+    const hearderText = getHeaderText({requestDetails, ministryId});
+    const status = getStatus({ headerValue, requestDetails });
     const showMinistryAssignedTo =
       status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.closed.name.toLowerCase() ||
@@ -193,7 +111,8 @@ const FOIRequestHeader = React.memo(
               <h3 className="foi-review-request-text">{hearderText}</h3>
             </Link>
           </div>
-          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 && (
+          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+            -1 && (
             <div
               className="foi-request-review-header-col1-row"
               style={{ marginTop: 5 + "px", display: "block" }}
@@ -225,7 +144,7 @@ const FOIRequestHeader = React.memo(
               disabled={disableInput}
               error={selectedAssignedTo.toLowerCase().includes("unassigned")}
             >
-              {getMenuItems()}
+              {menuItems}
             </TextField>
           </div>
 
