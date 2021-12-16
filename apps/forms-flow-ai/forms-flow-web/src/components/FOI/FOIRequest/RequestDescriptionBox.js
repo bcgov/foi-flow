@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import "./requestdescriptionbox.scss";
 import Card from '@material-ui/core/Card';
@@ -43,43 +43,55 @@ const RequestDescription = React.memo(({
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
     var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);    
     //updates the default values from the request description box    
-    React.useEffect(() => {        
+    useEffect(() => {
         const descriptionObject = {
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
             isProgramAreaSelected: !!requestDetails.selectedMinistries,
-            isPiiRedacted: ministryId ? true : requestDetails.ispiiredacted ? requestDetails.ispiiredacted : false
+            isPiiRedacted: ministryId ? true : !!requestDetails.ispiiredacted
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
     
-    //if updated program area list not exists then, update the master list with selected ministries
-    if (Object.entries(programAreaList).length === 0){       
-        const selectedMinistries = !!requestDetails.selectedMinistries ? requestDetails.selectedMinistries : "";
-        if(selectedMinistries !== "" && Object.entries(masterProgramAreaList).length !== 0) {
-            const selectedList = selectedMinistries.map(element => element.code);
-            masterProgramAreaList.map(programArea => {
-            return programArea.isChecked = !!selectedList.find(selectedMinistry => selectedMinistry === programArea.bcgovcode);           
-        });      
+    useEffect(() => {
+      //if updated program area list not exists then, update the master list with selected ministries
+      if (Object.entries(programAreaList).length === 0) {
+        const selectedMinistries = !!requestDetails.selectedMinistries
+          ? requestDetails.selectedMinistries
+          : "";
+        if (
+          selectedMinistries !== "" &&
+          Object.entries(masterProgramAreaList).length !== 0
+        ) {
+          const selectedList = selectedMinistries.map(
+            (element) => element.code
+          );
+          masterProgramAreaList = masterProgramAreaList.map((programArea) => {
+            programArea.isChecked = !!selectedList.find(
+              (selectedMinistry) => selectedMinistry === programArea.bcgovcode
+            );
+            return programArea;
+          });
+        } else {
+          //if it is add request then keep all check boxes unchecked
+          masterProgramAreaList = masterProgramAreaList.map((programArea) => {
+            programArea.isChecked = false;
+            return programArea;
+          });
         }
-        else {
-            //if it is add request then keep all check boxes unchecked
-            masterProgramAreaList.map(programArea => {
-                return programArea.isChecked = false;
-            });
-        }
-    }
-    //if updated program area list exists then use that list instead of master data
-    else {
-        masterProgramAreaList = programAreaList;       
-    }
+      }
+      //if updated program area list exists then use that list instead of master data
+      else {
+        masterProgramAreaList = programAreaList;
+      }
+    }, [programAreaList]);
 
     //component state management for startDate, endDate and Description
     const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
-    const [isPIIRedacted, setPIIRedacted] = React.useState(ministryId ? true : requestDetails.ispiiredacted ? requestDetails.ispiiredacted : false);
+    const [isPIIRedacted, setPIIRedacted] = React.useState(ministryId ? true : !!requestDetails.ispiiredacted);
 
     const handlePIIRedacted = (event) => {
         setPIIRedacted(event.target.checked);
@@ -110,12 +122,12 @@ const RequestDescription = React.memo(({
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DESCRIPTION, event.target.value);
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
-    const handleUpdatedMasterProgramAreaList = (programAreaList) => {
+    const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(programAreaList.some(programArea => programArea.isChecked), FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     
+        handleOnChangeRequiredRequestDescriptionValues(updatedProgramAreaList.some(programArea => programArea.isChecked), FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     
         //event bubble up - Updated program area list
-        handleUpdatedProgramAreaList(programAreaList);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, programAreaList);
+        handleUpdatedProgramAreaList(updatedProgramAreaList);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, updatedProgramAreaList);
     }
 
     const [openModal, setOpenModal] = React.useState(false);
@@ -143,7 +155,7 @@ const RequestDescription = React.memo(({
                 <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose}/>
                 <div className="row foi-details-row">
                 <div className="foi-request-description-history">
-                    <button type="button" className={`btn btn-link btn-description-history ${!(sortedList.length > 1)? classes.btndisabled : ""}`} disabled={!(sortedList.length > 1)}  onClick={handleDescriptionHistoryClick}>
+                    <button type="button" className={`btn btn-link btn-description-history ${sortedList.length <= 1 ? classes.btndisabled : ""}`} disabled={sortedList.length <= 1}  onClick={handleDescriptionHistoryClick}>
                        Description History
                     </button>
                 </div>
