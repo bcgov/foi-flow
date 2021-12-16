@@ -553,3 +553,7 @@ span[style="font-weight: bold;"] > span  {
 span[style="font-weight: bold;"] > *  {
   font-family: "BCSans-Bold"!important;
 }
+
+span[style*="font-weight: bold;"] > *  {
+  font-family: "BCSans-Bold"!important;
+}
