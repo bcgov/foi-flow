@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_,and_
+from sqlalchemy import or_, and_, text
 
 
 class FOIMinistryRequestDivision(db.Model):
@@ -40,12 +40,13 @@ class FOIMinistryRequestDivision(db.Model):
     foiministryrequestversion = relationship("FOIMinistryRequest",foreign_keys="[FOIMinistryRequestDivision.foiministryrequestversion_id]")
 
     @classmethod
-    def getrequest(cls,ministryrequestid,ministryrequestversion):
+    def getdivisions(cls,ministryrequestid,ministryrequestversion):
         division_schema = FOIMinistryRequestDivisionSchema(many=True)
         _divisions = db.session.query(FOIMinistryRequestDivision).filter(FOIMinistryRequestDivision.foiministryrequest_id == ministryrequestid , FOIMinistryRequestDivision.foiministryrequestversion_id == ministryrequestversion).order_by(FOIMinistryRequestDivision.foiministrydivisionid.asc()).all()
-        applicantinfos = division_schema.dump(_divisions)       
-        return applicantinfos
+        divisioninfos = division_schema.dump(_divisions)       
+        return divisioninfos
     
+   
 class FOIMinistryRequestDivisionSchema(ma.Schema):
     class Meta:
         fields = ('foiministrydivisionid','division.divisionid','division.name','stage.stageid','stage.name','foiministryrequest_id','foiministryrequestversion_id')
