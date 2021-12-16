@@ -30,7 +30,6 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
      */ 
     const classes = useStyles();
     const {requestState} = useParams();
-    const user = useSelector((state) => state.user.userDetail);
 
     //local state management for assignedTo
     //------- update this later when $567 is ready
