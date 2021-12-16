@@ -34,7 +34,7 @@ TRACER = Tracer.get_instance()
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiwatcher/rawrequest/<requestid>')
 class FOIRawRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Retrieve watchers for unopened request"""
 
        
     @staticmethod
@@ -45,8 +45,8 @@ class FOIRawRequestWatcher(Resource):
         try:
             result = watcherservice().getrawrequestwatchers(requestid)
             return json.dumps(result), 200
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except ValueError as err:
+            return {'status': 500, 'message':err.messages}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -55,7 +55,7 @@ class FOIRawRequestWatcher(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiwatcher/rawrequest')
 class CreateFOIRawRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Create watcher for unopened request"""
 
        
     @staticmethod
@@ -68,8 +68,6 @@ class CreateFOIRawRequestWatcher(Resource):
             rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)  
             result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getUserId(), AuthHelper.getUserGroups())
             return {'status': result.success, 'message':result.message} , 200 
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -78,7 +76,7 @@ class CreateFOIRawRequestWatcher(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiwatcher/rawrequest/disable/<requestid>')
 class DisableFOIRawRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Disable watcher for unopened request"""
 
        
     @staticmethod
@@ -89,8 +87,6 @@ class DisableFOIRawRequestWatcher(Resource):
         try:
             result = watcherservice().disablerawrequestwatchers(requestid, AuthHelper.getUserId())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -99,7 +95,7 @@ class DisableFOIRawRequestWatcher(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiwatcher/ministryrequest/<ministryrequestid>')
 class FOIRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Retrieve watchers for opened request"""
 
        
     @staticmethod
@@ -110,8 +106,6 @@ class FOIRequestWatcher(Resource):
         try:
             result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isMinistryMember())
             return json.dumps(result), 200
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -120,7 +114,7 @@ class FOIRequestWatcher(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiwatcher/ministryrequest')
 class CreateFOIRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Create watcher for opened request"""
 
        
     @staticmethod
@@ -133,8 +127,6 @@ class CreateFOIRequestWatcher(Resource):
             minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)  
             result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getUserId(),AuthHelper.getUserGroups())
             return {'status': result.success, 'message':result.message} , 200 
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -143,7 +135,7 @@ class CreateFOIRequestWatcher(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiwatcher/ministryrequest/disable/<ministryrequestid>')
 class DisableFOIRequestWatcher(Resource):
-    """Resource for managing FOI requests."""
+    """Disable watcher for opened request"""
 
        
     @staticmethod
@@ -154,8 +146,6 @@ class DisableFOIRequestWatcher(Resource):
         try:
             result = watcherservice().disableministryrequestwatchers(ministryrequestid, AuthHelper.getUserId())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

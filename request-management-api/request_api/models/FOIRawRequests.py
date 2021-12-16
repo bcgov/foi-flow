@@ -35,17 +35,16 @@ class FOIRawRequest(db.Model):
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, assigneegroup= None,assignee= None)->DefaultMethodResult:                
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userid, assigneegroup= None,assignee= None)->DefaultMethodResult:
         createdat = datetime.now()
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status,ispiiredacted, userId)->DefaultMethodResult:        
-        updatedat = datetime.now()
+    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status,ispiiredacted, userid)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
@@ -53,7 +52,7 @@ class FOIRawRequest(db.Model):
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updatedby=None,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted,createdby=userId,closedate=closedate,closereasonid=closereasonid)
+                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updatedby=None,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted,createdby=userid,closedate=closedate,closereasonid=closereasonid)
             )                 
             db.session.execute(insertstmt)               
             db.session.commit()                
@@ -62,14 +61,14 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'No request foound')
             
     @classmethod
-    def updateworkflowinstance(cls,wfinstanceid,requestid, userId)->DefaultMethodResult:
+    def updateworkflowinstance(cls,wfinstanceid,requestid, userid)->DefaultMethodResult:
         updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         requestraqw = dbquery.filter_by(requestid=requestid,version = 1)
         if(requestraqw.count() > 0) :
-            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
-            if(existingrequestswithWFid.count() == 0) :
-                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.updatedby:userId, FOIRawRequest.notes:"WF Instance created"}, synchronize_session = False)
+            existingrequestswithwfid = dbquery.filter_by(wfinstanceid=wfinstanceid)               
+            if(existingrequestswithwfid.count() == 0) :
+                requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.updatedby:userid, FOIRawRequest.notes:"WF Instance created"}, synchronize_session = False)
                 db.session.commit()
                 return DefaultMethodResult(True,'Request updated with WF Instance Id',requestid)
             else:
@@ -78,7 +77,7 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(False,'Requestid not exists',-1)              
 
     @classmethod
-    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes,userId)-> DefaultMethodResult:
+    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes,userid)-> DefaultMethodResult:
         updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
@@ -89,8 +88,7 @@ class FOIRawRequest(db.Model):
             if(request is not None and (request["status"] == "Redirect" or request["status"] == "Closed")):
                 status = request["status"]
                                 
-            existingrequestswithWFid = dbquery.filter_by(wfinstanceid=wfinstanceid)                    
-            requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userId}, synchronize_session = False)
+            requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userid}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Request updated',requestid)       
         else:
@@ -98,10 +96,9 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getrequests(cls):
-        request_schema = FOIRawRequestSchema(many=True)
         _session = db.session
-        _archivedRequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived'])).all()
-        _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedRequestids)).all()
+        _archivedrequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived'])).all()
+        _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedrequestids)).all()
         requests = []
         for _requestid in _requestids:
            request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid).order_by(FOIRawRequest.version.desc()).first()           
