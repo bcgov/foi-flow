@@ -1,5 +1,4 @@
 import {
-    httpPOSTRequest,
     httpGETRequest,
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
@@ -9,6 +8,7 @@ import {
     setRawRequestAttachments,
     setMinistryRequestAttachments
   } from "../../../actions/FOI/foiRequestActions";
+  import {postAttachment} from './foiServicesUtil';
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
 
@@ -77,23 +77,7 @@ import {
       );
     }
     return (dispatch) => {
-      httpPOSTRequest(apiUrl, data)
-        .then((res) => {          
-          if (res.data) {
-            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
-            dispatch(setFOIAttachmentListLoader(false));           
-            done(null, res.data);
-          } else {
-            dispatch(serviceActionError(res));
-            dispatch(setFOIAttachmentListLoader(false));
-            done("Error in posting Attachments");
-          }
-        })
-        .catch((error) => {
-          dispatch(serviceActionError(error));
-          dispatch(setFOIAttachmentListLoader(false));
-          done("Error in posting Attachments");
-        });
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in posting Attachments", done);     
     };
   };
 
@@ -125,23 +109,7 @@ import {
       const data = {
         filename: newFilename
       };
-      httpPOSTRequest(apiUrl, data)
-        .then((res) => {          
-          if (res.data) {
-            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
-            dispatch(setFOIAttachmentListLoader(false));           
-            done(null, res.data);
-          } else {
-            dispatch(serviceActionError(res));
-            dispatch(setFOIAttachmentListLoader(false));
-            done("Error in renaming the file");
-          }
-        })
-        .catch((error) => {
-          dispatch(serviceActionError(error));
-          dispatch(setFOIAttachmentListLoader(false));
-          done("Error in renaming the file");
-        });
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in renaming the file", done); 
     };
   };
 
@@ -165,23 +133,7 @@ import {
       ), "<documentid>", documentId);      
     }
     return (dispatch) => {
-      httpPOSTRequest(apiUrl, data)
-        .then((res) => {          
-          if (res.data) {
-            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
-            dispatch(setFOIAttachmentListLoader(false));           
-            done(null, res.data);
-          } else {
-            dispatch(serviceActionError(res));
-            dispatch(setFOIAttachmentListLoader(false));
-            done("Error in replacing the attachment");
-          }
-        })
-        .catch((error) => {
-          dispatch(serviceActionError(error));
-          dispatch(setFOIAttachmentListLoader(false));
-          done("Error in replacing the attachment");
-        });
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in replacing the attachment", done);
     };
   };
 
@@ -205,22 +157,6 @@ import {
       ), "<documentid>", documentId);      
     }
     return (dispatch) => {
-      httpPOSTRequest(apiUrl, data)
-        .then((res) => {
-          if (res.data) {
-            dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
-            dispatch(setFOIAttachmentListLoader(false));           
-            done(null, res.data);
-          } else {
-            dispatch(serviceActionError(res));
-            dispatch(setFOIAttachmentListLoader(false));
-            done("Error in deleting an attachment");
-          }
-        })
-        .catch((error) => {
-          dispatch(serviceActionError(error));
-          dispatch(setFOIAttachmentListLoader(false));
-          done("Error in deleting an attachment");
-        });
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in deleting an attachment", done);
     };
   };
