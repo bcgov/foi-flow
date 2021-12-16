@@ -68,7 +68,7 @@ class FOIRawRequest(Resource):
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid())                
                 if result.success == True:   
-                    rawrequestservice().postEventToWorkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
+                    rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid())               
