@@ -127,7 +127,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 )
               ) : (
 
-                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={i.commentTypeId === 1 ? getfullName(i.userId) : "FOI App"} />
+                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={i.commentTypeId === 1 ? getfullName(i.userId) : "Request History"} />
 
               )}
               {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
@@ -175,7 +175,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                           i={a}
                           reply
                           parentId={i.commentId}
-                          handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={a.commentTypeId === 1 ? getfullName(a.userId) : "FOI App"}
+                          handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={a.commentTypeId === 1 ? getfullName(a.userId) : "Request History"}
                         />
                       )}
                       {actions.replies.filter((id) => id === a.commentId).length !==
