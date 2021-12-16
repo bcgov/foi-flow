@@ -53,10 +53,10 @@ class requestservice:
             documentservice().copyrequestdocuments(ministry["id"], attachments, userid)
     
     def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
-        workflowservice.postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
+        workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
             
     def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
         if requeststatusid is not None:
             status = requestserviceconfigurator().getstatusname(requeststatusid)
-            workflowservice.postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
+            workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
