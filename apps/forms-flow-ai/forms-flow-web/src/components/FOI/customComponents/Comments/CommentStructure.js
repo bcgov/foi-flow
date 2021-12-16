@@ -49,14 +49,29 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const getHtmlfromRawContent = () => {
     let markup = null
-    if (i.commentTypeId === 1) {     
+    if (i.commentTypeId === 1) {
       const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
       let initialEditorState = EditorState.createWithContent(rawContentFromStore);
 
       const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
+      const entityMap = rawContentState.entityMap;      
       markup = draftToHtml(
         rawContentState
       );
+      let commentmentions = []
+      let updatedMarkup = ''
+      
+      Object.values(entityMap).forEach(entity => {
+        if (entity.type === 'mention') {
+          commentmentions.push(entity.data.mention.name);
+        }
+
+      });
+      const distinctMentions = [... new Set(commentmentions)]
+      distinctMentions.forEach(_mention => {
+        updatedMarkup = markup.replaceAll(_mention, `<span class='taggeduser'>${_mention}</span>`)
+        markup = updatedMarkup
+      })      
     }
     else {
       markup = `<p>${i.text}</p>`
