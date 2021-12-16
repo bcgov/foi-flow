@@ -17,7 +17,7 @@ class bpmservice(camundaservice):
     
      
     def unopenedevent(self,processinstanceid, userid, messagetype, token=None):
-        if self.bpmEngineRestUrl is not None:
+        if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
                                               "messageName": messagetype, 
                                               "processVariables":{
@@ -30,7 +30,7 @@ class bpmservice(camundaservice):
 
 
     def unopenedcomplete(self,processinstanceid, data, messagetype, token=None): 
-        if self.bpmEngineRestUrl is not None:
+        if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
                                               "messageName": messagetype, 
                                               "processVariables":{
@@ -43,7 +43,7 @@ class bpmservice(camundaservice):
         
         
     def openedevent(self, filenumber, groupname, userid, messagetype, token=None):
-        if self.bpmEngineRestUrl is not None:
+        if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
@@ -60,7 +60,7 @@ class bpmservice(camundaservice):
  
         
     def openedcomplete(self,filenumber, data, messagetype, token=None):
-        if self.bpmEngineRestUrl is not None:
+        if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
@@ -79,11 +79,11 @@ class bpmservice(camundaservice):
 
     def _getUrl_(self, messagetype):
         if messagetype is not None:
-            return self.bpmEngineRestUrl+"/message"
-        return self.bpmEngineRestUrl
+            return self.bpmengineresturl+"/message"
+        return self.bpmengineresturl
     
     def _getserviceaccounttoken_(self):
-        auth_response = requests.post(self.bpmTokenUrl, auth=(self.bpmClientId, self.bpmClientSecret), headers={
+        auth_response = requests.post(self.bpmtokenurl, auth=(self.bpmclientid, self.bpmclientsecret), headers={
             'Content-Type': 'application/x-www-form-urlencoded'}, data='grant_type=client_credentials')
         return auth_response.json().get('access_token')
     

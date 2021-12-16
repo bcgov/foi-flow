@@ -20,13 +20,13 @@ class workflowservice:
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None    
         if status == UnopenedEvent.intakeinprogress.value:
             messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.iaoopenclaim.value
-            return bpmservice.unopenedevent(wfinstanceid, assignedto, messagename)                 
+            return bpmservice().unopenedevent(wfinstanceid, assignedto, messagename)                 
         else:
             if status == UnopenedEvent.open.value:
                 metadata = json.dumps({"id": id, "status": status, "ministries": ministries, "assignedGroup": assignedgroup, "assignedTo": assignedto})
             else:            
                 metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
-            return bpmservice.unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
+            return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype):
         assignedgroup = self.__getopenedassigneevalue(usertype, requestsschema, "assignedgroup")
@@ -46,11 +46,11 @@ class workflowservice:
     def __postopenedevent(self, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
         if activity == Activity.complete.value:
             if self.__hasreopened(id, "ministryrequest") == True:
-                bpmservice.reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
+                bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
             else:
-                bpmservice.openedcomplete(filenumber, metadata, messagename)   
+                bpmservice().openedcomplete(filenumber, metadata, messagename)   
         else:
-            bpmservice.openedevent(filenumber, assignedgroup, assignedto, messagename)
+            bpmservice().openedevent(filenumber, assignedgroup, assignedto, messagename)
          
     
     def __getopenedassigneevalue(self, usertype, requestsschema, property):
