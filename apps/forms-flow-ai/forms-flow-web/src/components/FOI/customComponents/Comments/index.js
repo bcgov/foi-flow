@@ -61,11 +61,11 @@ export const CommentSection = ({
         <div className="addcommentBox">
           <button type="button" style={{ display: !showaddbox ? 'block' : 'none' }} className="btn foi-btn-create addcomment" onClick={() => { !showaddbox ? setshowaddbox(true) : setshowaddbox(false); }}>+ Add Comment</button>
         </div>
-
+{ showaddbox ?
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
           setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}/>}
-        </div>
+        </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
             <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange} checked={filterValue === -1 ? true:false} />
