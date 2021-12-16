@@ -72,20 +72,20 @@ class assigneeservice:
         
     def __generalgroupmappings(self, bcgovcode=None):  
         groups = []      
-        allgroups = [{"status":"Unopened", "groups":[UserGroup.intake.value()]},
-                {"status":"Intake In Progress","groups":[UserGroup.intake.value()]},
-                {"status":"Open","groups":[UserGroup.intake.value(),UserGroup.flex.value()]},
-                {"status":"Closed","groups":[UserGroup.intake.value(),UserGroup.flex.value()]},
-                {"status":"Call For Records","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Fee Estimate","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Deduplication","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"On Hold","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Harms Assessment","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Records Review","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Consult","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Ministry Sign Off","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Response","groups":[UserGroup.intake.value(),UserGroup.flex.value(),UserGroup.ministry.value()]},
-                {"status":"Redirect","groups":[UserGroup.intake.value(),UserGroup.flex.value()]},
+        allgroups = [{"status":"Unopened", "groups":[UserGroup.intake.value]},
+                {"status":"Intake In Progress","groups":[UserGroup.intake.value]},
+                {"status":"Open","groups":[UserGroup.intake.value,UserGroup.flex.value]},
+                {"status":"Closed","groups":[UserGroup.intake.value,UserGroup.flex.value]},
+                {"status":"Call For Records","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Fee Estimate","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Deduplication","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"On Hold","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Harms Assessment","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Records Review","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Consult","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Ministry Sign Off","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Response","groups":[UserGroup.intake.value,UserGroup.flex.value,UserGroup.ministry.value]},
+                {"status":"Redirect","groups":[UserGroup.intake.value,UserGroup.flex.value]},
             ]
         
         for entry in allgroups:
@@ -96,20 +96,20 @@ class assigneeservice:
        
     def __personalgroupmappings(self, bcgovcode=None):        
         groups = []      
-        allgroups =  [{"status":"Unopened", "groups":[UserGroup.intake.value()]},
-                {"status":"Intake In Progress","groups":[UserGroup.intake.value()]},
-                {"status":"Open","groups":[UserGroup.intake.value(),UserGroup.processing.value()]},
-                {"status":"Closed","groups":[UserGroup.intake.value(),UserGroup.processing.value()]},
-                {"status":"Call For Records","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Fee Estimate","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Deduplication","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"On Hold","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Harms Assessment","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Records Review","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Consult","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Ministry Sign Off","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Response","groups":[UserGroup.intake.value(),UserGroup.processing.value(),UserGroup.ministry.value()]},
-                {"status":"Redirect","groups":[UserGroup.intake.value(),UserGroup.processing.value()]},
+        allgroups =  [{"status":"Unopened", "groups":[UserGroup.intake.value]},
+                {"status":"Intake In Progress","groups":[UserGroup.intake.value]},
+                {"status":"Open","groups":[UserGroup.intake.value,UserGroup.processing.value]},
+                {"status":"Closed","groups":[UserGroup.intake.value,UserGroup.processing.value]},
+                {"status":"Call For Records","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Fee Estimate","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Deduplication","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"On Hold","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Harms Assessment","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Records Review","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Consult","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Ministry Sign Off","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Response","groups":[UserGroup.intake.value,UserGroup.processing.value,UserGroup.ministry.value]},
+                {"status":"Redirect","groups":[UserGroup.intake.value,UserGroup.processing.value]},
             ]
         for entry in allgroups:
             groups.append({"status": entry["status"], "groups": self.__formatgroups(entry["groups"], bcgovcode)})
