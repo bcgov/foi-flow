@@ -46,7 +46,7 @@ class FOIRawRequest(Resource):
             jsondata = {}
             requestidisinteger = int(requestid)
             if requestidisinteger :                
-                baserequestinfo = rawrequestservice.getrawrequest(requestid)                                    
+                baserequestinfo = rawrequestservice().getrawrequest(requestid)                                    
                 jsondata = json.dumps(baserequestinfo)
             return jsondata , 200 
         except ValueError:
@@ -63,15 +63,15 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()                        
             if int(requestid) and str(requestid) != "-1" :
                 status = rawrequestservice().getstatus(updaterequest["requeststatusid"])
-                rawrequest = rawrequestservice.getrawrequest(requestid)     
+                rawrequest = rawrequestservice().getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid())                
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid())                
                 if result.success == True:   
                     rawrequestservice().postEventToWorkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getuserid())               
+                result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid())               
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -95,7 +95,7 @@ class FOIRawRequestBPMProcess(Resource):
                 status = request_json['status'] if request_json.get('status') is not None else 'Unopened'
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
-                result = rawrequestservice.updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getuserid())
+                result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getuserid())
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200
                 else:
@@ -119,7 +119,7 @@ class FOIRawRequests(Resource):
         try:
             request_json = request.get_json()
             requestdatajson = request_json['requestData']           
-            result = rawrequestservice.saverawrequest(requestdatajson,"onlineform",None)
+            result = rawrequestservice().saverawrequest(requestdatajson,"onlineform",None)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
