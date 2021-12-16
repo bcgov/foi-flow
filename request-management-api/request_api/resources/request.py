@@ -128,7 +128,7 @@ class FOIRawRequests(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())
-    @expects_json(schema)
+    #@expects_json(schema)
     def post():
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
@@ -160,6 +160,10 @@ class FOIRawRequests(Resource):
                 # result1 = documentservice().createrequestdocument(requestId, documentschema, AuthHelper.getUserId(), "rawrequest")
                 result1 = documentservice().createrequestdocument(requestId, documentschema, None, "rawrequest")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
+            requestdatajson = request_json['requestData'] 
+            notes = 'Request added with FOI Payment Integration release'          
+            result = rawrequestservice.saverawrequest_foipayment(requestdatajson,notes)
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            

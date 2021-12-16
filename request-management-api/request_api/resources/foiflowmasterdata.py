@@ -48,7 +48,7 @@ class FOIFlowApplicantCategories(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
     @auth.require
-    @request_api.cache.cached(key_prefix="applicantcategories")
+    #@request_api.cache.cached(key_prefix="applicantcategories")
     def get():
         try:
             data = applicantcategoryservice.getapplicantcategories()
@@ -66,7 +66,7 @@ class FOIFlowProgramAreas(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
     @auth.require
-    @request_api.cache.cached(key_prefix="programareas")
+    #@request_api.cache.cached(key_prefix="programareas")
     def get():
         try:
             data = programareaservice.getprogramareas()
@@ -83,7 +83,7 @@ class FOIFlowDeliveryModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
     @auth.require
-    @request_api.cache.cached(key_prefix="deliverymodes")
+    #@request_api.cache.cached(key_prefix="deliverymodes")
     def get():
         try:
             data = deliverymodeservice.getdeliverymodes()
@@ -100,7 +100,7 @@ class FOIFlowReceivedModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
     @auth.require
-    @request_api.cache.cached(key_prefix="receivedmodes")
+    #@request_api.cache.cached(key_prefix="receivedmodes")
     def get():
         try:
             data = receivedmodeservice.getreceivedmodes()
