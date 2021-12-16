@@ -101,11 +101,9 @@ class documentservice:
         document['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
         return document   
         
-    
-
-      
+     
     def createrawrequestdocumentversion(self, requestid):
-        newversion = self.getversionforrequest(requestid,"rawrequest")     
+        newversion = self.__getversionforrequest(requestid,"rawrequest")     
         documents = self.getrequestdocuments(requestid, "rawrequest", newversion-1)
         documentarr = []
         for document in documents:
