@@ -46,7 +46,7 @@ class CreateFOIRequestComment(Resource):
         try:
             requestjson = request.get_json() 
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
-            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getUserId())
+            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getUserId(),taggedusers = minrquescommentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -69,7 +69,7 @@ class CreateFOIRawRequestComment(Resource):
         try:
             requestjson = request.get_json() 
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
-            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getUserId())
+            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getUserId(),taggedusers = rawrqcommentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -150,10 +150,10 @@ class FOIUpdateComment(Resource):
             requestjson = request.get_json()              
             if requesttype == "ministryrequest":
                 commentschema = FOIMinistryRequestCommentSchema().load(requestjson)
-                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getUserId())
+                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getUserId(), taggedusers=commentschema["taggedusers"])
             else:
                 commentschema = EditFOIRawRequestCommentSchema().load(requestjson)
-                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getUserId())
+                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getUserId(),taggedusers=commentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
