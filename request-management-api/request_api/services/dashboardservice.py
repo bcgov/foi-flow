@@ -90,6 +90,7 @@ class dashboardservice:
         baserequestinfo['firstName'] = firstname
         baserequestinfo['lastName'] = lastname
         baserequestinfo['xgov'] = 'No'
+        return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers):
         return {'id': id,
