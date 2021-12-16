@@ -228,7 +228,6 @@ const BottomButtonGroup = React.memo(({
           saveRequestObject.closedate = closingDate;
           saveRequestObject.closereasonid = closingReasonId;
           saveRequest();
-          // hasStatusRequestSaved(true, currentSelectedStatus)
         }
         else if(currentSelectedStatus === StateEnum.callforrecords.name && !isValidationError)
         {
@@ -245,77 +244,65 @@ const BottomButtonGroup = React.memo(({
             saveRequestObject.dueDate = calculatedRequestDueDate;
           }
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }  
         else if(currentSelectedStatus == StateEnum.redirect.name && !isValidationError)
         {        
           saveRequestObject.requeststatusid = StateEnum.redirect.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.open.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.open.id; // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.intakeinprogress.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.review.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.onhold.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.onhold.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.signoff.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.feeassessed.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.consult.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.consult.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.deduplication.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.harms.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.harms.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
         else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
         {
           saveRequestObject.requeststatusid = StateEnum.response.id;
           saveRequest();
-          // hasStatusRequestSaved(true,currentSelectedStatus)
         }
       }
-      else {
-        handleSaveRequest(requestState, true, "");
+      else {        
+          handleSaveRequest(requestState, unSavedRequest, "");        
       }
     }
 
