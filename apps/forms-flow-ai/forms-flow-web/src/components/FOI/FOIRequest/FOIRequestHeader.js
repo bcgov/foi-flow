@@ -79,8 +79,8 @@ const FOIRequestHeader  = React.memo(({headerValue, requestDetails, handleAssign
     const getMenuItems = () => {
         var menuItems = [];
         var i = 1;
-        menuItems.push(<MenuItem className={classes.group} key={0} value={'|'}>{}</MenuItem>);
-        menuItems.push(<MenuItem key={0} className={classes.item} value={selectedAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
+        menuItems.push(<MenuItem className={classes.group} key={i} value={'|'}>{}</MenuItem>);
+        menuItems.push(<MenuItem key={i+1} className={classes.item} value={selectedAssignedTo} disabled={true} >{'Unassigned'}</MenuItem>)
         if (assignedToList && assignedToList.length > 0) {
             for (var group of assignedToList) {
                 menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`}>{group.name}</MenuItem>);

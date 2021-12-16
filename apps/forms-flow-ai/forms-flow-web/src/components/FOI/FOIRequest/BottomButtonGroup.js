@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
-import {push} from "connected-react-router";
 import {saveRequestDetails, openRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
