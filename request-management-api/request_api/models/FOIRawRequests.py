@@ -28,26 +28,25 @@ class FOIRawRequest(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     sourceofsubmission = db.Column(db.String(120),  nullable=True)
-    ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)    
-    closedate = db.Column(db.DateTime, nullable=True) 
-    #ForeignKey References
+    ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
+    requirespayment = db.Column(db.Boolean, unique=False, nullable=True, default=False)
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, assigneegroup= None,assignee= None)->DefaultMethodResult:                
-        createdat = datetime.now()
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, requirespayment ,assigneegroup= None,assignee= None)->DefaultMethodResult:                
+        createdat = datetime.now()        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted, requirespayment=requirespayment)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequest_foipayment(cls,_requestrawdata,notes)->DefaultMethodResult:                
+    def saverawrequest_foipayment(cls,_requestrawdata,notes, requirespayment, ispiiredacted)->DefaultMethodResult:                
         createdat = datetime.now()        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',created_at=createdat,createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=False,notes=notes)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',created_at=createdat,createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=ispiiredacted,notes=notes, requirespayment= requirespayment)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
