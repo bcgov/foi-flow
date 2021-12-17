@@ -22,7 +22,6 @@ import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
 import RequestDescription from './RequestDescription';
 import RequestHeader from './RequestHeader';
-import RequestNotes from './RequestNotes';
 import RequestTracking from './RequestTracking';
 import BottomButtonGroup from './BottomButtonGroup';
 import {CommentSection} from '../../customComponents/Comments';
@@ -140,9 +139,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   //Variable to find if all required fields are filled or not
   const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned") || (divstages.length === 0 || hasincompleteDivstage);
 
-  const createMinistryRequestDetailsObject = (requestObject, name, value) => {
+  const createMinistryRequestDetailsObject = (requestObject, propName, value) => {
     // requestDetails.
-    if (name === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
+    if (propName === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
       const assignedToValue = value.split("|");
       if (assignedToValue.length > 1 && assignedToValue[0] && assignedToValue[1]) {
         requestObject.assignedministrygroup = assignedToValue[0];
@@ -151,26 +150,34 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   }
 
-  const createMinistrySaveRequestObject = (name, value, value2) => {
+  const createMinistrySaveRequestObject = (propName, value, value2) => {
     const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
-    createMinistryRequestDetailsObject(requestObject, name, value);
+    createMinistryRequestDetailsObject(requestObject, propName, value);
     setSaveMinistryRequestObject(requestObject);
   }
-
+  const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
+  const [stateChanged, setStateChanged] = useState(false);
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
     if (!_unSaved && ministryId && requestId) {
+      setStateChanged(false);
+      setcurrentrequestStatus(_state);
       setTimeout(() => {
         window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}`
       }
         , 1000);
     }
+    else {
+      setUpdateStateDropdown(!updateStateDropDown);
+      setcurrentrequestStatus(_state);
+    }
   }
 
   const handleStateChange = (currentStatus) => {
     setcurrentrequestStatus(currentStatus);
+    setStateChanged(true);
   }
 
   const hasStatusRequestSaved = (issavecompleted, state) => {
@@ -331,7 +338,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
+            <StateDropDown updateStateDropDown={updateStateDropDown} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">
@@ -367,7 +374,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                     <RequestDetails requestDetails={requestDetails}/>
                     <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
                     {/* <RequestNotes /> */}
-                    <BottomButtonGroup attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
+                    <BottomButtonGroup stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
                 : null }
                 </form>

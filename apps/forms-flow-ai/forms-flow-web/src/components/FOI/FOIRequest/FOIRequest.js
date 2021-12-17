@@ -518,11 +518,15 @@ const FOIRequest = React.memo(({userDetail}) => {
     createRequestDetailsObject(requestObject, name, value, value2);    
     setSaveRequestObject(requestObject);
   }
-
-  const handleSaveRequest = (_state, _unSaved, id) => {    
+  const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
+  const [stateChanged, setStateChanged] = useState(false);
+  const handleSaveRequest = (_state, _unSaved, id) => {   
     setHeader(_state);
     setUnSavedRequest(_unSaved);
-    if (!_unSaved) {      
+    if (!_unSaved) {
+      setStateChanged(false);
+      setcurrentrequestStatus(_state);
+      
       setTimeout(() => 
       {
         const redirectUrl = getRedirectAfterSaveUrl(_state);
@@ -535,6 +539,10 @@ const FOIRequest = React.memo(({userDetail}) => {
 
       }
       , 1000);
+    }
+    else {
+      setUpdateStateDropdown(!updateStateDropDown);
+      setcurrentrequestStatus(_state);
     }
   }
 
@@ -553,12 +561,20 @@ const FOIRequest = React.memo(({userDetail}) => {
   const handleOpenRequest = (parendId, ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
       if (!unSaved) {
-        dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${ministryId}/Open`));
+        setStateChanged(false);
+        setcurrentrequestStatus(StateEnum.open.name);
+        
+        dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${_ministryId}/Open`));
+      }
+      else {
+        setUpdateStateDropdown(!updateStateDropDown);
+        setcurrentrequestStatus(StateEnum.intakeinprogress.name); // should be revisited
       }
   }
-
+  
   const handleStateChange =(currentStatus)=>{    
     setcurrentrequestStatus(currentStatus);
+    setStateChanged(true);
   }
 
   const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{
@@ -750,10 +766,10 @@ const FOIRequest = React.memo(({userDetail}) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
+            <StateDropDown updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
-        <div className="tab">          
+        <div className="tab">
           <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
           {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
@@ -845,7 +861,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                         } 
                       <RequestNotes />
 
-                      <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
+                      <BottomButtonGroup stateChanged={stateChanged} isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
                     </>
                   ) : null}
                 </form>
