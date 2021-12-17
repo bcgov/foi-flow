@@ -39,7 +39,7 @@ class workflowservice:
                     oldstatus = self.__getministrystatus(filenumber, ministry["version"])
                     activity = self.__getministryactivity(oldstatus,newstatus)
                     metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"]})
-                    messagename = self.__messagename(id, oldstatus, activity, usertype)
+                    messagename = self.__messagename(oldstatus, activity, usertype)
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
         
     
@@ -62,7 +62,7 @@ class workflowservice:
             return None
         
              
-    def __messagename(self, id, status, activity, usertype):    
+    def __messagename(self, status, activity, usertype):    
         if status == UnopenedEvent.open.value:
             return MessageType.iaoopencomplete.value if activity == Activity.complete.value else MessageType.iaoopenclaim.value
         elif status == OpenedEvent.reopen.value:

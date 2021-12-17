@@ -48,7 +48,7 @@ class dashboardservice:
                 rawrequestwatchers = FOIRawRequestWatcher.getwatchers(request.requestid)
                 unopenrequest = self.__preparefoirequestinfo(request.requestid, firstname, lastname, requesttype, 
                                                               request.status, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedgroup, 
-                                                              request.assignedto, 'U-00' + str(id), request.version, rawrequestwatchers)
+                                                              request.assignedto, 'U-00' + str(request.requestid), request.version, rawrequestwatchers)
                 requestqueue.append(unopenrequest)
 
             for openrequest in openedrequests : 
