@@ -36,7 +36,7 @@ class divisionevent:
     @classmethod    
     def createcomment(self, requestid, division, stage, event):
         comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division, stage, event)}
-        commentservice().createministryrequestcomment(comment, AuthHelper.getUserId(), 2)
+        commentservice().createministryrequestcomment(comment, AuthHelper.getuserid(), 2)
 
     
     @classmethod    
