@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react'
 import uuid from 'react-uuid'
-import { saveRawRequestNote, editRawRequestNote, saveMinistryRequestNote, editMinistryRequestNote, deleteMinistryRequestNote, deleteRawRequestNote } from '../../../../apiManager/services/FOI/foiRequestServices'
+import { saveRawRequestNote, editRawRequestNote, saveMinistryRequestNote, editMinistryRequestNote, deleteMinistryRequestNote, deleteRawRequestNote } from '../../../../apiManager/services/FOI/foiRequestNoteServices'
 import { useDispatch, useSelector } from "react-redux";
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 export const ActionContext = createContext()

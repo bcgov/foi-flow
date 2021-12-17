@@ -9,12 +9,21 @@ import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import {  
   fetchFOIMinistryViewRequestDetails,
-  fetchFOIRequestDescriptionList,
-  fetchFOIRequestNotesList,
-  fetchFOIRequestAttachmentsList,
+  fetchFOIRequestDescriptionList
+} from "../../../../apiManager/services/FOI/foiRequestServices";
+
+import {  
   fetchFOIFullAssignedToList,
   fetchFOIMinistryAssignedToList
-} from "../../../../apiManager/services/FOI/foiRequestServices";
+} from "../../../../apiManager/services/FOI/foiMasterDataServices";
+
+import {
+  fetchFOIRequestAttachmentsList,
+} from "../../../../apiManager/services/FOI/foiAttachmentServices";
+
+import {
+  fetchFOIRequestNotesList
+} from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
 
@@ -22,7 +31,6 @@ import ApplicantDetails from './ApplicantDetails';
 import RequestDetails from './RequestDetails';
 import RequestDescription from './RequestDescription';
 import RequestHeader from './RequestHeader';
-import RequestNotes from './RequestNotes';
 import RequestTracking from './RequestTracking';
 import BottomButtonGroup from './BottomButtonGroup';
 import {CommentSection} from '../../customComponents/Comments';

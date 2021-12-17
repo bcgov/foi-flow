@@ -14,7 +14,6 @@ import {
   modalDelBtn
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
-import { fetchFOIFullAssignedToList, fetchFOIMinistryAssignedToList } from '../../../../apiManager/services/FOI/foiRequestServices'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
