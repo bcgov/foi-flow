@@ -82,7 +82,6 @@ class dashboardservice:
                     _openrequest['ministryrequestid'] = openrequest["ministryrequestid"],
                     _openrequest['applicantcategory'] = openrequest["applicantcategory"]                    
                     requestqueue.append(_openrequest)
-                        
             return requestqueue 
     
     def __preparefoirequestinfo(self, id, firstname, lastname, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers):

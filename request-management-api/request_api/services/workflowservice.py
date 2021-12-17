@@ -40,10 +40,10 @@ class workflowservice:
                     activity = self.__getministryactivity(oldstatus,newstatus)
                     metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"]})
                     messagename = self.__messagename(id, oldstatus, activity, usertype)
-                    self.__postopenedevent(filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
+                    self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
+        
     
-    
-    def __postopenedevent(self, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
+    def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
         if activity == Activity.complete.value:
             if self.__hasreopened(id, "ministryrequest") == True:
                 bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
