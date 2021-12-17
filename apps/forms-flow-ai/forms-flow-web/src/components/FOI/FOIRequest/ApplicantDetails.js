@@ -6,6 +6,7 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { formatDate } from "../../../helper/FOI/helper";
 
 const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, handleApplicantDetailsInitialValue, 
     handleApplicantDetailsValue, handleEmailValidation, createSaveRequestObject, disableInput}) => {
@@ -16,39 +17,39 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
 
     //gets the category list master data
     const category = useSelector(state=> state.foiRequests.foiCategoryList);
-    
-    const validateFields = (request, name) => {
-        if (request !== undefined) {
-            if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {
-              return request.firstName? requestDetails.firstName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {
-                return request.middleName? requestDetails.middleName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
-                return request.lastName? requestDetails.lastName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
-                return request.businessName? requestDetails.businessName: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
-                return request.email? requestDetails.email: ""
-            }
-            else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
-              return requestDetails.category !== undefined? requestDetails.category:"Select Category";
-            }            
-          }
-          else {
-            return "";
-          }
-    }
+
+    const validateFields = (data, name, options = {
+        dateFormat: false,
+        defaultValue: ""
+      }) => {
+
+        options.defaultValue = options.defaultValue || ""
+  
+        if(!data) {
+          return options.defaultValue;
+        }
+  
+        if(options.dateFormat) {
+          return data[name] ? formatDate(data[name]) : options.defaultValue;
+        }
+  
+        return data[name] || options.defaultValue;
+      }
+
+   
     //state management of Applicant FirstName, MiddleName, LastName, Organization, Email and Category
     const [applicantFirstNameText, setApplicantFirstName] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME));
     const [applicantMiddleNameText, setApplicantMiddleName] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME));
     const [applicantLastNameText, setApplicantLastName] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME));
     const [organizationText, setOrganization] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.ORGANIZATION));
     const [emailText, setEmail] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL));
-    const [selectedCategory, setCategoryValue] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY));
+    const [selectedCategory, setCategoryValue] = React.useState(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY,
+            {
+                dateFormat: false,
+                defaultValue: "Select Category",
+            }
+            ));
 
     //handle initial value for required field validation
     React.useEffect(() => {
