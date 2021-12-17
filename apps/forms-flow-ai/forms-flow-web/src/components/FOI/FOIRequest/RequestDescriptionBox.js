@@ -85,7 +85,8 @@ const RequestDescription = React.memo(({
       else {
         masterProgramAreaList = programAreaList;
       }
-    }, [programAreaList]);
+
+    }, [programAreaList, masterProgramAreaList]);
 
     //component state management for startDate, endDate and Description
     const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
