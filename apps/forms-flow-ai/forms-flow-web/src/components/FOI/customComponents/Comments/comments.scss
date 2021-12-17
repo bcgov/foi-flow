@@ -546,3 +546,14 @@ button.bc4rxid {
 strong {
   font-family: "BCSans-Bold"!important;
 }
+
+span[style="font-weight: bold;"] > span  {
+  font-family: "BCSans-Bold"!important;
+}
+span[style="font-weight: bold;"] > *  {
+  font-family: "BCSans-Bold"!important;
+}
+
+span[style*="font-weight: bold;"] > *  {
+  font-family: "BCSans-Bold"!important;
+}
