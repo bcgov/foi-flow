@@ -14,39 +14,24 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
      *  No mandatory fields here
      */ 
 
-     const getFirstName = (request) =>{
-      return !!request.childFirstName ? request.childFirstName : "";
-     }
-     const getMiddleName = (request) =>{
-      return !!request.childMiddleName ? request.childMiddleName : "";
-     }
-     const getLastName =(request) =>{
-      return !!request.childLastName ? request.childLastName : "";
-     }
-     const getNickName = (request) =>{
-      return !!request.childAlsoKnownAs ? request.childAlsoKnownAs : "";
-     }
-     const getDOB = (request) =>{
-      return !!request.childBirthDate ? formatDate(request.childBirthDate) : "";
-     }
-    
-      const validateFields = (request, name) => {
-        if (request !== undefined) {
-          switch(name){
-            case (FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME):
-              return getFirstName(request);
-            case (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME):
-              return getMiddleName(request);
-            case (FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME):
-              return getLastName(request);
-            case (FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME):
-              return getNickName(request);
-            case (FOI_COMPONENT_CONSTANTS.CHILD_DOB):
-              return getDOB(request);
-          }
-        }
-        return "";
+    const validateFields = (data, name, options = {
+      dateFormat: false,
+      defaultValue: ""
+    }) => {
+      options.defaultValue = options.defaultValue || ""
+
+      if(!data) {
+        return options.defaultValue;
       }
+
+      if(options.dateFormat) {
+        return data[name] ? formatDate(data[name]) : options.defaultValue;
+      }
+
+      return data[name] || options.defaultValue;
+    }
+
+   
 
     //local states for Child FirstName, MiddleName, LastName, NickName and DOB
     const [childFirstNameText, setChildFirstName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME));
