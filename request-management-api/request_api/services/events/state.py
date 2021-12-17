@@ -21,7 +21,7 @@ class stateevent:
                 return DefaultMethodResult(True,'Comment posted',requestid)
             else:   
                 return DefaultMethodResult(False,'unable to post comment',requestid)
-        
+        return  DefaultMethodResult(True,'No change',requestid)
             
     def __haschanged(self, requestid, requesttype):
         if requesttype == "rawrequest":

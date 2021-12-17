@@ -88,7 +88,7 @@ class documentservice:
                 attachment['requestnumber'] = str(requestid)
                 attachment['file'] = base64.b64decode(attachment['base64data'])
                 attachment.pop('base64data')
-                attachmentresponse = storageservice().uploadtos3(attachment)
+                attachmentresponse = storageservice().upload(attachment)
                 attachmentlist.append(attachmentresponse)
                 
             documentschema = CreateDocumentSchema().load({'documents': attachmentlist})
