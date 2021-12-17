@@ -38,6 +38,7 @@ import { StateEnum } from '../../../constants/FOI/statusEnum';
 import {CommentSection} from '../customComponents/Comments';
 import {AttachmentSection} from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
+import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,7 +54,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop:'30px',
     color: "#000000",
   },
- 
+  displayed: {
+    display: "block"
+  },
+  hidden: {
+    display: "none"
+  }
 }));
 
 const FOIRequest = React.memo(({userDetail}) => {
@@ -79,6 +85,33 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   //quillChange and removeComment added to handle Navigate away from Comments tabs
   const [quillChange, setQuillChange] = useState(false);
+
+  const initialStatuses = {
+    Request: {
+      display: false,
+      active: false,
+    },
+    Comments: {
+      display: false,
+      active: false,
+    },
+    Attachments: {
+      display: false,
+      active: false,
+    },
+    Option4: {
+      display: false,
+      active: false
+    }
+  };
+
+  const [tabLinksStatuses, setTabLinksStatuses] = useState({
+    ...initialStatuses,
+    Request: {
+      display: true,
+      active: true
+    },
+  })
   const [removeComment, setRemoveComment] = useState(false);
 
   const [attachments, setAttachments] = useState(requestAttachments);
@@ -307,8 +340,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     || (requiredRequestDetailsValues.requestStartDate === undefined || requiredRequestDetailsValues.requestStartDate === "")
     );
 
-  const classes = useStyles();
- 
+  const classes = useStyles(); 
 
   const updateAdditionalInfo = (name, value, requestObject) => {
     if (requestObject.additionalPersonalInfo === undefined) {
@@ -543,8 +575,10 @@ const FOIRequest = React.memo(({userDetail}) => {
     else {
       setUpdateStateDropdown(!updateStateDropDown);
       setcurrentrequestStatus(_state);
+      setStateChanged(false);
     }
   }
+
 
   const getRedirectAfterSaveUrl = (_state) => {
     if(ministryId) {
@@ -558,7 +592,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     return null;
   };
 
-  const handleOpenRequest = (parendId, ministryId, unSaved) => {
+  const handleOpenRequest = (parendId, _ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
       if (!unSaved) {
         setStateChanged(false);
@@ -568,7 +602,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       }
       else {
         setUpdateStateDropdown(!updateStateDropDown);
-        setcurrentrequestStatus(StateEnum.intakeinprogress.name); // should be revisited
+        setcurrentrequestStatus(requestState); // should be revisited
       }
   }
   
@@ -700,45 +734,56 @@ const FOIRequest = React.memo(({userDetail}) => {
     }
   });
 
-  const tabclick = (evt, param) => {
-    let clickedOk = true;
-    if (quillChange && param !== 'Comments') {
-      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-        setQuillChange(false);
-        setRemoveComment(true);
-      }
-      else {
-        setQuillChange(true);
-        setRemoveComment(false);
-        clickedOk = false;
-        param = 'Comments';
-        document.getElementById(param).className += " active";
-        document.getElementsByName(param)
-          .forEach((element) => {
-            element.className += " active";
-          });
-      }
-    }
-    else {
+  const tabclick = (param) => {
+    if(param === 'Comments') {
       setRemoveComment(false);
+      changeTabLinkStatuses(param);
+      return;
     }
-    var i, tabcontent, tablinks;
-
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-      tabcontent[i].className = tabcontent[i].className.replace(" active", "");
-    }
-
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    document.getElementById(param).style.display = "block";
-    if (clickedOk)
-      evt.currentTarget.className += " active";
     
+    if(quillChange) {
+      confirmChangesLost(
+        () => {
+          setQuillChange(false);
+          setRemoveComment(true);
+          changeTabLinkStatuses(param);
+        },
+        () => {
+          setQuillChange(true);
+          setRemoveComment(false);          
+        }
+      )
+    } else {
+
+      changeTabLinkStatuses(param);
+      
+    }
+
   }
+
+  const changeTabLinkStatuses = (param) => {
+    setTabLinksStatuses({
+      ...initialStatuses,
+      [param]: {
+        ...tabLinksStatuses[param],
+        active: true,
+        display: true,
+      },
+    });
+  }
+
+  const confirmChangesLost = (positiveCallback, negativeCallback) => {
+    if (
+      window.confirm(
+        "Are you sure you want to leave? Your changes will be lost."
+      )
+    ) {
+      positiveCallback();
+    } else {
+      negativeCallback();
+    }
+  };
+
   const bottomTextArray = _requestStatus.split('|');
       
   const userId = userDetail && userDetail.preferred_username
@@ -770,11 +815,24 @@ const FOIRequest = React.memo(({userDetail}) => {
           </div>
           
         <div className="tab">
-          <div className="tablinks active" name="Request" onClick={e => tabclick(e,'Request')}>Request</div>
+          <div
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Request.active
+            })}
+            name="Request" 
+            onClick={() => tabclick('Request')}>
+              Request
+          </div>
           {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
               && 
-                <div className="tablinks" name="Attachments" onClick={e=>tabclick(e,'Attachments')}>
+                <div
+                  className={clsx("tablinks", {
+                    "active": tabLinksStatuses.Attachments.active
+                  })}
+                  name="Attachments" 
+                  onClick={() => tabclick('Attachments')}
+                >
                   Attachments{
                     requestAttachments && requestAttachments.length > 0 
                     ? ` (${requestAttachments.length})`
@@ -784,11 +842,26 @@ const FOIRequest = React.memo(({userDetail}) => {
           }
           {
             url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
-              && <div className="tablinks" name="Comments" onClick={e=>tabclick(e,'Comments')}>
+              && <div 
+                  className={clsx("tablinks", {
+                    "active": tabLinksStatuses.Comments.active
+                  })}
+                  name="Comments" 
+                  onClick={() => tabclick('Comments')}
+                 >
                   Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}
                 </div>
           }
-          <div className="tablinks" name="Option3" onClick={e=>tabclick(e,'Option4')}>Option 4</div>
+          <div 
+            className="tablinks" 
+            className={clsx("tablinks", {
+              "active": tabLinksStatuses.Option4.active
+            })}
+            name="Option4" 
+            onClick={() => tabclick('Option4')}
+          >
+            Option 4
+          </div>
         </div>
        
         <div className="foileftpanelstatus">
@@ -813,7 +886,14 @@ const FOIRequest = React.memo(({userDetail}) => {
 
         </div>
         <div className="foitabpanelcollection"> 
-          <div id="Request" className="tabcontent active">                                
+          <div 
+            id="Request" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Request.active,
+              [classes.displayed]: tabLinksStatuses.Request.display,
+              [classes.hidden]: !tabLinksStatuses.Request.display,
+            })}
+          >                                
             <div className="container foi-review-request-container">
 
               <div className="foi-review-container">
@@ -868,7 +948,14 @@ const FOIRequest = React.memo(({userDetail}) => {
               </div>
             </div>                            
           </div> 
-          <div id="Attachments" className="tabcontent">
+          <div 
+            id="Attachments" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Attachments.active,
+              [classes.displayed]: tabLinksStatuses.Attachments.display,
+              [classes.hidden]: !tabLinksStatuses.Attachments.display,
+            })}
+          >
             {
              !isAttachmentListLoading && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
                 <>
@@ -879,7 +966,14 @@ const FOIRequest = React.memo(({userDetail}) => {
                 </> : <Loading />
             }
           </div> 
-          <div id="Comments" className="tabcontent">
+          <div 
+            id="Comments" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Comments.active,
+              [classes.displayed]: tabLinksStatuses.Comments.display,
+              [classes.hidden]: !tabLinksStatuses.Comments.display,
+            })}
+          >
             {
              !isLoading && requestNotes && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
                 <>
@@ -894,7 +988,14 @@ const FOIRequest = React.memo(({userDetail}) => {
 
           
               </div> 
-          <div id="Option4" className="tabcontent">
+          <div 
+            id="Option4" 
+            className={clsx("tabcontent", {
+              "active": tabLinksStatuses.Option4.active,
+              [classes.displayed]: tabLinksStatuses.Option4.display,
+              [classes.hidden]: !tabLinksStatuses.Option4.display,
+            })}
+          >
            <h3>Option 4</h3>
           </div>        
         </div>
