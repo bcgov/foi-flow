@@ -6,7 +6,8 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
@@ -259,7 +260,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
                 {attachment.filename}
               </div>
               <div className="attachment-badge">
-                <span class="badge badge-primary">{getCategory(attachment.category)}</span>
+                <span className="badge badge-primary">{getCategory(attachment.category)}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
