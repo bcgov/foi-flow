@@ -20,7 +20,7 @@ class stateevent:
             if _commentresponse.success == True:
                 return DefaultMethodResult(True,'Comment posted',requestid)
             else:   
-                return DefaultMethodResult(True,'unable to post comment',requestid)
+                return DefaultMethodResult(False,'unable to post comment',requestid)
         
             
     def __haschanged(self, requestid, requesttype):

@@ -5,73 +5,94 @@ from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDoc
 from request_api.models.FOIRawRequestDocuments import FOIRawRequestDocument
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
+from request_api.schemas.foidocument import CreateDocumentSchema
+from request_api.services.external.storageservice import storageservice
 import json
-
+import base64
 import maya
 
 class documentservice:
     """ FOI Document management service
-
     """
+    
     def getrequestdocuments(self, requestid, requesttype, version=None):
-        """ Retrives the request document based on type and version.
-        """
         requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
         documents = FOIMinistryRequestDocument.getdocuments(requestid, requestversion) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
         return self.__formatcreateddate(documents)
-            
+    
+    def getrequestdocumentsbyrole(self, requestid, requesttype, isministrymember):
+        documents = self.getrequestdocuments(requestid, requesttype)
+        if isministrymember:
+            for document in documents:
+                if document["category"] == "personal":
+                    document["documentpath"] = ""        
+        return documents
+
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
-        """ Creates a request document based on type passed in.
-        """
         if requesttype == "ministryrequest":
             return self.createministryrequestdocument(requestid, documentschema, userid)
         else:
             return self.createrawrequestdocument(requestid, documentschema, userid)
-    
+
     def createrequestdocumentversion(self, requestid, documentid, documentschema, userid, requesttype):
-        """ Creates a new version of document for updates.
-        """
         if requesttype == "ministryrequest":
            return self.createministrydocumentversion(requestid, documentid, documentschema, userid)
         else:
             return self.createrawdocumentversion(requestid, documentid, documentschema, userid)
 
-
     def deleterequestdocument(self, requestid, documentid, userid, requesttype):
-        """ Creates a new version of document for updates.
-        """
         documentschema = {'isactive':False}
-        return self.createrequestdocumentversion(requestid, documentid, documentschema, userid, requesttype)   
-    
-    
+        return self.createrequestdocumentversion(requestid, documentid, documentschema, userid, requesttype)
+
     def copyrequestdocuments(self, ministryrequestid, documents, userid):
+        """ Copies request documents upon updates
         """
-        """
-        _documents = []        
+        _documents = []
         for document in documents:
             _documents.append({"documentpath":document["documentpath"],"filename":document["filename"],"category":document["category"], "created_at":document["created_at"],"createdby": document["createdby"]})
         documentschema = {"documents": _documents}
-        return self.createministryrequestdocument(ministryrequestid, documentschema, userid)       
-            
+        return self.createministryrequestdocument(ministryrequestid, documentschema, userid)
+
     def createministryrequestdocument(self, ministryrequestid, documentschema, userid):
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")
-        return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema['documents'], userid)     
-    
+        return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema['documents'], userid)
+
     def createrawrequestdocument(self, requestid, documentschema, userid):
         version = self.__getversionforrequest(requestid, "rawrequest")
-        return FOIRawRequestDocument.createdocuments(requestid, version, documentschema['documents'], userid) 
-    
+        return FOIRawRequestDocument.createdocuments(requestid, version, documentschema['documents'], userid)
+
     def createministrydocumentversion(self, ministryrequestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")
         document = FOIMinistryRequestDocument.getdocument(documentid)
-        return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.copydocumentproperties(document,documentschema,document['version']), userid)    
+        return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.copydocumentproperties(document,documentschema,document['version']), userid)
 
     def createrawdocumentversion(self, requestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(requestid, "rawrequest")
         document = FOIRawRequestDocument.getdocument(documentid)
-        return FOIRawRequestDocument.createdocumentversion(requestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)  
-    
+        return FOIRawRequestDocument.createdocumentversion(requestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
 
+    def createrawrequestdocumentversion(self, requestid):
+        newversion = self.__getversionforrequest(requestid,"rawrequest")
+        documents = self.getrequestdocuments(requestid, "rawrequest", newversion-1)
+        documentarr = []
+        for document in documents:
+            documentarr.append({"documentpath": document["documentpath"], "filename": document["filename"], "category": document['category'], "version": 1, "foirequest_id": requestid, "foirequestversion_id": newversion - 1, "createdby": document['createdby'], "created_at": document['created_at']     })
+        return self.createrawrequestdocument(requestid, {"documents": documentarr}, None)
+
+    def uploadpersonaldocuments(self, requestid, attachments):
+        attachmentlist = []
+        if attachments:
+            for attachment in attachments:
+                attachment['filestatustransition'] = 'personal'
+                attachment['ministrycode'] = 'Misc'
+                attachment['requestnumber'] = str(requestid)
+                attachment['file'] = base64.b64decode(attachment['base64data'])
+                attachment.pop('base64data')
+                attachmentresponse = storageservice().uploadtos3(attachment)
+                attachmentlist.append(attachmentresponse)
+                
+            documentschema = CreateDocumentSchema().load({'documents': attachmentlist})
+            return self.createrequestdocument(requestid, documentschema, None, "rawrequest")        
 
     def __getversionforrequest(self, requestid, requesttype):
         """ Returns the active version of the request id based on type.
@@ -80,7 +101,7 @@ class documentservice:
             return FOIMinistryRequest.getversionforrequest(requestid)[0]
         else:
             return FOIRawRequest.getversionforrequest(requestid)[0]
-    
+
     def __copydocumentproperties(self, document, documentschema, version):
         document['version'] = version +1
         document['filename'] = documentschema['filename'] if 'filename' in documentschema  else document['filename']
@@ -99,13 +120,7 @@ class documentservice:
     def __pstformat(self, document):
         formatedcreateddate = maya.parse(document['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
         document['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
-        return document   
-        
-     
-    def createrawrequestdocumentversion(self, requestid):
-        newversion = self.__getversionforrequest(requestid,"rawrequest")     
-        documents = self.getrequestdocuments(requestid, "rawrequest", newversion-1)
-        documentarr = []
-        for document in documents:
-            documentarr.append({"documentpath": document["documentpath"], "filename": document["filename"], "category": document['category'], "version": 1, "foirequest_id": requestid, "foirequestversion_id": newversion - 1, "createdby": document['createdby'], "created_at": document['created_at']     })
-        return self.createrawrequestdocument(requestid, {"documents": documentarr}, None)
+        return document
+
+
+

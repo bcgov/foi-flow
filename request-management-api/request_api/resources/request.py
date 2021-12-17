@@ -23,8 +23,8 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
+from request_api.services.documentservice import documentservice
 import json
-import uuid
 from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
@@ -118,8 +118,14 @@ class FOIRawRequests(Resource):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestData']           
+            requestdatajson = request_json['requestData']  
+            #get attachments
+            attachments = requestdatajson['Attachments'] if requestdatajson.get('Attachments') != None else None
+            #save request
+            requestdatajson.pop('Attachments')
             result = rawrequestservice().saverawrequest(requestdatajson,"onlineform",None)
+            if result.success:
+                documentservice().uploadpersonaldocuments(result.identifier, attachments)   
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
