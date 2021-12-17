@@ -8,14 +8,12 @@ import {
     setRawRequestAttachments,
     setMinistryRequestAttachments
   } from "../../../actions/FOI/foiRequestActions";
-  import {postAttachment} from './foiServicesUtil';
+  import {postAttachment, fnDone} from './foiServicesUtil';
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
 
  export const fetchFOIRequestAttachmentsList = (requestId, ministryId, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done = fnDone(rest);
     let apiUrl = "";
     if (ministryId !=null) {
       apiUrl = replaceUrl(
@@ -59,10 +57,7 @@ import {
     };
   };
 
-  export const saveFOIRequestAttachmentsList = (requestId, ministryId, data, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const saveFOIRequestAttachmentsList = (requestId, ministryId, data, ...rest) => {    
     let apiUrl = "";
     if (ministryId !=null) {
       apiUrl = replaceUrl(
@@ -77,14 +72,12 @@ import {
       );
     }
     return (dispatch) => {
-      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in posting Attachments", done);     
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in posting Attachments", rest);     
     };
   };
 
   export const saveNewFilename = (newFilename, documentId, requestId, ministryId, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done =fnDone(rest);
 
     let apiUrl = "";
     if (ministryId !=null) {
@@ -114,9 +107,7 @@ import {
   };
 
   export const replaceFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done = fnDone(rest);
     let apiUrl = "";
 
     if (ministryId && documentId) {
@@ -138,9 +129,7 @@ import {
   };
 
   export const deleteFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done = fnDone(rest);
     let apiUrl = "";
 
     if (ministryId && documentId) {

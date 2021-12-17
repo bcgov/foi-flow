@@ -260,7 +260,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
                 {attachment.filename}
               </div>
               <div className="attachment-badge">
-                <span class="badge badge-primary">{getCategory(attachment.category)}</span>
+                <span className="badge badge-primary">{getCategory(attachment.category)}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>

@@ -10,12 +10,9 @@ import {
   } from "../../../actions/FOI/foiRequestActions";
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
+  import { catchError, fnDone } from "./foiServicesUtil";
 
-export const fetchFOIWatcherList = (requestId, ministryId, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
-  
+export const fetchFOIWatcherList = (requestId, ministryId) => {  
     let apiUrl = '';
     if (ministryId) {
       apiUrl = replaceUrl(
@@ -40,7 +37,6 @@ export const fetchFOIWatcherList = (requestId, ministryId, ...rest) => {
             });
             dispatch(setFOIWatcherList(data));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log("Error in fetching watcher list", res);
             dispatch(serviceActionError(res));
@@ -48,18 +44,13 @@ export const fetchFOIWatcherList = (requestId, ministryId, ...rest) => {
           }
         })
         .catch((error) => {
-          console.log("Error in fetching watcher list", error);
-          dispatch(serviceActionError(error));
-          dispatch(setFOILoader(false));
-          done(error);
+          catchError(error, dispatch);
         });
     };
   };
   
   export const saveWatcher = (ministryId, data, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done = fnDone(rest);
     let apiUrl = API.FOI_POST_RAW_REQUEST_WATCHERS;
     if (ministryId) {
       apiUrl = API.FOI_POST_MINISTRY_REQUEST_WATCHERS;
@@ -71,12 +62,12 @@ export const fetchFOIWatcherList = (requestId, ministryId, ...rest) => {
             done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
-            done("Error in updating watcher list");
+            throw new Error("Error in updating watcher list");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done("Error in updating watcher list");
+          done(error);
         });
     };
   };

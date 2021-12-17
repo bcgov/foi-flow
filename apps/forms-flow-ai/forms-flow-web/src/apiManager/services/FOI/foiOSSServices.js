@@ -7,13 +7,12 @@ import {
   import {
     serviceActionError,
   } from "../../../actions/FOI/foiRequestActions";
+  import { fnDone } from "./foiServicesUtil";
   import { saveAs } from "file-saver";
   
     
   export const getOSSHeaderDetails = (data, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done = fnDone(rest);
     return (dispatch) => {
       httpPOSTRequest(API.FOI_POST_OSS_HEADER, data)
         .then((res) => {
@@ -32,9 +31,7 @@ import {
   };
   
   export const saveFilesinS3 = (headerDetails, file, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done = fnDone(rest);
     var requestOptions = {
       headers: {
         'X-Amz-Date': headerDetails.amzdate,
@@ -59,9 +56,7 @@ import {
   };
   
   export const getFileFromS3 = (headerDetails, file, ...rest) => {  
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+    const done = fnDone(rest);
     var requestOptions = {
       headers: {
         "X-Amz-Date": headerDetails.amzdate,

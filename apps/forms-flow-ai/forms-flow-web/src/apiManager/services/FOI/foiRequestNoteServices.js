@@ -12,11 +12,9 @@ import {
   } from "../../../actions/FOI/foiRequestActions";
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
+  import { catchError } from './foiServicesUtil'
 
-  export const fetchFOIRequestNotesList = (requestId, ministryId, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const fetchFOIRequestNotesList = (requestId, ministryId) => {
     let apiUrl = "";
     if (ministryId != null) {
       apiUrl = replaceUrl(
@@ -42,7 +40,6 @@ import {
               dispatch(setRawRequestComments(res.data));
             }  
             dispatch(setFOILoader(false));
-            done(null, res.data);  
           } else {
             console.log("Error in fetching request notes", res);
             dispatch(serviceActionError(res));
@@ -50,61 +47,47 @@ import {
           }
         })
         .catch((error) => {
-          console.log("Error in fetching request notes", error);
-          dispatch(serviceActionError(error));
-          dispatch(setFOILoader(false));
-          done(error);
+          catchError(error, dispatch);
         });
     };
   };
 
-  export const saveRawRequestNote = (data, requestid, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const saveRawRequestNote = (data, requestid) => {    
     return (dispatch) => {
       httpPOSTRequest(API.FOI_POST_COMMENT_RAWREQUEST, data)
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(requestid, null))
           if (res.data) {
-            done(null, res.data);
+            console.log("Saved request note successfully!");
           } else {
             dispatch(serviceActionError(res));
-            done("Error Posting Raw Request Note");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done("Error Posting Raw Request Note");
         });
     };
   };
-  export const saveMinistryRequestNote = (data,  ministryId, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const saveMinistryRequestNote = (data,  ministryId) => {
     return (dispatch) => {
       httpPOSTRequest(API.FOI_POST_COMMENT_MINISTRYREQUEST, data)
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(null, ministryId))
           if (res.data) {            
-            done(null, res.data);
+            console.log("Saved request note successfully!");
           } else {
             dispatch(serviceActionError(res));
-            done("Error Posting Ministry Request Note");
+            console.log("Error Posting Ministry Request Note");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done("Error Posting Ministry Request Note");
+          console.log("Error Posting Ministry Request Note");
         });
     };
   };
   
-  export const editRawRequestNote = (data, commentid, requestid, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const editRawRequestNote = (data, commentid, requestid) => {
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_PUT_COMMENT_RAWREQUEST,
     ), "<requestid>", commentid);
@@ -113,22 +96,19 @@ import {
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(requestid, null))
           if (res.data) {
-            done(null, res.data);
+            console.log("Edit raw request note successfully!")
           } else {
             dispatch(serviceActionError(res));
-            done("Error editing raw request note");
+            console.log("Error editing raw request note");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done("Error editing raw request note");
+          console.log("Error editing raw request note");
         });
     };
   };
-  export const editMinistryRequestNote = (data, commentid,  ministryId, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const editMinistryRequestNote = (data, commentid,  ministryId) => {
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_PUT_COMMENT_MINISTRYREQUEST,
     ), "<ministryrequestid>", commentid);    
@@ -137,23 +117,20 @@ import {
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(null, ministryId))
           if (res.data) {
-            done(null, res.data);
+            console.log("Edit ministry request note successfully!");
           } else {
             dispatch(serviceActionError(res));
-            done("Error editing ministry request note");
+            console.log("Error editing ministry request note");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done("Error editing ministry request note");
+          console.log("Error editing ministry request note");
         });
     };
   };
     
-  export const deleteRawRequestNote = (data, commentid,requestid, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const deleteRawRequestNote = (data, commentid,requestid) => {
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_DELETE_COMMENT_RAWREQUEST,
     ), "<commentid>", commentid);
@@ -162,22 +139,19 @@ import {
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(requestid, null))
           if (res.data) {
-            done(null, res.data);
+            console.log("Deleted raw request note successfully!");
           } else {
             dispatch(serviceActionError(res));
-            done("Error deleting Raw Request Note");
+            console.log("Error deleting Raw Request Note");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done("Error deleting Raw Request Note");
+          console.log("Error deleting Raw Request Note");
         });
     };
   };
-  export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-        //This is intentional
-     };
+  export const deleteMinistryRequestNote = (data, commentid,ministryId) => {
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_DELETE_COMMENT_MINISTRYREQUEST,
     ), "<commentid>", commentid);
@@ -186,15 +160,15 @@ import {
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(null, ministryId))
           if (res.data) {
-            done(null, res.data);
+            console.log("Deleted ministry request note successfully!");
           } else {
             dispatch(serviceActionError(res));
-            done(`Error deleting ministry Request Note with id ${commentid}`);
+            console.log(`Error deleting ministry Request Note with id ${commentid}`);
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done(`Error deleting ministry Request Note with id ${commentid}`);
+          console.log(`Error deleting ministry Request Note with id ${commentid}`);
         });
     };
   };

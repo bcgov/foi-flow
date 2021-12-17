@@ -17,13 +17,11 @@ import {
     clearFOIMinistryDivisionalStages,
     setClosingReasons,    
   } from "../../../actions/FOI/foiRequestActions";
+  import { fnDone } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
   import { replaceUrl, addToFullnameList, getAssignToList, getFullnameTeamList } from "../../../helper/FOI/helper";
   
-  export const fetchFOICategoryList = (...rest) => {
-    const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  export const fetchFOICategoryList = () => {
     const firstCategory = { "applicantcategoryid": 0, "name": "Select Category" };
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_CATEGORIES_API, {}, UserService.getToken())
@@ -36,7 +34,6 @@ import {
             data.unshift(firstCategory);
             dispatch(setFOICategoryList(data));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log("Error while fetching category master data", res);
             dispatch(serviceActionError(res));
@@ -47,15 +44,11 @@ import {
           console.log("Error while fetching category master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(error);
         });
     };
   };
   
-  export const fetchFOIProgramAreaList = (...rest) => {
-    const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  export const fetchFOIProgramAreaList = () => {    
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
         .then((res) => {
@@ -66,7 +59,6 @@ import {
             });
             dispatch(setFOIProgramAreaList(data));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log("Error while fetching program area master data", res);
             dispatch(serviceActionError(res));
@@ -77,16 +69,12 @@ import {
           console.log("Error while fetching program area master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(error);
         });
     };
   };
   
   
-  export const fetchFOIAssignedToList = (requestType, status, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  export const fetchFOIAssignedToList = (requestType, status) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
     if (requestType && status) {
       apiUrlGETAssignedToList = replaceUrl(replaceUrl(
@@ -105,7 +93,6 @@ import {
             });
             dispatch(setFOIAssignedToList(data));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log(`Error while fetching assigned to master data based on requestType ${requestType} and state ${status} `, res);
             dispatch(serviceActionError(res));
@@ -116,7 +103,6 @@ import {
           console.log("Error while fetching assigned to master data based on requestType ${requestType} and state ${status}", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(error);
         });
     };
   };
@@ -134,9 +120,7 @@ import {
       };
   
       } else {
-        const done = rest.length ? rest[0] : () => {
-          //This is intentional
-       };
+        const done = fnDone(rest);
   
       return (dispatch) => {
         httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
@@ -181,9 +165,7 @@ import {
       };
   
       } else {
-        const done = rest.length ? rest[0] : () => {
-          //This is intentional
-       };
+        const done =fnDone(rest);
   
       const apiUrlGETAssignedToList = replaceUrl(
         API.FOI_GET_ASSIGNEDTO_MINISTRYGROUP_LIST_API,
@@ -219,10 +201,7 @@ import {
     }
   };
   
-  export const fetchFOIDeliveryModeList = (...rest) => {
-    const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  export const fetchFOIDeliveryModeList = () => {
     const firstDeliveryMode = { "deliverymodeid": 0, "name": "Select Delivery Mode" };
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_DELIVERY_MODELIST, {}, UserService.getToken())
@@ -235,7 +214,6 @@ import {
             data.unshift(firstDeliveryMode);
             dispatch(setFOIDeliveryModeList(data));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log("Error while fetching delivery mode master data", res);
             dispatch(serviceActionError(res));
@@ -246,15 +224,11 @@ import {
           console.log("Error while fetching delivery mode master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(error);
         });
     };
   };
   
-  export const fetchFOIReceivedModeList = (...rest) => {
-    const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  export const fetchFOIReceivedModeList = () => {
     const firstReceivedMode = { "receivedmodeid": 0, "name": "Select Received Mode" };
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_RECEIVED_MODELIST, {}, UserService.getToken())
@@ -268,7 +242,6 @@ import {
   
             dispatch(setFOIReceivedModeList(data));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log("Error while fetching received mode master data", res);
             dispatch(serviceActionError(res));
@@ -279,15 +252,11 @@ import {
           console.log("Error while fetching received mode master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(error);
         });
     };
   };
 
-  export const fetchClosingReasonList = (...rest) => {
-    const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  export const fetchClosingReasonList = () => {    
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_CLOSING_REASONS, {}, UserService.getToken())
         .then((res) => {
@@ -295,7 +264,6 @@ import {
             const closingReasons = res.data;
             dispatch(setClosingReasons(closingReasons));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log("Error while fetching close request reason master data", res);
             dispatch(serviceActionError(res));
@@ -306,15 +274,11 @@ import {
           console.log("Error while fetching close request reason master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(error);
         });
     };
   };
 
-  export const fetchFOIMinistryDivisionalStages = (bcgovcode, ...rest) => {
-    const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  export const fetchFOIMinistryDivisionalStages = (bcgovcode) => {
     const apiUrlgetdivisionalstages = replaceUrl(API.FOI_MINISTRY_DIVISIONALSTAGES, "<bcgovcode>", bcgovcode);
     return (dispatch) => {
       httpGETRequest(apiUrlgetdivisionalstages, {}, UserService.getToken())
@@ -324,7 +288,6 @@ import {
             dispatch(clearFOIMinistryDivisionalStages({}));
             dispatch(setFOIMinistryDivisionalStages(foiMinistryDivisionalStages));
             dispatch(setFOILoader(false));
-            done(null, res.data);
           } else {
             console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, res);
             dispatch(serviceActionError(res));
@@ -335,7 +298,6 @@ import {
           console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
-          done(error);
         });
     };
   };

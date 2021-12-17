@@ -15,13 +15,11 @@ import {
   setFOIMinistryRequestList,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
+import { catchError, fnDone } from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
 
-export const fetchFOIRequestList = (...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+export const fetchFOIRequestList = () => {
   return (dispatch) => {
     httpGETRequest(API.FOI_GET_REQUESTS_API, {}, UserService.getToken())
       .then((res) => {
@@ -33,27 +31,19 @@ export const fetchFOIRequestList = (...rest) => {
           dispatch(clearRequestDetails({}));
           dispatch(fetchFOIAssignedToList("", ""));
           dispatch(setFOIRequestList(data));
-          dispatch(setFOILoader(false));
-          done(null, res.data);
+          dispatch(setFOILoader(false)); 
         } else {
-          console.log("Error in fetching dashboard data for IAO", res);
           dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
+          throw new Error("Error in fetching dashboard data for IAO");
         }
       })
       .catch((error) => {
-        console.log("Error in fetching dashboard data for IAO", error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
+        catchError(error, dispatch);
       });
   };
 };
 
-export const fetchFOIMinistryRequestList = (...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+export const fetchFOIMinistryRequestList = () => {
   return (dispatch) => {
     httpGETRequest(API.FOI_GET_MINISTRY_REQUESTS_API, {}, UserService.getToken())
       .then((res) => {
@@ -68,26 +58,18 @@ export const fetchFOIMinistryRequestList = (...rest) => {
             dispatch(fetchFOIMinistryAssignedToList( foiRequests[0].bcgovcode.toLowerCase()));     
           dispatch(setFOIMinistryRequestList(data));
           dispatch(setFOILoader(false));
-          done(null, res.data);
         } else {
-          console.log("Error in fetching dashboard data for Ministry", res);
           dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
+          throw new Error("Error in fetching dashboard data for Ministry");
         }
       })
-      .catch((error) => {
-        console.log("Error in fetching dashboard data for Ministry", error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
+      .catch((error) => {        
+        catchError(error, dispatch);
       });
   };
 };
 
-export const fetchFOIRawRequestDetails = (requestId, ...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+export const fetchFOIRawRequestDetails = (requestId) => {
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_RAW_REQUEST_API,
     "<requestid>",
@@ -103,26 +85,18 @@ export const fetchFOIRawRequestDetails = (requestId, ...rest) => {
           dispatch(setFOIAssignedToList([]));
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
-          done(null, res.data);
         } else {
-          console.log(`Error in fetching raw request details for request# ${requestId}`, res);
           dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
+          throw new Error(`Error in fetching raw request details for request# ${requestId}`);
         }
       })
       .catch((error) => {
-        console.log(`Error in fetching raw request details for request# ${requestId}`, error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
+        catchError(error, dispatch);
       });
-  };
+  }
 };
 
-export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+export const fetchFOIRequestDetails = (requestId, ministryId) => {
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
@@ -138,26 +112,19 @@ export const fetchFOIRequestDetails = (requestId, ministryId, ...rest) => {
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
           dispatch(setFOILoader(false));
-          done(null, res.data);
         } else {
-          console.log(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`, res);
           dispatch(serviceActionError(res));
           dispatch(setFOILoader(false));
+          throw new Error(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`)
         }
       })
       .catch((error) => {
-        console.log(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`, error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
+        catchError(error, dispatch);
       });
   };
 };
 
-export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId, ...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId) => {
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_MINISTRYVIEW_REQUEST_API,
     "<requestid>",
@@ -172,26 +139,20 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId, ...res
           dispatch(setFOIMinistryViewRequestDetail(foiRequest));
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
           dispatch(setFOILoader(false));
-          done(null, res.data);
         } else {
-          console.log(`Error in fetching ministry request details for request# ${requestId} ministry# ${ministryId}`, res);
           dispatch(serviceActionError(res));
           dispatch(setFOILoader(false));
+          throw new Error(`Error in fetching ministry request details for request# ${requestId} ministry# ${ministryId}`)
         }
       })
       .catch((error) => {
-        console.log(`Error in fetching ministry request details for request# ${requestId} ministry# ${ministryId}`, error);
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(error);
+        catchError(error, dispatch);
       });
   };
 };
 
 export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  const done = fnDone(rest);
   let id = urlIndexCreateRequest > -1 ? -1 : requestId;
   let apiUrl = "";
   if (ministryId) {
@@ -212,44 +173,42 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
     httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {
+          console.log("Request saved successfully!");
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          done(`Error in saving request details for the request# ${requestId} and ministry# ${ministryId}`);
+          throw new Error(`Error in saving request details for the request# ${requestId} and ministry# ${ministryId}`);
         }
       })
       .catch((error) => {
-        dispatch(serviceActionError(error));
-        done(`Error in saving request details for the request# ${requestId} and ministry# ${ministryId}`);
+        done(error);
+        catchError(error, dispatch);
       });
   };
 };
 
 export const openRequestDetails = (data, ...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  const done = fnDone(rest);
   return (dispatch) => {
     httpPOSTRequest(API.FOI_POST_REQUEST_POST, data)
       .then((res) => {
         if (res.data) {
           done(null, res.data);
+          console.log("Request opened successfully!");
         } else {
           dispatch(serviceActionError(res));
-          done(`Error while opening the request`);
+          throw new Error("Error while opening the request");
         }
       })
       .catch((error) => {
-        dispatch(serviceActionError(error));
-        done(`Error while opening the request`);
+        done(error);
+        catchError(error, dispatch);
       });
   };
 };
 
 export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+  const done = fnDone(rest);
   let apiUrl = "";
   if (ministryId) {
     apiUrl = replaceUrl(replaceUrl(
@@ -262,24 +221,21 @@ export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest)
         .then((res) => {
           if (res.data) {
             done(null, res.data);
+            console.log("Request saved successfully!");
           } else {
             dispatch(serviceActionError(res));
-            done(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);
+            throw new Error(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);            
           }
         })
         .catch((error) => {
-          dispatch(serviceActionError(error));
-          done(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);
+          done(error);
+          catchError(error, dispatch);
         });
     };
   }
-  done("Error Posting data");
 };
 
-export const fetchFOIRequestDescriptionList = (requestId, ministryId, ...rest) => {
-  const done = rest.length ? rest[0] : () => {
-      //This is intentional
-   };
+export const fetchFOIRequestDescriptionList = (requestId, ministryId) => {
   let apiUrl = "";
   if (ministryId) {
     apiUrl = replaceUrl(replaceUrl(
@@ -299,17 +255,14 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId, ...rest) =
         if (res.data) {
           dispatch(setFOIRequestDescriptionHistory(res.data.audit));
           dispatch(setFOILoader(false));
-          done(null, res.data);
         } else {
-          done(`Error while fetching the request description history (request# ${requestId}, ministry# ${ministryId})`);
           dispatch(serviceActionError(res));
           dispatch(setFOILoader(false));
+          throw new Error(`Error while fetching the request description history (request# ${requestId}, ministry# ${ministryId})`);
         }
       })
       .catch((error) => {
-        dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
-        done(`Error while fetching the request description history (request# ${requestId}, ministry# ${ministryId})`);
+        catchError(error, dispatch);
       });
   };
 };
