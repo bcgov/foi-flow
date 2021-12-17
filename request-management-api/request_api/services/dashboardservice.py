@@ -57,7 +57,7 @@ class dashboardservice:
                                                                  openrequest["requestType"], openrequest["currentState"], openrequest["receivedDate"], 
                                                                  openrequest["receivedDateUF"], openrequest["assignedGroup"], openrequest["assignedTo"],
                                                                  openrequest["idNumber"], openrequest["version"], watchers)
-                    _openrequest['ministryrequestid'] = openrequest['ministryrequestid']
+                    _openrequest.update({'ministryrequestid':openrequest['ministryrequestid']})
                     requestqueue.append(_openrequest)                        
             return requestqueue
 
@@ -74,21 +74,21 @@ class dashboardservice:
                     _openrequest = self.__preparebaserequestinfo(openrequest["id"], openrequest["requestType"], openrequest["currentState"], 
                                                                  openrequest["receivedDate"], openrequest["receivedDateUF"], openrequest["assignedGroup"], 
                                                                  openrequest["assignedTo"], openrequest["idNumber"], openrequest["version"], watchers)
-                    _openrequest['assignedministrygroup'] = openrequest['assignedministrygroup'],
-                    _openrequest['assignedministryperson'] = openrequest['assignedministryperson'],
-                    _openrequest['cfrstatus'] = 'Select Division',
-                    _openrequest['cfrduedate'] = openrequest["cfrDueDate"],
-                    _openrequest['duedate'] = openrequest["dueDate"],
-                    _openrequest['ministryrequestid'] = openrequest["ministryrequestid"],
-                    _openrequest['applicantcategory'] = openrequest["applicantcategory"]                    
+                    _openrequest.update({'assignedministrygroup': openrequest['assignedministrygroup']})
+                    _openrequest.update({'assignedministryperson':openrequest['assignedministryperson']})
+                    _openrequest.update({'cfrstatus':'Select Division'})
+                    _openrequest.update({'cfrduedate':openrequest['cfrDueDate']})
+                    _openrequest.update({'duedate':openrequest['dueDate']})
+                    _openrequest.update({'ministryrequestid':openrequest['ministryrequestid']})
+                    _openrequest.update({'applicantcategory':openrequest['applicantcategory']})
                     requestqueue.append(_openrequest)
             return requestqueue 
     
     def __preparefoirequestinfo(self, id, firstname, lastname, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers):
         baserequestinfo = self.__preparebaserequestinfo(id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers)
-        baserequestinfo['firstName'] = firstname
-        baserequestinfo['lastName'] = lastname
-        baserequestinfo['xgov'] = 'No'
+        baserequestinfo.update({'firstName': firstname})
+        baserequestinfo.update({'lastName': lastname})
+        baserequestinfo.update({'xgov': 'No'})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers):
