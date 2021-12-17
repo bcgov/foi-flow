@@ -18,9 +18,9 @@ class ApplicantCategory(db.Model):
 
     @classmethod
     def getapplicantcategory(cls,appltcategory):
-        applicantCategory_schema = ApplicantCategorySchema()
+        applicantcategory_schema = ApplicantCategorySchema()
         query = db.session.query(ApplicantCategory).filter_by(name=appltcategory).first()
-        return applicantCategory_schema.dump(query)
+        return applicantcategory_schema.dump(query)
     
     
 class ApplicantCategorySchema(ma.Schema):

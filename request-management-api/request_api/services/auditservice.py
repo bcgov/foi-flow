@@ -12,34 +12,34 @@ class auditservice:
 
     """
     
-    def getAuditforField(self, type, id, field, groups,isAll=False):
+    def getauditforfield(self, type, id, field, groups,isall=False):
         if field == "description":
-            return self.getAuditForDescription(type, id, groups,isAll) 
+            return self.__getauditfordescription(type, id, groups,isall) 
         else:
             return None
         
         
-    def getAuditForDescription(self, type, id, groups,isAll):     
+    def __getauditfordescription(self, type, id, groups,isall):     
         _alldescriptions = []   
         if type == "ministryrequest":
-            ministryRsp = self._getAuditFromMinistryRequest(id)
-            _alldescriptions =  self._getAuditFromRawRequest(type, ministryRsp['foirequestid'], groups) +  ministryRsp['audit'] 
+            ministryrsp = self.__getauditfromministryrequest(id)
+            _alldescriptions =  self.__getauditfromrawrequest(type, ministryrsp['foirequestid'], groups) +  ministryrsp['audit'] 
         else:
-            _alldescriptions =  self._getAuditFromRawRequest(type, id, groups)     
+            _alldescriptions =  self.__getauditfromrawrequest(type, id, groups)     
         #Filter summary of changes
         datasummary=[]
-        _data, _startDate, _endDate = None, None, None
+        _data, _startdate, _enddate = None, None, None
         if len(_alldescriptions) > 0:
             for entry in _alldescriptions:
-                if isAll == True or (isAll == False and _data != entry['description'] or _startDate != entry['fromdate'] or _endDate != entry['todate']):
+                if isall == True or (isall == False and _data != entry['description'] or _startdate != entry['fromdate'] or _enddate != entry['todate']):
                     datasummary.append({"description": entry['description'], "fromDate": entry['fromdate'], "toDate": entry['todate'], "createdAt": entry['createdat'], "createdBy": entry['createdby'], "status": entry['status']})
                 _data = entry['description']
-                _startDate =  entry['fromdate']
-                _endDate = entry['todate']
+                _startdate =  entry['fromdate']
+                _enddate = entry['todate']
         return  datasummary[::-1]
     
     
-    def _getAuditFromMinistryRequest(self, id):
+    def __getauditfromministryrequest(self, id):
         _ministrydescriptions = []
         ministryrecords  = FOIMinistryRequest().getrequestById(id) 
         foirequestid = 0 
@@ -51,14 +51,14 @@ class auditservice:
             _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['createdby'], "status": entry['requeststatus.name']})
         return {"foirequestid" :foirequestid  , "audit":_ministrydescriptions}
     
-    def _getAuditFromRawRequest(self, type, id, groups):
+    def __getauditfromrawrequest(self, type, id, groups):
         _rawdescriptions = []
         if type == "ministryrequest":
             requestrecord  = FOIRequest().getrequest(id)
-            rawRequestId= requestrecord['foirawrequestid']
+            rawrequestid= requestrecord['foirawrequestid']
         else:
-            rawRequestId= id
-        rawrecords = FOIRawRequest().getDescriptionSummaryById(rawRequestId) 
+            rawrequestid= id
+        rawrecords = FOIRawRequest().getDescriptionSummaryById(rawrequestid) 
         
         
         for entry in rawrecords:
