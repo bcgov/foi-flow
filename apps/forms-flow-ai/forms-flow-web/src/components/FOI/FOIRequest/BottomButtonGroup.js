@@ -1,184 +1,250 @@
-import React, { useState } from 'react';
-import './bottombuttongroup.scss';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState } from "react";
+import "./bottombuttongroup.scss";
+import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
-import {saveRequestDetails, openRequestDetails} from "../../../apiManager/services/FOI/foiRequestServices";
-import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
-import { ConfirmationModal } from '../customComponents';
-import { addBusinessDays, formatDate, calculateDaysRemaining } from "../../../helper/FOI/helper";
-import { StateEnum } from '../../../constants/FOI/statusEnum';
+import {
+  saveRequestDetails,
+  openRequestDetails,
+} from "../../../apiManager/services/FOI/foiRequestServices";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
+import { ConfirmationModal } from "../customComponents";
+import {
+  addBusinessDays,
+  formatDate,
+  calculateDaysRemaining,
+} from "../../../helper/FOI/helper";
+import { StateEnum } from "../../../constants/FOI/statusEnum";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-      width: '100%',
-      marginTop:'30px',
-      marginBottom:'50px'
-    },
-    heading: {
-      fontSize: theme.typography.pxToRem(15),
-      fontWeight: theme.typography.fontWeightRegular,
-    },
-    btndisabled: {
-      border: 'none',
-      backgroundColor: '#eceaea',
-      color: '#FFFFFF'
-    },
-    btnenabled: {
-      border: 'none',
-      backgroundColor: '#38598A',
-      color: '#FFFFFF'
-    },
-    btnsecondaryenabled: {
-      border: '1px solid #38598A',
-      backgroundColor: '#FFFFFF',
-      color: '#38598A'
-    }
-  }));
+  root: {
+    width: "100%",
+    marginTop: "30px",
+    marginBottom: "50px",
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+  btndisabled: {
+    border: "none",
+    backgroundColor: "#eceaea",
+    color: "#FFFFFF",
+  },
+  btnenabled: {
+    border: "none",
+    backgroundColor: "#38598A",
+    color: "#FFFFFF",
+  },
+  btnsecondaryenabled: {
+    border: "1px solid #38598A",
+    backgroundColor: "#FFFFFF",
+    color: "#38598A",
+  },
+}));
 
-const BottomButtonGroup = React.memo(({
-  isValidationError, 
-  urlIndexCreateRequest, 
-  saveRequestObject, 
-  unSavedRequest,
-  handleSaveRequest,
-  handleOpenRequest,
-  currentSelectedStatus,
-  hasStatusRequestSaved,
-  disableInput,
-  stateChanged
+const BottomButtonGroup = React.memo(
+  ({
+    isValidationError,
+    urlIndexCreateRequest,
+    saveRequestObject,
+    unSavedRequest,
+    handleSaveRequest,
+    handleOpenRequest,
+    currentSelectedStatus,
+    hasStatusRequestSaved,
+    disableInput,
+    stateChanged,
   }) => {
-  /**
-   * Bottom Button Group of Review request Page
-   * Button enable/disable is handled here based on the validation
-   */
-    const {requestId, ministryId, requestState} = useParams();  
+    /**
+     * Bottom Button Group of Review request Page
+     * Button enable/disable is handled here based on the validation
+     */
+    const { requestId, ministryId, requestState } = useParams();
 
     const classes = useStyles();
     const dispatch = useDispatch();
-    
+
     const [openModal, setOpenModal] = useState(false);
     const [opensaveModal, setsaveModal] = useState(false);
 
-    const [closingDate, setClosingDate] = useState( formatDate(new Date()) );
+    const [closingDate, setClosingDate] = useState(formatDate(new Date()));
     const [closingReasonId, setClosingReasonId] = useState();
 
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
-    }
+    };
 
     const handleClosingReasonChange = (cReasonId) => {
       setClosingReasonId(cReasonId);
-    }
+    };
 
     const returnToQueue = (e) => {
-      if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+      if (
+        !unSavedRequest ||
+        window.confirm(
+          "Are you sure you want to leave? Your changes will be lost."
+        )
+      ) {
         e.preventDefault();
-        window.removeEventListener('beforeunload', alertUser);
-        window.location.href = '/foi/dashboard';
+        window.removeEventListener("beforeunload", alertUser);
+        window.location.href = "/foi/dashboard";
       }
-    }
+    };
+
     const dueDateCalculation = (dateText, noOfBusinessDays) => {
-      return dateText? addBusinessDays(dateText, noOfBusinessDays) : "";
-    }
+      if (!dateText) {
+        return "";
+      }
+
+      return addBusinessDays(dateText, noOfBusinessDays);
+    };
+
+    const getRequestState = () => {
+      if (currentSelectedStatus) {
+        return currentSelectedStatus;
+      }
+
+      if (
+        requestState === StateEnum.unopened.name &&
+        saveRequestObject.sourceOfSubmission === "onlineform"
+      ) {
+        return StateEnum.intakeinprogress.name;
+      }
+
+      if (urlIndexCreateRequest > -1) {
+        return StateEnum.intakeinprogress.name;
+      }
+
+      return requestState;
+    };
+
     const saveRequest = async () => {
       if (urlIndexCreateRequest > -1)
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
-      dispatch(saveRequestDetails(saveRequestObject, urlIndexCreateRequest, requestId, ministryId, (err, res) => {
-        if (!err) {
-          toast.success('The request has been saved successfully.', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            });
-            const _state = currentSelectedStatus ? currentSelectedStatus : ((requestState && requestState === StateEnum.unopened.name && saveRequestObject.sourceOfSubmission === 'onlineform') || urlIndexCreateRequest > -1 ? StateEnum.intakeinprogress.name : requestState);
-            handleSaveRequest(_state, false, res.id);
-            hasStatusRequestSaved(true, currentSelectedStatus);
-        } else {
-          toast.error('Temporarily unable to save your request. Please try again in a few minutes.', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            });
-            handleSaveRequest(requestState, true, "");
-        }
-      }));      
-    }
+      dispatch(
+        saveRequestDetails(
+          saveRequestObject,
+          urlIndexCreateRequest,
+          requestId,
+          ministryId,
+          (err, res) => {
+            if (!err) {
+              toast.success("The request has been saved successfully.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+              const _state = getRequestState();
+              handleSaveRequest(_state, false, res.id);
+              hasStatusRequestSaved(true, currentSelectedStatus);
+            } else {
+              toast.error(
+                "Temporarily unable to save your request. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+              handleSaveRequest(requestState, true, "");
+            }
+          }
+        )
+      );
+    };
 
-    const alertUser = e => {
+    const alertUser = (e) => {
       if (unSavedRequest) {
         e.preventDefault();
-        e.returnValue = '';
+        e.returnValue = "";
       }
-    }
+    };
 
-    const handleOnHashChange = (e) => {       
+    const handleOnHashChange = (e) => {
       returnToQueue(e);
     };
 
+    const fillAssignmentFields = (request) => {
+      if (request.requestType === "general") {
+        request.assignedTo = "";
+        request.assignedGroup = "Flex Team";
+      } else if (request.requestType === "personal") {
+        request.assignedTo = "";
+        request.assignedGroup = "Processing Team";
+      }
+    };
+
     React.useEffect(() => {
-      if(stateChanged && currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId === undefined || ministryId === null || ministryId === ''))
-      {
-        saveRequestObject.requeststatusid = StateEnum.open.id;
-        if(saveRequestObject.requestType === "general")
-        {
-          saveRequestObject.assignedTo=""
-          saveRequestObject.assignedGroup = "Flex Team"
-        }
-        else if(saveRequestObject.requestType === "personal"){
-          saveRequestObject.assignedTo=""
-          saveRequestObject.assignedGroup = "Processing Team"
-        }
-        openRequest();        
+      if (isValidationError || !stateChanged) {
+        return;
       }
-      else if(stateChanged && currentSelectedStatus === StateEnum.open.name && !isValidationError && (ministryId !== undefined || ministryId !== null || ministryId !== ''))
-      {
-        saveRequestObject.requeststatusid = StateEnum.open.id;        
+
+      if (
+        currentSelectedStatus &&
+        currentSelectedStatus !== StateEnum.open.name &&
+        saveRequestObject.requeststatusid &&
+        saveRequestObject.currentState
+      ) {
         saveRequestModal();
+        return;
       }
-      else if (stateChanged && currentSelectedStatus !== "" && currentSelectedStatus !== undefined && (saveRequestObject.requeststatusid != undefined && saveRequestObject.currentState) && !isValidationError){
+
+      saveRequestObject.requeststatusid = StateEnum.open.id;
+
+      if (!ministryId) {
+        fillAssignmentFields(saveRequestObject);
+        openRequest();
+      } else {
         saveRequestModal();
       }
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
       window.history.pushState(null, null, window.location.pathname);
-      window.addEventListener('popstate', handleOnHashChange);
-      window.addEventListener('beforeunload', alertUser);   
-      
-      return () => {
-        window.removeEventListener('popstate', handleOnHashChange);
-        window.removeEventListener('beforeunload', alertUser);
-        
-      }
-    });
-    
-   
-    const openRequest = () => {
-      saveRequestObject.id = saveRequestObject.id ? saveRequestObject.id :requestId; 
-      saveRequestObject.requeststatusid = 1
-      setOpenModal(true);     
-    }
+      window.addEventListener("popstate", handleOnHashChange);
+      window.addEventListener("beforeunload", alertUser);
 
-    const saveRequestModal =()=>{
+      return () => {
+        window.removeEventListener("popstate", handleOnHashChange);
+        window.removeEventListener("beforeunload", alertUser);
+      };
+    });
+
+    const openRequest = () => {
+      saveRequestObject.id = saveRequestObject.id
+        ? saveRequestObject.id
+        : requestId;
+      saveRequestObject.requeststatusid = 1;
+      setOpenModal(true);
+    };
+
+    const saveRequestModal = () => {
       if (currentSelectedStatus !== saveRequestObject?.currentState)
         setsaveModal(true);
-    }
+    };
 
-    const handleModal = (value, fileInfoList) => {     
-      setOpenModal(false);      
-      if (value) {
-        dispatch(openRequestDetails(saveRequestObject, (err, res) => {
-          if(!err) {
-            toast.success('The request has been opened successfully.', {
+    const handleModal = (value, fileInfoList) => {
+      setOpenModal(false);
+
+      if (!value) {
+        handleOpenRequest("", "", true);
+        return;
+      }
+
+      dispatch(
+        openRequestDetails(saveRequestObject, (err, res) => {
+          if (!err) {
+            toast.success("The request has been opened successfully.", {
               position: "top-right",
               autoClose: 3000,
               hideProgressBar: true,
@@ -186,140 +252,150 @@ const BottomButtonGroup = React.memo(({
               pauseOnHover: true,
               draggable: true,
               progress: undefined,
-              });
-            const parentRequestId = res.id;           
-            res.ministryRequests.sort(function(a, b) {
-              var keyA = a.filenumber,
-                  keyB = b.filenumber;             
-              if (keyA < keyB) return -1;
-              if (keyA > keyB) return 1;
-              return 0;
+            });
+            const parentRequestId = res.id;
+            res.ministryRequests.sort(function (a, b) {
+              return a.filenumber - b.filenumber;
             });
             const firstMinistry = res.ministryRequests[0];
             handleOpenRequest(parentRequestId, firstMinistry.id, false);
             hasStatusRequestSaved(true, StateEnum.open.name);
+          } else {
+            toast.error(
+              "Temporarily unable to open your request. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+            handleOpenRequest("", "", true);
           }
-          else {
-            toast.error('Temporarily unable to open your request. Please try again in a few minutes.', {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              });
-            handleOpenRequest("","",true);
-          }
-        }));
-        
-      }
-      else {
-        handleOpenRequest("", "", true);
-      }      
-    }
+        })
+      );
+    };
 
     const handleSaveModal = (value, fileInfoList) => {
       setsaveModal(false);
-      if (value) {
-        if(currentSelectedStatus == StateEnum.closed.name && !isValidationError)
-        {
+      if (!value) {
+        handleSaveRequest(requestState, unSavedRequest, "");
+        return;
+      }
+
+      if (isValidationError) {
+        return;
+      }
+
+      switch (currentSelectedStatus) {
+        case StateEnum.closed.name:
           saveRequestObject.requeststatusid = StateEnum.closed.id;
           saveRequestObject.closedate = closingDate;
           saveRequestObject.closereasonid = closingReasonId;
           saveRequest();
-        }
-        else if(currentSelectedStatus === StateEnum.callforrecords.name && !isValidationError)
-        {
+          break;
+
+        case StateEnum.callforrecords.name:
           saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
-          if (!('cfrDueDate' in saveRequestObject) || saveRequestObject.cfrDueDate === '') {
+          if (
+            !("cfrDueDate" in saveRequestObject) ||
+            saveRequestObject.cfrDueDate === ""
+          ) {
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-          }
-          else if (saveRequestObject.onholdTransitionDate) {
-            const onHoldDays = calculateDaysRemaining(new Date(), saveRequestObject.onholdTransitionDate);            
-            const calculatedCFRDueDate = addBusinessDays(saveRequestObject.cfrDueDate, onHoldDays-1);
-            const calculatedRequestDueDate = addBusinessDays(saveRequestObject.dueDate, onHoldDays-1);            
+          } else if (saveRequestObject.onholdTransitionDate) {
+            const onHoldDays = calculateDaysRemaining(
+              new Date(),
+              saveRequestObject.onholdTransitionDate
+            );
+            const calculatedCFRDueDate = addBusinessDays(
+              saveRequestObject.cfrDueDate,
+              onHoldDays - 1
+            );
+            const calculatedRequestDueDate = addBusinessDays(
+              saveRequestObject.dueDate,
+              onHoldDays - 1
+            );
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             saveRequestObject.dueDate = calculatedRequestDueDate;
           }
           saveRequest();
-        }  
-        else if(currentSelectedStatus == StateEnum.redirect.name && !isValidationError)
-        {        
-          saveRequestObject.requeststatusid = StateEnum.redirect.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.open.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.open.id; // Need to take from ENUM, -1 if not yet opened - RAW REQUEST
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.intakeinprogress.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.review.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.review.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.onhold.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.onhold.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.signoff.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.signoff.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.feeassessed.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.feeassessed.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.consult.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.consult.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.deduplication.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.deduplication.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.harms.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.harms.id;
-          saveRequest();
-        }
-        else if(currentSelectedStatus == StateEnum.response.name && !isValidationError)
-        {
-          saveRequestObject.requeststatusid = StateEnum.response.id;
-          saveRequest();
-        }
-      }
-      else {        
-          handleSaveRequest(requestState, unSavedRequest, "");        
-      }
-    }
+          break;
 
-  return (
-    <div className={classes.root}>
-      {openModal ? 
-      <ConfirmationModal requestId={requestId} openModal={openModal} handleModal={handleModal} state={StateEnum.open.name} saveRequestObject={saveRequestObject} /> 
-      : null}
-      {opensaveModal ? 
-      <ConfirmationModal requestId={requestId} openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} />
-      : null}
-      <div className="foi-bottom-button-group">
-      <button type="button" className={`btn btn-bottom ${isValidationError  ? classes.btndisabled : classes.btnenabled}`} disabled={isValidationError || disableInput} onClick={saveRequest}>Save</button>
-      <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>      
+        case StateEnum.redirect.name:
+        case StateEnum.intakeinprogress.name:
+        case StateEnum.review.name:
+        case StateEnum.onhold.name:
+        case StateEnum.signoff.name:
+        case StateEnum.feeassessed.name:
+        case StateEnum.consult.name:
+        case StateEnum.deduplication.name:
+        case StateEnum.harms.name:
+        case StateEnum.response.name:
+          const status = Object.values(StateEnum).find(
+            (statusValue) => statusValue.name === currentSelectedStatus
+          );
+
+          saveRequestObject.requeststatusid = status.id;
+          saveRequest();
+          break;
+
+        default:
+          return;
+      }
+    };
+
+    return (
+      <div className={classes.root}>
+        {openModal ? (
+          <ConfirmationModal
+            requestId={requestId}
+            openModal={openModal}
+            handleModal={handleModal}
+            state={StateEnum.open.name}
+            saveRequestObject={saveRequestObject}
+          />
+        ) : null}
+        {opensaveModal ? (
+          <ConfirmationModal
+            requestId={requestId}
+            openModal={opensaveModal}
+            handleModal={handleSaveModal}
+            state={currentSelectedStatus}
+            saveRequestObject={saveRequestObject}
+            handleClosingDateChange={handleClosingDateChange}
+            handleClosingReasonChange={handleClosingReasonChange}
+          />
+        ) : null}
+        <div className="foi-bottom-button-group">
+          <button
+            type="button"
+            className={`btn btn-bottom ${
+              isValidationError ? classes.btndisabled : classes.btnenabled
+            }`}
+            className={clsx("btn", "btn-bottom", {
+              [classes.btndisabled]: isValidationError,
+              [classes.btnenabled]: !isValidationError,
+            })}
+            disabled={isValidationError || disableInput}
+            onClick={saveRequest}
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
+            onClick={returnToQueue}
+          >
+            Return to Queue
+          </button>
+        </div>
       </div>
-    </div>
     );
-  });
+  }
+);
 
 export default BottomButtonGroup;
