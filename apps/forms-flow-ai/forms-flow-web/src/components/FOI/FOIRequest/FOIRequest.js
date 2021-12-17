@@ -223,37 +223,16 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const handleApplicantDetailsValue = (value, name) => {
     const detailsData = {...requiredApplicantDetails};
-    if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {
-      detailsData.firstName = value;
-    }    
-    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
-        detailsData.lastName = value;
-    }    
-    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
-        detailsData.email = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
-      detailsData.category = value
+    if(detailsData[name] !== undefined) {
+      detailsData[name] = value;
     }
     setRequiredApplicantDetails(detailsData);
   }
 
   const handleContanctDetailsValue = (value, name) => {
     const detailsData = {...requiredContactDetails};
-    if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
-      detailsData.primaryAddress = value;
-    } 
-    else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
-        detailsData.city = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
-      detailsData.province = value
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
-      detailsData.country = value
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
-      detailsData.postalCode = value
+    if(detailsData[name] !== undefined) {
+      detailsData[name] = value;
     }
     setrequiredContactDetails(detailsData);
   }
@@ -261,42 +240,20 @@ const FOIRequest = React.memo(({userDetail}) => {
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
     const descriptionData = {...requiredRequestDescriptionValues};
-    if(name === FOI_COMPONENT_CONSTANTS.START_DATE) {      
-      descriptionData.startDate = value;      
-    }    
-    else if(name === FOI_COMPONENT_CONSTANTS.END_DATE) {    
-      descriptionData.endDate = value;      
+    if(detailsData[name] !== undefined) {
+      detailsData[name] = value;
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {     
-      descriptionData.description = value;      
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED) {
-      descriptionData.isProgramAreaSelected = value;      
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.ISPIIREDACTED) {
-      descriptionData.isPiiRedacted = value;
-    }
-    
     setRequiredRequestDescriptionValues(descriptionData);
   }
   
   //Update required fields of request details box with latest value
   const handleRequestDetailsValue = (value, name, value2) => {    
     const detailsData = {...requiredRequestDetailsValues};
-    if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {      
-      detailsData.requestType = value;
+    if(detailsData[name] !== undefined) {
+      detailsData[name] = value;
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
-      detailsData.receivedMode = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
-      detailsData.deliveryMode = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {
-      detailsData.receivedDate = value;      
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-      detailsData.requestStartDate = value;
+
+    if(value2) {
       detailsData.dueDate = value2;   
     }
     setRequiredRequestDetailsValues(detailsData);
@@ -363,48 +320,11 @@ const FOIRequest = React.memo(({userDetail}) => {
            adoptiveFatherFirstName:"",
            personalHealthNumber:"",
            identityVerified:"",
-        };
+      };
     }
-    else {
-      if (name === FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME) {
-        requestObject.additionalPersonalInfo.childFirstName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME) {
-        requestObject.additionalPersonalInfo.childMiddleName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME) {
-        requestObject.additionalPersonalInfo.childLastName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME) {
-        requestObject.additionalPersonalInfo.childAlsoKnownAs = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.CHILD_DOB) {
-        requestObject.additionalPersonalInfo.childBirthDate = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME) {
-        requestObject.additionalPersonalInfo.anotherFirstName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME) {
-        requestObject.additionalPersonalInfo.anotherMiddleName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME) {
-        requestObject.additionalPersonalInfo.anotherLastName = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME) {
-        requestObject.additionalPersonalInfo.anotherAlsoKnownAs = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_DOB) {
-        requestObject.additionalPersonalInfo.anotherBirthDate = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.DOB) {
-        requestObject.additionalPersonalInfo.birthDate = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
-        requestObject.additionalPersonalInfo.personalHealthNumber = value;
-      }
-      else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
-        requestObject.additionalPersonalInfo.identityVerified = value;
-      }
+
+    if(requestObject.additionalPersonalInfo[name] !== undefined) {
+      requestObject.additionalPersonalInfo[name] = value;
     }
   }
 
@@ -414,6 +334,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     requestObject.dueDate = requiredRequestDetailsValues.dueDate;
     requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
     requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
+
     if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
       requestObject.receivedDate = value.receivedDate;     
       requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";
@@ -438,54 +359,6 @@ const FOIRequest = React.memo(({userDetail}) => {
       }   
       requestObject.assignedToName = value2;      
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) {       
-        requestObject.firstName = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) {        
-        requestObject.middleName = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) {
-        requestObject.lastName = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.ORGANIZATION) {
-        requestObject.businessName = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) {
-        requestObject.email = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) {
-        requestObject.category = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.HOME_PHONE) {
-      requestObject.phonePrimary = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) {
-      requestObject.phoneSecondary = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) {
-      requestObject.workPhonePrimary = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) {
-      requestObject.workPhoneSecondary = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) {
-      requestObject.address = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) {
-      requestObject.addressSecondary = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.CITY) {
-      requestObject.city = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.POSTALCODE) {
-      requestObject.postal = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.PROVINCE) {
-      requestObject.province = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.COUNTRY) {
-      requestObject.country = value;
-    }
     else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {     
       requestObject.receivedDate = formatDate(value, 'yyyy MMM, dd');
       const receivedDateUTC = new Date(value).toISOString();
@@ -494,25 +367,6 @@ const FOIRequest = React.memo(({userDetail}) => {
     else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
       requestObject.requestProcessStart = value;
       requestObject.dueDate = value2;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE) {
-      requestObject.requestType = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_MODE) {
-      requestObject.receivedMode = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
-      requestObject.deliveryMode = value;
-    }
-    
-    else if (name === FOI_COMPONENT_CONSTANTS.DESCRIPTION) {
-      requestObject.description = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.START_DATE) {
-      requestObject.fromDate = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.END_DATE) {
-      requestObject.toDate = value;
     }
     else if (name === FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST) {
       requestObject.selectedMinistries = [];
@@ -526,14 +380,10 @@ const FOIRequest = React.memo(({userDetail}) => {
       });
       requestObject.selectedMinistries = filteredData;
     }
-    else if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-      requestObject.correctionalServiceNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-      requestObject.publicServiceEmployeeNumber = value;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.ISPIIREDACTED) {
-      requestObject.ispiiredacted = value;
+    else {
+      if(detailsData[name] !== undefined) {
+        requestObject[name] = value;
+      }
     }
   }
 
