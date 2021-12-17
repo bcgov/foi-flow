@@ -134,7 +134,7 @@ class documentservice:
       
     @classmethod  
     def uploadtos3(self, attachment):
-        # print(attachment)
+        #upload attachment to OSS
 
         #get S3 auth
         formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
