@@ -40,8 +40,9 @@ const getPublicHoliDays = (startDate, endDate) => {
 	let publicHoliDays = 0;
 	let years = [];
 	years.push(dayjs(startDate).year());
-	if(years.includes(dayjs(endDate).year()) === false) {
-		years.push(dayjs(endDate).year());
+	const endYear = dayjs(endDate).year();
+	if(years.includes(endYear) === false) {
+		years.push(endYear);
 	}
 	for(const year of years) {
 		let holidays = hd.getHolidays(year);
@@ -89,10 +90,12 @@ const daysBetween = (startDate, endDate) => {
     return (endDate - startDate) / millisecondsPerDay;
 }
 const calculateDaysRemaining = (endDate, startDate) => {	
-	if (!startDate)
+	if (!startDate) {
 		startDate = new Date();
-	else
+	}
+	else {
 		startDate = new Date(startDate);
+	}	
     endDate = new Date(endDate);	
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);

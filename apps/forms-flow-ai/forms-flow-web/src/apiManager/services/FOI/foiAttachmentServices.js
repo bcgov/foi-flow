@@ -5,8 +5,7 @@ import {
   import {
     serviceActionError,
     setFOIAttachmentListLoader,
-    setRawRequestAttachments,
-    setMinistryRequestAttachments
+    setRequestAttachments,
   } from "../../../actions/FOI/foiRequestActions";
   import {postAttachment, fnDone} from './foiServicesUtil';
   import UserService from "../../../services/UserService";
@@ -31,14 +30,7 @@ import {
       httpGETRequest(apiUrl, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            if (ministryId!=null) {
-              dispatch(setMinistryRequestAttachments(res.data));
-            }
-  
-            if (requestId) {
-              dispatch(setRawRequestAttachments(res.data));
-            }
-  
+            dispatch(setRequestAttachments(res.data));
             dispatch(setFOIAttachmentListLoader(false));
             done(null, res.data);
             

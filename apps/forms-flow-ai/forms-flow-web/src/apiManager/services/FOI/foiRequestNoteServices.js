@@ -7,8 +7,7 @@ import {
   import {
     serviceActionError,
     setFOILoader,
-    setRawRequestComments,
-    setMinistryRequestComments,
+    setRequestComments,
   } from "../../../actions/FOI/foiRequestActions";
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
@@ -33,12 +32,7 @@ import {
       httpGETRequest(apiUrl, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            if (ministryId != null) {
-              dispatch(setMinistryRequestComments(res.data));
-            }
-            if (requestId != null) {
-              dispatch(setRawRequestComments(res.data));
-            }  
+            dispatch(setRequestComments(res.data));
             dispatch(setFOILoader(false));
           } else {
             console.log("Error in fetching request notes", res);

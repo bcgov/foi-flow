@@ -14,7 +14,6 @@ import {
     setFOIDeliveryModeList,
     setFOIReceivedModeList,
     setFOIMinistryDivisionalStages,
-    clearFOIMinistryDivisionalStages,
     setClosingReasons,    
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
@@ -285,7 +284,7 @@ import {
         .then((res) => {
           if (res.data) {
             const foiMinistryDivisionalStages = res.data;
-            dispatch(clearFOIMinistryDivisionalStages({}));
+            dispatch(setFOIMinistryDivisionalStages({}));
             dispatch(setFOIMinistryDivisionalStages(foiMinistryDivisionalStages));
             dispatch(setFOILoader(false));
           } else {

@@ -162,12 +162,6 @@ export const setFOIMinistryDivisionalStages = (data) => dispatch => {
     })
 }
 
-export const clearFOIMinistryDivisionalStages = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES,
-        payload:data      
-    })
-}
 export const setFOIWatcherList = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST,
@@ -189,35 +183,14 @@ export const clearRawRequestComments = (data) => dispatch => {
     })
 }
 
-export const setRawRequestComments = (data) => dispatch => {
+export const setRequestComments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
         payload:data      
     })
 }
 
-export const setMinistryRequestComments = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
-        payload:data      
-    })
-}
-
-export const clearMinistryRequestComments = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
-        payload:{}      
-    })
-}
-
-export const setRawRequestAttachments = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
-        payload:data      
-    })
-}
-
-export const setMinistryRequestAttachments = (data) => dispatch => {
+export const setRequestAttachments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
         payload:data      
