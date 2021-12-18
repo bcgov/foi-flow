@@ -120,9 +120,10 @@ class FOIRawRequests(Resource):
             request_json = request.get_json()
             requestdatajson = request_json['requestData']  
             #get attachments
-            attachments = requestdatajson['Attachments'] if requestdatajson.get('Attachments') != None else None
+            attachments = requestdatajson['Attachments'] if 'Attachments' in requestdatajson else None
             #save request
-            requestdatajson.pop('Attachments')
+            if attachments is not None:
+                requestdatajson.pop('Attachments')
             result = rawrequestservice().saverawrequest(requestdatajson,"onlineform",None)
             if result.success:
                 documentservice().uploadpersonaldocuments(result.identifier, attachments)   
