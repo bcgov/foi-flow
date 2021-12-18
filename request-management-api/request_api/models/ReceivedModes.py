@@ -17,9 +17,9 @@ class ReceivedMode(db.Model):
         return receivedmode_schema.dump(query)
     
     @classmethod
-    def getreceivedmode(cls,receivedModename):
+    def getreceivedmode(cls,receivedmode):
         deliverymode_schema = ReceivedModeSchema()
-        query = db.session.query(ReceivedMode).filter_by(name=receivedModename).first()
+        query = db.session.query(ReceivedMode).filter_by(name=receivedmode).first()
         return deliverymode_schema.dump(query)
 
 class ReceivedModeSchema(ma.Schema):
