@@ -57,7 +57,11 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
             firstName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME),
             lastName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME),
             email: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL),
-            category: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY),            
+            category: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY,
+                {
+                    dateFormat: false,
+                    defaultValue: "Select Category",
+                }),            
           }
         handleApplicantDetailsInitialValue(applicantDetailsObject);
     },[requestDetails, handleApplicantDetailsInitialValue])
