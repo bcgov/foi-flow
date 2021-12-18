@@ -64,35 +64,35 @@ class FOIRequest(db.Model):
         return request_schema.dump(query)
    
     @classmethod
-    def saverequest(cls,foirequest)->DefaultMethodResult:
-        db.session.add(foirequest)
+    def saverequest(cls,foiRequest)->DefaultMethodResult:
+        db.session.add(foiRequest)
         db.session.commit()
-        ministryarr = [] 
-        for ministry in foirequest.ministryRequests:
+        ministryArr = [] 
+        for ministry in foiRequest.ministryRequests:
             assignedministrygroup = ministry.assignedministrygroup if ministry.assignedministrygroup is not None else ""                                
-            ministryarr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "version":ministry.version})    
-        return DefaultMethodResult(True,'Request added',foirequest.foirequestid,ministryarr,foirequest.wfinstanceid)
+            ministryArr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "version":ministry.version})    
+        return DefaultMethodResult(True,'Request added',foiRequest.foirequestid,ministryArr,foiRequest.wfinstanceid)
                           
     @classmethod
-    def updateWFInstance(cls, foirequestid, wfinstanceid, userid)->DefaultMethodResult:
-        currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
-        setattr(currequest,'wfinstanceid',wfinstanceid)
-        setattr(currequest,'updated_at',datetime.now().isoformat())
-        setattr(currequest,'updatedby',userid)
+    def updateWFInstance(cls, foirequestid, wfinstanceid, userId)->DefaultMethodResult:
+        curRequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+        setattr(curRequest,'wfinstanceid',wfinstanceid)
+        setattr(curRequest,'updated_at',datetime.now().isoformat())
+        setattr(curRequest,'updatedby',userId)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',foirequestid)
     
     @classmethod
-    def updateStatus(cls, foirequestid, updatedministries, userid)->DefaultMethodResult:
-        currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
-        for ministry in currequest.ministryRequests:
-            for data in updatedministries:
+    def updateStatus(cls, foirequestid, updatedMinistries, userId)->DefaultMethodResult:
+        curRequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+        for ministry in curRequest.ministryRequests:
+            for data in updatedMinistries:
                 if ministry.filenumber == data["filenumber"]:
                     ministry.requeststatusid = data["requeststatusid"]
                     ministry.updated_at = datetime.now().isoformat()
-                    ministry.updatedby = userid
-        currequest.updated_at = datetime.now().isoformat()
-        currequest.updatedby = userid
+                    ministry.updatedby = userId
+        curRequest.updated_at = datetime.now().isoformat()
+        curRequest.updatedby = userId
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',foirequestid)
     

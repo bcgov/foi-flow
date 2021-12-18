@@ -24,3 +24,6 @@ async def error_cb(e):
 async def closed_cb():
     """Exit the session after the NATS connection is closed."""
     current_app.logger.info('Connection to NATS is closed.')
+    # my_loop = asyncio.get_running_loop()
+    # await asyncio.sleep(0.1, loop=my_loop)
+    # my_loop.stop()

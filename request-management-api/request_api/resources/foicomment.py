@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.commentservice import commentservice
 from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
@@ -30,27 +30,26 @@ from flask_cors import cross_origin
 
 
 API = Namespace('FOIComment', description='Endpoints for FOI Comment management')
-TRACER = Tracer.get_instance()
-"""Custom exception messages
-"""
-EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+TRACER = Tracer.get_instance()  
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicomment/ministryrequest')
 class CreateFOIRequestComment(Resource):
-    """Creates comment for ministry(opened) request."""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
-            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid())
+            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getUserId(),taggedusers = minrquescommentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -59,19 +58,21 @@ class CreateFOIRequestComment(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicomment/rawrequest')
 class CreateFOIRawRequestComment(Resource):
-    """Creates comment for raw(unopened) request."""
+    """Resource for managing FOI requests."""
 
      
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
-            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
+            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getUserId(),taggedusers = rawrqcommentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -80,22 +81,24 @@ class CreateFOIRawRequestComment(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foicomment/<requesttype>/<requestid>')
 class FOIComment(Resource):
-    """Retrieves comment based on type: ministry(opened) and raw(unopened)."""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def get(requesttype, requestid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
-                return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
+                return {'status': False, 'message':'Bad Request'}, 400 
         try:
             if requesttype == "ministryrequest":
                 result = commentservice().getministryrequestcomments(requestid)
             else:
                 result = commentservice().getrawrequestcomments(requestid)
             return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -106,22 +109,24 @@ class FOIComment(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foicomment/<requesttype>/<commentid>/disable')
 class FOIDisableComment(Resource):
-    """Disable comment based on type: ministry(opened) and raw(unopened)."""
+    """Resource for managing FOI requests."""
 
       
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
-                return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
+                return {'status': False, 'message':'Bad Request'}, 400 
         try:
             if requesttype == "ministryrequest":
-                result = commentservice().disableministryrequestcomment(commentid, AuthHelper.getuserid())
+                result = commentservice().disableministryrequestcomment(commentid, AuthHelper.getUserId())
             else:
-                result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getuserid())
+                result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getUserId())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -131,25 +136,27 @@ class FOIDisableComment(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foicomment/<requesttype>/<commentid>')
 class FOIUpdateComment(Resource):
-    """Update comment based on type: ministry(opened) and raw(unopened)."""
+    """Resource for managing FOI requests."""
 
       
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
-                return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
+                return {'status': False, 'message':'Bad Request'}, 400 
         try:
             requestjson = request.get_json()              
             if requesttype == "ministryrequest":
                 commentschema = FOIMinistryRequestCommentSchema().load(requestjson)
-                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getuserid())
+                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getUserId(), taggedusers=commentschema["taggedusers"])
             else:
                 commentschema = EditFOIRawRequestCommentSchema().load(requestjson)
-                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getuserid())
+                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getUserId(),taggedusers=commentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

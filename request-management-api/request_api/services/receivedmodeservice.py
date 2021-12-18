@@ -2,7 +2,5 @@ from request_api.models.ReceivedModes import ReceivedMode
 
 class receivedmodeservice:
 
-    def getreceivedmodes(self):
-        """ Returns the active records
-        """
+    def getreceivedmodes():
         return ReceivedMode.getreceivedmodes()

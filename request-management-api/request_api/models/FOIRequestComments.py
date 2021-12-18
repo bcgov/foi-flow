@@ -26,14 +26,14 @@ class FOIRequestComment(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     commenttypeid = db.Column(db.Integer, unique=False, nullable=False)
+    #commenttypeid =  relationship("CommentType",backref=backref("CommentTypes"),uselist=False)
  
     
     @classmethod
-    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None)->DefaultMethodResult: 
+    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None,taggedusers=None)->DefaultMethodResult: 
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
-        taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
-        _createddate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate        
-        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers)
+        _createdDate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate
+        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createdDate, createdby=userid,taggedusers=taggedusers)
         db.session.add(newcomment)
         db.session.commit()               
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
@@ -50,10 +50,9 @@ class FOIRequestComment(db.Model):
             return DefaultMethodResult(True,'No Comment found',commentid)  
         
     @classmethod
-    def updatecomment(cls, commentid, foirequestcomment, userid):   
+    def updatecomment(cls, commentid, foirequestcomment, userid,taggedusers=None):   
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
-        taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
         if(comment.count() > 0) :             
             comment.update({FOIRequestComment.isactive:True, FOIRequestComment.comment:foirequestcomment["comment"], FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now(),FOIRequestComment.taggedusers:taggedusers}, synchronize_session = False)
             db.session.commit()

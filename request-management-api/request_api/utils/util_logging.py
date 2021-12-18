@@ -25,7 +25,9 @@ def setup_logging(conf):
     if conf and path.isfile(conf):
         logfilepath = 'request_api/logs/logfile.log'
         logdir = os.path.dirname(logfilepath)
-
+        # root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # logdir = os.path.join(root, 'logs')
         if not os.path.exists(logdir):
             os.mkdir(logdir)
         logging.config.fileConfig(conf)
@@ -38,6 +40,7 @@ def setup_filelogging(app):
     """ 
     Log file setup 
     """
+    log_level = logging.INFO    
     logfilepath = 'request_api/logs/logfile.log'
     for handler in app.logger.handlers:
         app.logger.removeHandler(handler)

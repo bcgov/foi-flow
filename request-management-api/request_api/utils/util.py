@@ -73,13 +73,13 @@ def getrequiredmemberships():
     membership+='Intake Team,Flex Team,Processing Team'    
     return membership
 
-def allowedorigins():
-    _allowedcors = os.getenv('CORS_ORIGIN')
-    allowedcors = []
-    if ',' in _allowedcors:
-        for entry in re.split(",",_allowedcors):
-            allowedcors.append(entry)
-    return allowedcors
+def allowedOrigins():
+    _allowedCORS = os.getenv('CORS_ORIGIN')
+    allowedCors = []
+    if ',' in _allowedCORS:
+        for entry in re.split(",",_allowedCORS):
+            allowedCors.append(entry)
+    return allowedCors
 
 class Singleton(type):
     """Singleton meta."""

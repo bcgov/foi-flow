@@ -27,28 +27,28 @@ class FOIRequestApplicant(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     @classmethod
-    def getrequest(cls,foirequestapplicant):
+    def getrequest(cls,foiRequestApplicant):
         request_schema = FOIRequestApplicantSchema()
         dbquery = db.session.query(FOIRequestApplicant)
-        dbquery = dbquery.filter_by(firstname=foirequestapplicant.firstname)
-        if foirequestapplicant.middlename is not None:
-            dbquery = dbquery.filter_by(middlename=foirequestapplicant.middlename)
-        if foirequestapplicant.lastname is not None:
-            dbquery = dbquery.filter_by(lastname=foirequestapplicant.lastname)
-        if foirequestapplicant.businessname is not None:
-            dbquery = dbquery.filter_by(businessname=foirequestapplicant.businessname)
-        if foirequestapplicant.alsoknownas is not None:
-            dbquery = dbquery.filter_by(alsoknownas=foirequestapplicant.alsoknownas)
-        if foirequestapplicant.dob is not None:
-            dbquery = dbquery.filter_by(dob=foirequestapplicant.dob)
+        dbquery = dbquery.filter_by(firstname=foiRequestApplicant.firstname)
+        if foiRequestApplicant.middlename is not None:
+            dbquery = dbquery.filter_by(middlename=foiRequestApplicant.middlename)
+        if foiRequestApplicant.lastname is not None:
+            dbquery = dbquery.filter_by(lastname=foiRequestApplicant.lastname)
+        if foiRequestApplicant.businessname is not None:
+            dbquery = dbquery.filter_by(businessname=foiRequestApplicant.businessname)
+        if foiRequestApplicant.alsoknownas is not None:
+            dbquery = dbquery.filter_by(alsoknownas=foiRequestApplicant.alsoknownas)
+        if foiRequestApplicant.dob is not None:
+            dbquery = dbquery.filter_by(dob=foiRequestApplicant.dob)
         result = dbquery.first()   
         return request_schema.dump(result)
 
     @classmethod
-    def saverequest(cls,foirequestapplicant)->DefaultMethodResult:
-        db.session.add(foirequestapplicant)
+    def saverequest(cls,foiRequestApplicant)->DefaultMethodResult:
+        db.session.add(foiRequestApplicant)
         db.session.commit()               
-        return DefaultMethodResult(True,'Request added',foirequestapplicant.foirequestapplicantid)
+        return DefaultMethodResult(True,'Request added',foiRequestApplicant.foirequestapplicantid)
                 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:

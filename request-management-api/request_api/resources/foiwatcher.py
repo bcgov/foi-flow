@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.watcherservice import watcherservice
 from request_api.schemas.foiwatcher import  FOIRawRequestWatcherSchema, FOIMinistryRequestWatcherSchema
@@ -34,19 +34,19 @@ TRACER = Tracer.get_instance()
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiwatcher/rawrequest/<requestid>')
 class FOIRawRequestWatcher(Resource):
-    """Retrieve watchers for unopened request"""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def get(requestid):      
         try:
             result = watcherservice().getrawrequestwatchers(requestid)
             return json.dumps(result), 200
-        except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -55,19 +55,21 @@ class FOIRawRequestWatcher(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiwatcher/rawrequest')
 class CreateFOIRawRequestWatcher(Resource):
-    """Create watcher for unopened request"""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)  
-            result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getuserid(), AuthHelper.getusergroups())
+            result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getUserId(), AuthHelper.getUserGroups())
             return {'status': result.success, 'message':result.message} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -76,17 +78,19 @@ class CreateFOIRawRequestWatcher(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiwatcher/rawrequest/disable/<requestid>')
 class DisableFOIRawRequestWatcher(Resource):
-    """Disable watcher for unopened request"""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def put(requestid):      
         try:
-            result = watcherservice().disablerawrequestwatchers(requestid, AuthHelper.getuserid())
+            result = watcherservice().disablerawrequestwatchers(requestid, AuthHelper.getUserId())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -95,17 +99,19 @@ class DisableFOIRawRequestWatcher(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiwatcher/ministryrequest/<ministryrequestid>')
 class FOIRequestWatcher(Resource):
-    """Retrieve watchers for opened request"""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def get(ministryrequestid):      
         try:
-            result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isministrymember())
+            result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isMinistryMember())
             return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -114,19 +120,21 @@ class FOIRequestWatcher(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiwatcher/ministryrequest')
 class CreateFOIRequestWatcher(Resource):
-    """Create watcher for opened request"""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)  
-            result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getuserid(),AuthHelper.getusergroups())
+            result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getUserId(),AuthHelper.getUserGroups())
             return {'status': result.success, 'message':result.message} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -135,17 +143,19 @@ class CreateFOIRequestWatcher(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiwatcher/ministryrequest/disable/<ministryrequestid>')
 class DisableFOIRequestWatcher(Resource):
-    """Disable watcher for opened request"""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def put(ministryrequestid):      
         try:
-            result = watcherservice().disableministryrequestwatchers(ministryrequestid, AuthHelper.getuserid())
+            result = watcherservice().disableministryrequestwatchers(ministryrequestid, AuthHelper.getUserId())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

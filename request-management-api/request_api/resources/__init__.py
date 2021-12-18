@@ -21,9 +21,11 @@ All services have 2 defaults sets of endpoints:
 That are used to expose operational health information about the service, and meta information.
 """
 
+#from functools import partialmethod
 from flask import Blueprint
 from sbc_common_components.exception_handling.exception_handler import ExceptionHandler
 
+#from request_api.utils.exception_handler import ExceptionHandler
 from .apihelper import Api
 
 from .meta import API as META_API
@@ -33,6 +35,7 @@ from .foirequest import API as FOIREQUEST_API
 from .foiflowmasterdata import API as FOIFLOWMASTERDATA_API
 from .dashboard import API as DASHBOARD_API
 from .foiassignee import API as FOIASSIGNEE_API
+from .foiaction import API as FOIACTION_API
 from .foiaudit import API as FOIAUDTI_API
 from .foiwatcher import API as FOIWATCHER_API
 from .foicomment import API as FOICOMMENT_API
@@ -53,6 +56,8 @@ API = Api(
     title='FOI Request API',
     version='1.0',
     description='The Core API for the FOI Request System',
+    # security=['apikey'],
+    # authorizations=AUTHORIZATIONS,
 )
 
 
@@ -65,6 +70,7 @@ API.add_namespace(FOIREQUEST_API ,path="/api")
 API.add_namespace(FOIFLOWMASTERDATA_API ,path="/api")
 API.add_namespace(DASHBOARD_API,'/api')
 API.add_namespace(FOIASSIGNEE_API,'/api')
+API.add_namespace(FOIACTION_API,'/api')
 API.add_namespace(FOIAUDTI_API,'/api')
 API.add_namespace(FOIWATCHER_API,'/api')
 API.add_namespace(FOICOMMENT_API,'/api')

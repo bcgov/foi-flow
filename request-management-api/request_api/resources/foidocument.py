@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.documentservice import documentservice
 from request_api.schemas.foidocument import  CreateDocumentSchema, RenameDocumentSchema, ReplaceDocumentSchema 
@@ -41,14 +41,16 @@ class GetFOIDocument(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def get(requestid, requesttype): 
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
             return {'status': False, 'message':'Bad Request'}, 400          
         try:
-            result = documentservice().getrequestdocumentsbyrole(requestid, requesttype, AuthHelper.isministrymember())
+            result = documentservice().getrequestdocumentsbyrole(requestid, requesttype, AuthHelper.isMinistryMember())
             return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -62,7 +64,7 @@ class CreateFOIDocument(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post(requestid, requesttype):      
         try:
@@ -70,10 +72,12 @@ class CreateFOIDocument(Resource):
                 return {'status': False, 'message':'Bad Request'}, 400
             requestjson = request.get_json() 
             documentschema = CreateDocumentSchema().load(requestjson)
-            result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getuserid(), requesttype)
+            result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -88,16 +92,18 @@ class RenameFOIDocument(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post(requestid, documentid, requesttype):      
         try:
             requestjson = request.get_json() 
             documentschema = RenameDocumentSchema().load(requestjson)
-            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
+            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -111,16 +117,18 @@ class ReplaceFOIDocument(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post(requestid, documentid, requesttype):      
         try:
             requestjson = request.get_json() 
             documentschema = ReplaceDocumentSchema().load(requestjson)
-            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
+            result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -135,12 +143,14 @@ class DeleteFOIDocument(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def post(requestid, documentid, requesttype):      
         try:
-            result = documentservice().deleterequestdocument(requestid, documentid, AuthHelper.getuserid(), requesttype)
+            result = documentservice().deleterequestdocument(requestid, documentid, AuthHelper.getUserId(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

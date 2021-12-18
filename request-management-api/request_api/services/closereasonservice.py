@@ -2,7 +2,5 @@ from request_api.models.CloseReasons import CloseReason
 
 class closereasonservice:
 
-    def getclosereasons(self):
-        """ Returns the active records
-        """
+    def getclosereasons():
         return CloseReason.getallclosereasons()

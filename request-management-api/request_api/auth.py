@@ -55,11 +55,11 @@ class Auth:
                 _groups = groups.split(',')
                 token = jwt.get_token_auth_header()
                 unverified_claims = josejwt.get_unverified_claims(token)
-                usergroups = unverified_claims['groups']
-                usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
+                userGroups = unverified_claims['groups']
+                userGroups = [userGroup.replace('/','',1) if userGroup.startswith('/') else userGroup for userGroup in userGroups]
                 exists = False
                 for group in _groups:
-                    if group in usergroups: 
+                    if group in userGroups: 
                        exists = True
                 retval = "Unauthorized" , 401
                 if exists == True:            
@@ -77,33 +77,29 @@ auth = (
 
 class AuthHelper:
     
-    @classmethod
-    def getuserid(cls):
+    def getUserId():
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
         return unverified_claims['preferred_username']
     
-    @classmethod
-    def getusername(cls):
+    def getUserName():
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
         return unverified_claims['name']  
     
-    @classmethod
-    def isministrymember(cls):
+    def isMinistryMember():
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
-        usergroups = unverified_claims['groups']
-        usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
-        for group in usergroups:
+        userGroups = unverified_claims['groups']
+        userGroups = [userGroup.replace('/','',1) if userGroup.startswith('/') else userGroup for userGroup in userGroups]
+        for group in userGroups:
             if group.endswith("Ministry Team"):
                 return True
         return False
-    
-    @classmethod        
-    def getusergroups(cls):
+            
+    def getUserGroups():
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
-        usergroups = unverified_claims['groups']
-        usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
-        return usergroups
+        userGroups = unverified_claims['groups']
+        userGroups = [userGroup.replace('/','',1) if userGroup.startswith('/') else userGroup for userGroup in userGroups]
+        return userGroups

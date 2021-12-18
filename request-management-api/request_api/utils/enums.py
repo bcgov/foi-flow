@@ -70,9 +70,3 @@ class MinistryTeamWithKeycloackGroup(Enum):
     def list():
         return list(map(lambda c: c.value, MinistryTeamWithKeycloackGroup))
 
-class UserGroup(Enum):
-    intake = "Intake Team"    
-    flex = "Flex Team"
-    processing = "Processing Team"
-    ministry = "@bcgovcode Ministry Team" 
-    

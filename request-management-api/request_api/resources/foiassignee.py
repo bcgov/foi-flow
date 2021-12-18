@@ -19,7 +19,7 @@ from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedOrigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.assigneeservice import assigneeservice
 import json
@@ -36,17 +36,17 @@ TRACER = Tracer.get_instance()
 @API.route('/foiassignees/<requestype>/<status>')
 @API.route('/foiassignees/<requestype>/<status>/<bcgovcode>')
 class FOIAssigneesByTypeAndStatus(Resource):
-    """Resource for retriving FOI assignees based on status."""
+    """Resource for managing FOI requests."""
 
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def get(requestype=None, status=None, bcgovcode=None):
         if requestype is not None and (requestype != "personal" and requestype != "general"):
             return {'status': False, 'message':'Bad Request'}, 400   
         try:
-            result = assigneeservice().getgroupsandmembersbytypeandstatus(requestype, status, bcgovcode)
+            result = assigneeservice().getGroupsAndMembersByTypeAndStatus(requestype, status, bcgovcode)
             if result is not None:
                 return json.dumps(result), 200
             else:
@@ -58,16 +58,16 @@ class FOIAssigneesByTypeAndStatus(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiassignees/group/<groupname>')
 class FOIAssigneesByTypeAndStatus(Resource):
-    """esource for retriving FOI assignees based on group."""
+    """Resource for managing FOI requests."""
 
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
+    @cross_origin(origins=allowedOrigins())
     @auth.require
     def get(groupname):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            result = assigneeservice().getmembersbygroupname(groupname)
+            result = assigneeservice().getMembersByGroupName(groupname)
             if result is not None:
                 return json.dumps(result), 200
             else:

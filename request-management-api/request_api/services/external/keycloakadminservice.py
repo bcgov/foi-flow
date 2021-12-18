@@ -74,20 +74,17 @@ class KeycloakAdminService:
         users = []
         if groupresponse.status_code == 200 and groupresponse.content != '': 
             for user in groupresponse.json():           
-                _user =  self.__createuser(user)
+                _user =  {
+                       'id':user['id'],
+                       'username':user['username'],                       
+                       'email': user['email'] if 'email' in user is not None else None,
+                       'firstname':user['firstName'] if 'firstName' in user is not None else None,
+                       'lastname': user['lastName'] if 'lastName' in user is not None else None                        
+                   } 
                 users.append(_user)
         if self.iscacheenabled() == True:
             request_api.cache.set(cachename, users, os.getenv('CACHE_TIMEOUT'))
         return users 
-    
-    def __createuser(self, user):
-        return {
-                'id':user['id'],
-                'username':user['username'],                       
-                'email': user['email'] if 'email' in user is not None else None,
-                'firstname':user['firstName'] if 'firstName' in user is not None else None,
-                'lastname': user['lastName'] if 'lastName' in user is not None else None                        
-            } 
         
     def getheaders(self):
         return {
@@ -96,7 +93,9 @@ class KeycloakAdminService:
         }  
     
     def formatgroupname(self,input):
-        return input.lower().replace(' ', '')  
+        input = input.lower()
+        input = input.replace(' ', '')
+        return input  
         
     def getcachename(self,groupname):
         return "kc_"+groupname.replace(' ','').lower()+"_cache"
