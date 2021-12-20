@@ -26,7 +26,7 @@ const initialState = {
 }
 
 
-const foiRequests = (action, state = initialState)=> {  
+const foiRequests = (state = initialState, action)=> {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return {...state, isLoading: action.payload};
