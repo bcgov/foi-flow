@@ -1,93 +1,89 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './divisionstages.scss';
-import { useDispatch, useSelector } from "react-redux";
+import {
+  calculateStageCounter,
+  updateDivisions,
+  updateDivisionsState,
+  addDivisionalStage,
+} from "./utils";
 import clsx from 'clsx'
 
-const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popselecteddivstages}) => {
-    var stageCounter = []
-    
-    if(existingDivStages.length === 0 || existingDivStages == undefined)
-    {        
-        stageCounter.push({id:0,divisionid:-1,stageid:-1})
-    }
-    else{
+const DivisionalStages = React.memo(({
+    divisionalstages, 
+    existingDivStages, 
+    popSelectedDivStages
+}) => {
        
-        existingDivStages.forEach((item,index)=>{
-            stageCounter.push({id:index,divisionid:item.divisionid,stageid:item.stageid})
-        })        
-    }
+    const [minDivStages, setMinDivStages] = React.useState(() =>
+      calculateStageCounter(existingDivStages)
+    );
     
-    const [minDivStages, setMinDivStages] = React.useState(stageCounter);
-    
-    const handleDivisionChange = (e,id)=> {                
-        let arr = minDivStages;                
-        const idexists = arr.filter(st=>st.id === id).length > 0;
-        if(idexists)
-        {           
-            arr.filter(item=>item.id === id).forEach(item=> {item.divisionid = e.target.value})            
-            setMinDivStages([...arr])
-            appendstageIterator([...arr])            
-        }
-        else{
-            console.log("No Id found - handleDivisionChange ")
-        }        
-    }
-    const handleDivisionStageChange = (e,id)=> {          
-        let arr = minDivStages;       
-        const exists = arr.filter(st=>st.id === id).length > 0
-        if(exists)
-        {
-            arr.filter(st=>st.id === id).forEach(item=>{item.stageid = e.target.value})
-            
-        }
-        else{
-            console.log("No Id found - handleDivisionStageChange ")
-        }
-        setMinDivStages([...arr])                            
-    }
+    const handleDivisionChange = (e, id) => {
+      updateDivisions(e, id, minDivStages, (newStages) => {
+        setMinDivStages(newStages);
+        appendStageIterator(newStages);
+      });
+    };
+
+    const handleDivisionStageChange = (e, id) => {
+      updateDivisionsState(e, id, minDivStages, (newStages) => {
+        setMinDivStages(newStages);
+      });
+    };
    
-    popselecteddivstages(minDivStages)
+    popSelectedDivStages(minDivStages)
 
-    const deleteMinistryDivision = (id)=> {
-       
-        let existing = stageIterator;
-        let updatedIterator = existing.filter((i) => i.id !== id);
-        
-        setMinDivStages([...updatedIterator])
-        appendstageIterator([...updatedIterator])
-               
-    }
-      
-    const [stageIterator, appendstageIterator] = React.useState(stageCounter);
-        
-    const addDivisionalStage = () => {
+    const deleteMinistryDivision = (id) => {
+      let existing = stageIterator;
+      let updatedIterator = existing.filter((i) => i.id !== id);
 
-        let existing = stageIterator;
-        var val = stageIterator.length > 0 ?  stageIterator[stageIterator.length - 1].id + 1 :0
-        if (divisionList.length > stageIterator.length) {           
-            existing.push({id:val,divisionid:-1,stageid:-1})
-            setMinDivStages([...existing]) 
-            appendstageIterator([...existing])
-        }        
-    }
-
+      setMinDivStages([...updatedIterator]);
+      appendStageIterator([...updatedIterator]);
+    };
+    
+    const [stageIterator, appendStageIterator] = React.useState(() =>
+      calculateStageCounter(existingDivStages)
+    );
+    
+    const handleAddDivisionalStage = () => {
+      addDivisionalStage(stageIterator, divisionList, (newStages) => {
+        setMinDivStages(newStages);
+        appendStageIterator(newStages);
+      });
+    };
 
     const divisionList = divisionalstages.divisions
 
-    const getdivisionMenuList = () =>{
+    const getdivisionMenuList = () => {
 
-        var _divisionItems = []
-        _divisionItems.push(<MenuItem key={0} name="selectmenuitem"  value={-1} disabled={true} >{'Select Division'}</MenuItem>)
+        let _divisionItems = []
+        _divisionItems.push(
+            <MenuItem 
+                key={0} 
+                name="selectmenuitem" 
+                value={-1} 
+                disabled={true} 
+            >
+                {'Select Division'}
+            </MenuItem>
+        )
 
-        const divisionItems = divisionList !=undefined && divisionList.length > 0 && divisionList.map((item) => {
+        const divisionItems = !divisionList && divisionList.map((item) => {
 
-            let _mindivtem = minDivStages.filter(d=>d.divisionid === item.divisionid)               
+            let _mindivtem = minDivStages.filter(
+              (d) => d.divisionid === item.divisionid
+            );               
             return (
-                <MenuItem disabled={_mindivtem.length > 0 } className="foi-division-menuitem" key={item.divisionid}  value={item.divisionid} >
-                    <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
+                <MenuItem 
+                    disabled={_mindivtem.length > 0}
+                    className="foi-division-menuitem" 
+                    key={item.divisionid}
+                    value={item.divisionid}
+                >
+                    <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`}></span>
                     {item.name}
                 </MenuItem>
             )
@@ -98,7 +94,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
 
     const divisionstageList = divisionalstages.stages
 
-    const getDivisionalStages = () =>{
+    const getDivisionalStages = () => {
         var divisionstagesItems = []
         divisionstagesItems.push(
         <MenuItem 
@@ -110,7 +106,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
             {'Select Division Stage'}
         </MenuItem>)
 
-        const divisionstageItems = !divisionstageList && divisionstageList.length > 0 && divisionstageList.map((item) => {
+        const divisionstageItems = !divisionstageList && divisionstageList.map((item) => {
 
             return (
                 <MenuItem 
@@ -131,9 +127,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
         return divisionstagesItems
     }
 
-    
-
-    var divisionalStagesRow = (row,index) => {
+    const divisionalStagesRow = (row,index) => {
 
         let _id = row.id
        
@@ -182,7 +176,6 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                 </div>
             </div>
         )
-
     }
 
     return (
@@ -201,7 +194,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                 className="fa fa-plus-circle fa-3 foi-add"
                 aria-hidden="true"
               ></i>
-              <a href="#" onClick={addDivisionalStage}>
+              <a href="#" onClick={handleAddDivisionalStage}>
                 Add division to track
               </a>
             </div>

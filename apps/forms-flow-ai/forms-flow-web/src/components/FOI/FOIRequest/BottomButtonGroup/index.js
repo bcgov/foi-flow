@@ -5,16 +5,23 @@ import { useDispatch } from "react-redux";
 import {
   saveRequestDetails,
   openRequestDetails,
-} from "../../../apiManager/services/FOI/foiRequestServices";
+} from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
-import { ConfirmationModal } from "../customComponents";
+import { ConfirmationModal } from "../../customComponents";
 import {
   addBusinessDays,
   formatDate,
-  calculateDaysRemaining,
-} from "../../../helper/FOI/helper";
-import { StateEnum } from "../../../constants/FOI/statusEnum";
+  calculateDaysRemaining
+} from "../../../../helper/FOI/helper";
+import { StateEnum } from "../../../../constants/FOI/statusEnum";
+import {
+  dueDateCalculation,
+  getRequestState,
+  fillAssignmentFields,
+  alertUser,
+  returnToQueue,
+} from "./utils";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -57,6 +64,7 @@ const BottomButtonGroup = React.memo(
     disableInput,
     stateChanged,
   }) => {
+    
     /**
      * Bottom Button Group of Review request Page
      * Button enable/disable is handled here based on the validation
@@ -80,46 +88,6 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
-    const returnToQueue = (e) => {
-      if (
-        !unSavedRequest ||
-        window.confirm(
-          "Are you sure you want to leave? Your changes will be lost."
-        )
-      ) {
-        e.preventDefault();
-        window.removeEventListener("beforeunload", alertUser);
-        window.location.href = "/foi/dashboard";
-      }
-    };
-
-    const dueDateCalculation = (dateText, noOfBusinessDays) => {
-      if (!dateText) {
-        return "";
-      }
-
-      return addBusinessDays(dateText, noOfBusinessDays);
-    };
-
-    const getRequestState = () => {
-      if (currentSelectedStatus) {
-        return currentSelectedStatus;
-      }
-
-      if (
-        requestState === StateEnum.unopened.name &&
-        saveRequestObject.sourceOfSubmission === "onlineform"
-      ) {
-        return StateEnum.intakeinprogress.name;
-      }
-
-      if (urlIndexCreateRequest > -1) {
-        return StateEnum.intakeinprogress.name;
-      }
-
-      return requestState;
-    };
-
     const saveRequest = async () => {
       if (urlIndexCreateRequest > -1)
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
@@ -140,7 +108,12 @@ const BottomButtonGroup = React.memo(
                 draggable: true,
                 progress: undefined,
               });
-              const _state = getRequestState();
+              const _state = getRequestState({
+                currentSelectedStatus,
+                requestState,
+                urlIndexCreateRequest,
+                saveRequestObject,
+              });
               handleSaveRequest(_state, false, res.id);
               hasStatusRequestSaved(true, currentSelectedStatus);
             } else {
@@ -163,25 +136,8 @@ const BottomButtonGroup = React.memo(
       );
     };
 
-    const alertUser = (e) => {
-      if (unSavedRequest) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-
     const handleOnHashChange = (e) => {
       returnToQueue(e);
-    };
-
-    const fillAssignmentFields = (request) => {
-      if (request.requestType === "general") {
-        request.assignedTo = "";
-        request.assignedGroup = "Flex Team";
-      } else if (request.requestType === "personal") {
-        request.assignedTo = "";
-        request.assignedGroup = "Processing Team";
-      }
     };
 
     React.useEffect(() => {
@@ -212,11 +168,11 @@ const BottomButtonGroup = React.memo(
     React.useEffect(() => {
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener("popstate", handleOnHashChange);
-      window.addEventListener("beforeunload", alertUser);
+      window.addEventListener("beforeunload", (e) => alertUser(e, unSavedRequest));
 
       return () => {
         window.removeEventListener("popstate", handleOnHashChange);
-        window.removeEventListener("beforeunload", alertUser);
+        window.removeEventListener("beforeunload", (e) => alertUser(e, unSavedRequest));
       };
     });
 
@@ -233,7 +189,7 @@ const BottomButtonGroup = React.memo(
         setsaveModal(true);
     };
 
-    const handleModal = (value, fileInfoList) => {
+    const handleModal = (value) => {
       setOpenModal(false);
 
       if (!value) {
@@ -350,7 +306,7 @@ const BottomButtonGroup = React.memo(
 
     return (
       <div className={classes.root}>
-        {openModal ? (
+        {openModal && (
           <ConfirmationModal
             requestId={requestId}
             openModal={openModal}
@@ -358,8 +314,8 @@ const BottomButtonGroup = React.memo(
             state={StateEnum.open.name}
             saveRequestObject={saveRequestObject}
           />
-        ) : null}
-        {opensaveModal ? (
+        )}
+        {opensaveModal && (
           <ConfirmationModal
             requestId={requestId}
             openModal={opensaveModal}
@@ -369,7 +325,7 @@ const BottomButtonGroup = React.memo(
             handleClosingDateChange={handleClosingDateChange}
             handleClosingReasonChange={handleClosingReasonChange}
           />
-        ) : null}
+        )}
         <div className="foi-bottom-button-group">
           <button
             type="button"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../bottombuttongroup.scss';
+import '../BottomButtonGroup/bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import {push} from "connected-react-router";
