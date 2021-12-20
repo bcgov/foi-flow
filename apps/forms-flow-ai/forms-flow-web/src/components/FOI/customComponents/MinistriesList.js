@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import "./ministrieslist.scss";
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
+import clsx from 'clsx'
 
 const useStyles = makeStyles((theme) => ({  
   headingError: {
@@ -21,23 +22,34 @@ const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterPr
     
     //sets the isError to true if no program area selected by default
     useEffect(() => {
-      setError(!programAreaList.some(programArea => programArea.isChecked));
+      setError(
+        !programAreaList.some((programArea) => programArea.isChecked)
+      );
     },[programAreaList])
 
+    useEffect(() => {console.log(isError)}, [isError]);
+
     //handle onChange event of checkbox
-    const handleOnChangeProgramArea = (e) => {      
+    const handleOnChangeProgramArea = (e) => { 
       const newProgramAreaList = [...programAreaList];
-      newProgramAreaList.map(programArea => programArea.programareaid.toString() === e.target.dataset.programareaid? programArea.isChecked = e.target.checked: programArea);      
+      newProgramAreaList.forEach(
+        programArea => {
+          if (programArea.programareaid.toString() === e.target.dataset.programareaid) {
+            programArea.isChecked = e.target.checked;
+          }
+      });      
       //sets the program area list with updated values
       setProgramAreaListItems(newProgramAreaList);
       //event bubble up - send the updated list to RequestDescriptionBox component
-      handleUpdatedMasterProgramAreaList(newProgramAreaList);
-      //updates the isError based on the selection
-      setError(!newProgramAreaList.some(ministry => ministry.isChecked));     
-    }    
+      handleUpdatedMasterProgramAreaList(newProgramAreaList); 
+    }
      return (
         <div className="foi-ministries-container">
-        <h4 className={isError ? classes.headingError : classes.headingNormal}>Select Ministry Client *</h4>
+        <h4 className={clsx({
+          [classes.headingError]: isError,
+          [classes.headingNormal]: !isError
+        })
+        }>Select Ministry Client *</h4>
         <div className = "foi-ministries-checkboxes">
         {       
           programAreaList.map((programArea, index) => 
@@ -60,6 +72,6 @@ const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterPr
         </div>
         </div>
     );
-  });
+});
 
 export default MinistriesList;
