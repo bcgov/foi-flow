@@ -4,6 +4,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import './divisionstages.scss';
 import { useDispatch, useSelector } from "react-redux";
+import clsx from 'clsx'
 
 const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popselecteddivstages}) => {
     var stageCounter = []
@@ -50,10 +51,10 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
    
     popselecteddivstages(minDivStages)
 
-    const deleteMinistryDivision = (id)=>{
+    const deleteMinistryDivision = (id)=> {
        
         let existing = stageIterator;
-        let updatedIterator = existing.filter(i=>i.id !== id);
+        let updatedIterator = existing.filter((i) => i.id !== id);
         
         setMinDivStages([...updatedIterator])
         appendstageIterator([...updatedIterator])
@@ -99,13 +100,27 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
 
     const getDivisionalStages = () =>{
         var divisionstagesItems = []
-        divisionstagesItems.push(<MenuItem key={0} name="selectmenuitem"  value={-1} disabled={true} >{'Select Division Stage'}</MenuItem>)
+        divisionstagesItems.push(
+        <MenuItem 
+            key={0} 
+            name="selectmenuitem"  
+            value={-1} 
+            disabled={true} 
+        >
+            {'Select Division Stage'}
+        </MenuItem>)
 
-        const divisionstageItems = divisionstageList!=undefined && divisionstageList.length > 0 && divisionstageList.map((item) => {
+        const divisionstageItems = !divisionstageList && divisionstageList.length > 0 && divisionstageList.map((item) => {
 
             return (
-                <MenuItem className="foi-divisionstage-menuitem" key={item.stageid} value={item.stageid}   >
-                    <span className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} ></span>
+                <MenuItem 
+                    className="foi-divisionstage-menuitem" 
+                    key={item.stageid} 
+                    value={item.stageid}
+                >
+                    <span 
+                        className={`foi-menuitem-span ${item.name.toLowerCase().replace(/\s/g, '')}`} 
+                    ></span>
                     {item.name}
                 </MenuItem>
             )
@@ -121,16 +136,6 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
     var divisionalStagesRow = (row,index) => {
 
         let _id = row.id
-        let binclass = `fa fa-trash fa-3 foi-bin`
-        
-        if(index ===  0 && stageIterator.length > 1 )
-        {
-            binclass = `fa fa-trash fa-3 foi-bin` 
-        }
-        else if(index ===  0 && stageIterator.length === 1) 
-        {
-            binclass = `fa fa-trash fa-3 foi-bin hidebin` 
-        }
        
         return (
             <div className="row foi-details-row" id={`foi-division-row${_id}`}>
@@ -145,7 +150,7 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                         onChange={e => handleDivisionChange(e,_id)}
                         fullWidth                        
                         label="Select Divison*"
-                        value={row.divisionid !== -1 ? row.divisionid : -1} 
+                        value={row.divisionid} 
                         error= {row.divisionid ===-1 || row.divisionid === ""}                       
                     >
                         {getdivisionMenuList()}
@@ -163,14 +168,17 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
                         fullWidth                        
                         label="Select Divison Stage*"
                         onChange={e => handleDivisionStageChange(e,_id)} 
-                        value={row.stageid !== "" || row.stageid !== -1 ? row.stageid : -1 } 
-                        error= {row.stageid ===-1 || row.stageid === ""}                     
+                        value={row.stageid || -1} 
+                        error= {row.stageid === -1 || row.stageid === ""}                     
                     >
                         {getDivisionalStages()}
                     </TextField>
                 </div>
                 <div className="col-lg-2 foi-details-col">
-                    <i className={binclass} aria-hidden="true" onClick={e=>deleteMinistryDivision(_id)}></i>
+                    <i className={clsx(
+                        "fa fa-trash fa-3 foi-bin", {
+                        "hidebin": index === 0 && stageIterator.length === 1})
+                    } aria-hidden="true" onClick={e=>deleteMinistryDivision(_id)}></i>
                 </div>
             </div>
         )
@@ -178,29 +186,31 @@ const DivisionalStages = React.memo(({divisionalstages,existingDivStages,popsele
     }
 
     return (
-        <>
-            <div id="divstages" >
-
-                {
-                   divisionList!=undefined && divisionstageList!=undefined && stageIterator.map((item,index) =>
-
-                        divisionalStagesRow(item,index)
-                    )
-                }
-
+      <>
+        <div id="divstages">
+          {!divisionList &&
+            !divisionstageList &&
+            stageIterator.map((item, index) =>
+              divisionalStagesRow(item, index)
+            )}
+        </div>
+        {!divisionList && divisionList.length > stageIterator.length ? (
+          <div className="row foi-details-row">
+            <div className="col-lg-7 foi-details-col">
+              <i
+                className="fa fa-plus-circle fa-3 foi-add"
+                aria-hidden="true"
+              ></i>
+              <a href="#" onClick={addDivisionalStage}>
+                Add division to track
+              </a>
             </div>
-            {
-                divisionList!=undefined &&  divisionList.length > stageIterator.length ?
-                <div className="row foi-details-row">
-                <div className="col-lg-7 foi-details-col">
-                    <i className="fa fa-plus-circle fa-3 foi-add" aria-hidden="true"></i>  <a href="#" onClick={addDivisionalStage}>Add division to track</a>
-                </div>
-            </div> : <span/>
-
-            }
-            
-        </>
-    )
+          </div>
+        ) : (
+          <span />
+        )}
+      </>
+    );
 })
 
 export default DivisionalStages
