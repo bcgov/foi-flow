@@ -6,7 +6,7 @@ import DivisionalStages from './Divisions/DivisionalStages';
 import { useDispatch, useSelector } from "react-redux";
 import {
     fetchFOIMinistryDivisionalStages
-  } from "../../../../apiManager/services/FOI/foiRequestServices";
+  } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,ministrycode}) => {
 
     const dispatch = useDispatch();

@@ -13,21 +13,27 @@ import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
 import {
-  fetchFOIRawRequestDetails,
-  fetchFOIRequestDetails, 
   fetchFOICategoryList, 
   fetchFOIProgramAreaList, 
   fetchFOIAssignedToList, 
   fetchFOIDeliveryModeList, 
   fetchFOIReceivedModeList,
-  fetchFOIRequestDescriptionList,
   fetchClosingReasonList,
-  fetchFOIRequestNotesList,
-  fetchFOIRequestAttachmentsList,
   fetchFOIFullAssignedToList,
-  fetchFOIMinistryAssignedToList
-    
+  fetchFOIMinistryAssignedToList    
+} from "../../../apiManager/services/FOI/foiMasterDataServices";
+import {
+  fetchFOIRawRequestDetails,
+  fetchFOIRequestDetails, 
+  fetchFOIRequestDescriptionList
 } from "../../../apiManager/services/FOI/foiRequestServices";
+import {
+  fetchFOIRequestAttachmentsList    
+} from "../../../apiManager/services/FOI/foiAttachmentServices";
+import {
+  fetchFOIRequestNotesList 
+} from "../../../apiManager/services/FOI/foiRequestNoteServices";
+
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
@@ -133,7 +139,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       dispatch(fetchFOIRequestAttachmentsList(requestId,null));
     }
     else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
-      dispatch(fetchFOIAssignedToList(urlIndexCreateRequest,"",""));
+      dispatch(fetchFOIAssignedToList("",""));
     }
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOICategoryList());
