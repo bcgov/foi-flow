@@ -27,8 +27,6 @@ const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterPr
       );
     },[programAreaList])
 
-    useEffect(() => {console.log(isError)}, [isError]);
-
     //handle onChange event of checkbox
     const handleOnChangeProgramArea = (e) => { 
       const newProgramAreaList = [...programAreaList];
