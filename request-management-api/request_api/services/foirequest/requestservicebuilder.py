@@ -26,7 +26,7 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.foiministryrequestid = ministryid
             activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
         foiministryrequest.isactive = True
-        foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else fileNumber
+        foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
