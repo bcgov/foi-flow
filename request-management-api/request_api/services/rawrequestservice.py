@@ -57,7 +57,8 @@ class rawrequestservice:
     def getrawrequest(self, requestid):
         return rawrequestservicegetter().getrawrequestforid(requestid)
         
-    def getstatus(self, statusid):
+    def getstatus(self, foirequest):
+        statusid = foirequest["requeststatusid"] if "requeststatusid" in foirequest else None
         if statusid is not None:
             try:           
                 if statusid== 4:                    

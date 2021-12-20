@@ -62,7 +62,7 @@ class FOIRawRequest(Resource):
         try :                        
             updaterequest = request.get_json()                        
             if int(requestid) and str(requestid) != "-1" :
-                status = rawrequestservice().getstatus(updaterequest["requeststatusid"])
+                status = rawrequestservice().getstatus(updaterequest)
                 rawrequest = rawrequestservice().getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
