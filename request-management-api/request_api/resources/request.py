@@ -137,9 +137,10 @@ class FOIRawRequests(Resource):
             #get attachments
             attachments = requestdatajson['Attachments'] if requestdatajson.get('Attachments') != None else None
 
+            notes = 'Request added with FOI Payment Integration release'
             #save request
             requestdatajson.pop('Attachments')
-            result = rawrequestservice.saverawrequest(requestdatajson,"onlineform",None)
+            result = rawrequestservice.saverawrequest(requestdatajson=requestdatajson,sourceofsubmission="onlineform",userId=None,notes=notes)
             requestId = result.identifier
 
             #upload attachments
@@ -159,11 +160,7 @@ class FOIRawRequests(Resource):
                 documentschema = CreateDocumentSchema().load({'documents': attachmentList})
                 # result1 = documentservice().createrequestdocument(requestId, documentschema, AuthHelper.getUserId(), "rawrequest")
                 result1 = documentservice().createrequestdocument(requestId, documentschema, None, "rawrequest")
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
-            requestdatajson = request_json['requestData'] 
-            notes = 'Request added with FOI Payment Integration release'          
-            result = rawrequestservice.saverawrequest_foipayment(requestdatajson,notes)
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            

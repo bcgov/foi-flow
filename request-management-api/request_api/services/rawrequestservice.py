@@ -26,11 +26,12 @@ class rawrequestservice:
 
     """
 
-    def saverawrequest(requestdatajson,sourceofsubmission, userId):
+    def saverawrequest(requestdatajson,sourceofsubmission, userId,notes):
         assigneeGroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,ispiiredacted,userId,assigneeGroup,assignee)
+        requirespayment = rawrequestservice.doesRequirePayment(requestdatajson)        
+        result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,notes=notes, requirespayment=requirespayment, ispiiredacted=ispiiredacted,sourceofsubmission=sourceofsubmission,userId=userId,assigneegroup=assigneeGroup,assignee=assignee)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
@@ -39,12 +40,6 @@ class rawrequestservice:
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
             asyncio.run(redispubservice.publishtoredischannel(json_data))
-        return result
-
-    def saverawrequest_foipayment(requestdatajson,notes):
-        ispiiredacted = requestdatajson["isPIIRedacted"] if 'isPIIRedacted' in requestdatajson  else False
-        requirespayment = rawrequestservice.doesRequirePayment(requestdatajson)
-        result = FOIRawRequest.saverawrequest_foipayment(_requestrawdata=requestdatajson,notes=notes, requirespayment=requirespayment, ispiiredacted=ispiiredacted)       
         return result
     
     @staticmethod
