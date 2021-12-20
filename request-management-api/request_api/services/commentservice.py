@@ -6,7 +6,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRawRequests import FOIRawRequest
 import json
-from dateutil.parser import parse
+from dateutil.parser import *
 import datetime 
 
 from dateutil import parser
@@ -17,90 +17,115 @@ import maya
 
 
 class commentservice:
-    """ FOI comment management service
-    Supports creation, update and delete of comments for both unopened(raw) and opened(ministry) request
+    """ FOI watcher management service
+
     """
     
-    def createministryrequestcomment(self, data, userid, type=1):
-        version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
-        return FOIRequestComment.savecomment(type, data, version, userid) 
-
-    def createrawrequestcomment(self, data, userid, type=1):
-        version = FOIRawRequest.getversionforrequest(data["requestid"])    
-        return FOIRawRequestComment.savecomment(type, data, version, userid) 
     
+    @classmethod    
+    def createministryrequestcomment(self, data, userid, type=1,taggedusers=None):
+        version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
+        return FOIRequestComment.savecomment(type, data, version, userid,taggedusers=taggedusers) 
+
+    @classmethod    
+    def createrawrequestcomment(self, data, userid, type=1,taggedusers=None):
+        version = FOIRawRequest.getversionforrequest(data["requestid"])    
+        return FOIRawRequestComment.savecomment(type, data, version, userid,taggedusers=taggedusers) 
+    
+    @classmethod    
     def disableministryrequestcomment(self, commentid, userid):
         return FOIRequestComment.disablecomment(commentid, userid) 
 
+    @classmethod    
     def disablerawrequestcomment(self, commentid, userid):
         return FOIRawRequestComment.disablecomment(commentid, userid)     
         
-    def updateministryrequestcomment(self, commentid, data, userid):
-        return FOIRequestComment.updatecomment(commentid, data, userid) 
+    @classmethod    
+    def updateministryrequestcomment(self, commentid, data, userid,taggedusers=None):
+        return FOIRequestComment.updatecomment(commentid, data, userid,taggedusers=taggedusers) 
 
-    def updaterawrequestcomment(self, commentid, data, userid):
-        return FOIRawRequestComment.updatecomment(commentid, data, userid)          
+    @classmethod    
+    def updaterawrequestcomment(self, commentid, data, userid,taggedusers=None):
+        return FOIRawRequestComment.updatecomment(commentid, data, userid,taggedusers=taggedusers)          
         
+    @classmethod    
     def getministryrequestcomments(self, ministryrequestid):
         data = FOIRequestComment.getcomments(ministryrequestid)
-        return self.__preparecomments(data)
+        return self.preparecomments(data)
     
+    @classmethod    
     def getrawrequestcomments(self, requestid):
         data = FOIRawRequestComment.getcomments(requestid)
-        return self.__preparecomments(data)        
+        return self.preparecomments(data)        
+    
+   
 
+    @classmethod    
     def copyrequestcomment(self, ministryrequestid, comments, userid):
-        _comments = []        
-        for comment in comments:
-            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.__copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF']) 
+        _comments = []                
+        for comment in comments:            
+            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF'],comment['taggedusers']) 
             _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
                 for reply in comment['replies']:
-                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.__copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
+                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'],reply['taggedusers'])      
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
         return _comments
     
-    def __copyparentcomment(self, ministryrequestid, entry):
+    @classmethod  
+    def getmatchednministryid(self, _comments, parentid):
+        for entry in _comments:
+            if entry['rawcommentid'] == parentid:
+                return  entry['ministrycommentid']      
+        return None
+    
+    @classmethod  
+    def copyparentcomment(self, ministryrequestid, entry):
         return {
             "ministryrequestid": ministryrequestid,
             "comment": entry['text']
             }
     
-    def __copyreplycomment(self, ministryrequestid, entry, parentcommentid):
+    @classmethod  
+    def copyreplycomment(self, ministryrequestid, entry, parentcommentid):
         return {
             "ministryrequestid": ministryrequestid,
             "comment": entry['text'],
-            "parentcommentid":parentcommentid
+            "parentcommentid":parentcommentid            
         }
     
-    def __preparecomments(self, data):
+    @classmethod  
+    def preparecomments(self, data):
         comments=[]
-        comments = self.__parentcomments(data)
+        comments = self.parentcomments(data)
         for entry in data:
             if entry['parentcommentid'] is not None:
                 for _comment in comments:
                     if entry['parentcommentid'] == _comment['commentId']:
-                        _comment['replies'].append(self.__comment(entry))            
+                        _comment['replies'].append(self.comment(entry))            
         return comments        
     
-    def __parentcomments(self, data):
+    @classmethod    
+    def parentcomments(self, data):
         parentcomments = []
         for entry in data:
             if entry['parentcommentid'] is None:
-                _comment = self.__comment(entry)
+                _comment = self.comment(entry)
                 _comment['replies'] = []
                 parentcomments.append(_comment)        
         return parentcomments
           
         
-    def __comment(self, comment):
-        commentcreateddate = maya.parse(comment["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
+    @classmethod    
+    def comment(self, comment):
+        commentcreatedDate = maya.parse(comment["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
         return {
                 "userId": comment['createdby'],
                 "commentId": comment['commentid'],
                 "text": comment['comment'],
                 "dateUF":comment["created_at"],
-                "date":  commentcreateddate.strftime('%Y %b %d | %I:%M %p'),
+                "date":  commentcreatedDate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
-                "commentTypeId":comment['commenttypeid']
+                "commentTypeId":comment['commenttypeid'],
+                "taggedusers" : comment['taggedusers']              
         }     

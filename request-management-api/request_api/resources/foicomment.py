@@ -30,15 +30,12 @@ from flask_cors import cross_origin
 
 
 API = Namespace('FOIComment', description='Endpoints for FOI Comment management')
-TRACER = Tracer.get_instance()
-"""Custom exception messages
-"""
-EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+TRACER = Tracer.get_instance()  
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicomment/ministryrequest')
 class CreateFOIRequestComment(Resource):
-    """Creates comment for ministry(opened) request."""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
@@ -49,8 +46,10 @@ class CreateFOIRequestComment(Resource):
         try:
             requestjson = request.get_json() 
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
-            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getUserId())
+            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getUserId(),taggedusers = minrquescommentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -59,7 +58,7 @@ class CreateFOIRequestComment(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicomment/rawrequest')
 class CreateFOIRawRequestComment(Resource):
-    """Creates comment for raw(unopened) request."""
+    """Resource for managing FOI requests."""
 
      
     @staticmethod
@@ -70,8 +69,10 @@ class CreateFOIRawRequestComment(Resource):
         try:
             requestjson = request.get_json() 
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
-            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getUserId())
+            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getUserId(),taggedusers = rawrqcommentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -80,7 +81,7 @@ class CreateFOIRawRequestComment(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foicomment/<requesttype>/<requestid>')
 class FOIComment(Resource):
-    """Retrieves comment based on type: ministry(opened) and raw(unopened)."""
+    """Resource for managing FOI requests."""
 
        
     @staticmethod
@@ -89,13 +90,15 @@ class FOIComment(Resource):
     @auth.require
     def get(requesttype, requestid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
-                return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
+                return {'status': False, 'message':'Bad Request'}, 400 
         try:
             if requesttype == "ministryrequest":
                 result = commentservice().getministryrequestcomments(requestid)
             else:
                 result = commentservice().getrawrequestcomments(requestid)
             return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -106,7 +109,7 @@ class FOIComment(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foicomment/<requesttype>/<commentid>/disable')
 class FOIDisableComment(Resource):
-    """Disable comment based on type: ministry(opened) and raw(unopened)."""
+    """Resource for managing FOI requests."""
 
       
     @staticmethod
@@ -115,13 +118,15 @@ class FOIDisableComment(Resource):
     @auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
-                return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
+                return {'status': False, 'message':'Bad Request'}, 400 
         try:
             if requesttype == "ministryrequest":
                 result = commentservice().disableministryrequestcomment(commentid, AuthHelper.getUserId())
             else:
                 result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getUserId())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -131,7 +136,7 @@ class FOIDisableComment(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foicomment/<requesttype>/<commentid>')
 class FOIUpdateComment(Resource):
-    """Update comment based on type: ministry(opened) and raw(unopened)."""
+    """Resource for managing FOI requests."""
 
       
     @staticmethod
@@ -140,16 +145,18 @@ class FOIUpdateComment(Resource):
     @auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
-                return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
+                return {'status': False, 'message':'Bad Request'}, 400 
         try:
             requestjson = request.get_json()              
             if requesttype == "ministryrequest":
                 commentschema = FOIMinistryRequestCommentSchema().load(requestjson)
-                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getUserId())
+                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getUserId(), taggedusers=commentschema["taggedusers"])
             else:
                 commentschema = EditFOIRawRequestCommentSchema().load(requestjson)
-                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getUserId())
+                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getUserId(),taggedusers=commentschema["taggedusers"])
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

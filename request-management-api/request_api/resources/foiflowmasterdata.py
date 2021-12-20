@@ -43,8 +43,7 @@ TRACER = Tracer.get_instance()
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/applicantcategories')
 class FOIFlowApplicantCategories(Resource):
-    """Retrieves all active application categories.
-    """
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
@@ -52,18 +51,17 @@ class FOIFlowApplicantCategories(Resource):
     @request_api.cache.cached(key_prefix="applicantcategories")
     def get():
         try:
-            data = applicantcategoryservice().getapplicantcategories()
+            data = applicantcategoryservice.getapplicantcategories()
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
+        except:
             return "Error happened while accessing applicant categories" , 500
 
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
 class FOIFlowProgramAreas(Resource):
-    """Retrieves all active program areas.
-    """
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())      
@@ -71,17 +69,16 @@ class FOIFlowProgramAreas(Resource):
     @request_api.cache.cached(key_prefix="programareas")
     def get():
         try:
-            data = programareaservice().getprogramareas()
+            data = programareaservice.getprogramareas()
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
+        except:
             return "Error happened while accessing applicant categories" , 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/deliverymodes')
 class FOIFlowDeliveryModes(Resource):
-    """Retrieves all active delivery modes.
-    """
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
@@ -89,17 +86,16 @@ class FOIFlowDeliveryModes(Resource):
     @request_api.cache.cached(key_prefix="deliverymodes")
     def get():
         try:
-            data = deliverymodeservice().getdeliverymodes()
+            data = deliverymodeservice.getdeliverymodes()
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
+        except:
             return "Error happened while accessing delivery modes" , 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/receivedmodes')
 class FOIFlowReceivedModes(Resource):
-    """Retrieves all active received modes.
-    """
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
@@ -107,17 +103,16 @@ class FOIFlowReceivedModes(Resource):
     @request_api.cache.cached(key_prefix="receivedmodes")
     def get():
         try:
-            data = receivedmodeservice().getreceivedmodes()
+            data = receivedmodeservice.getreceivedmodes()
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
+        except:
             return "Error happened while accessing received modes" , 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/divisions/<bcgovcode>')
 class FOIFlowDivisions(Resource):
-    """Retrieves all active divisions for the passed in gov code    .
-    """
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
@@ -127,14 +122,13 @@ class FOIFlowDivisions(Resource):
             data = divisionstageservice().getdivisionandstages(bcgovcode)
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
+        except:
             return "Error happened while accessing divisions" , 500 
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
 class FOIFlowCloseReasons(Resource):
-    """Retrieves all active closure reasons.
-    """
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       
@@ -142,17 +136,16 @@ class FOIFlowCloseReasons(Resource):
     @request_api.cache.cached(key_prefix="closereasons")
     def get():
         try:
-            data = closereasonservice().getclosereasons()
+            data = closereasonservice.getclosereasons()
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
+        except:
             return "Error happened while accessing received modes" , 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/oss/authheader')
 class FOIFlowDocumentStorage(Resource):
-    """Retrieves authentication properties for document storage.
-    """
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedOrigins())       

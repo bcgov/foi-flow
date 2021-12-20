@@ -25,8 +25,10 @@ from request_api.exceptions import BusinessException, Error
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.dashboardservice import dashboardservice
 from request_api.services.external.bpmservice import bpmservice
+from request_api.services.documentservice import documentservice
+from request_api.schemas.foidocument import CreateDocumentSchema
 import json
-import uuid
+import base64
 from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
@@ -45,10 +47,10 @@ class FOIRawRequest(Resource):
     def get(requestid=None):
         try : 
             jsondata = {}
-            requestidisinteger = int(requestid)
-            if requestidisinteger :                
-                baserequestinfo = rawrequestservice.getrawrequest(requestid)                                    
-                jsondata = json.dumps(baserequestinfo)
+            requestidisInteger = int(requestid)
+            if requestidisInteger :                
+                baserequestInfo = rawrequestservice.getrawrequest(requestid)                                    
+                jsondata = json.dumps(baserequestInfo)
             return jsondata , 200 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -76,12 +78,12 @@ class FOIRawRequest(Resource):
                 except  KeyError:
                     print("Key Error on requeststatusid, ignore will be intake in Progress")    
                 
-                rawrequest = rawrequestservice.getrawrequest(requestid)     
-                assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
+                rawRequest = rawrequestservice.getrawrequest(requestid)     
+                assigneeGroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getUserId())                
+                result = rawrequestservice.saverawrequestversion(updaterequest,requestid,assigneeGroup, assignee,status,AuthHelper.getUserId())                
                 if result.success == True:   
-                    rawrequestservice().postEventToWorkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
+                    rawrequestservice().postEventToWorkflow(result.identifier, rawRequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getUserId())               
@@ -112,7 +114,7 @@ class FOIRawRequestBPMProcess(Resource):
                     return {'status': result.success, 'message':result.message}, 200
                 else:
                     return {'status': result.success, 'message':result.message}, 404
-            except KeyError:
+            except KeyError as keyexception:
                 return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
             except ValueError as valuexception:
                 return {'status': "BAD Request", 'message': str(valuexception)}, 500           
@@ -131,9 +133,33 @@ class FOIRawRequests(Resource):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestData']           
+            requestdatajson = request_json['requestData']
+            #get attachments
+            attachments = requestdatajson['Attachments'] if requestdatajson.get('Attachments') != None else None
+
+            #save request
+            requestdatajson.pop('Attachments')
             result = rawrequestservice.saverawrequest(requestdatajson,"onlineform",None)
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            requestId = result.identifier
+
+            #upload attachments
+            attachmentList = []
+            if attachments:
+                for attachment in attachments:
+                    attachment['filestatustransition'] = 'personal'
+                    attachment['ministrycode'] = 'Misc'
+                    attachment['requestnumber'] = str(requestId)
+
+                    attachment['file'] = base64.b64decode(attachment['base64data'])
+                    attachment.pop('base64data')
+
+                    attachmentObj = documentservice().uploadtos3(attachment)
+                    attachmentList.append(attachmentObj)
+                
+                documentschema = CreateDocumentSchema().load({'documents': attachmentList})
+                # result1 = documentservice().createrequestdocument(requestId, documentschema, AuthHelper.getUserId(), "rawrequest")
+                result1 = documentservice().createrequestdocument(requestId, documentschema, None, "rawrequest")
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            

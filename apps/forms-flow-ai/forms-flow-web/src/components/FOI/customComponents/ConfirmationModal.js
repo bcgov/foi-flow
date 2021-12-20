@@ -44,14 +44,14 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
   handleClosingDateChange, handleClosingReasonChange, attachmentsArray }) {    
     const classes = useStyles();    
     const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
-    const ministryGroup = saveRequestObject.selectedMinistries && saveRequestObject.selectedMinistries.length > 0   ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
+    const ministryGroup = saveRequestObject.selectedMinistries?.length > 0   ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
     const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : ministryGroup;
     const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;    
     const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : ""; 
-    const currentState = saveRequestObject && saveRequestObject.currentState;
-    const daysRemainingLDD = calculateDaysRemaining(saveRequestObject && saveRequestObject.dueDate);
+    const currentState = saveRequestObject?.currentState;
+    const daysRemainingLDD = calculateDaysRemaining(saveRequestObject?.dueDate);
     const multipleFiles = false;
-    const reOpenRequest = currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() ? true : false;
+    const reOpenRequest = currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() ? true : false;
     const [files, setFiles] = useState([]);
     const updateFilesCb = (_files) => {
       setFiles(_files);
@@ -96,7 +96,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }   
     const getMessage = (_state, _requestNumber) => {
-      if ((currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
+      if ((currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
         return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${requestId}`}? <br/> <span className="confirm-message-2"> The request will be re-opened to the previous state: {_state}</span> </>}; 
       }
       switch(_state.toLowerCase()) {
@@ -143,7 +143,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
-      if (currentState && currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
+      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) {
         return (
           <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>
         );
@@ -156,7 +156,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} /> 
         );
       }
-      else if ((currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id))) {
+      else if ((currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id))) {
         return (
           <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
         );
@@ -165,7 +165,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
         return (
           <>
-          {(currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ? 
+          {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ? 
             <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
               <tbody>
                 <tr>
@@ -174,7 +174,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 </tr>
               </tbody>
           </table> : null }
-        {([StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ? 
+        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ? 
           <table className="table table-bordered table-assignedto">
             <tbody>
               <tr>
@@ -218,7 +218,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </DialogContent>
           <DialogActions>            
             <button className={`btn-bottom btn-save ${ files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id )) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id )) } onClick={handleSave}>
-              {(currentState && currentState.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
+              {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
               "Save Change" : "Re-Open Request"}
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>

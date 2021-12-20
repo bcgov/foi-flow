@@ -5,11 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
-import { convertToRaw, convertFromRaw, convertFromHTML, ContentState, EditorState } from "draft-js";
+import { convertToRaw, EditorState } from "draft-js";
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
-import {namesort,suggestionList } from './commentutils'
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
 import {
   ItalicButton,
@@ -19,25 +18,25 @@ import {
   OrderedListButton,
 
 } from '@draft-js-plugins/buttons';
+import {namesort,suggestionList } from './commentutils'
+
 
 const staticToolbarPlugin = createToolbarPlugin();
 const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
-const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullnameList,
-  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  setEditorChange, removeComment, setRemoveComment
-}) => {
-  let maxcharacterlimit = 1000
+const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+  setEditorChange, removeComment, setRemoveComment }) => {
+  let maxcharacterlimit = 1000  
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
-
+  
   let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
   const mentionList = fulluserlist;
-
   const [suggestions, setSuggestions] = useState(mentionList);
+  const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
   const onOpenChange = (_open) => {
     setOpen(_open);
@@ -50,13 +49,6 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     }).sort(namesort)    
     setSuggestions(defaultSuggestionsFilter(value, filterlist))
   }
-
-  const getEditorState = (value) => {
-    const rawContentFromStore = convertFromRaw(JSON.parse(value))
-    let initialEditorState = EditorState.createWithContent(rawContentFromStore);
-    return initialEditorState
-  }
-  const [editorState, setEditorState] = useState(value === '' || value === undefined ? EditorState.createEmpty() : getEditorState(value))
 
   const getMentionsOnComment = () => {
     const rawContentState = convertToRaw(editorState.getCurrentContent());
@@ -72,19 +64,15 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     return commentmentions;
   }
 
-  const _handleChange = (editorState) => {
+  const _handleChange = (editorState) => {    
     const currentContent = editorState.getCurrentContent();
-    const rawContentState = convertToRaw(currentContent);
+    const rawContentState = convertToRaw(currentContent);    
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
     let _textLength = maxcharacterlimit - (currentContentLength - selectedTextLength)
-    if (_textLength > 0) 
-    { 
-      setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
-       
-    }
-    
-
+    if(_textLength > 0)
+      {setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))}
+  
     setuftext(currentContent.getPlainText(''))
     setEditorState(editorState);
     setEditorChange(currentContentLength > 0)
@@ -129,7 +117,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     return length;
   }
 
-  const _handleKeyCommand = (e) => {
+  const _handleKeyCommand = (e) => {   
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -143,7 +131,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     setuftext(currentContent.getPlainText(''))
   }
 
-  const _handleBeforeInput = () => {
+  const _handleBeforeInput = () => {   
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -156,7 +144,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     setuftext(currentContent.getPlainText(''))
   }
 
-  const _handlePastedText = (pastedText) => {
+  const _handlePastedText = (pastedText) => {    
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -170,25 +158,19 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
   }
 
 
-
-  useEffect(() => {
-    if (value !== undefined) {
-      const contentstate = getEditorState(value)
-      const currentContent = contentstate.getCurrentContent();
-      setuftext(currentContent.getPlainText(''))
-      setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
+  const post = () => {
+    if (uftext !== '' && uftext.trim().length > 0) {
+      const _mentions = getMentionsOnComment()
+      const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
+      setFOILoader(true)    
+      actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
+      setEditorState(createEditorStateWithText(''))
+      setEditorChange(false)
+      setTextLength(1000);
     }
 
-  }, [value])
-
-  //Handles Navigate Away
-  const closeX = () => {
-    setEditorState(EditorState.createEmpty())
-    setuftext('')
-    edit
-      ? actions.handleCancel(cancellor, edit)
-      : actions.handleCancel(cancellor)
   }
+
 
   //Handles Navigate Away
   useEffect(() => {
@@ -197,68 +179,20 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
         setEditorState(EditorState.createEmpty())
         setuftext('')
       }
-      else {
-        closeX();
-      }
+      
       setRemoveComment(false);
     }
   })
 
-  
-
-  const cancel = (e) => {
-    if (uftext) {
-      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-        closeX();
-        setEditorChange(false);
-      }
-    }
-    else {
-      closeX();
-    }
-    e.preventDefault();
-  }
-
-  const post = () => {
-    if (uftext !== '' && uftext.trim().length > 0) {
-      const _mentions = getMentionsOnComment()
-      const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
-      setFOILoader(true)
-      edit === true
-        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true)
-        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
-
-      setEditorState(createEditorStateWithText(''))
-      setEditorChange(false)
-      setTextLength(1000);
-    }
-
-  }
-
   let formclass = !parentId ? "parentform form" : "form"
   formclass = add ? `${formclass} addform` : formclass
-
-  formclass = (add === undefined && main === undefined && edit === undefined) ? `${formclass} addform newreply` : formclass
 
   const actions = useContext(ActionContext)
 
   return (
     <>
-      <form
-        className={formclass}
-      >
-        <div className="row cancelrow">
-          <div className="col-lg-12" style={{ height: '0px' }}>
-            {(!main) ? (
-              <button
-                className="cancelBtn"
-                onClick={cancel}
-              >
-                <FontAwesomeIcon icon={faTimes} size='2x' color={'#a5a5a5'} />
-              </button>
-            ) : null}
-          </div>
-        </div>
+      <form className={formclass}>
+       
         <Toolbar>
           {
             (externalProps) => (
@@ -304,7 +238,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
             disabled={uftext.trim().length === 0}
           >
             {' '}
-            <FontAwesomeIcon disabled={uftext.trim().length === 0} icon={faPaperPlane} size='2x' color={uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'} />
+            <FontAwesomeIcon disabled={uftext.trim().length === 0} icon={faPaperPlane} size='2x' color={ uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'} />
           </button>
         </div>
       </div>
@@ -313,4 +247,4 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
   )
 }
 
-export default InputField
+export default AddCommentField

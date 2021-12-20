@@ -83,8 +83,8 @@ const FOIRequest = React.memo(({userDetail}) => {
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   const [comment, setComment] = useState([]);
 
-  //quillChange and removeComment added to handle Navigate away from Comments tabs
-  const [quillChange, setQuillChange] = useState(false);
+  //editorChange and removeComment added to handle Navigate away from Comments tabs
+  const [editorChange, setEditorChange] = useState(false);
   const [removeComment, setRemoveComment] = useState(false);
 
   const [attachments, setAttachments] = useState(requestAttachments);
@@ -668,7 +668,7 @@ const FOIRequest = React.memo(({userDetail}) => {
    */
   //Below function will handle beforeunload event
   const alertUser = e => {
-    if (quillChange) {     
+    if (editorChange) {     
       e.returnValue = '';
       e.preventDefault();
     }
@@ -692,13 +692,13 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const tabclick = (evt, param) => {
     let clickedOk = true;
-    if (quillChange && param !== 'Comments') {
-      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-        setQuillChange(false);
+    if (editorChange && param !== 'Comments') {
+      if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {        
+        setEditorChange(false);
         setRemoveComment(true);
       }
       else {
-        setQuillChange(true);
+        setEditorChange(true);
         setRemoveComment(false);
         clickedOk = false;
         param = 'Comments';
@@ -865,7 +865,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
                   requestNumber={requestNumber} requestState={requestState}
-                  iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+                  iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} isMinistryCoordinator={false} />
                 </> : <Loading />
             }
           </div> 
@@ -876,8 +876,8 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: fullName }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
                     bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}
-                    //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-                    setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+                    //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 
                 </> : <Loading />
             }

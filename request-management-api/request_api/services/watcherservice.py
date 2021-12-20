@@ -8,77 +8,61 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 import json
 class watcherservice:
     """ FOI watcher management service
+
     """
-    
+    @classmethod
     def createrawrequestwatcher(self, data, userid, usergroups):
-        """Creates a watcher for a user with groups passed in for an unopened request.
-        """
         version = FOIRawRequest.getversionforrequest(data["requestid"])
         if 'watchedbygroup' in data:
             return FOIRawRequestWatcher.savewatcher(data, version, userid)
         else:
-            return FOIRawRequestWatcher.savewatcherbygroups(data, version, userid, self.__getwatchablegroups(usergroups))
+            return FOIRawRequestWatcher.savewatcherbygroups(data, version, userid, self.getwatchablegroups(usergroups))
 
-    
+    @classmethod
     def getrawrequestwatchers(self, requestid):
-        """Retrieves all watchers associated with an unopened request.
-        """
         return FOIRawRequestWatcher.getwatchers(requestid)
     
-    
+    @classmethod
     def disablerawrequestwatchers(self, requestid, userid):
-        """Remove an user from the watched list of an unopened request.
-        """
         return FOIRawRequestWatcher.disablewatchers(requestid, userid)
 
-    
+    @classmethod    
     def createministryrequestwatcher(self, data, userid, usergroups):
-        """Creates a watcher for a user with groups passed in for an opened request.
-        """
         version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
         if 'watchedbygroup' in data:
             return FOIRequestWatcher.savewatcher(data, version, userid) 
         else:
-            return FOIRequestWatcher.savewatcherbygroups(data, version, userid, self.__getwatchablegroups(usergroups))        
+            return FOIRequestWatcher.savewatcherbygroups(data, version, userid, self.getwatchablegroups(usergroups))
         
-    
+        
+    @classmethod
     def getministryrequestwatchers(self, ministryrequestid, isministrymember):
-        """Retrieves all watchers associated with an opened request.
-        """
         if isministrymember == True:
             return FOIRequestWatcher.getMinistrywatchers(ministryrequestid) 
         else:
             return FOIRequestWatcher.getNonMinistrywatchers(ministryrequestid)
     
-    
+    @classmethod
     def disableministryrequestwatchers(self, ministryrequestid, userid):
-        """Remove an user from the watched list of an opened request.
-        """
         return FOIRequestWatcher.disablewatchers(ministryrequestid, userid)
     
-    
-    def __getwatchablegroups(self, groups):
-        """Returns a list of filtered groups excluding black listed pattern.
-        """
+    @classmethod
+    def getwatchablegroups(self, groups):
         watchablegroups = []
         for group in groups:
             if self.isexcludegroup(group) == False:
                 watchablegroups.append(group)
         return watchablegroups  
                
-    
+    @classmethod    
     def isexcludegroup(self, input):
-        """Identifies whether the given input group is present in excluded groups.
-        """
-        for group in self.__excludegrouppattern():
+        for group in self.excludegrouppattern():
             if group in input.lower():
                 return True
         return False
               
-    
-    def __excludegrouppattern(self):
-        """Exclude KC groups matching the patterns listed.
-        """
+    @classmethod    
+    def excludegrouppattern(self):
         return ["formsflow","realm","camunda"]
         
         

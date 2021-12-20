@@ -2,7 +2,5 @@ from request_api.models.ApplicantCategories import ApplicantCategory
 
 class applicantcategoryservice:
 
-    def getapplicantcategories(self):
-        """ Returns the active records
-        """
+    def getapplicantcategories():
         return ApplicantCategory.getapplicantcategories()
