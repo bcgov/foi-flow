@@ -242,4 +242,28 @@ const getFullnameTeamList = () => {
 	return getSessionData('fullnameTeamList');
 }
 
-export { replaceUrl, formatDate, businessDay, addBusinessDays, calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, getMinistryByValue, addToFullnameList, getFullnameList, getAssignToList, getFullnameTeamList };
+const ConditionalComponent = ({condition, children}) => {
+	if(!condition) {
+		return null
+	}
+
+	return <>
+		{children}
+	</>
+}
+
+export {
+  replaceUrl,
+  formatDate,
+  businessDay,
+  addBusinessDays,
+  calculateDaysRemaining,
+  isMinistryCoordinator,
+  isMinistryLogin,
+  getMinistryByValue,
+  addToFullnameList,
+  getFullnameList,
+  getAssignToList,
+  getFullnameTeamList,
+  ConditionalComponent
+};
