@@ -1,4 +1,10 @@
-import { httpPOSTRequest, httpGETRequest, httpOSSPUTRequest, httpPUTRequest } from "../../httpRequestHandler";
+import {
+  httpPOSTRequest,
+  httpGETRequest,
+  httpOSSPUTRequest,
+  httpOSSGETRequest,
+  httpPUTRequest,
+} from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   setFOIRequestList,
@@ -30,6 +36,7 @@ import {
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import { replaceUrl, addToFullnameList, getAssignToList, getFullnameTeamList } from "../../../helper/FOI/helper";
+import { saveAs } from "file-saver";
 
 export const fetchFOICategoryList = (...rest) => {
   const done = rest.length ? rest[0] : () => { };
@@ -727,6 +734,34 @@ export const saveFilesinS3 = (headerDetails, file, ...rest) => {
   };
 };
 
+export const getFileFromS3 = (headerDetails, file, ...rest) => {  
+  const done = rest.length ? rest[0] : () => {};
+  var requestOptions = {
+    headers: {
+      "X-Amz-Date": headerDetails.amzdate,
+      Authorization: headerDetails.authheader,     
+    },
+    responseType: 'blob'
+  };  
+  return (dispatch) => {    
+    httpOSSGETRequest(headerDetails.filepath, requestOptions)
+    .then((res) => {
+        var blob = new Blob([res.data], {type: "application/octet-stream"});
+        saveAs(blob, file.filename)
+        if (res) {
+          done(null, res.status);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
 
 export const saveRawRequestNote = (data, requestid, ...rest) => {
   const done = rest.length ? rest[0] : () => { };
@@ -770,7 +805,7 @@ export const editRawRequestNote = (data, commentid, requestid, ...rest) => {
       });
   };
 };
-export const editMinistryRequestNote = (data, commentid,  ministryId, ...rest) => {
+export const editMinistryRequestNote = (data, commentid,  ministryId, ...rest) => {  
   const done = rest.length ? rest[0] : () => { };
   let apiUrl = replaceUrl(replaceUrl(
     API.FOI_PUT_COMMENT_MINISTRYREQUEST,

@@ -11,8 +11,7 @@ const StateList = Object.freeze({
     consult: [{status: "Consult", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
     review: [{status: "Records Review", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Consult", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status: "Response", isSelected: false}, {status: "Closed", isSelected: false}],
     signoff: [{status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
-    response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
-    closed: [{status: "Closed", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Response", isSelected: false}],
+    response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],    
 });
 
 const MinistryStateList = Object.freeze({

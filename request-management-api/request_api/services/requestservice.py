@@ -196,14 +196,14 @@ class requestservice:
                         updatedMinistries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
             return FOIRequest.updateStatus(foirequestid, updatedMinistries, userId)
     
-    def postEventToWorkflow(self, requestschema, data):        
+    def postEventToWorkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
         if requeststatusid is not None:
             status = FOIRequestUtil().getStatusName(requeststatusid)
-            workflowservice.postministryevent(requestschema, data, status)
+            workflowservice.postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
             
     def postOpeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
-        workflowservice.postintakeevent(id, wfinstanceid, requestschema, "Open", ministries)
+        workflowservice.postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)
        
     def copywatchers(self, rawrequestid, ministries, userid):
         watchers = watcherservice().getrawrequestwatchers(int(rawrequestid))
@@ -257,7 +257,7 @@ class requestservice:
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime('%Y-%m-%d') if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime('%Y-%m-%d') if requestministry['recordsearchtodate'] is not None else '',
-            'currentState':requestministry['requeststatus.name'],
+            'currentState':requestministry['requeststatus.name'],            
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart': parse(requestministry['startdate']).strftime('%Y-%m-%d') if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime('%Y-%m-%d'),            
@@ -270,9 +270,10 @@ class requestservice:
             'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
             #'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
             'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid),
-            'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d')
+            'lastStatusUpdateDate': FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime('%Y-%m-%d'),
+            'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid)
          }
-
+        
         if requestministry['cfrduedate'] is not None:
             baserequestInfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime('%Y-%m-%d')})
 
@@ -382,7 +383,8 @@ class requestservice:
                 'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
                 'divisions': FOIRequestUtil().getdivisions(requestministrydivisions),
                # 'documents': FOIRequestUtil().getdocuments(requestministrydocuments),
-                'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid)
+                'onholdTransitionDate': FOIRequestUtil().getonholdtransition(foiministryrequestid),
+                'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid)
             }
 
             if requestministry['cfrduedate'] is not None:

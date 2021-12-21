@@ -84,7 +84,7 @@ class FOIRequests(Resource):
             fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)       
             assignedGroup = request_json['assignedGroup'] if 'assignedGroup' in fOIRequestsSchema  else None
             assignedTo = request_json['assignedTo'] if 'assignedTo' in fOIRequestsSchema  else None
-            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Open",AuthHelper.getUserId())               
+            rawresult = rawrequestservice.saverawrequestversion(request_json,request_json['id'],assignedGroup,assignedTo,"Archived",AuthHelper.getUserId())               
             if rawresult.success == True:   
                 result = requestservice().saverequest(fOIRequestsSchema,AuthHelper.getUserId())
                 if result.success == True:
@@ -118,11 +118,9 @@ class FOIRequestsById(Resource):
             fOIRequestsSchema = FOIRequestWrapperSchema().load(request_json)                                    
             result = requestservice().saveRequestVersion(fOIRequestsSchema, foirequestid, foiministryrequestid,AuthHelper.getUserId())
             if result.success == True:
-                print('before posting event')
                 eventservice().postevent(foiministryrequestid,"ministryrequest")
-                print('success')
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
-                requestservice().postEventToWorkflow(fOIRequestsSchema, json.loads(metadata))
+                requestservice().postEventToWorkflow(foiministryrequestid,  result.args[1], fOIRequestsSchema, json.loads(metadata),"iao")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':'Record not found','id':foirequestid} , 404
@@ -153,6 +151,8 @@ class FOIRequestsByIdAndType(Resource):
             ministryrequestschema = FOIRequestMinistrySchema().load(request_json)    
             result = requestservice().saveMinistryRequestVersion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getUserId(), usertype)
             if result.success == True:
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                requestservice().postEventToWorkflow(foiministryrequestid, result.args[1], ministryrequestschema, json.loads(metadata),"ministry")
                 eventservice().postevent(foiministryrequestid,"ministryrequest")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:

@@ -6,7 +6,7 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
@@ -20,7 +20,8 @@ export const AttachmentSection = ({
   ministryId,
   bcgovcode,
   iaoassignedToList,
-  ministryAssignedToList
+  ministryAssignedToList,
+  isMinistryCoordinator
 }) => {
   const [attachments, setAttachments] = useState(attachmentsArray)
   const [iaoList, setIaoList] = useState(iaoassignedToList)
@@ -111,25 +112,54 @@ export const AttachmentSection = ({
   }
   }
 
+  const downloadDocument = (file) => {
+    const fileInfoList = [
+      {
+        ministrycode: "Misc",
+        requestnumber: `U-00${requestId}`,
+        filestatustransition: file.category,
+        filename: file.filename,
+        s3sourceuri: file.documentpath
+      },
+    ];
+    dispatch(
+      getOSSHeaderDetails(fileInfoList, (err, res) => {
+        if (!err) {
+          res.map((header, index) => {
+            dispatch(
+              getFileFromS3(header, file, (err, res) => {
+              })
+            );
+          });
+        }
+      }));
+  }
+
   const handlePopupButtonClick = (action, _attachment) => {
-    setUpdateAttachment();
     setUpdateAttachment(_attachment);
     setMultipleFiles(false);
-    switch(action) {
-      case 'replace':        
-        setModalFor('replace');        
+    switch (action) {
+      case "replace":
+        setModalFor("replace");
+        setModal(true);
         break;
-      case 'rename':        
-        setModalFor('rename');        
+      case "rename":
+        setModalFor("rename");
+        setModal(true);
         break;
-      case 'delete':        
-        setModalFor('delete');        
+      case "download":
+        downloadDocument(_attachment);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "delete":
+        setModalFor("delete")
+        setModal(true)
         break;
       default:
         setModal(false);
         break;
     }
-    setModal(true);
   }
 
   const handleRename = (_attachment, newFilename) => {
@@ -170,7 +200,7 @@ export const AttachmentSection = ({
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} handlePopupButtonClick={handlePopupButtonClick} getFullname={getFullname} />);
+    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} handlePopupButtonClick={handlePopupButtonClick} getFullname={getFullname} isMinistryCoordinator={isMinistryCoordinator} />);
   }
   
   return (
@@ -194,14 +224,16 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}) => {
+const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
 
   const [filename, setFilename] = useState("");
+  const [disabled, setDisabled] = useState(isMinistryCoordinator && attachment.category == 'personal');
   let lastIndex = 0;
   useEffect(() => {
     if(attachment && attachment.filename) {
       lastIndex = attachment.filename.lastIndexOf(".");
       setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
+      setDisabled(isMinistryCoordinator && attachment.category == 'personal')
     }
   }, [attachment])
 
@@ -212,9 +244,11 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
       case "cfr-feeassessed":
         return "cfr - fee estimate";
       case "signoff-response":
-        return "signoff - response";
+        return "signoff > response";
       case "harms-review":
         return "harms assessment - review";
+      case "personal":
+        return "personal";
       default:
         return "general";
     }
@@ -226,27 +260,27 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
         <div className="row foi-details-row">
           <div className="col-sm-12 foi-details-col">
             <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
-              <div className="attachment-name">
+              <div className={`attachment-name ${disabled? "attachment-disabled":""}`}>
                 {attachment.filename}
               </div>
               <div className="attachment-badge">
-                <span class="badge badge-primary">{getCategory(attachment.category)}</span>
+                <span class={`badge ${disabled? "badge-secondary":"badge-primary"}`}>{getCategory(attachment.category)}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>
               <div className="col-sm-1" style={{marginLeft:'auto'}}>
-                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick}/>
+                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick} disabled={disabled} />
               </div>                      
             </div>
           </div>
         </div>
         <div className="row foi-details-row">
-          <div className="col-sm-12 foi-details-col attachment-time">                      
+          <div className={`col-sm-12 foi-details-col attachment-time ${disabled? "attachment-disabled":""}`}>                      
             {attachment.created_at}
           </div>
         </div>
         <div className="row foi-details-row">
-          <div className="col-sm-12 foi-details-col attachment-owner">                      
+          <div className={`col-sm-12 foi-details-col attachment-owner ${disabled? "attachment-disabled":""}`}>                      
             {getFullname(attachment.createdby)}
           </div>
         </div>
@@ -260,48 +294,73 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname}
   );
 })
 
-const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick}) => {
+const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disabled}) => {
+  const ref = React.useRef();
+  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
   const handleRename = () => {
+    closeTooltip(); 
     handlePopupButtonClick("rename", attachment);
   }
 
   const handleReplace = () => {
+    closeTooltip(); 
     handlePopupButtonClick("replace", attachment);
   }
 
+  const handleDownload = () =>{
+    closeTooltip();   
+    handlePopupButtonClick("download", attachment);
+  }
+
   const handleDelete = () => {
+    closeTooltip(); 
     handlePopupButtonClick("delete", attachment);
+  };
+
+  const transitionStates = [
+    "statetransition",
+    StateTransitionCategories.cfrreview.name,
+    StateTransitionCategories.cfrfeeassessed.name,
+    StateTransitionCategories.signoffresponse.name,
+    StateTransitionCategories.harmsreview.name
+  ];
+
+  const showReplace = (category) => {
+    return transitionStates.includes(category.toLowerCase());
   }
 
   return (
     <Popup
       role='tooltip'
+      ref={ref}
       trigger={
-        <button className="actionsBtn">
+        <button className="actionsBtn" disabled={disabled}>
           <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
         </button>
       }
       className="attachment-popup"
       position={'bottom right'}
       closeOnDocumentClick
+      disabled={disabled}
       // keepTooltipInside=".tooltipBoundary"
     >
       <div>
-        <button className="childActionsBtn">
+        <button className="childActionsBtn" onClick={handleDownload}>
           Download
         </button>
         <button className="childActionsBtn" onClick={handleRename}>
           Rename
         </button>
-        {(attachment.category==="statetransition" || attachment.category===StateTransitionCategories.cfrreview.name || attachment.category===StateTransitionCategories.cfrfeeassessed.name || attachment.category===StateTransitionCategories.signoffresponse.name || attachment.category===StateTransitionCategories.harmsreview.name )?
-          <button className="childActionsBtn" onClick={handleReplace}>
-            Replace
-          </button>
-          :
-          <button className="childActionsBtn" onClick={handleDelete}>
-            Delete
-          </button>
+        {attachment.category === "personal"?"":
+          showReplace(attachment.category)?
+            <button className="childActionsBtn" onClick={handleReplace}>
+              Replace
+            </button>
+            :
+            <button className="childActionsBtn" onClick={handleDelete}>
+              Delete
+            </button>
         }
       </div>
     </Popup>

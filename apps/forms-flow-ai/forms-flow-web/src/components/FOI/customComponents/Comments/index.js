@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import './comments.scss'
 import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
-import SignField from './SignField'
 import Input from './Input'
 
 export const CommentSection = ({
@@ -17,7 +16,11 @@ export const CommentSection = ({
   bcgovcode,
   iaoassignedToList,
   ministryAssignedToList,
-  requestNumber
+  requestNumber,
+  //Handles Navigate Away
+  setEditorChange,
+  removeComment,
+  setRemoveComment
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)
   const [comments, setcomments] = useState([])
@@ -33,8 +36,6 @@ export const CommentSection = ({
     var _filterValue = parseInt(e.target.value) 
     setfilterValue(_filterValue)       
     setcomments([])
-    
-
   }
  
   return (
@@ -47,6 +48,10 @@ export const CommentSection = ({
       customInput={customInput}
       requestid={requestid}
       ministryId={ministryId}
+      //Handles Navigate Away
+      setEditorChange={setEditorChange}
+      removeComment={removeComment}
+      setRemoveComment={setRemoveComment}
     >
       <div className="section">
         <div className="foi-request-number-header">
@@ -56,10 +61,11 @@ export const CommentSection = ({
         <div className="addcommentBox">
           <button type="button" style={{ display: !showaddbox ? 'block' : 'none' }} className="btn foi-btn-create addcomment" onClick={() => { !showaddbox ? setshowaddbox(true) : setshowaddbox(false); }}>+ Add Comment</button>
         </div>
-
+{ showaddbox ?
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
-          {<Input add="add" />}
-        </div>
+          {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}/>}
+        </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
             <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange} checked={filterValue === -1 ? true:false} />
@@ -69,7 +75,9 @@ export const CommentSection = ({
             <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
             <label htmlFor="rbusercomments">User Comments</label>
           </div>
-          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+          <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
+          //Handles Navigate Away
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
 
       </div>
