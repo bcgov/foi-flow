@@ -79,17 +79,14 @@ class divisionevent:
 
     @classmethod                
     def __preparemessage(self, division, stage, event): 
-        return division+' with stage selected '+ stage + self.__messagesuffix(event)
-        
-    @classmethod                
-    def __messagesuffix(self, event): 
-        if event == EventType.add.value:
-            return ' added' 
-        elif event == EventType.modify.value:
-            return ' modified' 
+        if event == EventType.modify.value:
+            return '<i>'+division+'</i>'+' division has been updated to stage '+ '<i>'+stage+'</i>' 
+        elif event == EventType.add.value:
+             return '<i>'+division+'</i>'+' division with stage '+ '<i>'+stage+'</i>' +' has been added'  
         else:
-            return ' deleted' 
+             return '<i>'+division+'</i>'+' division has been removed with stage '+ '<i>'+stage+'</i>' 
         
+       
 class EventType(Enum):
     add = "add"    
     delete = "delete"
