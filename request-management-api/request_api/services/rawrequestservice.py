@@ -1,7 +1,9 @@
 
+import re
 from typing import Counter
 
 from flask.signals import request_started
+from sqlalchemy.sql.expression import false
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from dateutil.parser import *
@@ -30,7 +32,7 @@ class rawrequestservice:
         assigneeGroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-        requirespayment = rawrequestservice.doesRequirePayment(requestdatajson)        
+        requirespayment = rawrequestservice.doesRequirePayment(requestdatajson)                
         result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,notes=notes, requirespayment=requirespayment, ispiiredacted=ispiiredacted,sourceofsubmission=sourceofsubmission,userId=userId,assigneegroup=assigneeGroup,assignee=assignee)
         if result.success:
             redispubservice = RedisPublisherService()
@@ -43,21 +45,21 @@ class rawrequestservice:
         return result
     
     @staticmethod
-    def doesRequirePayment(requestdatajson):
-        if 'requestType' not in requestdatajson or 'requestType' not in requestdatajson['requestType']:
+    def doesRequirePayment(requestdatajson):                
+        if 'requestType' not in requestdatajson:            
             raise BusinessException(Error.DATA_NOT_FOUND)
-        if requestdatajson['requestType']['requestType'] == "personal":     
+        if requestdatajson['requestType'] == "personal":     
             return False
-        if 'contactInfo' in requestdatajson:
-            if requestdatajson['requestType']['requestType'] == "general":
-                if requestdatajson['contactInfo']['IGE']:
+        if 'contactInfo' in requestdatajson:            
+            if requestdatajson['requestType']== "general":                
+                if requestdatajson['contactInfo']['IGE']:                    
                     return False
                 return True
-            elif requestdatajson['requestType']['requestType'] == "personal":
+            elif requestdatajson['requestType'] == "personal":                
                 return False
         else:
-            if 'requiresPayment' not in requestdatajson:
-                raise BusinessException(Error.DATA_NOT_FOUND)
+            if 'requiresPayment' not in requestdatajson:                
+                return True ## Default PAYMENT TRUE ?
             return requestdatajson['requiresPayment']
             
         raise BusinessException(Error.DATA_NOT_FOUND)

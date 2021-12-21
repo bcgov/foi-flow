@@ -86,7 +86,7 @@ class FOIRawRequest(Resource):
                     rawrequestservice().postEventToWorkflow(result.identifier, rawRequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getUserId())               
+                result = rawrequestservice.saverawrequest(updaterequest,"intake",AuthHelper.getUserId(),notes="Request submitted from FOI Flow")               
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -136,30 +136,32 @@ class FOIRawRequests(Resource):
             requestdatajson = request_json['requestData']
             #get attachments
             attachments = requestdatajson['Attachments'] if requestdatajson.get('Attachments') != None else None
-
-            notes = 'Request added with FOI Payment Integration release'
+            notes = ''
             #save request
-            requestdatajson.pop('Attachments')
+            if attachments is not None:
+                requestdatajson.pop('Attachments')
             result = rawrequestservice.saverawrequest(requestdatajson=requestdatajson,sourceofsubmission="onlineform",userId=None,notes=notes)
             requestId = result.identifier
 
-            #upload attachments
-            attachmentList = []
-            if attachments:
-                for attachment in attachments:
-                    attachment['filestatustransition'] = 'personal'
-                    attachment['ministrycode'] = 'Misc'
-                    attachment['requestnumber'] = str(requestId)
+            if result.success:
+                #upload attachments
+                attachmentList = []
+                if attachments:
+                    for attachment in attachments:
+                        attachment['filestatustransition'] = 'personal'
+                        attachment['ministrycode'] = 'Misc'
+                        attachment['requestnumber'] = str(requestId)
 
-                    attachment['file'] = base64.b64decode(attachment['base64data'])
-                    attachment.pop('base64data')
+                        attachment['file'] = base64.b64decode(attachment['base64data'])
+                        attachment.pop('base64data')
 
-                    attachmentObj = documentservice().uploadtos3(attachment)
-                    attachmentList.append(attachmentObj)
-                
-                documentschema = CreateDocumentSchema().load({'documents': attachmentList})
-                # result1 = documentservice().createrequestdocument(requestId, documentschema, AuthHelper.getUserId(), "rawrequest")
-                result1 = documentservice().createrequestdocument(requestId, documentschema, None, "rawrequest")
+                        attachmentObj = documentservice().uploadtos3(attachment)
+                        attachmentList.append(attachmentObj)
+                    
+                    documentschema = CreateDocumentSchema().load({'documents': attachmentList})
+                    # result1 = documentservice().createrequestdocument(requestId, documentschema, AuthHelper.getUserId(), "rawrequest")
+                    result1 = documentservice().createrequestdocument(requestId, documentschema, None, "rawrequest")
+                    
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
