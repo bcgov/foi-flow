@@ -79,7 +79,6 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
 
     const containDuplicate = (fname) => {
       if(attachment.filename !== (fname+"."+extension)) {
-        // return attachmentFileNameListByCategory.includes(fname+"."+extension);
         return attchmentFileNameList.includes((fname+"."+extension).toLocaleLowerCase());
       } else {
         return false;
