@@ -41,7 +41,9 @@ const RequestDescription = React.memo(({
     const {ministryId} = useParams();
     //gets the program area list master data
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
-    var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);    
+    var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);
+
+    const [localProgramAreaList, setLocalProgramAreaList] = React.useState([])
     //updates the default values from the request description box    
     useEffect(() => {
         const descriptionObject = {
@@ -85,6 +87,8 @@ const RequestDescription = React.memo(({
       else {
         masterProgramAreaList = programAreaList;
       }
+
+      setLocalProgramAreaList(masterProgramAreaList);
 
     }, [programAreaList, masterProgramAreaList]);
 
@@ -223,8 +227,8 @@ const RequestDescription = React.memo(({
                         Description contains NO Personal Information
                     </label>      
                     </div>
-                    { Object.entries(masterProgramAreaList).length !== 0 ?
-                    <MinistriesList masterProgramAreaList={masterProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
+                    { Object.entries(localProgramAreaList).length !== 0 ?
+                    <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
                     :null}
             </CardContent>
         </Card>

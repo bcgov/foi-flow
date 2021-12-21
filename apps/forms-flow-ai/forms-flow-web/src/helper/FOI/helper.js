@@ -36,30 +36,37 @@ const formatDate = (d, formatString = 'yyyy-MM-dd') => {
 const businessDay = (date) => {	
 	return dayjs(date).isBusinessDay();
 }
+
+const getHolidayList = (years) => {
+	let holidays = [];
+	for(const year of years) {
+		holidays = hd.getHolidays(year);
+	}
+	return holidays;
+}
 const getPublicHoliDays = (startDate, endDate) => {
 	let publicHoliDays = 0;
 	let years = [];
 	years.push(dayjs(startDate).year());
-	if(years.includes(dayjs(endDate).year()) === false) {
-		years.push(dayjs(endDate).year());
+	const endYear = dayjs(endDate).year();
+	if(years.includes(endYear) === false) {
+		years.push(endYear);
 	}
-	for(const year of years) {
-		let holidays = hd.getHolidays(year);
-		for (const entry of holidays) {
-			let day = dayjs(entry.date).day();			
-			if(entry.type === "public" && dayjs(entry.date).isBetween(startDate, endDate, null, '[]') && (day >= 1 && day <= 5)) {
-				publicHoliDays++;
-			}
-			//Handle Easter Monday
-			if(entry.name === "Good Friday" && dayjs(entry.date).add(3,'day').isBetween(startDate, endDate, null, '[]')) {
-				publicHoliDays++;
-			}	
-			//Handle Boxing Day weekends
-			if(entry.name === "Boxing Day" && (day === 6 || day === 0) && dayjs(entry.date).isBetween(startDate, endDate, null, '[]')) {
-				publicHoliDays++;
-			}			
+	const holidays = getHolidayList(years);
+	for (const entry of holidays) {
+		let day = dayjs(entry.date).day();			
+		if(entry.type === "public" && dayjs(entry.date).isBetween(startDate, endDate, null, '[]') && (day >= 1 && day <= 5)) {
+			publicHoliDays++;
 		}
-	}
+		//Handle Easter Monday
+		if(entry.name === "Good Friday" && dayjs(entry.date).add(3,'day').isBetween(startDate, endDate, null, '[]')) {
+			publicHoliDays++;
+		}	
+		//Handle Boxing Day weekends
+		if(entry.name === "Boxing Day" && (day === 6 || day === 0) && dayjs(entry.date).isBetween(startDate, endDate, null, '[]')) {
+			publicHoliDays++;
+		}			
+	}	
 	return publicHoliDays;
 }
 const reconcilePublicHoliDays = (startDate, endDate) => {
@@ -89,10 +96,12 @@ const daysBetween = (startDate, endDate) => {
     return (endDate - startDate) / millisecondsPerDay;
 }
 const calculateDaysRemaining = (endDate, startDate) => {	
-	if (!startDate)
+	if (!startDate) {
 		startDate = new Date();
-	else
+	}
+	else {
 		startDate = new Date(startDate);
+	}	
     endDate = new Date(endDate);	
 	const publicHoliDays = getPublicHoliDays(startDate, endDate);
 	const weekendDays = countWeekendDays(startDate, endDate);
