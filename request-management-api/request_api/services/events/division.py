@@ -80,13 +80,17 @@ class divisionevent:
     @classmethod                
     def __preparemessage(self, division, stage, event): 
         if event == EventType.modify.value:
-            return '<i>'+division+'</i>'+' division has been updated to stage '+ '<i>'+stage+'</i>' 
+            return self.__formatmessage(division)+' division has been updated to stage '+ self.__formatmessage(stage)
         elif event == EventType.add.value:
-             return '<i>'+division+'</i>'+' division with stage '+ '<i>'+stage+'</i>' +' has been added'  
+            return self.__formatmessage(division)+' division has been added with stage '+ self.__formatmessage(stage) 
         else:
-             return '<i>'+division+'</i>'+' division has been removed with stage '+ '<i>'+stage+'</i>' 
+            return self.__formatmessage(division)+' division with stage '+ self.__formatmessage(stage) +' has been removed'  
+             
         
-       
+    @classmethod
+    def __formatmessage(self, data):
+        return '<i>'+data+'</i>'    
+
 class EventType(Enum):
     add = "add"    
     delete = "delete"
