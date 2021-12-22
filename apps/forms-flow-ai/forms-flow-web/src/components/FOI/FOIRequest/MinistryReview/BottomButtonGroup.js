@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../bottombuttongroup.scss';
+import '../BottomButtonGroup/bottombuttongroup.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch } from "react-redux";
 import { getOSSHeaderDetails, saveFilesinS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../../customComponents';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
+import { ConditionalComponent } from "../../../../helper/FOI/helper";
+import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,10 +61,15 @@ const BottomButtonGroup = React.memo(({
     const disableSave = isValidationError || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase();
 
     const returnToQueue = (e) => {
-      if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {
+      if (
+        !unSavedRequest ||
+        window.confirm(
+          "Are you sure you want to leave? Your changes will be lost."
+        )
+      ) {
         e.preventDefault();
-        window.removeEventListener('beforeunload', alertUser);
-        window.location.href = '/foi/dashboard';
+        window.removeEventListener("beforeunload", alertUser);
+        window.location.href = "/foi/dashboard";
       }
     }
  
@@ -175,55 +182,80 @@ const BottomButtonGroup = React.memo(({
     const handleSaveModal = (value, fileInfoList, files) => {
       setsaveModal(false);
       setFileCount(files?.length);
-      if (value) {
-        if(!isValidationError)
-        {
-          if (files?.length !== 0) {
-            dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {         
-              let _documents = [];
-              if (!err) {
-                res.map((header, index) => {
-                  const _file = files?.find(file => file.name === header.filename);
-                  const documentpath = {documentpath: header.filepath, filename: header.filename, category: header.filestatustransition};
-                  _documents.push(documentpath);
-                  setDocuments(_documents);
-                  dispatch(saveFilesinS3(header, _file, (_err, _res) => {
 
-                    if (_res === 200) {
-
-                      setSuccessCount(index+1);
-                    }
-                    else {
-                      setSuccessCount(0);
-                    }
-                  }));
-                });
-              }
-            }));
-          }
-          else {
-            saveStatusId();         
-            saveMinistryRequest();
-            hasStatusRequestSaved(true,currentSelectedStatus)
-          }
-        }
-      }
-      else {
+      if (!value) {
         handleSaveRequest(requestState, true, "");
+        return;
       }
-    }
+
+      if (isValidationError) {
+        return;
+      }
+
+      if(!files || files.length < 1) {
+        saveStatusId();
+        saveMinistryRequest();
+        hasStatusRequestSaved(true, currentSelectedStatus);
+        return
+      }
+
+      dispatch(
+        getOSSHeaderDetails(fileInfoList, (err, res) => {
+          let _documents = [];
+          if (!err) {
+            res.map((header, index) => {
+              const _file = files?.find(
+                (file) => file.name === header.filename
+              );
+              const documentpath = {
+                documentpath: header.filepath,
+                filename: header.filename,
+                category: header.filestatustransition,
+              };
+              _documents.push(documentpath);
+              setDocuments(_documents);
+              dispatch(
+                saveFilesinS3(header, _file, (_err, _res) => {
+                  let count = 0;
+                  if (_res === 200) {
+                    count = index + 1;
+                  }
+                  setSuccessCount(count);
+                })
+              );
+            });
+          }
+        })
+      );      
+    };
 
   return (
     <div className={classes.root}>
-      {opensaveModal ? 
-      <ConfirmationModal attachmentsArray={attachmentsArray} openModal={opensaveModal} handleModal={handleSaveModal} state={currentSelectedStatus} saveRequestObject={saveMinistryRequestObject}/>
-      : null }
+      <ConditionalComponent condition={opensaveModal}>
+        <ConfirmationModal
+          attachmentsArray={attachmentsArray}
+          openModal={opensaveModal}
+          handleModal={handleSaveModal}
+          state={currentSelectedStatus}
+          saveRequestObject={saveMinistryRequestObject}
+        />
+      </ConditionalComponent>
       <div className="foi-bottom-button-group">
-      <button type="button" className={`btn btn-bottom ${disableSave ? classes.btndisabled : classes.btnenabled}`} disabled={disableSave} onClick={saveMinistryRequest}>Save</button>
-      {/* <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>       */}
+        <button
+          type="button"
+          className={clsx("btn", "btn-bottom", {
+            [classes.btndisabled]: disableSave,
+            [classes.btnenabled]: !disableSave,
+          })}
+          disabled={disableSave}
+          onClick={saveMinistryRequest}
+        >
+          Save
+        </button>
+        {/* <button type="button" className={`btn btn-bottom ${classes.btnsecondaryenabled}`} onClick={returnToQueue} >Return to Queue</button>       */}
       </div>
     </div>
-    );
+  );
   });
 
 export default BottomButtonGroup;

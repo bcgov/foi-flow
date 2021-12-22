@@ -42,23 +42,60 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
     
     //creates the grouped menu items for assignedTo combobox    
     const getMenuItems = () => {
-        var menuItems = [];
-        var i = 1;
+      var menuItems = [];
+      menuItems.push(
+        <MenuItem className={classes.group} key={0} value={"|"} disabled={true}>
+          {}
+        </MenuItem>
+      );
+      menuItems.push(
+        <MenuItem
+          key={0}
+          className={classes.item}
+          value={"|Unassigned"}
+          disabled={true}
+        >
+          {"Unassigned"}
+        </MenuItem>
+      );
 
-        //add default value (unassigned)
-        menuItems.push(<MenuItem className={classes.group} key={0} value={'|'} disabled={true} >{}</MenuItem>);
-        menuItems.push(<MenuItem key={0} className={classes.item} value={'|Unassigned'} disabled={true} >{'Unassigned'}</MenuItem>)
-
-        if (ministryAssignedToList?.length > 0) {
-            for (var group of ministryAssignedToList) {
-                menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`} disabled={true} >{group.name}</MenuItem>);
-                for (var assignee of group.members) {
-                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={classes.item} value={`${group.name}|${assignee.username}`} disabled={assignee.username.toLowerCase().includes("unassigned")}>{getFullName(assignee.lastname, assignee.firstname, assignee.username)}</MenuItem>)
-                }
-            }
-        }
+      if (ministryAssignedToList && ministryAssignedToList.length < 1) {
         return menuItems;
-    }
+      }
+
+      ministryAssignedToList.forEach((group) => {
+        const groupItem = (
+          <MenuItem
+            className={classes.group}
+            key={group.id}
+            value={`${group.name}|${group.name}`}
+            disabled={true}
+          >
+            {group.name}
+          </MenuItem>
+        );
+        menuItems.push(groupItem);
+
+        const assigneeItems = group.members.map((assignee) => (
+          <MenuItem
+            key={`${assignee.id}`}
+            className={classes.item}
+            value={`${group.name}|${assignee.username}`}
+            disabled={assignee.username.toLowerCase().includes("unassigned")}
+          >
+            {getFullName(
+              assignee.lastname,
+              assignee.firstname,
+              assignee.username
+            )}
+          </MenuItem>
+        ));
+
+        menuItems.push(assigneeItems);
+      });
+
+      return menuItems;
+    };
 
     //handle onChange event for assigned To
     const handleMinistryAssignedToOnChange = (event) => {
