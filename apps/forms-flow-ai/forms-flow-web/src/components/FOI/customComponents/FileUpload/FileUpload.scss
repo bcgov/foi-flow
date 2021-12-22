@@ -1,23 +1,18 @@
 .file-upload-container {
-    position: relative;
-    // padding: 35px 20px 0px 35px;
+    position: relative;   
     padding: 0px 20px 0px 35px;
     display: flex;
     flex-direction: column;
     align-items: center;
     background-color: white;
 }
-.drag-and-drop-text {
-    // margin-top: 50px !important;  
-    // margin-left: 20%;
+.drag-and-drop-text {   
     margin-top: 15% !important;
     margin-left: 20%;
     text-align: center;
     font-size: 15px;
 }
-.btn-add-files {
-    // margin-left: 50px;
-    // margin-top: 45px;
+.btn-add-files {    
     margin-left: 10%;
     margin-bottom: 25%;
     margin-right: 10%;
@@ -32,9 +27,7 @@
 }
 .file-upload-input {
     font-size: 18px;
-    display: block;
-    // width: 90%;
-    // height: 150px;
+    display: block;   
     width: 80%;
     height: 75%;
     border: none;
@@ -49,9 +42,7 @@
 
 .file-upload-btn {
     font-size: 18px;
-    display: flex;
-    // width: 90%;
-    // height: 150px;
+    display: flex;    
     width: 40%;
     height: 75%;
     text-transform: none;
@@ -112,7 +103,7 @@
     padding-right: 20px;
 }
 .foi-file-close {
-  font: normal normal normal 14px/1 FontAwesome!important;
+  font: normal normal normal 14px/1 FontAwesome, sans-serif !important;
 }
 .error-message-ul {
   margin-left: 10%;
