@@ -11,10 +11,10 @@ const DivisionalTracking = React.memo(({requestDetails}) => {
         <Row key={index} className='divisions-row'>
             <Col className='text-right'>{division.divisionname}</Col>
             <Col>
-              <span className='arrow'>
-                <span className='line'></span>
-                <span className='point'></span>
-             </span>
+              <div style={{display: 'inline-flex'}} className='arrow'>
+                <div className='line'></div>
+                <div className='point'></div>
+             </div>
              </Col>
             <Col className='text-left'>{division.stagename}</Col>
         </Row>

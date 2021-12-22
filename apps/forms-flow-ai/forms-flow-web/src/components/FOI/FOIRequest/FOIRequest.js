@@ -743,7 +743,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
                         <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
-                      {requestDetails.currentState !== 'Open'? <DivisionalTracking requestDetails={requestDetails} /> : null}
+                      {requestDetails.currentState != undefined && requestDetails.currentState !== 'Open'? <DivisionalTracking requestDetails={requestDetails} /> : null}
                       
                       <RequestNotes />
 
