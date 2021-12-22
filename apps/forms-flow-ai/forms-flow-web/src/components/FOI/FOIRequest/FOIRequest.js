@@ -84,8 +84,9 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
-  const showDivisionalTracking = requestState && requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
-                  requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase();
+  const showDivisionalTracking = requestDetails && requestDetails.divisions?.length > 0 && 
+    (requestState && requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
+    requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase());
 
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""  
   const dispatch = useDispatch();
@@ -747,7 +748,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                         <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
                       {/* {requestDetails.currentState !== undefined && requestDetails.currentState.toLowerCase !== StateEnum.open.name.toLowerCase && 
                         requestDetails.currentState.toLowerCase !== StateEnum.intakeinprogress.name.toLowerCase? <DivisionalTracking requestDetails={requestDetails} /> : null} */}
-                      {showDivisionalTracking ? <DivisionalTracking requestDetails={requestDetails} /> : null}
+                      {showDivisionalTracking?<DivisionalTracking divisions={requestDetails.divisions} /> : null}
                       <RequestNotes />
 
                       <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />

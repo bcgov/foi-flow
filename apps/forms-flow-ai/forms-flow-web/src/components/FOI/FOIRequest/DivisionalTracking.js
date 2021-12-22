@@ -5,9 +5,9 @@ import {Row,Col} from 'react-bootstrap';
 import './divisionaltracking.scss';
 
 
-const DivisionalTracking = React.memo(({requestDetails}) => {
+const DivisionalTracking = React.memo(({divisions}) => {
 
-    const displayDivisions = requestDetails.divisions?.map((division, index) =>
+    const displayDivisions = divisions?.map((division, index) =>
         <Row key={index} className='divisions-row'>
             <Col className='text-right'>{division.divisionname}</Col>
             <Col>
@@ -24,7 +24,7 @@ const DivisionalTracking = React.memo(({requestDetails}) => {
         <Card className="foi-details-card">            
         <label className="foi-details-label">DIVISIONAL TRACKING</label>
         <CardContent className='align-division'> 
-        {requestDetails.divisions?.length > 0 ? displayDivisions : "No divisions to display"}
+        {displayDivisions}
         </CardContent>
     </Card>
     );
