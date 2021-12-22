@@ -50,7 +50,7 @@ const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedT
         menuItems.push(<MenuItem className={classes.group} key={0} value={'|'} disabled={true} >{}</MenuItem>);
         menuItems.push(<MenuItem key={0} className={classes.item} value={'|Unassigned'} disabled={true} >{'Unassigned'}</MenuItem>)
 
-        if (ministryAssignedToLis?.length > 0) {
+        if (ministryAssignedToList?.length > 0) {
             for (var group of ministryAssignedToList) {
                 menuItems.push(<MenuItem className={classes.group} key={group.id} value={`${group.name}|${group.name}`} disabled={true} >{group.name}</MenuItem>);
                 for (var assignee of group.members) {

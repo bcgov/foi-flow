@@ -158,14 +158,14 @@ import {
       fullnameTeamArray = [];
     }
   
-      if(fullnameTeamArray.includes(govCode.toLowerCase())) {
+    if(fullnameTeamArray.includes(govCode.toLowerCase())) {
       return (dispatch) => {
         dispatch(setFOIMinistryAssignedToList(getAssignToList(govCode)));
         dispatch(setFOILoader(false));
       };
   
-      } else {
-        const done =fnDone(rest);
+    } else {
+      const done =fnDone(rest);
   
       const apiUrlGETAssignedToList = replaceUrl(
         API.FOI_GET_ASSIGNEDTO_MINISTRYGROUP_LIST_API,

@@ -23,8 +23,7 @@ import {
   fetchFOIMinistryAssignedToList    
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
-  fetchFOIRawRequestDetails,
-  fetchFOIRequestDetails, 
+  fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
@@ -36,7 +35,6 @@ import {
 
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-import { formatDate } from "../../../helper/FOI/helper";
 import {push} from "connected-react-router";
 import { StateDropDown } from '../customComponents';
 import "./TabbedContainer.scss";
@@ -45,6 +43,16 @@ import {CommentSection} from '../customComponents/Comments';
 import {AttachmentSection} from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
+import { getAssignedTo } from "./FOIRequestHeader/utils";
+import {
+  getTabBottomText,
+  confirmChangesLost,
+  getRedirectAfterSaveUrl,
+  getTabBG,
+  assignValue,
+  updateAdditionalInfo,
+  createRequestDetailsObjectFunc
+} from "./utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -71,22 +79,20 @@ const useStyles = makeStyles((theme) => ({
 const FOIRequest = React.memo(({userDetail}) => {
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
-  
-
-  var foitabheaderBG;
-
-
-  const {requestId, ministryId, requestState} = useParams();  
-  const disableInput = requestState && requestState.toLowerCase() === StateEnum.closed.name.toLowerCase();
-
+  const {requestId, ministryId, requestState} = useParams();
+  const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
+
+  var foitabheaderBG = getTabBG(_tabStatus);
   
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
+  const isAddRequest = urlIndexCreateRequest > -1;
   //gets the request detail from the store
   let requestDetails = useSelector(state=> state.foiRequests.foiRequestDetail);
   let requestNotes = useSelector(state=> state.foiRequests.foiRequestComments) ;  
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
+  const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
 
   //quillChange and removeComment added to handle Navigate away from Comments tabs
@@ -120,57 +126,40 @@ const FOIRequest = React.memo(({userDetail}) => {
   })
   const [removeComment, setRemoveComment] = useState(false);
 
-  const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
 
-  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""  
+  let bcgovcode = ministryId && requestDetails?.selectedMinistries ? JSON.stringify(requestDetails.selectedMinistries[0]["code"]) : "";
   const dispatch = useDispatch();
-  useEffect(() => {      
-    if (ministryId) {
-      dispatch(fetchFOIRequestDetails(requestId, ministryId));
-      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
-      dispatch(fetchFOIRequestNotesList(requestId,ministryId));
-      dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
-    }
-    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1) {      
-      dispatch(fetchFOIRawRequestDetails(requestId));
-      dispatch(fetchFOIRequestNotesList(requestId,null));
-      dispatch(fetchFOIRequestDescriptionList(requestId, ""));
-      dispatch(fetchFOIRequestAttachmentsList(requestId,null));
-    }
-    else if (url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1) {
+  useEffect(() => {  
+    if(isAddRequest) {
       dispatch(fetchFOIAssignedToList("",""));
     }
+    else {
+      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+      dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+    }
+    
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
+
     if (bcgovcode)
       dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
-  },[requestId,ministryId, dispatch,comment, attachments]);
+  },[requestId, ministryId, comment, attachments]);
  
 
-  useEffect(() => {  
-    const requestDetailsValue = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1 ? {} : requestDetails;
+  useEffect(() => {
+    const requestDetailsValue = isAddRequest ? {} : requestDetails;
     setSaveRequestObject(requestDetailsValue);
-
-    const assignedTo = getAssignedTo();
-
-    setAssignedToValue(assignedTo); 
+    const assignedTo = getAssignedTo(requestDetails);
+    setAssignedToValue(assignedTo);
   },[requestDetails]);
 
-  const getAssignedTo = () => {
-    if(!requestDetails.assignedGroup || requestDetails === "Unassigned") {
-      return "|Unassigned"
-    }
-
-    return requestDetails.assignedTo
-      ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}`
-      : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
-  }
-  
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
     endDate: "",
@@ -228,36 +217,24 @@ const FOIRequest = React.memo(({userDetail}) => {
   },[])
 
   const handleApplicantDetailsValue = (value, name) => {
-    const detailsData = {...requiredApplicantDetails};
-    if(detailsData[name] !== undefined) {
-      detailsData[name] = value;
-    }
+    const detailsData = assignValue(requiredApplicantDetails, value, name);
     setRequiredApplicantDetails(detailsData);
   }
 
   const handleContanctDetailsValue = (value, name) => {
-    const detailsData = {...requiredContactDetails};
-    if(detailsData[name] !== undefined) {
-      detailsData[name] = value;
-    }
+    const detailsData = assignValue(requiredContactDetails, value, name);
     setrequiredContactDetails(detailsData);
   }
 
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
-    const descriptionData = {...requiredRequestDescriptionValues};
-    if(detailsData[name] !== undefined) {
-      detailsData[name] = value;
-    }
+    const descriptionData = assignValue(requiredRequestDescriptionValues, value, name);
     setRequiredRequestDescriptionValues(descriptionData);
   }
   
   //Update required fields of request details box with latest value
   const handleRequestDetailsValue = (value, name, value2) => {    
-    const detailsData = {...requiredRequestDetailsValues};
-    if(detailsData[name] !== undefined) {
-      detailsData[name] = value;
-    }
+    const detailsData = assignValue(requiredRequestDetailsValues, value, name);
 
     if(value2) {
       detailsData.dueDate = value2;   
@@ -288,122 +265,39 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   //Variable to find if all required fields are filled or not
   const isValidationError = (
-    requiredApplicantDetails.firstName === "" || requiredApplicantDetails.lastName === "" 
+    requiredApplicantDetails.firstName === ""
+    || requiredApplicantDetails.lastName === "" 
     || requiredApplicantDetails.category.toLowerCase().includes("select")
     || contactDetailsNotGiven
     || requiredRequestDescriptionValues.description === ""
     || !requiredRequestDescriptionValues.isProgramAreaSelected
     || !requiredRequestDescriptionValues.isPiiRedacted
-    || (validation.helperTextValue !== undefined && validation.helperTextValue !== "")
+    || !!validation.helperTextValue
     || assignedToValue.toLowerCase().includes("unassigned")
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
     || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
     || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
-    || (requiredRequestDetailsValues.receivedDate === undefined || requiredRequestDetailsValues.receivedDate === "")
-    || (requiredRequestDetailsValues.requestStartDate === undefined || requiredRequestDetailsValues.requestStartDate === "")
+    || !requiredRequestDetailsValues.receivedDate
+    || !requiredRequestDetailsValues.requestStartDate
     );
 
   const classes = useStyles(); 
 
-  const updateAdditionalInfo = (name, value, requestObject) => {
-    if (requestObject.additionalPersonalInfo === undefined) {
-      requestObject.additionalPersonalInfo = {
-           alsoKnownAs:"",            
-           birthDate:"",
-           childFirstName:"",
-           childMiddleName:"",
-           childLastName:"",
-           childAlsoKnownAs:"",
-           childBirthDate:"",
-           anotherFirstName:"",
-           anotherMiddleName:"",
-           anotherLastName:"",
-           anotherAlsoKnownAs:"",
-           anotherBirthDate:"",
-           adoptiveMotherFirstName:"",
-           adoptiveMotherLastName:"",
-           adoptiveFatherLastName:"",
-           adoptiveFatherFirstName:"",
-           personalHealthNumber:"",
-           identityVerified:"",
-      };
-    }
-
-    if(requestObject.additionalPersonalInfo[name] !== undefined) {
-      requestObject.additionalPersonalInfo[name] = value;
-    }
-  }
-
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
-    requestObject.id = requestId;
-    requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
-    requestObject.dueDate = requiredRequestDetailsValues.dueDate;
-    requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
-    requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
-
-    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
-      requestObject.receivedDate = value.receivedDate;     
-      requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";
-      requestObject.requestProcessStart = value.requestStartDate;
-      requestObject.dueDate = value.dueDate;
-      requestObject.receivedMode = value.receivedMode;
-      requestObject.deliveryMode = value.deliveryMode;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.ASSIGNED_TO) {
-      const assignedTo = value.split("|");
-      if (FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(groupName => (groupName === assignedTo[0] && groupName === assignedTo[1]))) {
-        requestObject.assignedGroup = assignedTo[0];
-        requestObject.assignedTo = "";
-      }
-      else if (assignedTo.length > 1) {
-        requestObject.assignedGroup = assignedTo[0];
-        requestObject.assignedTo = assignedTo[1];
-      }
-      else {
-        requestObject.assignedGroup = "Unassigned";
-        requestObject.assignedTo = assignedTo[0];
-      }   
-      requestObject.assignedToName = value2;      
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE) {     
-      requestObject.receivedDate = formatDate(value, 'yyyy MMM, dd');
-      const receivedDateUTC = new Date(value).toISOString();
-      requestObject.receivedDateUF = receivedDateUTC;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE) {
-      requestObject.requestProcessStart = value;
-      requestObject.dueDate = value2;
-    }
-    else if (name === FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST) {
-      requestObject.selectedMinistries = [];
-      const filteredData = value.filter(programArea => programArea.isChecked)
-      .map(filteredProgramArea => {
-        return {
-          code: filteredProgramArea.bcgovcode,
-          name: filteredProgramArea.name,
-          isSelected: filteredProgramArea.isChecked
-        }
-      });
-      requestObject.selectedMinistries = filteredData;
-    }
-    else {
-      if(detailsData[name] !== undefined) {
-        requestObject[name] = value;
-      }
-    }
+    return createRequestDetailsObjectFunc(requestObject, requiredRequestDetailsValues, name, value, value2);
   }
 
   const createSaveRequestObject = (name, value, value2) => 
   {
-    const requestObject = {...saveRequestObject};  
+    let requestObject = {...saveRequestObject};  
     if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
       setUnSavedRequest(false);      
     }
     else {
       setUnSavedRequest(true);
     }
-    updateAdditionalInfo(name, value, requestObject);
-    createRequestDetailsObject(requestObject, name, value, value2);    
+    requestObject = updateAdditionalInfo(name, value, requestObject);
+    requestObject = createRequestDetailsObject(requestObject, name, value, value2);
     setSaveRequestObject(requestObject);
   }
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
@@ -417,7 +311,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       
       setTimeout(() => 
       {
-        const redirectUrl = getRedirectAfterSaveUrl(_state);
+        const redirectUrl = getRedirectAfterSaveUrl(_state, ministryId, requestId);
         
         if(redirectUrl) {
           window.location.href = redirectUrl
@@ -434,19 +328,6 @@ const FOIRequest = React.memo(({userDetail}) => {
       setStateChanged(false);
     }
   }
-
-
-  const getRedirectAfterSaveUrl = (_state) => {
-    if(ministryId) {
-      return `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}`;
-    }
-
-    if(requestId) {
-      return `/foi/reviewrequest/${requestId}/${_state}`;
-    }
-
-    return null;
-  };
 
   const handleOpenRequest = (parendId, _ministryId, unSaved) => {
     setUnSavedRequest(unSaved);
@@ -482,85 +363,12 @@ const FOIRequest = React.memo(({userDetail}) => {
     setRequestStatus(bottomText);
   }
 
-  const getTabBottomText = ({ _daysRemainingText, _cfrDaysRemainingText, _status }) => {
-    if (
-      _status === StateEnum.open.name ||
-      _status === StateEnum.review.name ||
-      _status === StateEnum.redirect.name ||
-      _status === StateEnum.consult.name ||
-      _status === StateEnum.signoff.name ||
-      _status === StateEnum.response.name ||
-      _status === StateEnum.closed.name
-    ) {
-      return _daysRemainingText;
-    }
-
-    if (
-      _status === StateEnum.callforrecords.name ||
-      _status === StateEnum.feeassessed.name ||
-      _status === StateEnum.deduplication.name ||
-      _status === StateEnum.harms.name
-    ) {
-      return `${_cfrDaysRemainingText}|${_daysRemainingText}`;
-    }
-
-    return _status;
-  };
-
   const hasStatusRequestSaved =(issavecompleted,state)=>{
     if(issavecompleted)
       {
         settabStatus(state)
         setcurrentrequestStatus("")
       }
-  }
-
-  switch (_tabStatus){
-    case StateEnum.intakeinprogress.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderIntakeInProgressBG"
-      break;
-    case StateEnum.open.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
-      break;
-    case StateEnum.closed.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
-      break;
-    case StateEnum.callforrecords.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
-      break;
-    case StateEnum.callforrecordsoverdue.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
-      break;
-    case StateEnum.redirect.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
-      break;
-    case StateEnum.review.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"
-      break;
-    case StateEnum.feeassessed.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderFeeBG"
-      break;
-    case StateEnum.consult.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderConsultBG"
-      break;
-    case StateEnum.signoff.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
-      break;
-    case StateEnum.deduplication.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
-      break;
-    case StateEnum.harms.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
-      break;
-    case StateEnum.onhold.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
-      break;
-    case StateEnum.response.name: 
-      foitabheaderBG = "foitabheadercollection foitabheaderResponseBG"
-      break;
-    default:
-      foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
-      break;      
   }
 
   /*******
@@ -628,34 +436,23 @@ const FOIRequest = React.memo(({userDetail}) => {
     });
   }
 
-  const confirmChangesLost = (positiveCallback, negativeCallback) => {
-    if (
-      window.confirm(
-        "Are you sure you want to leave? Your changes will be lost."
-      )
-    ) {
-      positiveCallback();
-    } else {
-      negativeCallback();
-    }
-  };
 
   const bottomTextArray = _requestStatus.split('|');
       
-  const userId = userDetail && userDetail.preferred_username
+  const userId = userDetail?.preferred_username
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const fullName = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name}`
+  const fullName = `${userDetail?.family_name}, ${userDetail?.given_name}`
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  const requestNumber = requestDetails && requestDetails.idNumber;
+  const requestNumber = requestDetails?.idNumber;
 
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   const isAttachmentListLoading = useSelector(state=> state.foiRequests.isAttachmentListLoading);
 
-  const stateTransition = requestDetails && requestDetails.stateTransition;
+  const stateTransition = requestDetails?.stateTransition;
 
   return (
 
@@ -680,7 +477,7 @@ const FOIRequest = React.memo(({userDetail}) => {
               Request
           </div>
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
+            !isAddRequest
               && 
                 <div
                   className={clsx("tablinks", {
@@ -690,14 +487,14 @@ const FOIRequest = React.memo(({userDetail}) => {
                   onClick={() => tabclick('Attachments')}
                 >
                   Attachments{
-                    requestAttachments && requestAttachments.length > 0 
-                    ? ` (${requestAttachments.length})`
+                    attachments?.length > 0 
+                    ? ` (${attachments.length})`
                     : ''
                   }
                 </div>
           }
           {
-            url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) === -1 
+            !isAddRequest
               && <div 
                   className={clsx("tablinks", {
                     "active": tabLinksStatuses.Comments.active
@@ -705,7 +502,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                   name="Comments" 
                   onClick={() => tabclick('Comments')}
                  >
-                  Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}
+                  Comments {requestNotes?.length > 0  ? `(${requestNotes.length})`:""}
                 </div>
           }
           <div 
@@ -725,9 +522,7 @@ const FOIRequest = React.memo(({userDetail}) => {
         <>
           <h4>
             {
-            _tabStatus 
-              && 
-                (_tabStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
+            (_tabStatus?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus?.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
                   ? "" 
                   : bottomTextArray[0]
             }
@@ -754,7 +549,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  {(urlIndexCreateRequest === -1 && Object.entries(requestDetails).length !== 0) || urlIndexCreateRequest > -1 ? (
+                  {(!isAddRequest && Object.entries(requestDetails).length !== 0) || isAddRequest ? (
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       
@@ -813,9 +608,9 @@ const FOIRequest = React.memo(({userDetail}) => {
             })}
           >
             {
-             !isAttachmentListLoading && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
+             !isAttachmentListLoading && ( iaoassignedToList?.length > 0 || ministryAssignedToList?.length > 0 ) ?
                 <>
-                <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
+                <AttachmentSection currentUser={userId} attachmentsArray={attachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
                   requestNumber={requestNumber} requestState={requestState}
                   iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} isMinistryCoordinator={false} />
@@ -831,7 +626,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             })}
           >
             {
-             !isLoading && requestNotes && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
+             !isLoading && requestNotes && ( iaoassignedToList?.length > 0 || ministryAssignedToList?.length > 0 ) ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: fullName }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
