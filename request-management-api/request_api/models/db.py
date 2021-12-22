@@ -17,8 +17,6 @@ These will get initialized by the application using the models
 """
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
-#from sqlalchemy_continuum import make_versioned
-#from sqlalchemy_continuum.plugins import ActivityPlugin
 
 
 # by convention in the Flask community these are lower case,
@@ -26,6 +24,5 @@ from flask_sqlalchemy import SQLAlchemy
 ma = Marshmallow()  # pylint: disable=invalid-name
 db = SQLAlchemy()  # pylint: disable=invalid-name
 
-#activity_plugin = ActivityPlugin()  # pylint: disable=invalid-name
 
 #make_versioned(user_cls=None, plugins=[activity_plugin])

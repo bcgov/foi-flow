@@ -29,13 +29,12 @@ class FOIRawRequestComment(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     commenttypeid = db.Column(db.Integer, unique=False, nullable=False)
-    #commenttype =  relationship("CommentType",backref=backref("CommentTypes"),uselist=False)
-
+   
     @classmethod
-    def savecomment(cls, commenttypeid, foirequestcomment, version, userid,taggedusers=None) -> DefaultMethodResult:
+    def savecomment(cls, commenttypeid, foirequestcomment, version, userid) -> DefaultMethodResult:
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment else None
-        newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment[
-                                          "comment"], parentcommentid=parentcommentid, isactive=True, created_at=datetime.now(), createdby=userid,taggedusers=taggedusers)
+        taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
+        newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=datetime.now(), createdby=userid,taggedusers=taggedusers)
         db.session.add(newcomment)
         db.session.commit()
         return DefaultMethodResult(True, 'Comment added', newcomment.commentid)
@@ -53,12 +52,12 @@ class FOIRawRequestComment(db.Model):
             return DefaultMethodResult(True, 'No Comment found', commentid)
 
     @classmethod
-    def updatecomment(cls, commentid, foirequestcomment, userid,taggedusers=None):
+    def updatecomment(cls, commentid, foirequestcomment, userid):
         dbquery = db.session.query(FOIRawRequestComment)
-        comment = dbquery.filter_by(commentid=commentid)
+        comment = dbquery.filter_by(commentid=commentid)        
+        taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
         if(comment.count() > 0):
-            comment.update({FOIRawRequestComment.isactive: True, FOIRawRequestComment.comment: foirequestcomment[
-                           "comment"], FOIRawRequestComment.updatedby: userid, FOIRawRequestComment.updated_at: datetime.now(),FOIRawRequestComment.taggedusers:taggedusers}, synchronize_session=False)
+            comment.update({FOIRawRequestComment.isactive: True, FOIRawRequestComment.comment: foirequestcomment["comment"], FOIRawRequestComment.updatedby: userid, FOIRawRequestComment.updated_at: datetime.now(),FOIRawRequestComment.taggedusers:taggedusers}, synchronize_session=False)
             db.session.commit()
             return DefaultMethodResult(True, 'Comment updated', commentid)
         else:

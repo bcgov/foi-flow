@@ -16,7 +16,6 @@ class divisionevent:
     """ FOI Event management service
 
     """
-    @classmethod    
     def createdivisionevent(self, requestid, requesttype):
         if requesttype != "ministryrequest":
             return DefaultMethodResult(True,'No division required',requestid)
@@ -33,55 +32,52 @@ class divisionevent:
             return DefaultMethodResult(False,'unable to post comment - '+exception.message,requestid)   
                 
         
-    @classmethod    
     def createcomment(self, requestid, division, stage, event):
         comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division, stage, event)}
-        commentservice().createministryrequestcomment(comment, AuthHelper.getUserId(), 2)
+        commentservice().createministryrequestcomment(comment, AuthHelper.getuserid(), 2)
 
     
-    @classmethod    
     def __maintained(self,cdivisions, pdivisions):
         divisions = []
         for cdivision in cdivisions:
-            if self.__isdivisionpresent(cdivision['division.name'], pdivisions) == False:
+            if self.__isdivisionpresent(self.__getdivisioname(cdivision), pdivisions) == False:
                divisions.append(self.__createdivisionsummary(cdivision, EventType.add.value)) 
             else:
-                if self.__isstagechanged(cdivision['division.name'], cdivision['stage.name'], pdivisions) == True :
+                if self.__isstagechanged(self.__getdivisioname(cdivision), self.__getstagename(cdivision), pdivisions) == True :
                    divisions.append(self.__createdivisionsummary(cdivision, EventType.modify.value))                      
         return divisions            
     
-    @classmethod    
     def __deleted(self,cdivisions, pdivisions):
         divisions = []
         for pdivision in pdivisions:
-            if self.__isdivisionpresent(pdivision['division.name'], cdivisions) == False:      
+            if self.__isdivisionpresent(self.__getdivisioname(pdivision), cdivisions) == False:      
                 divisions.append(self.__createdivisionsummary(pdivision, EventType.delete.value))   
         return divisions      
     
-    @classmethod    
     def __isdivisionpresent(self, divisionid, divisionlist):
         for division in divisionlist:
-            if division['division.name'] == divisionid:
+            if self.__getdivisioname(division) == divisionid:
                 return True
         return False
     
-    @classmethod   
     def __isstagechanged(self, divisionid, stageid, divisionlist):
         for division in divisionlist:
-            if division['division.name'] == divisionid and division['stage.name'] != stageid:
+            if self.__getdivisioname(division) == divisionid and self.__getstagename(division) != stageid:
                 return True
         return False
                                
-    @classmethod    
     def __createdivisionsummary(self, division, event):
-        return {'division': division['division.name'], 'stage': division['stage.name'], 'event': event}
+        return {'division': self.__getdivisioname(division), 'stage': self.__getstagename(division), 'event': event}
         
+    def __getdivisioname(self, dataschema):
+        return dataschema['division.name']
 
-    @classmethod                
+    def __getstagename(self, dataschema):
+        return dataschema['stage.name']    
+
     def __preparemessage(self, division, stage, event): 
         return division+' with stage selected '+ stage + self.__messagesuffix(event)
         
-    @classmethod                
     def __messagesuffix(self, event): 
         if event == EventType.add.value:
             return ' added' 
