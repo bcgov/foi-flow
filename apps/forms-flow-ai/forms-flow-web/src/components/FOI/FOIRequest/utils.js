@@ -182,9 +182,7 @@ export const createRequestDetailsObjectFunc = (requestObject, requiredRequestDet
       requestObject.selectedMinistries = filteredData;
       break;
     default:
-      if(requestObject[name] !== undefined) {
-        requestObject[name] = value;
-      }
+      requestObject[name] = value;
       break;
   }
   return requestObject;

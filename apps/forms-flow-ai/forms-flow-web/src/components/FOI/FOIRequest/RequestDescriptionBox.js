@@ -51,7 +51,7 @@ const RequestDescription = React.memo(({
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
             isProgramAreaSelected: !!requestDetails.selectedMinistries,
-            isPiiRedacted: ministryId ? true : !!requestDetails.ispiiredacted
+            ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted
         }    
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     

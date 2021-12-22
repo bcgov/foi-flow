@@ -165,7 +165,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     endDate: "",
     description: "",
     isProgramAreaSelected: false,
-    isPiiRedacted: false
+    ispiiredacted: false
   }  
 
   const requiredRequestDetailsInitialValues = {
@@ -271,7 +271,7 @@ const FOIRequest = React.memo(({userDetail}) => {
     || contactDetailsNotGiven
     || requiredRequestDescriptionValues.description === ""
     || !requiredRequestDescriptionValues.isProgramAreaSelected
-    || !requiredRequestDescriptionValues.isPiiRedacted
+    || !requiredRequestDescriptionValues.ispiiredacted
     || !!validation.helperTextValue
     || assignedToValue.toLowerCase().includes("unassigned")
     || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
@@ -284,7 +284,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const classes = useStyles(); 
 
   const createRequestDetailsObject = (requestObject, name, value, value2) => {
-    return createRequestDetailsObjectFunc(requestObject, requiredRequestDetailsValues, name, value, value2);
+    return createRequestDetailsObjectFunc(requestObject, requiredRequestDetailsValues, requestId, name, value, value2);
   }
 
   const createSaveRequestObject = (name, value, value2) => 

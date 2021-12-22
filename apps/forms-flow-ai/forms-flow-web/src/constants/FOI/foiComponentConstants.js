@@ -68,7 +68,7 @@ const FOI_COMPONENT_CONSTANTS = {
     ONLINE_FORM: "Online Form",
     ADD_REQUEST: "Add Request",
     REVIEW_REQUEST: "Review Request",
-    ISPIIREDACTED:"isPiiRedacted"
+    ISPIIREDACTED:"ispiiredacted"
   };
   
   export default FOI_COMPONENT_CONSTANTS;
