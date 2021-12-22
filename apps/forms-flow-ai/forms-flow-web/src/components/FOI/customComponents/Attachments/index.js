@@ -245,7 +245,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
       case "cfr-feeassessed":
         return "cfr - fee estimate";
       case "signoff-response":
-        return "signoff > response";
+        return "signoff - response";
       case "harms-review":
         return "harms assessment - review";
       case "personal":
