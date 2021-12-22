@@ -12,7 +12,8 @@ import { ConfirmationModal } from "../../customComponents";
 import {
   addBusinessDays,
   formatDate,
-  calculateDaysRemaining
+  calculateDaysRemaining,
+  ConditionalComponent
 } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import {
@@ -306,7 +307,7 @@ const BottomButtonGroup = React.memo(
 
     return (
       <div className={classes.root}>
-        {openModal && (
+        <ConditionalComponent condition={openModal}>
           <ConfirmationModal
             requestId={requestId}
             openModal={openModal}
@@ -314,8 +315,9 @@ const BottomButtonGroup = React.memo(
             state={StateEnum.open.name}
             saveRequestObject={saveRequestObject}
           />
-        )}
-        {opensaveModal && (
+        </ConditionalComponent>
+
+        <ConditionalComponent condition={opensaveModal}>
           <ConfirmationModal
             requestId={requestId}
             openModal={opensaveModal}
@@ -325,13 +327,11 @@ const BottomButtonGroup = React.memo(
             handleClosingDateChange={handleClosingDateChange}
             handleClosingReasonChange={handleClosingReasonChange}
           />
-        )}
+        </ConditionalComponent>
+
         <div className="foi-bottom-button-group">
           <button
             type="button"
-            className={`btn btn-bottom ${
-              isValidationError ? classes.btndisabled : classes.btnenabled
-            }`}
             className={clsx("btn", "btn-bottom", {
               [classes.btndisabled]: isValidationError,
               [classes.btnenabled]: !isValidationError,
