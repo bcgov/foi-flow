@@ -30,9 +30,13 @@ export default function StateDropDown({requestStatus, handleStateChange, isMinis
     const getClosedList = () => {
         const stateArray = [...new Set(stateTransition && stateTransition.map(_state => JSON.stringify({status: _state.status})))].map(s => JSON.parse(s));
         const isCFR = stateArray.some(_state => _state.status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase());
+        const isUnopened = stateArray.some(_state => _state.status.toLowerCase() === StateEnum.unopened.name.toLowerCase());
         let resultArray = [];
         if (isCFR) {
             resultArray = stateArray.filter(_state => _state.status.toLowerCase() !== StateEnum.open.name.toLowerCase());
+        }
+        else if (isUnopened) {
+            resultArray = stateArray.filter(_state => _state.status.toLowerCase() !== StateEnum.unopened.name.toLowerCase());
         }
         else {
             resultArray = stateArray;

@@ -83,7 +83,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
 
-  var foitabheaderBG = getTabBG(_tabStatus);
+  var foitabheaderBG = getTabBG(_tabStatus, requestState);
   
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);

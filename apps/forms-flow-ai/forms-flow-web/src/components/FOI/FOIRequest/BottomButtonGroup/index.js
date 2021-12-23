@@ -21,6 +21,7 @@ import {
   getRequestState,
   fillAssignmentFields,
   returnToQueue,
+  alertUser
 } from "./utils";
 import clsx from "clsx";
 
@@ -115,7 +116,7 @@ const BottomButtonGroup = React.memo(
                 saveRequestObject,
               });
               handleSaveRequest(_state, false, res.id);
-              hasStatusRequestSaved(true, currentSelectedStatus);
+              hasStatusRequestSaved(true, currentSelectedStatus);              
             } else {
               toast.error(
                 "Temporarily unable to save your request. Please try again in a few minutes.",
@@ -165,22 +166,21 @@ const BottomButtonGroup = React.memo(
       }
     }, [currentSelectedStatus, stateChanged]);
 
-    const alertUser = (e) => {
-      if (unSavedRequest) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
+    const handleBeforeUnload = (e) => {
+      if (unSavedRequest)
+        alertUser(e);
     };
     React.useEffect(() => {
-      window.history.pushState(null, null, window.location.pathname);
-      window.addEventListener("popstate", handleOnHashChange);
-      window.addEventListener("beforeunload",alertUser);
-
-      return () => {
-        window.removeEventListener("popstate", handleOnHashChange);
-        window.removeEventListener("beforeunload",alertUser);
-      };
-    });
+      if (unSavedRequest) {
+        window.history.pushState(null, null, window.location.pathname);
+        window.addEventListener("popstate", handleOnHashChange);     
+        window.addEventListener("beforeunload",handleBeforeUnload);
+        return () => {
+          window.removeEventListener("popstate", handleOnHashChange);        
+          window.removeEventListener("beforeunload",handleBeforeUnload);
+        };
+      }    
+    }, [unSavedRequest]);
 
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id
