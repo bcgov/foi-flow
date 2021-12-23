@@ -227,3 +227,8 @@ export const checkValidationError = (requiredApplicantDetails, contactDetailsNot
     || !requiredRequestDetailsValues.requestStartDate
   );
 };
+
+export const alertUser = (e) => {  
+  e.preventDefault();
+  e.returnValue = "";
+};

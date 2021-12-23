@@ -54,7 +54,8 @@ import {
   createRequestDetailsObjectFunc,
   checkContactGiven,
   getBCgovCode,
-  checkValidationError
+  checkValidationError,
+  alertUser
 } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -355,28 +356,28 @@ const FOIRequest = React.memo(({userDetail}) => {
    * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
    */
   //Below function will handle beforeunload event
-  const alertUser = e => {
+  const handleBeforeUnload = e => {
     if (quillChange) {     
-      e.returnValue = '';
-      e.preventDefault();
+      alertUser(e);
     }
   }
 
   //Below function will handle popstate event
   const handleOnHashChange = (e) => {   
     e.preventDefault();
-    window.removeEventListener('beforeunload', alertUser);
   };
 
-  React.useEffect(() => {    
-    window.history.pushState(null, null, window.location.pathname);
-    window.addEventListener('popstate', handleOnHashChange);
-    window.addEventListener('beforeunload', alertUser);
-    return () => {
-      window.removeEventListener('popstate', handleOnHashChange);
-      window.removeEventListener('beforeunload', alertUser);
+  React.useEffect(() => {
+    if (quillChange){
+      window.history.pushState(null, null, window.location.pathname);
+      window.addEventListener('popstate', handleOnHashChange);
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => {
+        window.removeEventListener('popstate', handleOnHashChange);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      }
     }
-  });
+  }, [quillChange]);
 
   const tabclick = (param) => {
     if(param === 'Comments') {
