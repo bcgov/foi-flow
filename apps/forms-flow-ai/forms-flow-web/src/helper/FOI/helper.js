@@ -183,51 +183,50 @@ const getSessionData = (key) => {
 };
 
 const addToFullnameList = (userArray, foiteam) => {
-	if(foiteam) {
-		const _team = foiteam.toLowerCase();
-		let currentMember;
+	if (!foiteam)
+		return
 
-		//fullname array (all teams) -> fullname value pairs
-		let fullnameArray = getSessionData('fullnameList');
-		if(!fullnameArray || !Array.isArray(fullnameArray)) {
-			fullnameArray = [];
-		}
+	const _team = foiteam.toLowerCase();
+	let currentMember;
+
+	//fullname array (all teams) -> fullname value pairs
+	let fullnameArray = getSessionData('fullnameList');
+if(!Array.isArray(fullnameArray)) {
+		fullnameArray = [];
+	}
 	
-		//teams saved in fullnameList
-		let fullnameTeamArray = getSessionData('fullnameTeamList');
-		if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
-			fullnameTeamArray = [];
-		}
+	//teams saved in fullnameList
+	let fullnameTeamArray = getSessionData('fullnameTeamList');
+	if(!Array.isArray(fullnameTeamArray)) {
+		fullnameTeamArray = [];
+	}
 	
-		//extract fullname and append to the array
-		if(userArray && Array.isArray(userArray)) {
-			userArray.forEach(team => {
-				if(team && team.members && Array.isArray(team.members)) {
-					team.members.forEach(member => {
-						if(!fullnameArray.some(e => e.username === member.username)) {
-							currentMember = {
-								username: member.username,
-								fullname: `${member.lastname}, ${member.firstname}`
-							};
-	
-							fullnameArray.push(currentMember);  
-						}
-					});
+	//extract fullname and append to the array
+if(Array.isArray(userArray)) {
+		userArray?.forEach(team => {
+	if(Array.isArray(team?.members)) {
+			team.members?.forEach(member => {
+			if(!fullnameArray.some(e => e.username === member.username)) {
+					currentMember = {
+						username: member.username,
+						fullname: `${member.lastname}, ${member.firstname}`
+					};
+					fullnameArray.push(currentMember);  
 				}
 			});
-	
-			//save team name
-			if(!fullnameTeamArray.includes(_team)) {
-				fullnameTeamArray.push(_team);
-				saveSessionData(`fullnameTeamList`, fullnameTeamArray);
-
-				//save for assignedto or ministryassignto dropdown
-				saveSessionData(`${_team}AssignToList`, userArray);
-			}
 		}
+		});
 	
-		saveSessionData('fullnameList', fullnameArray);
-	}
+		//save team name
+		if(!fullnameTeamArray.includes(_team)) {
+			fullnameTeamArray.push(_team);
+			saveSessionData(`fullnameTeamList`, fullnameTeamArray);
+
+			//save for assignedto or ministryassignto dropdown
+			saveSessionData(`${_team}AssignToList`, userArray);
+		}
+	}	
+	saveSessionData('fullnameList', fullnameArray);	
 }
 
 const getFullnameList = () => {
