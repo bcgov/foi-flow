@@ -76,7 +76,7 @@ class FOIRawRequest(Resource):
                     if(updaterequest["requeststatusid"] is not None and updaterequest["requeststatusid"] == 3):                    
                         status = 'Closed'    
                 except  KeyError:
-                    print("Key Error on requeststatusid, ignore will be intake in Progress")    
+                    print("Key Error on requeststatusid, ignore will be intake in Progress.")    
                 
                 rawRequest = rawrequestservice.getrawrequest(requestid)     
                 assigneeGroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
