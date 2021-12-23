@@ -10,7 +10,6 @@ import {
   setFOIRequestDetail,
   setFOIMinistryViewRequestDetail,
   clearRequestDetails,
-  setFOIAssignedToList,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
 } from "../../../actions/FOI/foiRequestActions";
@@ -69,6 +68,15 @@ export const fetchFOIMinistryRequestList = () => {
   };
 };
 
+export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
+  if(ministryId) {
+    return fetchFOIRequestDetails(requestId, ministryId);
+  }
+  else {
+    return fetchFOIRawRequestDetails(requestId);
+  }
+};
+
 export const fetchFOIRawRequestDetails = (requestId) => {
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_RAW_REQUEST_API,
@@ -82,7 +90,6 @@ export const fetchFOIRawRequestDetails = (requestId) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(setFOIAssignedToList([]));
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
