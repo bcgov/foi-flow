@@ -196,7 +196,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleModal = (value) => {     
-      
+      setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);
         return;
@@ -237,7 +237,7 @@ const BottomButtonGroup = React.memo(
           }
         })
       );
-      setOpenModal(false);
+     
     };
 
     const handleSaveModal = (value, fileInfoList) => {
@@ -287,8 +287,8 @@ const BottomButtonGroup = React.memo(
           break;
 
         case StateEnum.redirect.name:
-        case StateEnum.intakeinprogress.name:
         case StateEnum.open.name:
+        case StateEnum.intakeinprogress.name:        
         case StateEnum.review.name:
         case StateEnum.onhold.name:
         case StateEnum.signoff.name:
