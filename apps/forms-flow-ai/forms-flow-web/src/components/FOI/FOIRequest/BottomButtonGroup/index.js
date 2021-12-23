@@ -20,7 +20,6 @@ import {
   dueDateCalculation,
   getRequestState,
   fillAssignmentFields,
-  alertUser,
   returnToQueue,
 } from "./utils";
 import clsx from "clsx";
@@ -138,7 +137,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleOnHashChange = (e) => {
-      returnToQueue(e);
+      returnToQueue(e, unSavedRequest);
     };
 
     React.useEffect(() => {
@@ -153,27 +152,33 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.currentState
       ) {
         saveRequestModal();
-        return;
       }
-
-      saveRequestObject.requeststatusid = StateEnum.open.id;
-
-      if (!ministryId) {
-        fillAssignmentFields(saveRequestObject);
-        openRequest();
-      } else {
-        saveRequestModal();
+      else {
+        saveRequestObject.requeststatusid = StateEnum.open.id;
+        if (currentSelectedStatus === StateEnum.open.name && ministryId) {
+          saveRequestModal();
+        }
+        else {
+          fillAssignmentFields(saveRequestObject);
+          openRequest();          
+        }
       }
     }, [currentSelectedStatus, stateChanged]);
 
+    const alertUser = (e) => {
+      if (unSavedRequest) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
     React.useEffect(() => {
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener("popstate", handleOnHashChange);
-      window.addEventListener("beforeunload", (e) => alertUser(e, unSavedRequest));
+      window.addEventListener("beforeunload",alertUser);
 
       return () => {
         window.removeEventListener("popstate", handleOnHashChange);
-        window.removeEventListener("beforeunload", (e) => alertUser(e, unSavedRequest));
+        window.removeEventListener("beforeunload",alertUser);
       };
     });
 
@@ -190,14 +195,12 @@ const BottomButtonGroup = React.memo(
         setsaveModal(true);
     };
 
-    const handleModal = (value) => {
-      setOpenModal(false);
-
+    const handleModal = (value) => {     
+      
       if (!value) {
         handleOpenRequest("", "", true);
         return;
       }
-
       dispatch(
         openRequestDetails(saveRequestObject, (err, res) => {
           if (!err) {
@@ -234,6 +237,7 @@ const BottomButtonGroup = React.memo(
           }
         })
       );
+      setOpenModal(false);
     };
 
     const handleSaveModal = (value, fileInfoList) => {
@@ -284,6 +288,7 @@ const BottomButtonGroup = React.memo(
 
         case StateEnum.redirect.name:
         case StateEnum.intakeinprogress.name:
+        case StateEnum.open.name:
         case StateEnum.review.name:
         case StateEnum.onhold.name:
         case StateEnum.signoff.name:
@@ -302,7 +307,7 @@ const BottomButtonGroup = React.memo(
 
         default:
           return;
-      }
+      }    
     };
 
     return (

@@ -45,7 +45,7 @@ export const fillAssignmentFields = (request) => {
   }
 };
 
-export const alertUser = (e, unSavedRequest) => {
+export const alertUser = (e, unSavedRequest) => {  
   if (unSavedRequest) {
     e.preventDefault();
     e.returnValue = "";
@@ -55,7 +55,7 @@ export const alertUser = (e, unSavedRequest) => {
 export const returnToQueue = (e, unSavedRequest) => {
   if (
     !unSavedRequest ||
-    window.confirm("Are you sure you want to leave? Your changes will be lost.")
+    (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))
   ) {
     e.preventDefault();
     window.removeEventListener("beforeunload", (event) =>
