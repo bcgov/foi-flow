@@ -198,3 +198,30 @@ export const createRequestDetailsObjectFunc = (requestObject, requiredRequestDet
   }
   return requestObject;
 };
+
+export const checkContactGiven = (requiredContactDetails, requiredApplicantDetails) => {
+  return ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
+};
+
+export const getBCgovCode = (ministryId, requestDetails) => {
+  return ministryId && requestDetails?.selectedMinistries ? JSON.stringify(requestDetails.selectedMinistries[0]["code"]) : "";
+};
+
+export const checkValidationError = (requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, assignedToValue, requiredRequestDetailsValues) => {
+  return (
+    requiredApplicantDetails.firstName === ""
+    || requiredApplicantDetails.lastName === "" 
+    || requiredApplicantDetails.category.toLowerCase().includes("select")
+    || contactDetailsNotGiven
+    || requiredRequestDescriptionValues.description === ""
+    || !requiredRequestDescriptionValues.isProgramAreaSelected
+    || !requiredRequestDescriptionValues.ispiiredacted
+    || !!validation.helperTextValue
+    || assignedToValue.toLowerCase().includes("unassigned")
+    || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
+    || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
+    || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
+    || !requiredRequestDetailsValues.receivedDate
+    || !requiredRequestDetailsValues.requestStartDate
+  );
+};
