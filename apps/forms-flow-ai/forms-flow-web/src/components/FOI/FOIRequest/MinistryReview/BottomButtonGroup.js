@@ -175,7 +175,7 @@ const BottomButtonGroup = React.memo(({
           saveStatusId();
           saveMinistryRequestObject.documents = documents;
           saveMinistryRequest();
-          hasStatusRequestSaved(true,currentSelectedStatus);
+          hasStatusRequestSaved(currentSelectedStatus);
       }
     },[successCount])
 
@@ -195,7 +195,7 @@ const BottomButtonGroup = React.memo(({
       if(!files || files.length < 1) {
         saveStatusId();
         saveMinistryRequest();
-        hasStatusRequestSaved(true, currentSelectedStatus);
+        hasStatusRequestSaved(currentSelectedStatus);
         return
       }
 

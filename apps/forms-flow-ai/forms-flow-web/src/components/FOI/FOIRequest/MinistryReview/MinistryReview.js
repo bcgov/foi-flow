@@ -218,11 +218,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setStateChanged(true);
   }
 
-  const hasStatusRequestSaved = (issavecompleted, state) => {
-    if (issavecompleted) {
-      settabStatus(state)
-      setcurrentrequestStatus("")
-    }
+  const hasStatusRequestSaved = (state) => {
+    settabStatus(state);
+    setcurrentrequestStatus("");
   }
 
 

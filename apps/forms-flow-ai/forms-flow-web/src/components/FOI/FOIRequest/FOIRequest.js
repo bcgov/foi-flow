@@ -363,12 +363,9 @@ const FOIRequest = React.memo(({userDetail}) => {
     setRequestStatus(bottomText);
   }
 
-  const hasStatusRequestSaved =(issavecompleted,state)=>{
-    if(issavecompleted)
-      {
-        settabStatus(state)
-        setcurrentrequestStatus("")
-      }
+  const hasStatusRequestSaved =(state)=>{
+    settabStatus(state);
+    setcurrentrequestStatus("");
   }
 
   /*******
