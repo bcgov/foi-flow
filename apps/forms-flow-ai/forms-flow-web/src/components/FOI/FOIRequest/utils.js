@@ -66,7 +66,9 @@ export const getRedirectAfterSaveUrl = (_state, ministryId, requestId) => {
   return null;
 };
 
-export const getTabBG = (_tabStatus) => {
+export const getTabBG = (_tabStatus, _requestState) => {
+  if (!_tabStatus && _requestState)
+    _tabStatus = _requestState;
   switch (_tabStatus){
     case StateEnum.intakeinprogress.name:
       return "foitabheadercollection foitabheaderIntakeInProgressBG";
@@ -224,4 +226,9 @@ export const checkValidationError = (requiredApplicantDetails, contactDetailsNot
     || !requiredRequestDetailsValues.receivedDate
     || !requiredRequestDetailsValues.requestStartDate
   );
+};
+
+export const alertUser = (e) => {  
+  e.preventDefault();
+  e.returnValue = "";
 };

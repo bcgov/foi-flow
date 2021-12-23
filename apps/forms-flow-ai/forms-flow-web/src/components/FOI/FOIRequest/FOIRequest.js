@@ -54,9 +54,10 @@ import {
   createRequestDetailsObjectFunc,
   checkContactGiven,
   getBCgovCode,
-  checkValidationError
+  checkValidationError,
+  alertUser
 } from "./utils";
-
+import { ConditionalComponent } from '../../../helper/FOI/helper';
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -86,7 +87,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
 
-  var foitabheaderBG = getTabBG(_tabStatus);
+  var foitabheaderBG = getTabBG(_tabStatus, requestState);
   
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
@@ -355,28 +356,28 @@ const FOIRequest = React.memo(({userDetail}) => {
    * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
    */
   //Below function will handle beforeunload event
-  const alertUser = e => {
+  const handleBeforeUnload = e => {
     if (quillChange) {     
-      e.returnValue = '';
-      e.preventDefault();
+      alertUser(e);
     }
   }
 
   //Below function will handle popstate event
   const handleOnHashChange = (e) => {   
     e.preventDefault();
-    window.removeEventListener('beforeunload', alertUser);
   };
 
-  React.useEffect(() => {    
-    window.history.pushState(null, null, window.location.pathname);
-    window.addEventListener('popstate', handleOnHashChange);
-    window.addEventListener('beforeunload', alertUser);
-    return () => {
-      window.removeEventListener('popstate', handleOnHashChange);
-      window.removeEventListener('beforeunload', alertUser);
+  React.useEffect(() => {
+    if (quillChange){
+      window.history.pushState(null, null, window.location.pathname);
+      window.addEventListener('popstate', handleOnHashChange);
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => {
+        window.removeEventListener('popstate', handleOnHashChange);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      }
     }
-  });
+  }, [quillChange]);
 
   const tabclick = (param) => {
     if(param === 'Comments') {
@@ -525,7 +526,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  {(!isAddRequest && Object.entries(requestDetails).length !== 0) || isAddRequest ? (
+                  <ConditionalComponent condition={(!isAddRequest && Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       
@@ -570,7 +571,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
                       <BottomButtonGroup stateChanged={stateChanged} isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
                     </>
-                  ) : null}
+                  </ConditionalComponent>
                 </form>
               </div>
             </div>                            

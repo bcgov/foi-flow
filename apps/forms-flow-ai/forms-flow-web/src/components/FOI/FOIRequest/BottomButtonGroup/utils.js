@@ -45,21 +45,19 @@ export const fillAssignmentFields = (request) => {
   }
 };
 
-export const alertUser = (e, unSavedRequest) => {
-  if (unSavedRequest) {
+export const alertUser = (e) => {  
     e.preventDefault();
     e.returnValue = "";
-  }
 };
 
-export const returnToQueue = (e, unSavedRequest) => {
+export const returnToQueue = (e, _unSavedRequest) => { 
   if (
-    !unSavedRequest ||
-    window.confirm("Are you sure you want to leave? Your changes will be lost.")
+    !_unSavedRequest ||
+    (_unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))
   ) {
     e.preventDefault();
     window.removeEventListener("beforeunload", (event) =>
-      alertUser(event, unSavedRequest)
+      alertUser(event)
     );
     window.location.href = "/foi/dashboard";
   }

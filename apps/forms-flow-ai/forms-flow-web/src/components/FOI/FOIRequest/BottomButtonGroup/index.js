@@ -20,8 +20,8 @@ import {
   dueDateCalculation,
   getRequestState,
   fillAssignmentFields,
-  alertUser,
   returnToQueue,
+  alertUser
 } from "./utils";
 import clsx from "clsx";
 
@@ -138,7 +138,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleOnHashChange = (e) => {
-      returnToQueue(e);
+      returnToQueue(e, unSavedRequest);
     };
 
     React.useEffect(() => {
@@ -153,29 +153,34 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.currentState
       ) {
         saveRequestModal();
-        return;
       }
-
-      saveRequestObject.requeststatusid = StateEnum.open.id;
-
-      if (!ministryId) {
-        fillAssignmentFields(saveRequestObject);
-        openRequest();
-      } else {
-        saveRequestModal();
+      else {
+        saveRequestObject.requeststatusid = StateEnum.open.id;
+        if (currentSelectedStatus === StateEnum.open.name && ministryId) {
+          saveRequestModal();
+        }
+        else {
+          fillAssignmentFields(saveRequestObject);
+          openRequest();          
+        }
       }
     }, [currentSelectedStatus, stateChanged]);
 
+    const handleBeforeUnload = (e) => {
+      if (unSavedRequest)
+        alertUser(e);
+    };
     React.useEffect(() => {
-      window.history.pushState(null, null, window.location.pathname);
-      window.addEventListener("popstate", handleOnHashChange);
-      window.addEventListener("beforeunload", (e) => alertUser(e, unSavedRequest));
-
-      return () => {
-        window.removeEventListener("popstate", handleOnHashChange);
-        window.removeEventListener("beforeunload", (e) => alertUser(e, unSavedRequest));
-      };
-    });
+      if (unSavedRequest) {
+        window.history.pushState(null, null, window.location.pathname);
+        window.addEventListener("popstate", handleOnHashChange);     
+        window.addEventListener("beforeunload",handleBeforeUnload);
+        return () => {
+          window.removeEventListener("popstate", handleOnHashChange);        
+          window.removeEventListener("beforeunload",handleBeforeUnload);
+        };
+      }    
+    }, [unSavedRequest]);
 
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id
@@ -190,14 +195,12 @@ const BottomButtonGroup = React.memo(
         setsaveModal(true);
     };
 
-    const handleModal = (value) => {
+    const handleModal = (value) => {     
       setOpenModal(false);
-
       if (!value) {
         handleOpenRequest("", "", true);
         return;
       }
-
       dispatch(
         openRequestDetails(saveRequestObject, (err, res) => {
           if (!err) {
@@ -234,6 +237,7 @@ const BottomButtonGroup = React.memo(
           }
         })
       );
+     
     };
 
     const handleSaveModal = (value, fileInfoList) => {
@@ -283,7 +287,8 @@ const BottomButtonGroup = React.memo(
           break;
 
         case StateEnum.redirect.name:
-        case StateEnum.intakeinprogress.name:
+        case StateEnum.open.name:
+        case StateEnum.intakeinprogress.name:        
         case StateEnum.review.name:
         case StateEnum.onhold.name:
         case StateEnum.signoff.name:
@@ -302,7 +307,7 @@ const BottomButtonGroup = React.memo(
 
         default:
           return;
-      }
+      }    
     };
 
     return (
