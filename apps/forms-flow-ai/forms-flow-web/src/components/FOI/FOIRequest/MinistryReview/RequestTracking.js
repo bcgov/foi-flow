@@ -36,7 +36,7 @@ const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,min
                 <div className="col-lg-12 foi-details-col">
                     {
 
-                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 && divisionalstages.divisions.length >0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popselecteddivstages={popselecteddivstages}   /> : <span className="nodivstages">Divisional stages does not exists for this ministry</span>
+                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 && divisionalstages.divisions.length >0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popSelectedDivStages={popselecteddivstages}   /> : <span className="nodivstages">Divisional stages does not exists for this ministry</span>
                     }                      
                   
                 </div>
