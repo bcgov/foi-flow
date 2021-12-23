@@ -57,7 +57,7 @@ import {
   checkValidationError,
   alertUser
 } from "./utils";
-
+import { ConditionalComponent } from '../../../helper/FOI/helper';
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -526,7 +526,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  {(!isAddRequest && Object.entries(requestDetails).length !== 0) || isAddRequest ? (
+                  <ConditionalComponent condition={(!isAddRequest && Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       
@@ -571,7 +571,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
                       <BottomButtonGroup stateChanged={stateChanged} isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
                     </>
-                  ) : null}
+                  </ConditionalComponent>
                 </form>
               </div>
             </div>                            
