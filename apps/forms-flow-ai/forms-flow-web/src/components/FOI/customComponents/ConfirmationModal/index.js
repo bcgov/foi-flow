@@ -6,16 +6,18 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import './confirmationmodal.scss';
-import { StateEnum, StateTransitionCategories } from '../../../constants/FOI/statusEnum';
-import FileUpload from './FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate, calculateDaysRemaining } from "../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
-import { MimeTypeList, MaxFileSizeInMB } from "../../../constants/FOI/enum";
+
+import './confirmationmodal.scss';
+import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
+import FileUpload from '../FileUpload'
+import { formatDate, calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo } from './util';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,16 +44,16 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ConfirmationModal({requestId, openModal, handleModal, state, saveRequestObject, 
   handleClosingDateChange, handleClosingReasonChange, attachmentsArray }) {    
-    const classes = useStyles();    
-    const assignedTo= saveRequestObject.assignedTo ? saveRequestObject.assignedTo : saveRequestObject.assignedGroup;
-    const ministryGroup = saveRequestObject.selectedMinistries?.length > 0   ? saveRequestObject.selectedMinistries[0].name + " Queue" : "";
-    const selectedMinistry = saveRequestObject.assignedministrygroup ? saveRequestObject.assignedministrygroup + " Queue" : ministryGroup;
-    const selectedMinistryAssignedTo = saveRequestObject.assignedministryperson ? saveRequestObject.assignedministryperson : selectedMinistry;    
-    const requestNumber = saveRequestObject.idNumber ? saveRequestObject.idNumber : ""; 
+    const classes = useStyles();
+    const assignedTo= getAssignedTo(saveRequestObject);
+    const ministryGroup = getMinistryGroup(saveRequestObject);
+    const selectedMinistry = getSelectedMinistry(saveRequestObject, ministryGroup);
+    const selectedMinistryAssignedTo = getSelectedMinistryAssignedTo(saveRequestObject, selectedMinistry);
+    const requestNumber = saveRequestObject?.idNumber; 
     const currentState = saveRequestObject?.currentState;
     const daysRemainingLDD = calculateDaysRemaining(saveRequestObject?.dueDate);
     const multipleFiles = false;
-    const reOpenRequest = currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() ? true : false;
+    const reOpenRequest = currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
     const [files, setFiles] = useState([]);
     const updateFilesCb = (_files) => {
       setFiles(_files);
@@ -77,11 +79,13 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         let fileStatusTransition = "";    
         if (state.toLowerCase() === StateEnum.response.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.signoffresponse.name;
-        else if (saveRequestObject.requeststatusid === StateEnum.callforrecords.id && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+        else if (saveRequestObject.requeststatusid === StateEnum.callforrecords.id 
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.cfrreview.name;
         else if (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.cfrfeeassessed.name;
-        else if (saveRequestObject.requeststatusid === StateEnum.harms.id && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+        else if (saveRequestObject.requeststatusid === StateEnum.harms.id 
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.harmsreview.name;
         fileInfoList = files.map(file => {
           return {
@@ -93,53 +97,10 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         });
       }
       handleModal(true, fileInfoList, files);
-    }   
-    const getMessage = (_state, _requestNumber) => {
-      if ((currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
-        return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${requestId}`}? <br/> <span className="confirm-message-2"> The request will be re-opened to the previous state: {_state}</span> </>}; 
-      }
-      switch(_state.toLowerCase()) {
-        case StateEnum.intakeinprogress.name.toLowerCase():
-            return {title: "Changing the state", body: "Are you sure you want to change the state to Intake in Progress?"};
-        case StateEnum.open.name.toLowerCase():
-            return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
-        case StateEnum.closed.name.toLowerCase():
-          return {title: "Close Request", body: ""}; 
-        case StateEnum.redirect.name.toLowerCase():
-            return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};  
-        case StateEnum.callforrecords.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
-        case StateEnum.review.name.toLowerCase():
-          if (saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
-            return {title: "Review Request", body: `Upload completed Call for Records form to change the state.`};
-          else if (saveRequestObject.requeststatusid === StateEnum.harms.id)
-            return {title: "Review Request", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
-          else
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
-        case StateEnum.consult.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.consult.name}?`};
-        case StateEnum.signoff.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.signoff.name}?`};
-        case StateEnum.feeassessed.name.toLowerCase():
-            return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
-        case StateEnum.deduplication.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
-        case StateEnum.harms.name.toLowerCase():
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};       
-        case StateEnum.onhold.name.toLowerCase():
-            return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <span className="confirm-message-2">This will <b>stop</b> the clock and assign to Processing Team </span> </>};
-        case StateEnum.response.name.toLowerCase():
-          if (saveRequestObject.requeststatusid === StateEnum.signoff.id)
-            return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
-          else
-            return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
-        default:
-            return {title: "", body: ""};
-      }
     }
 
-    let message = getMessage(state, requestNumber);
-    const attchmentFileNameList = attachmentsArray && attachmentsArray.map(_file => _file.filename);
+    let message = getMessage(saveRequestObject, state, requestNumber, currentState, requestId);
+    const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
       if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) {
