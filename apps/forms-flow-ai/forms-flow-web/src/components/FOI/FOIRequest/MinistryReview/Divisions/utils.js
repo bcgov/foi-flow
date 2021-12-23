@@ -1,11 +1,11 @@
 
 export const calculateStageCounter = (existingDivStages) => {
   if (existingDivStages.length === 0 || !existingDivStages) {
-    return {
+    return [{
       id: 0,
       divisionid: -1,
       stageid: -1,
-    };
+    }];
   }
 
   return existingDivStages.map((item, index) => {
