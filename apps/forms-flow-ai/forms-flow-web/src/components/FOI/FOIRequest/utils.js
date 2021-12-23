@@ -2,7 +2,10 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { formatDate } from "../../../helper/FOI/helper";
 
-export const getTabBottomText = ({ _daysRemainingText, _cfrDaysRemainingText, _status }) => {
+export const getTabBottomText = ({ _daysRemaining, _cfrDaysRemaining, _status }) => {
+  const _daysRemainingText = getDaysRemainingText(_daysRemaining);
+  const _cfrDaysRemainingText = getcfrDaysRemainingText(_cfrDaysRemaining);
+
   const generalStates = [
     StateEnum.open.name,
     StateEnum.review.name,
@@ -29,6 +32,14 @@ export const getTabBottomText = ({ _daysRemainingText, _cfrDaysRemainingText, _s
   }
 
   return _status;
+};
+
+const getDaysRemainingText = (_daysRemaining) => {
+  return _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
+};
+
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
+  return _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
 };
 
 export const confirmChangesLost = (positiveCallback, negativeCallback) => {
@@ -186,4 +197,31 @@ export const createRequestDetailsObjectFunc = (requestObject, requiredRequestDet
       break;
   }
   return requestObject;
+};
+
+export const checkContactGiven = (requiredContactDetails, requiredApplicantDetails) => {
+  return ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
+};
+
+export const getBCgovCode = (ministryId, requestDetails) => {
+  return ministryId && requestDetails?.selectedMinistries ? JSON.stringify(requestDetails.selectedMinistries[0]["code"]) : "";
+};
+
+export const checkValidationError = (requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, assignedToValue, requiredRequestDetailsValues) => {
+  return (
+    requiredApplicantDetails.firstName === ""
+    || requiredApplicantDetails.lastName === "" 
+    || requiredApplicantDetails.category.toLowerCase().includes("select")
+    || contactDetailsNotGiven
+    || requiredRequestDescriptionValues.description === ""
+    || !requiredRequestDescriptionValues.isProgramAreaSelected
+    || !requiredRequestDescriptionValues.ispiiredacted
+    || !!validation.helperTextValue
+    || assignedToValue.toLowerCase().includes("unassigned")
+    || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
+    || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
+    || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
+    || !requiredRequestDetailsValues.receivedDate
+    || !requiredRequestDetailsValues.requestStartDate
+  );
 };

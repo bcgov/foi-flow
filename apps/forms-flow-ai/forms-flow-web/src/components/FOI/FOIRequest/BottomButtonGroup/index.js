@@ -116,7 +116,7 @@ const BottomButtonGroup = React.memo(
                 saveRequestObject,
               });
               handleSaveRequest(_state, false, res.id);
-              hasStatusRequestSaved(true, currentSelectedStatus);
+              hasStatusRequestSaved(currentSelectedStatus);
             } else {
               toast.error(
                 "Temporarily unable to save your request. Please try again in a few minutes.",
@@ -216,7 +216,7 @@ const BottomButtonGroup = React.memo(
             });
             const firstMinistry = res.ministryRequests[0];
             handleOpenRequest(parentRequestId, firstMinistry.id, false);
-            hasStatusRequestSaved(true, StateEnum.open.name);
+            hasStatusRequestSaved(StateEnum.open.name);
           } else {
             toast.error(
               "Temporarily unable to open your request. Please try again in a few minutes.",
