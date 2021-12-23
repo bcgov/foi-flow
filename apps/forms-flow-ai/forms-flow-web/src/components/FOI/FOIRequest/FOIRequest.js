@@ -51,7 +51,10 @@ import {
   getTabBG,
   assignValue,
   updateAdditionalInfo,
-  createRequestDetailsObjectFunc
+  createRequestDetailsObjectFunc,
+  checkContactGiven,
+  getBCgovCode,
+  checkValidationError
 } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -128,7 +131,7 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
 
-  let bcgovcode = ministryId && requestDetails?.selectedMinistries ? JSON.stringify(requestDetails.selectedMinistries[0]["code"]) : "";
+  let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const dispatch = useDispatch();
   useEffect(() => {  
     if(isAddRequest) {
@@ -261,25 +264,10 @@ const FOIRequest = React.memo(({userDetail}) => {
     setProgramAreaList(_programAreaList); 
   } 
 
-  const contactDetailsNotGiven = ((requiredContactDetails.primaryAddress === "" || requiredContactDetails.city === "" || requiredContactDetails.province === "" || requiredContactDetails.country === "" || requiredContactDetails.postalCode === "" ) && requiredApplicantDetails.email === "");
+  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails, requiredApplicantDetails);
 
   //Variable to find if all required fields are filled or not
-  const isValidationError = (
-    requiredApplicantDetails.firstName === ""
-    || requiredApplicantDetails.lastName === "" 
-    || requiredApplicantDetails.category.toLowerCase().includes("select")
-    || contactDetailsNotGiven
-    || requiredRequestDescriptionValues.description === ""
-    || !requiredRequestDescriptionValues.isProgramAreaSelected
-    || !requiredRequestDescriptionValues.ispiiredacted
-    || !!validation.helperTextValue
-    || assignedToValue.toLowerCase().includes("unassigned")
-    || requiredRequestDetailsValues.requestType.toLowerCase().includes("select")
-    || requiredRequestDetailsValues.receivedMode.toLowerCase().includes("select")
-    || requiredRequestDetailsValues.deliveryMode.toLowerCase().includes("select")
-    || !requiredRequestDetailsValues.receivedDate
-    || !requiredRequestDetailsValues.requestStartDate
-    );
+  const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, assignedToValue, requiredRequestDetailsValues);
 
   const classes = useStyles(); 
 
@@ -290,12 +278,8 @@ const FOIRequest = React.memo(({userDetail}) => {
   const createSaveRequestObject = (name, value, value2) => 
   {
     let requestObject = {...saveRequestObject};  
-    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
-      setUnSavedRequest(false);      
-    }
-    else {
-      setUnSavedRequest(true);
-    }
+    setUnSavedRequest(name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES);      
+
     requestObject = updateAdditionalInfo(name, value, requestObject);
     requestObject = createRequestDetailsObject(requestObject, name, value, value2);
     setSaveRequestObject(requestObject);
@@ -348,27 +332,23 @@ const FOIRequest = React.memo(({userDetail}) => {
     setStateChanged(true);
   }
 
-  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{
-    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {      
+  const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining)=>{
+    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {
       settabStatus(StateEnum.callforrecordsoverdue.name)
     }
-    const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
-    const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+
     const bottomText = getTabBottomText({
-      _daysRemainingText,
-      _cfrDaysRemainingText,
+      _daysRemaining,
+      _cfrDaysRemaining,
       _status
     });
     
     setRequestStatus(bottomText);
   }
 
-  const hasStatusRequestSaved =(issavecompleted,state)=>{
-    if(issavecompleted)
-      {
-        settabStatus(state)
-        setcurrentrequestStatus("")
-      }
+  const hasStatusRequestSaved =(state)=>{
+    settabStatus(state);
+    setcurrentrequestStatus("");
   }
 
   /*******
@@ -479,6 +459,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           {
             !isAddRequest
               && 
+              <>
                 <div
                   className={clsx("tablinks", {
                     "active": tabLinksStatuses.Attachments.active
@@ -486,16 +467,9 @@ const FOIRequest = React.memo(({userDetail}) => {
                   name="Attachments" 
                   onClick={() => tabclick('Attachments')}
                 >
-                  Attachments{
-                    attachments?.length > 0 
-                    ? ` (${attachments.length})`
-                    : ''
-                  }
+                  Attachments {requestAttachments?.length > 0 ? `(${requestAttachments.length})`:""}
                 </div>
-          }
-          {
-            !isAddRequest
-              && <div 
+                <div 
                   className={clsx("tablinks", {
                     "active": tabLinksStatuses.Comments.active
                   })}
@@ -504,7 +478,9 @@ const FOIRequest = React.memo(({userDetail}) => {
                  >
                   Comments {requestNotes?.length > 0  ? `(${requestNotes.length})`:""}
                 </div>
+              </>
           }
+
           <div 
             className="tablinks" 
             className={clsx("tablinks", {
@@ -519,19 +495,19 @@ const FOIRequest = React.memo(({userDetail}) => {
        
         <div className="foileftpanelstatus">
         {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) &&
-        <>
-          <h4>
+          <>
+            <h4>
+              {
+              (_tabStatus?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus?.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
+                    ? "" 
+                    : bottomTextArray[0]
+              }
+            </h4>
             {
-            (_tabStatus?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus?.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
-                  ? "" 
-                  : bottomTextArray[0]
+              bottomTextArray.length > 1 && <h4>{bottomTextArray[1]}</h4>
             }
-          </h4>
-          {
-            bottomTextArray.length > 1 && <h4>{bottomTextArray[1]}</h4>
-          }
           </>
-          }
+        }
         </div>
         
 
@@ -562,34 +538,34 @@ const FOIRequest = React.memo(({userDetail}) => {
                         createSaveRequestObject={createSaveRequestObject} 
                         disableInput={disableInput} 
                       />
-                       {
+                      {
                         requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                        <>
                           <ChildDetails 
                             additionalInfo={requestDetails.additionalPersonalInfo} 
                             createSaveRequestObject={createSaveRequestObject} 
                             disableInput={disableInput}
                           />
-                        }
+                          <OnBehalfOfDetails 
+                            additionalInfo={requestDetails.additionalPersonalInfo} 
+                            createSaveRequestObject={createSaveRequestObject} 
+                            disableInput={disableInput} 
+                          />
+                        </>
 
-                        {
-                          requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
-                            <OnBehalfOfDetails 
-                              additionalInfo={requestDetails.additionalPersonalInfo} 
-                              createSaveRequestObject={createSaveRequestObject} 
-                              disableInput={disableInput} 
-                            />
-                        }
-                       <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} disableInput={disableInput} />
+                      }
+
+                      <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} disableInput={disableInput} />
                       <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails={requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
-                        {
-                          requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
-                            <AdditionalApplicantDetails 
-                              requestDetails={requestDetails} 
-                              createSaveRequestObject={createSaveRequestObject} 
-                              disableInput={disableInput} 
-                            />
-                        } 
+                      {
+                        requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                          <AdditionalApplicantDetails 
+                            requestDetails={requestDetails} 
+                            createSaveRequestObject={createSaveRequestObject} 
+                            disableInput={disableInput} 
+                          />
+                      } 
                       <RequestNotes />
 
                       <BottomButtonGroup stateChanged={stateChanged} isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
@@ -610,7 +586,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             {
              !isAttachmentListLoading && ( iaoassignedToList?.length > 0 || ministryAssignedToList?.length > 0 ) ?
                 <>
-                <AttachmentSection currentUser={userId} attachmentsArray={attachments}
+                <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
                   requestNumber={requestNumber} requestState={requestState}
                   iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} isMinistryCoordinator={false} />
