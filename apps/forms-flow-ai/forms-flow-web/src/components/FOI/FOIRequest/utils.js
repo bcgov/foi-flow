@@ -2,7 +2,10 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { formatDate } from "../../../helper/FOI/helper";
 
-export const getTabBottomText = ({ _daysRemainingText, _cfrDaysRemainingText, _status }) => {
+export const getTabBottomText = ({ _daysRemaining, _cfrDaysRemaining, _status }) => {
+  const _daysRemainingText = getDaysRemainingText(_daysRemaining);
+  const _cfrDaysRemainingText = getcfrDaysRemainingText(_cfrDaysRemaining);
+
   const generalStates = [
     StateEnum.open.name,
     StateEnum.review.name,
@@ -29,6 +32,14 @@ export const getTabBottomText = ({ _daysRemainingText, _cfrDaysRemainingText, _s
   }
 
   return _status;
+};
+
+const getDaysRemainingText = (_daysRemaining) => {
+  return _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
+};
+
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
+  return _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
 };
 
 export const confirmChangesLost = (positiveCallback, negativeCallback) => {

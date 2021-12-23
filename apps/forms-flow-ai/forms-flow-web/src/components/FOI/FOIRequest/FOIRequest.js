@@ -290,12 +290,8 @@ const FOIRequest = React.memo(({userDetail}) => {
   const createSaveRequestObject = (name, value, value2) => 
   {
     let requestObject = {...saveRequestObject};  
-    if (name === FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES) {
-      setUnSavedRequest(false);      
-    }
-    else {
-      setUnSavedRequest(true);
-    }
+    setUnSavedRequest(name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES);      
+
     requestObject = updateAdditionalInfo(name, value, requestObject);
     requestObject = createRequestDetailsObject(requestObject, name, value, value2);
     setSaveRequestObject(requestObject);
@@ -348,15 +344,14 @@ const FOIRequest = React.memo(({userDetail}) => {
     setStateChanged(true);
   }
 
-  const handlestatusudpate = (_daysRemaining,_status, _cfrDaysRemaining)=>{
-    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {      
+  const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining)=>{
+    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {
       settabStatus(StateEnum.callforrecordsoverdue.name)
     }
-    const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
-    const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+
     const bottomText = getTabBottomText({
-      _daysRemainingText,
-      _cfrDaysRemainingText,
+      _daysRemaining,
+      _cfrDaysRemaining,
       _status
     });
     
@@ -476,6 +471,7 @@ const FOIRequest = React.memo(({userDetail}) => {
           {
             !isAddRequest
               && 
+              <>
                 <div
                   className={clsx("tablinks", {
                     "active": tabLinksStatuses.Attachments.active
@@ -483,16 +479,9 @@ const FOIRequest = React.memo(({userDetail}) => {
                   name="Attachments" 
                   onClick={() => tabclick('Attachments')}
                 >
-                  Attachments{
-                    attachments?.length > 0 
-                    ? ` (${attachments.length})`
-                    : ''
-                  }
+                  Attachments {attachments?.length > 0 ? `(${attachments.length})`:""}
                 </div>
-          }
-          {
-            !isAddRequest
-              && <div 
+                <div 
                   className={clsx("tablinks", {
                     "active": tabLinksStatuses.Comments.active
                   })}
@@ -501,7 +490,9 @@ const FOIRequest = React.memo(({userDetail}) => {
                  >
                   Comments {requestNotes?.length > 0  ? `(${requestNotes.length})`:""}
                 </div>
+              </>
           }
+
           <div 
             className="tablinks" 
             className={clsx("tablinks", {
@@ -516,19 +507,19 @@ const FOIRequest = React.memo(({userDetail}) => {
        
         <div className="foileftpanelstatus">
         {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days") ) &&
-        <>
-          <h4>
+          <>
+            <h4>
+              {
+              (_tabStatus?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus?.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
+                    ? "" 
+                    : bottomTextArray[0]
+              }
+            </h4>
             {
-            (_tabStatus?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus?.toLowerCase() === StateEnum.closed.name.toLowerCase()) 
-                  ? "" 
-                  : bottomTextArray[0]
+              bottomTextArray.length > 1 && <h4>{bottomTextArray[1]}</h4>
             }
-          </h4>
-          {
-            bottomTextArray.length > 1 && <h4>{bottomTextArray[1]}</h4>
-          }
           </>
-          }
+        }
         </div>
         
 
