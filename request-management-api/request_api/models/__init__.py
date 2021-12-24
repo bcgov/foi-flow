@@ -43,4 +43,10 @@ from .PersonalInformationAttributes import PersonalInformationAttribute
 
 from .FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 
+from .RevenueAccount import RevenueAccount
+from .FeeCode import FeeCode
+from .Payment import Payment
+from .DocumentType import DocumentType
+from .DocumentTemplate import DocumentTemplate
+
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)

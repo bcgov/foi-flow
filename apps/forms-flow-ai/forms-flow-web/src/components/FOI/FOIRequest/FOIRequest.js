@@ -510,7 +510,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       setUnSavedRequest(true);
     }
     updateAdditionalInfo(name, value, requestObject);
-    createRequestDetailsObject(requestObject, name, value, value2);    
+    createRequestDetailsObject(requestObject, name, value, value2);        
     setSaveRequestObject(requestObject);
   }
 

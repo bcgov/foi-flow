@@ -43,6 +43,7 @@ from flask_caching import Cache
 #Cache Initialization
 app = Flask(__name__)
     
+#commenting caching for FOI payment release        
 app.config.from_object('request_api.utils.cache.Config') 
 cache = Cache(app) 
 
