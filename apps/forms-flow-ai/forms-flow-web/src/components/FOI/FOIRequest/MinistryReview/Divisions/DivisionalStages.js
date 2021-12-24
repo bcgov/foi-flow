@@ -23,14 +23,14 @@ const DivisionalStages = React.memo(({
     
     const handleDivisionChange = (e, id) => {
       updateDivisions(e, id, minDivStages, (newStages) => {
-        setMinDivStages(newStages);
-        appendStageIterator(newStages);
+        setMinDivStages([...newStages]);
+        appendStageIterator([...newStages]);
       });
     };
 
     const handleDivisionStageChange = (e, id) => {
       updateDivisionsState(e, id, minDivStages, (newStages) => {
-        setMinDivStages(newStages);
+        setMinDivStages([...newStages]);
       });
     };
    
@@ -50,8 +50,8 @@ const DivisionalStages = React.memo(({
     
     const handleAddDivisionalStage = () => {
       addDivisionalStage(stageIterator, divisionList, (newStages) => {
-        setMinDivStages(newStages);
-        appendStageIterator(newStages);
+        setMinDivStages([...newStages]);
+        appendStageIterator([...newStages]);
       });
     };
 
@@ -71,7 +71,7 @@ const DivisionalStages = React.memo(({
             </MenuItem>
         )
 
-        const divisionItems = !divisionList && divisionList.map((item) => {
+        const divisionItems = divisionList && divisionList.map((item) => {
 
             let _mindivtem = minDivStages.filter(
               (d) => d.divisionid === item.divisionid
@@ -106,7 +106,7 @@ const DivisionalStages = React.memo(({
             {'Select Division Stage'}
         </MenuItem>)
 
-        const divisionstageItems = !divisionstageList && divisionstageList.map((item) => {
+        const divisionstageItems = divisionstageList && divisionstageList.map((item) => {
 
             return (
                 <MenuItem 
@@ -181,13 +181,13 @@ const DivisionalStages = React.memo(({
     return (
       <>
         <div id="divstages">
-          {!divisionList &&
-            !divisionstageList &&
+          {divisionList &&
+            divisionstageList &&
             stageIterator.map((item, index) =>
               divisionalStagesRow(item, index)
             )}
         </div>
-        {!divisionList && divisionList.length > stageIterator.length ? (
+        {divisionList && divisionList.length > stageIterator.length ? (
           <div className="row foi-details-row">
             <div className="col-lg-7 foi-details-col">
               <i

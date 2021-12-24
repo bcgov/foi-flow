@@ -57,7 +57,7 @@ export const addDivisionalStage = (stageIterator, divisionList, setStates) => {
   let existing = stageIterator;
   let val =
     stageIterator.length > 0
-      ? stageIterator[stageIterator.lastIndex].id + 1
+      ? stageIterator[stageIterator.length - 1].id + 1
       : 0;
   if (divisionList.length > stageIterator.length) {
     existing.push({ id: val, divisionid: -1, stageid: -1 });
