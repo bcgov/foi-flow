@@ -746,9 +746,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
                         <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
-                      {/* {requestDetails.currentState !== undefined && requestDetails.currentState.toLowerCase !== StateEnum.open.name.toLowerCase && 
-                        requestDetails.currentState.toLowerCase !== StateEnum.intakeinprogress.name.toLowerCase? <DivisionalTracking requestDetails={requestDetails} /> : null} */}
-                      {showDivisionalTracking?<DivisionalTracking divisions={requestDetails.divisions} /> : null}
+                      {showDivisionalTracking && <DivisionalTracking divisions={requestDetails.divisions} />}
                       <RequestNotes />
 
                       <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
