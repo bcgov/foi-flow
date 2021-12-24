@@ -71,7 +71,7 @@ class FOIRawRequest(Resource):
                     rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid())               
+                result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")               
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -121,10 +121,11 @@ class FOIRawRequests(Resource):
             requestdatajson = request_json['requestData']  
             #get attachments
             attachments = requestdatajson['Attachments'] if 'Attachments' in requestdatajson else None
+            notes = 'Request submission from FOI WebForm'
             #save request
             if attachments is not None:
                 requestdatajson.pop('Attachments')
-            result = rawrequestservice().saverawrequest(requestdatajson,"onlineform",None)
+            result = rawrequestservice().saverawrequest(requestdatajson=requestdatajson,sourceofsubmission="onlineform",userid=None,notes=notes)
             if result.success:
                 documentservice().uploadpersonaldocuments(result.identifier, attachments)   
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200

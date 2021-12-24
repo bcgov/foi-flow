@@ -76,16 +76,18 @@ class divisionevent:
         return dataschema['stage.name']    
 
     def __preparemessage(self, division, stage, event): 
-        return division+' with stage selected '+ stage + self.__messagesuffix(event)
-        
-    def __messagesuffix(self, event): 
-        if event == EventType.add.value:
-            return ' added' 
-        elif event == EventType.modify.value:
-            return ' modified' 
+        if event == EventType.modify.value:
+            return self.__formatmessage(division)+' division has been updated to stage '+ self.__formatmessage(stage)
+        elif event == EventType.add.value:
+            return self.__formatmessage(division)+' division has been added with stage '+ self.__formatmessage(stage) 
         else:
-            return ' deleted' 
+            return self.__formatmessage(division)+' division with stage '+ self.__formatmessage(stage) +' has been removed'  
+             
         
+    @classmethod
+    def __formatmessage(self, data):
+        return '<i>'+data+'</i>'    
+
 class EventType(Enum):
     add = "add"    
     delete = "delete"

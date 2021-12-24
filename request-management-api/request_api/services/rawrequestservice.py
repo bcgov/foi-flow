@@ -1,7 +1,9 @@
 
+import re
 from typing import Counter
 
 from flask.signals import request_started
+from sqlalchemy.sql.expression import false
 from request_api.models.FOIRawRequests import FOIRawRequest
 import json
 import asyncio
@@ -10,6 +12,7 @@ from request_api.services.workflowservice import workflowservice
 from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 from request_api.services.rawrequest.rawrequestservicegetter import rawrequestservicegetter
+from request_api.exceptions import BusinessException, Error
 
 class rawrequestservice:
     """ FOI Raw Request management service
@@ -18,11 +21,12 @@ class rawrequestservice:
 
     """
 
-    def saverawrequest(self, requestdatajson, sourceofsubmission, userid):
+    def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-        result = FOIRawRequest.saverawrequest(requestdatajson,sourceofsubmission,ispiiredacted,userid,assigneegroup,assignee)
+        requirespayment =  rawrequestservice.doesRequirePayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
+        result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,sourceofsubmission= sourceofsubmission,ispiiredacted=ispiiredacted,userId= userid,assigneegroup=assigneegroup,assignee=assignee,requirespayment=requirespayment,notes=notes)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
@@ -32,6 +36,25 @@ class rawrequestservice:
             json_data = json.dumps(data)
             asyncio.run(redispubservice.publishtoredischannel(json_data))
         return result
+
+    @staticmethod
+    def doesRequirePayment(requestdatajson):        
+        if 'requestType' not in requestdatajson or 'requestType' not in requestdatajson['requestType']:            
+            raise BusinessException(Error.DATA_NOT_FOUND)
+        if requestdatajson['requestType']['requestType'] == "personal":                 
+            return False
+        if 'contactInfo' in requestdatajson:            
+            if requestdatajson['requestType']['requestType'] == "general":                
+                if 'IGE' in requestdatajson['contactInfo'] and requestdatajson['contactInfo']['IGE']:                    
+                    return False                   
+                return True
+            elif requestdatajson['requestType']['requestType'] == "personal":                
+                return False
+        else:
+            if 'requiresPayment' not in requestdatajson:                                
+                raise BusinessException(Error.DATA_NOT_FOUND)                
+            return requestdatajson['requiresPayment']            
+        raise BusinessException(Error.DATA_NOT_FOUND)    
 
     def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
