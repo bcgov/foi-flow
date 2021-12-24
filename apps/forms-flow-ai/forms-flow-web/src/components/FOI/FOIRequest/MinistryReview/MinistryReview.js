@@ -67,6 +67,12 @@ const useStyles = makeStyles((theme) => ({
     border: '1px solid #38598A',
     backgroundColor: '#FFFFFF',
     color: '#38598A'
+  },
+  displayed: {
+    display: "block"
+  },
+  hidden: {
+    display: "none"
   }
 
 }));
@@ -131,7 +137,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
     
-  }, [requestId, dispatch]);
+  }, [requestId, comment, attachments]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -301,7 +307,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   });
 
-  const tabclick = (evt, param) => {
+  const tabclick = (param) => {
     if (param === "Comments") {
       setRemoveComment(false);
       changeTabLinkStatuses(param);
