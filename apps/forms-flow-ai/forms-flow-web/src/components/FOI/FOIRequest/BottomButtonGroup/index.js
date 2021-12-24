@@ -268,7 +268,7 @@ const BottomButtonGroup = React.memo(
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           } 
-          if (currentSelectedStatus !== StateEnum.closed.name && saveRequestObject.onholdTransitionDate) {
+          if (![StateEnum.closed.name, StateEnum.onhold.name].includes(currentSelectedStatus) && saveRequestObject.onholdTransitionDate) {
             const onHoldDays = calculateDaysRemaining(
               new Date(),
               saveRequestObject.onholdTransitionDate
