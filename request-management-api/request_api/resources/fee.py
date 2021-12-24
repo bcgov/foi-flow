@@ -21,7 +21,7 @@ from flask_restx import Namespace, Resource
 
 from request_api.services import FeeService
 from request_api.services.document_generation_service import DocumentGenerationService
-from request_api.utils.util import cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 API = Namespace('Fees', description='Endpoints for Fee and payments')
 
@@ -31,7 +31,7 @@ API = Namespace('Fees', description='Endpoints for Fee and payments')
 class Fee(Resource):
 
     @staticmethod
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     def get(code):
         try:
             date = request.args.get('date', datetime.today().strftime('%Y-%m-%d'))
@@ -46,7 +46,7 @@ class Fee(Resource):
 class Payment(Resource):
 
     @staticmethod
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     def post(request_id: int):
         try:
             request_json = request.get_json()
@@ -62,7 +62,7 @@ class Payment(Resource):
 class Payment(Resource):
 
     @staticmethod
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     def put(request_id: int, payment_id: int):
         try:
             request_json = request.get_json()
@@ -77,7 +77,7 @@ class Payment(Resource):
 class Payment(Resource):
 
     @staticmethod
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     def post(request_id: int, payment_id: int):
         try:
             request_json = request.get_json()

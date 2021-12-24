@@ -19,11 +19,8 @@ This module is the API for the Authroization system.
 import json
 import os
 import logging
-#import sentry_sdk  # noqa: I001; pylint: disable=ungrouped-imports,wrong-import-order; conflicts with Flake8
 from flask import Flask
-#from humps.main import camelize
 from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
-#from sentry_sdk.integrations.flask import FlaskIntegration  # noqa: I001
 
 import request_api.config as config
 from request_api.config import _Config
@@ -36,9 +33,6 @@ import re
 from flask_caching import Cache
 
 
-# Disable more logging.  
-# TODO - Put this behind an env var.
-# setup_logging(os.path.join(_Config.PROJECT_ROOT, 'logging.conf'))  # important to do this first
 
 #Cache Initialization
 app = Flask(__name__)
@@ -52,15 +46,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     #Routing specific CORS setup
     
     app.config.from_object(config.CONFIGURATION[run_mode])
-    #app.config['DEBUG'] = True
 
-    # Configure Sentry
-    # if app.config.get('SENTRY_DSN', None):
-    #     sentry_sdk.init(
-    #         dsn=app.config.get('SENTRY_DSN'),
-    #         integrations=[FlaskIntegration()]
-    #     )
-   
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
     print("environment :" + run_mode)
@@ -68,17 +54,8 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     CORS(app, supports_credentials=True)
     db.init_app(app)
     ma.init_app(app)
-    #mail.init_app(app)
-    
-
 
     app.register_blueprint(API_BLUEPRINT)
-    #app.register_blueprint(DEFAULT_API_BLUEPRINT)
-
-    #app.register_blueprint(OPS_BLUEPRINT)
-
-    # if os.getenv('FLASK_ENV', 'production') in ['development', 'testing']:
-    #     app.register_blueprint(TEST_BLUEPRINT)
 
     if os.getenv('FLASK_ENV', 'production') != 'testing':
         print("JWTSET DONE!!!!!!!!!!!!!!!!")
@@ -86,29 +63,9 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
 
     ExceptionHandler(app)
 
-    # @app.after_request
-    # def handle_after_request(response):  # pylint: disable=unused-variable
-    #     add_version(response)
-    #     camelize_json(response)
-    #     return response
-
-    # def add_version(response):
-    #     version = get_run_version()
-    #     response.headers['API'] = f'request_api/{version}'
-
-    # def camelize_json(response):
-    #     if response.headers['Content-Type'] == 'application/json':
-    #         response.set_data(json.dumps(camelize(json.loads(response.get_data()))))
 
     register_shellcontext(app)
     
-    ###### Added handler to log to a file ######
-
-
-    # This breaks OpenShift until we have PVC setup, so skip for now.
-    # Suggestion is to create to env vars (open to disucssion): ENABLE_LOG_FILE and LOG_FILE_PATH
-    # setup_filelogging(app)
-
     return app
 
 
@@ -121,8 +78,7 @@ def setup_jwt_manager(app, jwt_manager):
     app.config['JWT_ROLE_CALLBACK'] = get_roles
     
     jwt_manager.init_app(app)
-    
-    return
+
 
 
 def register_shellcontext(app):
