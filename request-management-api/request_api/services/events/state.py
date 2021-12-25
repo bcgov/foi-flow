@@ -46,7 +46,7 @@ class stateevent:
 
     def __createnotification(self, requestid, state, requesttype):
         notification = self.__preparenotification(state)
-        notificationservice().createnotification(notification, requestid, requesttype, "State", AuthHelper.getUserId())
+        notificationservice().createnotification(notification, requestid, requesttype, "State", AuthHelper.getuserid())
 
     def __preparenotification(self, state):
         return self.__notificationmessage(state)
