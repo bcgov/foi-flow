@@ -35,10 +35,10 @@ class FOIRawRequest(db.Model):
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, notes, requirespayment ,assigneegroup= None,assignee= None)->DefaultMethodResult:                
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userid, notes, requirespayment ,assigneegroup= None,assignee= None)->DefaultMethodResult:
         createdat = datetime.now()        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -146,7 +146,6 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getversionforrequest(cls,requestid):   
-        print(requestid)
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
     @classmethod

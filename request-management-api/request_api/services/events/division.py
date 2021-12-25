@@ -84,7 +84,6 @@ class divisionevent:
             return self.__formatmessage(division)+' division with stage '+ self.__formatmessage(stage) +' has been removed'  
              
         
-    @classmethod
     def __formatmessage(self, data):
         return '<i>'+data+'</i>'    
 
