@@ -2,6 +2,7 @@
 from os import stat
 from re import VERBOSE
 from request_api.services.commentservice import commentservice
+from request_api.services.notificationservice import notificationservice
 from request_api.auth import auth, AuthHelper
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
@@ -17,6 +18,7 @@ class stateevent:
         state = self.__haschanged(requestid, requesttype)
         if state is not None:
             _commentresponse = self.__createcomment(requestid, state, requesttype)
+            self.__createnotification(requestid, state, requesttype)
             if _commentresponse.success == True:
                 return DefaultMethodResult(True,'Comment posted',requestid)
             else:   
@@ -42,6 +44,13 @@ class stateevent:
         else:
             return commentservice().createrawrequestcomment(comment, AuthHelper.getuserid(),2)
 
+    def __createnotification(self, requestid, state, requesttype):
+        notification = self.__preparenotification(state)
+        notificationservice().createnotification(notification, requestid, requesttype, "State", AuthHelper.getUserId())
+
+    def __preparenotification(self, state):
+        return self.__notificationmessage(state)
+
     def __preparecomment(self, requestid, state,requesttype):
         comment = {"comment": self.__commentmessage(state)}
         if requesttype == "ministryrequest":
@@ -56,5 +65,6 @@ class stateevent:
     def __commentmessage(self, state):
         return  AuthHelper.getusername()+' changed the state of the request to '+self.__formatstate(state)
 
-        
+    def __notificationmessage(self, state):
+        return  'Moved to '+self.__formatstate(state)+ ' State'        
             
