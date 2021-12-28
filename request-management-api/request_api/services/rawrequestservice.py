@@ -56,12 +56,12 @@ class rawrequestservice:
             return requestdatajson['requiresPayment']            
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
-    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid):
+    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, username):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
         #Get documents
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid)
         documentservice().createrawrequestdocumentversion(_requestid)
-        eventservice().postevent(_requestid,"rawrequest")
+        asyncio.run(eventservice().postevent(_requestid,"rawrequest",userid, username))
         return result
 
    

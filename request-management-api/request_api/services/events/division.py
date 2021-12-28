@@ -3,7 +3,6 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
 from request_api.services.commentservice import commentservice
-from request_api.auth import auth, AuthHelper
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
@@ -16,7 +15,7 @@ class divisionevent:
     """ FOI Event management service
 
     """
-    def createdivisionevent(self, requestid, requesttype):
+    def createdivisionevent(self, requestid, requesttype, userid):
         if requesttype != "ministryrequest":
             return DefaultMethodResult(True,'No division required',requestid)
         version = FOIMinistryRequest.getversionforrequest(requestid)
@@ -26,15 +25,15 @@ class divisionevent:
         
         try:
             for division in divsisionsummary:  
-                self.createcomment(requestid, division['division'], division['stage'], division['event'])
+                self.createcomment(requestid, division['division'], division['stage'], division['event'], userid)
             return DefaultMethodResult(True,'Comment posted',requestid)
         except BusinessException as exception:
             return DefaultMethodResult(False,'unable to post comment - '+exception.message,requestid)   
                 
         
-    def createcomment(self, requestid, division, stage, event):
+    def createcomment(self, requestid, division, stage, event, userid):
         comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division, stage, event)}
-        commentservice().createministryrequestcomment(comment, AuthHelper.getuserid(), 2)
+        commentservice().createministryrequestcomment(comment, userid, 2)
 
     
     def __maintained(self,cdivisions, pdivisions):
