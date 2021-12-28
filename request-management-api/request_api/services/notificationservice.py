@@ -1,6 +1,8 @@
 
 from os import stat
 from re import VERBOSE
+
+from requests.api import request
 from request_api.services.watcherservice import watcherservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
@@ -20,10 +22,11 @@ class notificationservice:
     def createnotification(self, message, requestid, requesttype, notificationtype, userid):
         foirequest = self.__getrequest(requestid, requesttype)
         notification = self.__preparenotification(message, foirequest, requesttype, notificationtype, userid)
-        if requesttype == "ministryrequest":         
-            FOIRequestNotification.savenotification(notification)
-        else:
-            FOIRawRequestNotification.savenotification(notification)
+        if notification is not None: 
+            if requesttype == "ministryrequest":         
+                FOIRequestNotification.savenotification(notification)
+            else:
+                FOIRawRequestNotification.savenotification(notification)
             
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid)
@@ -42,12 +45,13 @@ class notificationservice:
         notification.createdby = userid
         notification.created_at = datetime2.now()
         notification.notification = message  
-        notificationusers = self.__getnotificationusers(foirequest, requesttype)
+        notificationusers = self.__getnotificationusers(foirequest, requesttype, userid)
         users = []
         for notificationuser in notificationusers:
             users.append(self.__preparenotificationuser(requesttype, notificationuser, userid))
         notification.notificationusers = users
-        return notification    
+        return notification if users else None
+        
     
 
     def __preparenotificationuser(self, requesttype, notificationuser, userid):
@@ -62,18 +66,18 @@ class notificationservice:
         return user
 
    
-    def __getnotificationusers(self, foirequest, requesttype):
+    def __getnotificationusers(self, foirequest, requesttype, userid):
         notificationusers = []
         _users = self.__getwatchers(foirequest, requesttype) + self.__getassignees(foirequest, requesttype)
         for user in _users:
-            if self.__isduplicate(user, notificationusers) == False:
+            if self.__isignorable(user, notificationusers, userid) == False:
                 notificationusers.append(user)
         return notificationusers
     
     
-    def __isduplicate(self, notificationuser, users):
+    def __isignorable(self, notificationuser, users, userid):
         for user in users:
-            if notificationuser["userid"] == user["userid"]:
+            if notificationuser["userid"] == user["userid"] or notificationuser["userid"] == userid:
                 return True
         return False
         
