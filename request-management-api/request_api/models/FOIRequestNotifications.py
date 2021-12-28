@@ -38,15 +38,15 @@ class FOIRequestNotification(db.Model):
 
     @classmethod 
     def getconsolidatednotifications(cls, userid):
-        sql = """select idnumber, notification , notificationtypeid, userid, notificationtypeid, created_at, createdby from (   
-                    select frn.idnumber, frn.notification, frn.notificationtypeid, frn.created_at , frns.createdby, frns.userid, frns.notificationusertypeid  from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid where frns.userid=:userid and frn.created_at  >= current_date - interval '10' day
+        sql = """select idnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby from (   
+                    select frn.idnumber, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype  from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval '10' day
                     union all
-                    select frn.idnumber, frn.notification, frn.notificationtypeid, frn.created_at , frns.createdby, frns.userid, frns.notificationusertypeid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid where frns.userid=:userid and frn.created_at  >= current_date - interval '10' day
+                    select frn.idnumber, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval '10' day
                   ) as notf order by created_at desc"""
         rs = db.session.execute(text(sql), {'userid': userid})
         notifications = []
         for row in rs:
-            notifications.append({"idnumber": row["idnumber"], "notification": row["notification"], "notificationtypeid": row["notificationtypeid"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
         return notifications
 
 class FOIRequestNotificationSchema(ma.Schema):
