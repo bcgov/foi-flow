@@ -49,6 +49,8 @@ class FOIRequestNotification(db.Model):
             notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
         return notifications
 
+       
+
 class FOIRequestNotificationSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'ministryrequestid', 'notification', 'notificationtypeid','created_at','createdby','updated_at','updatedby') 

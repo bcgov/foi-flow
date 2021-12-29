@@ -10,6 +10,7 @@ from request_api.models.FOIRequestNotifications import FOIRequestNotification
 from request_api.models.FOIRequestNotificationUsers import FOIRequestNotificationUser
 from request_api.models.FOIRawRequestNotifications import FOIRawRequestNotification
 from request_api.models.FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
+from request_api.models.default_method_result import DefaultMethodResult
 from datetime import datetime as datetime2
 
 import json
@@ -27,10 +28,32 @@ class notificationservice:
                 FOIRequestNotification.savenotification(notification)
             else:
                 FOIRawRequestNotification.savenotification(notification)
+     
             
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid)
+    
+    
+    def dismissnotification(self, userid, idnumber, notificationid):        
+        if idnumber is not None and notificationid is not None:
+            requesttype = self.__getnotificationtypefromid(idnumber)
+            if requesttype == "ministryrequest":
+                return FOIRequestNotificationUser.dismissnotification(notificationid)
+            else:
+                return FOIRawRequestNotificationUser.dismissnotification(notificationid)
+        else:
+            requestnotification = FOIRequestNotificationUser.dismissnotificationbyuser(userid)
+            rawnotification = FOIRawRequestNotificationUser.dismissnotificationbyuser(userid)   
+            if requestnotification.success == True and rawnotification.success == True:
+                return DefaultMethodResult(True,'Notifications deleted for user',userid) 
+            else:
+                return DefaultMethodResult(False,'Unable to delete the notifications',userid)
 
+
+    def __getnotificationtypefromid(self, idnumber):
+        return 'rawrequest' if idnumber.lower().startswith('u-00') else 'ministryrequest'
+    
+            
     def __preparenotification(self, message, foirequest, requesttype, notificationtype, userid):            
         if requesttype == "ministryrequest":
             notification = FOIRequestNotification()
@@ -52,8 +75,6 @@ class notificationservice:
         notification.notificationusers = users
         return notification if users else None
         
-    
-
     def __preparenotificationuser(self, requesttype, notificationuser, userid):
         if requesttype == "ministryrequest":
             user = FOIRequestNotificationUser()
@@ -65,7 +86,6 @@ class notificationservice:
         user.created_at = datetime2.now()
         return user
 
-   
     def __getnotificationusers(self, foirequest, requesttype, userid):
         notificationusers = []
         _users = self.__getwatchers(foirequest, requesttype) + self.__getassignees(foirequest, requesttype)

@@ -23,6 +23,17 @@ class FOIRequestNotificationUser(db.Model):
 
     notificationusertypeid = db.Column(db.Integer,nullable=False)
 
+    @classmethod
+    def dismissnotification(cls, notificationuserid):
+        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.notificationuserid == notificationuserid).delete()
+        db.session.commit()  
+        return DefaultMethodResult(True,'Notification deleted',notificationuserid)
+    
+    @classmethod
+    def dismissnotificationbyuser(cls, userid):
+        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.userid == userid).delete()
+        db.session.commit()  
+        return DefaultMethodResult(True,'Notifications deleted for user',userid)
 class FOIRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 

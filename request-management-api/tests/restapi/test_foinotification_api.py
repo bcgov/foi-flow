@@ -31,11 +31,12 @@ def test_ping(app, client):
     response = client.get('/api/healthz')
     assert response.status_code == 200
 
+
 with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
   generalrequestjson = json.load(y)
   generalupdaterequestjson = json.load(z)
   rawrequestjson = json.load(x)
-def test_post_foirequest_general_cfr(app, client):
+def test_post_get_foirequest_general_cfr_notification(app, client):
     rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_user_auth_header(app, client), content_type='application/json')
     jsondata = json.loads(rawresponse.data)    
     getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_user_auth_header(app, client), content_type='application/json') 
@@ -51,6 +52,75 @@ def test_post_foirequest_general_cfr(app, client):
     foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
     foiupdaterequest["requeststatusid"] = 2
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
-    foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
+    foiministryreqresponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
     foinotification = client.get('/api/foinotifications',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
-    assert foiministryreqResponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foinotification.status_code == 200
+    assert foiministryreqresponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foinotification.status_code == 200
+
+
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_dismiss_foirequest_general_cfr_notification(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_user_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)   
+    watcherjson = {
+    "requestid":str(jsondata["id"]),
+    "watchedbygroup": "Intake Team",
+    "watchedby": "sumathi",
+    "isactive": True
+    }
+    createwatcherresponse = client.post('/api/foiwatcher/rawrequest', data=json.dumps(watcherjson), headers=factory_user_auth_header(app, client), content_type='application/json')    
+    jsondata = json.loads(rawresponse.data)    
+    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_user_auth_header(app, client), content_type='application/json') 
+    foirequest = generalrequestjson
+    foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
+    foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foijsondata = json.loads(foiresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiupdaterequest = generalupdaterequestjson
+    foiupdaterequest["id"] = str(foijsondata["id"])
+    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
+    foiupdaterequest["requeststatusid"] = 2
+    foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiministryreqresponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
+    foinotification = client.get('/api/foinotifications',headers=factory_user_auth_header(app, client), content_type='application/json')
+    foinotificationdata = json.loads(foinotification.data)
+    deletefoinotification = client.delete('/api/foinotifications/'+str(foinotificationdata[0]["idnumber"])+'/'+str(foinotificationdata[0]["notificationid"]),headers=factory_user_auth_header(app, client), content_type='application/json')
+    assert foiministryreqresponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foinotification.status_code == 200 and createwatcherresponse.status_code == 200 and deletefoinotification.status_code == 200
+
+
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_dismissall_foirequest_general_cfr_notification(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_user_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)   
+    watcherjson = {
+    "requestid":str(jsondata["id"]),
+    "watchedbygroup": "Intake Team",
+    "watchedby": "sumathi",
+    "isactive": True
+    }
+    createwatcherresponse = client.post('/api/foiwatcher/rawrequest', data=json.dumps(watcherjson), headers=factory_user_auth_header(app, client), content_type='application/json')    
+    jsondata = json.loads(rawresponse.data)    
+    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_user_auth_header(app, client), content_type='application/json') 
+    foirequest = generalrequestjson
+    foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
+    foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foijsondata = json.loads(foiresponse.data)    
+    wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
+    wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiupdaterequest = generalupdaterequestjson
+    foiupdaterequest["id"] = str(foijsondata["id"])
+    foiupdaterequest["idNumber"] = str(foijsondata["ministryRequests"][0]["filenumber"])
+    foiupdaterequest["requeststatusid"] = 2
+    foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
+    foiministryreqresponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
+    foinotification = client.get('/api/foinotifications',headers=factory_user_auth_header(app, client), content_type='application/json')
+    deletefoinotification = client.delete('/api/foinotifications',headers=factory_user_auth_header(app, client), content_type='application/json')
+    assert foiministryreqresponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foinotification.status_code == 200 and createwatcherresponse.status_code == 200 and deletefoinotification.status_code == 200
