@@ -25,6 +25,9 @@ class FOIRawRequestNotificationUser(db.Model):
 
     @classmethod
     def dismissnotification(cls, notificationuserid):
+        exists = bool(db.session.query(FOIRawRequestNotificationUser.notificationuserid).filter_by(notificationuserid=notificationuserid).first())
+        if exists == False:
+            return DefaultMethodResult(False,'Invalid ID',notificationuserid)
         db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.notificationuserid == notificationuserid).delete()
         db.session.commit()  
         return DefaultMethodResult(True,'Notification deleted',notificationuserid)
