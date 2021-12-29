@@ -14,8 +14,9 @@ import {
   modalDelBtn
 } from './ModalStyles'
 import { ActionContext } from './ActionContext'
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import draftToHtml from 'draftjs-to-html';
+import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
@@ -32,7 +33,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const [toggleIcon, settoggleIcon] = useState(faCaretDown)
 
   const ref = useRef();
-  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
+  const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
   const toggleCollapse = (e, parentId) => {
 
@@ -46,7 +47,38 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   }
 
-  
+  const getHtmlfromRawContent = () => {
+    let markup = null
+    if (i.commentTypeId === 1) {
+      const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
+      let initialEditorState = EditorState.createWithContent(rawContentFromStore);
+
+      const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
+      const entityMap = rawContentState.entityMap;      
+      markup = draftToHtml(
+        rawContentState
+      );
+      let commentmentions = []
+      let updatedMarkup = ''
+      
+      Object.values(entityMap).forEach(entity => {
+        if (entity.type === 'mention') {
+          commentmentions.push(entity.data.mention.name);
+        }
+
+      });
+      const distinctMentions = [... new Set(commentmentions)]
+      distinctMentions.forEach(_mention => {
+        updatedMarkup = markup.replaceAll(_mention, `<span class='taggeduser'>${_mention}</span>`)
+        markup = updatedMarkup
+      })      
+    }
+    else {
+      markup = `<p>${i.text}</p>`
+    }
+
+    return markup
+  }
 
   return (
     <>
@@ -60,9 +92,8 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
 
           </div>
-          <div className="commenttext">
+          <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
 
-            <ReactQuill value={i.text} readOnly={true} theme={"bubble"} />
           </div>
 
           <div>
@@ -83,12 +114,12 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               role='tooltip'
               trigger={
                 i.commentTypeId === 1 ?
-                <button className="actionsBtn">
-                  <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
-                </button> :
-                <button className="actionsBtn" disabled>
-                <FontAwesomeIcon icon={faEllipsisH} size='1x' color='grey' />
-              </button>
+                  <button className="actionsBtn">
+                    <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
+                  </button> :
+                  <button className="actionsBtn" disabled>
+                    <FontAwesomeIcon icon={faEllipsisH} size='1x' color='grey' />
+                  </button>
               }
               position='right center'
               nested

@@ -57,7 +57,7 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.assignedgroup = self.__getgroupname(requestschema)
 
         if ministryid is not None:
-            divisions = FOIMinistryRequestDivision().getrequest(ministryid , activeversion-1)
+            divisions = FOIMinistryRequestDivision().getdivisions(ministryid , activeversion-1)
             foiministryrequest.divisions = requestserviceministrybuilder().createfoirequestdivisionfromobject(divisions, ministryid, activeversion, userid)  
             foiministryrequest.documents = requestserviceministrybuilder().createfoirequestdocuments(requestschema,ministryid , activeversion , userid)       
         foiministryrequest.version = activeversion

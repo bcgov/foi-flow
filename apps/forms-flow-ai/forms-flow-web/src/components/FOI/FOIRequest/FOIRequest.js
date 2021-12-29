@@ -58,6 +58,7 @@ import {
   alertUser
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
+import DivisionalTracking from './DivisionalTracking';
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -99,6 +100,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
 
+  const [editorChange, setEditorChange] = useState(false);
   //quillChange and removeComment added to handle Navigate away from Comments tabs
   const [quillChange, setQuillChange] = useState(false);
 
@@ -131,6 +133,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   const [removeComment, setRemoveComment] = useState(false);
 
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
+  const showDivisionalTracking = requestDetails && requestDetails.divisions?.length > 0 && 
+    (requestState && requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
+    requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase());
 
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const dispatch = useDispatch();
@@ -359,6 +364,10 @@ const FOIRequest = React.memo(({userDetail}) => {
   const handleBeforeUnload = e => {
     if (quillChange) {     
       alertUser(e);
+  const alertUser = e => {
+    if (editorChange) {     
+      e.returnValue = '';
+      e.preventDefault();
     }
   }
 
@@ -567,6 +576,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                             disableInput={disableInput} 
                           />
                       } 
+                      {showDivisionalTracking && <DivisionalTracking divisions={requestDetails.divisions} />}
                       <RequestNotes />
 
                       <BottomButtonGroup stateChanged={stateChanged} isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
@@ -608,8 +618,8 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: fullName }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
                     bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}
-                    //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-                    setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+                    //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 
                 </> : <Loading />
             }

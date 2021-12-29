@@ -11,23 +11,23 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 """
 class camundaservice:
     
-    bpmEngineRestUrl = os.getenv('BPM_ENGINE_REST_URL')
-    bpmTokenUrl =  os.getenv("BPM_TOKEN_URL")
-    bpmClientId =  os.getenv("BPM_CLIENT_ID")
-    bpmClientSecret =  os.getenv("BPM_CLIENT_SECRET")
-    bpmGrantType =  os.getenv("BPM_GRANT_TYPE")
+    bpmengineresturl = os.getenv('BPM_ENGINE_REST_URL')
+    bpmtokenurl =  os.getenv("BPM_TOKEN_URL")
+    bpmclientid =  os.getenv("BPM_CLIENT_ID")
+    bpmclientsecret =  os.getenv("BPM_CLIENT_SECRET")
+    bpmgranttype =  os.getenv("BPM_GRANT_TYPE")
     
     
-    def _getServiceAccountToken_(self):
-        auth_response = requests.post(self.bpmTokenUrl, auth=(self.bpmClientId, self.bpmClientSecret), headers={
+    def _getserviceaccounttoken_(self):
+        auth_response = requests.post(self.bpmtokenurl, auth=(self.bpmclientid, self.bpmclientsecret), headers={
             'Content-Type': 'application/x-www-form-urlencoded'}, data='grant_type=client_credentials')
         return auth_response.json().get('access_token')
     
     
-    def _getHeaders_(self, token):
+    def _getheaders_(self, token):
         """Generate headers."""
         if token is None:
-            token = self._getServiceAccountToken_(self);
+            token = self._getserviceaccounttoken_();
         return {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json",

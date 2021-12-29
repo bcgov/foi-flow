@@ -97,3 +97,7 @@
 .attachment-disabled {
   color:lightslategrey;
 }
+
+button[disabled]{
+  cursor:not-allowed!important;
+}

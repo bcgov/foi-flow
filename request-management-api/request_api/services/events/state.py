@@ -20,8 +20,8 @@ class stateevent:
             if _commentresponse.success == True:
                 return DefaultMethodResult(True,'Comment posted',requestid)
             else:   
-                return DefaultMethodResult(True,'unable to post comment',requestid)
-        
+                return DefaultMethodResult(False,'unable to post comment',requestid)
+        return  DefaultMethodResult(True,'No change',requestid)
             
     def __haschanged(self, requestid, requesttype):
         if requesttype == "rawrequest":
@@ -38,9 +38,9 @@ class stateevent:
     def __createcomment(self, requestid, state, requesttype):
         comment = self.__preparecomment(requestid, state, requesttype)
         if requesttype == "ministryrequest":
-            return commentservice().createministryrequestcomment(comment, AuthHelper.getUserId(), 2)
+            return commentservice().createministryrequestcomment(comment, AuthHelper.getuserid(), 2)
         else:
-            return commentservice().createrawrequestcomment(comment, AuthHelper.getUserId(),2)
+            return commentservice().createrawrequestcomment(comment, AuthHelper.getuserid(),2)
 
     def __preparecomment(self, requestid, state,requesttype):
         comment = {"comment": self.__commentmessage(state)}
@@ -53,12 +53,8 @@ class stateevent:
     def __formatstate(self, state):
         return "Open" if state == "Archived" else state
 
-    @classmethod
-    def __formatstate(self, state):
-        return "Open" if state == "Archived" else state    
-        
-    @classmethod            
     def __commentmessage(self, state):
-        return  AuthHelper.getUserName()+' changed the state of the request to '+self.__formatstate(state)
+        return  AuthHelper.getusername()+' changed the state of the request to '+self.__formatstate(state)
+
         
             

@@ -54,7 +54,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         if 'divisions' in requestschema:
             foiministryrequest.divisions = self.createfoirequestdivision(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
         else:
-            divisions = FOIMinistryRequestDivision().getrequest(ministryschema["foiministryrequestid"] ,ministryschema["version"])
+            divisions = FOIMinistryRequestDivision().getdivisions(ministryschema["foiministryrequestid"] ,ministryschema["version"])
             foiministryrequest.divisions = self.createfoirequestdivisionfromobject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
         foiministryrequest.documents = self.createfoirequestdocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)       
         foiministryrequest.closedate = requestschema['closedate'] if 'closedate' in requestschema  else None

@@ -54,29 +54,30 @@ class FOIMinistryRequestDocumentSchema(Schema):
     category = fields.Str(data_key="category",allow_none=False)
 class FOIRequestWrapperSchema(Schema):
 
+    BLANK_EXCEPTION_MESSAGE = 'Field cannot be blank'
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE
     foirawrequestid = fields.Int(data_key="id")
-    description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
-    category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
-    requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')]) 
-    firstName = fields.Str(data_key="firstName", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])    
+    description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)]) 
+    firstName = fields.Str(data_key="firstName", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])    
     middleName = fields.Str(data_key="middleName",allow_none=True)    
-    lastName = fields.Str(data_key="lastName", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])         
+    lastName = fields.Str(data_key="lastName", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])         
     email = fields.Str(data_key="email",allow_none=True)      
     businessName = fields.Str(data_key="businessName",allow_none=True) 
     assignedGroup = fields.Str(data_key="assignedGroup",allow_none=True)
     assignedTo = fields.Str(data_key="assignedTo",allow_none=True)  
     fromDate = fields.Str(data_key="fromDate",allow_none=True)
     toDate = fields.Str(data_key="toDate",allow_none=True)
-    dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
+    dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     cfrDueDate = fields.Date(data_key="cfrDueDate", required=False,allow_none=True)
-    deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
-    receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])   
-    receivedDate = fields.Str(data_key="receivedDateUF", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])
-    startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error='Field cannot be blank')])  
+    deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
+    receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
+    receivedDate = fields.Str(data_key="receivedDateUF", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])  
     assignedministrygroup = fields.Str(data_key="assignedministrygroup",allow_none=True)
     assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True)        
 

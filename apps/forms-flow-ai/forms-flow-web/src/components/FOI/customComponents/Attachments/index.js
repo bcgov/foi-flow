@@ -336,7 +336,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
       role='tooltip'
       ref={ref}
       trigger={
-        <button className="actionsBtn">
+        <button className="actionsBtn" disabled={disabled}>
           <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
         </button>
       }
