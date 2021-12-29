@@ -100,8 +100,8 @@ const FOIRequest = React.memo(({userDetail}) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
 
+  //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
-  //quillChange and removeComment added to handle Navigate away from Comments tabs
   const [quillChange, setQuillChange] = useState(false);
 
   const initialStatuses = {
@@ -362,12 +362,8 @@ const FOIRequest = React.memo(({userDetail}) => {
    */
   //Below function will handle beforeunload event
   const handleBeforeUnload = e => {
-    if (quillChange) {     
-      alertUser(e);
-  const alertUser = e => {
     if (editorChange) {     
-      e.returnValue = '';
-      e.preventDefault();
+      alertUser(e);
     }
   }
 
@@ -377,7 +373,7 @@ const FOIRequest = React.memo(({userDetail}) => {
   };
 
   React.useEffect(() => {
-    if (quillChange){
+    if (editorChange){
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', handleOnHashChange);
       window.addEventListener('beforeunload', handleBeforeUnload);
@@ -386,7 +382,7 @@ const FOIRequest = React.memo(({userDetail}) => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
       }
     }
-  }, [quillChange]);
+  }, [editorChange]);
 
   const tabclick = (param) => {
     if(param === 'Comments') {
@@ -395,7 +391,7 @@ const FOIRequest = React.memo(({userDetail}) => {
       return;
     }
     
-    if(quillChange) {
+    if(editorChange) {
       confirmChangesLost(
         () => {
           setQuillChange(false);
