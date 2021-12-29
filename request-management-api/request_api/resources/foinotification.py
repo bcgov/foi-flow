@@ -32,7 +32,7 @@ TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foinotifications')
-class FOIRawRequestWatcher(Resource):
+class FOINotification(Resource):
     """Resource for managing FOI requests."""
 
        
