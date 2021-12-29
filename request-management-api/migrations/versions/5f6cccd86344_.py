@@ -39,6 +39,7 @@ def upgrade():
             {'name':'Division','description':'Division','isactive':True},
             {'name':'User Comments','description':'User Comments','isactive':True},
             {'name':'Extension','description':'Extension','isactive':True},
+            {'name':'Assignment','description':'Assignment','isactive':True},
         ]
     )
     op.create_table('NotificationUserTypes',
