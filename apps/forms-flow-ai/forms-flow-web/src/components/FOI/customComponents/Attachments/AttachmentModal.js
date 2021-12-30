@@ -240,7 +240,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
           <DialogActions>
             {
               modalFor === 'rename'?
-              <button className="btn-bottom btn-save" onClick={saveNewFilename}>
+              <button className={`btn-bottom btn-save ${classes.btnenabled}`} onClick={saveNewFilename}>
                 Save
               </button>
               :

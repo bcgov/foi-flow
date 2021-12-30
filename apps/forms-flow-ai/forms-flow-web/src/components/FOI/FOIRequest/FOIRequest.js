@@ -38,6 +38,7 @@ import { StateEnum } from '../../../constants/FOI/statusEnum';
 import {CommentSection} from '../customComponents/Comments';
 import {AttachmentSection} from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
+import DivisionalTracking from './DivisionalTracking';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -77,12 +78,15 @@ const FOIRequest = React.memo(({userDetail}) => {
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   const [comment, setComment] = useState([]);
 
-  //quillChange and removeComment added to handle Navigate away from Comments tabs
-  const [quillChange, setQuillChange] = useState(false);
+  //editorChange and removeComment added to handle Navigate away from Comments tabs
+  const [editorChange, setEditorChange] = useState(false);
   const [removeComment, setRemoveComment] = useState(false);
 
   const [attachments, setAttachments] = useState(requestAttachments);
   const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
+  const showDivisionalTracking = requestDetails && requestDetails.divisions?.length > 0 && 
+    (requestState && requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
+    requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase());
 
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""  
   const dispatch = useDispatch();
@@ -506,11 +510,11 @@ const FOIRequest = React.memo(({userDetail}) => {
       setUnSavedRequest(true);
     }
     updateAdditionalInfo(name, value, requestObject);
-    createRequestDetailsObject(requestObject, name, value, value2);    
+    createRequestDetailsObject(requestObject, name, value, value2);        
     setSaveRequestObject(requestObject);
   }
 
-  const handleSaveRequest = (_state, _unSaved, id) => {
+  const handleSaveRequest = (_state, _unSaved, id) => {    
     setHeader(_state);
     setUnSavedRequest(_unSaved);
     if (!_unSaved) {      
@@ -605,7 +609,7 @@ const FOIRequest = React.memo(({userDetail}) => {
    */
   //Below function will handle beforeunload event
   const alertUser = e => {
-    if (quillChange) {     
+    if (editorChange) {     
       e.returnValue = '';
       e.preventDefault();
     }
@@ -629,14 +633,14 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   const tabclick = (evt, param) => {
     let clickedOk = true;
-    if (quillChange && param !== 'Comments') {
+    if (editorChange && param !== 'Comments') {
       if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
         clickedOk = true;
-        setQuillChange(false);
+        setEditorChange(false);
         setRemoveComment(true);
       }
       else {
-        setQuillChange(true);
+        setEditorChange(true);
         setRemoveComment(false);
         clickedOk = false;
         param = 'Comments';
@@ -682,6 +686,9 @@ const FOIRequest = React.memo(({userDetail}) => {
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   const isAttachmentListLoading = useSelector(state=> state.foiRequests.isAttachmentListLoading);
+
+  const stateTransition = requestDetails && requestDetails.stateTransition;
+
   return (
 
     <div className="foiformcontent">
@@ -692,7 +699,7 @@ const FOIRequest = React.memo(({userDetail}) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
+            <StateDropDown stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">          
@@ -739,6 +746,7 @@ const FOIRequest = React.memo(({userDetail}) => {
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       {requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ?
                         <AdditionalApplicantDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} /> : null} 
+                      {showDivisionalTracking && <DivisionalTracking divisions={requestDetails.divisions} />}
                       <RequestNotes />
 
                       <BottomButtonGroup isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
@@ -755,19 +763,19 @@ const FOIRequest = React.memo(({userDetail}) => {
                 <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
                   setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
                   requestNumber={requestNumber} requestState={requestState}
-                  iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} />
+                  iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} isMinistryCoordinator={false} />
                 </> : <Loading />
             }
           </div> 
           <div id="Comments" className="tabcontent">
             {
-             !isLoading && requestNotes && (iaoassignedToList.length > 0 || ministryAssignedToList.length > 0) ?
+             !isLoading && requestNotes && ( (iaoassignedToList &&iaoassignedToList.length > 0 ) || (ministryAssignedToList && ministryAssignedToList.length > 0 )) ?
                 <>
                 <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function(a, b) { return b.commentId - a.commentId;})}
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId} 
                     bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}
-                    //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-                    setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+                    //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 
                 </> : <Loading />
             }

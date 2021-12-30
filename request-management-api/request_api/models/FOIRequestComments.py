@@ -16,7 +16,8 @@ class FOIRequestComment(db.Model):
     commentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     ministryrequestid =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
-    comment = db.Column(db.Text, unique=False, nullable=True)  
+    comment = db.Column(db.Text, unique=False, nullable=True)
+    taggedusers = db.Column(JSON, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime2.now())
@@ -25,14 +26,14 @@ class FOIRequestComment(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     commenttypeid = db.Column(db.Integer, unique=False, nullable=False)
-    #commenttypeid =  relationship("CommentType",backref=backref("CommentTypes"),uselist=False)
  
     
     @classmethod
     def savecomment(cls, commenttypeid, foirequestcomment, version, userid,commentcreatedate=None)->DefaultMethodResult: 
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
-        _createdDate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate
-        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createdDate, createdby=userid)
+        taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
+        _createddate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate        
+        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers)
         db.session.add(newcomment)
         db.session.commit()               
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
@@ -52,8 +53,9 @@ class FOIRequestComment(db.Model):
     def updatecomment(cls, commentid, foirequestcomment, userid):   
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
+        taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
         if(comment.count() > 0) :             
-            comment.update({FOIRequestComment.isactive:True, FOIRequestComment.comment:foirequestcomment["comment"], FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now()}, synchronize_session = False)
+            comment.update({FOIRequestComment.isactive:True, FOIRequestComment.comment:foirequestcomment["comment"], FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now(),FOIRequestComment.taggedusers:taggedusers}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Comment updated',commentid)
         else:
@@ -67,4 +69,4 @@ class FOIRequestComment(db.Model):
     
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
-        fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby') 
+        fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby','taggedusers') 

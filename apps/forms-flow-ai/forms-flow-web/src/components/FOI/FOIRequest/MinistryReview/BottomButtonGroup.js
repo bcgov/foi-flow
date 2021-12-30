@@ -55,7 +55,7 @@ const BottomButtonGroup = React.memo(({
     
     const [opensaveModal, setsaveModal] = useState(false);
 
-    const disableSave = isValidationError || requestState.toLowerCase() != StateEnum.callforrecords.name.toLowerCase();
+    const disableSave = isValidationError;
 
     const returnToQueue = (e) => {
       if (!unSavedRequest || (unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))) {

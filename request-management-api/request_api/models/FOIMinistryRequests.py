@@ -81,8 +81,8 @@ class FOIMinistryRequest(db.Model):
         return [row[0] for row in rs][0]
     
     @classmethod
-    def deActivateFileNumberVersion(cls, ministryId, idnumber, currentVersion, userId)->DefaultMethodResult:
-        db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryId, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentVersion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userId}, synchronize_session=False)
+    def deActivateFileNumberVersion(cls, ministryid, idnumber, currentversion, userid)->DefaultMethodResult:
+        db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryid, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         return DefaultMethodResult(True,'Request Updated',idnumber)
     
     @classmethod
@@ -91,24 +91,23 @@ class FOIMinistryRequest(db.Model):
         _ministryrequestids = []
  
         if group is None:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True and FOIMinistryRequest.requeststatusid != 3).all()        
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
         elif (group == 'Flex Team'):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.requeststatusid != 3,FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.requeststatusid != 3, FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,12,13,7,8,9,10,11,14])))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])))).all()
         elif (group == 'Processing Team'):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.requeststatusid != 3,FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.requeststatusid != 3, FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,7,8,9,10,11,14])))).all()           
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])))).all()           
         else:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.requeststatusid != 3,FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.requeststatusid != 3, FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14]))))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
-        request_schema = FOIRequestsSchema()
         for _requestid in _ministryrequestids:
            _request ={}
            
            ministryrequest =ministryrequest_schema.dump(_session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == _requestid).order_by(FOIMinistryRequest.version.desc()).first())           
            parentrequest = _session.query(FOIRequest).filter(FOIRequest.foirequestid == ministryrequest['foirequest_id'] and FOIRequest.version == ministryrequest['foirequestversion_id']).order_by(FOIRequest.version.desc()).first()
            requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(ministryrequest['foirequest_id'],ministryrequest['foirequestversion_id'])
-           _receivedDate = parentrequest.receiveddate
+           _receiveddate = parentrequest.receiveddate
            _request["firstName"] = requestapplicants[0]['foirequestapplicant.firstname']
            _request["lastName"] = requestapplicants[0]['foirequestapplicant.lastname']
            _request["requestType"] = parentrequest.requesttype
@@ -116,8 +115,8 @@ class FOIMinistryRequest(db.Model):
            _request["currentState"] = ministryrequest["requeststatus.name"]
            _request["dueDate"] = ministryrequest["duedate"]
            _request["cfrDueDate"] = ministryrequest["cfrduedate"]
-           _request["receivedDate"] = _receivedDate.strftime('%Y %b, %d')
-           _request["receivedDateUF"] =str(_receivedDate)
+           _request["receivedDate"] = _receiveddate.strftime('%Y %b, %d')
+           _request["receivedDateUF"] =str(_receiveddate)
            _request["assignedGroup"]=ministryrequest["assignedgroup"]
            _request["assignedTo"]=ministryrequest["assignedto"]
            _request["assignedministrygroup"]=ministryrequest["assignedministrygroup"]
@@ -164,13 +163,27 @@ class FOIMinistryRequest(db.Model):
         return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
 
     @classmethod
-    def getstatenavigation(cls, ministryrequestid):
-        _session = db.session
-        _requeststates = _session.query(FOIMinistryRequest.requeststatusid).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).limit(2)
+    def getstatesummary(cls, ministryrequestid):                
+        sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+        where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
+ 
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        transitions = []
+        for row in rs:
+            transitions.append({"status": row["status"], "version": row["version"]})
+        return transitions
+
+    @classmethod
+    def getstatenavigation(cls, ministryrequestid):                
+        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+        where foiministryrequestid=:ministryrequestid  order by version desc limit  2"""
+ 
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         requeststates = []
-        for _requeststate in _requeststates:
-            requeststates.append(_requeststate[0])
+        for row in rs:
+            requeststates.append(row["status"])
         return requeststates
+
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
