@@ -37,6 +37,17 @@ export const CommentSection = ({
     setfilterValue(_filterValue)       
     setcomments([])
   }
+
+  const getRequestNumber = ()=>{
+    let requestHeaderString = 'Request #'
+    if(requestNumber)
+      {
+        return requestHeaderString+requestNumber
+      }else
+      {
+        return requestHeaderString+`U-00${requestid}`
+      }  
+  }
  
   return (
     <ActionProvider
@@ -55,7 +66,7 @@ export const CommentSection = ({
     >
       <div className="section">
         <div className="foi-request-number-header">
-          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber : `U-00${requestid}`}`}</h1>
+          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{getRequestNumber()}</h1>
         </div>
 
         <div className="addcommentBox">

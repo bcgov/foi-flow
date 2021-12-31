@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useState, useRef } from 'react'
-import { useDispatch, useSelector } from "react-redux";
+import React, { useContext, useState, useRef } from 'react'
 import './comments.scss'
 import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faReply, faEllipsisH, faInfoCircle, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
 import {
   modal,
-  modalClose,
   modalHeader,
   modalContent,
   modalActions,
@@ -35,16 +33,23 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
-  const toggleCollapse = (e, parentId) => {
+  const setInnerText = (e, text) => {
+    e.target.innerText = text
+  }
 
-    var hiddenreplies = document.getElementsByName(`hiddenreply_${parentId}`)
+  const setnodeDisplay = (commentnode, displaymode) => {
+    commentnode.style.display = displaymode
+  }
+
+  const toggleCollapse = (e, parentcommentId) => {
+
+    var hiddenreplies = document.getElementsByName(`hiddenreply_${parentcommentId}`)
     hiddenreplies.forEach((commentnode) => {
-      commentnode.style.display === 'none' ? commentnode.style.display = 'flex' : commentnode.style.display = 'none'
+      commentnode.style.display === 'none' ? setnodeDisplay(commentnode, 'flex') : setnodeDisplay(commentnode, 'none')
     })
     let _toggleIcon = e.target.innerText === "Show more comments" ? faCaretUp : faCaretDown
     settoggleIcon(_toggleIcon)
-    e.target.innerText === "Show fewer comments" ? e.target.innerText = "Show more comments" : e.target.innerText = "Show fewer comments"
-
+    e.target.innerText === "Show fewer comments" ? setInnerText(e, "Show more comments") : setInnerText(e, "Show fewer comments")
   }
 
   const getHtmlfromRawContent = () => {
@@ -54,13 +59,13 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       let initialEditorState = EditorState.createWithContent(rawContentFromStore);
 
       const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
-      const entityMap = rawContentState.entityMap;      
+      const entityMap = rawContentState.entityMap;
       markup = draftToHtml(
         rawContentState
       );
       let commentmentions = []
       let updatedMarkup = ''
-      
+
       Object.values(entityMap).forEach(entity => {
         if (entity.type === 'mention') {
           commentmentions.push(entity.data.mention.name);
@@ -71,7 +76,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       distinctMentions.forEach(_mention => {
         updatedMarkup = markup.replaceAll(_mention, `<span class='taggeduser'>${_mention}</span>`)
         markup = updatedMarkup
-      })      
+      })
     }
     else {
       markup = `<p>${i.text}</p>`

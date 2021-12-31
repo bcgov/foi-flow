@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import React, { useContext, useState, useEffect} from 'react'
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
-import { convertToRaw, convertFromRaw, convertFromHTML, ContentState, EditorState } from "draft-js";
+import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
@@ -25,7 +25,7 @@ const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
-const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullnameList,
+const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, fullnameList,
   //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
   setEditorChange, removeComment, setRemoveComment
 }) => {
@@ -44,19 +44,20 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
   }
 
   // Check editor text for mentions
-  const onSearchChange = ({ value }) => {
-    var filterlist = mentionList.filter(function(item){
-      return (item.firstname.indexOf(value.toLowerCase()) === 0 || item.lastname.indexOf(value.toLowerCase()) === 0)
-    }).sort(namesort)    
-    setSuggestions(defaultSuggestionsFilter(value, filterlist))
+  const onSearchChange = ({ value }) => {      
+    var filterlist = mentionList.filter(function(item){      
+      return (item.firstname?.indexOf(value?.toLowerCase()) === 0 || item.lastname?.indexOf(value?.toLowerCase()) === 0)
+    }).sort(namesort)        
+    if(filterlist?.length >0 )    
+      setSuggestions(defaultSuggestionsFilter(value, filterlist))
   }
 
-  const getEditorState = (value) => {
-    const rawContentFromStore = convertFromRaw(JSON.parse(value))
-    let initialEditorState = EditorState.createWithContent(rawContentFromStore);
-    return initialEditorState
+  const getEditorState = (_value) => {
+    const rawContentFromStore = convertFromRaw(JSON.parse(_value))
+    return EditorState.createWithContent(rawContentFromStore);
+    
   }
-  const [editorState, setEditorState] = useState(value === '' || value === undefined ? EditorState.createEmpty() : getEditorState(value))
+  const [editorState, setEditorState] = useState(inputvalue === '' || inputvalue === undefined ? EditorState.createEmpty() : getEditorState(inputvalue))
 
   const getMentionsOnComment = () => {
     const rawContentState = convertToRaw(editorState.getCurrentContent());
@@ -72,9 +73,8 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     return commentmentions;
   }
 
-  const _handleChange = (editorState) => {
-    const currentContent = editorState.getCurrentContent();
-    const rawContentState = convertToRaw(currentContent);
+  const _handleChange = (_editorState) => {
+    const currentContent = _editorState.getCurrentContent();    
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
     let _textLength = maxcharacterlimit - (currentContentLength - selectedTextLength)
@@ -82,11 +82,9 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
     { 
       setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
        
-    }
-    
-
+    }    
     setuftext(currentContent.getPlainText(''))
-    setEditorState(editorState);
+    setEditorState(_editorState);
     setEditorChange(currentContentLength > 0)
   }
 
@@ -122,11 +120,11 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
           }
 
           currentKey = currentContent.getKeyAfter(currentKey);
-        };
+        }
       }
     }
 
-    return length;
+    return length
   }
 
   const _handleKeyCommand = (e) => {
@@ -172,14 +170,14 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
 
 
   useEffect(() => {
-    if (value !== undefined) {
-      const contentstate = getEditorState(value)
+    if (inputvalue !== undefined) {
+      const contentstate = getEditorState(inputvalue)
       const currentContent = contentstate.getCurrentContent();
       setuftext(currentContent.getPlainText(''))
       setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
     }
 
-  }, [value])
+  }, [inputvalue])
 
   //Handles Navigate Away
   const closeX = () => {
@@ -284,7 +282,7 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add, fullna
           open={open}
           onOpenChange={onOpenChange}
           suggestions={suggestions}
-          onSearchChange={onSearchChange}
+          onSearchChange={(v)=>onSearchChange(v)}
           onAddMention={(_mentions) => {
             console.log('onAddMention')
             // get the mention object selected
