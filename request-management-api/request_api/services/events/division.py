@@ -21,10 +21,11 @@ class divisionevent:
         version = FOIMinistryRequest.getversionforrequest(requestid)
         curdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version)
         prevdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version[0]-1)
-        divsisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions) 
-        
+        divisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions) 
+        if divisionsummary is None or (divisionsummary and len(divisionsummary) <1):
+            return  DefaultMethodResult(True,'No change',requestid)
         try:
-            for division in divsisionsummary:  
+            for division in divisionsummary:  
                 self.createcomment(requestid, division['division'], division['stage'], division['event'], userid)
             return DefaultMethodResult(True,'Comment posted',requestid)
         except BusinessException as exception:
