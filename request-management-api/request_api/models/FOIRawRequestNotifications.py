@@ -39,7 +39,7 @@ class FOIRawRequestNotification(db.Model):
     def dismissnotification(cls, notificationids):
         db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
         db.session.commit()  
-        return DefaultMethodResult(True,'Notifications deleted', notificationids)
+        return DefaultMethodResult(True,'Notifications deleted ', notificationids)
 
 class FOIRawRequestNotificationSchema(ma.Schema):
     class Meta:

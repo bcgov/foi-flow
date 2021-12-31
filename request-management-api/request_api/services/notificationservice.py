@@ -12,7 +12,7 @@ from request_api.models.FOIRawRequestNotifications import FOIRawRequestNotificat
 from request_api.models.FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
 from request_api.models.default_method_result import DefaultMethodResult
 from datetime import datetime as datetime2
-
+import os
 import json
 
 
@@ -32,7 +32,7 @@ class notificationservice:
      
             
     def getnotifications(self, userid):
-        return FOIRequestNotification.getconsolidatednotifications(userid)
+        return FOIRequestNotification.getconsolidatednotifications(userid, self.__getnotificationdays())
     
     
     def dismissnotification(self, userid, idnumber, notificationid):        
@@ -97,6 +97,7 @@ class notificationservice:
             notification = FOIRequestNotification()
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
+            notification.foirequestid = foirequest["foirequest_id"]
         else:
             notification = FOIRawRequestNotification()
             notification.requestid = foirequest["requestid"]     
@@ -189,3 +190,9 @@ class notificationservice:
         elif notificationusertype == "Assignee":
             return 2
         return 0
+    
+    def __getnotificationdays(self):
+        if 'FOI_NOTIFICATION_DAYS' in os.environ and os.getenv('FOI_NOTIFICATION_DAYS') != '':
+            return os.getenv('FOI_NOTIFICATION_DAYS')
+        else:
+            return str(10)
