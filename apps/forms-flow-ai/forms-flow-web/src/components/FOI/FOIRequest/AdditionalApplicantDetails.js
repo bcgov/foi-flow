@@ -13,38 +13,52 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
      *  No mandatory fields here
      */ 
 
-    const validateFields = (request, name) => {
-      if (request !== undefined) {
-        if (name === FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) {
-          return !!request.correctionalServiceNumber ? request.correctionalServiceNumber : "";
-        }
-        else if (name === FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) {
-          return !!request.publicServiceEmployeeNumber ? request.publicServiceEmployeeNumber : "";
-        }
-        if(request.additionalPersonalInfo !== undefined) {
-          if (name === FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) {
-            return !!request.additionalPersonalInfo.personalHealthNumber ? request.additionalPersonalInfo.personalHealthNumber : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED) {
-            return !!request.additionalPersonalInfo.identityVerified ? request.additionalPersonalInfo.identityVerified : "";
-          }
-        
-          else if (name === FOI_COMPONENT_CONSTANTS.DOB) {          
-            return !!request.additionalPersonalInfo.birthDate ? formatDate(request.additionalPersonalInfo.birthDate) : "";
-          }
-        }
-    }
-      else {
-        return "";
+    const validateField = (data, name, options = {
+      dateFormat: false,
+      defaultValue: ""
+    }) => {
+      options.defaultValue = options.defaultValue || ""
+
+      if(!data) {
+        return options.defaultValue;
       }
+
+      if(options.dateFormat) {
+        return data[name] ? formatDate(data[name]) : options.defaultValue;
+      }
+
+      return data[name] || options.defaultValue;
     }
+    
     //local state management for personalHealthNumber, identityVerified, correctionNumber, and birthDate
-    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER));
-    const [identityVerifiedText, setIdentityVerified] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED));  
-    const [correctionsNumberText, setCorrectionsNumber] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER));
-    const [employeeNumberText, setEmployeeNumber] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER));
-    const dob = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DOB);   
-    const [birthDateText, setDOB] = React.useState(dob);
+    const [personalHealthNumberText, setPersonalHealthNumber] = React.useState(
+      validateField(
+        requestDetails?.additionalPersonalInfo,
+        FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER
+      )
+    );
+    const [identityVerifiedText, setIdentityVerified] = React.useState(
+      validateField(
+        requestDetails?.additionalPersonalInfo,
+        FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED
+      )
+    );
+    const [correctionsNumberText, setCorrectionsNumber] = React.useState(
+      validateField(requestDetails, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER)
+    );
+    const [employeeNumberText, setEmployeeNumber] = React.useState(
+      validateField(requestDetails, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER)
+    );
+    const [birthDateText, setDOB] = React.useState(
+      validateField(
+        requestDetails?.additionalPersonalInfo,
+        FOI_COMPONENT_CONSTANTS.DOB,
+        {
+          dateFormat: true,
+          defaultValue: "",
+        }
+      )
+    );
 
   const handlePersonalHealthNumber = (e) => {
     setPersonalHealthNumber(e.target.value);
