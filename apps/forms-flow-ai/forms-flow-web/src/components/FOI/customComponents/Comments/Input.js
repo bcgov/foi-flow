@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import AddCommentField from './AddCommentField'
-import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 

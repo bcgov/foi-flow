@@ -13,28 +13,24 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
      *  On Behalf of details box in the UI
      *  No mandatory fields here
      */ 
-      const validateFields = (request, name) => {
-        if (request !== undefined) {
-          if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME) {
-            return !!request.anotherFirstName ? request.anotherFirstName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME) {
-            return !!request.anotherMiddleName ? request.anotherMiddleName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME) {
-            return !!request.anotherLastName ? request.anotherLastName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME) {
-            return !!request.anotherAlsoKnownAs ? request.anotherAlsoKnownAs : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.ANOTHER_DOB) {
-            return !!request.anotherBirthDate ? formatDate(request.anotherBirthDate) : "";
-          }
+      const validateFields = (data, name, options = {
+        dateFormat: false,
+        defaultValue: ""
+      }) => {
+        options.defaultValue = options.defaultValue || ""
+  
+        if(!data) {
+          return options.defaultValue;
         }
-        else {
-          return "";
+  
+        if(options.dateFormat) {
+          return data[name] ? formatDate(data[name]) : options.defaultValue;
         }
+  
+        return data[name] || options.defaultValue;
       }
+
+     
 
     //local states for Another person FirstName, MiddleName, LastName, NickName and DOB
     const [anotherFirstNameText, setAnotherFirstName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME));

@@ -1,5 +1,4 @@
 import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
-
 const initialState = {
   isLoading:true,
   isAssignedToListLoading:true,
@@ -25,8 +24,7 @@ const initialState = {
   foiRequestAttachments:[]
 }
 
-
-const foiRequests = (state = initialState, action)=> {  
+const foiRequests = (state = initialState, action)=> {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return {...state, isLoading: action.payload};
@@ -47,37 +45,9 @@ const foiRequests = (state = initialState, action)=> {
     case FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED:
       return {...state, foiIsRequestUpdated: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_CATEGORYLIST:
-        return {...state, foiCategoryList: action.payload};   
-    case FOI_ACTION_CONSTANTS.FOI_SELECTED_CATEGORY:
-      return {...state, foiSelectedCategory: action.payload};
+        return {...state, foiCategoryList: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREALIST:
       return {...state, foiProgramAreaList: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_IS_REQUIRED_ERROR:
-      return {...state, foiIsRequiredError: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_REQUIRED_FIELDS:
-      const requiredFields = state.foirequiredFields;
-      requiredFields[action.payload.property] = action.payload.value;
-      return {...state, foirequiredFields: requiredFields};
-    case FOI_ACTION_CONSTANTS.FOI_SELECTED_ASSIGNED_TO:
-      return {...state, foiSelectedAssignedTo: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_SELECTED_REQUEST_TYPE:
-      return {...state, foiSelectedRequestType: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_SELECTED_RECEIVED_MODE:
-      return {...state, foiSelectedReceiveMode: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_SELECTED_DELIVERY_MODE:
-      return {...state, foiSelectedDeliveryMode: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION:
-      return {...state, foiRequestDescription: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_START_DATE:
-      return {...state, foiStartDate: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_END_DATE:
-      return {...state, foiEndDate: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_RECEIVED_DATE:
-      return {...state, foiReceivedDate: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_REQUEST_START_DATE:
-      return {...state, foiRequestStartDate: action.payload};
-    case FOI_ACTION_CONSTANTS.FOI_IS_MINISTRY_SELECTED:
-      return {...state, foiIsMinistrySelected: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST:
         return {...state, foiReceivedModeList: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST:
@@ -108,5 +78,4 @@ const foiRequests = (state = initialState, action)=> {
       return state;
   }
 }
-
 export default foiRequests ;

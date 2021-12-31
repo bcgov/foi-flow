@@ -13,29 +13,25 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
      *  Child details box in the UI
      *  No mandatory fields here
      */ 
-    
-      const validateFields = (request, name) => {
-        if (request !== undefined) {
-          if (name === FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME) {
-            return !!request.childFirstName ? request.childFirstName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME) {
-            return !!request.childMiddleName ? request.childMiddleName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME) {
-            return !!request.childLastName ? request.childLastName : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME) {
-            return !!request.childAlsoKnownAs ? request.childAlsoKnownAs : "";
-          }
-          else if (name === FOI_COMPONENT_CONSTANTS.CHILD_DOB) {
-            return !!request.childBirthDate ? formatDate(request.childBirthDate) : "";
-          }
-        }
-        else {
-          return "";
-        }
+
+    const validateFields = (data, name, options = {
+      dateFormat: false,
+      defaultValue: ""
+    }) => {
+      options.defaultValue = options.defaultValue || ""
+
+      if(!data) {
+        return options.defaultValue;
       }
+
+      if(options.dateFormat) {
+        return data[name] ? formatDate(data[name]) : options.defaultValue;
+      }
+
+      return data[name] || options.defaultValue;
+    }
+
+   
 
     //local states for Child FirstName, MiddleName, LastName, NickName and DOB
     const [childFirstNameText, setChildFirstName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME));
