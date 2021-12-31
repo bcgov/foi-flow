@@ -102,7 +102,6 @@ const FOIRequest = React.memo(({userDetail}) => {
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
-  const [quillChange, setQuillChange] = useState(false);
 
   const initialStatuses = {
     Request: {
@@ -394,12 +393,12 @@ const FOIRequest = React.memo(({userDetail}) => {
     if(editorChange) {
       confirmChangesLost(
         () => {
-          setQuillChange(false);
+          setEditorChange(false);
           setRemoveComment(true);
           changeTabLinkStatuses(param);
         },
         () => {
-          setQuillChange(true);
+          setEditorChange(true);
           setRemoveComment(false);          
         }
       )
