@@ -16,6 +16,7 @@ class FOIRequestNotification(db.Model):
     __tablename__ = 'FOIRequestNotifications' 
       # Defining the columns
     notificationid = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    foirequestid =db.Column(db.Integer,  nullable=False)
     requestid =db.Column(db.Integer,  db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))    
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
@@ -34,22 +35,26 @@ class FOIRequestNotification(db.Model):
     def savenotification(cls,foinotification)->DefaultMethodResult:
         db.session.add(foinotification)
         db.session.commit()
-        return DefaultMethodResult(True,'Request added',foinotification.requestid)
+        return DefaultMethodResult(True,'Notification added',foinotification.requestid)
 
     @classmethod 
-    def getconsolidatednotifications(cls, userid):
-        sql = """select idnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby from (   
-                    select frn.idnumber, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype  from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval '10' day
+    def getconsolidatednotifications(cls, userid, days):
+        sql = """select idnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
+                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
                     union all
-                    select frn.idnumber, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval '10' day
+                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
                   ) as notf order by created_at desc"""
-        rs = db.session.execute(text(sql), {'userid': userid})
+        rs = db.session.execute(text(sql), {'userid': userid, 'days': days})
         notifications = []
         for row in rs:
-            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
         return notifications
 
-       
+    @classmethod
+    def dismissnotification(cls, notificationids):
+        db.session.query(FOIRequestNotification).filter(FOIRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Notifications deleted ', notificationids)       
 
 class FOIRequestNotificationSchema(ma.Schema):
     class Meta:

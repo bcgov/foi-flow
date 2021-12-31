@@ -17,8 +17,8 @@ class stateevent:
         state = self.__haschanged(requestid, requesttype)
         if state is not None:
             _commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
-            self.__createnotification(requestid, state, requesttype, userid)
-            if _commentresponse.success == True:
+            _notificationresponse = self.__createnotification(requestid, state, requesttype, userid)
+            if _commentresponse.success == True and _notificationresponse.success == True :
                 return DefaultMethodResult(True,'Comment posted',requestid)
             else:   
                 return DefaultMethodResult(False,'unable to post comment',requestid)
@@ -45,7 +45,7 @@ class stateevent:
 
     def __createnotification(self, requestid, state, requesttype, userid):
         notification = self.__preparenotification(state)
-        notificationservice().createnotification(notification, requestid, requesttype, "State", userid)
+        return notificationservice().createnotification(notification, requestid, requesttype, "State", userid)
 
     def __preparenotification(self, state):
         return self.__notificationmessage(state)

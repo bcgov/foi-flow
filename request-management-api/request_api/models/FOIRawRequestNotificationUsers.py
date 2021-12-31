@@ -38,6 +38,26 @@ class FOIRawRequestNotificationUser(db.Model):
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
 
+    @classmethod 
+    def getnotificationsbyid(cls, notificationuserid):
+        sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
+                    where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where notificationuserid  = :notificationuserid) group by notificationid """
+        rs = db.session.execute(text(sql), {'notificationuserid': notificationuserid})
+        notifications = []
+        for row in rs:
+            notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        return notifications
+    
+    @classmethod 
+    def getnotificationsbyuser(cls, userid):
+        sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
+                    where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where userid = :userid) group by notificationid """
+        rs = db.session.execute(text(sql), {'userid': userid})
+        notifications = []
+        for row in rs:
+            notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        return notifications
+
 class FOIRawRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 

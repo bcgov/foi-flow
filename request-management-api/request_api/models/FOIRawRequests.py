@@ -145,6 +145,17 @@ class FOIRawRequest(db.Model):
         return [row[0] for row in rs][0]
 
     @classmethod
+    def getassignmenttransition(cls,requestid):
+        sql = """select version, assignedto, status from "FOIRawRequests" 
+                    where requestid = :requestid
+                    order by version desc limit 2;"""
+        rs = db.session.execute(text(sql), {'requestid': requestid})
+        assignments = []
+        for row in rs:
+            assignments.append({"assignedto": row["assignedto"], "status": row["status"], "version": row["version"]})
+        return assignments
+    
+    @classmethod
     def getversionforrequest(cls,requestid):   
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
