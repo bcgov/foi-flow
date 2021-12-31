@@ -34,7 +34,7 @@ class FOIRequestNotification(db.Model):
     def savenotification(cls,foinotification)->DefaultMethodResult:
         db.session.add(foinotification)
         db.session.commit()
-        return DefaultMethodResult(True,'Request added',foinotification.requestid)
+        return DefaultMethodResult(True,'Notification added',foinotification.requestid)
 
     @classmethod 
     def getconsolidatednotifications(cls, userid):
@@ -49,7 +49,11 @@ class FOIRequestNotification(db.Model):
             notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
         return notifications
 
-       
+    @classmethod
+    def dismissnotification(cls, notificationids):
+        db.session.query(FOIRequestNotification).filter(FOIRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Notifications deleted ', notificationids)       
 
 class FOIRequestNotificationSchema(ma.Schema):
     class Meta:
