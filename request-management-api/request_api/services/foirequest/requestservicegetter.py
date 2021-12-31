@@ -158,7 +158,6 @@ class requestservicegetter:
                 }                    
           
     def __preparepersonalattribute(self, personalattribute):
-        print(personalattribute)
         if personalattribute['personalattributeid'] == 1:                   
             return {'publicServiceEmployeeNumber': personalattribute['attributevalue']}, "main"
         

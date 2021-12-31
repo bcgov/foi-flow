@@ -135,9 +135,7 @@ export const updateAdditionalInfo = (name, value, requestObject) => {
     };
   }
 
-  if (Object.keys(requestObject.additionalPersonalInfo).indexOf(name) > -1) {
-    requestObject.additionalPersonalInfo[name] = value;
-  }
+  requestObject.additionalPersonalInfo[name] = value;
   return requestObject;
 };
 
