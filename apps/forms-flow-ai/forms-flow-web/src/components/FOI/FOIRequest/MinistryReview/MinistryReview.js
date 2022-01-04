@@ -95,9 +95,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
-  //quillChange and removeComment added to handle Navigate away from Comments tabs
-  const [quillChange, setQuillChange] = useState(false);
-
+  
   const initialStatuses = {
     Request: {
       display: false,
@@ -139,7 +137,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
     
-  }, [requestId, comment, attachments]);
+  }, [requestId]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -316,15 +314,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
       return;
     }
 
-    if (quillChange) {
+    if (editorChange) {
       confirmChangesLost(
         () => {
-          setQuillChange(false);
+          setEditorChange(false);
           setRemoveComment(true);
           changeTabLinkStatuses(param);
         },
         () => {
-          setQuillChange(true);
+          setEditorChange(true);
           setRemoveComment(false);
         }
       );
@@ -357,10 +355,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   };
 
-  const pubmindivstagestomain = (divstages) => {
+  const pubmindivstagestomain = (_divstages) => {
 
-    saveMinistryRequestObject.divisions = divstages
-    setdivStages(divstages)
+    saveMinistryRequestObject.divisions = _divstages
+    setdivStages(_divstages)
   }
 
 
