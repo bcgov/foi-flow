@@ -137,7 +137,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
     
-  }, [requestId, comment, attachments]);
+  }, [requestId]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
