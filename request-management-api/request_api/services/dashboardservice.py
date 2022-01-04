@@ -10,11 +10,13 @@ import pytz
 import maya
 
 class dashboardservice:
+    """ FOI dashboard management service
 
+    This service class manages dashboard retrival for both unopened and opened request with consideration of user types.
 
+    """
 
-    def getrequestqueue(groups=None):
-            
+    def getrequestqueue(self, groups=None):            
             requests = []
             openedrequests = []
             if "Intake Team" in groups or groups is None:                
@@ -28,65 +30,39 @@ class dashboardservice:
             
             for request in requests:
 
-                firstName , lastName, requestType = '','',''
-               
-                _receivedDate = request.created_at
-                                
-                dt = maya.parse(_receivedDate).datetime(to_timezone='America/Vancouver', naive=False)
-                _receivedDate = dt
+                firstname , lastname, requesttype = '','',''
+                dt = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+                _receiveddate = dt
                 
                                 
                 if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
-                    firstName = request.requestrawdata['firstName']
-                    lastName =  request.requestrawdata['lastName']
-                    requestType =  request.requestrawdata['requestType']
-                    _receivedDate = parser.parse(request.requestrawdata['receivedDateUF'])
+                    firstname = request.requestrawdata['firstName']
+                    lastname =  request.requestrawdata['lastName']
+                    requesttype =  request.requestrawdata['requestType']
+                    _receiveddate = parser.parse(request.requestrawdata['receivedDateUF'])
                 elif (request.sourceofsubmission!= "intake" and request.version == 1):               
-                    firstName = request.requestrawdata['contactInfo']['firstName']
-                    lastName = request.requestrawdata['contactInfo']['lastName']
-                    requestType = request.requestrawdata['requestType']['requestType']
+                    firstname = request.requestrawdata['contactInfo']['firstName']
+                    lastname = request.requestrawdata['contactInfo']['lastName']
+                    requesttype = request.requestrawdata['requestType']['requestType']
 
                 rawrequestwatchers = FOIRawRequestWatcher.getwatchers(request.requestid)
-                unopenrequest = {'id': request.requestid,
-                                 'firstName': firstName,
-                                 'lastName': lastName,
-                                 'requestType': requestType,
-                                 'currentState': request.status,
-                                 'receivedDate': _receivedDate.strftime('%Y %b, %d'),
-                                 'receivedDateUF': _receivedDate.strftime('%Y-%m-%d %H:%M:%S.%f'),
-                                 'assignedGroup': request.assignedgroup,
-                                 'assignedTo': request.assignedto,
-                                 'xgov': 'No',
-                                 'idNumber': 'U-00' + str(request.requestid),
-                                 'version':request.version,
-                                 'watchers':rawrequestwatchers
-                                 }
+                unopenrequest = self.__preparefoirequestinfo(request.requestid, firstname, lastname, requesttype, 
+                                                              request.status, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedgroup, 
+                                                              request.assignedto, 'U-00' + str(request.requestid), request.version, rawrequestwatchers)
                 requestqueue.append(unopenrequest)
 
             for openrequest in openedrequests : 
                     watchers = FOIRequestWatcher.getNonMinistrywatchers(openrequest['ministryrequestid'])
-                    _openrequest = {'id': openrequest["id"],
-                                 'firstName':  openrequest["firstName"],
-                                 'lastName':  openrequest["lastName"],
-                                 'requestType':  openrequest["requestType"],
-                                 'currentState':  openrequest["currentState"],
-                                 'receivedDate':  openrequest["receivedDate"],
-                                 'receivedDateUF':  openrequest["receivedDateUF"],
-                                 'assignedGroup':  openrequest["assignedGroup"],
-                                 'assignedTo':  openrequest["assignedTo"],
-                                 'xgov': 'No',
-                                 'idNumber':  openrequest["idNumber"],
-                                 'version': openrequest["version"],
-                                 'ministryrequestid':openrequest['ministryrequestid'],
-                                 'watchers':watchers
-                                 }
-                    requestqueue.append(_openrequest)
-                        
+                    _openrequest = self.__preparefoirequestinfo(openrequest["id"], openrequest["firstName"], openrequest["lastName"],
+                                                                 openrequest["requestType"], openrequest["currentState"], openrequest["receivedDate"], 
+                                                                 openrequest["receivedDateUF"], openrequest["assignedGroup"], openrequest["assignedTo"],
+                                                                 openrequest["idNumber"], openrequest["version"], watchers)
+                    _openrequest.update({'ministryrequestid':openrequest['ministryrequestid']})
+                    requestqueue.append(_openrequest)                        
             return requestqueue
 
-    def getministryrequestqueue (groups=None):
-            openedrequests = []
-            
+    def getministryrequestqueue (self, groups=None):
+            openedrequests = []            
             for group in groups:
                 _teamrequests = FOIMinistryRequest.getrequests(group)
                 openedrequests+=_teamrequests
@@ -95,24 +71,35 @@ class dashboardservice:
             
             for openrequest in openedrequests : 
                     watchers = FOIRequestWatcher.getMinistrywatchers(openrequest['ministryrequestid'])
-                    _openrequest = {'id': openrequest["id"],                                 
-                                 'requestType':  openrequest["requestType"],
-                                 'currentState':  openrequest["currentState"],
-                                 'receivedDate':  openrequest["receivedDate"],
-                                 'receivedDateUF':  openrequest["receivedDateUF"],
-                                 'assignedGroup':  openrequest["assignedGroup"],
-                                 'assignedTo':  openrequest["assignedTo"],
-                                 'assignedministrygroup':  openrequest["assignedministrygroup"],
-                                 'assignedministryperson':  openrequest["assignedministryperson"],
-                                 'cfrstatus': 'Select Division',
-                                 'cfrduedate': openrequest["cfrDueDate"],
-                                 'duedate': openrequest["dueDate"],
-                                 'idNumber':  openrequest["idNumber"],
-                                 'version': openrequest["version"],
-                                 'ministryrequestid':openrequest['ministryrequestid'],
-                                 'applicantcategory':openrequest['applicantcategory'],
-                                 'watchers':watchers
-                                 }
+                    _openrequest = self.__preparebaserequestinfo(openrequest["id"], openrequest["requestType"], openrequest["currentState"], 
+                                                                 openrequest["receivedDate"], openrequest["receivedDateUF"], openrequest["assignedGroup"], 
+                                                                 openrequest["assignedTo"], openrequest["idNumber"], openrequest["version"], watchers)
+                    _openrequest.update({'assignedministrygroup': openrequest['assignedministrygroup']})
+                    _openrequest.update({'assignedministryperson':openrequest['assignedministryperson']})
+                    _openrequest.update({'cfrstatus':'Select Division'})
+                    _openrequest.update({'cfrduedate':openrequest['cfrDueDate']})
+                    _openrequest.update({'duedate':openrequest['dueDate']})
+                    _openrequest.update({'ministryrequestid':openrequest['ministryrequestid']})
+                    _openrequest.update({'applicantcategory':openrequest['applicantcategory']})
                     requestqueue.append(_openrequest)
-                        
-            return requestqueue  
+            return requestqueue 
+    
+    def __preparefoirequestinfo(self, id, firstname, lastname, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers):
+        baserequestinfo = self.__preparebaserequestinfo(id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers)
+        baserequestinfo.update({'firstName': firstname})
+        baserequestinfo.update({'lastName': lastname})
+        baserequestinfo.update({'xgov': 'No'})
+        return baserequestinfo
+        
+    def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, watchers):
+        return {'id': id,
+            'requestType': requesttype,
+            'currentState': status,
+            'receivedDate': receiveddate,
+            'receivedDateUF': receiveddateuf,
+            'assignedGroup': assignedgroup,
+            'assignedTo': assignedto,            
+            'idNumber': idnumber,
+            'version':version,
+            'watchers':watchers
+        }

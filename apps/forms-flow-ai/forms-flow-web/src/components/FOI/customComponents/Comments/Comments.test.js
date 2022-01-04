@@ -1,9 +1,7 @@
-import {render, screen, cleanup} from '@testing-library/react';
 import renderer from 'react-test-renderer';
-import { Provider } from "react-redux";
+import { Provider ,useSelector } from "react-redux";
 import configureStore from 'redux-mock-store'
 import CommentSection from './index';
-import { useSelector } from "react-redux";
 import { shallow } from 'enzyme';
 
 jest.mock("react-redux", () => ({
@@ -24,7 +22,7 @@ describe('FOI Comments component', () => {
 
     const initialState = {output:10}
     const mockStore = configureStore()
-    let store,wrapper
+    let store
    
     it("FOI Comments Rendering Unit test - shallow check", () => {
         store = mockStore(initialState)

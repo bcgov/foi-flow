@@ -6,7 +6,8 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
@@ -244,7 +245,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
       case "cfr-feeassessed":
         return "cfr - fee estimate";
       case "signoff-response":
-        return "signoff > response";
+        return "signoff - response";
       case "harms-review":
         return "harms assessment - review";
       case "personal":

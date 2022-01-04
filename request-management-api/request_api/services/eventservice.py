@@ -12,7 +12,6 @@ class eventservice:
     """ FOI event management service
 
     """
-    @classmethod    
     def postevent(self, requestid, requesttype):
         stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype)
         divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype)
