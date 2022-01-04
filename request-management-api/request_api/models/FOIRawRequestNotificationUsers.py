@@ -58,6 +58,12 @@ class FOIRawRequestNotificationUser(db.Model):
             notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
         return notifications
 
+    @classmethod
+    def deletebynotificationid(cls, notificationids):
+        db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.notificationid.in_(notificationids)).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Notifications deleted for id',notificationids)  
+    
 class FOIRawRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 

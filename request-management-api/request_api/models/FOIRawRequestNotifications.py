@@ -41,6 +41,21 @@ class FOIRawRequestNotification(db.Model):
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted ', notificationids)
 
+    @classmethod
+    def deletebynotificationid(cls, notificationids):
+        db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Notifications deleted for id',notificationids) 
+
+    @classmethod
+    def getnotificationidsbynumber(cls, idnumber, notificationtypeid):
+        sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
+        rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeid': notificationtypeid})
+        notificationids = []
+        for row in rs:
+            notificationids.append(row["notificationid"])
+        return notificationids
+    
 class FOIRawRequestNotificationSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'requestid', 'idnumber','notification', 'notificationtypeid','created_at','createdby','updated_at','updatedby','notificationusers') 
