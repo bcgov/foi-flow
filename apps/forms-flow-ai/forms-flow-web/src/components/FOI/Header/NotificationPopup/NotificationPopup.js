@@ -6,17 +6,16 @@ import NotificationList from './NotificationList/NotificationList'
 const NotificationPopup = ({notifications}) => {
 
   const assigmentNotifications = notifications?.map((notification,index) =>
-    {notification.notificationusertype === 'Assignee' &&
+    {return notification.notificationusertype === 'Assignee' &&
       <NotificationList key= {index} notification={notification}></NotificationList>
     }
   )
 
   const watchNotifications = notifications?.map((notification,index) =>
-  {notification.notificationusertype === 'Watcher' &&
-    <NotificationList key= {index} notification={notification}></NotificationList>
-  }
-)
-
+    {return notification.notificationusertype === 'Watcher' &&
+      <NotificationList key= {index} notification={notification}></NotificationList>
+    }
+  )
 
   return (
     <Tabs defaultActiveKey="my-request" id="uncontrolled-tab-example" className="notification-tab">
