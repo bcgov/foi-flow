@@ -32,8 +32,8 @@ const FOI_COMPONENT_CONSTANTS = {
     PROVINCE: "province",
     COUNTRY: "country",
 
-    START_DATE: "fromDate",
-    END_DATE: "toDate",
+    FROM_DATE: "fromDate",
+    TO_DATE: "toDate",
     DESCRIPTION: "description",
     IS_PROGRAM_AREA_SELECTED: "isProgramAreaSelected",
     PROGRAM_AREA_LIST: "programAreaList",
