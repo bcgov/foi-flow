@@ -7,7 +7,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import TextField from '@material-ui/core/TextField';
-import '../confirmationmodal.scss';
+import '../ConfirmationModal/confirmationmodal.scss';
 import './attachmentmodal.scss';
 import FileUpload from '../FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
@@ -79,7 +79,6 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
 
     const containDuplicate = (fname) => {
       if(attachment.filename !== (fname+"."+extension)) {
-        // return attachmentFileNameListByCategory.includes(fname+"."+extension);
         return attchmentFileNameList.includes((fname+"."+extension).toLocaleLowerCase());
       } else {
         return false;
@@ -214,9 +213,9 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 <FileUpload attachment={attachment}  attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={mimeTypes} maxFileSize={maxFileSize} totalFileSize={totalFileSize} updateFilesCb={updateFilesCb} /> 
                 :
                 (modalFor === 'rename'?
-                <div class="row">
-                  <div class="col-sm-1"></div>
-                  <div class="col-sm-9">
+                <div className="row">
+                  <div className="col-sm-1"></div>
+                  <div className="col-sm-9">
                     <TextField                            
                     label="Rename Attachment"
                     InputLabelProps={{ shrink: true, }}
@@ -228,10 +227,10 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                     helperText={errorMessage}
                     />
                   </div>
-                  <div class="col-sm-1 extension-name">
+                  <div className="col-sm-1 extension-name">
                     .{extension}
                   </div>
-                  <div class="col-sm-1"></div>
+                  <div className="col-sm-1"></div>
                 </div>                 
                 : null)
               }

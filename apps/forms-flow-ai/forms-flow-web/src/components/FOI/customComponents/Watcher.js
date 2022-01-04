@@ -6,7 +6,7 @@ import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
 import './Watcher.scss'
-import { saveWatcher, fetchFOIWatcherList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { saveWatcher, fetchFOIWatcherList } from "../../../apiManager/services/FOI/foiWatcherServices";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

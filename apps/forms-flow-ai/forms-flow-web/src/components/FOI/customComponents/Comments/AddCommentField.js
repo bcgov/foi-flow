@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
 import { convertToRaw, EditorState } from "draft-js";
@@ -64,9 +64,8 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditor
     return commentmentions;
   }
 
-  const _handleChange = (editorState) => {    
-    const currentContent = editorState.getCurrentContent();
-    const rawContentState = convertToRaw(currentContent);    
+  const _handleChange = (_editorState) => {    
+    const currentContent = _editorState.getCurrentContent();        
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
     let _textLength = maxcharacterlimit - (currentContentLength - selectedTextLength)
@@ -74,7 +73,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditor
       {setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))}
   
     setuftext(currentContent.getPlainText(''))
-    setEditorState(editorState);
+    setEditorState(_editorState);
     setEditorChange(currentContentLength > 0)
   }
 
@@ -110,7 +109,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditor
           }
 
           currentKey = currentContent.getKeyAfter(currentKey);
-        };
+        }
       }
     }
 

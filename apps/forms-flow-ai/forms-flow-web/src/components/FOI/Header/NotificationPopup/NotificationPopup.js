@@ -5,9 +5,17 @@ import NotificationList from './NotificationList/NotificationList'
 
 const NotificationPopup = ({notifications}) => {
 
-  const listItems = notifications?.map((notification,index) =>
-    <NotificationList key= {index} notification={notification}></NotificationList>
+  const assigmentNotifications = notifications?.map((notification,index) =>
+    {notification.notificationusertype === 'Assignee' &&
+      <NotificationList key= {index} notification={notification}></NotificationList>
+    }
   )
+
+  const watchNotifications = notifications?.map((notification,index) =>
+  {notification.notificationusertype === 'Watcher' &&
+    <NotificationList key= {index} notification={notification}></NotificationList>
+  }
+)
 
 
   return (
@@ -22,7 +30,7 @@ const NotificationPopup = ({notifications}) => {
         </Row> */}
         {(notifications || []).find(notification => notification.notificationusertype === 'Assignee') ?
         <ListGroup className="notification-list">
-        {listItems}
+        {assigmentNotifications}
         </ListGroup>
         :
         <ListGroup className="notification-list empty-notifications">
@@ -40,7 +48,7 @@ const NotificationPopup = ({notifications}) => {
         </Row> */}
         {(notifications || []).find(notification => notification.notificationusertype === 'Watcher') ?
         <ListGroup className="notification-list">
-        {listItems}
+        {watchNotifications}
         </ListGroup>
         : 
         <ListGroup className="notification-list empty-notifications">
