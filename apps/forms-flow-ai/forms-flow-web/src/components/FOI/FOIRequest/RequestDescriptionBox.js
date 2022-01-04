@@ -157,7 +157,11 @@ const RequestDescription = React.memo(({
         <Card className="foi-details-card">            
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
-                <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose}/>
+                <RequestDescriptionHistory 
+                  requestDescriptionHistoryList={sortedList} 
+                  openModal={openModal} 
+                  handleModalClose={handleModalClose}
+                />
                 <div className="row foi-details-row">
                 <div className="foi-request-description-history">
                     <button type="button" className={`btn btn-link btn-description-history ${sortedList.length <= 1 ? classes.btndisabled : ""}`} disabled={sortedList.length <= 1}  onClick={handleDescriptionHistoryClick}>
