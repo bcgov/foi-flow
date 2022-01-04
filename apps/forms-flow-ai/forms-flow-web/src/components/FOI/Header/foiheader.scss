@@ -36,14 +36,10 @@ nav h2 {
 }
 
 .bell-icon {
-  // margin-right: 40px;
   padding-top: 0.5rem;
   
   .MuiBadge-badge{
     visibility: visible !important;
-    // height: 18px;
-    // min-width: 15px !important;
-
   }
 
   .MuiBadge-anchorOriginTopRightRectangle {
@@ -88,7 +84,6 @@ nav h2 {
   background-color: #fff !important;
   width: 390px !important;
   top: 75px !important;
-  left: 835px !important;
   padding: 0px !important;
   z-index: 1400 !important;
 }
@@ -105,8 +100,7 @@ nav h2 {
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   background-color: #E5EAEF;
-  // height: 60px;
-  // margin-top: 24px;
+  cursor: pointer;
 }
 
 .drawer-div{
@@ -114,6 +108,7 @@ nav h2 {
   width: 30px;
   margin-right: 40px;
   height: 70px;
+  cursor: pointer;
 }
 
 

@@ -57,6 +57,16 @@ export const httpPUTRequest = (url, data, token, isBearer = true) => {
   });
 };
 
+export const httpDELETERequest = (url, data, token, isBearer = true) => {
+  return axios.delete(url, data, {
+    headers: {
+      Authorization: isBearer
+        ? `Bearer ${token || UserService.getToken()}`
+        : token,
+    },
+  });
+};
+
 /*export const httpPUTRequest = (url, data, token, isBearer=true) => {
   return axios.put(url, data, { headers: { Authorization: isBearer ?`Bearer ${ token || UserService.getToken()}`: token } });
 };*/

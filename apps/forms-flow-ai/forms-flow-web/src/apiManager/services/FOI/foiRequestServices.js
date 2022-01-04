@@ -4,6 +4,7 @@ import {
   httpOSSPUTRequest,
   httpOSSGETRequest,
   httpPUTRequest,
+  httpDELETERequest,
 } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
@@ -32,7 +33,8 @@ import {
   setRawRequestComments,
   setMinistryRequestComments,
   setRawRequestAttachments,
-  setMinistryRequestAttachments
+  setMinistryRequestAttachments,
+  setFOINotifications
 } from "../../../actions/FOI/foiRequestActions";
 import UserService from "../../../services/UserService";
 import { replaceUrl, addToFullnameList, getAssignToList, getFullnameTeamList } from "../../../helper/FOI/helper";
@@ -1144,6 +1146,58 @@ export const deleteMinistryRequestNote = (data, commentid,ministryId, ...rest) =
         .catch((error) => {
           dispatch(serviceActionError(error));
           dispatch(setFOIAttachmentListLoader(false));
+          done(error);
+        });
+    };
+  };
+
+  export const fetchFOINotifications = (...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_NOTIFICATIONS, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            let data = res.data.map((foiNotifications) => {
+              return { ...foiNotifications };
+            });
+            dispatch(setFOINotifications(data));
+            dispatch(setFOILoader(false));
+            done(null, res.data);
+          } else {
+            console.log("Error", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+          done(error);
+        });
+    };
+  };
+
+  export const deleteFOINotification = (idNumber, notificationId,data, ...rest) => {
+    const done = rest.length ? rest[0] : () => { };
+    let apiUrl = replaceUrl(replaceUrl(
+      API.FOI_DELETE_NOTIFICATION,
+      "<idNumber>",
+      idNumber
+    ), "<notificationId>", notificationId);
+    return (dispatch) => {
+      httpDELETERequest(apiUrl, data)
+        .then((res) => {
+          dispatch(fetchFOINotifications())
+          if (res.data) {
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            done("Error dismissing Notification");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
           done(error);
         });
     };

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useEffect,useState } from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
@@ -9,7 +9,9 @@ import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
 import Popup from 'reactjs-popup';
 import NotificationPopup from "./NotificationPopup/NotificationPopup";
-
+import {
+  fetchFOINotifications
+} from "../../../apiManager/services/FOI/foiRequestServices";
 
 const FOIHeader = React.memo(() => { 
 
@@ -21,19 +23,35 @@ const FOIHeader = React.memo(() => {
 }
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
-
+const [screenPosition, setScreenPosition] = useState(0);
 const [open, setOpen] = useState(false);
 const closeModal = () => setOpen(false);
-const openModal = () => {
-  // console.log(`Before setting=${open}`);
+const openModal = (coordinates) => {
+  const screenX = coordinates.pageX;
+  setScreenPosition(screenX);
+  console.log(screenX);
   setOpen(!open);
 }
+
+let foiNotifications = useSelector(state=> state.foiRequests.foiNotifications);
+
+useEffect(() => {     
+  dispatch(fetchFOINotifications());
+  const fetchNotifications = () =>{
+    dispatch(fetchFOINotifications());
+  }
+  setInterval(() => {
+    fetchNotifications();
+  }, 900000);
+},[dispatch]);
+
+
 
 const triggerPopup = () => {
   return(
     <> 
-    <Badge badgeContent={6} color="secondary">
-      <i style={{color: open==true ? "#003366" : "white",cursor: "pointer"}}  onClick={openModal} className="fa fa-bell-o foi-bell"></i>
+    <Badge badgeContent={foiNotifications?.length} color="secondary">
+      <i style={{color: open? "#003366" : "white",cursor: "pointer"}} className="fa fa-bell-o foi-bell"></i>
     </Badge>
    </>
   )
@@ -67,7 +85,7 @@ const triggerPopup = () => {
                           <span className="navbar-text">  {user.name || user.preferred_username || ""} </span>
                       </li>
                       <li className="bell-icon foinavitem" >
-                      <div className={`drawer-div ${open == true ? 'notification-popup-drawer' : ''}`}>
+                      <div onClick={(e) => openModal(e)} className={`drawer-div ${open && 'notification-popup-drawer'}`}>
                         <Popup className="notification-popup" 
                         role='tooltip'
                         open={open} 
@@ -77,9 +95,10 @@ const triggerPopup = () => {
                         }
                         nested
                         closeOnDocumentClick 
+                        contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup></NotificationPopup>
+                        <NotificationPopup notifications={foiNotifications} ></NotificationPopup>
                         </Popup>
                       </div>
                       </li>

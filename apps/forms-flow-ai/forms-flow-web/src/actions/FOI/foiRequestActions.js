@@ -223,3 +223,10 @@ export const setMinistryRequestAttachments = (data) => dispatch => {
         payload:data      
     })
 }
+
+export const setFOINotifications = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_NOTIFICATIONS,
+        payload:data
+    })
+}

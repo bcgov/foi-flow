@@ -35,6 +35,7 @@
     background-color: #E5EAEF !important;
     border-bottom-left-radius: 10px !important;
     border-bottom-right-radius: 10px !important;
+    min-height: 300px;
 }
 
 .list-header{
@@ -58,4 +59,9 @@
 .notification-dismiss {
     font-weight: bold;
     font-size: 15px;
+}
+
+.empty-notifications{
+    text-align: center;
+    justify-content: center;
 }

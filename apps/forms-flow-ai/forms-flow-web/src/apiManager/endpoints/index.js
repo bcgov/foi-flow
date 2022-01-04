@@ -47,6 +47,10 @@ const API = {
   FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>/documentid/<documentid>/replace`,
   FOI_DELETE_ATTACHMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>/documentid/<documentid>/delete`,
   FOI_DELETE_ATTACHMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>/documentid/<documentid>/delete`,
+
+  FOI_GET_NOTIFICATIONS:`${FOI_BASE_API_URL}/api/foinotifications`,
+  FOI_DELETE_NOTIFICATION: `${FOI_BASE_API_URL}/api/foinotifications/<idNumber>/<notificationId>`,
+  
 };
 
 export default API;

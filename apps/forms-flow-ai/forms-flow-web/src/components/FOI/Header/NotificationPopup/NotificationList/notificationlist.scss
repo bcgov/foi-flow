@@ -1,7 +1,7 @@
 
 .close-btn-align{
-
     text-align: right;
+    cursor: pointer;
 }
 
 .list-group-item:first-child {
@@ -26,4 +26,18 @@
     font-size: 15px;
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.redirect-url h1 {
+    color: #000000;
+}
+
+.notification-heading > a {
+    text-decoration: none!important;
+    color: #000000;
+}
+
+.notification-heading > a:hover {
+    text-decoration: none!important;
+    color: #000000;
 }
