@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react'
 import uuid from 'react-uuid'
 import { saveRawRequestNote, editRawRequestNote, saveMinistryRequestNote, editMinistryRequestNote, deleteMinistryRequestNote, deleteRawRequestNote } from '../../../../apiManager/services/FOI/foiRequestNoteServices'
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 export const ActionContext = createContext()
 export const ActionProvider = ({
@@ -57,26 +57,32 @@ export const ActionProvider = ({
     }
   }
 
-  const onSubmit = (text, parentId, child) => {
+  const getmaxcommentid = (_comments) => {
+    return _comments?.length > 0 && _comments.reduce(
+      (max, comment) => (comment?.commentId > max ? comment.commentId : max),
+      comments[0].commentId
+    );
+  }
+
+  const saverequestcomment = (text,taggedusers) => {
+    if (ministryId) {
+      dispatch(saveMinistryRequestNote({ "ministryrequestid": ministryId, "comment": text, "taggedusers": taggedusers }, ministryId));
+    }
+    else {
+      dispatch(saveRawRequestNote({ "requestid": requestid, "comment": text, "taggedusers": taggedusers }, requestid));
+    }
+  }
+  const onSubmit = (text, parentId, child, taggedusers) => {
     setFOILoader(true)
     if (text.length > 0) {
       if (!parentId && !child) {
-        if (ministryId) {
-          const _inputData = { "ministryrequestid": ministryId, "comment": text }
-          dispatch(saveMinistryRequestNote(_inputData, ministryId));
-        }
-        else {
-          const _inputData = { "requestid": requestid, "comment": text }
-          dispatch(saveRawRequestNote(_inputData, requestid));
-        }
-        const maxId = comments && comments.length > 0 && comments.reduce(
-          (max, comment) => (comment && comment.commentId > max ? comment.commentId : max),
-          comments[0].commentId
-        );
+        saverequestcomment(text,taggedusers)
+        const maxId = getmaxcommentid(comments)
         comments.push(
           {
             userId: currentUser.userId,
             commentId: maxId + 1,
+            commentTypeId: 1,
             avatarUrl: currentUser.avatarUrl,
             fullName: currentUser.name,
             text: text
@@ -89,6 +95,7 @@ export const ActionProvider = ({
         newList[index].replies.push({
           userId: currentUser.userId,
           commentId: uuid(),
+          commentTypeId: 1,
           avatarUrl: currentUser.avatarUrl,
           fullName: currentUser.name,
           text: text
@@ -104,16 +111,17 @@ export const ActionProvider = ({
         newReplies.push({
           userId: currentUser.userId,
           commentId: uuid(),
+          commentTypeId: 1,
           avatarUrl: currentUser.avatarUrl,
           fullName: currentUser.name,
           text: text
         })
         if (ministryId) {
-          const _inputData = { "ministryrequestid": ministryId, "comment": text, "parentcommentid": parentId }
+          const _inputData = { "ministryrequestid": ministryId, "comment": text, "parentcommentid": parentId, "taggedusers": taggedusers }
           dispatch(saveMinistryRequestNote(_inputData, ministryId));
         }
         else {
-          const _inputData = { "requestid": requestid, "comment": text, "parentcommentid": parentId }
+          const _inputData = { "requestid": requestid, "comment": text, "parentcommentid": parentId, "taggedusers": taggedusers }
           dispatch(saveRawRequestNote(_inputData, requestid));
         }
 
@@ -123,16 +131,16 @@ export const ActionProvider = ({
     }
   }
 
-  const editText = (id, text, parentId) => {
+  const editText = (id, text, parentId, taggedusers) => {
     setFOILoader(true)
     if (parentId === undefined) {
 
       if (ministryId) {
-        const _inputData = { "comment": text }
+        const _inputData = { "comment": text, "taggedusers": taggedusers }
         dispatch(editMinistryRequestNote(_inputData, id, ministryId));
       }
       else {
-        const _inputData = { "comment": text }
+        const _inputData = { "comment": text, "taggedusers": taggedusers }
         dispatch(editRawRequestNote(_inputData, id, requestid));
       }
 
@@ -142,11 +150,11 @@ export const ActionProvider = ({
       setComment(newList)
     } else if (parentId !== undefined) {
       if (ministryId) {
-        const _inputData = { "comment": text }
+        const _inputData = { "comment": text, "taggedusers": taggedusers }
         dispatch(editMinistryRequestNote(_inputData, id, ministryId));
       }
       else {
-        const _inputData = { "comment": text }
+        const _inputData = { "comment": text, "taggedusers": taggedusers }
         dispatch(editRawRequestNote(_inputData, id, requestid));
       }
       const newList = [...comments]
@@ -180,16 +188,15 @@ export const ActionProvider = ({
     }
   }
 
-  const submit = (cancellor, text, parentId, edit, setText, child) => {
-
+  const submit = (cancellor, text, taggedusers, parentId, edit, child) => {
     if (edit) {
-      editText(cancellor, text, parentId)
+      editText(cancellor, text, parentId, taggedusers)
       handleCancel(cancellor, edit)
-      setText('')
+
     } else {
-      onSubmit(text, parentId, child)
+      onSubmit(text, parentId, child, taggedusers)
       handleCancel(cancellor)
-      setText('')
+
     }
   }
 

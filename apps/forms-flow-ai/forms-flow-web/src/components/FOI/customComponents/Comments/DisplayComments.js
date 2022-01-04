@@ -1,4 +1,4 @@
-import React, { useContext,useState,useEffect } from 'react'
+import React, { useContext, useState } from 'react'
 import './comments.scss'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
@@ -6,30 +6,38 @@ import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, setQuillChange, removeComment, setRemoveComment }) => {
+
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, setEditorChange, removeComment, setRemoveComment }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
-  const getfullName = (userId) => {
-    let user;
+  const finduserbyuserid = (userId) => {
+    let user = fullnameList.find(u => u.username === userId);
+    return user && user.fullname ? user.fullname : userId;
 
-    if(fullnameList) {
-      user = fullnameList.find(u => u.username === userId);
-      return user && user.fullname ? user.fullname : userId;
+  }
+
+  const getfullName = (commenttypeid, userId) => {
+
+    if (commenttypeid === 1) {
+      if (fullnameList) {
+        return finduserbyuserid(userId)
+      } else {
+
+        if (iaoassignedToList.length > 0) {
+          addToFullnameList(iaoassignedToList, "iao");
+          setFullnameList(getFullnameList());
+        }
+
+        if (ministryAssignedToList.length > 0) {
+          addToFullnameList(iaoassignedToList, bcgovcode);
+          setFullnameList(getFullnameList());
+        }
+
+        return finduserbyuserid(userId)
+      }
     } else {
-
-      if(iaoassignedToList.length > 0) {
-        addToFullnameList(iaoassignedToList, "iao");
-        setFullnameList(getFullnameList());
-      }
-  
-      if(ministryAssignedToList.length > 0) {
-        addToFullnameList(iaoassignedToList, bcgovcode);
-        setFullnameList(getFullnameList());
-      }
-  
-      user = fullnameList.find(u => u.username === userId);
-      return user && user.fullname ? user.fullname : userId;
+      return "Request History"
     }
   }
 
@@ -57,11 +65,40 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
   }
 
-  
+
   const [showmorehidden, setshowmorehidden] = useState(false)
 
+  const checkcommentlengthforindex = (comment, index) => {
+    var commentlenghchecker = new Object()
+
+    commentlenghchecker.totalcharacterCount = comment.text.length
+    commentlenghchecker.reachedLimit = false
+    commentlenghchecker.returnindex = 3
+    
+    if (commentlenghchecker.totalcharacterCount > 2000 && index > 3) {
+      commentlenghchecker.returnindex = index
+      commentlenghchecker.reachedLimit = true
+      return commentlenghchecker
+    }
+
+    if (comment.replies && comment.replies.length > 0) {
+      comment.replies.forEach((reply) => {
+        if (!commentlenghchecker.reachedLimit) {
+          commentlenghchecker.totalcharacterCount += reply.text.length
+          if (commentlenghchecker.totalcharacterCount > 2000 && index > 3) {
+            commentlenghchecker.returnindex = index
+            commentlenghchecker.reachedLimit = true
+            return commentlenghchecker
+          }
+        }
+      })
+    }
+
+    return commentlenghchecker
+  }
+
   const dynamicIndexFinder = () => {
-    var _commentscopy = [...comments]    
+    var _commentscopy = [...comments]
     var returnindex = 3
     var totalcharacterCount = 0
     var reachedLimit = false;
@@ -69,24 +106,10 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     _commentscopy.forEach((comment, index) => {
 
       if (!reachedLimit) {
-        totalcharacterCount += comment.text.length
-
-        if (comment.replies && comment.replies.length > 0) {
-          comment.replies.forEach((reply) => {
-            if (!reachedLimit) {
-              totalcharacterCount += reply.text.length
-              if (totalcharacterCount > 2000  && index > 3) {
-                returnindex = index
-                reachedLimit = true
-              }
-            }
-          })
-        }
-
-        if (totalcharacterCount > 2000 && index > 3) {
-          returnindex = index
-          reachedLimit = true
-        }
+        var commentlenghchecker = checkcommentlengthforindex(comment, index)
+        totalcharacterCount += commentlenghchecker.totalcharacterCount
+        reachedLimit = commentlenghchecker.reachedLimit
+        returnindex = commentlenghchecker.returnindex
       }
 
     })
@@ -94,116 +117,106 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     return returnindex;
   }
 
- 
+
   let limit = dynamicIndexFinder()
-  
-  useEffect(() => {    
-    // if(!showmorehidden)
-    //   {setshowmorehidden(comments.length < 3)}
-  }, [comments])
 
-  const actions = useContext(ActionContext)
-  
+  const gettotalcommentflag = (i) => {
+    return i.replies?.length > 0 ? -100 : -101
+  }
 
-  return (
-    <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
-   
-      {
-      comments.length === 0 ?<div className="nofiltermessage">No comments under this filter category</div>:
-      comments.map((i, index) => (
-        <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit && !showmorehidden ? { display: 'none' } : {display: 'block'}}>
-          {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
-            actions.customInput ? (
-              actions.customInput({
-                cancellor: i.commentId,
-                value: i.text,
-                handleCancel: actions.handleCancel,
-                submit: actions.submit,
-                edit: true
-              })
-            ) : (
-              <InputField cancellor={i.commentId} value={i.text} edit 
-               //Handles Navigate Away
-              setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
-            )
+  const renderreplies = (i) => {
+
+    return (i.replies && i.replies.sort((a, b) => { return a.commentId - b.commentId }) &&
+      i.replies.map((a, replyindex) => (
+        <div key={a.commentId}>
+          {actions.editArr.filter((id) => id === a.commentId).length !==
+            0 ? (
+            <InputField
+              cancellor={a.commentId}
+              inputvalue={a.text}
+              edit
+              parentId={i.commentId}
+              fullnameList={fullnameList}
+              //Handles Navigate Away
+              setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
+            />
           ) : (
-
-            <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={i.replies && i.replies.length > 0 ? -100 : -101} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={i.commentTypeId === 1 ? getfullName(i.userId) : "Request History"} />
-
+            <CommentStructure
+              i={a}
+              reply
+              parentId={i.commentId}
+              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={getfullName(a.commentTypeId, a.userId)}
+            />
           )}
-          {actions.replies.filter((id) => id === i.commentId).length !== 0 &&
+          {actions.replies.filter((id) => id === a.commentId).length !==
+            0 &&
             (actions.customInput ? (
               actions.customInput({
-                cancellor: i.commentId,
+                cancellor: a.commentId,
                 parentId: i.commentId,
+                child: true,
                 submit: actions.submit,
                 handleCancel: actions.handleCancel,
                 edit: false
               })
             ) : (
-              <InputField cancellor={i.commentId} parentId={i.commentId} 
-               //Handles Navigate Away
-              setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+              <InputField
+                cancellor={a.commentId}
+                parentId={i.commentId}
+                child
+                fullnameList={fullnameList}
+                //Handles Navigate Away
+                setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
+              />
             ))}
-          <div className="replySection">
-            {
-              i.replies && i.replies.sort((a, b) => { return a.commentId - b.commentId }) &&
-              i.replies.map((a, index) => (
-                <div key={a.commentId}>
-                  {actions.editArr.filter((id) => id === a.commentId).length !==
-                    0 ? (
-                    actions.customInput ? (
-                      actions.customInput({
-                        cancellor: a.commentId,
-                        value: a.text,
-                        handleCancel: actions.handleCancel,
-                        edit: true,
-                        parentId: i.commentId,
-                        submit: actions.submit
-                      })
-                    ) : (
-                      <InputField
-                        cancellor={a.commentId}
-                        value={a.text}
-                        edit
-                        parentId={i.commentId}
-                         //Handles Navigate Away
-                        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
-                      />
-                    )
-                  ) : (
-                    <CommentStructure
-                      i={a}
-                      reply
-                      parentId={i.commentId}
-                      handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={index} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={a.commentTypeId === 1 ? getfullName(a.userId) : "Request History"}
-                    />
-                  )}
-                  {actions.replies.filter((id) => id === a.commentId).length !==
-                    0 &&
-                    (actions.customInput ? (
-                      actions.customInput({
-                        cancellor: a.commentId,
-                        parentId: i.commentId,
-                        child: true,
-                        submit: actions.submit,
-                        handleCancel: actions.handleCancel,
-                        edit: false
-                      })
-                    ) : (
-                      <InputField
-                        cancellor={a.commentId}
-                        parentId={i.commentId}
-                        child
-                         //Handles Navigate Away
-                        setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
-                      />
-                    ))}
-                </div>
-              ))}
-          </div>
         </div>
-      ))}
+      )))
+
+  }
+
+  const rendercomments = () =>{
+    if(fullnameList?.length > 0)
+    {
+        return (
+          comments.map((i, index) => (
+            <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit && !showmorehidden ? { display: 'none' } : { display: 'block' }}>
+              {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
+                <InputField cancellor={i.commentId} inputvalue={i.text} edit fullnameList={fullnameList} //Handles Navigate Away
+                  setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+              ) : (
+                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
+              )}
+              {
+                actions.replies.filter((id) => id === i.commentId).length !== 0 &&
+                (
+                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} //Handles Navigate Away
+                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+                )
+              }
+              <div className="replySection">
+                {
+                  renderreplies(i)
+                }
+              </div>
+            </div>
+          ))
+
+
+
+        )
+    }
+  }
+
+
+  const actions = useContext(ActionContext)
+
+  return (
+    <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>
+
+      {
+        comments.length === 0 ? <div className="nofiltermessage">No comments under this filter category</div> :
+          rendercomments()          
+          }
       <div id="showMoreParentComments" className="showMoreParentComments" style={!showmorehidden && comments.length > 3 ? { display: 'block' } : { display: 'none' }}>
         <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 5)}>Show more comments</button>
       </div>

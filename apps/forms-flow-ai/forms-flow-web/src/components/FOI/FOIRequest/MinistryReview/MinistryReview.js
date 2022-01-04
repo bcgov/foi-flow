@@ -93,9 +93,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
   const [comment, setComment] = useState([]);
 
-  //quillChange and removeComment added to handle Navigate away from Comments tabs
-  const [quillChange, setQuillChange] = useState(false);
-
+  //editorChange and removeComment added to handle Navigate away from Comments tabs
+  const [editorChange, setEditorChange] = useState(false);
+  
   const initialStatuses = {
     Request: {
       display: false,
@@ -137,7 +137,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
     
-  }, [requestId, comment, attachments]);
+  }, [requestId]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
@@ -285,7 +285,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
    */
   //Below function will handle beforeunload event
   const alertUser = e => {
-    if (quillChange) {     
+    if (editorChange) {     
       e.returnValue = '';
       e.preventDefault();
     }
@@ -314,15 +314,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
       return;
     }
 
-    if (quillChange) {
+    if (editorChange) {
       confirmChangesLost(
         () => {
-          setQuillChange(false);
+          setEditorChange(false);
           setRemoveComment(true);
           changeTabLinkStatuses(param);
         },
         () => {
-          setQuillChange(true);
+          setEditorChange(true);
           setRemoveComment(false);
         }
       );
@@ -355,10 +355,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   };
 
-  const pubmindivstagestomain = (divstages) => {
+  const pubmindivstagestomain = (_divstages) => {
 
-    saveMinistryRequestObject.divisions = divstages
-    setdivStages(divstages)
+    saveMinistryRequestObject.divisions = _divstages
+    setdivStages(_divstages)
   }
 
 
@@ -505,8 +505,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
                     setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
                     ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
                     requestNumber={requestNumber}
-                    //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-                    setQuillChange={setQuillChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+                    //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 </> : <Loading />}
           </div>
           <div 

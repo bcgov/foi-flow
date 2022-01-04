@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.watcherservice import watcherservice
 from request_api.schemas.foiwatcher import  FOIRawRequestWatcherSchema, FOIMinistryRequestWatcherSchema
@@ -39,7 +39,7 @@ class FOIRawRequestWatcher(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def get(requestid):      
         try:
@@ -60,13 +60,13 @@ class CreateFOIRawRequestWatcher(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)  
-            result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getUserId(), AuthHelper.getUserGroups())
+            result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getuserid(), AuthHelper.getusergroups())
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -81,11 +81,11 @@ class DisableFOIRawRequestWatcher(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def put(requestid):      
         try:
-            result = watcherservice().disablerawrequestwatchers(requestid, AuthHelper.getUserId())
+            result = watcherservice().disablerawrequestwatchers(requestid, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -100,11 +100,11 @@ class FOIRequestWatcher(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def get(ministryrequestid):      
         try:
-            result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isMinistryMember())
+            result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isministrymember())
             return json.dumps(result), 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -119,13 +119,13 @@ class CreateFOIRequestWatcher(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)  
-            result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getUserId(),AuthHelper.getUserGroups())
+            result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getuserid(),AuthHelper.getusergroups())
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -140,11 +140,11 @@ class DisableFOIRequestWatcher(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def put(ministryrequestid):      
         try:
-            result = watcherservice().disableministryrequestwatchers(ministryrequestid, AuthHelper.getUserId())
+            result = watcherservice().disableministryrequestwatchers(ministryrequestid, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

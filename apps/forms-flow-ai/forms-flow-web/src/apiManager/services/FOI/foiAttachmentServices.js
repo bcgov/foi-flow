@@ -69,8 +69,6 @@ import {
   };
 
   export const saveNewFilename = (newFilename, documentId, requestId, ministryId, ...rest) => {
-    const done =fnDone(rest);
-
     let apiUrl = "";
     if (ministryId !=null) {
       apiUrl = replaceUrl(
@@ -94,14 +92,12 @@ import {
       const data = {
         filename: newFilename
       };
-      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in renaming the file", done); 
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in renaming the file", rest); 
     };
   };
 
   export const replaceFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
-    const done = fnDone(rest);
     let apiUrl = "";
-
     if (ministryId && documentId) {
       apiUrl = replaceUrl(replaceUrl(
         API.FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST,
@@ -116,12 +112,12 @@ import {
       ), "<documentid>", documentId);      
     }
     return (dispatch) => {
-      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in replacing the attachment", done);
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in replacing the attachment", rest);
     };
   };
 
   export const deleteFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
-    const done = fnDone(rest);
+    
     let apiUrl = "";
 
     if (ministryId && documentId) {
@@ -138,6 +134,6 @@ import {
       ), "<documentid>", documentId);      
     }
     return (dispatch) => {
-      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in deleting an attachment", done);
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in deleting an attachment", rest);
     };
   };

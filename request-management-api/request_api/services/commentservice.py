@@ -55,6 +55,7 @@ class commentservice:
             commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.__copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF']) 
             _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
+                print('am i here')
                 for reply in comment['replies']:
                     response=FOIRequestComment.savecomment(reply['commentTypeId'], self.__copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
@@ -63,13 +64,15 @@ class commentservice:
     def __copyparentcomment(self, ministryrequestid, entry):
         return {
             "ministryrequestid": ministryrequestid,
-            "comment": entry['text']
+            "comment": entry['text'],
+            "taggedusers": entry['taggedusers']
             }
     
     def __copyreplycomment(self, ministryrequestid, entry, parentcommentid):
         return {
             "ministryrequestid": ministryrequestid,
             "comment": entry['text'],
+            "taggedusers": entry['taggedusers'],
             "parentcommentid":parentcommentid
         }
     
@@ -102,5 +105,6 @@ class commentservice:
                 "dateUF":comment["created_at"],
                 "date":  commentcreateddate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
-                "commentTypeId":comment['commenttypeid']
+                "commentTypeId":comment['commenttypeid'],
+                "taggedusers" : comment['taggedusers']
         }     

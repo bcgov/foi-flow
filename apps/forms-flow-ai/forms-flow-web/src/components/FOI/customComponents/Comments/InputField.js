@@ -1,65 +1,199 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'
+import React, { useContext, useState, useEffect} from 'react'
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
+import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
+import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
+import createMentionPlugin, {
+  defaultSuggestionsFilter
+} from '@draft-js-plugins/mention';
+import {namesort,suggestionList } from './commentutils'
+import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
+import {
+  ItalicButton,
+  BoldButton,
+  UnderlineButton,
+  UnorderedListButton,
+  OrderedListButton,
 
+} from '@draft-js-plugins/buttons';
 
-const InputField = ({ cancellor, parentId, child, value, edit, main, add,
-  //setQuillChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  setQuillChange, removeComment, setRemoveComment 
-  }) => {
+const staticToolbarPlugin = createToolbarPlugin();
+const mentionPlugin = createMentionPlugin();
+const { Toolbar } = staticToolbarPlugin;
+const { MentionSuggestions } = mentionPlugin
+const plugins = [staticToolbarPlugin, mentionPlugin];
+const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, fullnameList,
+  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+  setEditorChange, removeComment, setRemoveComment
+}) => {
   let maxcharacterlimit = 1000
-  const [text, setText] = useState('')
   const [uftext, setuftext] = useState('')
-  const [textlength, setTextLength] = useState(maxcharacterlimit)
+  const [textlength, setTextLength] = useState(1000)
+  const [open, setOpen] = useState(false);
 
-  const handleQuillChange = (htmlcontent, delta, source, editor) => {
-    let _unformattedtext = editor.getText()
-    if (_unformattedtext && _unformattedtext.trim() != "" && _unformattedtext != undefined && textlength <= maxcharacterlimit) {      
-      if (_unformattedtext.trim().length - 1 <= maxcharacterlimit) {
-        setText(htmlcontent)
+  let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
+  const mentionList = fulluserlist;
 
-      }
-      else {
-        setText(_unformattedtext.trim().substring(0, maxcharacterlimit - 1))
-      }
-      setuftext(_unformattedtext.trim())
-      if (_unformattedtext.length - 1 <= maxcharacterlimit)
-        setTextLength(maxcharacterlimit - (_unformattedtext && _unformattedtext != "" && _unformattedtext.trim().length - 1 <= maxcharacterlimit ? _unformattedtext.trim().length  : 0))
-      
-      //Handles Navigate Away
-      setQuillChange(true);
-    }
-    else if(htmlcontent === "<p><br></p>")
-    {
-      setTextLength(1000);
-      setText("")
-      setuftext("")
-      //Handles Navigate Away
-      setQuillChange(false);
-    }
+  const [suggestions, setSuggestions] = useState(mentionList);
+
+  const onOpenChange = (_open) => {
+    setOpen(_open);
   }
 
-  const handlekeydown = (event) => {
-
-    if ((textlength > maxcharacterlimit && event.key !== 'Backspace') || (textlength <= 0 && event.key !== 'Backspace'))
-      event.preventDefault();
+  // Check editor text for mentions
+  const onSearchChange = ({ value }) => {      
+    var filterlist = mentionList.filter(function(item){      
+      return (item.firstname?.indexOf(value?.toLowerCase()) === 0 || item.lastname?.indexOf(value?.toLowerCase()) === 0)
+    }).sort(namesort)        
+    if(filterlist?.length >0 )    
+      setSuggestions(defaultSuggestionsFilter(value, filterlist))
   }
+
+  const getEditorState = (_value) => {
+    const rawContentFromStore = convertFromRaw(JSON.parse(_value))
+    return EditorState.createWithContent(rawContentFromStore);
+    
+  }
+  const [editorState, setEditorState] = useState(inputvalue === '' || inputvalue === undefined ? EditorState.createEmpty() : getEditorState(inputvalue))
+
+  const getMentionsOnComment = () => {
+    const rawContentState = convertToRaw(editorState.getCurrentContent());
+    const commentmentions = [];
+    const entityMap = rawContentState.entityMap;
+    Object.values(entityMap).forEach(entity => {
+
+      if (entity.type === 'mention') {
+        commentmentions.push({ username: entity.data.mention.username, name: entity.data.mention.name });
+      }
+    });
+
+    return commentmentions;
+  }
+
+  const _handleChange = (_editorState) => {
+    const currentContent = _editorState.getCurrentContent();    
+    const currentContentLength = currentContent.getPlainText('').length;
+    const selectedTextLength = _getLengthOfSelectedText();
+    let _textLength = maxcharacterlimit - (currentContentLength - selectedTextLength)
+    if (_textLength > 0) 
+    { 
+      setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
+       
+    }    
+    setuftext(currentContent.getPlainText(''))
+    setEditorState(_editorState);
+    setEditorChange(currentContentLength > 0)
+  }
+
+  const _getLengthOfSelectedText = () => {
+    const currentSelection = editorState.getSelection();
+    const isCollapsed = currentSelection.isCollapsed();
+
+    let length = 0;
+
+    if (!isCollapsed) {
+      const currentContent = editorState.getCurrentContent();
+      const startKey = currentSelection.getStartKey();
+      const endKey = currentSelection.getEndKey();
+      const startBlock = currentContent.getBlockForKey(startKey);
+      const isStartAndEndBlockAreTheSame = startKey === endKey;
+      const startBlockTextLength = startBlock.getLength();
+      const startSelectedTextLength = startBlockTextLength - currentSelection.getStartOffset();
+      const endSelectedTextLength = currentSelection.getEndOffset();
+      const keyAfterEnd = currentContent.getKeyAfter(endKey);
+
+      if (isStartAndEndBlockAreTheSame) {
+        length += currentSelection.getEndOffset() - currentSelection.getStartOffset();
+      } else {
+        let currentKey = startKey;
+
+        while (currentKey && currentKey !== keyAfterEnd) {
+          if (currentKey === startKey) {
+            length += startSelectedTextLength + 1;
+          } else if (currentKey === endKey) {
+            length += endSelectedTextLength;
+          } else {
+            length += currentContent.getBlockForKey(currentKey).getLength() + 1;
+          }
+
+          currentKey = currentContent.getKeyAfter(currentKey);
+        }
+      }
+    }
+
+    return length
+  }
+
+  const _handleKeyCommand = (e) => {
+    const currentContent = editorState.getCurrentContent();
+    const currentContentLength = currentContent.getPlainText('').length;
+    const selectedTextLength = _getLengthOfSelectedText();
+    if ((e === 'backspace' || e === 'delete') && currentContentLength - 1 >= 0) {
+      setTextLength((maxcharacterlimit) - (currentContentLength - 1))
+    }
+
+    if ((e === 'backspace' || e === 'delete') && selectedTextLength > 0) {
+      setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
+    }
+    setuftext(currentContent.getPlainText(''))
+  }
+
+  const _handleBeforeInput = () => {
+    const currentContent = editorState.getCurrentContent();
+    const currentContentLength = currentContent.getPlainText('').length;
+    const selectedTextLength = _getLengthOfSelectedText();
+    if (currentContentLength - selectedTextLength > maxcharacterlimit - 1) {
+      return 'handled';
+    }
+    else {
+      setTextLength((maxcharacterlimit - 1) - (currentContentLength - selectedTextLength))
+    }
+    setuftext(currentContent.getPlainText(''))
+  }
+
+  const _handlePastedText = (pastedText) => {
+    const currentContent = editorState.getCurrentContent();
+    const currentContentLength = currentContent.getPlainText('').length;
+    const selectedTextLength = _getLengthOfSelectedText();
+    if (currentContentLength + pastedText.length - selectedTextLength > maxcharacterlimit) {
+      return 'handled';
+    }
+    else {
+      setTextLength((maxcharacterlimit) - (currentContentLength + pastedText.length - selectedTextLength))
+    }
+    setuftext(currentContent.getPlainText(''))
+  }
+
+
 
   useEffect(() => {
-    setText(value)
-    setuftext(value)    
-  }, [value])
+    if (inputvalue !== undefined) {
+      const contentstate = getEditorState(inputvalue)
+      const currentContent = contentstate.getCurrentContent();
+      setuftext(currentContent.getPlainText(''))
+      setTextLength(maxcharacterlimit - currentContent.getPlainText('').length)
+    }
+
+  }, [inputvalue])
+
+  //Handles Navigate Away
+  const closeX = () => {
+    setEditorState(EditorState.createEmpty())
+    setuftext('')
+    edit
+      ? actions.handleCancel(cancellor, edit)
+      : actions.handleCancel(cancellor)
+  }
 
   //Handles Navigate Away
   useEffect(() => {
     if (removeComment) {
       if (add) {
-        setText("");
+        setEditorState(EditorState.createEmpty())
+        setuftext('')
       }
       else {
         closeX();
@@ -68,62 +202,51 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add,
     }
   })
 
-  //Handles Navigate Away
-  const closeX = () => {
-    setText('')
-    setuftext('')
-    edit
-      ? actions.handleCancel(cancellor, edit)
-      : actions.handleCancel(cancellor)
-  }
-
+  
 
   const cancel = (e) => {
-    if (text) {
+    if (uftext) {
       if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
         closeX();
-        setQuillChange(false);
+        setEditorChange(false);
       }
     }
     else {
       closeX();
     }
-    e.preventDefault(); 
+    e.preventDefault();
   }
 
   const post = () => {
-
-    setTextLength(1000);
-    if (text !== '<p><br></p>') {
+    if (uftext !== '' && uftext.trim().length > 0) {
+      const _mentions = getMentionsOnComment()
+      const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)
       edit === true
-        ? actions.submit(cancellor, text, parentId, true, setText)
-        : actions.submit(cancellor, text, parentId, false, setText)
-    }
-    //Handles Navigate Away
-    setQuillChange(false);
+        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true)
+        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
 
-  }
-
-  const quillRef = (el) => {
-    if (el && document.getElementById('Comments').style.display === 'block') {     
-      el.focus()
+      setEditorState(createEditorStateWithText(''))
+      setEditorChange(false)
+      setTextLength(1000);
     }
+
   }
 
   let formclass = !parentId ? "parentform form" : "form"
   formclass = add ? `${formclass} addform` : formclass
-  
+
   formclass = (add === undefined && main === undefined && edit === undefined) ? `${formclass} addform newreply` : formclass
 
   const actions = useContext(ActionContext)
+
   return (
     <>
       <form
         className={formclass}
       >
         <div className="row cancelrow">
-          <div className="col-lg-12">
+          <div className="col-lg-12" style={{ height: '0px' }}>
             {(!main) ? (
               <button
                 className="cancelBtn"
@@ -134,10 +257,37 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add,
             ) : null}
           </div>
         </div>
-
-        <ReactQuill ref={(el) => { quillRef(el) }} theme="snow" value={text || ''} onKeyDown={handlekeydown} onChange={handleQuillChange} placeholder={"Add a new note"} />
-
-
+        <Toolbar>
+          {
+            (externalProps) => (
+              <div>
+                <BoldButton {...externalProps} />
+                <ItalicButton {...externalProps} />
+                <UnderlineButton {...externalProps} />
+                <UnorderedListButton {...externalProps} />
+                <OrderedListButton {...externalProps} />
+              </div>
+            )
+          }
+        </Toolbar>
+        <Editor
+          editorState={editorState}
+          onChange={_handleChange}
+          handleBeforeInput={_handleBeforeInput}
+          handlePastedText={_handlePastedText}
+          handleKeyCommand={_handleKeyCommand}
+          plugins={plugins}
+        />
+        <MentionSuggestions
+          open={open}
+          onOpenChange={onOpenChange}
+          suggestions={suggestions}
+          onSearchChange={(v)=>onSearchChange(v)}
+          onAddMention={(_mentions) => {
+            console.log('onAddMention')
+            // get the mention object selected
+          }}
+        />
 
       </form>
       <div className="inputActions">
@@ -149,11 +299,10 @@ const InputField = ({ cancellor, parentId, child, value, edit, main, add,
             className="postBtn"
             onClick={post}
             type='button'
-            disabled={!uftext}
-
+            disabled={uftext.trim().length === 0}
           >
             {' '}
-            <FontAwesomeIcon disabled={text === undefined || textlength === 0} icon={faPaperPlane} size='2x' color={text === undefined || text.length === 0 || textlength === maxcharacterlimit ? '#a5a5a5' : 'darkblue'} />
+            <FontAwesomeIcon disabled={uftext.trim().length === 0} icon={faPaperPlane} size='2x' color={uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'} />
           </button>
         </div>
       </div>

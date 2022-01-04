@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedOrigins
+from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.commentservice import commentservice
 from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
@@ -43,13 +43,13 @@ class CreateFOIRequestComment(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
-            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getUserId())
+            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -64,13 +64,13 @@ class CreateFOIRawRequestComment(Resource):
      
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def post():      
         try:
             requestjson = request.get_json() 
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
-            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getUserId())
+            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -85,7 +85,7 @@ class FOIComment(Resource):
        
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def get(requesttype, requestid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
@@ -111,16 +111,16 @@ class FOIDisableComment(Resource):
       
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
                 return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
         try:
             if requesttype == "ministryrequest":
-                result = commentservice().disableministryrequestcomment(commentid, AuthHelper.getUserId())
+                result = commentservice().disableministryrequestcomment(commentid, AuthHelper.getuserid())
             else:
-                result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getUserId())
+                result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -136,7 +136,7 @@ class FOIUpdateComment(Resource):
       
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedOrigins())
+    @cross_origin(origins=allowedorigins())
     @auth.require
     def put(requesttype, commentid):      
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
@@ -145,10 +145,10 @@ class FOIUpdateComment(Resource):
             requestjson = request.get_json()              
             if requesttype == "ministryrequest":
                 commentschema = FOIMinistryRequestCommentSchema().load(requestjson)
-                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getUserId())
+                result = commentservice().updateministryrequestcomment(commentid, commentschema, AuthHelper.getuserid())
             else:
                 commentschema = EditFOIRawRequestCommentSchema().load(requestjson)
-                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getUserId())
+                result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
