@@ -355,10 +355,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   };
 
-  const pubmindivstagestomain = (divstages) => {
+  const pubmindivstagestomain = (_divstages) => {
 
-    saveMinistryRequestObject.divisions = divstages
-    setdivStages(divstages)
+    saveMinistryRequestObject.divisions = _divstages
+    setdivStages(_divstages)
   }
 
 
