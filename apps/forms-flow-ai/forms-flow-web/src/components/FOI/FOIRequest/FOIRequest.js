@@ -565,7 +565,18 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       }
 
                       <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} disableInput={disableInput} />
-                      <RequestDescriptionBox programAreaList={programAreaList} urlIndexCreateRequest={urlIndexCreateRequest} requestDetails={requestDetails} handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
+                      
+                      <RequestDescriptionBox 
+                        programAreaList={programAreaList} 
+                        urlIndexCreateRequest={urlIndexCreateRequest} 
+                        requestDetails={requestDetails} 
+                        handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} 
+                        handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} 
+                        handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} 
+                        createSaveRequestObject={createSaveRequestObject} 
+                        disableInput={disableInput} 
+                      />
+
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       {
                         requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
@@ -578,7 +589,18 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       {showDivisionalTracking && <DivisionalTracking divisions={requestDetails.divisions} />}
                       <RequestNotes />
 
-                      <BottomButtonGroup stateChanged={stateChanged} isValidationError={isValidationError} urlIndexCreateRequest={urlIndexCreateRequest} saveRequestObject={saveRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} handleOpenRequest={handleOpenRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} disableInput={disableInput} />
+                      <BottomButtonGroup 
+                        stateChanged={stateChanged} 
+                        isValidationError={isValidationError} 
+                        urlIndexCreateRequest={urlIndexCreateRequest} 
+                        saveRequestObject={saveRequestObject} 
+                        unSavedRequest={unSavedRequest} 
+                        handleSaveRequest={handleSaveRequest} 
+                        handleOpenRequest={handleOpenRequest} 
+                        currentSelectedStatus={_currentrequestStatus} 
+                        hasStatusRequestSaved={hasStatusRequestSaved} 
+                        disableInput={disableInput} 
+                      />
                     </>
                   </ConditionalComponent>
                 </form>
