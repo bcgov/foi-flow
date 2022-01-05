@@ -109,15 +109,15 @@ const RequestDescription = React.memo(({
         if(endDate === "" || new Date(event.target.value) > new Date(endDate))
           setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.START_DATE);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.START_DATE, event.target.value);
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.FROM_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.FROM_DATE, event.target.value);
     };
     //handle onchange of end date and set state with latest value
     const handleEndDateChange = (event) => {
         setEndDate(event.target.value);
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.END_DATE);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.END_DATE, event.target.value);
+        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.TO_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.TO_DATE, event.target.value);
     };
     //handle onchange of description and set state with latest value
     const handleRequestDescriptionChange = (event) => {
@@ -157,7 +157,11 @@ const RequestDescription = React.memo(({
         <Card className="foi-details-card">            
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
-                <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose}/>
+                <RequestDescriptionHistory 
+                  requestDescriptionHistoryList={sortedList} 
+                  openModal={openModal} 
+                  handleModalClose={handleModalClose}
+                />
                 <div className="row foi-details-row">
                 <div className="foi-request-description-history">
                     <button type="button" className={`btn btn-link btn-description-history ${sortedList.length <= 1 ? classes.btndisabled : ""}`} disabled={sortedList.length <= 1}  onClick={handleDescriptionHistoryClick}>
