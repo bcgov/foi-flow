@@ -176,9 +176,3 @@ export const setRequestAttachments = (data) => dispatch => {
     })
 }
 
-export const setFOINotifications = (data) => dispatch =>{
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_NOTIFICATIONS,
-        payload:data
-    })
-}
