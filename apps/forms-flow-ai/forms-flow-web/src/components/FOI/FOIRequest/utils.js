@@ -112,7 +112,7 @@ export const assignValue = (jsonObj, value, name) => {
 };
 
 export const updateAdditionalInfo = (name, value, requestObject) => {
-  if (requestObject.additionalPersonalInfo === undefined) {
+  if (!requestObject.additionalPersonalInfo) {
     requestObject.additionalPersonalInfo = {
          alsoKnownAs:"",            
          birthDate:"",
@@ -135,9 +135,7 @@ export const updateAdditionalInfo = (name, value, requestObject) => {
     };
   }
 
-  if(requestObject.additionalPersonalInfo[name] !== undefined) {
-    requestObject.additionalPersonalInfo[name] = value;
-  }
+  requestObject.additionalPersonalInfo[name] = value;
   return requestObject;
 };
 
@@ -193,6 +191,11 @@ export const createRequestDetailsObjectFunc = (requestObject, requiredRequestDet
         }
       });
       requestObject.selectedMinistries = filteredData;
+      break;
+    case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
+    case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
+    case FOI_COMPONENT_CONSTANTS.DOB:
+      updateAdditionalInfo(name, value, requestObject);
       break;
     default:
       requestObject[name] = value;

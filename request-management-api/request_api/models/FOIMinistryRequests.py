@@ -26,7 +26,7 @@ class FOIMinistryRequest(db.Model):
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
 
     filenumber = db.Column(db.String(50), unique=False, nullable=False)
-    description = db.Column(db.String(500), unique=False, nullable=False)
+    description = db.Column(db.Text, unique=False, nullable=False)
     recordsearchfromdate = db.Column(db.DateTime, nullable=True)
     recordsearchtodate = db.Column(db.DateTime, nullable=True)
 
