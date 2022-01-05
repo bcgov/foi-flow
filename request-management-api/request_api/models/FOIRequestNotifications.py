@@ -47,7 +47,9 @@ class FOIRequestNotification(db.Model):
         rs = db.session.execute(text(sql), {'userid': userid, 'days': days})
         notifications = []
         for row in rs:
-            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
+            dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
+            _createddate = dt
+            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %H:%M:%S %p'), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
         return notifications
 
     @classmethod
