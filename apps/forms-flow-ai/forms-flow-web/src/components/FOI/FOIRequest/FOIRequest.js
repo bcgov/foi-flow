@@ -50,7 +50,6 @@ import {
   getRedirectAfterSaveUrl,
   getTabBG,
   assignValue,
-  updateAdditionalInfo,
   createRequestDetailsObjectFunc,
   checkContactGiven,
   getBCgovCode,
