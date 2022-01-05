@@ -38,11 +38,8 @@ let foiNotifications = useSelector(state=> state.notifications.foiNotifications)
 useEffect(() => {     
   if(isAuthenticated)
     dispatch(fetchFOINotifications());
-  const fetchNotifications = () =>{
-    dispatch(fetchFOINotifications());
-  }
   setInterval(() => {
-    fetchNotifications();
+    dispatch(fetchFOINotifications());
   }, 900000);
 },[dispatch]);
 

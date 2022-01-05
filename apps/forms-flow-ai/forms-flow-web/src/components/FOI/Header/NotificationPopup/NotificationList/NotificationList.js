@@ -5,7 +5,7 @@ import { formatDate } from '../../../../../helper/FOI/helper'
 // import {
 //   deleteFOINotification
 // } from "../../../../../apiManager/services/FOI/foiNotificationServices";
-import {useDispatch} from "react-redux";
+// import {useDispatch} from "react-redux";
 
 
 const NotificationList = (props) => {
@@ -13,7 +13,7 @@ const NotificationList = (props) => {
   //const dispatch = useDispatch();
 
   const formatNoticationDate = (creationDate) =>{
-    return formatDate(creationDate, 'yyyy MMM dd | hh:mm a');  
+    return formatDate(creationDate, 'yyyy MMM dd | hh:mm a').toUpperCase();  
   }
   //TODO : To be continued for dismiss
   // const dismissNotification = () => {
