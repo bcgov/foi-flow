@@ -41,11 +41,16 @@ class requestservicegetter:
             if requestortypeid == 1:
                 baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname, businessname))
             additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(firstname, middlename, lastname, dob, alsoknownas, requestortypeid))
+                       
+        for personalattribute in personalattributes:
+            attribute, location = self.__preparepersonalattribute(personalattribute)
+            if location == "main":
+                baserequestinfo.update(attribute)
+            elif location =="additionalPersonalInfo":
+                additionalpersonalinfo.update(attribute)
                 
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
-        for personalattribute in personalattributes:
-            baserequestinfo.update(self.__preparepersonalattribute(personalattribute))                
-
+        
         return baserequestinfo
 
     def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authmembershipgroups):
@@ -55,7 +60,6 @@ class requestservicegetter:
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
-
         return baserequestinfo
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
@@ -155,18 +159,24 @@ class requestservicegetter:
           
     def __preparepersonalattribute(self, personalattribute):
         if personalattribute['personalattributeid'] == 1:                   
-            return {'publicServiceEmployeeNumber': personalattribute['attributevalue']}
+            return {'publicServiceEmployeeNumber': personalattribute['attributevalue']}, "main"
+        
         elif  personalattribute['personalattributeid'] == 2 :    
-            return {'correctionalServiceNumber': personalattribute['attributevalue']}
+            return {'correctionalServiceNumber': personalattribute['attributevalue']}, "main"
+        
         elif  personalattribute['personalattributeid'] == 3 :    
-            return {'personalHealthNumber': personalattribute['attributevalue']}
+            return {'personalHealthNumber': personalattribute['attributevalue']}, "additionalPersonalInfo"
+        
         elif personalattribute['personalattributeid'] == 4:     
-            return {'adoptiveMotherFirstName': personalattribute['attributevalue']}
+            return {'adoptiveMotherFirstName': personalattribute['attributevalue']}, "main"
+        
         elif personalattribute['personalattributeid'] == 5:     
-            return {'adoptiveMotherLastName': personalattribute['attributevalue']}
+            return {'adoptiveMotherLastName': personalattribute['attributevalue']}, "main"
+        
         elif personalattribute['personalattributeid'] == 6:     
-            return {'adoptiveFatherFirstName': personalattribute['attributevalue']}
+            return {'adoptiveFatherFirstName': personalattribute['attributevalue']}, "main"
+        
         elif personalattribute['personalattributeid'] == 7:     
-            return {'adoptiveFatherLastName': personalattribute['attributevalue']}             
+            return {'adoptiveFatherLastName': personalattribute['attributevalue']}, "main"         
           
     
