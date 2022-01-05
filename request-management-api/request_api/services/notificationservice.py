@@ -22,14 +22,28 @@ class notificationservice:
     
     def createnotification(self, message, requestid, requesttype, notificationtype, userid):
         foirequest = self.__getrequest(requestid, requesttype)
+        self.cleanupnotifications(requesttype, foirequest, notificationtype)
         notification = self.__preparenotification(message, foirequest, requesttype, notificationtype, userid)
-        if notification is not None: 
-            if requesttype == "ministryrequest":         
+        if notification is not None:               
+            if requesttype == "ministryrequest": 
                 return FOIRequestNotification.savenotification(notification)
             else:
                 return FOIRawRequestNotification.savenotification(notification)
         return  DefaultMethodResult(True,'No change',requestid)
      
+            
+    def cleanupnotifications(self,requesttype, foirequest, notificationtype):
+        notificationid = self.__getnotificationtypeid(notificationtype)
+        if requesttype == "ministryrequest":
+            _ids = FOIRequestNotification.getnotificationidsbynumber(foirequest["filenumber"], notificationid)
+            if _ids:
+                FOIRequestNotificationUser.deletebynotificationid(_ids)
+                FOIRequestNotification.deletebynotificationid(_ids)
+        else:
+            _ids = FOIRawRequestNotification.getnotificationidsbynumber('U-00' + str(foirequest['requestid']), notificationid)
+            if _ids:
+                FOIRawRequestNotificationUser.deletebynotificationid(_ids)
+                FOIRawRequestNotification.deletebynotificationid(_ids)    
             
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid, self.__getnotificationdays())
