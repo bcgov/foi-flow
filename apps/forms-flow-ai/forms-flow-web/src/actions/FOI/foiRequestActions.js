@@ -1,47 +1,40 @@
 import FOI_ACTION_CONSTANTS from './foiActionConstants'
-
 export const setFOILoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_LOADING,
         payload:data
     })
 }
-
 export const setFOIAssignedToListLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING,
         payload:data
     })
 }
-
 export const setFOIAttachmentListLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING,
         payload:data
     })
 }
-
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
         payload:data
     })
 }
-
 export const setFOIRequestList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS,
         payload:data
     })
 }
-
 export const setFOIMinistryRequestList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST,
         payload:data
     })
 }
-
 export const setFOIRequestCount = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUESTS_COUNT,
@@ -54,14 +47,12 @@ export const setFOIRequestDetail = (data) => dispatch =>{
         payload:data
     })
 }
-
 export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_MINISTRYVIEW_REQUEST_DETAIL,
         payload:data
     })
 }
-
 export const serviceActionError = (data) => dispatch => {
    //TODO update to a common file
     dispatch({
@@ -69,7 +60,6 @@ export const serviceActionError = (data) => dispatch => {
       payload: 'Error Handling API'
     })
 }
-
 export const setFOICategoryList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_CATEGORYLIST,
@@ -112,21 +102,18 @@ export const setFOIAssignedToList = (data) => dispatch =>{
         payload:data
     })
 }
-
 export const setFOIFullAssignedToList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_FULL_ASSIGNED_TOLIST,
         payload:data
     })
 }
-
 export const setFOIMinistryAssignedToList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_ASSIGNED_TOLIST,
         payload:data
     })
 }
-
 export const setFOIProgramAreaList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREALIST,
@@ -140,29 +127,19 @@ export const clearRequestDetails = (data) => dispatch => {
     })
 }
 
-
 export const clearMinistryViewRequestDetails = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLEAR_MINISTRYVIEWREQUEST_DETAILS,
         payload:data      
     })
 }
-
 export const setFOIRequestDescriptionHistory = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY,
         payload:data      
     })
 }
-
 export const setFOIMinistryDivisionalStages = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES,
-        payload:data      
-    })
-}
-
-export const clearFOIMinistryDivisionalStages = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES,
         payload:data      
@@ -174,59 +151,28 @@ export const setFOIWatcherList = (data) => dispatch => {
         payload:data      
     })
 }
-
 export const setClosingReasons = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLOSING_REASONS,
         payload:data      
     })
 }
-
 export const clearRawRequestComments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_RAWREQUEST_COMMENTS,
         payload:{}      
     })
 }
-
-export const setRawRequestComments = (data) => dispatch => {
+export const setRequestComments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
         payload:data      
     })
 }
-
-export const setMinistryRequestComments = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
-        payload:data      
-    })
-}
-
-export const clearMinistryRequestComments = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
-        payload:{}      
-    })
-}
-
-export const setRawRequestAttachments = (data) => dispatch => {
+export const setRequestAttachments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
         payload:data      
     })
 }
 
-export const setMinistryRequestAttachments = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
-        payload:data      
-    })
-}
-
-export const setFOINotifications = (data) => dispatch =>{
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_NOTIFICATIONS,
-        payload:data
-    })
-}

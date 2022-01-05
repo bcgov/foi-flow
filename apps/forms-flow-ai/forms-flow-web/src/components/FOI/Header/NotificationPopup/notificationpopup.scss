@@ -30,12 +30,11 @@
 
 .notification-list{
     max-width: 400px !important;
-    max-height: 475px !important;
     overflow: auto;
     background-color: #E5EAEF !important;
     border-bottom-left-radius: 10px !important;
     border-bottom-right-radius: 10px !important;
-    min-height: 300px;
+    height: 475px !important;
 }
 
 .list-header{
@@ -64,4 +63,8 @@
 .empty-notifications{
     text-align: center;
     justify-content: center;
+}
+
+.list-group-item:first-child {
+    margin-top: 20px;
 }

@@ -2,7 +2,7 @@ import {render, screen, cleanup} from '@testing-library/react';
 import renderer from 'react-test-renderer';
 import { Provider } from "react-redux";
 import configureStore from 'redux-mock-store'
-import BottomButtonGroup from './BottomButtonGroup';
+import BottomButtonGroup from '.';
 import { useSelector } from "react-redux";
 import { shallow } from 'enzyme';
 import Router, { useParams } from "react-router-dom";

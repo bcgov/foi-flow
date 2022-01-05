@@ -11,7 +11,7 @@ import Popup from 'reactjs-popup';
 import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
-} from "../../../apiManager/services/FOI/foiRequestServices";
+} from "../../../apiManager/services/FOI/foiNotificationServices";
 
 const FOIHeader = React.memo(() => { 
 
@@ -33,15 +33,13 @@ const openModal = (coordinates) => {
   setOpen(!open);
 }
 
-let foiNotifications = useSelector(state=> state.foiRequests.foiNotifications);
+let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
 
 useEffect(() => {     
-  dispatch(fetchFOINotifications());
-  const fetchNotifications = () =>{
+  if(isAuthenticated)
     dispatch(fetchFOINotifications());
-  }
   setInterval(() => {
-    fetchNotifications();
+    dispatch(fetchFOINotifications());
   }, 900000);
 },[dispatch]);
 
