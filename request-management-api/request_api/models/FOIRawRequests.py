@@ -61,8 +61,24 @@ class FOIRawRequest(db.Model):
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
-                values(requestid=request.requestid, requestrawdata=_requestrawdata,version=_version,updatedby=None,status=status,assignedgroup=assigneegroup,assignedto=assignee,wfinstanceid=request.wfinstanceid,sourceofsubmission=request.sourceofsubmission,ispiiredacted=ispiiredacted,createdby=userid,closedate=closedate,closereasonid=closereasonid)
-            )                 
+                values(
+                    requestid=request.requestid, 
+                    requestrawdata=_requestrawdata,
+                    version=_version,
+                    updatedby=None,
+                    updated_at=datetime.now(),
+                    status=status,
+                    assignedgroup=assigneegroup,
+                    assignedto=assignee,
+                    wfinstanceid=request.wfinstanceid,
+                    sourceofsubmission=request.sourceofsubmission,
+                    ispiiredacted=ispiiredacted,
+                    createdby=userid,
+                    closedate=closedate,
+                    closereasonid=closereasonid,
+                )
+            )
+            print("saverawrequestversion")                 
             db.session.execute(insertstmt)               
             db.session.commit()                
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
