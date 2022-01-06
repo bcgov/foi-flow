@@ -26,7 +26,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('extensionreasonid')
     )
 
-    extensionstatus_stage_table =  op.create_table('FOIExtensionStatuses',
+    extensionstatus_stage_table =  op.create_table('ExtensionStatuses',
     sa.Column('extensionstatusid', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=25), nullable=False),
     sa.Column('description', sa.String(length=100), nullable=False),
@@ -53,7 +53,7 @@ def upgrade():
 
     sa.ForeignKeyConstraint(['foiministryrequest_id', 'foiministryrequestversion_id'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
     sa.ForeignKeyConstraint(['extensionreasonid'], ['ExtensionReasons.extensionreasonid'], ),
-    sa.ForeignKeyConstraint(['extensionstatusid'], ['FOIExtensionStatuses.extensionstatusid'], ),
+    # sa.ForeignKeyConstraint(['extensionstatusid'], ['ExtensionStatuses.extensionstatusid'], ),
     sa.PrimaryKeyConstraint('foirequestextensionid', 'version')
     )
 
@@ -97,10 +97,9 @@ def upgrade():
         ]
     )
 
-
 def downgrade():    
     op.drop_table('FOIRequestExtensionDocumentMapping')
     op.drop_table('FOIRequestExtensions')
     op.drop_table('ExtensionReasons')
-    op.drop_table('FOIExtensionStatuses')
+    op.drop_table('ExtensionStatuses')
  

@@ -1,8 +1,4 @@
 from .db import  db, ma
-from .default_method_result import DefaultMethodResult
-from sqlalchemy.orm import relationship,backref
-from datetime import datetime
-from sqlalchemy import text
 
 class ExtensionReason(db.Model):
     __tablename__ = 'ExtensionReasons' 
@@ -19,7 +15,7 @@ class ExtensionReason(db.Model):
         return extensionreason_schema.dump(query)
 
     @classmethod
-    def getclosereason(cls,extensionreasonid):
+    def getextensionreason(cls,extensionreasonid):
         extensionreason_schema = ExtensionReasonSchema(many=True)
         query = db.session.query(ExtensionReason).filter_by(extensionreasonid=extensionreasonid).first()
         return extensionreason_schema.dump(query)
