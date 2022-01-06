@@ -7,7 +7,8 @@ import ChildDetails from './ChildDetails';
 import OnBehalfOfDetails from './OnBehalfOfDetails';
 import AddressContactDetails from './AddressContanctInfo';
 import RequestDescriptionBox from './RequestDescriptionBox';
-import RequestDetails from './RequestDetails';
+import AdditionalRequestDetails from "./AdditionalRequestDetails";
+import RequestDetails from "./RequestDetails";
 import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
@@ -574,8 +575,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject} 
                         disableInput={disableInput} 
                       />
-
-                      <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
+                      <RequestDetails requestDetails={requestDetails}/>
+                      <AdditionalRequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       {
                         requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
                         <AdditionalApplicantDetails
