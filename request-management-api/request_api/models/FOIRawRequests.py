@@ -78,7 +78,6 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                 )
             )
-            print("saverawrequestversion")                 
             db.session.execute(insertstmt)               
             db.session.commit()                
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
