@@ -10,13 +10,13 @@ from sqlalchemy import or_,and_,text
 class FOIRequestExtension(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestExtensions'
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["foiministryrequest_id", "foiministryrequestversion_id"], ["FOIMinistryRequests.foiministryrequestid", "FOIMinistryRequests.version"]
-        ),
-        # ForeignKeyConstraint(['extensionreasonid'], ['ExtensionReasons.extensionreasonid'], ),
-        # ForeignKeyConstraint(['extensionstatus_id'], ['ExtensionStatuses.extensionstatusid'], ),
-    )
+    # __table_args__ = (
+    #     ForeignKeyConstraint(
+    #         ["foiministryrequest_id", "foiministryrequestversion_id"], ["FOIMinistryRequests.foiministryrequestid", "FOIMinistryRequests.version"]
+    #     ),
+    #     # ForeignKeyConstraint(['extensionreasonid'], ['ExtensionReasons.extensionreasonid'], ),
+    #     # ForeignKeyConstraint(['extensionstatus_id'], ['ExtensionStatuses.extensionstatusid'], ),
+    # )
         
     # Defining the columns
     foirequestextensionid = db.Column(db.Integer, primary_key=True,autoincrement=True)
@@ -35,8 +35,8 @@ class FOIRequestExtension(db.Model):
     #ForeignKey References   
     foiministryrequest_id =db.Column(db.Integer, ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'))    
-    foiministryrequest = relationship("FOIMinistryRequest",foreign_keys="[FOIRequestExtension.foiministryrequest_id]")
-    foiministryrequestversion = relationship("FOIMinistryRequest",foreign_keys="[FOIRequestExtension.foiministryrequestversion_id]")
+    # foiministryrequest = relationship("FOIMinistryRequest",foreign_keys="[FOIRequestExtension.foiministryrequest_id]")
+    # foiministryrequestversion = relationship("FOIMinistryRequest",foreign_keys="[FOIRequestExtension.foiministryrequestversion_id]")
 
     extensionstatusid =db.Column(db.Integer, unique=False, nullable=False) #ForeignKey('ExtensionStatuses.extensionstatusid'))    
     # extensionstatus = relationship("ExtensionStatus",foreign_keys="FOIRequestExtension.extensionstatus_id")
@@ -44,7 +44,7 @@ class FOIRequestExtension(db.Model):
 
     extensionreasonid =db.Column(db.Integer, ForeignKey('ExtensionReasons.extensionreasonid'))
     # extensionreason = relationship("ExtensionReason",foreign_keys="FOIRequestExtension.extensionreasonid")
-    extensionreason = relationship("ExtensionReason",uselist=False) 
+    # extensionreason = relationship("ExtensionReason",uselist=False) 
     
     @classmethod
     def getextension(cls,foirequestextensionid):   
@@ -54,20 +54,33 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def createextension(cls,ministryrequestid,ministryrequestversion, extension, userid):
-        createuserid = 'dviswana@idir' #extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
-        createdat = datetime.now() #extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
-        decisiondate = None #extension['decisiondate'] if 'decisiondate' in extension else None
-        approvednoofdays = None #extension['approvednoofdays'] if 'approvednoofdays' in extension else None
-        # extensionstatusid = extension['extensionstatusid'] if 'extensionstatusid' in extension else 1
-        extensionreasonid=1
-        extendedduedays=None
-        extendedduedate=None
-        newextension = FOIRequestExtension(extensionreasonid=extensionreasonid, 
-        extendedduedays=extendedduedays, extendedduedate=extendedduedate, 
+        # createuserid = 'dviswana@idir' #extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
+        # createdat = datetime.now() #extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
+        # decisiondate = None #extension['decisiondate'] if 'decisiondate' in extension else None
+        # approvednoofdays = None #extension['approvednoofdays'] if 'approvednoofdays' in extension else None
+        # # extensionstatusid = extension['extensionstatusid'] if 'extensionstatusid' in extension else 1
+        # extensionreasonid=1
+        # extendedduedays=None
+        # extendedduedate=None
+        # newextension = FOIRequestExtension(extensionreasonid=extensionreasonid, 
+        # extendedduedays=extendedduedays, extendedduedate=extendedduedate, 
+        # decisiondate=decisiondate, approvednoofdays=approvednoofdays, 
+        # extensionstatusid=1, version=1, isactive=True, 
+        # foiministryrequest_id=1, foiministryrequestversion_id=1, 
+        # created_at=createdat, createdby=createuserid, updated_at=createdat, updatedby=createuserid)
+
+        createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
+        createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
+        decisiondate = extension['decisiondate'] if 'decisiondate' in extension else None
+        approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
+        extensionstatusid = extension['extensionstatusid'] if 'extensionstatusid' in extension else 1        
+      
+        newextension = FOIRequestExtension(extensionreasonid=extension['extensionreasonid'], 
+        extendedduedays=extension['extendedduedays'], extendedduedate=extension['extendedduedate'], 
         decisiondate=decisiondate, approvednoofdays=approvednoofdays, 
-        extensionstatusid=1, version=1, isactive=True, 
-        foiministryrequest_id=1, foiministryrequestversion_id=1, 
-        created_at=createdat, createdby=createuserid, updated_at=createdat, updatedby=createuserid)
+        extensionstatusid=extensionstatusid, version=1, isactive=True, 
+        foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, 
+        created_at=createdat, createdby=createuserid)
 
         db.session.add(newextension)
         db.session.commit()

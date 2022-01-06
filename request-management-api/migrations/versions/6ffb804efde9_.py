@@ -53,7 +53,7 @@ def upgrade():
 
     sa.ForeignKeyConstraint(['foiministryrequest_id', 'foiministryrequestversion_id'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
     sa.ForeignKeyConstraint(['extensionreasonid'], ['ExtensionReasons.extensionreasonid'], ),
-    # sa.ForeignKeyConstraint(['extensionstatusid'], ['ExtensionStatuses.extensionstatusid'], ),
+    sa.ForeignKeyConstraint(['extensionstatusid'], ['ExtensionStatuses.extensionstatusid'], ),
     sa.PrimaryKeyConstraint('foirequestextensionid', 'version')
     )
 
