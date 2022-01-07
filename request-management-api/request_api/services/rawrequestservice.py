@@ -26,7 +26,7 @@ class rawrequestservice:
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
-        result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,sourceofsubmission= sourceofsubmission,ispiiredacted=ispiiredacted,userId= userid,assigneegroup=assigneegroup,assignee=assignee,requirespayment=requirespayment,notes=notes)
+        result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,sourceofsubmission= sourceofsubmission,ispiiredacted=ispiiredacted,userid= userid,assigneegroup=assigneegroup,assignee=assignee,requirespayment=requirespayment,notes=notes)
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
