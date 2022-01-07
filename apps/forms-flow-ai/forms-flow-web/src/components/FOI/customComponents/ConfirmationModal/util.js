@@ -1,10 +1,30 @@
-import { StateEnum } from '../../../../constants/FOI/statusEnum';  
+import { StateEnum } from '../../../../constants/FOI/statusEnum';
+import { getFullnameList } from "../../../../helper/FOI/helper"
   
   export const getAssignedTo = (_saveRequestObject) => {
-    if (_saveRequestObject?.assignedTo)
-      return _saveRequestObject.assignedTo
+
+    if (_saveRequestObject?.assignedTo) {
+      return getFullName(_saveRequestObject.assignedTo);
+    }
+
     return _saveRequestObject?.assignedGroup
   }
+
+  export const getFullName = (username) => {
+    if(!username) {
+      return null
+    }
+    
+    const fullNameList = getFullnameList()
+      .filter(assignee => assignee.username === username)
+
+    if(fullNameList.length > 0) {
+      return fullNameList[0].fullname
+    }
+
+    return username;
+  };
+  
   export const getMinistryGroup = (_saveRequestObject) => {
     if (_saveRequestObject.selectedMinistries?.length > 0 )
       return `${_saveRequestObject.selectedMinistries[0].name} Queue`; 
