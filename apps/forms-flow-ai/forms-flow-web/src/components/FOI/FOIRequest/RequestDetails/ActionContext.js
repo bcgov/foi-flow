@@ -11,6 +11,7 @@ export const ActionProvider = ({
   return (
     <ActionContext.Provider
       value={{
+        modalOpen: modalOpen,
         setModalOpen: setModalOpen,
       }}
     >

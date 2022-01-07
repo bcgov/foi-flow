@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ActionProvider } from "./ActionContext";
-import RequestDetailsBox from "."
+import RequestDetailsBox from "./RequestDetailsBox"
 
 const RequestDetails = React.memo(
   ({
