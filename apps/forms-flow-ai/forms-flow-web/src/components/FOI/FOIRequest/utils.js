@@ -133,8 +133,7 @@ export const updateAdditionalInfo = (name, value, requestObject) => {
          personalHealthNumber:"",
          identityVerified:"",
     };
-  }
-
+  }  
   requestObject.additionalPersonalInfo[name] = value;
   return requestObject;
 };
@@ -144,9 +143,8 @@ export const createRequestDetailsObjectFunc = (requestObject, requiredRequestDet
   requestObject.requestProcessStart = requiredRequestDetailsValues.requestStartDate;
   requestObject.dueDate = requiredRequestDetailsValues.dueDate;
   requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
-  requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
-
-  switch(name) {
+  requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;  
+    switch(name) {
     case FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES:
       requestObject.receivedDate = value.receivedDate;     
       requestObject.receivedDateUF = value.receivedDate? new Date(value.receivedDate).toISOString(): "";
@@ -195,6 +193,16 @@ export const createRequestDetailsObjectFunc = (requestObject, requiredRequestDet
     case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
     case FOI_COMPONENT_CONSTANTS.DOB:
+    case FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME:
+    case FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME:
+    case FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME:
+    case FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME:
+    case FOI_COMPONENT_CONSTANTS.CHILD_DOB:
+    case FOI_COMPONENT_CONSTANTS.ANOTHER_DOB:
+    case FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME:
+    case FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME:
+    case FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME:
+    case FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME:     
       updateAdditionalInfo(name, value, requestObject);
       break;
     default:
