@@ -14,14 +14,14 @@ import {
   import {fnDone} from './foiServicesUtil';
 
   
-  export const fetchFOINotifications = (...rest) => {
-    const done = fnDone(rest);
+  export const fetchFOINotifications = () => {
+    //const done = fnDone(rest);
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_NOTIFICATIONS, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
             dispatch(setFOINotifications(res.data));
-            done(null, res.data);
+            //done(null, res.data);
           } else {
             console.log("Error", res);
             dispatch(serviceActionError(res));
@@ -30,13 +30,13 @@ import {
         .catch((error) => {
           console.log("Error", error);
           dispatch(serviceActionError(error));
-          done(error);
+         // done(error);
         });
     };
   };
 
-  export const deleteFOINotification = (idNumber, notificationId,data, ...rest) => {
-    const done = fnDone(rest);
+  export const deleteFOINotification = (idNumber, notificationId,data,) => {
+    //const done = fnDone(rest);
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_DELETE_NOTIFICATION,
       "<idNumber>",
@@ -47,15 +47,37 @@ import {
         .then((res) => {
           dispatch(fetchFOINotifications())
           if (res.data) {
-            done(null, res.data);
+            dispatch(setFOINotifications(res.data));
+            //done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
-            done("Error dismissing Notification");
+           // done("Error dismissing Notification");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-          done(error);
+         // done(error);
+        });
+    };
+  };
+
+  export const deleteAllNotifications = (data) => {
+    //const done = fnDone(rest);
+    return (dispatch) => {
+      httpDELETERequest(API.FOI_DELETE_ALL_NOTIFICATIONS, data)
+        .then((res) => {
+          dispatch(fetchFOINotifications())
+          if (res.data) {
+            //dispatch(setFOINotifications(res.data));
+            //done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            //done("Error dismissing all Notifications");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+         // done(error);
         });
     };
   };
