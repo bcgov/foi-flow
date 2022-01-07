@@ -155,8 +155,7 @@ class rawrequestservicegetter:
                     'adoptiveFatherFirstName': self.__getpropertyvalue(adoptiveparents,'fatherFirstName', hasadoptiveparentinfo)
                 }
     
-    def __prepareadditionalpersonalinfoforintakesubmission(self,requestrawdata):          
-               
+    def __prepareadditionalpersonalinfoforintakesubmission(self,requestrawdata):                  
         _childandanotherpersoninfo = requestrawdata['additionalPersonalInfo']         
         additionalpersonalinfo = {                    
                         'childFirstName': _childandanotherpersoninfo['childFirstName'] if _childandanotherpersoninfo.get('childFirstName') is not None else '',
@@ -168,7 +167,9 @@ class rawrequestservicegetter:
                         'anotherMiddleName': _childandanotherpersoninfo['anotherMiddleName'] if _childandanotherpersoninfo.get('anotherMiddleName') is not None else '',
                         'anotherLastName':_childandanotherpersoninfo['anotherLastName'] if _childandanotherpersoninfo.get('anotherLastName') is not None else '',
                         'anotherAlsoKnownAs': _childandanotherpersoninfo['anotherAlsoKnownAs'] if _childandanotherpersoninfo.get('anotherAlsoKnownAs') is not None else '',
-                        'anotherBirthDate':  _childandanotherpersoninfo['anotherBirthDate'] if _childandanotherpersoninfo.get('anotherBirthDate') is not None else '',                    
+                        'anotherBirthDate':  _childandanotherpersoninfo['anotherBirthDate'] if _childandanotherpersoninfo.get('anotherBirthDate') is not None else '', 
+                        'personalHealthNumber' : _childandanotherpersoninfo['personalHealthNumber'] if _childandanotherpersoninfo.get('personalHealthNumber') is not None else '',                  
+                        'birthDate': _childandanotherpersoninfo['birthDate'] if _childandanotherpersoninfo.get('birthDate') is not None else ''
                     }                 
         return additionalpersonalinfo    
 
