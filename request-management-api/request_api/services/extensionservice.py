@@ -13,7 +13,7 @@ class extensionservice:
     
     def getrequestextensions(self, requestid, version=None):
         requestversion =  self.__getversionforrequest(requestid) if version is None else version
-        extensions = FOIRequestExtension.getextension(requestid, requestversion)
+        extensions = FOIRequestExtension.getextensions(requestid, requestversion)
         return self.__formatcreateddate(extensions)
 
     def createrequestextnesion(self, ministryrequestid, extensionschema, userid):

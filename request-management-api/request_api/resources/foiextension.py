@@ -34,9 +34,39 @@ TRACER = Tracer.get_instance()
 """Custom exception messages
 """
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiextension/<requestid>')
+class GetFOIExtensions(Resource):
+    """Resource for managing FOI requests."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(requestid):
+        extensions = []
+        try:
+            extensionrecords = extensionservice().getrequestextensions(requestid)
+            for entry in extensionrecords:
+                extendedduedate =entry['extendedduedate'].strftime('%Y-%m-%d') if entry['extendedduedate'] is not None else None 
+                decisiondate = entry['decisiondate'].strftime('%Y-%m-%d') if entry['decisiondate'] is not None else None
+                created_at = entry['created_at'].strftime('%Y-%m-%d %H:%M:%S.%f') if entry['decisiondate'] is not None else None
+                extensions.append({"foirequestextensionid": entry["foirequestextensionid"], 
+                    "extensionreasonid": entry["extensionreasonid"], "extensionreson": entry["reason"],
+                    "extensionstatusid": entry["extensionstatusid"], "extensionstatus": entry["name"],
+                    "extendedduedays": entry["extendedduedays"], 
+                    "extendedduedate": extendedduedate, "decisiondate": decisiondate, 
+                    "approvednoofdays": entry["approvednoofdays"], "created_at": created_at, "createdby": entry["createdby"]})
+            return json.dumps(extensions), 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/ministryrequest/<requestid>')
+@API.route('/foiextension/<requestid>')
 class CreateFOIRequestExtension(Resource):
     """Creates extension for ministry(opened) request."""
 

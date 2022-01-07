@@ -69,8 +69,17 @@ class FOIRequestExtension(db.Model):
         newextesion = FOIRequestExtension( foirequestextensionid=extension["foirequestextensionid"], extendedduedays=extension["extendedduedays"], extendedduedate=extension["extendedduedate"], decisiondate=extension["decisiondate"], approvednoofdays=extension["approvednoofdays"], version=extension["version"], isactive=extension["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
         db.session.add(newextesion)
         db.session.commit()               
-        return DefaultMethodResult(True,'New Extension version created', newextesion.foirequestextensionid)   
-    
+        return DefaultMethodResult(True,'New Extension version created', newextesion.foirequestextensionid) 
+
+    @classmethod   
+    def getextensions(cls,ministryrequestid,ministryrequestversion):
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY created_at DESC'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
+        extensions = []
+        for row in rs:
+            if row["isactive"] == True:
+                extensions.append(dict(row))
+        return extensions
     
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:

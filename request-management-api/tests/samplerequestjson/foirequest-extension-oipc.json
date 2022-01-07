@@ -1,7 +1,6 @@
 {
-    "extension": {
-        "extensionreasonid": 5,
-        "extendedduedays": 30,
-        "extendedduedate": "2022-03-04"
-    }
+    "extensionreasonid": 5,
+    "extendedduedays": 30,
+    "extendedduedate": "2022-03-04"
+ 
 }
