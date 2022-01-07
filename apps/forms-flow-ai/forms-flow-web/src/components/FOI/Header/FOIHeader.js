@@ -39,7 +39,8 @@ useEffect(() => {
   if(isAuthenticated)
     dispatch(fetchFOINotifications());
   setInterval(() => {
-    dispatch(fetchFOINotifications());
+    if(isAuthenticated)
+      dispatch(fetchFOINotifications());
   }, 900000);
 },[dispatch]);
 

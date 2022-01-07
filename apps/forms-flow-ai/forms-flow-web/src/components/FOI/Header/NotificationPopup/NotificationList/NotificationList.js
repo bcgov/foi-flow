@@ -3,10 +3,6 @@ import {useSelector } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
 import {addToFullnameList, getFullnameList } from '../../../../../helper/FOI/helper'
-// import {
-//   deleteFOINotification
-// } from "../../../../../apiManager/services/FOI/foiNotificationServices";
-// import {useDispatch} from "react-redux";
 import { useParams } from 'react-router-dom';
 import {
   getBCgovCode
@@ -46,11 +42,6 @@ const NotificationList = (props) => {
       }
   }
 
-  //TODO : To be continued for dismiss
-  // const dismissNotification = () => {
-  //   dispatch(deleteFOINotification(notification.idnumber, notification.notificationid, {}));
-  // }
-
   return(
     <ListGroup.Item>
       <Row>
@@ -58,9 +49,6 @@ const NotificationList = (props) => {
           <h6 className="notification-heading">
             <a>{notification.idnumber}</a></h6>
         </Col>
-        {/*TODO : To be continued for dismiss: <Col className="close-btn-align" onClick={dismissNotification}>
-        <i className="fa fa-times"></i>
-        </Col> */}
       </Row>
       <div>
       {notification.notification}
