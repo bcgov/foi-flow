@@ -25,7 +25,7 @@ class rawrequestservice:
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-        requirespayment =  rawrequestservice.doesRequirePayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
+        requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
         result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,sourceofsubmission= sourceofsubmission,ispiiredacted=ispiiredacted,userId= userid,assigneegroup=assigneegroup,assignee=assignee,requirespayment=requirespayment,notes=notes)
         if result.success:
             redispubservice = RedisPublisherService()
@@ -38,7 +38,7 @@ class rawrequestservice:
         return result
 
     @staticmethod
-    def doesRequirePayment(requestdatajson):        
+    def doesrequirepayment(requestdatajson):        
         if 'requestType' not in requestdatajson or 'requestType' not in requestdatajson['requestType']:            
             raise BusinessException(Error.DATA_NOT_FOUND)
         if requestdatajson['requestType']['requestType'] == "personal":                 
