@@ -36,7 +36,7 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiextension/<requestid>')
+@API.route('/foiextension/ministryrequest/<requestid>')
 class GetFOIExtensions(Resource):
     """Resource for managing FOI requests."""
 
@@ -66,7 +66,7 @@ class GetFOIExtensions(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/<requestid>')
+@API.route('/foiextension/ministryrequest/<requestid>')
 class CreateFOIRequestExtension(Resource):
     """Creates extension for ministry(opened) request."""
 
