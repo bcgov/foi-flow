@@ -8,14 +8,24 @@ import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import CloseIcon from "@material-ui/icons/Close";
+import MenuItem from "@material-ui/core/MenuItem";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
 import "../../customComponents/ConfirmationModal/confirmationmodal.scss";
 import DateRangeIcon from "@material-ui/icons/DateRange";
-import { formatDate, addBusinessDays } from "../../../../helper/FOI/helper";
+import {
+  formatDate,
+  addBusinessDays,
+  calculateDaysRemaining,
+} from "../../../../helper/FOI/helper";
+import {
+  fetchExtensionReasons,
+  saveExtensionRequest,
+} from "../../../../apiManager/services/FOI/foiExtensionServices";
 import clsx from "clsx";
+import { useParams } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,50 +57,124 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddExtensionModal({ state, saveRequestObject }) {
   const classes = useStyles();
+const { requestId } = useParams();
+  const { 
+    modalOpen, 
+    setModalOpen, 
+    extensionReasons, 
+    setExtensionReasons, 
+    dispatch,
+    extensions,
+    startDate,
+    currentDueDate
+  } = useContext(ActionContext);
 
-  const { modalOpen, setModalOpen } = useContext(ActionContext);
+  const originalDueDate = currentDueDate
 
   const [reason, setReason] = useState("");
   const [publicBodySelected, setPublicBodySelected] = useState(false)
-  const [extendDate, setExtendDate] = useState("");
+  const [numberDays, setNumberDays] = useState("");
   const [extendedDate, setExtendedDate] = useState("")
 
   const initialErrors = {
-      reason: false,
-      extendDate: false
-  }
-  const [errors, setErrors] = useState({
-    reason: false,
-    extendDate: false,
-  });
+    reason: true,
+    extendDate: true,
+  };
+  const [errors, setErrors] = useState(initialErrors);
 
   const [saveLoading, setSaveLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    console.log(modalOpen);
-  }, [modalOpen]);
+  const [loading, setLoading] = useState(true);
 
   const handleReasonChange = (e) => {
-    setErrors({
-        ...errors,
-        reason: false,
-        extendDate: false
-    });
-    setExtendDate("")
-    setExtendedDate("")
-    setReason(e.target.value);
+
+    const extensionReason = extensionReasons.find(er => er.extensionreasonid === e.target.value)
+
+    setPublicBodySelected(extensionReason.extensiontype === "Public Body");
+    setReason(extensionReason);
   };
 
-  const handleExtendDateChange = (e) => {
+  const handleNumberDaysChange = (e) => {
       const numDays = e.target.value
-      setExtendDate(numDays);
-      setExtendedDate(addBusinessDays(Date(), numDays));
+      updateExtendedDate(numDays);
+  }
+
+  const updateExtendedDate = (days) => {
+      setNumberDays(days);
+      setExtendedDate(addBusinessDays(currentDueDate, days));
+
+  }
+  const handleExtendedDateChange = (e) => {
+    const newDate = e.target.value
+    const numDays = calculateDaysRemaining(newDate, currentDueDate)-1;
+    
+    updateExtendedDate(numDays);
   }
 
   const handleClose = () => {
     setModalOpen(false);
   };
+
+  useEffect(() => {
+    checkErrors()
+  }, [reason, numberDays])
+
+  const checkErrors = () => {
+    const updatedErrors = {
+      reason: !reason,
+      extendDate: !numberDays || numberDays < 1
+    }
+
+    let extensionTypeError = false
+    if (publicBodySelected) {
+      extensionTypeError = numberDays > 30;
+    }
+
+    updatedErrors.extendDate = numberDays < 1 || extensionTypeError;
+    setErrors({
+      ...errors,
+      ...updatedErrors,
+    });
+  }
+
+  const handleSave = () => {
+    setSaveLoading(true)
+    const extensionRequest = {
+      extensionreasonid: reason.extensionreasonid,
+      extendedduedays: numberDays,
+      extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
+    };
+
+    saveExtensionRequest({
+      extensionRequest,
+      requestId,
+      callback: (data) => {
+        console.log("saved", data)
+        setModalOpen(false);
+        setSaveLoading(false);
+      },
+      errorCallBack: () => {
+        setModalOpen(false);
+      },
+      dispatch
+    });
+
+    console.log("Save worked")
+    setSaveLoading(false)
+  }
+
+  useEffect(() => {
+    fetchExtensionReasons({
+        callback: (data) => {
+          setExtensionReasons(data)
+          setLoading(false)
+        },
+        errorCallBack: () => {
+          setModalOpen(false)
+        },
+        dispatch: dispatch
+    })
+    
+  }, [])
 
   const ConditionalRenderContent = ({ children }) => {
     if (loading) {
@@ -114,8 +198,10 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
     return <>{children}</>;
   };
 
-  const errorExists = Object.values(errors).some((isError) => isError);
   const maxExtendDays = publicBodySelected ? 30 : null
+  const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
+  const minimumExtendedDate = addBusinessDays(currentDueDate, 1);
+  console.log("errorExists", errorExists)
   return (
     <div className="state-change-dialog">
       <Dialog
@@ -125,7 +211,7 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
         aria-describedby="state-change-dialog-description"
         maxWidth={"md"}
         fullWidth={true}
-        // id="state-change-dialog"
+        id="add-extension-dialog"
       >
         <DialogTitle disableTypography id="state-change-dialog-title">
           <h2 className="state-change-header">Extension</h2>
@@ -153,13 +239,13 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
               spacing={2}
             >
               <Grid item xs={12}>
-                <strong>Start Date:</strong> 06-01-2022
+                <strong>Start Date:</strong> {startDate}
               </Grid>
               <Grid item xs={12} lg={6}>
-                <strong>Original Due Date:</strong> 06-01-2022
+                <strong>Original Due Date:</strong> {originalDueDate}
               </Grid>
               <Grid item xs={12} lg={6}>
-                <strong>Current Due Date:</strong> 06-01-2022
+                <strong>Current Due Date:</strong> {currentDueDate}
               </Grid>
 
               <Grid item xs={12}>
@@ -170,18 +256,32 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
                   required
                   select
                   label="Reason for Extension"
-                  value={reason}
+                  placeholder="Select Reason for Extension"
+                  value={reason.extensionreasonid}
                   onChange={handleReasonChange}
                   error={errors.reason}
                   fullWidth
-                ></TextField>
+                >
+                  {extensionReasons &&
+                    extensionReasons.map((extensionReason) => {
+                      return (
+                        <MenuItem
+                          key={`extension-${extensionReason.extensionreasonid}`}
+                          value={extensionReason.extensionreasonid}
+                          disabled={!extensionReason.isactive}
+                        >
+                          {extensionReason.reason}
+                        </MenuItem>
+                      );
+                    })}
+                </TextField>
               </Grid>
 
               <Grid item xs={6}>
                 <TextField
                   id="outlined-extension-reasons"
                   name="extendDate"
-                  value={extendDate}
+                  value={numberDays}
                   type="number"
                   variant="outlined"
                   required
@@ -192,7 +292,7 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
                     ),
                     inputProps: { min: 1, max: maxExtendDays },
                   }}
-                  onChange={handleExtendDateChange}
+                  onChange={handleNumberDaysChange}
                   fullWidth
                   error={errors.extendDate}
                 ></TextField>
@@ -200,10 +300,10 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
 
               <Grid item xs={6}>
                 <TextField
-                  label="Received Date"
+                  label="Extended Due Date"
                   type="date"
                   value={extendedDate}
-                  disabled
+                  onChange={handleExtendedDateChange}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -213,6 +313,7 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
                         <DateRangeIcon />
                       </InputAdornment>
                     ),
+                    inputProps: { min: minimumExtendedDate },
                   }}
                   variant="outlined"
                   fullWidth
@@ -241,6 +342,7 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
                   [classes.btndisabled]: saveLoading,
                 })}
                 disabled={saveLoading || errorExists}
+                onClick={handleSave}
               >
                 Save
                 {saveLoading && (

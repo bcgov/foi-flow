@@ -264,5 +264,5 @@ export {
   getFullnameList,
   getAssignToList,
   getFullnameTeamList,
-  ConditionalComponent
+  ConditionalComponent,
 };

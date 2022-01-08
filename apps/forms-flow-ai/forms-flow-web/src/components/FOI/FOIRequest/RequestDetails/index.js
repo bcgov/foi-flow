@@ -8,7 +8,9 @@ const RequestDetails = React.memo(
   }) => {
 
     return (
-      <ActionProvider>
+      <ActionProvider
+        requestDetails={requestDetails}
+      >
         <RequestDetailsBox 
           requestDetails={requestDetails} 
         />
