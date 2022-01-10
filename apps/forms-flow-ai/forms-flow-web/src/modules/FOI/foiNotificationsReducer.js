@@ -3,7 +3,7 @@ const initialState = {
   foiNotifications: []
 }
 
-const notifications = (state = initialState, action)=> {
+const notifications = (state = initialState, action = {})=> {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return {...state, isLoading: action.payload};

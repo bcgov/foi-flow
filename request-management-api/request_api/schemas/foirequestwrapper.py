@@ -99,7 +99,7 @@ class FOIRequestWrapperSchema(Schema):
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True) 
   
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
-    additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema)
+    additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
     idNumber = fields.Str(data_key="idNumber",allow_none=True) 
 
