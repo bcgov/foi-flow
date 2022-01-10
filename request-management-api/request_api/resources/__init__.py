@@ -38,6 +38,7 @@ from .foiwatcher import API as FOIWATCHER_API
 from .foicomment import API as FOICOMMENT_API
 from .foidocument import API as FOIDOCUMENT_API
 from .fee import API as FEE_API
+from .foinotification import API as FOINOTIFICATION_API
 
 __all__ = ('API_BLUEPRINT')
 
@@ -71,3 +72,4 @@ API.add_namespace(FOIWATCHER_API,'/api')
 API.add_namespace(FOICOMMENT_API,'/api')
 API.add_namespace(FOIDOCUMENT_API,'/api')
 API.add_namespace(FEE_API,'/api')
+API.add_namespace(FOINOTIFICATION_API,'/api')

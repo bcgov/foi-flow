@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect,useState } from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
@@ -7,7 +7,11 @@ import { Container } from "@material-ui/core";
 import UserService from "../../../services/UserService";
 import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
-
+import Popup from 'reactjs-popup';
+import NotificationPopup from "./NotificationPopup/NotificationPopup";
+import {
+  fetchFOINotifications
+} from "../../../apiManager/services/FOI/foiNotificationServices";
 
 const FOIHeader = React.memo(() => { 
 
@@ -19,12 +23,44 @@ const FOIHeader = React.memo(() => {
 }
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
+const [screenPosition, setScreenPosition] = useState(0);
+const [open, setOpen] = useState(false);
+const closeModal = () => setOpen(false);
+const openModal = (coordinates) => {
+  const screenX = coordinates.pageX;
+  setScreenPosition(screenX);
+  console.log(screenX);
+  setOpen(!open);
+}
+
+let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
+
+useEffect(() => {     
+  if(isAuthenticated)
+    dispatch(fetchFOINotifications());
+  setInterval(() => {
+    if(isAuthenticated)
+      dispatch(fetchFOINotifications());
+  }, 900000);
+},[dispatch]);
+
+
+
+const triggerPopup = () => {
+  return(
+    <> 
+    <Badge badgeContent={foiNotifications?.length} color="secondary">
+      <i style={{color: open? "#003366" : "white",cursor: "pointer"}} className="fa fa-bell-o foi-bell"></i>
+    </Badge>
+   </>
+  )
+}
 
   return (
     <div>
     <div className="row ">
     <Navbar collapseOnSelect fixed="top" expand="sm" bg="#036" variant="dark" style={{borderBottom: "2px solid #fcba19"}}>
-      <Container className="foiContainer">
+      <Container className="foiContainer" style={{maxHeight: "45px"}}>
         <Nav className="ml-auto">  
         <div className="col-md-12 col-sm-12">
           <div className="col-md-3 col-sm-4 foiheaderLogosection">
@@ -47,11 +83,23 @@ const user = useSelector((state) => state.user.userDetail);
                       <li className="nav-item username foinavitem">
                           <span className="navbar-text">  {user.name || user.preferred_username || ""} </span>
                       </li>
-                      <li className="nav-item bell-icon foinavitem">
-                      <Badge color="secondary" badgeContent=" " variant="dot">
-                          <i className="fa fa-bell-o foi-bell"></i>
-                      </Badge>
-                        
+                      <li className="bell-icon foinavitem" >
+                      <div onClick={(e) => openModal(e)} className={`drawer-div ${open && 'notification-popup-drawer'}`}>
+                        <Popup className="notification-popup" 
+                        role='tooltip'
+                        open={open} 
+                        onClose={closeModal}
+                        trigger={
+                          triggerPopup
+                        }
+                        nested
+                        closeOnDocumentClick 
+                        contentStyle={{left: `${(screenPosition - 300)}px`}}
+                        position={'bottom right'}
+                        >
+                        <NotificationPopup notifications={foiNotifications} ></NotificationPopup>
+                        </Popup>
+                      </div>
                       </li>
                       <li className="nav-item foinavitem">
                         <button type="button" className="btn btn-primary signout-btn" onClick={signout}>Sign Out</button>

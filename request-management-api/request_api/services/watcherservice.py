@@ -50,7 +50,10 @@ class watcherservice:
         else:
             return FOIRequestWatcher.getNonMinistrywatchers(ministryrequestid)
     
+    def getallministryrequestwatchers(self,ministryrequestid):
+        return FOIRequestWatcher.getMinistrywatchers(ministryrequestid) + FOIRequestWatcher.getNonMinistrywatchers(ministryrequestid)
     
+        
     def disableministryrequestwatchers(self, ministryrequestid, userid):
         """Remove an user from the watched list of an opened request.
         """
