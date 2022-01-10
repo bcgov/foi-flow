@@ -36,9 +36,15 @@ nav h2 {
 }
 
 .bell-icon {
-  margin-right: 40px;
+  padding-top: 0.5rem;
   
-  
+  .MuiBadge-badge{
+    visibility: visible !important;
+  }
+
+  .MuiBadge-anchorOriginTopRightRectangle {
+    transform: scale(0.85) translate(50%, -50%);
+  }
 }
 
 .signout-btn {
@@ -50,7 +56,7 @@ nav h2 {
   color: #FFFF;
   border-color: #FFFF !important;
   position: relative;
- 
+  max-height: 40px;
 }
 
 .foiheaderLogosection{
@@ -70,6 +76,39 @@ nav h2 {
 
 .foi-bell {
   font: normal normal normal 14px/1 FontAwesome, sans-serif !important;
+}
+
+.notification-popup-content{
+  border: 1px solid #214E7A !important;
+  border-radius: 10px !important;
+  background-color: #fff !important;
+  width: 390px !important;
+  top: 75px !important;
+  padding: 0px !important;
+  z-index: 1400 !important;
+}
+
+.notification-popup-content .list-group-item{
+  background-color: transparent !important;
+}
+
+.notification-popup-arrow {
+  display: none;
+}
+
+.notification-popup-drawer{
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  background-color: #E5EAEF;
+  cursor: pointer;
+}
+
+.drawer-div{
+  padding-left: 7px;
+  width: 30px;
+  margin-right: 40px;
+  height: 70px;
+  cursor: pointer;
 }
 
 

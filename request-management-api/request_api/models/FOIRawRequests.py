@@ -35,10 +35,10 @@ class FOIRawRequest(db.Model):
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userId, notes, requirespayment ,assigneegroup= None,assignee= None)->DefaultMethodResult:                
+    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userid, notes, requirespayment ,assigneegroup= None,assignee= None)->DefaultMethodResult:
         createdat = datetime.now()        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userId,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -160,8 +160,18 @@ class FOIRawRequest(db.Model):
         return [row[0] for row in rs][0]
 
     @classmethod
+    def getassignmenttransition(cls,requestid):
+        sql = """select version, assignedto, status from "FOIRawRequests" 
+                    where requestid = :requestid
+                    order by version desc limit 2;"""
+        rs = db.session.execute(text(sql), {'requestid': requestid})
+        assignments = []
+        for row in rs:
+            assignments.append({"assignedto": row["assignedto"], "status": row["status"], "version": row["version"]})
+        return assignments
+    
+    @classmethod
     def getversionforrequest(cls,requestid):   
-        print(requestid)
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
     @classmethod

@@ -21,7 +21,7 @@ const initialState = {
   foiMinistryDivisionalStages:[], 
   foiWatcherList: [],
   foiRequestComments:[],
-  foiRequestAttachments:[]
+  foiRequestAttachments:[],
 }
 
 const foiRequests = (state = initialState, action)=> {
