@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddExtensionModal({ state, saveRequestObject }) {
   const classes = useStyles();
-const { requestId } = useParams();
+  const { requestId } = useParams();
   const { 
     modalOpen, 
     setModalOpen, 
@@ -101,8 +101,8 @@ const { requestId } = useParams();
   const updateExtendedDate = (days) => {
       setNumberDays(days);
       setExtendedDate(addBusinessDays(currentDueDate, days));
-
   }
+
   const handleExtendedDateChange = (e) => {
     const newDate = e.target.value
     const numDays = calculateDaysRemaining(newDate, currentDueDate)-1;
@@ -169,7 +169,7 @@ const { requestId } = useParams();
           setLoading(false)
         },
         errorCallBack: () => {
-          setModalOpen(false)
+          setLoading(false);
         },
         dispatch: dispatch
     })
@@ -336,7 +336,7 @@ const { requestId } = useParams();
               <button
                 className={`btn-save`}
                 style={{ width: "100%" }}
-                // onClick={handleSave}
+                onClick={handleSave}
                 className={clsx("btn-save", {
                   [classes.btnenabled]: !saveLoading,
                   [classes.btndisabled]: saveLoading,

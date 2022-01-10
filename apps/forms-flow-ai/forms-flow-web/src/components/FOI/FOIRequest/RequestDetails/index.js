@@ -12,7 +12,6 @@ const RequestDetails = React.memo(
         requestDetails={requestDetails}
       >
         <RequestDetailsBox 
-          requestDetails={requestDetails} 
         />
       </ActionProvider>
     );

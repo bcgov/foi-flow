@@ -8,7 +8,7 @@ import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConst
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import AddExtensionModal from "./AddExtensionModal"
 
-const RequestDetailsBox = React.memo(({ requestDetails }) => {
+const RequestDetailsBox = React.memo(() => {
   const { modalOpen, setModalOpen } = useContext(ActionContext);
   return (
     <>
