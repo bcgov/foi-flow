@@ -184,6 +184,10 @@ class FOIMinistryRequest(db.Model):
             requeststates.append(row["status"])
         return requeststates
 
+    @classmethod
+    def getrequestoriginalduedate(cls,ministryrequestid):       
+        return db.session.query(FOIMinistryRequest.duedate).filter(and_(FOIMinistryRequest.foiministryrequestid == ministryrequestid), and_(FOIMinistryRequest.requeststatusid == 1)).order_by(FOIMinistryRequest.version).first()[0]
+         
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
