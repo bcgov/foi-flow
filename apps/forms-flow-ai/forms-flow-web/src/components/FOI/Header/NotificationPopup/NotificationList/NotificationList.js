@@ -4,7 +4,7 @@ import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
 import {addToFullnameList, getFullnameList } from '../../../../../helper/FOI/helper'
 import {
-  deleteFOINotification
+  deleteFOINotifications
 } from "../../../../../apiManager/services/FOI/foiNotificationServices";
 import { useParams } from 'react-router-dom';
 import {
@@ -48,7 +48,7 @@ const NotificationList = (props) => {
   }
 
   const dismissNotification = () => {
-    dispatch(deleteFOINotification(notification.idnumber, notification.notificationid, {}));
+    dispatch(deleteFOINotifications(notification.idnumber, notification.notificationid,null,{}));
   }
 
   return(

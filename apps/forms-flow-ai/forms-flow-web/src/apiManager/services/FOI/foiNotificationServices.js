@@ -11,7 +11,7 @@ import {
   } from "../../../actions/FOI/foiNotificationActions"
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper"; 
-  import {fnDone} from './foiServicesUtil';
+  //import {fnDone} from './foiServicesUtil';
 
   
   export const fetchFOINotifications = () => {
@@ -35,49 +35,54 @@ import {
     };
   };
 
-  export const deleteFOINotification = (idNumber, notificationId,data,) => {
-    //const done = fnDone(rest);
-    let apiUrl = replaceUrl(replaceUrl(
-      API.FOI_DELETE_NOTIFICATION,
-      "<idNumber>",
-      idNumber
-    ), "<notificationId>", notificationId);
+  export const deleteFOINotifications = (idNumber, notificationId, type, data) => {
+    let apiUrl = "";
+    if(type){
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_DELETE_NOTIFICATION,
+        "<type>",
+        type
+      ));
+    }
+    else{
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_DELETE_NOTIFICATION,
+        "<idNumber>",
+        idNumber
+      ), "<notificationId>", notificationId);
+    }
     return (dispatch) => {
       httpDELETERequest(apiUrl, data)
         .then((res) => {
-          dispatch(fetchFOINotifications())
           if (res.data) {
             dispatch(setFOINotifications(res.data));
-            //done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
-           // done("Error dismissing Notification");
           }
         })
         .catch((error) => {
           dispatch(serviceActionError(error));
-         // done(error);
         });
     };
   };
 
-  export const deleteAllNotifications = (data) => {
-    //const done = fnDone(rest);
-    return (dispatch) => {
-      httpDELETERequest(API.FOI_DELETE_ALL_NOTIFICATIONS, data)
-        .then((res) => {
-          dispatch(fetchFOINotifications())
-          if (res.data) {
-            //dispatch(setFOINotifications(res.data));
-            //done(null, res.data);
-          } else {
-            dispatch(serviceActionError(res));
-            //done("Error dismissing all Notifications");
-          }
-        })
-        .catch((error) => {
-          dispatch(serviceActionError(error));
-         // done(error);
-        });
-    };
-  };
+  // export const deleteAllNotifications = (data) => {
+  //   let apiUrl = replaceUrl(replaceUrl(
+  //     API.FOI_DELETE_NOTIFICATION,
+  //     "<type>",
+  //     type
+  //   ));
+  //   return (dispatch) => {
+  //     httpDELETERequest(apiUrl, data)
+  //       .then((res) => {
+  //         if (res.data) {
+  //           dispatch(setFOINotifications(res.data));
+  //         } else {
+  //           dispatch(serviceActionError(res));
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         dispatch(serviceActionError(error));
+  //       });
+  //   };
+  // };

@@ -3,7 +3,7 @@ import { Tabs, ListGroup, Tab, Row, Col} from "react-bootstrap";
 import './notificationpopup.scss';
 import NotificationList from './NotificationList/NotificationList'
 import {
-  deleteAllNotifications
+  deleteFOINotifications
 } from "../../../../apiManager/services/FOI/foiNotificationServices";
 import {useDispatch } from "react-redux";
 
@@ -37,8 +37,8 @@ const NotificationPopup = ({notifications}) => {
   }
 
   const dispatch = useDispatch();
-  const dismissAllNotifications = () => {
-    dispatch(deleteAllNotifications());
+  const dismissAllNotifications = (type) => {
+    dispatch(deleteFOINotifications(null, null,type,{}));
   }
 
   return (
@@ -47,7 +47,7 @@ const NotificationPopup = ({notifications}) => {
         {checkIfNotificationExists('assignee')  && <Row className="list-header">
           {/* <Col><div><i className="fa fa-volume-up"></i></div></Col> */}
           <Col className="close-btn-align">
-            <div className="notification-dismiss" onClick={dismissAllNotifications}>
+            <div className="notification-dismiss" onClick={() => dismissAllNotifications('assignee')}>
               <i className="fa fa-times" style={{paddingRight:"5px"}}></i>Dismiss All
             </div></Col>
         </Row>}
@@ -65,7 +65,7 @@ const NotificationPopup = ({notifications}) => {
         {checkIfNotificationExists('watcher') && <Row className="list-header">
           {/* <Col><div><i className="fa fa-volume-up"></i></div></Col> */}
           <Col className="close-btn-align">
-          <div className="notification-dismiss" onClick={dismissAllNotifications}>
+          <div className="notification-dismiss" onClick={() => dismissAllNotifications('watcher')}>
             <i className="fa fa-times" style={{paddingRight:"5px"}}></i>
             Dismiss All</div></Col>
         </Row>}
