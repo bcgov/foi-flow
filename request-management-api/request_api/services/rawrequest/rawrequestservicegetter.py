@@ -61,7 +61,15 @@ class rawrequestservicegetter:
             if request['status'] == 'Closed':
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             return request['requestrawdata']    
-        elif request != {} and request['sourceofsubmission'] == "intake":            
+        elif request != {} and request['sourceofsubmission'] == "intake":
+            requestrawdata = request['requestrawdata']
+            requesttype = requestrawdata['requestType']             
+            additionalpersonalinfo = None           
+            if self.__ispersonalrequest(requesttype) and requestrawdata.get('additionalPersonalInfo') is not None:                
+                additionalpersonalinfo = self.__prepareadditionalpersonalinfoforintakesubmission(requestrawdata)
+
+            request['requestrawdata']['additionalPersonalInfo'] = additionalpersonalinfo              
+            
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['currentState'] = request['status']
             requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
@@ -147,8 +155,26 @@ class rawrequestservicegetter:
                     'adoptiveFatherFirstName': self.__getpropertyvalue(adoptiveparents,'fatherFirstName', hasadoptiveparentinfo)
                 }
     
+    def __prepareadditionalpersonalinfoforintakesubmission(self,requestrawdata):                  
+        _childandanotherpersoninfo = requestrawdata['additionalPersonalInfo']         
+        additionalpersonalinfo = {                    
+                        'childFirstName': _childandanotherpersoninfo['childFirstName'] if _childandanotherpersoninfo.get('childFirstName') is not None else '',
+                        'childMiddleName': _childandanotherpersoninfo['childMiddleName'] if _childandanotherpersoninfo.get('childMiddleName') is not None else '',
+                        'childLastName': _childandanotherpersoninfo['childLastName'] if _childandanotherpersoninfo.get('childLastName') is not None else '',
+                        'childAlsoKnownAs':_childandanotherpersoninfo['childAlsoKnownAs'] if _childandanotherpersoninfo.get('childAlsoKnownAs') is not None else '',
+                        'childBirthDate': _childandanotherpersoninfo['childBirthDate'] if _childandanotherpersoninfo.get('childBirthDate') is not None else '',
+                        'anotherFirstName': _childandanotherpersoninfo['anotherFirstName'] if _childandanotherpersoninfo.get('anotherFirstName') is not None else '',
+                        'anotherMiddleName': _childandanotherpersoninfo['anotherMiddleName'] if _childandanotherpersoninfo.get('anotherMiddleName') is not None else '',
+                        'anotherLastName':_childandanotherpersoninfo['anotherLastName'] if _childandanotherpersoninfo.get('anotherLastName') is not None else '',
+                        'anotherAlsoKnownAs': _childandanotherpersoninfo['anotherAlsoKnownAs'] if _childandanotherpersoninfo.get('anotherAlsoKnownAs') is not None else '',
+                        'anotherBirthDate':  _childandanotherpersoninfo['anotherBirthDate'] if _childandanotherpersoninfo.get('anotherBirthDate') is not None else '', 
+                        'personalHealthNumber' : _childandanotherpersoninfo['personalHealthNumber'] if _childandanotherpersoninfo.get('personalHealthNumber') is not None else '',                  
+                        'birthDate': _childandanotherpersoninfo['birthDate'] if _childandanotherpersoninfo.get('birthDate') is not None else ''
+                    }                 
+        return additionalpersonalinfo    
+
     def __getpropertyvalue(self, inputschema, property, criteria):
-        return inputschema[property] if criteria else ''
+        return inputschema[property] if inputschema is not None and criteria  else ''
     
     def __ispersonalrequest(self, requesttype):
         return True if requesttype == 'personal' else False
