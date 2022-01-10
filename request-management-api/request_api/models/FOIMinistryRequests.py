@@ -81,6 +81,17 @@ class FOIMinistryRequest(db.Model):
         return [row[0] for row in rs][0]
     
     @classmethod
+    def getassignmenttransition(cls,requestid):
+        sql = """select version, assignedto, assignedministryperson from "FOIMinistryRequests" 
+                    where foiministryrequestid = :requestid
+                    order by version desc limit 2;"""
+        rs = db.session.execute(text(sql), {'requestid': requestid})
+        assignments = []
+        for row in rs:
+            assignments.append({"assignedto": row["assignedto"], "assignedministryperson": row["assignedministryperson"], "version": row["version"]})
+        return assignments
+    
+    @classmethod
     def deActivateFileNumberVersion(cls, ministryid, idnumber, currentversion, userid)->DefaultMethodResult:
         db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryid, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         return DefaultMethodResult(True,'Request Updated',idnumber)

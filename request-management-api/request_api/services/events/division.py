@@ -3,7 +3,6 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
 from request_api.services.commentservice import commentservice
-from request_api.auth import auth, AuthHelper
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
@@ -16,25 +15,26 @@ class divisionevent:
     """ FOI Event management service
 
     """
-    def createdivisionevent(self, requestid, requesttype):
+    def createdivisionevent(self, requestid, requesttype, userid):
         if requesttype != "ministryrequest":
             return DefaultMethodResult(True,'No division required',requestid)
         version = FOIMinistryRequest.getversionforrequest(requestid)
         curdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version)
         prevdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version[0]-1)
-        divsisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions) 
-        
+        divisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions) 
+        if divisionsummary is None or (divisionsummary and len(divisionsummary) <1):
+            return  DefaultMethodResult(True,'No change',requestid)
         try:
-            for division in divsisionsummary:  
-                self.createcomment(requestid, division['division'], division['stage'], division['event'])
+            for division in divisionsummary:  
+                self.createcomment(requestid, division['division'], division['stage'], division['event'], userid)
             return DefaultMethodResult(True,'Comment posted',requestid)
         except BusinessException as exception:
             return DefaultMethodResult(False,'unable to post comment - '+exception.message,requestid)   
                 
         
-    def createcomment(self, requestid, division, stage, event):
+    def createcomment(self, requestid, division, stage, event, userid):
         comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division, stage, event)}
-        commentservice().createministryrequestcomment(comment, AuthHelper.getuserid(), 2)
+        commentservice().createministryrequestcomment(comment, userid, 2)
 
     
     def __maintained(self,cdivisions, pdivisions):
@@ -84,7 +84,6 @@ class divisionevent:
             return self.__formatmessage(division)+' division with stage '+ self.__formatmessage(stage) +' has been removed'  
              
         
-    @classmethod
     def __formatmessage(self, data):
         return '<i>'+data+'</i>'    
 
