@@ -51,8 +51,9 @@ class FOINotification(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('GET,OPTIONS')
+@cors_preflight('DELETE,OPTIONS')
 @API.route('/foinotifications')
+@API.route('/foinotifications/<string:type>')
 @API.route('/foinotifications/<string:idnumber>/<int:notficationid>')
 class FOIDismissNotification(Resource):
     """Resource for managing FOI requests."""
@@ -62,9 +63,9 @@ class FOIDismissNotification(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def delete(idnumber=None,notficationid=None):      
+    def delete(type=None,idnumber=None,notficationid=None):      
         try:
-            result = notificationservice().dismissnotification(AuthHelper.getuserid(), idnumber, notficationid)
+            result = notificationservice().dismissnotification(AuthHelper.getuserid(), type, idnumber, notficationid)
             if result.success == True:
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 500

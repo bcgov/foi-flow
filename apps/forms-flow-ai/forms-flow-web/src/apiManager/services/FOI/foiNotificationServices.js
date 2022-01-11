@@ -23,29 +23,37 @@ import {
             dispatch(setFOINotifications(res.data));
             done(null, res.data);
           } else {
-            console.log("Error", res);
             dispatch(serviceActionError(res));
           }
         })
         .catch((error) => {
-          console.log("Error", error);
           dispatch(serviceActionError(error));
           done(error);
         });
     };
   };
 
-  export const deleteFOINotification = (idNumber, notificationId,data, ...rest) => {
+  export const deleteFOINotifications = (idNumber, notificationId, type, ...rest) => {
     const done = fnDone(rest);
-    let apiUrl = replaceUrl(replaceUrl(
-      API.FOI_DELETE_NOTIFICATION,
-      "<idNumber>",
-      idNumber
-    ), "<notificationId>", notificationId);
+    let apiUrl = "";
+    if(type){
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_DELETE_ALL_NOTIFICATIONS,
+        "<type>",
+        type
+      ));
+    }
+    else{
+      apiUrl = replaceUrl(replaceUrl(
+        API.FOI_DELETE_NOTIFICATION,
+        "<idNumber>",
+        idNumber
+      ), "<notificationId>", notificationId);
+    }
     return (dispatch) => {
-      httpDELETERequest(apiUrl, data)
+      httpDELETERequest(apiUrl, UserService.getToken())
         .then((res) => {
-          dispatch(fetchFOINotifications())
+          dispatch(fetchFOINotifications());
           if (res.data) {
             done(null, res.data);
           } else {
