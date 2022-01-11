@@ -66,7 +66,7 @@ class notificationservice:
             presponse = FOIRequestNotification.dismissnotification(notficationids)            
         else:
             cresponse = FOIRawRequestNotificationUser.dismissnotification(notificationuserid)
-            presponse = FOIRawRequestNotificationUser.dismissnotification(notficationids)
+            presponse = FOIRawRequestNotification.dismissnotification(notficationids)
         if cresponse.success == True and presponse.success == True:
             return DefaultMethodResult(True,'Notifications deleted for id',notificationuserid) 
         else:
