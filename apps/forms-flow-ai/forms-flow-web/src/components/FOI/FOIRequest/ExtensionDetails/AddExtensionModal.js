@@ -57,7 +57,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddExtensionModal({ state, saveRequestObject }) {
   const classes = useStyles();
-  const { requestId } = useParams();
+  const { requestId, ministryId } = useParams();
+  const params = useParams()
+
   const { 
     modalOpen, 
     setModalOpen, 
@@ -145,10 +147,9 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
     };
 
     saveExtensionRequest({
-      extensionRequest,
-      requestId,
+      data: extensionRequest,
+      ministryId,
       callback: (data) => {
-        console.log("saved", data)
         setModalOpen(false);
         setSaveLoading(false);
       },
@@ -157,24 +158,24 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
       },
       dispatch
     });
-
-    console.log("Save worked")
     setSaveLoading(false)
   }
 
   useEffect(() => {
-    fetchExtensionReasons({
-        callback: (data) => {
-          setExtensionReasons(data)
-          setLoading(false)
-        },
-        errorCallBack: () => {
-          setLoading(false);
-        },
-        dispatch: dispatch
-    })
+    if(requestId) {
+      fetchExtensionReasons({
+          callback: (data) => {
+            setExtensionReasons(data)
+            setLoading(false)
+          },
+          errorCallBack: () => {
+            setLoading(false);
+          },
+          dispatch: dispatch
+      })
+    }
     
-  }, [])
+  }, [requestId])
 
   const ConditionalRenderContent = ({ children }) => {
     if (loading) {
@@ -201,7 +202,7 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
   const maxExtendDays = publicBodySelected ? 30 : null
   const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
   const minimumExtendedDate = addBusinessDays(currentDueDate, 1);
-  console.log("errorExists", errorExists)
+
   return (
     <div className="state-change-dialog">
       <Dialog
@@ -336,7 +337,6 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
               <button
                 className={`btn-save`}
                 style={{ width: "100%" }}
-                onClick={handleSave}
                 className={clsx("btn-save", {
                   [classes.btnenabled]: !saveLoading,
                   [classes.btndisabled]: saveLoading,

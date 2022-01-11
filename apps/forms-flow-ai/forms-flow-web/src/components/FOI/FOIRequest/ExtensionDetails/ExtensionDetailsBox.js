@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { ActionContext } from "./ActionContext";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -7,15 +9,28 @@ import Input from "@material-ui/core/Input";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import AddExtensionModal from "./AddExtensionModal"
+import {
+  fetchExtensions,
+} from "../../../../apiManager/services/FOI/foiExtensionServices";
+import ExtensionsTable from "./ExtensionsTable";
 
-const RequestDetailsBox = React.memo(() => {
-  const { modalOpen, setModalOpen } = useContext(ActionContext);
+const ExtensionDetailsBox = React.memo(() => {
+  const { modalOpen, setModalOpen, dispatch} = useContext(ActionContext);
+
+  const {ministryId} = useParams()
+
+  useEffect(() => {
+    if (ministryId) {
+      dispatch(fetchExtensions(ministryId));
+    }
+  }, [ministryId]);
+  
   return (
     <>
       <Card className="foi-details-card">
         <div className="row foi-details-row">
           <div className="col-lg-8 foi-details-col ">
-            <label className="foi-details-label">REQUEST DETAILS</label>
+            <label className="foi-details-label">EXTENSION DETAILS</label>
           </div>
           <div className="col-lg-4 foi-details-col ">
             <a
@@ -35,6 +50,7 @@ const RequestDetailsBox = React.memo(() => {
             <div className="col-lg-6 foi-details-col"></div>
             <div className="col-lg-6 foi-details-col"></div>
           </div>
+          <ExtensionsTable/>
         </CardContent>
       </Card>
       <AddExtensionModal/>
@@ -42,4 +58,4 @@ const RequestDetailsBox = React.memo(() => {
   );
 });
 
-export default RequestDetailsBox;
+export default ExtensionDetailsBox;

@@ -175,3 +175,9 @@ export const setRequestAttachments = (data) => dispatch => {
         payload:data      
     })
 }
+export const setRequestExtensions = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS,
+    payload: data,
+  });
+};
