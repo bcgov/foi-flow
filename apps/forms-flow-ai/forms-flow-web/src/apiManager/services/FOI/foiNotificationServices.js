@@ -39,7 +39,7 @@ import {
     let apiUrl = "";
     if(type){
       apiUrl = replaceUrl(replaceUrl(
-        API.FOI_DELETE_NOTIFICATION,
+        API.FOI_DELETE_ALL_NOTIFICATIONS,
         "<type>",
         type
       ));
@@ -52,10 +52,10 @@ import {
       ), "<notificationId>", notificationId);
     }
     return (dispatch) => {
-      httpDELETERequest(apiUrl, data)
+      httpDELETERequest(apiUrl, data, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            dispatch(setFOINotifications(res.data));
+            dispatch(fetchFOINotifications());
           } else {
             dispatch(serviceActionError(res));
           }
@@ -65,24 +65,3 @@ import {
         });
     };
   };
-
-  // export const deleteAllNotifications = (data) => {
-  //   let apiUrl = replaceUrl(replaceUrl(
-  //     API.FOI_DELETE_NOTIFICATION,
-  //     "<type>",
-  //     type
-  //   ));
-  //   return (dispatch) => {
-  //     httpDELETERequest(apiUrl, data)
-  //       .then((res) => {
-  //         if (res.data) {
-  //           dispatch(setFOINotifications(res.data));
-  //         } else {
-  //           dispatch(serviceActionError(res));
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         dispatch(serviceActionError(error));
-  //       });
-  //   };
-  // };
