@@ -51,7 +51,7 @@ class FOINotification(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('DEL,OPTIONS')
+@cors_preflight('DELETE,OPTIONS')
 @API.route('/foinotifications')
 @API.route('/foinotifications/<string:type>')
 @API.route('/foinotifications/<string:idnumber>/<int:notficationid>')
