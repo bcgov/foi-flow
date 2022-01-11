@@ -20,7 +20,7 @@ const API = {
   FOI_MINISTRYVIEW_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/ministry`,
   FOI_RAW_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/rawrequest/<requestid>/description`,
   FOI_MINISTRY_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/ministryrequest/<ministryid>/description`,
-  FOI_MINISTRY_DIVISIONALSTAGES: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>`,    
+  FOI_MINISTRY_DIVISIONALSTAGES: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>`,
   FOI_POST_RAW_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/rawrequest`,
   FOI_GET_RAW_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/rawrequest/<requestid>`,
   FOI_POST_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest`,
@@ -28,21 +28,21 @@ const API = {
   FOI_GET_CLOSING_REASONS: `${FOI_BASE_API_URL}/api/foiflow/closereasons`,
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
 
-  FOI_POST_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
-  FOI_GET_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
-  FOI_PUT_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
-  FOI_DELETE_COMMENT_RAWREQUEST:`${FOI_BASE_API_URL}/api/foicomment/rawrequest/<commentid>/disable`,
+  FOI_POST_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
+  FOI_GET_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
+  FOI_PUT_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
+  FOI_DELETE_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<commentid>/disable`,
 
-  FOI_POST_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest`,
-  FOI_GET_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
-  FOI_PUT_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
-  FOI_DELETE_COMMENT_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<commentid>/disable`,
+  FOI_POST_COMMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest`,
+  FOI_GET_COMMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
+  FOI_PUT_COMMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>`,
+  FOI_DELETE_COMMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<commentid>/disable`,
 
-  FOI_ATTACHMENTS_RAWREQUEST:`${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>`,
-  FOI_ATTACHMENTS_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>`,
+  FOI_ATTACHMENTS_RAWREQUEST: `${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>`,
+  FOI_ATTACHMENTS_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>`,
 
-  FOI_RENAME_ATTACHMENTS_RAWREQUEST:`${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>/documentid/<documentid>/rename`,
-  FOI_RENAME_ATTACHMENTS_MINISTRYREQUEST:`${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>/documentid/<documentid>/rename`,
+  FOI_RENAME_ATTACHMENTS_RAWREQUEST: `${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>/documentid/<documentid>/rename`,
+  FOI_RENAME_ATTACHMENTS_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>/documentid/<documentid>/rename`,
   FOI_REPLACE_ATTACHMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>/documentid/<documentid>/replace`,
   FOI_REPLACE_ATTACHMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>/documentid/<documentid>/replace`,
   FOI_DELETE_ATTACHMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foidocument/rawrequest/<requestid>/documentid/<documentid>/delete`,
@@ -51,6 +51,9 @@ const API = {
   FOI_GET_NOTIFICATIONS:`${FOI_BASE_API_URL}/api/foinotifications`,
   FOI_DELETE_NOTIFICATION: `${FOI_BASE_API_URL}/api/foinotifications/<idNumber>/<notificationId>`,
   
+  FOI_GET_EXTENSION_REASONS: `${FOI_BASE_API_URL}/api/foiflow/extensionreasons`,
+  FOI_POST_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/ministryrequest/<ministryrequestid>`,
+  FOI_GET_EXTENSIONS: `${FOI_BASE_API_URL}/api/foiextension/ministryrequest/<requestid>`,
+  
 };
-
 export default API;
