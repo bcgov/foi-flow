@@ -4,20 +4,16 @@ import { useParams } from "react-router-dom";
 import { ActionContext } from "./ActionContext";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import AddExtensionModal from "./AddExtensionModal"
-import {
-  fetchExtensions,
-} from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { fetchExtensions } from "../../../../../apiManager/services/FOI/foiExtensionServices";
 import ExtensionsTable from "./ExtensionsTable";
 
 const ExtensionDetailsBox = React.memo(() => {
-  const { setModalOpen, dispatch} = useContext(ActionContext);
+  const { dispatch } = useContext(ActionContext);
 
   const { requestId } = useParams();
 
   useEffect(() => {
     if (requestId) {
-      console.log("fetched")
       dispatch(fetchExtensions(requestId));
     }
   }, [requestId]);
@@ -29,28 +25,15 @@ const ExtensionDetailsBox = React.memo(() => {
           <div className="col-lg-8 foi-details-col ">
             <label className="foi-details-label">EXTENSION DETAILS</label>
           </div>
-          <div className="col-lg-4 foi-details-col ">
-            <a
-              href="#"
-              className="foi-floatright foi-link"
-              onClick={(e) => {
-                e.preventDefault();
-                setModalOpen(true);
-              }}
-            >
-              New Extension
-            </a>
-          </div>
         </div>
         <CardContent>
           <div className="row foi-details-row">
             <div className="col-lg-6 foi-details-col"></div>
             <div className="col-lg-6 foi-details-col"></div>
           </div>
-          <ExtensionsTable/>
+          <ExtensionsTable showActions={false}/>
         </CardContent>
       </Card>
-      <AddExtensionModal/>
     </>
   );
 });

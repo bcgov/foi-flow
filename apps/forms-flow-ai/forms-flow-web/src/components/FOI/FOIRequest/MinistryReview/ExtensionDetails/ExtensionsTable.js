@@ -61,7 +61,7 @@ const ConditionalTableBody = ({empty, children}) => {
 }
 
 const ConditionalTableCell = ({condition, children, ...rest}) => {
-  if(condition) {
+  if(!condition) {
     return null;
   }
 

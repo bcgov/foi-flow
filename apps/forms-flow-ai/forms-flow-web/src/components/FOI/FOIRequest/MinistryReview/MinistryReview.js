@@ -37,6 +37,7 @@ import {CommentSection} from '../../customComponents/Comments';
 import {AttachmentSection} from '../../customComponents/Attachments';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../../containers/Loading";
+import ExtensionDetails from './ExtensionDetails';
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -463,6 +464,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                     <ApplicantDetails requestDetails={requestDetails} /> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
+                    <ExtensionDetails requestDetails={requestDetails}/>
                     <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
                     {/* <RequestNotes /> */}
                     <BottomButtonGroup stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />

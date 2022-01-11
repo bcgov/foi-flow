@@ -71,10 +71,10 @@ export const saveExtensionRequest = ({data, ministryId, callback, errorCallBack,
     "<ministryrequestid>",
     ministryId
   );
+
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
       if (res.data) {
-        dispatch(fetchExtensions());
         callback(res.data);
       } else {
         errorCallBack();

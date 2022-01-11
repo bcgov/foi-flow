@@ -55,23 +55,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddExtensionModal({ state, saveRequestObject }) {
+export default function AddExtensionModal() {
   const classes = useStyles();
   const { requestId, ministryId } = useParams();
-  const params = useParams()
 
-  const { 
-    modalOpen, 
-    setModalOpen, 
-    extensionReasons, 
-    setExtensionReasons, 
+  const {
+    modalOpen,
+    setModalOpen,
+    extensionReasons,
+    setExtensionReasons,
     dispatch,
-    extensions,
     startDate,
-    currentDueDate
+    currentDueDate,
+    originalDueDate,
   } = useContext(ActionContext);
-
-  const originalDueDate = currentDueDate
 
   const [reason, setReason] = useState("");
   const [publicBodySelected, setPublicBodySelected] = useState(false)
@@ -85,14 +82,32 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
   const [errors, setErrors] = useState(initialErrors);
 
   const [saveLoading, setSaveLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);  
 
+  const checkForAutoFillExtension = (extensionReason) => {
+    const reasonsForAutoFillDate = [
+      "Public Body - Consultation",
+      "Public Body - Further Detail from Applicant Required",
+      "Public Body - Large Volume and/or Volume of Search",
+      "Public Body - Large Volume and/or Volume of Search and Consultation",
+    ];
+
+    if (
+      !!reasonsForAutoFillDate.find(
+        (ER) => ER.toLowerCase() === extensionReason.reason.toLowerCase()
+      )
+    ) {
+      updateExtendedDate(30);
+    }
+  };
+  
   const handleReasonChange = (e) => {
 
     const extensionReason = extensionReasons.find(er => er.extensionreasonid === e.target.value)
 
     setPublicBodySelected(extensionReason.extensiontype === "Public Body");
     setReason(extensionReason);
+    checkForAutoFillExtension(extensionReason);
   };
 
   const handleNumberDaysChange = (e) => {
@@ -148,15 +163,17 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
 
     saveExtensionRequest({
       data: extensionRequest,
-      ministryId,
-      callback: (data) => {
+      ministryId: ministryId,
+      requestId: requestId,
+      callback: () => {
         setModalOpen(false);
         setSaveLoading(false);
+        window.history.go(0)
       },
       errorCallBack: () => {
         setModalOpen(false);
       },
-      dispatch
+      dispatch,
     });
     setSaveLoading(false)
   }
@@ -315,6 +332,7 @@ export default function AddExtensionModal({ state, saveRequestObject }) {
                       </InputAdornment>
                     ),
                     inputProps: { min: minimumExtendedDate },
+                    readOnly: true
                   }}
                   variant="outlined"
                   fullWidth
