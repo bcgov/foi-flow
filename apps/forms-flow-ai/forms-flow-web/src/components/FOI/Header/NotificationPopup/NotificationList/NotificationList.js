@@ -50,7 +50,7 @@ const NotificationList = (props) => {
   const dismissNotification = () => {
     let idNumber = notification.idnumber;
     idNumber+='';
-    dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null,{}));
+    dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null));
   }
 
   return(

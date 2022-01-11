@@ -38,7 +38,7 @@ const NotificationPopup = ({notifications}) => {
 
   const dispatch = useDispatch();
   const dismissAllNotifications = (type) => {
-    dispatch(deleteFOINotifications(null, null,type,{}));
+    dispatch(deleteFOINotifications(null, null,type));
   }
 
   return (
