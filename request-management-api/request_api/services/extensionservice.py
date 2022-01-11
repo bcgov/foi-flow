@@ -3,6 +3,7 @@ from re import VERBOSE
 from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDocument
 from request_api.models.FOIRequestExtensions import FOIRequestExtension
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.services.requestservice import requestservice
 import json
 import base64
 import maya
@@ -16,9 +17,18 @@ class extensionservice:
         extensions = FOIRequestExtension.getextensions(requestid, requestversion)
         return self.__formatcreateddate(extensions)
 
-    def createrequestextnesion(self, ministryrequestid, extensionschema, userid):
-        version = self.__getversionforrequest(ministryrequestid)
-        return FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)
+    def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
+        extnsionresult = {"success": False, "message": "", "identifier": 0}
+        
+        if extensionschema['extensionreasonid'] <= 4:            
+            ministryrequestschema = {
+                "duedate": extensionschema['extendedduedate']
+            }
+            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)                      
+            if result.success == True:
+                version = self.__getversionforrequest(ministryrequestid)               
+                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)               
+        return extnsionresult
            
 
     def __getversionforrequest(self, requestid):

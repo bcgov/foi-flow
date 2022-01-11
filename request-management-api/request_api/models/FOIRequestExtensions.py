@@ -45,9 +45,16 @@ class FOIRequestExtension(db.Model):
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
         decisiondate = extension['decisiondate'] if 'decisiondate' in extension else None
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
-        extensionstatusid = extension['extensionstatusid'] if 'extensionstatusid' in extension else 1        
+
+        if 'extensionstatusid' in extension:
+            extensionstatusid = extension['extensionstatusid']
+        elif extension['extensionreasonid'] <= 4:
+            extensionstatusid = 2
+        else:
+            extensionstatusid = 1        
       
-        newextension = FOIRequestExtension(extensionreasonid=extension['extensionreasonid'], 
+        newextension = FOIRequestExtension(
+        extensionreasonid=extension['extensionreasonid'], 
         extendedduedays=extension['extendedduedays'], 
         extendedduedate=extension['extendedduedate'], 
         decisiondate=decisiondate, 

@@ -31,7 +31,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foirequest.createdby = userid
         return foirequest
     
-    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):
+    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):  
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
         foiministryrequest.version = ministryschema["version"] + 1
@@ -43,7 +43,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.filenumber = ministryschema["filenumber"]
         foiministryrequest.cfrduedate = ministryschema['cfrduedate'] if 'cfrduedate' in ministryschema  else None
         foiministryrequest.startdate = ministryschema['startdate'] if 'startdate' in ministryschema  else None
-        foiministryrequest.duedate =ministryschema['duedate'] if 'duedate' in ministryschema  else None
+        foiministryrequest.duedate = requestschema['duedate'] if 'duedate' in requestschema else ministryschema["duedate"] #and isextension == True 
         foiministryrequest.assignedministrygroup = requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"]
         foiministryrequest.assignedministryperson = requestschema['assignedministryperson'] if 'assignedministryperson' in requestschema  else ministryschema["assignedministryperson"]
         foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"]

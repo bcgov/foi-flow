@@ -66,7 +66,7 @@ class GetFOIExtensions(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/ministryrequest/<requestid>')
+@API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
 class CreateFOIRequestExtension(Resource):
     """Creates extension for ministry(opened) request."""
 
@@ -75,12 +75,11 @@ class CreateFOIRequestExtension(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid):      
+    def post(requestid, ministryrequestid):      
         try:
             requestjson = request.get_json()
-            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)
-            print(rquesextensionschema)
-            result = extensionservice().createrequestextnesion(requestid, rquesextensionschema, AuthHelper.getuserid())
+            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
+            result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
