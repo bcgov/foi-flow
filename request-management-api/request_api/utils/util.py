@@ -36,7 +36,7 @@ def cors_preflight(methods):
 
     def wrapper(f):
         def options(self, *args, **kwargs):  # pylint: disable=unused-argument
-            return {'Allow': 'GET, DELETE, POST'}, 200, \
+            return {'Allow': 'GET, DELETE, PUT, POST'}, 200, \
                    {
                     #'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': methods,
