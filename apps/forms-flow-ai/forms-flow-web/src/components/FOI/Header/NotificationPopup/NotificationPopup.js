@@ -63,7 +63,6 @@ const NotificationPopup = ({notifications}) => {
       </Tab>
       <Tab eventKey="watch-request" title="Watching Requests" className="popup-background">
         {checkIfNotificationExists('watcher') && <Row className="list-header">
-          {/* <Col><div><i className="fa fa-volume-up"></i></div></Col> */}
           <Col className="close-btn-align">
           <div className="notification-dismiss" onClick={() => dismissAllNotifications('watcher')}>
             <i className="fa fa-times" style={{paddingRight:"5px"}}></i>

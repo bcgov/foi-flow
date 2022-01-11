@@ -48,7 +48,9 @@ const NotificationList = (props) => {
   }
 
   const dismissNotification = () => {
-    dispatch(deleteFOINotifications(notification.idnumber, notification.notificationid,null,{}));
+    let idNumber = notification.idnumber;
+    idNumber+='';
+    dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null,{}));
   }
 
   return(

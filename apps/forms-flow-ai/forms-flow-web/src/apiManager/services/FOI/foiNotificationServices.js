@@ -11,26 +11,20 @@ import {
   } from "../../../actions/FOI/foiNotificationActions"
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper"; 
-  //import {fnDone} from './foiServicesUtil';
 
   
   export const fetchFOINotifications = () => {
-    //const done = fnDone(rest);
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_NOTIFICATIONS, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
             dispatch(setFOINotifications(res.data));
-            //done(null, res.data);
           } else {
-            console.log("Error", res);
             dispatch(serviceActionError(res));
           }
         })
         .catch((error) => {
-          console.log("Error", error);
           dispatch(serviceActionError(error));
-         // done(error);
         });
     };
   };
