@@ -26,7 +26,8 @@ class extensionservice:
             }
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)                      
             if result.success == True:
-                version = self.__getversionforrequest(ministryrequestid)               
+                version = self.__getversionforrequest(ministryrequestid)
+                FOIRequestExtension.updateextensionversion(ministryrequestid, version, userid)
                 extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)               
         return extnsionresult
            
