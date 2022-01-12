@@ -72,7 +72,10 @@ export default function AddExtensionModal() {
 
   const [reason, setReason] = useState("");
   const [publicBodySelected, setPublicBodySelected] = useState(false)
+
   const [numberDays, setNumberDays] = useState("");
+  const maxExtendDays = publicBodySelected ? 30 : 100;
+  
   const [extendedDate, setExtendedDate] = useState("")
 
   const initialErrors = {
@@ -116,7 +119,12 @@ export default function AddExtensionModal() {
   }
 
   const updateExtendedDate = (days) => {
+      if (days > maxExtendDays) {
+        return;
+      }
+      
       setNumberDays(days);
+      
       setExtendedDate(addBusinessDays(currentDueDate, days));
   }
 
@@ -193,30 +201,7 @@ export default function AddExtensionModal() {
     }
     
   }, [requestId])
-
-  const ConditionalRenderContent = ({ children }) => {
-    if (loading) {
-      return (
-        <>
-          <DialogContent className={classes.dialogContent}>
-            <Grid
-              container
-              direction="row"
-              justifyContent="center"
-              className={classes.gridContainer}
-              spacing={2}
-            >
-              <CircularProgress />
-            </Grid>
-          </DialogContent>
-        </>
-      );
-    }
-
-    return <>{children}</>;
-  };
-
-  const maxExtendDays = publicBodySelected ? 30 : null
+  
   const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
   const minimumExtendedDate = addBusinessDays(currentDueDate, 1);
 
@@ -241,106 +226,104 @@ export default function AddExtensionModal() {
           </IconButton>
         </DialogTitle>
 
-        <ConditionalRenderContent>
-          <DialogContent
-            className="dialog-content"
-            style={{
-              overflowX: "hidden",
-            }}
+        <DialogContent
+          className="dialog-content"
+          style={{
+            overflowX: "hidden",
+          }}
+        >
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            className={classes.gridContainer}
+            spacing={2}
           >
-            <Grid
-              container
-              direction="row"
-              justify="flex-start"
-              alignItems="flex-start"
-              className={classes.gridContainer}
-              spacing={2}
-            >
-              <Grid item xs={12}>
-                <strong>Start Date:</strong> {startDate}
-              </Grid>
-              <Grid item xs={12} lg={6}>
-                <strong>Original Due Date:</strong> {originalDueDate}
-              </Grid>
-              <Grid item xs={12} lg={6}>
-                <strong>Current Due Date:</strong> {currentDueDate}
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  id="outlined-extension-reasons"
-                  name="reason"
-                  variant="outlined"
-                  required
-                  select
-                  label="Reason for Extension"
-                  placeholder="Select Reason for Extension"
-                  value={reason.extensionreasonid}
-                  onChange={handleReasonChange}
-                  error={errors.reason}
-                  fullWidth
-                >
-                  {extensionReasons &&
-                    extensionReasons.map((extensionReason) => {
-                      return (
-                        <MenuItem
-                          key={`extension-${extensionReason.extensionreasonid}`}
-                          value={extensionReason.extensionreasonid}
-                          disabled={!extensionReason.isactive}
-                        >
-                          {extensionReason.reason}
-                        </MenuItem>
-                      );
-                    })}
-                </TextField>
-              </Grid>
-
-              <Grid item xs={6}>
-                <TextField
-                  id="outlined-extension-reasons"
-                  name="extendDate"
-                  value={numberDays}
-                  type="number"
-                  variant="outlined"
-                  required
-                  label="Extend Due Date"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">Days</InputAdornment>
-                    ),
-                    inputProps: { min: 1, max: maxExtendDays },
-                  }}
-                  onChange={handleNumberDaysChange}
-                  fullWidth
-                  error={errors.extendDate}
-                ></TextField>
-              </Grid>
-
-              <Grid item xs={6}>
-                <TextField
-                  label="Extended Due Date"
-                  type="date"
-                  value={extendedDate}
-                  onChange={handleExtendedDateChange}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <DateRangeIcon />
-                      </InputAdornment>
-                    ),
-                    inputProps: { min: minimumExtendedDate },
-                    readOnly: true
-                  }}
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
+            <Grid item xs={12}>
+              <strong>Start Date:</strong> {startDate}
             </Grid>
-          </DialogContent>
-        </ConditionalRenderContent>
+            <Grid item xs={12} lg={6}>
+              <strong>Original Due Date:</strong> {originalDueDate}
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <strong>Current Due Date:</strong> {currentDueDate}
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                id="outlined-extension-reasons"
+                name="reason"
+                variant="outlined"
+                required
+                select
+                label="Reason for Extension"
+                placeholder="Select Reason for Extension"
+                value={reason.extensionreasonid}
+                onChange={handleReasonChange}
+                error={errors.reason}
+                fullWidth
+              >
+                {extensionReasons &&
+                  extensionReasons.map((extensionReason) => {
+                    return (
+                      <MenuItem
+                        key={`extension-${extensionReason.extensionreasonid}`}
+                        value={extensionReason.extensionreasonid}
+                        disabled={!extensionReason.isactive}
+                      >
+                        {extensionReason.reason}
+                      </MenuItem>
+                    );
+                  })}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                id="outlined-extension-number-days"
+                name="extendDate"
+                value={numberDays}
+                type="number"
+                variant="outlined"
+                required
+                label="Extend Due Date"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">Days</InputAdornment>
+                  ),
+                  inputProps: { min: 1, max: maxExtendDays },
+                }}
+                onChange={handleNumberDaysChange}
+                fullWidth
+                error={errors.extendDate}
+              ></TextField>
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                label="Extended Due Date"
+                type="date"
+                value={extendedDate}
+                onChange={handleExtendedDateChange}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <DateRangeIcon />
+                    </InputAdornment>
+                  ),
+                  inputProps: { min: minimumExtendedDate },
+                  readOnly: true
+                }}
+                variant="outlined"
+                fullWidth
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
 
         <DialogActions className="dialog-content-nomargin">
           <Grid
