@@ -68,7 +68,7 @@ class FOIRequestExtension(db.Model):
         createdby=createuserid)        
         db.session.add(newextension)
         db.session.commit()
-        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid)   
+        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid)      
     
 
     @classmethod
