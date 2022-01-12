@@ -30,7 +30,7 @@ const NotificationList = (props) => {
 
   }
   const getfullName = (userId) => {
-      if (fullnameList) {
+      if (fullnameList && fullnameList !== null) {
         return finduserbyuserid(userId)
       } else {
         if (iaoassignedToList.length > 0) {
@@ -42,8 +42,8 @@ const NotificationList = (props) => {
           addToFullnameList(iaoassignedToList, bcgovcode);
           setFullnameList(getFullnameList());
         }
-
-        return finduserbyuserid(userId)
+        if (fullnameList && fullnameList !== null)
+          return finduserbyuserid(userId)
       }
   }
 

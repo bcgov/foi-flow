@@ -79,6 +79,7 @@ class FOIRequestNotificationUser(db.Model):
         for row in rs:
             notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
         return notifications  
+
 class FOIRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 
