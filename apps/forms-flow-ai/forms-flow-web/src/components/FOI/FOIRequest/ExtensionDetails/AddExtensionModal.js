@@ -80,7 +80,7 @@ export default function AddExtensionModal() {
 
   const initialErrors = {
     reason: true,
-    extendDate: true,
+    numberDays: true,
   };
   const [errors, setErrors] = useState(initialErrors);
 
@@ -146,7 +146,7 @@ export default function AddExtensionModal() {
   const checkErrors = () => {
     const updatedErrors = {
       reason: !reason,
-      extendDate: !numberDays || numberDays < 1
+      numberDays: !numberDays || numberDays < 1
     }
 
     let extensionTypeError = false
@@ -154,7 +154,7 @@ export default function AddExtensionModal() {
       extensionTypeError = numberDays > 30;
     }
 
-    updatedErrors.extendDate = numberDays < 1 || extensionTypeError;
+    updatedErrors.numberDays = numberDays < 1 || extensionTypeError;
     setErrors({
       ...errors,
       ...updatedErrors,
@@ -244,6 +244,13 @@ export default function AddExtensionModal() {
         maxWidth={"md"}
         fullWidth={true}
         id="add-extension-dialog"
+        TransitionProps={{
+          onExit: () => {
+            setNumberDays("")
+            setReason("")
+            setExtendedDate("")
+          }
+        }}
       >
         <DialogTitle disableTypography id="state-change-dialog-title">
           <h2 className="state-change-header">Extension</h2>
@@ -299,12 +306,12 @@ export default function AddExtensionModal() {
             <Grid item xs={6}>
               <TextField
                 id="outlined-extension-number-days"
-                name="extendDate"
+                name="numberDays"
                 value={numberDays || 0}
                 type="number"
                 variant="outlined"
                 required
-                label="Extended Due Date"
+                label="Extended Due Days"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">Days</InputAdornment>
@@ -313,7 +320,7 @@ export default function AddExtensionModal() {
                 }}
                 onChange={handleNumberDaysChange}
                 fullWidth
-                error={errors.extendDate}
+                error={errors.numberDays}
               ></TextField>
             </Grid>
 
