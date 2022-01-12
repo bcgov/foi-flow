@@ -11,11 +11,11 @@ const NotificationPopup = ({notifications}) => {
 
 
   const [myRequestTitle, setMyRequestTitle] = useState([]);
-  const [myWatchingRequestTitle, setMyWatchingRequestTitle] = useState([]);
+  const [myWatchingRequestTitle, setMyWatchingRequestTitle] = useState();
 
   useEffect(() => {     
     tabTitle();
-  },[dispatch]);
+  });
 
   const tabTitle = () =>{
     let myRequestList = notifications.filter(x => x.notificationusertype === 'Assignee');

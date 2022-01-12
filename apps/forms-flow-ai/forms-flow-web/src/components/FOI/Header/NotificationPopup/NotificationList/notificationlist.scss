@@ -27,6 +27,14 @@
     font-size: 15px;
     font-weight: bold;
     margin-bottom: 10px;
+
+    div[disabled]{
+        opacity: 1;
+    }
+}
+
+.disable-click-wrapper{
+    cursor: not-allowed;
 }
 
 .notification-heading > a {
@@ -36,5 +44,10 @@
 
 .notification-heading > a:hover {
     text-decoration: none!important;
+    color: #000000;
+}
+
+.redirect-url {
+    cursor: pointer;
     color: #000000;
 }
