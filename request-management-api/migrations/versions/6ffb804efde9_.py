@@ -23,6 +23,7 @@ def upgrade():
     sa.Column('reason', sa.String(length=100), nullable=False),
     sa.Column('isactive', sa.Boolean(), nullable=False),
     sa.Column('extensiontype', sa.String(length=25), nullable=False),
+    sa.Column('defaultextendedduedays', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('extensionreasonid')
     )
 
@@ -74,17 +75,17 @@ def upgrade():
     op.bulk_insert(
         extensionreason_stage_table,
         [
-            {'reason':'Public Body - Applicant Consent','isactive':True, 'extensiontype': 'Public Body'},
-            {'reason':'Public Body - Consultation','isactive':True, 'extensiontype': 'Public Body'},
-            {'reason':'Public Body - Further Detail from Applicant Required','isactive':True, 'extensiontype': 'Public Body'},
-            {'reason':'Public Body - Large Volume and/or Volume of Search','isactive':True, 'extensiontype': 'Public Body'},
-            {'reason':'Public Body - Large Volume and/or Volume of Search and Consultation','isactive':True, 'extensiontype': 'Public Body'},
-            {'reason':'OIPC - Applicant Consent','isactive':True, 'extensiontype': 'OIPC'},
-            {'reason':'OIPC - Consultation','isactive':True, 'extensiontype': 'OIPC'},
-            {'reason':'OIPC - Further Detail from Applicant Required','isactive':True, 'extensiontype': 'OIPC'},
-            {'reason':'OIPC - Large Volume and/or Volume of Search','isactive':True, 'extensiontype': 'OIPC'},
-            {'reason':'OIPC - Large Volume and/or Volume of Search and Consultation','isactive':True, 'extensiontype': 'OIPC'},
-            {'reason':'OIPC - Fair and Reasonable','isactive':True, 'extensiontype': 'OIPC'},
+            {'reason':'Public Body - Applicant Consent','isactive':True, 'extensiontype': 'Public Body', 'defaultextendedduedays': 30},
+            {'reason':'Public Body - Consultation','isactive':True, 'extensiontype': 'Public Body', 'defaultextendedduedays': 30},
+            {'reason':'Public Body - Further Detail from Applicant Required','isactive':True, 'extensiontype': 'Public Body', 'defaultextendedduedays': 30},
+            {'reason':'Public Body - Large Volume and/or Volume of Search','isactive':True, 'extensiontype': 'Public Body', 'defaultextendedduedays': 30},
+            {'reason':'Public Body - Large Volume and/or Volume of Search and Consultation','isactive':True, 'extensiontype': 'Public Body', 'defaultextendedduedays': 30},
+            {'reason':'OIPC - Applicant Consent','isactive':True, 'extensiontype': 'OIPC', 'defaultextendedduedays': 0},
+            {'reason':'OIPC - Consultation','isactive':True, 'extensiontype': 'OIPC', 'defaultextendedduedays': 0},
+            {'reason':'OIPC - Further Detail from Applicant Required','isactive':True, 'extensiontype': 'OIPC', 'defaultextendedduedays': 0},
+            {'reason':'OIPC - Large Volume and/or Volume of Search','isactive':True, 'extensiontype': 'OIPC', 'defaultextendedduedays': 0},
+            {'reason':'OIPC - Large Volume and/or Volume of Search and Consultation','isactive':True, 'extensiontype': 'OIPC', 'defaultextendedduedays': 0},
+            {'reason':'OIPC - Fair and Reasonable','isactive':True, 'extensiontype': 'OIPC', 'defaultextendedduedays': 0},
            
         ]
     )
