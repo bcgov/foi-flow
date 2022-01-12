@@ -49,7 +49,7 @@ const API = {
   FOI_DELETE_ATTACHMENT_MINISTRYREQUEST: `${FOI_BASE_API_URL}/api/foidocument/ministryrequest/<ministryrequestid>/documentid/<documentid>/delete`,
 
   FOI_GET_EXTENSION_REASONS: `${FOI_BASE_API_URL}/api/foiflow/extensionreasons`,
-  FOI_POST_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/ministryrequest/<ministryrequestid>`,
+  FOI_POST_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_GET_EXTENSIONS: `${FOI_BASE_API_URL}/api/foiextension/ministryrequest/<requestid>`,
 };
 export default API;

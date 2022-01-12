@@ -61,15 +61,15 @@ export const fetchExtensions = (
   }
 }
 
-export const saveExtensionRequest = ({data, ministryId, callback, errorCallBack, dispatch}) => {
+export const saveExtensionRequest = ({data, ministryId, requestId, callback, errorCallBack, dispatch}) => {
   if(!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
   
   const apiUrl = replaceUrl(
-    API.FOI_POST_EXTENSION,
-    "<ministryrequestid>",
-    ministryId
+    replaceUrl(API.FOI_POST_EXTENSION, "<ministryrequestid>", ministryId),
+    "<requestid>",
+    requestId
   );
 
   httpPOSTRequest(apiUrl, data)
