@@ -35,15 +35,29 @@ class notificationservice:
     def cleanupnotifications(self,requesttype, foirequest, notificationtype):
         notificationid = self.__getnotificationtypeid(notificationtype)
         if requesttype == "ministryrequest":
-            _ids = FOIRequestNotification.getnotificationidsbynumber(foirequest["filenumber"], notificationid)
+            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(foirequest["filenumber"], notificationid)
             if _ids:
                 FOIRequestNotificationUser.deletebynotificationid(_ids)
                 FOIRequestNotification.deletebynotificationid(_ids)
         else:
-            _ids = FOIRawRequestNotification.getnotificationidsbynumber('U-00' + str(foirequest['requestid']), notificationid)
+            _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationid)
             if _ids:
                 FOIRawRequestNotificationUser.deletebynotificationid(_ids)
                 FOIRawRequestNotification.deletebynotificationid(_ids)    
+
+    def cleanupnotificationsbyid(self,requestid, requesttype):
+        foirequest = self.__getrequest(requestid, requesttype)
+        if requesttype == "ministryrequest":
+            _ids = FOIRequestNotification.getnotificationidsbynumber(foirequest["filenumber"])
+            if _ids:
+                FOIRequestNotificationUser.deletebynotificationid(_ids)
+                FOIRequestNotification.deletebynotificationid(_ids)
+        else:
+            _ids = FOIRawRequestNotification.getnotificationidsbynumber('U-00' + str(foirequest['requestid']))
+            if _ids:
+                FOIRawRequestNotificationUser.deletebynotificationid(_ids)
+                FOIRawRequestNotification.deletebynotificationid(_ids)    
+    
             
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid, self.__getnotificationdays())
@@ -96,7 +110,7 @@ class notificationservice:
             return DefaultMethodResult(True,'Notifications deleted for user',userid) 
         else:
             return DefaultMethodResult(False,'Unable to delete the notifications',userid)
-        
+
     def __getdismissparentids(self, requesttype, notificationuserid):
         if requesttype == "ministryrequest":         
             _notficationids = FOIRequestNotificationUser.getnotificationsbyid(notificationuserid)
@@ -126,8 +140,7 @@ class notificationservice:
         return notficationids 
             
     def __getnotificationtypefromid(self, idnumber):
-        return 'rawrequest' if idnumber.lower().startswith('u-00') else 'ministryrequest'
-    
+        return 'rawrequest' if idnumber.lower().startswith('u-00') else 'ministryrequest'    
             
     def __preparenotification(self, message, foirequest, requesttype, notificationtype, userid):            
         if requesttype == "ministryrequest":
@@ -164,10 +177,10 @@ class notificationservice:
 
     def __getnotificationusers(self, notificationtype, foirequest, requesttype, userid):
         notificationusers = []
-        if notificationtype == "Assignment":
-            _users = self.__getassignees(foirequest, requesttype)
+        if 'Assignment' in notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype)
         else:
-            _users = self.__getassignees(foirequest, requesttype) + self.__getwatchers(foirequest, requesttype)
+            _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
         for user in _users:
             if self.__isignorable(user, notificationusers, userid) == False:
                 notificationusers.append(user)
@@ -195,12 +208,12 @@ class notificationservice:
         return notificationusers
         
     
-    def __getassignees(self, foirequest, requesttype):
+    def __getassignees(self, foirequest, requesttype, notificationtype):
         notificationusers = []
         notificationtypeid = self.__getnotificationusertypeid("Assignee")
-        if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None:
+        if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
             notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})
-        if foirequest["assignedto"] is not None and foirequest["assignedto"] != '':
+        if foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
             notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
         return notificationusers
             
@@ -215,9 +228,10 @@ class notificationservice:
     def __getnotificationtypeid(self, notificationtype):
         if notificationtype == "State":
             return 1
-        elif notificationtype == "Assignment":
-            return 5
-        
+        elif "IAO Assignment" in notificationtype:
+            return 5   
+        elif "Ministry Assignment" in notificationtype:
+            return 6      
         return 0
     
     

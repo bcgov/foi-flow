@@ -13,11 +13,11 @@ class eventservice:
     """ FOI event management service
 
     """
-    async def postevent(self, requestid, requesttype, userid, username):
+    async def postevent(self, requestid, requesttype, userid, username, isministryuser):
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
-            assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid)
+            assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser)
             if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message))
         except BusinessException as exception:            
