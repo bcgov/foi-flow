@@ -74,6 +74,7 @@ def upgrade():
     op.bulk_insert(
         extensionreason_stage_table,
         [
+            {'reason':'Public Body - Applicant Consent','isactive':True, 'extensiontype': 'Public Body'},
             {'reason':'Public Body - Consultation','isactive':True, 'extensiontype': 'Public Body'},
             {'reason':'Public Body - Further Detail from Applicant Required','isactive':True, 'extensiontype': 'Public Body'},
             {'reason':'Public Body - Large Volume and/or Volume of Search','isactive':True, 'extensiontype': 'Public Body'},
