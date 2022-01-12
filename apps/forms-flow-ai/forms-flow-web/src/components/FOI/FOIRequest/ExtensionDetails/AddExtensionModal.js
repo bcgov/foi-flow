@@ -225,7 +225,7 @@ export default function AddExtensionModal() {
         fullWidth={true}
         id="add-extension-dialog"
         TransitionProps={{
-          onExit: () => {
+          onExited: () => {
             setNumberDays("");
             setReason("");
             setExtendedDate("");

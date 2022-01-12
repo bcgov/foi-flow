@@ -29,14 +29,14 @@ export const fetchExtensionReasons = async ({
 };
 
 export const fetchExtensions = (
-  requestId,
+  ministryId,
   ...rest
 ) => {
   const done = fnDone(rest);
   const apiUrl = replaceUrl(
     API.FOI_GET_EXTENSIONS,
-    "<requestid>",
-    requestId
+    "<ministryrequestid>",
+    ministryId
   );
 
   return (dispatch) => {
