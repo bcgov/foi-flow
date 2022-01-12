@@ -89,7 +89,7 @@ class requestservicegetter:
             'categoryid':request['applicantcategory.applicantcategoryid'],
             'assignedministrygroup':requestministry["assignedministrygroup"],
             'assignedministryperson':requestministry["assignedministryperson"],            
-            'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'name':requestministry['programarea.name'],'selected':'true'}],
+            'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            
             'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid)

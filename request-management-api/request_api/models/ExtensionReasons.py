@@ -5,7 +5,8 @@ class ExtensionReason(db.Model):
     # Defining the columns
     extensionreasonid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     reason = db.Column(db.String(100), unique=False, nullable=False)
-    extensiontype = db.Column(db.String(25), unique=False, nullable=False) 
+    extensiontype = db.Column(db.String(25), unique=False, nullable=False)
+    defaultextendedduedays = db.Column(db.Integer, unique=False, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)    
     
     @classmethod
@@ -24,4 +25,4 @@ class ExtensionReason(db.Model):
 
 class ExtensionReasonSchema(ma.Schema):
     class Meta:
-        fields = ('extensionreasonid','reason','extensiontype','isactive')
+        fields = ('extensionreasonid','reason','extensiontype','isactive', 'defaultextendedduedays')

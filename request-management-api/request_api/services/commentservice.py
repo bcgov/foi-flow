@@ -55,7 +55,6 @@ class commentservice:
             commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.__copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF']) 
             _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
-                print('am i here')
                 for reply in comment['replies']:
                     response=FOIRequestComment.savecomment(reply['commentTypeId'], self.__copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        

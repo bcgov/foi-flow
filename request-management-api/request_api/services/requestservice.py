@@ -55,7 +55,7 @@ class requestservice:
     def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
             
-    def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
+    async def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
         if requeststatusid is not None:
             status = requestserviceconfigurator().getstatusname(requeststatusid)

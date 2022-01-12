@@ -24,7 +24,9 @@ from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.documentservice import documentservice
+from request_api.services.eventservice import eventservice
 import json
+import asyncio
 from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
@@ -66,12 +68,13 @@ class FOIRawRequest(Resource):
                 rawrequest = rawrequestservice().getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid())                
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid(), AuthHelper.getusername(),AuthHelper.isministrymember())                
                 if result.success == True:   
-                    rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
+                    asyncio.run(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")               
+                asyncio.run(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
@@ -127,7 +130,7 @@ class FOIRawRequests(Resource):
                 requestdatajson.pop('Attachments')
             result = rawrequestservice().saverawrequest(requestdatajson=requestdatajson,sourceofsubmission="onlineform",userid=None,notes=notes)
             if result.success:
-                documentservice().uploadpersonaldocuments(result.identifier, attachments)   
+                documentservice().uploadpersonaldocuments(result.identifier, attachments)                   
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   

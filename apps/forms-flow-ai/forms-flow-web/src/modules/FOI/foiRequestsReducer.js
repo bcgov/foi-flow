@@ -24,8 +24,8 @@ const initialState = {
   foiRequestDescriptionHistoryList: [],
   foiMinistryDivisionalStages: [],
   foiWatcherList: [],
-  foiRequestComments: [],
-  foiRequestAttachments: [],
+  foiRequestComments:[],
+  foiRequestAttachments:[],
   foiRequestExtesions: []
 };
 
