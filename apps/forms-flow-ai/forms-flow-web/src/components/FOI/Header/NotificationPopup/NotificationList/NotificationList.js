@@ -29,9 +29,9 @@ const NotificationList = (props) => {
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const [requestState, setRequestState] = useState();
 
-  useEffect(() => {     
-    getRequestState();
-  });
+  // useEffect(() => {     
+  //   getRequestState();
+  // });
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -72,6 +72,7 @@ const NotificationList = (props) => {
   }
 
   const redirectUrl = () => {
+    getRequestState();
     if(notification.requesttype === 'rawrequest'){
        dispatch(push(`/foi/reviewrequest/${notification.foirequestid}/${requestState}`));
     }
