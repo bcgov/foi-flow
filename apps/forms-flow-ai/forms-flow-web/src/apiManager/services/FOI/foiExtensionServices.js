@@ -11,7 +11,6 @@ import API from "../../endpoints";
 
 export const fetchExtensionReasons = async ({
   callback,
-  errorCallBack,
   dispatch
 }) => {
   const apiUrl = API.FOI_GET_EXTENSION_REASONS;
@@ -21,13 +20,11 @@ export const fetchExtensionReasons = async ({
       if (res.data) {
         callback(res.data);
       } else {
-        errorCallBack();
         dispatch(serviceActionError(res));
       }
     })
     .catch((error) => {
       dispatch(serviceActionError(error));
-      errorCallBack();
     });
 };
 

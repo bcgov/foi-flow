@@ -8,7 +8,6 @@ import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import CloseIcon from "@material-ui/icons/Close";
 import MenuItem from "@material-ui/core/MenuItem";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
@@ -18,7 +17,6 @@ import DateRangeIcon from "@material-ui/icons/DateRange";
 import {
   formatDate,
   addBusinessDays,
-  calculateDaysRemaining,
 } from "../../../../helper/FOI/helper";
 import {
   fetchExtensionReasons,
@@ -53,6 +51,10 @@ const useStyles = makeStyles((theme) => ({
   DialogContent: {
     margin: "auto",
   },
+  DialogLable: {
+    fontWeight: theme.typography.fontWeightBold
+  }
+
 }));
 
 export default function AddExtensionModal() {
@@ -74,7 +76,7 @@ export default function AddExtensionModal() {
   const [publicBodySelected, setPublicBodySelected] = useState(false)
 
   const [numberDays, setNumberDays] = useState("");
-  const maxExtendDays = publicBodySelected ? 30 : 100;
+  const maxExtendDays = reason?.defaultextendedduedays || 100
   
   const [extendedDate, setExtendedDate] = useState("")
 
@@ -85,32 +87,18 @@ export default function AddExtensionModal() {
   const [errors, setErrors] = useState(initialErrors);
 
   const [saveLoading, setSaveLoading] = useState(false);
-  const [loading, setLoading] = useState(true);  
-
-  const checkForAutoFillExtension = (extensionReason) => {
-    const reasonsForAutoFillDate = [
-      "Public Body - Consultation",
-      "Public Body - Further Detail from Applicant Required",
-      "Public Body - Large Volume and/or Volume of Search",
-      "Public Body - Large Volume and/or Volume of Search and Consultation",
-    ];
-
-    if (
-      !!reasonsForAutoFillDate.find(
-        (ER) => ER.toLowerCase() === extensionReason.reason.toLowerCase()
-      )
-    ) {
-      updateExtendedDate(30);
-    }
-  };
-  
+ 
   const handleReasonChange = (e) => {
 
     const extensionReason = extensionReasons.find(er => er.extensionreasonid === e.target.value)
 
     setPublicBodySelected(extensionReason.extensiontype === "Public Body");
     setReason(extensionReason);
-    checkForAutoFillExtension(extensionReason);
+
+    if(extensionReason.defaultextendedduedays) {
+      updateExtendedDate(extensionReason.defaultextendedduedays);
+    }
+
   };
 
   const handleNumberDaysChange = (e) => {
@@ -126,13 +114,6 @@ export default function AddExtensionModal() {
       setNumberDays(days);
       
       setExtendedDate(addBusinessDays(currentDueDate, days));
-  }
-
-  const handleExtendedDateChange = (e) => {
-    const newDate = e.target.value
-    const numDays = calculateDaysRemaining(newDate, currentDueDate)-1;
-    
-    updateExtendedDate(numDays);
   }
 
   const handleClose = () => {
@@ -180,17 +161,21 @@ export default function AddExtensionModal() {
       },
       errorCallBack: (errorMessage) => {
         setSaveLoading(false)        
-        toast.error(errorMessage, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        errorToast(errorMessage);
       },
       dispatch,
+    });
+  }
+
+  const errorToast = (errorMessage) => {
+    return toast.error(errorMessage, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
     });
   }
 
@@ -199,10 +184,6 @@ export default function AddExtensionModal() {
       fetchExtensionReasons({
           callback: (data) => {
             setExtensionReasons(data)
-            setLoading(false)
-          },
-          errorCallBack: () => {
-            setLoading(false);
           },
           dispatch: dispatch
       })
@@ -211,7 +192,6 @@ export default function AddExtensionModal() {
   }, [requestId])
   
   const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
-  const minimumExtendedDate = addBusinessDays(currentDueDate, 1);
 
   const getExtensionReasonMenueItems = () => {
     const reasons = extensionReasons.map((extensionReason) => {
@@ -246,10 +226,10 @@ export default function AddExtensionModal() {
         id="add-extension-dialog"
         TransitionProps={{
           onExit: () => {
-            setNumberDays("")
-            setReason("")
-            setExtendedDate("")
-          }
+            setNumberDays("");
+            setReason("");
+            setExtendedDate("");
+          },
         }}
       >
         <DialogTitle disableTypography id="state-change-dialog-title">
@@ -277,13 +257,16 @@ export default function AddExtensionModal() {
             spacing={2}
           >
             <Grid item xs={12}>
-              <strong>Start Date:</strong> {startDate}
+              <span className={classes.DialogLable}>Start Date: </span>
+              {startDate}
             </Grid>
             <Grid item xs={12} lg={6}>
-              <strong>Original Due Date:</strong> {originalDueDate}
+              <span className={classes.DialogLable}>Original Due Date: </span>
+              {originalDueDate}
             </Grid>
             <Grid item xs={12} lg={6}>
-              <strong>Current Due Date:</strong> {currentDueDate}
+              <span className={classes.DialogLable}>Current Due Date: </span>
+              {currentDueDate}
             </Grid>
 
             <Grid item xs={12}>
@@ -329,7 +312,6 @@ export default function AddExtensionModal() {
                 label="Extended Due Date"
                 type="date"
                 value={extendedDate}
-                onChange={handleExtendedDateChange}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -339,7 +321,6 @@ export default function AddExtensionModal() {
                       <DateRangeIcon />
                     </InputAdornment>
                   ),
-                  inputProps: { min: minimumExtendedDate },
                   readOnly: true,
                 }}
                 variant="outlined"

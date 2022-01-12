@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     border: "none"
   },
   columnLabel: {
-      fontWeight: "bold"
+      fontWeight: theme.typography.fontWeightBold
   },
   labelRow: {
       borderBottom: "2px solid black"
