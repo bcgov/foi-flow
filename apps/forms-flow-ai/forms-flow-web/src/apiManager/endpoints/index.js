@@ -50,6 +50,7 @@ const API = {
 
   FOI_GET_NOTIFICATIONS:`${FOI_BASE_API_URL}/api/foinotifications`,
   FOI_DELETE_NOTIFICATION: `${FOI_BASE_API_URL}/api/foinotifications/<idNumber>/<notificationId>`,
+  FOI_DELETE_ALL_NOTIFICATIONS: `${FOI_BASE_API_URL}/api/foinotifications/<type>`,
   
   FOI_GET_EXTENSION_REASONS: `${FOI_BASE_API_URL}/api/foiflow/extensionreasons`,
   FOI_POST_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/ministryrequest/<ministryrequestid>`,
