@@ -1,14 +1,19 @@
 import React, {useState } from 'react';
-import {useSelector } from "react-redux";
+import {useSelector, useDispatch } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
 import {addToFullnameList, getFullnameList } from '../../../../../helper/FOI/helper'
+import {
+  deleteFOINotifications
+} from "../../../../../apiManager/services/FOI/foiNotificationServices";
 import { useParams } from 'react-router-dom';
 import {
   getBCgovCode
 } from "../../../FOIRequest/utils";
 
 const NotificationList = (props) => {
+
+  const dispatch = useDispatch();
   let notification = props.notification;
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
@@ -25,7 +30,7 @@ const NotificationList = (props) => {
 
   }
   const getfullName = (userId) => {
-      if (fullnameList) {
+      if (fullnameList && fullnameList !== null) {
         return finduserbyuserid(userId)
       } else {
         if (iaoassignedToList.length > 0) {
@@ -37,9 +42,15 @@ const NotificationList = (props) => {
           addToFullnameList(iaoassignedToList, bcgovcode);
           setFullnameList(getFullnameList());
         }
-
-        return finduserbyuserid(userId)
+        if (fullnameList && fullnameList !== null)
+          return finduserbyuserid(userId)
       }
+  }
+
+  const dismissNotification = () => {
+    let idNumber = notification.idnumber;
+    idNumber+='';
+    dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null));
   }
 
   return(
@@ -48,6 +59,9 @@ const NotificationList = (props) => {
         <Col>
           <h6 className="notification-heading">
             <a>{notification.idnumber}</a></h6>
+        </Col>
+        <Col className="close-btn-align" onClick={dismissNotification}>
+          <i className="fa fa-times"></i>
         </Col>
       </Row>
       <div>

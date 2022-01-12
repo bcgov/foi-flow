@@ -68,13 +68,13 @@ class FOIRawRequest(Resource):
                 rawrequest = rawrequestservice().getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
                 assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid(), AuthHelper.getusername())                
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid(), AuthHelper.getusername(),AuthHelper.isministrymember())                
                 if result.success == True:   
                     asyncio.run(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")               
-                asyncio.run(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername()))
+                asyncio.run(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
