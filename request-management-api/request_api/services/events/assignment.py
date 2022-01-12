@@ -13,19 +13,19 @@ class assignmentevent:
     """ FOI Event management service
 
     """
-    def createassignmentevent(self, requestid, requesttype, userid):
+    def createassignmentevent(self, requestid, requesttype, userid, isministryuser):
         ischanged = self.__haschanged(requestid, requesttype)
         if ischanged == True:
-            notificationresponse = self.__createnotification(requestid, requesttype, userid)
+            notificationresponse = self.__createnotification(requestid, requesttype, userid, isministryuser)
             if notificationresponse.success == True:
                 return DefaultMethodResult(True,'Notification posted',requestid)
             else:   
                 return DefaultMethodResult(False,'unable to post notification',requestid)
         return  DefaultMethodResult(True,'No change',requestid)
 
-    def __createnotification(self, requestid, requesttype, userid):
+    def __createnotification(self, requestid, requesttype, userid, isministryuser):
         notification = self.__preparenotification()
-        return notificationservice().createnotification(notification, requestid, requesttype, "Assignment", userid)
+        return notificationservice().createnotification(notification, requestid, requesttype, self.__assignmenttype(isministryuser), userid)
 
     def __preparenotification(self):
         return self.__notificationmessage()
@@ -55,3 +55,5 @@ class assignmentevent:
     def __notificationmessage(self):
         return  'New Request Assigned to You.'        
             
+    def __assignmenttype(self, isministryuser):
+        return 'Ministry Assignment' if isministryuser == True else 'IAO Assignment'
