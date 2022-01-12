@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
@@ -10,6 +9,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import CloseIcon from "@material-ui/icons/Close";
 import MenuItem from "@material-ui/core/MenuItem";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
@@ -114,7 +114,7 @@ export default function AddExtensionModal() {
   };
 
   const handleNumberDaysChange = (e) => {
-      const numDays = e.target.value
+      const numDays = Number(e.target.value)
       updateExtendedDate(numDays);
   }
 
@@ -178,12 +178,20 @@ export default function AddExtensionModal() {
         setSaveLoading(false);
         window.history.go(0)
       },
-      errorCallBack: () => {
-        setModalOpen(false);
+      errorCallBack: (errorMessage) => {
+        setSaveLoading(false)        
+        toast.error(errorMessage, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       },
       dispatch,
     });
-    setSaveLoading(false)
   }
 
   useEffect(() => {
@@ -204,6 +212,27 @@ export default function AddExtensionModal() {
   
   const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
   const minimumExtendedDate = addBusinessDays(currentDueDate, 1);
+
+  const getExtensionReasonMenueItems = () => {
+    const reasons = extensionReasons.map((extensionReason) => {
+      return (
+        <MenuItem
+          key={`extension-${extensionReason.extensionreasonid}`}
+          value={extensionReason.extensionreasonid}
+          disabled={!extensionReason.isactive}
+        >
+          {extensionReason.reason}
+        </MenuItem>
+      );
+    });
+
+    reasons.unshift(
+      <MenuItem key={`extension-placeholder`} value={0} disabled={true}>
+        Select Reason for Extension
+      </MenuItem>
+    );
+    return reasons
+  }
 
   return (
     <div className="state-change-dialog">
@@ -258,24 +287,12 @@ export default function AddExtensionModal() {
                 required
                 select
                 label="Reason for Extension"
-                placeholder="Select Reason for Extension"
-                value={reason.extensionreasonid}
+                value={reason.extensionreasonid || 0}
                 onChange={handleReasonChange}
                 error={errors.reason}
                 fullWidth
               >
-                {extensionReasons &&
-                  extensionReasons.map((extensionReason) => {
-                    return (
-                      <MenuItem
-                        key={`extension-${extensionReason.extensionreasonid}`}
-                        value={extensionReason.extensionreasonid}
-                        disabled={!extensionReason.isactive}
-                      >
-                        {extensionReason.reason}
-                      </MenuItem>
-                    );
-                  })}
+                {extensionReasons && getExtensionReasonMenueItems()}
               </TextField>
             </Grid>
 
@@ -283,11 +300,11 @@ export default function AddExtensionModal() {
               <TextField
                 id="outlined-extension-number-days"
                 name="extendDate"
-                value={numberDays}
+                value={numberDays || 0}
                 type="number"
                 variant="outlined"
                 required
-                label="Extend Due Date"
+                label="Extended Due Date"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">Days</InputAdornment>
@@ -316,7 +333,7 @@ export default function AddExtensionModal() {
                     </InputAdornment>
                   ),
                   inputProps: { min: minimumExtendedDate },
-                  readOnly: true
+                  readOnly: true,
                 }}
                 variant="outlined"
                 fullWidth
@@ -339,20 +356,13 @@ export default function AddExtensionModal() {
                 className={`btn-save`}
                 style={{ width: "100%" }}
                 className={clsx("btn-save", {
-                  [classes.btnenabled]: !saveLoading,
-                  [classes.btndisabled]: saveLoading,
+                  [classes.btnenabled]: !(saveLoading || errorExists),
+                  [classes.btndisabled]: saveLoading || errorExists,
                 })}
                 disabled={saveLoading || errorExists}
                 onClick={handleSave}
               >
                 Save
-                {saveLoading && (
-                  <CircularProgress
-                    size={14}
-                    color={"warning"}
-                    style={{ marginLeft: "1em" }}
-                  />
-                )}
               </button>
             </Grid>
             <Grid item xs={6}>

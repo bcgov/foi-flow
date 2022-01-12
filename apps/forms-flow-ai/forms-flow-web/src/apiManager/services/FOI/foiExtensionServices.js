@@ -6,7 +6,7 @@ import API from "../../endpoints";
     setRequestExtensions,
   } from "../../../actions/FOI/foiRequestActions";
   import { replaceUrl } from "../../../helper/FOI/helper";
-  import { postAttachment, fnDone } from "./foiServicesUtil";
+  import { fnDone, catchError } from "./foiServicesUtil";
 
 
 export const fetchExtensionReasons = async ({
@@ -77,12 +77,12 @@ export const saveExtensionRequest = ({data, ministryId, requestId, callback, err
       if (res.data) {
         callback(res.data);
       } else {
-        errorCallBack();
         dispatch(serviceActionError(res));
+        throw new Error()
       }
     })
     .catch((error) => {
-      dispatch(serviceActionError(error));
-      errorCallBack();
+      catchError(error, dispatch)
+      errorCallBack("An error occured while trying to save this extension");
     });
 };
