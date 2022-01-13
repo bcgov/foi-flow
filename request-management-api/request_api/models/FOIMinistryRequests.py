@@ -198,7 +198,7 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getupcomingcfrduerecords(cls):
         sql = """select distinct on (filenumber) filenumber, cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and cfrduedate is not null 
+                    where isactive = true and cfrduedate is not null and requeststatusid not in (3,10,11)
                     and cfrduedate between NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER-7 AND NOW()::DATE-EXTRACT(DOW from NOW())::INTEGER+7 
                     order by filenumber , version desc;""" 
         rs = db.session.execute(text(sql))
@@ -210,7 +210,7 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getupcominglegislativeduerecords(cls):
         sql = """select distinct on (filenumber) filenumber, duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and duedate is not null 
+                    where isactive = true and duedate is not null and requeststatusid not in (3,10,11)
                     and duedate between NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER-7 AND NOW()::DATE-EXTRACT(DOW from NOW())::INTEGER+7 
                     order by filenumber , version desc;""" 
         rs = db.session.execute(text(sql))
