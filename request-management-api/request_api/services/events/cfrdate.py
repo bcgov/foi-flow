@@ -26,7 +26,7 @@ class cfrdateevent(duecalculator):
             ca_holidays = self.getholidays()
             _upcomingdues = FOIMinistryRequest.getupcomingcfrduerecords()
             for entry in _upcomingdues:
-                _duedate = self.formatdate(entry['cfrduedate'])  
+                _duedate = self.formatduedate(entry['cfrduedate'])  
                 message = None
                 if  _duedate == _today:                
                     message = self.__todayduemessage()     

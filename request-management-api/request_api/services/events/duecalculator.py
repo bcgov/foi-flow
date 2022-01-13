@@ -26,8 +26,9 @@ class duecalculator:
         now_pst = now_utc.astimezone(timezone(self.__getdefaulttimezone()))
         return now_pst.strftime(self.__getdefaultdateformat()) 
     
-    def formatdate(self,input):
-        return parse(str(input)).strftime(self.__getdefaultdateformat())
+    def formatduedate(self,input):
+        due_pst = input.astimezone(timezone(self.__getdefaulttimezone()))
+        return due_pst.strftime(self.__getdefaultdateformat())
     
     def getholidays(self):        
         ca_holidays = []

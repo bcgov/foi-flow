@@ -27,7 +27,7 @@ class legislativedateevent(duecalculator):
             ca_holidays = self.getholidays()
             _upcomingdues = FOIMinistryRequest.getupcominglegislativeduerecords()
             for entry in _upcomingdues:
-                _duedate = self.formatdate(entry['duedate'])
+                _duedate = self.formatduedate(entry['duedate'])
                 message = None
                 if  _duedate == _today:                
                     message = self.__todayduemessage()     
