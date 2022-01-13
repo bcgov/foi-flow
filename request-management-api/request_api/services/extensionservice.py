@@ -4,6 +4,7 @@ from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDoc
 from request_api.models.FOIRequestExtensions import FOIRequestExtension
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.requestservice import requestservice
+from request_api.services.extensionreasonservice import extensionreasonservice
 import json
 import base64
 import maya
@@ -19,7 +20,8 @@ class extensionservice:
 
     def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
         version = self.__getversionforrequest(ministryrequestid)
-        if extensionschema['extensionreasonid'] <= 4:            
+        extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
+        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body':            
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
@@ -27,9 +29,9 @@ class extensionservice:
            
             if result.success == True:
                 version = self.__getversionforrequest(ministryrequestid)
-                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)
+                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         else:
-            extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)
+            extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         return extnsionresult
            
 

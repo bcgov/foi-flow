@@ -16,8 +16,8 @@ class ExtensionReason(db.Model):
         return extensionreason_schema.dump(query)
 
     @classmethod
-    def getextensionreason(cls,extensionreasonid):
-        extensionreason_schema = ExtensionReasonSchema(many=True)
+    def getextensionreasonbyid(cls,extensionreasonid):
+        extensionreason_schema = ExtensionReasonSchema()
         query = db.session.query(ExtensionReason).filter_by(extensionreasonid=extensionreasonid).first()
         return extensionreason_schema.dump(query)
     
