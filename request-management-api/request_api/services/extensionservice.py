@@ -16,8 +16,7 @@ class extensionservice:
         created_atdateformat = '%Y-%m-%d %H:%M:%S.%f'
         otherdateformat = '%Y-%m-%d'
         requestversion =  self.__getversionforrequest(requestid) if version is None else version
-        extensionrecords = FOIRequestExtension.getextensions(requestid, requestversion)
-        print(extensionrecords)
+        extensionrecords = FOIRequestExtension.getextensions(requestid, requestversion)        
         for entry in extensionrecords:               
                 extensions.append({"foirequestextensionid": entry["foirequestextensionid"], 
                     "extensionreasonid": entry["extensionreasonid"], 

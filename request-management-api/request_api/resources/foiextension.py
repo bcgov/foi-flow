@@ -14,13 +14,15 @@
 """API endpoints for managing a FOI Requests resource."""
 
 
+from sqlalchemy.log import Identified
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedorigins, getgroupsfromtoken, getrequiredmemberships
+from request_api.utils.enums import UserGroup
 from request_api.exceptions import BusinessException, Error
 from request_api.services.extensionservice import extensionservice
 from request_api.schemas.foiextension import  FOIRequestExtensionSchema
@@ -64,12 +66,24 @@ class CreateFOIRequestExtension(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post(requestid, ministryrequestid):      
         try:
+            statuscode = 200
+            groups = getgroupsfromtoken()   
             requestjson = request.get_json()
-            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
-            result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)
+            if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups):           
+                result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
+                success = result.success
+                message = result.message
+                identifier = result.identifier
+            else:
+                statuscode = 401
+                success = False
+                message = 'Unautherized user'
+                identifier = -1
+            return {'status': success, 'message':message,'id':identifier} , statuscode 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
