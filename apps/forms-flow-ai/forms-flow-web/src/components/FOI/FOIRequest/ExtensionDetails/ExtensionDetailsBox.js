@@ -9,6 +9,7 @@ import {
   fetchExtensions,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import ExtensionsTable from "./ExtensionsTable";
+import "./extensionscss.scss"
 
 const ExtensionDetailsBox = React.memo(() => {
   const { setModalOpen, dispatch} = useContext(ActionContext);
@@ -31,7 +32,7 @@ const ExtensionDetailsBox = React.memo(() => {
           <div className="col-lg-4 foi-details-col ">
             <a
               href="#"
-              className="foi-floatright foi-link"
+              className="foi-floatright modal-link-button"
               onClick={(e) => {
                 e.preventDefault();
                 setModalOpen(true);
@@ -42,14 +43,10 @@ const ExtensionDetailsBox = React.memo(() => {
           </div>
         </div>
         <CardContent>
-          <div className="row foi-details-row">
-            <div className="col-lg-6 foi-details-col"></div>
-            <div className="col-lg-6 foi-details-col"></div>
-          </div>
-          <ExtensionsTable/>
+          <ExtensionsTable />
         </CardContent>
       </Card>
-      <AddExtensionModal/>
+      <AddExtensionModal />
     </>
   );
 });

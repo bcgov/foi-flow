@@ -27,10 +27,6 @@ const ExtensionDetailsBox = React.memo(() => {
           </div>
         </div>
         <CardContent>
-          <div className="row foi-details-row">
-            <div className="col-lg-6 foi-details-col"></div>
-            <div className="col-lg-6 foi-details-col"></div>
-          </div>
           <ExtensionsTable showActions={false}/>
         </CardContent>
       </Card>
