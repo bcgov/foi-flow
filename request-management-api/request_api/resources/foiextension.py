@@ -46,20 +46,9 @@ class GetFOIExtensions(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     def get(requestid):
-        extensions = []
         try:
-            extensionrecords = extensionservice().getrequestextensions(requestid)
-            for entry in extensionrecords:
-                extendedduedate =entry['extendedduedate'].strftime('%Y-%m-%d') if entry['extendedduedate'] is not None else None 
-                decisiondate = entry['decisiondate'].strftime('%Y-%m-%d') if entry['decisiondate'] is not None else None
-                created_at = entry['created_at'].strftime('%Y-%m-%d %H:%M:%S.%f') if entry['decisiondate'] is not None else None
-                extensions.append({"foirequestextensionid": entry["foirequestextensionid"], 
-                    "extensionreasonid": entry["extensionreasonid"], "extensionreson": entry["reason"],
-                    "extensionstatusid": entry["extensionstatusid"], "extensionstatus": entry["name"],
-                    "extendedduedays": entry["extendedduedays"], 
-                    "extendedduedate": extendedduedate, "decisiondate": decisiondate, 
-                    "approvednoofdays": entry["approvednoofdays"], "created_at": created_at, "createdby": entry["createdby"]})
-            return json.dumps(extensions), 200
+            extensionrecords = extensionservice().getrequestextensions(requestid)            
+            return json.dumps(extensionrecords), 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
