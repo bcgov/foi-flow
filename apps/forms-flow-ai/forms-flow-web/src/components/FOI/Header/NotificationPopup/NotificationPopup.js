@@ -15,7 +15,7 @@ const NotificationPopup = ({notifications}) => {
 
   useEffect(() => {     
     tabTitle();
-  });
+  },[]);
 
   const tabTitle = () =>{
     let myRequestList = notifications.filter(x => x.notificationusertype === 'Assignee');

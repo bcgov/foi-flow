@@ -11,7 +11,8 @@ import {
   getBCgovCode
 } from "../../../FOIRequest/utils";
 import {
-  fetchFOIRequestDetails 
+  fetchFOIRequestDetails,
+  fetchFOIRawRequestDetails 
 } from "../../../../../apiManager/services/FOI/foiRequestServices";
 import { StateEnum } from '../../../../../constants/FOI/statusEnum';
 import {push} from "connected-react-router";
@@ -29,9 +30,9 @@ const NotificationList = (props) => {
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const [requestState, setRequestState] = useState();
 
-  // useEffect(() => {     
-  //   getRequestState();
-  // });
+  useEffect(() => {     
+    getRequestState();
+  }, [requestDetails]);
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -63,7 +64,12 @@ const NotificationList = (props) => {
   }
 
   const getRequestState = () =>{
-    dispatch(fetchFOIRequestDetails(notification.foirequestid,notification.requestid));
+    if(notification.requesttype === 'rawrequest'){
+      dispatch(fetchFOIRawRequestDetails(notification.requestid));
+    }
+    else if(notification.requesttype === 'ministryrequest'){
+      dispatch(fetchFOIRequestDetails(notification.foirequestid,notification.requestid));
+    }
     Object.entries(StateEnum).forEach(([key, value]) =>{
       if(value.id === requestDetails.requeststatusid){
         setRequestState(value.name);
@@ -72,13 +78,15 @@ const NotificationList = (props) => {
   }
 
   const redirectUrl = () => {
-    getRequestState();
+    //getRequestState();
+    let url = "";
     if(notification.requesttype === 'rawrequest'){
-       dispatch(push(`/foi/reviewrequest/${notification.foirequestid}/${requestState}`));
+      url=`/foi/reviewrequest/${notification.requestid}/${requestState}`;
     }
     else if(notification.requesttype === 'ministryrequest'){
-      dispatch(push(`/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`));
+      url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
     }
+    dispatch(push(url));
     window.location.reload();
   }
 
@@ -87,7 +95,7 @@ const NotificationList = (props) => {
       <Row>
         <Col>
           <h6 className={`notification-heading ${(!requestState || requestState === "Open") && 'disable-click-wrapper'}`}>
-            <div className="redirect-url" disabled={!requestState || requestState === "Open"} onClick={redirectUrl}>{notification.idnumber}</div></h6>
+            <div className="redirect-url"  disabled={!requestState || requestState === "Open"} onClick={redirectUrl}>{notification.idnumber}</div></h6>
         </Col>
         <Col className="close-btn-align" onClick={dismissNotification}>
           <i className="fa fa-times"></i>
