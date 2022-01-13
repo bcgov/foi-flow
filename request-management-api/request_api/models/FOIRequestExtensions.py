@@ -68,7 +68,7 @@ class FOIRequestExtension(db.Model):
         createdby=createuserid)        
         db.session.add(newextension)
         db.session.commit()
-        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid)   
+        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid)      
     
 
     @classmethod
@@ -88,6 +88,12 @@ class FOIRequestExtension(db.Model):
                 extensions.append(dict(row))
         return extensions
     
+    @classmethod
+    def updateextensionversion(cls,ministryrequestid,ministryrequestversion, userid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid).update({"foiministryrequestversion_id": ministryrequestversion, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        return DefaultMethodResult(True,'Version Updated',ministryrequestversion)
+        
+
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
         fields = ('foirequestextensionid', 'extensionreasonid', 'extensionstatusid', 'foiministryrequest_id', 'foiministryrequestversion_id', 'extendedduedays', 'extendedduedate', 'decisiondate', 'approvednoofdays', 'version', 'isactive')

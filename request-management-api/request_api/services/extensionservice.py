@@ -18,16 +18,19 @@ class extensionservice:
         return self.__formatcreateddate(extensions)
 
     def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
-        extnsionresult = {"success": False, "message": "", "identifier": 0}
-        
+        version = self.__getversionforrequest(ministryrequestid)
         if extensionschema['extensionreasonid'] <= 4:            
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
-            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)                      
+            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+           
             if result.success == True:
-                version = self.__getversionforrequest(ministryrequestid)               
-                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)               
+                version = self.__getversionforrequest(ministryrequestid)
+                FOIRequestExtension.updateextensionversion(ministryrequestid, version, userid)
+                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)
+        else:
+            extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, userid)
         return extnsionresult
            
 
