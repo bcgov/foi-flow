@@ -49,6 +49,4 @@ from .Payment import Payment
 from .DocumentType import DocumentType
 from .DocumentTemplate import DocumentTemplate
 
-from .FOIRequestExtensions import FOIRequestExtension
-
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
