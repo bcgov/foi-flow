@@ -47,9 +47,8 @@ class FOIRequestNotification(db.Model):
         rs = db.session.execute(text(sql), {'userid': userid, 'days': days})
         notifications = []
         for row in rs:
-            dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
-            _createddate = dt
-            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
+            _createddate = row["created_at"].strftime('%Y %b %d | %I:%M %p').upper()
+            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate, "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
         return notifications
 
     @classmethod
@@ -57,12 +56,6 @@ class FOIRequestNotification(db.Model):
         db.session.query(FOIRequestNotification).filter(FOIRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted ', notificationids)       
-
-    @classmethod
-    def deletebynotificationid(cls, notificationids):
-        db.session.query(FOIRequestNotification).filter(FOIRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
-        db.session.commit()  
-        return DefaultMethodResult(True,'Notifications deleted for id',notificationids) 
 
     @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
@@ -77,6 +70,15 @@ class FOIRequestNotification(db.Model):
     def getnotificationidsbynumber(cls, idnumber):
         sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber """
         rs = db.session.execute(text(sql), {'idnumber': idnumber})
+        notificationids = []
+        for row in rs:
+            notificationids.append(row["notificationid"])
+        return notificationids
+
+    @classmethod
+    def getnotificationidsbytype(cls, notificationtypeid):
+        sql = """select notificationid from "FOIRequestNotifications" where notificationtypeid= :notificationtypeid """
+        rs = db.session.execute(text(sql), {'notificationtypeid': notificationtypeid})
         notificationids = []
         for row in rs:
             notificationids.append(row["notificationid"])
