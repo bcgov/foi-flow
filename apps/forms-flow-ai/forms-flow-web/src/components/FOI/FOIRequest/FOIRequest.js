@@ -7,7 +7,7 @@ import ChildDetails from './ChildDetails';
 import OnBehalfOfDetails from './OnBehalfOfDetails';
 import AddressContactDetails from './AddressContanctInfo';
 import RequestDescriptionBox from './RequestDescriptionBox';
-import AdditionalRequestDetails from "./AdditionalRequestDetails";
+import RequestDetails from "./RequestDetails";
 import ExtensionDetails from "./ExtensionDetails";
 import AdditionalApplicantDetails from './AdditionalApplicantDetails';
 import RequestNotes from './RequestNotes';
@@ -575,7 +575,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject} 
                         disableInput={disableInput} 
                       />
-                      <AdditionalRequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
+                      <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       
                       <ExtensionDetails requestDetails={requestDetails}/>
                       {

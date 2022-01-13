@@ -10,7 +10,7 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
-const AdditionalRequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject, disableInput}) => {
+const RequestDetails = React.memo(({requestDetails, handleRequestDetailsValue, handleRequestDetailsInitialValue, createSaveRequestObject, disableInput}) => {
 
     /**
      *  Request details box in the UI
@@ -297,4 +297,4 @@ const AdditionalRequestDetails = React.memo(({requestDetails, handleRequestDetai
     );
   });
 
-export default AdditionalRequestDetails;
+export default RequestDetails;
