@@ -4,6 +4,8 @@ from re import VERBOSE
 from request_api.services.events.state import stateevent
 from request_api.services.events.division import divisionevent
 from request_api.services.events.assignment import assignmentevent
+from request_api.services.events.cfrdate import cfrdateevent
+from request_api.services.events.legislativedate import legislativedateevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 import json
@@ -23,5 +25,14 @@ class eventservice:
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('FOI Notification Error', exception.message))
             
+    def postreminderevent(self):
+        try:
+            cfreventresponse = cfrdateevent().createdueevent() 
+            legislativeeventresponse = legislativedateevent().createdueevent()   
+            if cfreventresponse.success == False or legislativeeventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for event cfr response=%s ; legislative response=%s" % (cfreventresponse.message, legislativeeventresponse.message))     
+                return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
+            return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
+        except BusinessException as exception:            
+            current_app.logger.error("%s,%s" % ('FOI Notification Error', exception.message))
     
-          

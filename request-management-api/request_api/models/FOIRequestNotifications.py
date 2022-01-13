@@ -59,12 +59,6 @@ class FOIRequestNotification(db.Model):
         return DefaultMethodResult(True,'Notifications deleted ', notificationids)       
 
     @classmethod
-    def deletebynotificationid(cls, notificationids):
-        db.session.query(FOIRequestNotification).filter(FOIRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
-        db.session.commit()  
-        return DefaultMethodResult(True,'Notifications deleted for id',notificationids) 
-
-    @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
         sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
         rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeid': notificationtypeid})
@@ -77,6 +71,15 @@ class FOIRequestNotification(db.Model):
     def getnotificationidsbynumber(cls, idnumber):
         sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber """
         rs = db.session.execute(text(sql), {'idnumber': idnumber})
+        notificationids = []
+        for row in rs:
+            notificationids.append(row["notificationid"])
+        return notificationids
+
+    @classmethod
+    def getnotificationidsbytype(cls, notificationtypeid):
+        sql = """select notificationid from "FOIRequestNotifications" where notificationtypeid= :notificationtypeid """
+        rs = db.session.execute(text(sql), {'notificationtypeid': notificationtypeid})
         notificationids = []
         for row in rs:
             notificationids.append(row["notificationid"])
