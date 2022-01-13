@@ -64,7 +64,8 @@ class FOIMinistryRequest(db.Model):
     
     documents = relationship('FOIMinistryRequestDocument', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDocument.foiministryrequest_id, "
                         "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
-    
+    extensions = relationship('FOIRequestExtension', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestExtension.foiministryrequest_id, "
+                         "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
      
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -196,6 +197,10 @@ class FOIMinistryRequest(db.Model):
         return requeststates
 
     @classmethod
+    def getrequestoriginalduedate(cls,ministryrequestid):       
+        return db.session.query(FOIMinistryRequest.duedate).filter(and_(FOIMinistryRequest.foiministryrequestid == ministryrequestid), and_(FOIMinistryRequest.requeststatusid == 1)).order_by(FOIMinistryRequest.version).first()[0]
+         
+    @classmethod
     def getupcomingcfrduerecords(cls):
         sql = """select distinct on (filenumber) filenumber, cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
                     where isactive = true and cfrduedate is not null 
@@ -218,6 +223,7 @@ class FOIMinistryRequest(db.Model):
         for row in rs:
             upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         return upcomingduerecords    
+
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
