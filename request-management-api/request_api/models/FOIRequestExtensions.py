@@ -39,7 +39,7 @@ class FOIRequestExtension(db.Model):
         return document_schema.dump(request)
 
     @classmethod
-    def saveextension(cls,ministryrequestid,ministryrequestversion, extension, userid):
+    def saveextension(cls,ministryrequestid,ministryrequestversion, extension, extensionreason, userid):
         
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
@@ -48,7 +48,7 @@ class FOIRequestExtension(db.Model):
 
         if 'extensionstatusid' in extension:
             extensionstatusid = extension['extensionstatusid']
-        elif extension['extensionreasonid'] <= 4:
+        elif 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body': 
             extensionstatusid = 2
         else:
             extensionstatusid = 1        
