@@ -21,6 +21,7 @@ class extensionservice:
                 extensions.append({"foirequestextensionid": entry["foirequestextensionid"], 
                     "extensionreasonid": entry["extensionreasonid"], 
                     "extensionreson": entry["reason"],
+                    "extensiontype": entry["extensiontype"],
                     "extensionstatusid": entry["extensionstatusid"], 
                     "extensionstatus": entry["name"],
                     "extendedduedays": entry["extendedduedays"], 
