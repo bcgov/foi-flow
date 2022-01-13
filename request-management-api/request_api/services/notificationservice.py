@@ -173,7 +173,7 @@ class notificationservice:
         notification.notificationtypeid = self.__getnotificationtypeid(notificationtype)
         notification.version = foirequest["version"]        
         notification.createdby = userid
-        notification.created_at = self.__gettoday()
+        notification.created_at = datetime2.now()
         notification.notification = message  
         notificationusers = self.__getnotificationusers(notificationtype, foirequest, requesttype, userid)
         users = []
@@ -190,7 +190,7 @@ class notificationservice:
         user.notificationusertypeid = notificationuser["usertype"]
         user.userid = notificationuser["userid"]
         user.createdby = userid
-        user.created_at = self.__gettoday()
+        user.created_at = datetime2.now()
         return user
 
     def __getnotificationusers(self, notificationtype, foirequest, requesttype, userid):
@@ -264,7 +264,3 @@ class notificationservice:
         else:
             return str(14)
         
-    def __gettoday(self):
-        now_utc = datetime.now(timezone('UTC'))
-        now_pst = now_utc.astimezone(timezone('America/Vancouver'))
-        return now_pst.strftime('%Y-%m-%d %H:%M:%S')
