@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
-import "../../customComponents/ConfirmationModal/confirmationmodal.scss";
+import "./extensionscss.scss"
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import {
   formatDate,
@@ -26,15 +26,7 @@ import clsx from "clsx";
 import { useParams } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-    marginTop: "30px",
-    marginBottom: "50px",
-  },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightRegular,
-  },
+
   btndisabled: {
     border: "none",
     backgroundColor: "#eceaea",
@@ -215,12 +207,11 @@ export default function AddExtensionModal() {
   }
 
   return (
-    <div className="state-change-dialog">
+    <div>
       <Dialog
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        aria-labelledby="state-change-dialog-title"
-        aria-describedby="state-change-dialog-description"
+        aria-labelledby="extension-dialog-title"
         maxWidth={"md"}
         fullWidth={true}
         id="add-extension-dialog"
@@ -232,8 +223,8 @@ export default function AddExtensionModal() {
           },
         }}
       >
-        <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">Extension</h2>
+        <DialogTitle disableTypography id="extension-dialog-title">
+          <h2 className="extension-header">Extension</h2>
           <IconButton
             className="title-col3"
             onClick={() => setModalOpen(false)}

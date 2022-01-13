@@ -1,7 +1,7 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchExtensions } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import { formatDate } from "../../../../helper/FOI/helper";
+
 export const ActionContext = createContext();
 export const ActionProvider = ({ children, requestDetails }) => {
   const dispatch = useDispatch();

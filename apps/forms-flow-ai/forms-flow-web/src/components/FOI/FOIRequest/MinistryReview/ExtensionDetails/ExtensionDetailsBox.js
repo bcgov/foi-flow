@@ -10,13 +10,13 @@ import ExtensionsTable from "./ExtensionsTable";
 const ExtensionDetailsBox = React.memo(() => {
   const { dispatch } = useContext(ActionContext);
 
-  const { requestId } = useParams();
+  const { ministryId } = useParams();
 
   useEffect(() => {
-    if (requestId) {
-      dispatch(fetchExtensions(requestId));
+    if (ministryId) {
+      dispatch(fetchExtensions(ministryId));
     }
-  }, [requestId]);
+  }, [ministryId]);
   
   return (
     <>
@@ -27,10 +27,6 @@ const ExtensionDetailsBox = React.memo(() => {
           </div>
         </div>
         <CardContent>
-          <div className="row foi-details-row">
-            <div className="col-lg-6 foi-details-col"></div>
-            <div className="col-lg-6 foi-details-col"></div>
-          </div>
           <ExtensionsTable showActions={false}/>
         </CardContent>
       </Card>
