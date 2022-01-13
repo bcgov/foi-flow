@@ -146,7 +146,7 @@ class FOIRequestsByIdAndType(Resource):
                 return {'status': False, 'message':'Bad Request'}, 400   
             request_json = request.get_json()    
             ministryrequestschema = FOIRequestMinistrySchema().load(request_json)    
-            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
+            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 asyncio.run(requestservice().posteventtoworkflow(foiministryrequestid, result.args[1], ministryrequestschema, json.loads(metadata),"ministry"))

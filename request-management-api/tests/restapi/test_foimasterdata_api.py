@@ -52,7 +52,3 @@ def test_post_fois3storagerequests(app, client):
     for item in jsonresponse:
         assert item['authheader'] is not None and  item['filepath'] is not None
     assert response.status_code == 200 and len(jsonresponse) >=1  
-
-def test_get_extensionreasons(app, client):
-  response = client.get('/api/foiflow/extensionreasons', headers=factory_user_auth_header(app, client), content_type='application/json')
-  assert response.status_code == 200

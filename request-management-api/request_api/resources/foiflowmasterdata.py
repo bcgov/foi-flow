@@ -30,7 +30,6 @@ from request_api.services.receivedmodeservice import receivedmodeservice
 from request_api.services.divisionstageservice import divisionstageservice
 from request_api.services.closereasonservice import closereasonservice
 from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
-from request_api.services.extensionreasonservice import extensionreasonservice
 import json
 import request_api
 import requests
@@ -205,20 +204,4 @@ class FOIFlowDocumentStorage(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/extensionreasons')
-class FOIFlowExtensionReasons(Resource):
-    """Retrieves all active extension reasons.
-    """
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
-    @auth.require
-    @request_api.cache.cached(key_prefix="extensionreasons")
-    def get():
-        try:
-            data = extensionreasonservice().getextensionreasons()
-            jsondata = json.dumps(data)
-            return jsondata , 200
-        except BusinessException as exception:
-            return {'status': exception.status_code, 'message':exception.message}, 500        
+            
