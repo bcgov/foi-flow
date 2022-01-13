@@ -64,7 +64,8 @@ class FOIMinistryRequest(db.Model):
     
     documents = relationship('FOIMinistryRequestDocument', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDocument.foiministryrequest_id, "
                         "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
-    
+    extensions = relationship('FOIRequestExtension', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestExtension.foiministryrequest_id, "
+                         "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
      
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -195,6 +196,10 @@ class FOIMinistryRequest(db.Model):
             requeststates.append(row["status"])
         return requeststates
 
+    @classmethod
+    def getrequestoriginalduedate(cls,ministryrequestid):       
+        return db.session.query(FOIMinistryRequest.duedate).filter(and_(FOIMinistryRequest.foiministryrequestid == ministryrequestid), and_(FOIMinistryRequest.requeststatusid == 1)).order_by(FOIMinistryRequest.version).first()[0]
+         
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

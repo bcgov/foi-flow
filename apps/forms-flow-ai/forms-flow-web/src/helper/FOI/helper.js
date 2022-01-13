@@ -79,6 +79,9 @@ const reconcilePublicHoliDays = (startDate, endDate) => {
 	return endDate;
 }
 const addBusinessDays = (dateText, days) => {
+	if(!dateText) {
+		return 0;
+	}
 	let startDate = dayjs(dateText);	
 	let endDate = startDate.businessDaysAdd(days);
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
@@ -264,5 +267,5 @@ export {
   getFullnameList,
   getAssignToList,
   getFullnameTeamList,
-  ConditionalComponent
+  ConditionalComponent,
 };
