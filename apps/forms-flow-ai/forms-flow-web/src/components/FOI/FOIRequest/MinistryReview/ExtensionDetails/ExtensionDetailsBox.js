@@ -10,13 +10,13 @@ import ExtensionsTable from "./ExtensionsTable";
 const ExtensionDetailsBox = React.memo(() => {
   const { dispatch } = useContext(ActionContext);
 
-  const { requestId } = useParams();
+  const { ministryId } = useParams();
 
   useEffect(() => {
-    if (requestId) {
-      dispatch(fetchExtensions(requestId));
+    if (ministryId) {
+      dispatch(fetchExtensions(ministryId));
     }
-  }, [requestId]);
+  }, [ministryId]);
   
   return (
     <>
