@@ -220,5 +220,5 @@ class FOIFlowExtensionReasons(Resource):
             data = extensionreasonservice().getextensionreasons()
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
-            return "Error happened while accessing received modes" , 500         
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500        
