@@ -224,7 +224,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
 
   return (
     <>
-    <div className="rowfoi-details-row  confirm-modal-row first-row">
+    <div className="row foi-details-row confirm-modal-row first-row">
       <div className="col-lg-6 foi-details-col">
         <div className="confirm-label-area"><b>Applicant: </b><span className="confirm-label-content">{_requestDetails.firstName+" "+_requestDetails.lastName}</span></div>
       </div>
