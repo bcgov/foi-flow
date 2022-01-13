@@ -1,18 +1,18 @@
 version: '3'
-services: 
+services:
   foiredis:
     image: redis:4.0
     container_name: aot_foi_request_redis
     ports:
-      - "6379:6379" 
+      - "6379:6379"
   BACKEND:
     build:
-      context: ./request-management-api  
+      context: ./request-management-api
       dockerfile: dockerfile.local
     image: foirequestsbackendimage
     container_name: aot_foi_requests_backend_api
-    depends_on: 
-      - foi-requests-DB     
+    depends_on:
+      - foi-requests-DB
     networks:
       services-network:
         aliases:
@@ -55,11 +55,12 @@ services:
       - OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
       - OSS_S3_FORMS_ACCESS_KEY_ID=${OSS_S3_FORMS_ACCESS_KEY_ID}
       - OSS_S3_FORMS_SECRET_ACCESS_KEY=${OSS_S3_FORMS_SECRET_ACCESS_KEY}
-      - OSS_S3_HOST=${OSS_S3_HOST} 
+      - OSS_S3_HOST=${OSS_S3_HOST}
       - OSS_S3_REGION=${OSS_S3_REGION}
       - OSS_S3_SERVICE=${OSS_S3_SERVICE}
       - FOI_NOTIFICATION_DAYS=${FOI_NOTIFICATION_DAYS}
-        
+      - FOI_ADDITIONAL_HOLIDAYS=${FOI_ADDITIONAL_HOLIDAYS}
+
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg
@@ -71,7 +72,7 @@ services:
     networks:
       services-network:
         aliases:
-          - db   
+          - db
   forms-flow-bpm-db:
     image: postgres:latest
     environment:
@@ -121,11 +122,11 @@ services:
       - WEBSOCKET_FOI_RAWREQUEST_TOPIC=${WEBSOCKET_FOI_RAWREQUEST_TOPIC}
       - FORMSFLOW_WF_URL=${FORMSFLOW_WF_URL}
       - FOI_REQ_MANAGEMENT_API_URL=${FOI_REQ_MANAGEMENT_API_URL}
-    depends_on: 
+    depends_on:
       - forms-flow-bpm-db
     networks:
       - forms-flow-bpm-network
-      
+
   forms-flow-web:
     container_name: forms-flow-web
     build:
@@ -133,9 +134,9 @@ services:
       dockerfile: Dockerfile.local
       args:
         - NODE_ENV=${NODE_ENV:-development}
-        - GENERATE_SOURCEMAP=false                
-        - REACT_APP_KEYCLOAK_CLIENT=${KEYCLOAK_WEB_CLIENTID:-forms-flow-web}       
-        - REACT_APP_WEB_BASE_URL=${FORMSFLOW_API_URL}                
+        - GENERATE_SOURCEMAP=false
+        - REACT_APP_KEYCLOAK_CLIENT=${KEYCLOAK_WEB_CLIENTID:-forms-flow-web}
+        - REACT_APP_WEB_BASE_URL=${FORMSFLOW_API_URL}
         - REACT_APP_KEYCLOAK_URL_REALM=${KEYCLOAK_URL_REALM:-forms-flow-ai}
         - REACT_APP_KEYCLOAK_URL=${KEYCLOAK_URL}
         - REACT_APP_APPLICATION_NAME=${APPLICATION_NAME:-foi-flow}
@@ -146,10 +147,10 @@ services:
     ports:
       - "3000:8080"
     tty: true
-    
+
 volumes:
   dbdata:
 networks:
   forms-flow-bpm-network:
-  services-network:    
+  services-network:
     driver: bridge
