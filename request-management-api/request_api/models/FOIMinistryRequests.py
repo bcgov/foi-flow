@@ -64,7 +64,8 @@ class FOIMinistryRequest(db.Model):
     
     documents = relationship('FOIMinistryRequestDocument', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDocument.foiministryrequest_id, "
                         "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
-    
+    extensions = relationship('FOIRequestExtension', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestExtension.foiministryrequest_id, "
+                         "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
      
     @classmethod
     def getrequest(cls,ministryrequestid):
