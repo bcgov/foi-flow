@@ -88,3 +88,35 @@ class CreateFOIRequestExtension(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiextension/<ministryrequestid>/<extensionid>/edit')#/foidocument/<requesttype>/<requestid>/documentid/<documentid>/replace
+class EditFOIRequestExtension(Resource):
+    """Edits extension for ministry(opened) request."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def post(ministryrequestid, extensionid):      
+        try:
+            statuscode = 200
+            groups = getgroupsfromtoken()   
+            requestjson = request.get_json()
+            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)
+            if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups):           
+                result = extensionservice().createrequestextensionversion(ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
+                success = result.success
+                message = result.message
+                identifier = result.identifier
+            else:
+                statuscode = 401
+                success = False
+                message = 'Unautherized user'
+                identifier = -1
+            return {'status': success, 'message':message,'id':identifier} , statuscode 
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 

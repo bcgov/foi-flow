@@ -47,7 +47,27 @@ class extensionservice:
         else:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         return extnsionresult
-           
+
+    def createrequestextensionversion(self, ministryrequestid, extensionid, extensionschema, userid):      
+        version = self.__getversionforrequest(ministryrequestid)
+        extension = FOIRequestExtension.getextension(extensionid)
+        #save document here documentservice().createministryrequestdocument(ministryrequestid, extensionschema['document], userid)
+        return FOIRequestExtension.createextensionversion(ministryrequestid, version, self.__copyextensionproperties(extension,extensionschema,extension['version']), userid)
+    
+    def __copyextensionproperties(self, extension, extensionschema, version):
+        extension['version'] = version +1
+        extension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else extension['extensionreasonid']
+        extension['extensionstatusid'] = extensionschema['extensionstatusid'] if 'extensionstatusid' in extensionschema  else extension['extensionstatusid']
+        extension['extendedduedays'] = extensionschema['extendedduedays'] if 'extendedduedays' in extensionschema  else extension['extendedduedays']
+        extension['extendedduedate'] = extensionschema['extendedduedate'] if 'extendedduedate' in extensionschema  else extension['extendedduedate']
+        extension['decisiondate'] = extensionschema['decisiondate'] if 'decisiondate' in extensionschema  else extension['decisiondate']
+        extension['approvednoofdays'] = extensionschema['approvednoofdays'] if 'approvednoofdays' in extensionschema  else extension['approvednoofdays']
+        
+        extension['document'] = extensionschema['document'] if 'document' in extensionschema  else None
+        extension['isactive'] =  extensionschema['isactive'] if 'isactive' in extensionschema  else True
+        extension['created_at'] =  extensionschema['created_at'] if 'created_at' in extensionschema  else None
+        extension['createdby'] = extensionschema['createdby'] if 'createdby' in extensionschema  else None
+        return extension
 
     def __getversionforrequest(self, requestid):
         """ Returns the active version of the request id based on type.

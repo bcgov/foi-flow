@@ -9,6 +9,15 @@ __author__      = "divya.v@aot-technologies.com"
 
 """
 
+class FOIMinistryRequestDocumentSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    documentpath = fields.Str(data_key="documentpath",allow_none=False)
+    filename = fields.Str(data_key="filename",allow_none=False)
+    category = fields.Str(data_key="category",allow_none=False)
+
 class FOIRequestExtensionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
@@ -24,3 +33,4 @@ class FOIRequestExtensionSchema(Schema):
     foiministryrequest_id = fields.Int(data_key="foiministryrequest_id")
     foiministryrequestversion_id = fields.Int(data_key="foiministryrequestversion_id")  
     isactive = fields.Bool(data_key="isactive",allow_none=True)
+    document = fields.Nested(FOIMinistryRequestDocumentSchema, required=False, allow_none=True)
