@@ -139,13 +139,22 @@ export default function AddExtensionModal() {
     });
   }
 
+  const getStatusId = () => {
+    if(publicBodySelected) {
+      return extensionStatusId.approved
+    }
+
+    else {
+      return status
+    }
+  }
   const handleSave = () => {
     setSaveLoading(true)
     const extensionRequest = {
       extensionreasonid: reason.extensionreasonid,
       extendedduedays: numberDays,
       extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
-      extensionstatusid: !publicBodySelected && status
+      extensionstatusid: getStatusId()
     };
 
     saveExtensionRequest({
