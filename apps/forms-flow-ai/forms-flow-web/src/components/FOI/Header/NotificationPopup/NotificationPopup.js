@@ -9,13 +9,12 @@ import {useDispatch } from "react-redux";
 
 const NotificationPopup = ({notifications}) => {
 
-
   const [myRequestTitle, setMyRequestTitle] = useState();
   const [watchingRequestTitle, setWatchingRequestTitle] = useState();
 
   useEffect(() => {     
     tabTitle();
-  },[]);
+  },[notifications]);
 
   const tabTitle = () =>{
     let myRequestList = notifications?.filter(x => x.notificationusertype === 'Assignee');
@@ -68,8 +67,7 @@ const NotificationPopup = ({notifications}) => {
         :
         <ListGroup className="notification-list empty-notifications">
         No notifications
-        </ListGroup>
-    }
+        </ListGroup>}
       </Tab>
       <Tab eventKey="watch-request" title={watchingRequestTitle} className="popup-background">
         {checkIfNotificationExists('watcher') && <Row className="list-header">
@@ -85,10 +83,8 @@ const NotificationPopup = ({notifications}) => {
         : 
         <ListGroup className="notification-list empty-notifications">
           No notifications
-        </ListGroup>
-    }
+        </ListGroup>}
       </Tab>
-
     </Tabs>
   );
 
