@@ -17,6 +17,7 @@ import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMas
 import { catchError, fnDone } from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 export const fetchFOIRequestList = () => {
   return (dispatch) => {
@@ -266,6 +267,74 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId) => {
           dispatch(serviceActionError(res));
           dispatch(setFOILoader(false));
           throw new Error(`Error while fetching the request description history (request# ${requestId}, ministry# ${ministryId})`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
+};
+
+export const fetchFOIRawRequestDetailsForNotification = (requestId, notification) => {
+  const apiUrlgetRequestDetails = replaceUrl(
+    API.FOI_RAW_REQUEST_API,
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          Object.entries(StateEnum).forEach(([key, value]) =>{
+            if(value.id === foiRequest.requeststatusid){
+              let url = "";
+              if(notification.requesttype === 'rawrequest'){
+                url=`/foi/reviewrequest/${notification.requestid}/${value.name}`;
+              }
+              else if(notification.requesttype === 'ministryrequest'){
+                url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
+              }
+              window.location.href=url;
+            }
+          })
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching raw request details for request# ${requestId}`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, notification) => {
+  const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+    API.FOI_REQUEST_API,
+    "<requestid>",
+    requestId
+  ), "<ministryid>", ministryId);
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          Object.entries(StateEnum).forEach(([key, value]) =>{
+            if(value.id === foiRequest.requeststatusid){
+              let url = "";
+              if(notification.requesttype === 'rawrequest'){
+                url=`/foi/reviewrequest/${notification.requestid}/${value.name}`;
+              }
+              else if(notification.requesttype === 'ministryrequest'){
+                url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
+              }
+              window.location.href=url;
+            }
+          })
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`)
         }
       })
       .catch((error) => {

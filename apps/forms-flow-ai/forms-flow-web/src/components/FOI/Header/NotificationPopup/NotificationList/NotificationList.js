@@ -1,4 +1,4 @@
-import React, {useState, useEffect } from 'react';
+import React, {useState } from 'react';
 import {useSelector, useDispatch } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
@@ -11,11 +11,9 @@ import {
   getBCgovCode
 } from "../../../FOIRequest/utils";
 import {
-  fetchFOIRequestDetails,
-  fetchFOIRawRequestDetails 
+  fetchFOIRequestDetailsForNotification,
+  fetchFOIRawRequestDetailsForNotification 
 } from "../../../../../apiManager/services/FOI/foiRequestServices";
-import { StateEnum } from '../../../../../constants/FOI/statusEnum';
-import {push} from "connected-react-router";
 
 const NotificationList = (props) => {
 
@@ -24,15 +22,11 @@ const NotificationList = (props) => {
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
-  
+    
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const {ministryId} = useParams();
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
-  const [requestState, setRequestState] = useState();
 
-  useEffect(() => {     
-    getRequestState();
-  }, [requestDetails]);
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -63,39 +57,23 @@ const NotificationList = (props) => {
     dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null));
   }
 
-  const getRequestState = () =>{
+  const getStatusAndRedirect = () =>{
     if(notification.requesttype === 'rawrequest'){
-      dispatch(fetchFOIRawRequestDetails(notification.requestid));
+      dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification))
     }
     else if(notification.requesttype === 'ministryrequest'){
-      dispatch(fetchFOIRequestDetails(notification.foirequestid,notification.requestid));
+      dispatch(fetchFOIRequestDetailsForNotification(notification.foirequestid,notification.requestid, notification));
     }
-    Object.entries(StateEnum).forEach(([key, value]) =>{
-      if(value.id === requestDetails.requeststatusid){
-        setRequestState(value.name);
-      }
-    })
   }
 
-  const redirectUrl = () => {
-    //getRequestState();
-    let url = "";
-    if(notification.requesttype === 'rawrequest'){
-      url=`/foi/reviewrequest/${notification.requestid}/${requestState}`;
-    }
-    else if(notification.requesttype === 'ministryrequest'){
-      url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
-    }
-    dispatch(push(url));
-    window.location.reload();
-  }
+
 
   return(
     <ListGroup.Item>
       <Row>
         <Col>
-          <h6 className={`notification-heading ${(!requestState || requestState === "Open") && 'disable-click-wrapper'}`}>
-            <div className="redirect-url"  disabled={!requestState || requestState === "Open"} onClick={redirectUrl}>{notification.idnumber}</div></h6>
+          <h6 className="notification-heading">
+            <div className="redirect-url" onClick={getStatusAndRedirect}>{notification.idnumber}</div></h6>
         </Col>
         <Col className="close-btn-align" onClick={dismissNotification}>
           <i className="fa fa-times"></i>
