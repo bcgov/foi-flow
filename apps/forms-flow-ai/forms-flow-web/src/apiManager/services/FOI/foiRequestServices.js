@@ -14,10 +14,9 @@ import {
   setFOIMinistryRequestList,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
-import { catchError, fnDone } from './foiServicesUtil';
+import { catchError, fnDone, setRedirectUrl } from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
-import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 export const fetchFOIRequestList = () => {
   return (dispatch) => {
@@ -287,18 +286,7 @@ export const fetchFOIRawRequestDetailsForNotification = (requestId, notification
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          Object.entries(StateEnum).forEach(([key, value]) =>{
-            if(value.id === foiRequest.requeststatusid){
-              let url = "";
-              if(notification.requesttype === 'rawrequest'){
-                url=`/foi/reviewrequest/${notification.requestid}/${value.name}`;
-              }
-              else if(notification.requesttype === 'ministryrequest'){
-                url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
-              }
-              window.location.href=url;
-            }
-          })
+          setRedirectUrl(foiRequest, notification);
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching raw request details for request# ${requestId}`);
@@ -322,18 +310,7 @@ export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, not
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          Object.entries(StateEnum).forEach(([key, value]) =>{
-            if(value.id === foiRequest.requeststatusid){
-              let url = "";
-              if(notification.requesttype === 'rawrequest'){
-                url=`/foi/reviewrequest/${notification.requestid}/${value.name}`;
-              }
-              else if(notification.requesttype === 'ministryrequest'){
-                url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
-              }
-              window.location.href=url;
-            }
-          })
+          setRedirectUrl(foiRequest, notification);
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`)
@@ -344,4 +321,3 @@ export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, not
       });
   };
 };
-
