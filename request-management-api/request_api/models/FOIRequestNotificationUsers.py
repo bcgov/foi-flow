@@ -45,7 +45,7 @@ class FOIRequestNotificationUser(db.Model):
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
     
     @classmethod
-    def deletebynotificationid(cls, notificationids):
+    def dismissbynotificationid(cls, notificationids):
         db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.notificationid.in_(notificationids)).delete(synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for id',notificationids)  

@@ -50,7 +50,8 @@ class requestservicegetter:
                 additionalpersonalinfo.update(attribute)
                 
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
-        
+        originalduedate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
+        baserequestinfo['originalDueDate'] = originalduedate.strftime(self.__genericdateformat())
         return baserequestinfo
 
     def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authmembershipgroups):
