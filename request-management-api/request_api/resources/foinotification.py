@@ -23,6 +23,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.notificationservice import notificationservice
+from request_api.services.eventservice import eventservice
 import json
 from flask_cors import cross_origin
 
@@ -75,3 +76,24 @@ class FOIDismissNotification(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foinotifications/reminder')
+class FOIReminderNotification(Resource):
+    """Resource for managing FOI requests."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():      
+        try:
+            reminderresponse = eventservice().postreminderevent()
+            respcode = 200 if reminderresponse.success == True else 500
+            return {'status': reminderresponse.success, 'message':reminderresponse.message,'id': reminderresponse.identifier} , respcode
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        

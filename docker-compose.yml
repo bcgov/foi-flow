@@ -59,7 +59,7 @@ services:
       - OSS_S3_REGION=${OSS_S3_REGION}
       - OSS_S3_SERVICE=${OSS_S3_SERVICE}
       - FOI_NOTIFICATION_DAYS=${FOI_NOTIFICATION_DAYS}
-        
+      - FOI_ADDITIONAL_HOLIDAYS=${FOI_ADDITIONAL_HOLIDAYS}
   foi-requests-DB:
     image: postgres
     container_name: aot_foi_requests_db_pg
