@@ -26,11 +26,11 @@ class cfrdateevent(duecalculator):
             ca_holidays = self.getholidays()
             _upcomingdues = FOIMinistryRequest.getupcomingcfrduerecords()
             for entry in _upcomingdues:
-                _duedate = self.formatduedate(entry['cfrduedate'])  
+                _duedate = self.formatduedate(entry['cfrduedate']) 
                 message = None
                 if  _duedate == _today:                
                     message = self.__todayduemessage()     
-                elif  self.getpreviousbusinessday(_duedate,ca_holidays) == _today:
+                elif  self.getpreviousbusinessday(entry['cfrduedate'],ca_holidays) == _today:
                     message = self.__upcomingduemessage(_duedate)
                 self.__createnotification(message,entry['foiministryrequestid'])
             return DefaultMethodResult(True,'CFR reminder notifications created',_today)
