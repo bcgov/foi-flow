@@ -2,6 +2,7 @@
 from os import stat
 from re import VERBOSE
 import json
+from datetime import datetime as datetime2
 from datetime import datetime, timedelta
 import holidays
 import maya
@@ -22,12 +23,13 @@ class duecalculator:
             return self.getpreviousbusinessday(_prevbusinessday,ca_holidays)
  
     def gettoday(self):
-        now_utc = datetime.now(timezone('UTC'))
-        now_pst = now_utc.astimezone(timezone(self.__getdefaulttimezone()))
+        now_utc = datetime2.now()
+        now_pst = maya.parse(now_utc).datetime(to_timezone=self.__getdefaulttimezone(), naive=False)
         return now_pst.strftime(self.__getdefaultdateformat()) 
     
     def formatduedate(self,input):
-        due_pst = input.astimezone(timezone(self.__getdefaulttimezone()))
+        dt = maya.parse(input).datetime(to_timezone=self.__getdefaulttimezone(), naive=False)
+        due_pst = dt
         return due_pst.strftime(self.__getdefaultdateformat())
     
     def getholidays(self):        

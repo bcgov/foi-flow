@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
-  <bpmn:process id="Process_0g2ilhp" isExecutable="true">
+  <bpmn:process id="due_reminder_notifications" name="Due Reminder Notifications" isExecutable="true" camunda:versionTag="1">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_0qym7g1</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_0f35rt9">
@@ -107,7 +107,7 @@ connector.getVariable("statusCode");</camunda:script>
   <bpmn:error id="Error_06fsjjn" name="FOI-REMINDER-API-ERR" camunda:errorMessage="FOI Request invocation failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0g2ilhp">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="due_reminder_notifications">
       <bpmndi:BPMNEdge id="Flow_017kmm6_di" bpmnElement="Flow_017kmm6">
         <di:waypoint x="585" y="290" />
         <di:waypoint x="712" y="290" />
