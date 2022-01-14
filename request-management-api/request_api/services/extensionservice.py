@@ -1,22 +1,36 @@
 from os import stat
 from re import VERBOSE
-from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDocument
 from request_api.models.FOIRequestExtensions import FOIRequestExtension
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.requestservice import requestservice
 from request_api.services.extensionreasonservice import extensionreasonservice
 import json
 import base64
-import maya
 
 class extensionservice:
     """ FOI Extension management service
     """
     
     def getrequestextensions(self, requestid, version=None):
+        extensions = []
+        created_atdateformat = '%Y-%m-%d %H:%M:%S.%f'
+        otherdateformat = '%Y-%m-%d'
         requestversion =  self.__getversionforrequest(requestid) if version is None else version
-        extensions = FOIRequestExtension.getextensions(requestid, requestversion)
-        return self.__formatcreateddate(extensions)
+        extensionrecords = FOIRequestExtension.getextensions(requestid, requestversion)        
+        for entry in extensionrecords:               
+                extensions.append({"foirequestextensionid": entry["foirequestextensionid"], 
+                    "extensionreasonid": entry["extensionreasonid"], 
+                    "extensionreson": entry["reason"],
+                    "extensiontype": entry["extensiontype"],
+                    "extensionstatusid": entry["extensionstatusid"], 
+                    "extensionstatus": entry["name"],
+                    "extendedduedays": entry["extendedduedays"], 
+                    "extendedduedate": self.__formatdate(entry["extendedduedate"], otherdateformat),  
+                    "decisiondate": self.__formatdate(entry["decisiondate"], otherdateformat), 
+                    "approvednoofdays": entry["approvednoofdays"], 
+                    "created_at": self.__formatdate(entry["created_at"], created_atdateformat),  
+                    "createdby": entry["createdby"]})        
+        return extensions
 
     def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
         version = self.__getversionforrequest(ministryrequestid)
@@ -40,12 +54,7 @@ class extensionservice:
         """       
         return FOIMinistryRequest.getversionforrequest(requestid)[0]
 
-    def __formatcreateddate(self, extensions):
-        for extension in extensions:
-            extension = self.__pstformat(extension)
-        return extensions
-
-    def __pstformat(self, extension):
-        formatedcreateddate = maya.parse(extension['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
-        extension['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
-        return extension
+    def __formatdate(self, datevalue, format):        
+        return datevalue.strftime(format) if datevalue is not None else None
+        
+  
