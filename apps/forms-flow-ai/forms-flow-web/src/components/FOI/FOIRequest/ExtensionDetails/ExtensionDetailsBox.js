@@ -10,10 +10,24 @@ import {
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import ExtensionsTable from "./ExtensionsTable";
 import "./extensionscss.scss"
+import { extensionStatusId } from "../../../../constants/FOI/enum"
+import clsx from "clsx"
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+  btndisabled: {
+    color: "#808080",
+  },
+}));
 
 const ExtensionDetailsBox = React.memo(() => {
-  const { setModalOpen, dispatch} = useContext(ActionContext);
+  const classes = useStyles();
 
+  const { setModalOpen, dispatch, extensions} = useContext(ActionContext);
+
+  const pendingExtensionExists = extensions.some(
+    (ex) => ex.extensionstatusid === extensionStatusId.pending
+  );
   const { ministryId } = useParams();
 
   useEffect(() => {
@@ -30,16 +44,18 @@ const ExtensionDetailsBox = React.memo(() => {
             <label className="foi-details-label">EXTENSION DETAILS</label>
           </div>
           <div className="col-lg-4 foi-details-col ">
-            <a
-              href="#"
-              className="foi-floatright modal-link-button"
+            <button
+              className={clsx("btn", "btn-link", "btn-description-history", {
+                [classes.btndisabled]: pendingExtensionExists,
+              })}
               onClick={(e) => {
                 e.preventDefault();
                 setModalOpen(true);
               }}
+              disabled={pendingExtensionExists}
             >
               New Extension
-            </a>
+            </button>
           </div>
         </div>
         <CardContent>
