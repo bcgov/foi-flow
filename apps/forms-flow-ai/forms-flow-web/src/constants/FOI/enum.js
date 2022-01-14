@@ -15,4 +15,10 @@ const MaxFileSizeInMB = Object.freeze({
     totalFileSize: 500,
 });
 
-export { MimeTypeList, MaxFileSizeInMB };
+const extensionStatusId = Object.freeze({
+  denied: 3,
+  pending: 1,
+  approved: 2,
+});
+
+export { MimeTypeList, MaxFileSizeInMB, extensionStatusId };

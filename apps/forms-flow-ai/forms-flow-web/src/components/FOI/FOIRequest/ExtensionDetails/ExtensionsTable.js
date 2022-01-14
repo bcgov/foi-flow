@@ -95,7 +95,18 @@ const ConditionalTableCell = ({condition, children, ...rest}) => {
           </TableRow>
         </TableHead>
         <ConditionalTableBody empty={!extensions || extensions.length < 1}>
-          {extensions.map((extension) => {
+          {extensions.sort((extensionA, extensionB) => {
+            if(!extensionA.extendedduedate || !extensionB.extendedduedate) {
+              return 0
+            }
+
+            else {
+              return (
+                new Date(extensionB.extendedduedate) - new Date(extensionA.extendedduedate)
+              );
+            }
+          })
+            .map((extension) => {
             return (
               <TableRow key={`key-${extension.extensionstatusid}`}>
                 <TableCell numeric>{extension.extensionreson}</TableCell>
