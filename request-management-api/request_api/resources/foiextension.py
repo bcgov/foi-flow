@@ -65,25 +65,16 @@ class CreateFOIRequestExtension(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.require   
     def post(requestid, ministryrequestid):      
-        try:
-            statuscode = 200
-            groups = getgroupsfromtoken()   
+        try:                     
             requestjson = request.get_json()
-            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)
-            if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups):           
+            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
+            if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
-                success = result.success
-                message = result.message
-                identifier = result.identifier
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
             else:
-                statuscode = 401
-                success = False
-                message = 'Unautherized user'
-                identifier = -1
-            return {'status': success, 'message':message,'id':identifier} , statuscode 
+                return {'status': False, 'message':'Unautherized user','id':-1} , 403
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

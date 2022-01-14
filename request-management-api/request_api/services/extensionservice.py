@@ -55,6 +55,6 @@ class extensionservice:
         return FOIMinistryRequest.getversionforrequest(requestid)[0]
 
     def __formatdate(self, datevalue, format):        
-        formatteddate = datevalue.strftime(format) if datevalue is not None else None 
-        return formatteddate
+        return datevalue.strftime(format) if datevalue is not None else None
+        
   
