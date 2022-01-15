@@ -299,12 +299,22 @@ export const fetchFOIRawRequestDetailsForNotification = (requestId, notification
 };
 
 // TO DO: Need Refinement once the request state is removed from the page url of a request.
-export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, notification) => {
-  const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
-    API.FOI_REQUEST_API,
-    "<requestid>",
-    requestId
-  ), "<ministryid>", ministryId);
+export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, notification, isMinistry) => {
+  let apiUrlgetRequestDetails ="";
+  if(isMinistry){
+    apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+      API.FOI_MINISTRYVIEW_REQUEST_API,
+      "<requestid>",
+      requestId
+    ), "<ministryid>", ministryId);
+  }
+  else{
+    apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+      API.FOI_REQUEST_API,
+      "<requestid>",
+      requestId
+    ), "<ministryid>", ministryId);
+  }
   return (dispatch) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
