@@ -40,7 +40,7 @@ export const postAttachment = (dispatch, apiUrl, data, requestId, ministryId, er
         });
 }
 
-export const setRedirectUrl = (foiRequest,notification) =>{
+export const setRedirectUrl = (foiRequest,notification,isMinistry) =>{
   Object.entries(StateEnum).forEach(([key, value]) =>{
     if(key && value.id === foiRequest.requeststatusid){
       let url = "";
@@ -48,7 +48,10 @@ export const setRedirectUrl = (foiRequest,notification) =>{
         url=`/foi/reviewrequest/${notification.requestid}/${value.name}`;
       }
       else if(notification.requesttype === 'ministryrequest'){
-        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
+        if(isMinistry)
+          url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
+        else
+          url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
       }
       window.location.href=url;
     }

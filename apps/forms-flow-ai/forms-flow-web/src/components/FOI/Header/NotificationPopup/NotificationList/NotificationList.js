@@ -2,7 +2,7 @@ import React, {useState } from 'react';
 import {useSelector, useDispatch } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
-import {addToFullnameList, getFullnameList } from '../../../../../helper/FOI/helper'
+import {addToFullnameList, getFullnameList, isMinistryLogin } from '../../../../../helper/FOI/helper'
 import {
   deleteFOINotifications
 } from "../../../../../apiManager/services/FOI/foiNotificationServices";
@@ -22,7 +22,13 @@ const NotificationList = (props) => {
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
-    
+  const userDetail = useSelector(state=> state.user.userDetail);
+  let isMinistry = false;
+  if (Object.entries(userDetail).length !== 0) {
+    const userGroups = userDetail && userDetail.groups?.map(group => group.slice(1));
+    isMinistry = isMinistryLogin(userGroups);
+  }
+
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const {ministryId} = useParams();
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
@@ -62,7 +68,7 @@ const NotificationList = (props) => {
       dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification))
     }
     else if(notification.requesttype === 'ministryrequest'){
-      dispatch(fetchFOIRequestDetailsForNotification(notification.foirequestid,notification.requestid, notification));
+      dispatch(fetchFOIRequestDetailsForNotification(notification.foirequestid,notification.requestid, notification, isMinistry));
     }
   }
 
