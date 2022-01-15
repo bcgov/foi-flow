@@ -320,7 +320,7 @@ export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, not
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          setRedirectUrl(foiRequest, notification);
+          setRedirectUrl(foiRequest, notification, isMinistry);
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`)
