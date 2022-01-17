@@ -14,7 +14,7 @@ import {
   setFOIMinistryRequestList,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
-import { catchError, fnDone } from './foiServicesUtil';
+import { catchError, fnDone, setRedirectUrl } from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
 
@@ -274,3 +274,60 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId) => {
   };
 };
 
+// TO DO: Need Refinement once the request state is removed from the page url of a request.
+export const fetchFOIRawRequestDetailsForNotification = (requestId, notification) => {
+  const apiUrlgetRequestDetails = replaceUrl(
+    API.FOI_RAW_REQUEST_API,
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          setRedirectUrl(foiRequest, notification);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching raw request details for request# ${requestId}`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+// TO DO: Need Refinement once the request state is removed from the page url of a request.
+export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, notification, isMinistry) => {
+  let apiUrlgetRequestDetails ="";
+  if(isMinistry){
+    apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+      API.FOI_MINISTRYVIEW_REQUEST_API,
+      "<requestid>",
+      requestId
+    ), "<ministryid>", ministryId);
+  }
+  else{
+    apiUrlgetRequestDetails = replaceUrl(replaceUrl(
+      API.FOI_REQUEST_API,
+      "<requestid>",
+      requestId
+    ), "<ministryid>", ministryId);
+  }
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          setRedirectUrl(foiRequest, notification, isMinistry);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`)
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
+};

@@ -14,16 +14,20 @@ import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
 import "./extensionscss.scss"
 import DateRangeIcon from "@material-ui/icons/DateRange";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
 import {
   formatDate,
   addBusinessDays,
 } from "../../../../helper/FOI/helper";
 import {
-  fetchExtensionReasons,
   saveExtensionRequest,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import clsx from "clsx";
 import { useParams } from "react-router-dom";
+import { extensionStatusId } from "../../../../constants/FOI/enum"
 
 const useStyles = makeStyles((theme) => ({
 
@@ -57,7 +61,6 @@ export default function AddExtensionModal() {
     modalOpen,
     setModalOpen,
     extensionReasons,
-    setExtensionReasons,
     dispatch,
     startDate,
     currentDueDate,
@@ -71,6 +74,7 @@ export default function AddExtensionModal() {
   const maxExtendDays = reason?.defaultextendedduedays || 100
   
   const [extendedDate, setExtendedDate] = useState("")
+  const [status, setStatus] = useState(extensionStatusId.pending);
 
   const initialErrors = {
     reason: true,
@@ -134,12 +138,22 @@ export default function AddExtensionModal() {
     });
   }
 
+  const getStatusId = () => {
+    if(publicBodySelected) {
+      return extensionStatusId.approved
+    }
+
+    else {
+      return status
+    }
+  }
   const handleSave = () => {
     setSaveLoading(true)
     const extensionRequest = {
       extensionreasonid: reason.extensionreasonid,
       extendedduedays: numberDays,
       extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
+      extensionstatusid: getStatusId()
     };
 
     saveExtensionRequest({
@@ -170,18 +184,6 @@ export default function AddExtensionModal() {
       progress: undefined,
     });
   }
-
-  useEffect(() => {
-    if(requestId) {
-      fetchExtensionReasons({
-          callback: (data) => {
-            setExtensionReasons(data)
-          },
-          dispatch: dispatch
-      })
-    }
-    
-  }, [requestId])
   
   const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
 
@@ -318,6 +320,39 @@ export default function AddExtensionModal() {
                 fullWidth
               />
             </Grid>
+
+            {reason && !publicBodySelected && (
+              <>
+                <Grid item xs={6}>
+                  <FormControl component="fieldset">
+                    <RadioGroup
+                      row
+                      name="controlled-radio-buttons-group"
+                      value={status}
+                      onChange={(e) => {
+                        setStatus(Number(e.target.value));
+                      }}
+                    >
+                      <FormControlLabel
+                        value={extensionStatusId.pending}
+                        control={<Radio color="default" />}
+                        label="Pending"
+                      />
+                      <FormControlLabel
+                        value={extensionStatusId.approved}
+                        control={<Radio color="default" />}
+                        label="Approved"
+                      />
+                      <FormControlLabel
+                        value={extensionStatusId.denied}
+                        control={<Radio color="default" />}
+                        label="Denied"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
+              </>
+            )}
           </Grid>
         </DialogContent>
 
