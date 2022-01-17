@@ -1,6 +1,7 @@
 
 from re import T
 from request_api.models.FOIRequests import FOIRequest
+from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.services.foirequest.requestservicebuilder import requestservicebuilder 
 
@@ -19,4 +20,7 @@ class requestserviceupdate(requestservicebuilder):
                 for status in allstatus:
                     if ministry["status"] == status["name"]:
                         updatedministries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
-            return FOIRequest.updateStatus(foirequestid, updatedministries, userid)    
+            return FOIRequest.updateStatus(foirequestid, updatedministries, userid)
+    
+    def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
+        return FOIMinistryRequest().updateduedate(ministryrequestid, duedate, userid)

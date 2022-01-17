@@ -224,7 +224,14 @@ class FOIMinistryRequest(db.Model):
             upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         return upcomingduerecords    
 
-
+    @classmethod
+    def updateduedate(cls, ministryrequestid, duedate, userid)->DefaultMethodResult:
+        currequest = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
+        setattr(currequest,'duedate',duedate)
+        setattr(currequest,'updated_at',datetime.now().isoformat())
+        setattr(currequest,'updatedby',userid)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Request updated',ministryrequestid)
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson','assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name')

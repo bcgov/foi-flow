@@ -23,7 +23,6 @@ class FOIRequestExtensionDocumentMapping(db.Model):
     foirequestextensionid =db.Column(db.Integer, ForeignKey('FOIRequestExtensions.foirequestextensionid'))
     extensionversion = db.Column(db.Integer, ForeignKey('FOIRequestExtensions.version'))
     foiministrydocumentid =db.Column(db.Integer, ForeignKey('FOIMinistryRequestDocuments.foiministrydocumentid'))
-    foiministryrequest_id =db.Column(db.Integer, ForeignKey('FOIMinistryRequests.foiministryrequestid'))
 
     @classmethod
     def getextensiondocument(cls,foirequestextensiondocumentid):   
@@ -31,18 +30,24 @@ class FOIRequestExtensionDocumentMapping(db.Model):
         request = db.session.query(FOIRequestExtensionDocumentMapping).filter_by(foirequestextensiondocumentid=foirequestextensiondocumentid)
         return document_schema.dump(request)
     @classmethod
-    def saveextensiondocument(cls, ministryrequestid, extensionid, ministrydocumentid, version):
-        newextensiondocument = FOIRequestExtensionDocumentMapping(
-            foirequestextensionid=extensionid,
-            extensionversion=version,
-            foiministrydocumentid=ministrydocumentid,
-            foiministryrequest_id=ministryrequestid
-        )
-        db.session.add(newextensiondocument)
+    def saveextensiondocument(cls, extensionid, documents, version, userid):        
+        newdocuments = []        
+        for document in documents:
+            createuserid = document['createdby'] if 'createdby' in document and document['createdby'] is not None else userid
+            createdat = document['created_at'] if 'created_at' in document  and document['created_at'] is not None else datetime.now()
+            newextensiondocument = FOIRequestExtensionDocumentMapping(
+                foirequestextensionid=extensionid,
+                extensionversion=version,
+                foiministrydocumentid=document["foiministrydocumentid"],
+                created_at=createdat, 
+                createdby=createuserid
+            )
+            newdocuments.append(newextensiondocument)
+        db.session.add_all(newdocuments)
         db.session.commit()
-        return DefaultMethodResult(True,'Extension Document Mapping created', newextensiondocument.foirequestextensiondocumentid) 
+        return DefaultMethodResult(True,'Extension Document Mapping created') 
 
 class FOIRequestExtensionDocumentMappingSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestextensiondocumentid', 'foirequestextensionid', 'foiministrydocumentid', 'foiministryrequest_id', 'extensionversion')
+        fields = ('foirequestextensiondocumentid', 'foirequestextensionid', 'foiministrydocumentid', 'extensionversion')
     

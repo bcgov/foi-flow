@@ -37,14 +37,23 @@ class FOIMinistryRequestDocument(db.Model):
 
     @classmethod
     def getdocuments(cls,ministryrequestid,ministryrequestversion):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
         documents = []
         for row in rs:
             if row["isactive"] == True:
                 documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        return documents
+
+    @classmethod
+    def getdocumentsbycategory(cls, ministryrequestid, ministryrequestversion, category):
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion and category = :category ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion, 'category': category})
+        documents = []
+        for row in rs:
+            if row["isactive"] == True:
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
         return documents 
-    
     @classmethod
     def getdocument(cls,foiministrydocumentid):   
         document_schema = FOIMinistryRequestDocumentSchema()            

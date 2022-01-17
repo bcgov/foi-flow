@@ -57,7 +57,7 @@ class GetFOIExtensions(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
+@API.route('/foiextension/ministryrequest/<ministryrequestid>')
 class CreateFOIRequestExtension(Resource):
     """Creates extension for ministry(opened) request."""
 
@@ -67,14 +67,14 @@ class CreateFOIRequestExtension(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
-    def post(requestid, ministryrequestid):      
+    def post(ministryrequestid):      
         try:
             statuscode = 200
             groups = getgroupsfromtoken()   
             requestjson = request.get_json()
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)
             if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups):           
-                result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
+                result = extensionservice().createrequestextension(ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
                 success = result.success
                 message = result.message
                 identifier = result.identifier
@@ -90,7 +90,7 @@ class CreateFOIRequestExtension(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/<ministryrequestid>/<extensionid>/edit')#/foidocument/<requesttype>/<requestid>/documentid/<documentid>/replace
+@API.route('/foiextension/ministryrequest/<ministryrequestid>/extension/<extensionid>/edit')
 class EditFOIRequestExtension(Resource):
     """Edits extension for ministry(opened) request."""
 
@@ -104,7 +104,7 @@ class EditFOIRequestExtension(Resource):
             statuscode = 200
             groups = getgroupsfromtoken()   
             requestjson = request.get_json()
-            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)
+            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups):           
                 result = extensionservice().createrequestextensionversion(ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
                 success = result.success

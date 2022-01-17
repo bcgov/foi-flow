@@ -33,4 +33,4 @@ class FOIRequestExtensionSchema(Schema):
     foiministryrequest_id = fields.Int(data_key="foiministryrequest_id")
     foiministryrequestversion_id = fields.Int(data_key="foiministryrequestversion_id")  
     isactive = fields.Bool(data_key="isactive",allow_none=True)
-    document = fields.Nested(FOIMinistryRequestDocumentSchema, required=False, allow_none=True)
+    documents = fields.Nested(FOIMinistryRequestDocumentSchema, required=False, many=True, allow_none=True)

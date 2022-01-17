@@ -64,8 +64,12 @@ class documentservice:
     def createministrydocumentversion(self, ministryrequestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")
         document = FOIMinistryRequestDocument.getdocument(documentid)
-        return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
-
+        if document:
+           return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)          
+        else:            
+            return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema, userid)          
+        
+        
     def createrawdocumentversion(self, requestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(requestid, "rawrequest")
         document = FOIRawRequestDocument.getdocument(documentid)
