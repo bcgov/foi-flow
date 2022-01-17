@@ -31,7 +31,7 @@ class legislativedateevent(duecalculator):
                 message = None
                 if  _duedate == _today:                
                     message = self.__todayduemessage()     
-                elif  self.getpreviousbusinessday(_duedate,ca_holidays) == _today:
+                elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today:
                     message = self.__upcomingduemessage(_duedate)
                 self.__createnotification(message,entry['foiministryrequestid'])
             return DefaultMethodResult(True,'Legislative reminder notifications created',_today)
