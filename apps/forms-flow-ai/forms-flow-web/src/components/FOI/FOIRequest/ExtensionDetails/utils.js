@@ -1,4 +1,3 @@
-
 import {
   getOSSHeaderDetails,
   saveFilesinS3,
@@ -10,7 +9,7 @@ export const getFileInfoList = (files, idNumber) => {
       ministrycode: idNumber.split("-")[0],
       requestnumber: idNumber,
       filestatustransition: "extension",
-      filename: file.filename || file.name
+      filename: file.filename || file.name,
     };
   });
 };
@@ -39,7 +38,6 @@ export const uploadFiles = async (filesToUpload, idNumber, dispatch) => {
           if (err) {
             reject("An error occurred while attempting to upload files");
           }
-          console.log("resolving upload");
           resolve({
             documentpath: header.filepath,
             filename: header.filename,
@@ -49,4 +47,15 @@ export const uploadFiles = async (filesToUpload, idNumber, dispatch) => {
       });
     })
   );
+};
+
+export const checkPublicBodyError = (numberDays, publicBodySelected) => {
+  if (!numberDays) {
+    return true;
+  }
+  if (publicBodySelected) {
+    return numberDays > 30;
+  }
+
+  return false;
 };

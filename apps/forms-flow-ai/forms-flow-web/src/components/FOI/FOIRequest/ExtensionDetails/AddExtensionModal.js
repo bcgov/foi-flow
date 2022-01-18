@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -26,8 +26,11 @@ import {
 import { saveExtensionRequest } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import clsx from "clsx";
 import { useParams } from "react-router-dom";
-import { extensionStatusId } from "../../../../constants/FOI/enum";
-import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import {
+  extensionStatusId,
+  MimeTypeList,
+  MaxFileSizeInMB,
+} from "../../../../constants/FOI/enum";
 import FileUpload from "../../customComponents/FileUpload";
 import { uploadFiles } from "./utils";
 
@@ -63,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddExtensionModal() {
+const AddExtensionModal = () => {
   const classes = useStyles();
 
   const costumFormat = useMemo(() => {
@@ -73,7 +76,7 @@ export default function AddExtensionModal() {
     };
   });
 
-  const { requestId, ministryId } = useParams();
+  const { ministryId } = useParams();
 
   const {
     modalOpen,
@@ -95,7 +98,7 @@ export default function AddExtensionModal() {
   const [extendedDate, setExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
 
-  const [approvedDate, setApprovedDate] = useState(Date());
+  const [approvedDate, setApprovedDate] = useState(formatDate(new Date()));
   const [approvedNumberDays, setApprovedNumberDays] = useState("");
 
   const [existingFiles, setExistingFiles] = useState([]);
@@ -103,12 +106,6 @@ export default function AddExtensionModal() {
   const updateFilesCb = (_files) => {
     setNewFiles(_files);
   };
-
-  const initialErrors = {
-    reason: true,
-    numberDays: true,
-  };
-  const [errors, setErrors] = useState(initialErrors);
 
   const [saveLoading, setSaveLoading] = useState(false);
 
@@ -153,29 +150,7 @@ export default function AddExtensionModal() {
 
   const handleClose = () => {
     setModalOpen(false);
-  };
-
-  useEffect(() => {
-    checkErrors();
-  }, [reason, numberDays]);
-
-  const checkErrors = () => {
-    const updatedErrors = {
-      reason: !reason,
-      numberDays: !numberDays || numberDays < 1,
-    };
-
-    let extensionTypeError = false;
-    if (publicBodySelected) {
-      extensionTypeError = numberDays > 30;
-    }
-
-    updatedErrors.numberDays = numberDays < 1 || extensionTypeError;
-    setErrors({
-      ...errors,
-      ...updatedErrors,
-    });
-  };
+  }
 
   const getStatusId = () => {
     if (publicBodySelected) {
@@ -217,7 +192,6 @@ export default function AddExtensionModal() {
   const handleSave = async () => {
     try {
       const documents = await handleFileChanges();
-      console.log(documents)
       setSaveLoading(true);
       const extensionRequest = {
         extensionreasonid: reason.extensionreasonid,
@@ -259,7 +233,12 @@ export default function AddExtensionModal() {
     });
   };
 
-  const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
+  const errorExists = Object.values({
+    reason: !reason,
+    numberDays: checkPublicBodyError(numberDays, publicBodySelected),
+    approvedDate: status === extensionStatusId.approved && !approvedDate,
+    approvedNumberDays: status === extensionStatusId.approved && !approvedNumberDays,
+  }).some((isErrorTrue) => isErrorTrue);
 
   const getExtensionReasonMenueItems = () => {
     const reasons = extensionReasons.map((extensionReason) => {
@@ -298,10 +277,10 @@ export default function AddExtensionModal() {
             setNumberDays("");
             setReason("");
             setExtendedDate("");
-            setNewFiles([])
-            setExistingFiles([])
-            setApprovedDate("")
-            setApprovedNumberDays("")
+            setNewFiles([]);
+            setExistingFiles([]);
+            setApprovedDate("");
+            setApprovedNumberDays("");
           },
         }}
       >
@@ -352,7 +331,7 @@ export default function AddExtensionModal() {
                 label="Reason for Extension"
                 value={reason.extensionreasonid || 0}
                 onChange={handleReasonChange}
-                error={errors.reason}
+                error={!reason}
                 fullWidth
               >
                 {extensionReasons && getExtensionReasonMenueItems()}
@@ -376,7 +355,7 @@ export default function AddExtensionModal() {
                 }}
                 onChange={handleNumberDaysChange}
                 fullWidth
-                error={errors.numberDays}
+                error={checkPublicBodyError(numberDays, publicBodySelected)}
               />
             </Grid>
 
@@ -450,9 +429,11 @@ export default function AddExtensionModal() {
                           <DateRangeIcon />
                         </InputAdornment>
                       ),
+                      inputProps: { max: formatDate(new Date()) },
                     }}
                     variant="outlined"
                     fullWidth
+                    error={!approvedDate}
                   />
                 </Grid>
 
@@ -473,7 +454,7 @@ export default function AddExtensionModal() {
                     }}
                     onChange={handleApprovedNumberDaysChange}
                     fullWidth
-                    error={errors.numberDays}
+                    error={!approvedNumberDays}
                   />
                 </Grid>
 
@@ -482,8 +463,8 @@ export default function AddExtensionModal() {
                     className={classes.fullWidth}
                     attchmentFileNameList={[]}
                     multipleFiles={false}
-                    mimeTypes={MimeTypeList.attachmentLog}
-                    maxFileSize={MaxFileSizeInMB.attachmentLog}
+                    mimeTypes={MimeTypeList.extensionAttachment}
+                    maxFileSize={MaxFileSizeInMB.extensionAttachment}
                     updateFilesCb={updateFilesCb}
                     customFormat={costumFormat}
                   />
@@ -532,3 +513,5 @@ export default function AddExtensionModal() {
     </div>
   );
 }
+
+export default AddExtensionModal
