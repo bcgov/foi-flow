@@ -13,7 +13,7 @@ import base64
 class extensionservice:
     """ FOI Extension management service
     """
-    
+
     def getrequestextensions(self, requestid, version=None):
         extensions = []
         created_atdateformat = '%Y-%m-%d %H:%M:%S.%f'
@@ -70,6 +70,39 @@ class extensionservice:
         if documents:
             FOIRequestExtensionDocumentMapping.saveextensiondocument(extensionid, documents, extension['version'], userid)
         return extensionresult
+
+    def getrequestextension(self, extensionid):
+        requestextension = FOIRequestExtension().getextension(extensionid)
+        extensiondocuments = self.__getextensiondocuments(requestextension["foirequestextensionid"], requestextension["version"])
+        documents = self.__getextensiondocumentsinfo(extensiondocuments)
+        requestextensionwithdocuments = self.__createextensionobject(requestextension, documents)
+        return requestextensionwithdocuments
+
+    def __createextensionobject(self, requestextension, documents):
+        
+        decisiondate = requestextension['decisiondate'] if 'decisiondate' in requestextension  else None
+        approvednoofdays = requestextension['approvednoofdays'] if 'approvednoofdays' in requestextension  else None
+        extension = {
+            "foirequestextensionid": requestextension["foirequestextensionid"],
+            "extensionreasonid": requestextension["extensionreasonid"],
+            "extensionstatusid": requestextension["extensionstatusid"],
+            "extendedduedays": requestextension["extendedduedays"],
+            "extendedduedate": requestextension["extendedduedate"],
+            "decisiondate": decisiondate,
+            "approvednoofdays": approvednoofdays,
+            "documents": documents
+        }
+        return extension
+
+    def __getextensiondocuments(self, extensionid, extensionversion):
+        return FOIRequestExtensionDocumentMapping().getextensiondocuments(extensionid, extensionversion)
+
+    def __getextensiondocumentsinfo(self, extensiondocuments):
+        reqdocuments = []
+        for extensiondocument in extensiondocuments:
+            document = FOIMinistryRequestDocument().getdocument(extensiondocument["foiministrydocumentid"])            
+            reqdocuments.append({"foiministrydocumentid": document["foiministrydocumentid"], "filename": document["filename"], "documentpath": document["documentpath"], "category": document["category"]})
+        return reqdocuments
 
     def __savedocumentversion(self, ministryrequestid, ministryversion, extensiondocumentschema, userid):
         documentids = []        

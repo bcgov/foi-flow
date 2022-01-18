@@ -56,24 +56,24 @@ class GetFOIExtensions(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-# @cors_preflight('GET,OPTIONS')
-# @API.route('/foiextension/<extensionid>')
-# class GetFOIExtension(Resource):
-#     """Resource for managing Extension."""
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiextension/<extensionid>')
+class GetFOIExtension(Resource):
+    """Resource for managing Extension."""
 
        
-#     @staticmethod
-#     @TRACER.trace()
-#     @cross_origin(origins=allowedorigins())
-#     @auth.require
-#     def get(extensionid):
-#         try:
-#             extensionrecords = extensionservice().getrequestextensions(requestid)            
-#             return json.dumps(extensionrecords), 200
-#         except KeyError as err:
-#             return {'status': False, 'message':err.messages}, 400        
-#         except BusinessException as exception:            
-#             return {'status': exception.status_code, 'message':exception.message}, 500 
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(extensionid):
+        try:
+            extensionrecord = extensionservice().getrequestextension(extensionid)            
+            return json.dumps(extensionrecord), 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
