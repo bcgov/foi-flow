@@ -204,7 +204,7 @@ class FOIMinistryRequest(db.Model):
     def getupcomingcfrduerecords(cls):
         sql = """select distinct on (filenumber) filenumber, cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
                     where isactive = true and cfrduedate is not null and requeststatusid not in (3,10,11)  
-                    and cfrduedate between NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER-7 AND NOW()::DATE-EXTRACT(DOW from NOW())::INTEGER+7 
+                    and cfrduedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
         rs = db.session.execute(text(sql))
         upcomingduerecords = []
@@ -216,7 +216,7 @@ class FOIMinistryRequest(db.Model):
     def getupcominglegislativeduerecords(cls):
         sql = """select distinct on (filenumber) filenumber, duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
                     where isactive = true and duedate is not null and requeststatusid not in (3,10,11)     
-                    and duedate between NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER-7 AND NOW()::DATE-EXTRACT(DOW from NOW())::INTEGER+7 
+                    and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
         rs = db.session.execute(text(sql))
         upcomingduerecords = []

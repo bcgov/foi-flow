@@ -23,14 +23,11 @@ class duecalculator:
             return self.getpreviousbusinessday(_prevbusinessday,ca_holidays)
  
     def gettoday(self):
-        now_utc = datetime2.now()
-        now_pst = maya.parse(now_utc).datetime(to_timezone=self.__getdefaulttimezone(), naive=False)
+        now_pst = maya.parse(maya.now()).datetime(to_timezone=self.__getdefaulttimezone(), naive=False)
         return now_pst.strftime(self.__getdefaultdateformat()) 
     
     def formatduedate(self,input):
-        dt = maya.parse(input).datetime(to_timezone=self.__getdefaulttimezone(), naive=False)
-        due_pst = dt
-        return due_pst.strftime(self.__getdefaultdateformat())
+        return input.strftime(self.__getdefaultdateformat())
     
     def getholidays(self):        
         ca_holidays = []
@@ -43,15 +40,14 @@ class duecalculator:
         return ca_holidays    
         
     def __getpreviousweekday(self, cfrduedate):
-        _cfrdate = datetime.strptime(cfrduedate, self.__getdefaultdateformat())
         diff = 1
-        if _cfrdate.weekday() == 0:
+        if cfrduedate.weekday() == 0:
             diff = 3
-        elif _cfrdate.weekday() == 6:
+        elif cfrduedate.weekday() == 6:
             diff = 2
         else :
             diff = 1  
-        res = _cfrdate - timedelta(days=diff)
+        res = cfrduedate - timedelta(days=diff)
         return res.strftime(self.__getdefaultdateformat())            
    
     def __isholiday(self, input, ca_holidays):

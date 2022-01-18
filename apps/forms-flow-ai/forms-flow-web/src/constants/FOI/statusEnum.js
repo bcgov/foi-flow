@@ -34,7 +34,7 @@ const MinistryStateList = Object.freeze({
 const StateEnum = Object.freeze({
     open: {name: "Open", id: 1},
     callforrecords: {name: "Call For Records", id: 2},
-    callforrecordsoverdue: {name: "Call For Records Overdue", id: 15},
+    callforrecordsoverdue: {name: "Call For Records Overdue", id: 16},
     closed: {name: "Closed", id: 3},
     redirect: {name: "Redirect", id: 4},
     unopened: {name: "Unopened", id: 5},
@@ -46,7 +46,8 @@ const StateEnum = Object.freeze({
     onhold: {name: "On Hold", id: 11},
     deduplication: {name: "Deduplication", id: 12},
     harms: {name: "Harms Assessment", id: 13},
-    response: {name: "Response", id: 14}
+    response: {name: "Response", id: 14},
+    archived: {name: "Archived", id: 15}
 });
 
 const StateTransitionCategories = Object.freeze({

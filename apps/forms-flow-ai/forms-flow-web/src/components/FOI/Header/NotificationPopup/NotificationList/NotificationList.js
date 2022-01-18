@@ -2,7 +2,7 @@ import React, {useState } from 'react';
 import {useSelector, useDispatch } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
-import {addToFullnameList, getFullnameList } from '../../../../../helper/FOI/helper'
+import {addToFullnameList, getFullnameList, isMinistryLogin } from '../../../../../helper/FOI/helper'
 import {
   deleteFOINotifications
 } from "../../../../../apiManager/services/FOI/foiNotificationServices";
@@ -10,6 +10,10 @@ import { useParams } from 'react-router-dom';
 import {
   getBCgovCode
 } from "../../../FOIRequest/utils";
+import {
+  fetchFOIRequestDetailsForNotification,
+  fetchFOIRawRequestDetailsForNotification 
+} from "../../../../../apiManager/services/FOI/foiRequestServices";
 
 const NotificationList = (props) => {
 
@@ -18,7 +22,13 @@ const NotificationList = (props) => {
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
-  
+  const userDetail = useSelector(state=> state.user.userDetail);
+  let isMinistry = false;
+  if (Object.entries(userDetail).length !== 0) {
+    const userGroups = userDetail && userDetail.groups?.map(group => group.slice(1));
+    isMinistry = isMinistryLogin(userGroups);
+  }
+
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const {ministryId} = useParams();
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
@@ -53,12 +63,23 @@ const NotificationList = (props) => {
     dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null));
   }
 
+  const getStatusAndRedirect = () =>{
+    if(notification.requesttype === 'rawrequest'){
+      dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification))
+    }
+    else if(notification.requesttype === 'ministryrequest'){
+      dispatch(fetchFOIRequestDetailsForNotification(notification.foirequestid,notification.requestid, notification, isMinistry));
+    }
+  }
+
+
+
   return(
     <ListGroup.Item>
       <Row>
         <Col>
           <h6 className="notification-heading">
-            <a>{notification.idnumber}</a></h6>
+            <div className="redirect-url" onClick={getStatusAndRedirect}>{notification.idnumber}</div></h6>
         </Col>
         <Col className="close-btn-align" onClick={dismissNotification}>
           <i className="fa fa-times"></i>
