@@ -21,6 +21,7 @@ export const ActionProvider = ({ children, requestDetails }) => {
   const extensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
   );
+  const idNumber = requestDetails?.idNumber
 
   const filterExtensionReason = (extensionReasonsToFilter) => {
     if(!extensions || extensions.length < 1) {
@@ -58,7 +59,8 @@ export const ActionProvider = ({ children, requestDetails }) => {
         currentDueDate,
         originalDueDate,
         startDate,
-        extensions
+        extensions,
+        idNumber
       }}
     >
       {children}

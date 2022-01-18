@@ -29,10 +29,7 @@ import { useParams } from "react-router-dom";
 import { extensionStatusId } from "../../../../constants/FOI/enum";
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import FileUpload from "../../customComponents/FileUpload";
-import {
-  getOSSHeaderDetails,
-  saveFilesinS3,
-} from "../../../../apiManager/services/FOI/foiOSSServices";
+import { uploadFiles } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
   btndisabled: {
@@ -86,6 +83,7 @@ export default function AddExtensionModal() {
     startDate,
     currentDueDate,
     originalDueDate,
+    idNumber,
   } = useContext(ActionContext);
 
   const [reason, setReason] = useState("");
@@ -160,6 +158,7 @@ export default function AddExtensionModal() {
   useEffect(() => {
     checkErrors();
   }, [reason, numberDays]);
+
   const checkErrors = () => {
     const updatedErrors = {
       reason: !reason,
@@ -186,66 +185,11 @@ export default function AddExtensionModal() {
     }
   };
 
-  const getFileInfoList = (files) => {
-    return files.map((file) => {
-      return {
-        ministrycode: "Misc",
-        requestnumber: `U-00${requestId}`,
-        filestatustransition: "extension",
-        filename: file.filename ? file.filename : file.name,
-      };
-    });
-  };
-
-  // const getHeaders = async (fileInfoList) => {
-  //   try {
-  //     return new Promise((resolve, reject) => {
-  //       getOSSHeaderDetails(fileInfoList, async (err, res) => {
-  //         if (err) {
-  //           reject(err);
-  //         }
-  //         resolve(res);
-  //       });
-  //     });
-  //   } catch {
-  //     return [];
-  //   }
-  // };
-
-  const uploadFiles = async (filesToUpload) => {
-    const fileInfoList = getFileInfoList(filesToUpload);
-
-    const headers = await new Promise((resolve, reject) => {
-      getOSSHeaderDetails(fileInfoList, async (err, res) => {
-        if (err) {
-          reject("An internal server error occured while attempting to upload files");
-        }
-        resolve(res);
-      });
-    });
-
-    return Promise.all(
-      headers.map((header) => {
-        const _file = filesToUpload.find(
-          (file) => file.filename === header.filename
-        );
-        return new Promise((resolve, reject) => {
-          saveFilesinS3(header, _file, (err, res) => {
-            if (err) {
-              reject("An error occurred while attempting to upload files");
-            }
-            resolve({
-              documentpath: header.filepath,
-              filename: header.filename,
-              category: header.filestatustransition,
-            });
-          });
-        });
-      })
-    );
-  };
-
   const handleFileChanges = async () => {
+    if(publicBodySelected) {
+      return []
+    }
+    
     const existingFilesNameSet = new Set(
       existingFiles.map((EF) => EF.filename)
     );
@@ -254,27 +198,38 @@ export default function AddExtensionModal() {
       (NF) => !existingFilesNameSet.has(NF.filename)
     );
 
+    const filesToKeep = newFiles.filter(
+      (NF) => existingFilesNameSet.has(NF.filename)
+    );
+
     if (filesToUpload.length < 1) {
-      return;
+      return [...filesToKeep];
     }
-    await uploadFiles(filesToUpload);
+
+    const uploadedFiles = await uploadFiles(
+      filesToUpload,
+      idNumber,
+      dispatch
+    );
+    return [...uploadedFiles, ...filesToKeep];
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      handleFileChanges();
+      const documents = await handleFileChanges();
+      console.log(documents)
       setSaveLoading(true);
       const extensionRequest = {
         extensionreasonid: reason.extensionreasonid,
         extendedduedays: numberDays,
         extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
         extensionstatusid: getStatusId(),
+        documents: documents
       };
   
       saveExtensionRequest({
         data: extensionRequest,
         ministryId: ministryId,
-        requestId: requestId,
         callback: () => {
           setModalOpen(false);
           setSaveLoading(false);
@@ -343,6 +298,10 @@ export default function AddExtensionModal() {
             setNumberDays("");
             setReason("");
             setExtendedDate("");
+            setNewFiles([])
+            setExistingFiles([])
+            setApprovedDate("")
+            setApprovedNumberDays("")
           },
         }}
       >

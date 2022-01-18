@@ -199,34 +199,30 @@ const BottomButtonGroup = React.memo(({
         return
       }
 
-      dispatch(
-        getOSSHeaderDetails(fileInfoList, (err, res) => {
-          let _documents = [];
-          if (!err) {
-            res.map((header, index) => {
-              const _file = files?.find(
-                (file) => file.name === header.filename
-              );
-              const documentpath = {
-                documentpath: header.filepath,
-                filename: header.filename,
-                category: header.filestatustransition,
-              };
-              _documents.push(documentpath);
-              setDocuments(_documents);
-              dispatch(
-                saveFilesinS3(header, _file, (_err, _res) => {
-                  let count = 0;
-                  if (_res === 200) {
-                    count = index + 1;
-                  }
-                  setSuccessCount(count);
-                })
-              );
-            });
-          }
-        })
-      );      
+      getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+        let _documents = [];
+        if (!err) {
+          res.map((header, index) => {
+            const _file = files?.find(
+              (file) => file.name === header.filename
+            );
+            const documentpath = {
+              documentpath: header.filepath,
+              filename: header.filename,
+              category: header.filestatustransition,
+            };
+            _documents.push(documentpath);
+            setDocuments(_documents);
+            saveFilesinS3(header, _file, dispatch, (_err, _res) => {
+              let count = 0;
+              if (_res === 200) {
+                count = index + 1;
+              }
+              setSuccessCount(count);
+            })
+          });
+        }
+      }) 
     };
 
   return (
