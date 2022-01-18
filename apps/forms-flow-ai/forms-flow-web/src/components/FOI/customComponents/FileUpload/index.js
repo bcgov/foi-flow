@@ -8,6 +8,7 @@ import { countOccurrences,
   convertNestedObjectToArray, 
   convertBytesToMB } from "./util";
 import "./FileUpload.scss"
+import clsx from "clsx"
 
 const FileUpload = ({
     multipleFiles,
@@ -16,7 +17,8 @@ const FileUpload = ({
     totalFileSize,
     updateFilesCb,
     attchmentFileNameList,
-    attachment
+    attachment,
+    customFormat = {}
 }) => {
     const fileInputField = useRef(null);
     const fileInputFieldMultiple = useRef(null);
@@ -157,66 +159,78 @@ const FileUpload = ({
     }
   return (
     <>
-      <section className="file-upload-container">       
-      <div className="row file-upload-preview" 
+      <section
+        className={clsx("file-upload-container", {
+          [customFormat.container]: !!customFormat.container,
+        })}
+      >
+        <div
+          className={clsx("row", "file-upload-preview", {
+            [customFormat.preview]: !!customFormat.preview,
+          })}
           onDragOver={dragOver}
           onDragEnter={dragEnter}
           onDragLeave={dragLeave}
-          onDrop={fileDrop} >
+          onDrop={fileDrop}
+        >
           <div className="file-upload-column">
-            {Object.entries(files).length === 0 ?
-          
-            <div className="file-upload-btn">
-              <p className="drag-and-drop-text">{showDragandDrop()}</p>               
-                       
-            </div>
-            :         
-            <FilePreviewContainer files={files} removeFile={removeFile} />
-            }
+            {Object.entries(files).length === 0 ? (
+              <div className="file-upload-btn">
+                <p className="drag-and-drop-text">{showDragandDrop()}</p>
+              </div>
+            ) : (
+              <FilePreviewContainer files={files} removeFile={removeFile} />
+            )}
           </div>
           <div className="file-upload-column file-upload-column-2">
             <input
-            className="file-upload-input-multiple"
-            type="file"
-            ref={fileInputFieldMultiple}
-            onChange={handleNewFileUpload}
-            title=""
-            value=""
-            multiple={true}
-            accept={mimeTypes}
+              className="file-upload-input-multiple"
+              type="file"
+              ref={fileInputFieldMultiple}
+              onChange={handleNewFileUpload}
+              title=""
+              value=""
+              multiple={true}
+              accept={mimeTypes}
             />
           </div>
           <div className="file-upload-column file-upload-column-3">
-            {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
-                  Add Files
-            </button>  : null}
+            {(Object.entries(files).length === 0 && !multipleFiles) ||
+            multipleFiles ? (
+              <button
+                className="btn-add-files"
+                type="button"
+                onClick={handleUploadBtnClick}
+              >
+                Add Files
+              </button>
+            ) : null}
+          </div>
         </div>
-        </div>
-        {Object.entries(files).length === 0 ?
-        <input
-          className="file-upload-input"
-          type="file"
-          ref={fileInputField}
-          onChange={handleNewFileUpload}
-          title=""
-          value=""
-          multiple={multipleFiles}
-          accept={mimeTypes}
-        />
-        : null}
-        
+        {Object.entries(files).length === 0 ? (
+          <input
+            className="file-upload-input"
+            type="file"
+            ref={fileInputField}
+            onChange={handleNewFileUpload}
+            title=""
+            value=""
+            multiple={multipleFiles}
+            accept={mimeTypes}
+          />
+        ) : null}
       </section>
       <ul className="error-message-ul">
-      {errorMessage ? errorMessage.map(error => 
-           <li>
-            <div className="error-message-container">
-              <p>{error}</p>
-            </div>
-           </li>
-           )
-      : null}
-     </ul>
+        {errorMessage
+          ? errorMessage.map((error) => (
+              <li>
+                <div className="error-message-container">
+                  <p>{error}</p>
+                </div>
+              </li>
+            ))
+          : null}
+      </ul>
     </>
   );
 };

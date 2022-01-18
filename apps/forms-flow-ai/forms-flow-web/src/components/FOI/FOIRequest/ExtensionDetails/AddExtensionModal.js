@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
-import "./extensionscss.scss"
+import "./extensionscss.scss";
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -21,16 +21,20 @@ import FormControl from "@material-ui/core/FormControl";
 import {
   formatDate,
   addBusinessDays,
+  ConditionalComponent,
 } from "../../../../helper/FOI/helper";
-import {
-  saveExtensionRequest,
-} from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { saveExtensionRequest } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import clsx from "clsx";
 import { useParams } from "react-router-dom";
-import { extensionStatusId } from "../../../../constants/FOI/enum"
+import { extensionStatusId } from "../../../../constants/FOI/enum";
+import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import FileUpload from "../../customComponents/FileUpload";
+import {
+  getOSSHeaderDetails,
+  saveFilesinS3,
+} from "../../../../apiManager/services/FOI/foiOSSServices";
 
 const useStyles = makeStyles((theme) => ({
-
   btndisabled: {
     border: "none",
     backgroundColor: "#eceaea",
@@ -48,13 +52,30 @@ const useStyles = makeStyles((theme) => ({
     margin: "auto",
   },
   DialogLable: {
-    fontWeight: theme.typography.fontWeightBold
-  }
-
+    fontWeight: theme.typography.fontWeightBold,
+  },
+  fullWidth: {
+    width: "100%",
+    padding: 0,
+  },
+  fileUploadContainer: {
+    padding: "0",
+  },
+  fileUploadPreview: {
+    width: "100%",
+  },
 }));
 
 export default function AddExtensionModal() {
   const classes = useStyles();
+
+  const costumFormat = useMemo(() => {
+    return {
+      container: classes.fileUploadContainer,
+      preview: classes.fileUploadPreview,
+    };
+  });
+
   const { requestId, ministryId } = useParams();
 
   const {
@@ -68,13 +89,22 @@ export default function AddExtensionModal() {
   } = useContext(ActionContext);
 
   const [reason, setReason] = useState("");
-  const [publicBodySelected, setPublicBodySelected] = useState(false)
+  const [publicBodySelected, setPublicBodySelected] = useState(false);
 
   const [numberDays, setNumberDays] = useState("");
-  const maxExtendDays = reason?.defaultextendedduedays || 100
-  
-  const [extendedDate, setExtendedDate] = useState("")
+  const maxExtendDays = reason?.defaultextendedduedays || 100;
+
+  const [extendedDate, setExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
+
+  const [approvedDate, setApprovedDate] = useState(Date());
+  const [approvedNumberDays, setApprovedNumberDays] = useState("");
+
+  const [existingFiles, setExistingFiles] = useState([]);
+  const [newFiles, setNewFiles] = useState([]);
+  const updateFilesCb = (_files) => {
+    setNewFiles(_files);
+  };
 
   const initialErrors = {
     reason: true,
@@ -83,50 +113,60 @@ export default function AddExtensionModal() {
   const [errors, setErrors] = useState(initialErrors);
 
   const [saveLoading, setSaveLoading] = useState(false);
- 
-  const handleReasonChange = (e) => {
 
-    const extensionReason = extensionReasons.find(er => er.extensionreasonid === e.target.value)
+  const handleReasonChange = (e) => {
+    const extensionReason = extensionReasons.find(
+      (er) => er.extensionreasonid === e.target.value
+    );
 
     setPublicBodySelected(extensionReason.extensiontype === "Public Body");
     setReason(extensionReason);
 
-    if(extensionReason.defaultextendedduedays) {
+    if (extensionReason.defaultextendedduedays) {
       updateExtendedDate(extensionReason.defaultextendedduedays);
     }
-
   };
 
   const handleNumberDaysChange = (e) => {
-      const numDays = Number(e.target.value)
-      updateExtendedDate(numDays);
-  }
+    const numDays = Number(e.target.value);
+    updateExtendedDate(numDays);
+  };
+
+  const handleApprovedNumberDaysChange = (e) => {
+    const days = Number(e.target.value);
+
+    if (days > numberDays) {
+      return;
+    }
+
+    setApprovedNumberDays(days);
+    setExtendedDate(addBusinessDays(currentDueDate, days));
+  };
 
   const updateExtendedDate = (days) => {
-      if (days > maxExtendDays) {
-        return;
-      }
-      
-      setNumberDays(days);
-      
-      setExtendedDate(addBusinessDays(currentDueDate, days));
-  }
+    if (days > maxExtendDays) {
+      return;
+    }
+
+    setNumberDays(days);
+    setApprovedNumberDays(days);
+    setExtendedDate(addBusinessDays(currentDueDate, days));
+  };
 
   const handleClose = () => {
     setModalOpen(false);
   };
 
   useEffect(() => {
-    checkErrors()
-  }, [reason, numberDays])
-
+    checkErrors();
+  }, [reason, numberDays]);
   const checkErrors = () => {
     const updatedErrors = {
       reason: !reason,
-      numberDays: !numberDays || numberDays < 1
-    }
+      numberDays: !numberDays || numberDays < 1,
+    };
 
-    let extensionTypeError = false
+    let extensionTypeError = false;
     if (publicBodySelected) {
       extensionTypeError = numberDays > 30;
     }
@@ -136,42 +176,121 @@ export default function AddExtensionModal() {
       ...errors,
       ...updatedErrors,
     });
-  }
+  };
 
   const getStatusId = () => {
-    if(publicBodySelected) {
-      return extensionStatusId.approved
+    if (publicBodySelected) {
+      return extensionStatusId.approved;
+    } else {
+      return status;
     }
+  };
 
-    else {
-      return status
-    }
-  }
-  const handleSave = () => {
-    setSaveLoading(true)
-    const extensionRequest = {
-      extensionreasonid: reason.extensionreasonid,
-      extendedduedays: numberDays,
-      extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
-      extensionstatusid: getStatusId()
-    };
-
-    saveExtensionRequest({
-      data: extensionRequest,
-      ministryId: ministryId,
-      requestId: requestId,
-      callback: () => {
-        setModalOpen(false);
-        setSaveLoading(false);
-        window.history.go(0)
-      },
-      errorCallBack: (errorMessage) => {
-        setSaveLoading(false)        
-        errorToast(errorMessage);
-      },
-      dispatch,
+  const getFileInfoList = (files) => {
+    return files.map((file) => {
+      return {
+        ministrycode: "Misc",
+        requestnumber: `U-00${requestId}`,
+        filestatustransition: "extension",
+        filename: file.filename ? file.filename : file.name,
+      };
     });
-  }
+  };
+
+  // const getHeaders = async (fileInfoList) => {
+  //   try {
+  //     return new Promise((resolve, reject) => {
+  //       getOSSHeaderDetails(fileInfoList, async (err, res) => {
+  //         if (err) {
+  //           reject(err);
+  //         }
+  //         resolve(res);
+  //       });
+  //     });
+  //   } catch {
+  //     return [];
+  //   }
+  // };
+
+  const uploadFiles = async (filesToUpload) => {
+    const fileInfoList = getFileInfoList(filesToUpload);
+
+    const headers = await new Promise((resolve, reject) => {
+      getOSSHeaderDetails(fileInfoList, async (err, res) => {
+        if (err) {
+          reject("An internal server error occured while attempting to upload files");
+        }
+        resolve(res);
+      });
+    });
+
+    return Promise.all(
+      headers.map((header) => {
+        const _file = filesToUpload.find(
+          (file) => file.filename === header.filename
+        );
+        return new Promise((resolve, reject) => {
+          saveFilesinS3(header, _file, (err, res) => {
+            if (err) {
+              reject("An error occurred while attempting to upload files");
+            }
+            resolve({
+              documentpath: header.filepath,
+              filename: header.filename,
+              category: header.filestatustransition,
+            });
+          });
+        });
+      })
+    );
+  };
+
+  const handleFileChanges = async () => {
+    const existingFilesNameSet = new Set(
+      existingFiles.map((EF) => EF.filename)
+    );
+
+    const filesToUpload = newFiles.filter(
+      (NF) => !existingFilesNameSet.has(NF.filename)
+    );
+
+    if (filesToUpload.length < 1) {
+      return;
+    }
+    await uploadFiles(filesToUpload);
+  };
+
+  const handleSave = () => {
+    try {
+      handleFileChanges();
+      setSaveLoading(true);
+      const extensionRequest = {
+        extensionreasonid: reason.extensionreasonid,
+        extendedduedays: numberDays,
+        extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
+        extensionstatusid: getStatusId(),
+      };
+  
+      saveExtensionRequest({
+        data: extensionRequest,
+        ministryId: ministryId,
+        requestId: requestId,
+        callback: () => {
+          setModalOpen(false);
+          setSaveLoading(false);
+          window.history.go(0);
+        },
+        errorCallBack: (errorMessage) => {
+          setSaveLoading(false);
+          errorToast(errorMessage);
+        },
+        dispatch,
+      });
+
+    } catch(error) {
+      errorToast(error.message || "Error occured while saving extension details")
+    }
+  };
 
   const errorToast = (errorMessage) => {
     return toast.error(errorMessage, {
@@ -183,8 +302,8 @@ export default function AddExtensionModal() {
       draggable: true,
       progress: undefined,
     });
-  }
-  
+  };
+
   const errorExists = Object.values(errors).some((isErrorTrue) => isErrorTrue);
 
   const getExtensionReasonMenueItems = () => {
@@ -205,8 +324,10 @@ export default function AddExtensionModal() {
         Select Reason for Extension
       </MenuItem>
     );
-    return reasons
-  }
+    return reasons;
+  };
+
+  const showStatusOptions = reason && !publicBodySelected;
 
   return (
     <div>
@@ -297,7 +418,7 @@ export default function AddExtensionModal() {
                 onChange={handleNumberDaysChange}
                 fullWidth
                 error={errors.numberDays}
-              ></TextField>
+              />
             </Grid>
 
             <Grid item xs={6}>
@@ -321,38 +442,95 @@ export default function AddExtensionModal() {
               />
             </Grid>
 
-            {reason && !publicBodySelected && (
-              <>
+            <ConditionalComponent condition={showStatusOptions}>
+              <Grid item xs={12}>
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    row
+                    name="controlled-radio-buttons-group"
+                    value={status}
+                    onChange={(e) => {
+                      setStatus(Number(e.target.value));
+                    }}
+                  >
+                    <FormControlLabel
+                      value={extensionStatusId.pending}
+                      control={<Radio color="default" />}
+                      label="Pending"
+                    />
+                    <FormControlLabel
+                      value={extensionStatusId.approved}
+                      control={<Radio color="default" />}
+                      label="Approved"
+                    />
+                    <FormControlLabel
+                      value={extensionStatusId.denied}
+                      control={<Radio color="default" />}
+                      label="Denied"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              <ConditionalComponent
+                condition={status === extensionStatusId.approved}
+              >
                 <Grid item xs={6}>
-                  <FormControl component="fieldset">
-                    <RadioGroup
-                      row
-                      name="controlled-radio-buttons-group"
-                      value={status}
-                      onChange={(e) => {
-                        setStatus(Number(e.target.value));
-                      }}
-                    >
-                      <FormControlLabel
-                        value={extensionStatusId.pending}
-                        control={<Radio color="default" />}
-                        label="Pending"
-                      />
-                      <FormControlLabel
-                        value={extensionStatusId.approved}
-                        control={<Radio color="default" />}
-                        label="Approved"
-                      />
-                      <FormControlLabel
-                        value={extensionStatusId.denied}
-                        control={<Radio color="default" />}
-                        label="Denied"
-                      />
-                    </RadioGroup>
-                  </FormControl>
+                  <TextField
+                    label="Approved Date"
+                    type="date"
+                    value={approvedDate || ""}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange={(e) => {
+                      setApprovedDate(e.target.value);
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <DateRangeIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                    variant="outlined"
+                    fullWidth
+                  />
                 </Grid>
-              </>
-            )}
+
+                <Grid item xs={6}>
+                  <TextField
+                    id="outlined-extension-number-days"
+                    name="approvedNumberDays"
+                    value={approvedNumberDays || 0}
+                    type="number"
+                    variant="outlined"
+                    required
+                    label="Approved Number of Days"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">Days</InputAdornment>
+                      ),
+                      inputProps: { min: 1, max: numberDays },
+                    }}
+                    onChange={handleApprovedNumberDaysChange}
+                    fullWidth
+                    error={errors.numberDays}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FileUpload
+                    className={classes.fullWidth}
+                    attchmentFileNameList={[]}
+                    multipleFiles={false}
+                    mimeTypes={MimeTypeList.attachmentLog}
+                    maxFileSize={MaxFileSizeInMB.attachmentLog}
+                    updateFilesCb={updateFilesCb}
+                    customFormat={costumFormat}
+                  />
+                </Grid>
+              </ConditionalComponent>
+            </ConditionalComponent>
           </Grid>
         </DialogContent>
 

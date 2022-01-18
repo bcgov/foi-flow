@@ -214,7 +214,17 @@ export const AttachmentSection = ({
         <div className="addAttachmentBox">
             <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
         </div>
-        <AttachmentModal modalFor={modalFor} openModal={openModal} handleModal={handleContinueModal} multipleFiles={multipleFiles} requestNumber={requestNumber} requestId={requestId} attachment={updateAttachment} attachmentsArray={attachmentsArray} handleRename={handleRename} />
+        <AttachmentModal 
+          modalFor={modalFor} 
+          openModal={openModal} 
+          handleModal={handleContinueModal} 
+          multipleFiles={multipleFiles} 
+          requestNumber={requestNumber} 
+          requestId={requestId} 
+          attachment={updateAttachment} 
+          attachmentsArray={attachmentsArray} 
+          handleRename={handleRename} 
+          />
         <div className="displayAttachments">
           {attachmentsList}
         </div>
