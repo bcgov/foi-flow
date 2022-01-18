@@ -73,25 +73,23 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def createextensionversion(cls,ministryrequestid,ministryrequestversion, extension, userid):
-        newextesion = FOIRequestExtension( foirequestextensionid=extension["foirequestextensionid"], extendedduedays=extension["extendedduedays"], extendedduedate=extension["extendedduedate"], decisiondate=extension["decisiondate"], approvednoofdays=extension["approvednoofdays"], version=extension["version"], isactive=extension["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
+        # if 'document' in extension:
+        #     newextensiondocument = 
+        newextesion = FOIRequestExtension( foirequestextensionid=extension["foirequestextensionid"], extensionreasonid=extension['extensionreasonid'], extensionstatusid=extension['extensionstatusid'], extendedduedays=extension["extendedduedays"], extendedduedate=extension["extendedduedate"], decisiondate=extension["decisiondate"], approvednoofdays=extension["approvednoofdays"], version=extension["version"], isactive=extension["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
         db.session.add(newextesion)
         db.session.commit()               
         return DefaultMethodResult(True,'New Extension version created', newextesion.foirequestextensionid) 
 
     @classmethod   
     def getextensions(cls,ministryrequestid,ministryrequestversion):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, er.extensiontype, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY created_at DESC'
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, er.extensiontype, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby, fre.version FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY created_at DESC'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
         extensions = []
         for row in rs:
             if row["isactive"] == True:
                 extensions.append(dict(row))
-        return extensions
-    
-    @classmethod
-    def updateextensionversion(cls,ministryrequestid,ministryrequestversion, userid):
-        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid).update({"foiministryrequestversion_id": ministryrequestversion, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
-        return DefaultMethodResult(True,'Version Updated',ministryrequestversion)
+        return extensions    
+
         
 
 class FOIRequestExtensionSchema(ma.Schema):

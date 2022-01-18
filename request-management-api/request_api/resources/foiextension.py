@@ -57,7 +57,7 @@ class GetFOIExtensions(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
+@API.route('/foiextension/ministryrequest/<ministryrequestid>')
 class CreateFOIRequestExtension(Resource):
     """Creates extension for ministry(opened) request."""
 
@@ -66,12 +66,12 @@ class CreateFOIRequestExtension(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require   
-    def post(requestid, ministryrequestid):      
+    def post(ministryrequestid):      
         try:                     
             requestjson = request.get_json()
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
-                result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
+                result = extensionservice().createrequestextension(ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
             else:
                 return {'status': False, 'message':'Unautherized user','id':-1} , 403
@@ -79,3 +79,26 @@ class CreateFOIRequestExtension(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiextension/ministryrequest/<ministryrequestid>/extension/<extensionid>/edit')
+class EditFOIRequestExtension(Resource):
+    """Edits extension for ministry(opened) request."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require    
+    def post(ministryrequestid, extensionid):
+        try:                     
+            requestjson = request.get_json()
+            rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
+            if (AuthHelper.isministrymember() == False):           
+                result = extensionservice().createrequestextensionversion(ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
+            else:
+                return {'status': False, 'message':'Unautherized user','id':-1} , 403
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500        

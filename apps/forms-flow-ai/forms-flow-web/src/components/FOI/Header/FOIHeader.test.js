@@ -1,9 +1,7 @@
-import {render, screen, cleanup} from '@testing-library/react';
 import renderer from 'react-test-renderer';
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import configureStore from 'redux-mock-store'
 import FOIHeader from './FOIHeader';
-import { useSelector } from "react-redux";
 import { shallow } from 'enzyme';
 
 jest.mock("react-redux", () => ({
@@ -24,7 +22,7 @@ describe('FOI Header component', () => {
 
     const initialState = {output:10}
     const mockStore = configureStore()
-    let store,wrapper
+    let store
    
     it("FOI Header Rendering Unit test - shallow check", () => {
         store = mockStore(initialState)
@@ -33,6 +31,18 @@ describe('FOI Header component', () => {
             user: {
                 name: 'John',
                 preferred_username: 'John Smith'
+            },
+            notifications:{
+              foiNotifications:[{ created_at: "2022 JAN 13 | 11:11 AM",
+              createdby: "foiintake@idir",
+              foirequestid: 1,
+              idnumber: "CITZ-2022-121786",
+              notification: "Moved to Call For Records State",
+              notificationid: 5,
+              notificationtype: "State",
+              notificationusertype: "Assignee",
+              requestid: 1,
+              requesttype: "ministryrequest"}]
             }
         }
         useSelector.mockImplementation(callback => {
@@ -48,6 +58,18 @@ describe('FOI Header component', () => {
             user: {
                 name: 'John',
                 preferred_username: 'John Smith'
+            },
+            notifications:{
+              foiNotifications:[{ created_at: "2022 JAN 13 | 11:11 AM",
+              createdby: "foiintake@idir",
+              foirequestid: 1,
+              idnumber: "CITZ-2022-121786",
+              notification: "Moved to Call For Records State",
+              notificationid: 5,
+              notificationtype: "State",
+              notificationusertype: "Assignee",
+              requestid: 1,
+              requesttype: "ministryrequest"}]
             }
         }
         useSelector.mockImplementation(callback => {

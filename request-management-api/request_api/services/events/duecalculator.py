@@ -40,15 +40,14 @@ class duecalculator:
         return ca_holidays    
         
     def __getpreviousweekday(self, cfrduedate):
-        _cfrdate = datetime.strptime(cfrduedate, self.__getdefaultdateformat())
         diff = 1
-        if _cfrdate.weekday() == 0:
+        if cfrduedate.weekday() == 0:
             diff = 3
-        elif _cfrdate.weekday() == 6:
+        elif cfrduedate.weekday() == 6:
             diff = 2
         else :
             diff = 1  
-        res = _cfrdate - timedelta(days=diff)
+        res = cfrduedate - timedelta(days=diff)
         return res.strftime(self.__getdefaultdateformat())            
    
     def __isholiday(self, input, ca_holidays):

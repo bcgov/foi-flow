@@ -1,4 +1,4 @@
-import React from "react";
+import React , { useEffect, useState } from "react";
 import { Tabs, ListGroup, Tab, Row, Col} from "react-bootstrap";
 import './notificationpopup.scss';
 import NotificationList from './NotificationList/NotificationList'
@@ -9,13 +9,25 @@ import {useDispatch } from "react-redux";
 
 const NotificationPopup = ({notifications}) => {
 
+  const [myRequestTitle, setMyRequestTitle] = useState();
+  const [watchingRequestTitle, setWatchingRequestTitle] = useState();
+
+  useEffect(() => {     
+    tabTitle();
+  },[notifications]);
+
+  const tabTitle = () =>{
+    let myRequestList = notifications?.filter(x => x.notificationusertype === 'Assignee');
+    let watchingRequestList = notifications?.filter(x => x.notificationusertype === 'Watcher');
+    setMyRequestTitle(myRequestList?.length > 0 ? "My Requests ("+myRequestList.length+")": "My Requests");
+    setWatchingRequestTitle(watchingRequestList?.length > 0 ? "Watching Requests ("+watchingRequestList.length+")": "Watching Requests");
+  }
 
   const assigmentNotifications = notifications?.map((notification,index) =>
     {return notification.notificationusertype === 'Assignee' &&
       <NotificationList key= {index} notification={notification}></NotificationList>
     }
   )
-
 
   const watchNotifications = notifications?.map((notification,index) =>
     {return notification.notificationusertype === 'Watcher' &&
@@ -24,7 +36,6 @@ const NotificationPopup = ({notifications}) => {
   )
 
   const checkIfNotificationExists = (type) => {
-
     if(type ==='assignee' && notifications.find(notification => 
       notification.notificationusertype === 'Assignee')){
         return true;
@@ -33,7 +44,6 @@ const NotificationPopup = ({notifications}) => {
       notification.notificationusertype === 'Watcher')){
          return true;
     }
-
   }
 
   const dispatch = useDispatch();
@@ -43,9 +53,8 @@ const NotificationPopup = ({notifications}) => {
 
   return (
     <Tabs defaultActiveKey="my-request" id="uncontrolled-tab-example" className="notification-tab">
-      <Tab eventKey="my-request" title="My Requests" className="popup-background">
+      <Tab eventKey="my-request" title={myRequestTitle} className="popup-background">
         {checkIfNotificationExists('assignee')  && <Row className="list-header">
-          {/* <Col><div><i className="fa fa-volume-up"></i></div></Col> */}
           <Col className="close-btn-align">
             <div className="notification-dismiss" onClick={() => dismissAllNotifications('assignee')}>
               <i className="fa fa-times" style={{paddingRight:"5px"}}></i>Dismiss All
@@ -57,11 +66,10 @@ const NotificationPopup = ({notifications}) => {
         </ListGroup>
         :
         <ListGroup className="notification-list empty-notifications">
-        No requests
-        </ListGroup>
-    }
+        No notifications
+        </ListGroup>}
       </Tab>
-      <Tab eventKey="watch-request" title="Watching Requests" className="popup-background">
+      <Tab eventKey="watch-request" title={watchingRequestTitle} className="popup-background">
         {checkIfNotificationExists('watcher') && <Row className="list-header">
           <Col className="close-btn-align">
           <div className="notification-dismiss" onClick={() => dismissAllNotifications('watcher')}>
@@ -74,11 +82,9 @@ const NotificationPopup = ({notifications}) => {
         </ListGroup>
         : 
         <ListGroup className="notification-list empty-notifications">
-          No watching requests
-        </ListGroup>
-    }
+          No notifications
+        </ListGroup>}
       </Tab>
-
     </Tabs>
   );
 
