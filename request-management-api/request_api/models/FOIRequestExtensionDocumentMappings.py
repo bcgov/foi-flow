@@ -29,6 +29,13 @@ class FOIRequestExtensionDocumentMapping(db.Model):
         document_schema = FOIRequestExtensionDocumentMappingSchema()            
         request = db.session.query(FOIRequestExtensionDocumentMapping).filter_by(foirequestextensiondocumentid=foirequestextensiondocumentid)
         return document_schema.dump(request)
+    
+    @classmethod
+    def getextensiondocuments(cls,foirequestextensionid, extensionversion):   
+        document_schema = FOIRequestExtensionDocumentMappingSchema(many=True)   
+        request = db.session.query(FOIRequestExtensionDocumentMapping).filter(FOIRequestExtensionDocumentMapping.foirequestextensionid == foirequestextensionid, FOIRequestExtensionDocumentMapping.extensionversion == extensionversion).all()
+        return document_schema.dump(request)
+        
     @classmethod
     def saveextensiondocument(cls, extensionid, documents, version, userid):        
         newdocuments = []        
@@ -49,5 +56,5 @@ class FOIRequestExtensionDocumentMapping(db.Model):
 
 class FOIRequestExtensionDocumentMappingSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestextensiondocumentid', 'foirequestextensionid', 'foiministrydocumentid', 'extensionversion')
+        fields = ('foirequestextensiondocumentid', 'foirequestextensionid', 'foiministrydocumentid', 'extensionversion','created_at','createdby','updated_at','updatedby')
     

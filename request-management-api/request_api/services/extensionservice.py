@@ -35,22 +35,31 @@ class extensionservice:
                     "createdby": entry["createdby"]})        
         return extensions
 
-    def createrequestextension(self, ministryrequestid, extensionschema, userid):    
+    def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
         version = self.__getversionforrequest(ministryrequestid)
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
-        extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
-        if extnsionresult.success == True and 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body':
-            requestservice().updateministryrequestduedate(ministryrequestid, extensionschema['extendedduedate'], userid )
+        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body':            
+            ministryrequestschema = {
+                "duedate": extensionschema['extendedduedate']
+            }
+            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+           
+            if result.success == True:
+                version = self.__getversionforrequest(ministryrequestid)
+                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
+        else:
+            extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         return extnsionresult
 
     def createrequestextensionversion(self, ministryrequestid, extensionid, extensionschema, userid):
-        documents = None  
+        documents = []    
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)        
         copyextension = self.__copyextensionproperties(extension, extensionschema, extension['version'])       
         if 'documents' in copyextension and copyextension['extensionstatusid'] != 1:
-            self.__savedocumentversion(ministryrequestid, ministryversion, copyextension['documents'], userid)
-            documents = FOIMinistryRequestDocument().getdocumentsbycategory(ministryrequestid, ministryversion, 'extension')           
+            documentids = self.__savedocumentversion(ministryrequestid, ministryversion, copyextension['documents'], userid)
+            for documentid in documentids:
+                documents.append(FOIMinistryRequestDocument().getdocument(documentid))
         extensioresult = self.saveextensiondocumentversion(ministryrequestid, ministryversion, extensionid, documents, copyextension, userid)  
         if extensioresult.success == True and 'extensionstatusid' in copyextension and copyextension['extensionstatusid'] == 2:            
             requestservice().updateministryrequestduedate(ministryrequestid, copyextension['extendedduedate'], userid )
@@ -63,12 +72,16 @@ class extensionservice:
         return extensionresult
 
     def __savedocumentversion(self, ministryrequestid, ministryversion, extensiondocumentschema, userid):
-        documentid = 0       
+        documentids = []        
         for document in extensiondocumentschema:
             if 'foiministrydocumentid' in document:
                 documentid = document['foiministrydocumentid']
-            documentservice().createministrydocumentversion(ministryrequestid, documentid, extensiondocumentschema, userid)       
-    
+            else:
+                documentid = 0            
+            documentresult = documentservice().createministrydocumentversion(ministryrequestid, documentid, document, userid)
+            documentids.append(documentresult.identifier)
+        return documentids
+
     def __copyextensionproperties(self, extension, extensionschema, version):
         extension['version'] = version +1
         extension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else extension['extensionreasonid']
