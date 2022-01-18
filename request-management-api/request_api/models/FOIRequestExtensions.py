@@ -30,7 +30,10 @@ class FOIRequestExtension(db.Model):
     foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'))    
 
     extensionstatusid =db.Column(db.Integer, unique=False, nullable=False)
-    extensionreasonid =db.Column(db.Integer, unique=False, nullable=False)   
+    extensionreasonid =db.Column(db.Integer, unique=False, nullable=False)
+
+    extensiondocuments = relationship('FOIRequestExtensionDocumentMapping', primaryjoin="and_(FOIRequestExtension.foirequestextensionid==FOIRequestExtensionDocumentMapping.foirequestextensionid, "
+                         "FOIRequestExtension.version==FOIRequestExtensionDocumentMapping.extensionversion)")   
     
     @classmethod
     def getextension(cls,foirequestextensionid):   

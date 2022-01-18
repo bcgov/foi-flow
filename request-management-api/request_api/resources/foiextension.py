@@ -40,7 +40,7 @@ EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiextension/ministryrequest/<requestid>')
 class GetFOIExtensions(Resource):
-    """Resource for managing FOI requests."""
+    """Resource for managing Extensions."""
 
        
     @staticmethod
@@ -54,10 +54,29 @@ class GetFOIExtensions(Resource):
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiextension/<extensionid>')
+class GetFOIExtension(Resource):
+    """Resource for managing Extension."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(extensionid):
+        try:
+            extensionrecord = extensionservice().getrequestextension(extensionid)            
+            return json.dumps(extensionrecord), 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/ministryrequest/<ministryrequestid>')
+@API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
 class CreateFOIRequestExtension(Resource):
     """Creates extension for ministry(opened) request."""
 
@@ -66,12 +85,12 @@ class CreateFOIRequestExtension(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require   
-    def post(ministryrequestid):      
+    def post(requestid, ministryrequestid):      
         try:                     
             requestjson = request.get_json()
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
-                result = extensionservice().createrequestextension(ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
+                result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
             else:
                 return {'status': False, 'message':'Unautherized user','id':-1} , 403

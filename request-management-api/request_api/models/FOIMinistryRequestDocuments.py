@@ -42,7 +42,7 @@ class FOIMinistryRequestDocument(db.Model):
         documents = []
         for row in rs:
             if row["isactive"] == True:
-                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"], "version": row["version"]})
         return documents
 
     @classmethod
@@ -71,6 +71,14 @@ class FOIMinistryRequestDocument(db.Model):
         db.session.commit()               
         return DefaultMethodResult(True,'Documents created')   
     
+    @classmethod
+    def createdocument(cls,ministryrequestid,ministryrequestversion, document, userid):
+        createuserid = document['createdby'] if 'createdby' in document and document['createdby'] is not None else userid
+        createdat = document['created_at'] if 'created_at' in document  and document['created_at'] is not None else datetime.now()
+        newdocument = FOIMinistryRequestDocument(documentpath=document["documentpath"], version='1', filename=document["filename"], category=document["category"], isactive=True, foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=createdat, createdby=createuserid)
+        db.session.add(newdocument)
+        db.session.commit()               
+        return DefaultMethodResult(True,'New Document version created', newdocument.foiministrydocumentid) 
 
     @classmethod
     def createdocumentversion(cls,ministryrequestid,ministryrequestversion, document, userid):
