@@ -8,7 +8,6 @@ import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import CloseIcon from "@material-ui/icons/Close";
 import MenuItem from "@material-ui/core/MenuItem";
-import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
@@ -24,19 +23,18 @@ import {
   addBusinessDays,
   ConditionalComponent,
 } from "../../../../helper/FOI/helper";
-import {
-  saveExtensionRequest,
-  fetchExtension,
-} from "../../../../apiManager/services/FOI/foiExtensionServices";
 import clsx from "clsx";
-import { useParams } from "react-router-dom";
 import {
   extensionStatusId,
   MimeTypeList,
   MaxFileSizeInMB,
 } from "../../../../constants/FOI/enum";
 import FileUpload from "../../customComponents/FileUpload";
-import { uploadFiles, checkPublicBodyError } from "./utils";
+import {
+  uploadFiles,
+  checkPublicBodyError,
+  filterExtensionReason,
+} from "./utils";
 
 const useStyles = makeStyles((theme) => ({
   btndisabled: {
@@ -80,8 +78,6 @@ const AddExtensionModal = () => {
     };
   });
 
-  const { ministryId, requestId } = useParams();
-
   const {
     modalOpen,
     setModalOpen,
@@ -93,8 +89,13 @@ const AddExtensionModal = () => {
     idNumber,
     selectedExtension,
     loading,
-    setLoading
+    setLoading,
+    saveExtensionRequest,
+    extensionId,
+    errorToast,
   } = useContext(ActionContext);
+
+  const filteredExtensionReasons = filterExtensionReason(extensionReasons, extensionId);
 
   const [reason, setReason] = useState("");
   const publicBodySelected = reason?.extensiontype === "Public Body";
@@ -127,7 +128,7 @@ const AddExtensionModal = () => {
       setNumberDays(selectedExtension.extendedduedays);
       setExtendedDate(formatDate(selectedExtension.extendedduedate));
       setStatus(selectedExtension.extensionstatusid);
-      setApprovedDate(selectedExtension.decisiondate || formatDate(new Date()));
+      setApprovedDate(formatDate(selectedExtension.decisiondate) || formatDate(new Date()));
       setApprovedNumberDays(
         selectedExtension.approvednoofdays || selectedExtension.extendedduedays
       );
@@ -136,7 +137,7 @@ const AddExtensionModal = () => {
   }, [selectedExtension, extensionReasons]);
 
   const handleReasonChange = (e) => {
-    const extensionReason = extensionReasons.find(
+    const extensionReason = filteredExtensionReasons.find(
       (er) => er.extensionreasonid === e.target.value
     );
 
@@ -206,49 +207,53 @@ const AddExtensionModal = () => {
     return [...uploadedFiles, ...filesToKeep];
   };
 
+  const getStatusOptions = async () => {
+    
+    const documents = await handleFileChanges();
+
+    const allOptions = {
+      [extensionStatusId.pending]: {},
+      [extensionStatusId.approved]: {
+        decisiondate: approvedDate,
+        approvednoofdays: approvedNumberDays,
+        extensionstatusid: status,
+        documents,
+      },
+      [extensionStatusId.denied]: {}
+    };
+
+    return allOptions[status] || {}
+  };
+
   const handleSave = async () => {
     try {
-      const documents = await handleFileChanges();
       setSaveLoading(true);
+
+      const statusOptions = await getStatusOptions();
       const extensionRequest = {
         extensionreasonid: reason.extensionreasonid,
         extendedduedays: numberDays,
         extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
         extensionstatusid: status,
-        documents: documents
+        ...statusOptions,
       };
   
       saveExtensionRequest({
         data: extensionRequest,
-        requestId: requestId,
-        ministryId: ministryId,
         callback: () => {
           setModalOpen(false);
           setSaveLoading(false);
           window.history.go(0);
         },
-        errorCallBack: (errorMessage) => {
+        errorCallback: (errorMessage) => {
           setSaveLoading(false);
           errorToast(errorMessage);
         },
-        dispatch,
       });
 
     } catch(error) {
       errorToast(error.message || "Error occured while saving extension details")
     }
-  };
-
-  const errorToast = (errorMessage) => {
-    return toast.error(errorMessage, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
   };
 
   const errorExists = Object.values({
@@ -259,7 +264,8 @@ const AddExtensionModal = () => {
   }).some((isErrorTrue) => isErrorTrue);
 
   const getExtensionReasonMenueItems = () => {
-    const reasons = extensionReasons.map((extensionReason) => {
+
+    const reasons = filteredExtensionReasons.map((extensionReason) => {
       return (
         <MenuItem
           key={`extension-${extensionReason.extensionreasonid}`}
@@ -352,7 +358,7 @@ const AddExtensionModal = () => {
                   error={!reason}
                   fullWidth
                 >
-                  {extensionReasons && getExtensionReasonMenueItems()}
+                  {filteredExtensionReasons && getExtensionReasonMenueItems()}
                 </TextField>
               </Grid>
 
@@ -491,7 +497,7 @@ const AddExtensionModal = () => {
               </ConditionalComponent>
             </Grid>
           </ConditionalComponent>
-          <ConditionalComponent condition={loading}>            
+          <ConditionalComponent condition={loading}>
             <Grid
               container
               direction="row"

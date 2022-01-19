@@ -5,17 +5,22 @@ import { useParams } from "react-router-dom";
 import {
   fetchExtensionReasons,
   fetchExtension,
+  createExtensionRequest,
+  updateExtensionRequest,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { extensionStatusId } from "../../../../constants/FOI/enum";
+import { toast } from "react-toastify";
 
 export const ActionContext = createContext();
 export const ActionProvider = ({ children, requestDetails }) => {
 
   const dispatch = useDispatch();
-  const { requestId } = useParams();
+  const { requestId, ministryId } = useParams();
 
   const [modalOpen, setModalOpen] = useState();
   const [loading, setLoading] = useState(true)
-  const [extensionReasons, setExtensionReasons] = useState()
+  const [extensionReasons, setExtensionReasons] = useState()  
+
   const [extensionId, setExtensionId] = useState(null)
   const [selectedExtension, setSelectedExtension] = useState(null)
 
@@ -26,27 +31,15 @@ export const ActionProvider = ({ children, requestDetails }) => {
     (state) => state.foiRequests.foiRequestExtesions
   );
   const idNumber = requestDetails?.idNumber
-
-  const filterExtensionReason = (extensionReasonsToFilter) => {
-    if(!extensions || extensions.length < 1) {
-      return extensionReasonsToFilter;
-    }
-
-    if (extensions.some((ex) => ex.extensiontype === "Public Body")) {
-      return extensionReasonsToFilter.filter((ex) => {
-        return ex.extensiontype !== "Public Body";
-      });
-    }
-
-    return extensionReasonsToFilter;
-  }
+  const pendingExtensionExists = extensions.some(
+    (ex) => ex.extensionstatusid === extensionStatusId.pending
+  );
 
   useEffect(() => {
     if (requestId) {
       fetchExtensionReasons({
         callback: (data) => {
-          const filteredExtensionReasons = filterExtensionReason(data)
-          setExtensionReasons(filteredExtensionReasons);
+          setExtensionReasons(data);
         },
         dispatch: dispatch,
       });
@@ -54,8 +47,8 @@ export const ActionProvider = ({ children, requestDetails }) => {
   }, [extensions]);
 
   useEffect(() => {
-    if(extensionId && modalOpen) {
-      setLoading(true)
+    if (extensionId && modalOpen) {
+      setLoading(true);
       fetchExtension({
         extensionId: extensionId,
         callback: (data) => {
@@ -64,7 +57,41 @@ export const ActionProvider = ({ children, requestDetails }) => {
         dispatch: dispatch,
       });
     }
-  }, [modalOpen])
+  }, [modalOpen, extensionId]);
+
+  const saveExtensionRequest = ({ data, callback, errorCallback }) => {
+    if (extensionId) {
+      updateExtensionRequest({
+        data,
+        extensionId,
+        ministryId,
+        callback,
+        errorCallback,
+        dispatch,
+      });
+    } else {
+      createExtensionRequest({
+        data,
+        requestId,
+        ministryId,
+        callback,
+        errorCallback,
+        dispatch,
+      });
+    }
+  };
+
+  const errorToast = (errorMessage) => {
+    return toast.error(errorMessage, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
   return (
     <ActionContext.Provider
@@ -83,7 +110,10 @@ export const ActionProvider = ({ children, requestDetails }) => {
         originalDueDate,
         startDate,
         extensions,
-        idNumber
+        idNumber,
+        saveExtensionRequest,
+        pendingExtensionExists,
+        errorToast,
       }}
     >
       {children}

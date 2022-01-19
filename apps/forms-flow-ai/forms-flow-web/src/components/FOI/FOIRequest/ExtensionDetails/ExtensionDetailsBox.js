@@ -23,12 +23,14 @@ const useStyles = makeStyles((theme) => ({
 const ExtensionDetailsBox = React.memo(() => {
   const classes = useStyles();
 
-  const { setModalOpen, dispatch, extensions, setExtensionId} = useContext(ActionContext);
+  const {
+    setModalOpen,
+    dispatch,
+    setExtensionId,
+    pendingExtensionExists,
+  } = useContext(ActionContext);
 
-  const pendingExtensionExists = extensions.some(
-    (ex) => ex.extensionstatusid === extensionStatusId.pending
-  );
-  const { ministryId } = useParams();
+    const { ministryId } = useParams();
 
   useEffect(() => {
     if (ministryId) {

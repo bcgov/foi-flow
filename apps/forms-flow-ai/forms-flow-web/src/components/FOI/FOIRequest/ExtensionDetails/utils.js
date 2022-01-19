@@ -59,3 +59,21 @@ export const checkPublicBodyError = (numberDays, publicBodySelected) => {
 
   return false;
 };
+
+export const filterExtensionReason = (extensionReasonsToFilter, extensionId) => {
+  if (
+    !extensionReasonsToFilter ||
+    extensionReasonsToFilter.length < 1 ||
+    extensionId
+  ) {
+    return extensionReasonsToFilter;
+  }
+
+  if (extensionReasonsToFilter.some((ex) => ex.extensiontype === "Public Body")) {
+    return extensionReasonsToFilter.filter((ex) => {
+      return ex.extensiontype !== "Public Body";
+    });
+  }
+
+  return extensionReasonsToFilter;
+};

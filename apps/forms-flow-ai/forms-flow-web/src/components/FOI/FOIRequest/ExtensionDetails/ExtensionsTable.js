@@ -37,11 +37,7 @@ const ExtensionsTable = ({showActions = true}) => {
 
 const classes = useStyles()
 
-const {
-  extensions,
-  setModalOpen,
-  setExtensionId
-} = useContext(ActionContext);
+const { extensions, setModalOpen, setExtensionId, pendingExtensionExists, errorToast } = useContext(ActionContext);
 
 const ConditionalTableBody = ({empty, children}) => {
 
@@ -67,9 +63,12 @@ const ConditionalTableBody = ({empty, children}) => {
 }
 
 const handleRowClick = (extension) => {
-  // if(extension.extensionstatusid !== extensionStatusId.pending) {
-  //   return;
-  // }
+  if(extension.extensionstatusid !== extensionStatusId.pending && pendingExtensionExists) {
+    errorToast(
+      "Changes to approved/denied extensions can not be made when there is a pending extension"
+    );
+    return;
+  }
 
   setExtensionId(extension.foirequestextensionid);
   setModalOpen(true)

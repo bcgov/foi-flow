@@ -77,7 +77,7 @@ export const fetchExtensions = (
   }
 }
 
-export const saveExtensionRequest = ({data, requestId, ministryId, callback, errorCallBack, dispatch}) => {
+export const createExtensionRequest = ({data, requestId, ministryId, callback, errorCallBack, dispatch}) => {
   if(!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
@@ -102,5 +102,38 @@ export const saveExtensionRequest = ({data, requestId, ministryId, callback, err
     .catch((error) => {
       catchError(error, dispatch)
       errorCallBack("An error occured while trying to save this extension");
+    });
+};
+
+export const updateExtensionRequest = ({
+  data,
+  extensionId,
+  ministryId,
+  callback,
+  errorCallback,
+  dispatch,
+}) => {
+  if (!ministryId) {
+    dispatch(serviceActionError("No request id"));
+  }
+
+  const apiUrl = replaceUrl(
+    replaceUrl(API.FOI_POST_UPDATE_EXTENSION, "<extensionid>", extensionId),
+    "<ministryrequestid>",
+    ministryId
+  );
+
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        callback(res.data);
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      catchError(error, dispatch);
+      errorCallback("An error occured while trying to save this extension");
     });
 };
