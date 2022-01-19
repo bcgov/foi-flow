@@ -100,7 +100,7 @@ class CreateFOIRequestExtension(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiextension/ministryrequest/<ministryrequestid>/extension/<extensionid>/edit')
+@API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>/extension/<extensionid>/edit')
 class EditFOIRequestExtension(Resource):
     """Edits extension for ministry(opened) request."""
 
@@ -108,12 +108,12 @@ class EditFOIRequestExtension(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require    
-    def post(ministryrequestid, extensionid):
+    def post(requestid, ministryrequestid, extensionid):
         try:                     
             requestjson = request.get_json()
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
-                result = extensionservice().createrequestextensionversion(ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
+                result = extensionservice().createrequestextensionversion(requestid, ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
             else:
                 return {'status': False, 'message':'Unautherized user','id':-1} , 403
