@@ -4,6 +4,7 @@ import { formatDate } from "../../../../helper/FOI/helper";
 import { useParams } from "react-router-dom";
 import {
   fetchExtensionReasons,
+  fetchExtension,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 
 export const ActionContext = createContext();
@@ -13,8 +14,11 @@ export const ActionProvider = ({ children, requestDetails }) => {
   const { requestId } = useParams();
 
   const [modalOpen, setModalOpen] = useState();
+  const [loading, setLoading] = useState(true)
   const [extensionReasons, setExtensionReasons] = useState()
-  
+  const [extensionId, setExtensionId] = useState(null)
+  const [selectedExtension, setSelectedExtension] = useState(null)
+
   const currentDueDate = formatDate(requestDetails.dueDate)
   const startDate = formatDate(requestDetails.requestProcessStart);
   const originalDueDate = formatDate(requestDetails.originalDueDate);
@@ -49,11 +53,30 @@ export const ActionProvider = ({ children, requestDetails }) => {
     }
   }, [extensions]);
 
+  useEffect(() => {
+    if(extensionId && modalOpen) {
+      setLoading(true)
+      fetchExtension({
+        extensionId: extensionId,
+        callback: (data) => {
+          setSelectedExtension(data);
+        },
+        dispatch: dispatch,
+      });
+    }
+  }, [modalOpen])
+
   return (
     <ActionContext.Provider
       value={{
         modalOpen,
         setModalOpen,
+        loading,
+        setLoading,
+        extensionId,
+        setExtensionId,
+        selectedExtension,
+        setSelectedExtension,
         extensionReasons,
         dispatch,
         currentDueDate,

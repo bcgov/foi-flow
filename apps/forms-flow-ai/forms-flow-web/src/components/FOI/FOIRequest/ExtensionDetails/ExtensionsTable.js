@@ -10,6 +10,10 @@ import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
+import {
+  extensionStatusId
+} from "../../../../constants/FOI/enum";
+import { set } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,6 +39,8 @@ const classes = useStyles()
 
 const {
   extensions,
+  setModalOpen,
+  setExtensionId
 } = useContext(ActionContext);
 
 const ConditionalTableBody = ({empty, children}) => {
@@ -58,6 +64,15 @@ const ConditionalTableBody = ({empty, children}) => {
         <TableBody>{children}</TableBody>
       </>
     );
+}
+
+const handleRowClick = (extension) => {
+  // if(extension.extensionstatusid !== extensionStatusId.pending) {
+  //   return;
+  // }
+
+  setExtensionId(extension.foirequestextensionid);
+  setModalOpen(true)
 }
 
 const ConditionalTableCell = ({condition, children, ...rest}) => {
@@ -108,7 +123,11 @@ const ConditionalTableCell = ({condition, children, ...rest}) => {
           })
             .map((extension) => {
             return (
-              <TableRow key={`key-${extension.extensionstatusid}`}>
+              <TableRow
+                key={`key-${extension.extensionstatusid}`}
+                onClick={() => handleRowClick(extension)}
+                hover
+              >
                 <TableCell numeric>{extension.extensionreson}</TableCell>
                 <TableCell numeric>{extension.extendedduedays}</TableCell>
                 <TableCell>{extension.extendedduedate}</TableCell>

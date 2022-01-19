@@ -28,6 +28,25 @@ export const fetchExtensionReasons = async ({
     });
 };
 
+
+
+export const fetchExtension = ({extensionId, callback, dispatch}) => {
+  console.log(extensionId);
+  const apiUrl = replaceUrl(
+    API.FOI_GET_EXTENSION,
+    "<extensionId>",
+    extensionId
+  );
+
+  httpGETRequest(apiUrl, {}, UserService.getToken())
+    .then((res) => {
+      callback(res.data);
+    })
+    .catch((error) => {
+      dispatch(serviceActionError(error));
+    });
+};
+
 export const fetchExtensions = (
   ministryId,
   ...rest
@@ -58,16 +77,18 @@ export const fetchExtensions = (
   }
 }
 
-export const saveExtensionRequest = ({data, ministryId, callback, errorCallBack, dispatch}) => {
+export const saveExtensionRequest = ({data, requestId, ministryId, callback, errorCallBack, dispatch}) => {
   if(!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
   
   const apiUrl = replaceUrl(
-    API.FOI_POST_EXTENSION,
+    replaceUrl(API.FOI_POST_EXTENSION, "<requestid>", requestId),
     "<ministryrequestid>",
     ministryId
   );
+
+  
 
   httpPOSTRequest(apiUrl, data)
     .then((res) => {

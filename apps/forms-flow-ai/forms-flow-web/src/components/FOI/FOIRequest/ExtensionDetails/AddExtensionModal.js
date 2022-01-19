@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from "react";
+import React, { useState, useContext, useEffect, useMemo } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -18,12 +18,16 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   formatDate,
   addBusinessDays,
   ConditionalComponent,
 } from "../../../../helper/FOI/helper";
-import { saveExtensionRequest } from "../../../../apiManager/services/FOI/foiExtensionServices";
+import {
+  saveExtensionRequest,
+  fetchExtension,
+} from "../../../../apiManager/services/FOI/foiExtensionServices";
 import clsx from "clsx";
 import { useParams } from "react-router-dom";
 import {
@@ -32,7 +36,7 @@ import {
   MaxFileSizeInMB,
 } from "../../../../constants/FOI/enum";
 import FileUpload from "../../customComponents/FileUpload";
-import { uploadFiles } from "./utils";
+import { uploadFiles, checkPublicBodyError } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
   btndisabled: {
@@ -76,7 +80,7 @@ const AddExtensionModal = () => {
     };
   });
 
-  const { ministryId } = useParams();
+  const { ministryId, requestId } = useParams();
 
   const {
     modalOpen,
@@ -87,10 +91,13 @@ const AddExtensionModal = () => {
     currentDueDate,
     originalDueDate,
     idNumber,
+    selectedExtension,
+    loading,
+    setLoading
   } = useContext(ActionContext);
 
   const [reason, setReason] = useState("");
-  const [publicBodySelected, setPublicBodySelected] = useState(false);
+  const publicBodySelected = reason?.extensiontype === "Public Body";
 
   const [numberDays, setNumberDays] = useState("");
   const maxExtendDays = reason?.defaultextendedduedays || 100;
@@ -101,20 +108,38 @@ const AddExtensionModal = () => {
   const [approvedDate, setApprovedDate] = useState(formatDate(new Date()));
   const [approvedNumberDays, setApprovedNumberDays] = useState("");
 
-  const [existingFiles, setExistingFiles] = useState([]);
+  const existingFiles = selectedExtension?.documents || []
   const [newFiles, setNewFiles] = useState([]);
+  const attchmentFileNameList = existingFiles.map(file => file.filename)
+
   const updateFilesCb = (_files) => {
     setNewFiles(_files);
   };
 
   const [saveLoading, setSaveLoading] = useState(false);
 
+  useEffect(() => {
+    if (selectedExtension && extensionReasons) {
+      const existingReason = extensionReasons.find(
+        (ex) => ex.extensionreasonid === selectedExtension.extensionreasonid
+      );
+      setReason(existingReason);
+      setNumberDays(selectedExtension.extendedduedays);
+      setExtendedDate(formatDate(selectedExtension.extendedduedate));
+      setStatus(selectedExtension.extensionstatusid);
+      setApprovedDate(selectedExtension.decisiondate || formatDate(new Date()));
+      setApprovedNumberDays(
+        selectedExtension.approvednoofdays || selectedExtension.extendedduedays
+      );
+    }
+    setLoading(false);
+  }, [selectedExtension, extensionReasons]);
+
   const handleReasonChange = (e) => {
     const extensionReason = extensionReasons.find(
       (er) => er.extensionreasonid === e.target.value
     );
 
-    setPublicBodySelected(extensionReason.extensiontype === "Public Body");
     setReason(extensionReason);
 
     if (extensionReason.defaultextendedduedays) {
@@ -151,14 +176,6 @@ const AddExtensionModal = () => {
   const handleClose = () => {
     setModalOpen(false);
   }
-
-  const getStatusId = () => {
-    if (publicBodySelected) {
-      return extensionStatusId.approved;
-    } else {
-      return status;
-    }
-  };
 
   const handleFileChanges = async () => {
     if(publicBodySelected) {
@@ -197,12 +214,13 @@ const AddExtensionModal = () => {
         extensionreasonid: reason.extensionreasonid,
         extendedduedays: numberDays,
         extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
-        extensionstatusid: getStatusId(),
+        extensionstatusid: status,
         documents: documents
       };
   
       saveExtensionRequest({
         data: extensionRequest,
+        requestId: requestId,
         ministryId: ministryId,
         callback: () => {
           setModalOpen(false);
@@ -264,7 +282,7 @@ const AddExtensionModal = () => {
   const showStatusOptions = reason && !publicBodySelected;
 
   return (
-    <div>
+    <>
       <Dialog
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -278,7 +296,6 @@ const AddExtensionModal = () => {
             setReason("");
             setExtendedDate("");
             setNewFiles([]);
-            setExistingFiles([]);
             setApprovedDate("");
             setApprovedNumberDays("");
           },
@@ -300,178 +317,194 @@ const AddExtensionModal = () => {
             overflowX: "hidden",
           }}
         >
-          <Grid
-            container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            className={classes.gridContainer}
-            spacing={2}
-          >
-            <Grid item xs={12}>
-              <span className={classes.DialogLable}>Start Date: </span>
-              {startDate}
-            </Grid>
-            <Grid item xs={12} lg={6}>
-              <span className={classes.DialogLable}>Original Due Date: </span>
-              {originalDueDate}
-            </Grid>
-            <Grid item xs={12} lg={6}>
-              <span className={classes.DialogLable}>Current Due Date: </span>
-              {currentDueDate}
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                id="outlined-extension-reasons"
-                name="reason"
-                variant="outlined"
-                required
-                select
-                label="Reason for Extension"
-                value={reason.extensionreasonid || 0}
-                onChange={handleReasonChange}
-                error={!reason}
-                fullWidth
-              >
-                {extensionReasons && getExtensionReasonMenueItems()}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField
-                id="outlined-extension-number-days"
-                name="numberDays"
-                value={numberDays || 0}
-                type="number"
-                variant="outlined"
-                required
-                label="Extended Due Days"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">Days</InputAdornment>
-                  ),
-                  inputProps: { min: 1, max: maxExtendDays },
-                }}
-                onChange={handleNumberDaysChange}
-                fullWidth
-                error={checkPublicBodyError(numberDays, publicBodySelected)}
-              />
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField
-                label="Extended Due Date"
-                type="date"
-                value={extendedDate}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <DateRangeIcon />
-                    </InputAdornment>
-                  ),
-                  readOnly: true,
-                }}
-                variant="outlined"
-                fullWidth
-              />
-            </Grid>
-
-            <ConditionalComponent condition={showStatusOptions}>
+          <ConditionalComponent condition={!loading}>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              className={classes.gridContainer}
+              spacing={2}
+            >
               <Grid item xs={12}>
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    row
-                    name="controlled-radio-buttons-group"
-                    value={status}
-                    onChange={(e) => {
-                      setStatus(Number(e.target.value));
-                    }}
-                  >
-                    <FormControlLabel
-                      value={extensionStatusId.pending}
-                      control={<Radio color="default" />}
-                      label="Pending"
-                    />
-                    <FormControlLabel
-                      value={extensionStatusId.approved}
-                      control={<Radio color="default" />}
-                      label="Approved"
-                    />
-                    <FormControlLabel
-                      value={extensionStatusId.denied}
-                      control={<Radio color="default" />}
-                      label="Denied"
-                    />
-                  </RadioGroup>
-                </FormControl>
+                <span className={classes.DialogLable}>Start Date: </span>
+                {startDate}
               </Grid>
-              <ConditionalComponent
-                condition={status === extensionStatusId.approved}
-              >
-                <Grid item xs={6}>
-                  <TextField
-                    label="Approved Date"
-                    type="date"
-                    value={approvedDate || ""}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange={(e) => {
-                      setApprovedDate(e.target.value);
-                    }}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <DateRangeIcon />
-                        </InputAdornment>
-                      ),
-                      inputProps: { max: formatDate(new Date()) },
-                    }}
-                    variant="outlined"
-                    fullWidth
-                    error={!approvedDate}
-                  />
-                </Grid>
+              <Grid item xs={12} lg={6}>
+                <span className={classes.DialogLable}>Original Due Date: </span>
+                {originalDueDate}
+              </Grid>
+              <Grid item xs={12} lg={6}>
+                <span className={classes.DialogLable}>Current Due Date: </span>
+                {currentDueDate}
+              </Grid>
 
-                <Grid item xs={6}>
-                  <TextField
-                    id="outlined-extension-number-days"
-                    name="approvedNumberDays"
-                    value={approvedNumberDays || 0}
-                    type="number"
-                    variant="outlined"
-                    required
-                    label="Approved Number of Days"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">Days</InputAdornment>
-                      ),
-                      inputProps: { min: 1, max: numberDays },
-                    }}
-                    onChange={handleApprovedNumberDaysChange}
-                    fullWidth
-                    error={!approvedNumberDays}
-                  />
-                </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="outlined-extension-reasons"
+                  name="reason"
+                  variant="outlined"
+                  required
+                  select
+                  label="Reason for Extension"
+                  value={reason?.extensionreasonid || 0}
+                  onChange={handleReasonChange}
+                  error={!reason}
+                  fullWidth
+                >
+                  {extensionReasons && getExtensionReasonMenueItems()}
+                </TextField>
+              </Grid>
 
+              <Grid item xs={6}>
+                <TextField
+                  id="outlined-extension-number-days"
+                  name="numberDays"
+                  value={numberDays || 0}
+                  type="number"
+                  variant="outlined"
+                  required
+                  label="Extended Due Days"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">Days</InputAdornment>
+                    ),
+                    inputProps: { min: 1, max: maxExtendDays },
+                  }}
+                  onChange={handleNumberDaysChange}
+                  fullWidth
+                  error={checkPublicBodyError(numberDays, publicBodySelected)}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <TextField
+                  label="Extended Due Date"
+                  type="date"
+                  value={extendedDate}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <DateRangeIcon />
+                      </InputAdornment>
+                    ),
+                    readOnly: true,
+                  }}
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+
+              <ConditionalComponent condition={showStatusOptions}>
                 <Grid item xs={12}>
-                  <FileUpload
-                    className={classes.fullWidth}
-                    attchmentFileNameList={[]}
-                    multipleFiles={false}
-                    mimeTypes={MimeTypeList.extensionAttachment}
-                    maxFileSize={MaxFileSizeInMB.extensionAttachment}
-                    updateFilesCb={updateFilesCb}
-                    customFormat={costumFormat}
-                  />
+                  <FormControl component="fieldset">
+                    <RadioGroup
+                      row
+                      name="controlled-radio-buttons-group"
+                      value={status}
+                      onChange={(e) => {
+                        setStatus(Number(e.target.value));
+                      }}
+                    >
+                      <FormControlLabel
+                        value={extensionStatusId.pending}
+                        control={<Radio color="default" />}
+                        label="Pending"
+                      />
+                      <FormControlLabel
+                        value={extensionStatusId.approved}
+                        control={<Radio color="default" />}
+                        label="Approved"
+                      />
+                      <FormControlLabel
+                        value={extensionStatusId.denied}
+                        control={<Radio color="default" />}
+                        label="Denied"
+                      />
+                    </RadioGroup>
+                  </FormControl>
                 </Grid>
+                <ConditionalComponent
+                  condition={status === extensionStatusId.approved}
+                >
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Approved Date"
+                      type="date"
+                      value={approvedDate || ""}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      onChange={(e) => {
+                        setApprovedDate(e.target.value);
+                      }}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <DateRangeIcon />
+                          </InputAdornment>
+                        ),
+                        inputProps: { max: formatDate(new Date()) },
+                      }}
+                      variant="outlined"
+                      fullWidth
+                      error={!approvedDate}
+                    />
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <TextField
+                      id="outlined-extension-number-days"
+                      name="approvedNumberDays"
+                      value={approvedNumberDays || 0}
+                      type="number"
+                      variant="outlined"
+                      required
+                      label="Approved Number of Days"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">Days</InputAdornment>
+                        ),
+                        inputProps: { min: 1, max: numberDays },
+                      }}
+                      onChange={handleApprovedNumberDaysChange}
+                      fullWidth
+                      error={!approvedNumberDays}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <FileUpload
+                      className={classes.fullWidth}
+                      attchmentFileNameList={attchmentFileNameList}
+                      multipleFiles={false}
+                      mimeTypes={MimeTypeList.extensionAttachment}
+                      maxFileSize={MaxFileSizeInMB.extensionAttachment}
+                      updateFilesCb={updateFilesCb}
+                      customFormat={costumFormat}
+                    />
+                  </Grid>
+                </ConditionalComponent>
               </ConditionalComponent>
-            </ConditionalComponent>
-          </Grid>
+            </Grid>
+          </ConditionalComponent>
+          <ConditionalComponent condition={loading}>            
+            <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              className={classes.gridContainer}
+              spacing={2}
+            >
+              <Grid item xs={12}>
+                <CircularProgress />
+              </Grid>
+            </Grid>
+          </ConditionalComponent>
         </DialogContent>
 
         <DialogActions className="dialog-content-nomargin">
@@ -510,7 +543,7 @@ const AddExtensionModal = () => {
           </Grid>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 }
 

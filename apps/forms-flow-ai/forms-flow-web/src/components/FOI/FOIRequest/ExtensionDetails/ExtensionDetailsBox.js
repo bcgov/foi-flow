@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 const ExtensionDetailsBox = React.memo(() => {
   const classes = useStyles();
 
-  const { setModalOpen, dispatch, extensions} = useContext(ActionContext);
+  const { setModalOpen, dispatch, extensions, setExtensionId} = useContext(ActionContext);
 
   const pendingExtensionExists = extensions.some(
     (ex) => ex.extensionstatusid === extensionStatusId.pending
@@ -51,6 +51,7 @@ const ExtensionDetailsBox = React.memo(() => {
               onClick={(e) => {
                 e.preventDefault();
                 setModalOpen(true);
+                setExtensionId(null)
               }}
               disabled={pendingExtensionExists}
             >
