@@ -51,7 +51,7 @@ class extensionservice:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         return extnsionresult
 
-    def createrequestextensionversion(self, ministryrequestid, extensionid, extensionschema, userid):
+    def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid):
         documents = []    
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)        
@@ -62,7 +62,11 @@ class extensionservice:
                 documents.append(FOIMinistryRequestDocument().getdocument(documentid))
         extensioresult = self.saveextensiondocumentversion(ministryrequestid, ministryversion, extensionid, documents, copyextension, userid)  
         if extensioresult.success == True and 'extensionstatusid' in copyextension and copyextension['extensionstatusid'] == 2:            
-            requestservice().updateministryrequestduedate(ministryrequestid, copyextension['extendedduedate'], userid )
+            # requestservice().updateministryrequestduedate(ministryrequestid, copyextension['extendedduedate'], userid )            
+            ministryrequestschema = {
+                "duedate": copyextension['extendedduedate']
+            }
+            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
         return extensioresult
 
     def saveextensiondocumentversion(self, ministryrequestid, ministryversion, extensionid, documents, extension, userid):
