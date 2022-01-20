@@ -9,9 +9,9 @@ import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 
-export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition, updateStateDropDown}) {
+export default function StateDropDown({requestState, requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition, updateStateDropDown}) {
 
-    const {requestState} = useParams();
+    //const {requestState} = useParams();
 
     let userDetail = useSelector(state=> state.user.userDetail);
    

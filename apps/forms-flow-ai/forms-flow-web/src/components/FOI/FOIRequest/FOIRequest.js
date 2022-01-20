@@ -84,7 +84,7 @@ const useStyles = makeStyles((theme) => ({
 const FOIRequest = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
-  const { requestId, ministryId, requestState } = useParams();
+  const { requestId, ministryId} = useParams();
   const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
 
@@ -99,7 +99,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(state => state.foiRequests.foiRequestAttachments);
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
-
+  const [requestState, setRequestState] = useState();
+  
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -137,6 +138,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase());
 
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
+  
   const dispatch = useDispatch();
   useEffect(() => {
     if (isAddRequest) {
@@ -166,6 +168,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
+    if(requestDetails){
+      setRequestState(requestDetails.currentState);
+      settabStatus(requestDetails.currentState);
+    }
   }, [requestDetails]);
 
   const requiredRequestDescriptionDefaultData = {
@@ -294,15 +300,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setUnSavedRequest(_unSaved);
     if (!_unSaved) {
       setStateChanged(false);
+      console.log("Inside handleSaveRequest-FoiRequest.js",_state);
       setcurrentrequestStatus(_state);
 
       setTimeout(() => {
-        const redirectUrl = getRedirectAfterSaveUrl(_state, ministryId, requestId);
+        const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
 
         if (redirectUrl) {
           window.location.href = redirectUrl
         } else {
-          dispatch(push(`/foi/reviewrequest/${id}/${_state}`))
+          dispatch(push(`/foi/reviewrequest/${id}`))
         }
 
       }
@@ -321,7 +328,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setStateChanged(false);
       setcurrentrequestStatus(StateEnum.open.name);
 
-      dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${_ministryId}/Open`));
+      dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${_ministryId}`));
     }
     else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -452,7 +459,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
+            <StateDropDown requestState={requestState} updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
 
           <div className="tab">

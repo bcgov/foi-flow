@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MinistryReview = React.memo(({ userDetail }) => {
 
-  const { requestId, ministryId, requestState} = useParams();
+  const { requestId, ministryId} = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -93,7 +93,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
   const [comment, setComment] = useState([]);
-
+  const [requestState, setRequestState] = useState();
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
   
@@ -137,7 +137,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
       if (bcgovcode)
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
-    
+    if(requestDetails){
+      setRequestState(requestDetails.currentState);
+      settabStatus(requestDetails.currentState);
+    }
   }, [requestId]);
 
   const [headerValue, setHeader] = useState("");

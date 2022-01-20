@@ -61,6 +61,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
 
+    console.log("Use Effect state", state);
     React.useEffect(() => {  
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
     },[state]);

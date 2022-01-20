@@ -154,10 +154,10 @@ const search = (data) => {
 
 const renderReviewRequest = (e) => {
   if (e.row.ministryrequestid) {
-    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
+    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`));
   }
   else {
-    dispatch(push(`/foi/reviewrequest/${e.row.id}/${e.row.currentState}`));
+    dispatch(push(`/foi/reviewrequest/${e.row.id}`));
   }
 }
 const addRequest = (e) => {

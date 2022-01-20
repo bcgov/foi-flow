@@ -54,13 +54,13 @@ export const confirmChangesLost = (positiveCallback, negativeCallback) => {
   }
 };
 
-export const getRedirectAfterSaveUrl = (_state, ministryId, requestId) => {
+export const getRedirectAfterSaveUrl = (ministryId, requestId) => {
   if(ministryId) {
-    return `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}`;
+    return `/foi/foirequests/${requestId}/ministryrequest/${ministryId}`;
   }
 
   if(requestId) {
-    return `/foi/reviewrequest/${requestId}/${_state}`;
+    return `/foi/reviewrequest/${requestId}`;
   }
 
   return null;

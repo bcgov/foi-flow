@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
@@ -70,7 +70,7 @@ const BottomButtonGroup = React.memo(
      * Bottom Button Group of Review request Page
      * Button enable/disable is handled here based on the validation
      */
-    const { requestId, ministryId, requestState } = useParams();
+    const { requestId, ministryId } = useParams();
 
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -81,6 +81,7 @@ const BottomButtonGroup = React.memo(
     const [closingDate, setClosingDate] = useState(formatDate(new Date()));
     const [closingReasonId, setClosingReasonId] = useState();
 
+    const [requestState, setRequestState] = useState();
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
     };
@@ -89,7 +90,18 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
+    console.log("stateChanged",stateChanged);
+    useEffect(() => {
+      console.log("Rendering!!");
+      console.log("Request state!!",requestState);
+      if(stateChanged){
+        setRequestState(saveRequestObject.currentState);
+        console.log("Request state set!!:",requestState);
+      }
+    }, [stateChanged]);
+
     const saveRequest = async () => {
+      
       if (urlIndexCreateRequest > -1)
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
       dispatch(
@@ -130,6 +142,8 @@ const BottomButtonGroup = React.memo(
                   progress: undefined,
                 }
               );
+              // setRequestState({requeststate: saveRequestObject.currentState},  
+              //   handleSaveRequest(requestState, true, ""))
               handleSaveRequest(requestState, true, "");
             }
           }
@@ -195,7 +209,8 @@ const BottomButtonGroup = React.memo(
         setsaveModal(true);
     };
 
-    const handleModal = (value) => {     
+    const handleModal = (value) => {  
+        
       setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);

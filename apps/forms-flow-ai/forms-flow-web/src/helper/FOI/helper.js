@@ -135,7 +135,7 @@ const isMinistryCoordinator = (userdetail, ministryteam) =>
 }
 
 const isMinistryLogin = (userGroups) => {
-	return Object.values(MINISTRYGROUPS).some(group => userGroups.includes(group));
+	return Object.values(MINISTRYGROUPS).some(group => userGroups?.includes(group));
 }
 
 const getMinistryByValue = (userGroups) => {
