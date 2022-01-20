@@ -49,10 +49,10 @@ class FOIRequestExtension(db.Model):
         decisiondate = extension['decisiondate'] if 'decisiondate' in extension else None
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
 
-        if 'extensionstatusid' in extension:
-            extensionstatusid = extension['extensionstatusid']
-        elif 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body': 
+        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body': 
             extensionstatusid = 2
+        elif 'extensionstatusid' in extension:
+            extensionstatusid = extension['extensionstatusid']
         else:
             extensionstatusid = 1        
       

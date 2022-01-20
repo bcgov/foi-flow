@@ -79,10 +79,11 @@ class extensionservice:
         requestextension = FOIRequestExtension().getextension(extensionid)
         extensiondocuments = self.__getextensiondocuments(requestextension["foirequestextensionid"], requestextension["version"])
         documents = self.__getextensiondocumentsinfo(extensiondocuments)
-        requestextensionwithdocuments = self.__createextensionobject(requestextension, documents)
+        extensionreason = extensionreasonservice().getextensionreasonbyid(requestextension['extensionreasonid'])
+        requestextensionwithdocuments = self.__createextensionobject(requestextension, documents, extensionreason)
         return requestextensionwithdocuments
 
-    def __createextensionobject(self, requestextension, documents):
+    def __createextensionobject(self, requestextension, documents, extensionreason):
         
         decisiondate = requestextension['decisiondate'] if 'decisiondate' in requestextension  else None
         approvednoofdays = requestextension['approvednoofdays'] if 'approvednoofdays' in requestextension  else None
@@ -92,6 +93,7 @@ class extensionservice:
             "extensionstatusid": requestextension["extensionstatusid"],
             "extendedduedays": requestextension["extendedduedays"],
             "extendedduedate": requestextension["extendedduedate"],
+            "extensiontype": extensionreason["extensiontype"],
             "decisiondate": decisiondate,
             "approvednoofdays": approvednoofdays,
             "documents": documents
