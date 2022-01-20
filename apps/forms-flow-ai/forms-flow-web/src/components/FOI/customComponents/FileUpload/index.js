@@ -76,7 +76,7 @@ const FileUpload = ({
           const sizeInMB = convertBytesToMB(file.size);
           _totalFileSizeInMB += parseFloat(sizeInMB);
           
-          if (allowedFileType(file, mimeTypes, multipleFiles)) {
+          if (allowedFileType(file, mimeTypes)) {
             if (allowedFileSize(_totalFileSizeInMB, multipleFiles, totalFileSize)) {
               if (sizeInMB <= maxFileSize) {
                 const duplicateFileName = handleDuplicateFiles(file);
