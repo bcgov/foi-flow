@@ -60,16 +60,30 @@ export const checkPublicBodyError = (numberDays, publicBodySelected) => {
   return false;
 };
 
-export const filterExtensionReason = (extensionReasonsToFilter, extensionId) => {
-  if (
-    !extensionReasonsToFilter ||
-    extensionReasonsToFilter.length < 1 ||
-    extensionId
-  ) {
+export const filterExtensionReason = (
+  extensionReasonsToFilter,
+  extensions,
+  selectedExtension
+) => {
+  if (!extensionReasonsToFilter || extensionReasonsToFilter.length < 1) {
     return extensionReasonsToFilter;
   }
 
-  if (extensionReasonsToFilter.some((ex) => ex.extensiontype === "Public Body")) {
+  const publicBodyExtensions = new Set(
+    extensions
+      .filter((ex) => ex.extensiontype === "Public Body")
+      .map((ex) => ex.extensionreasonid)
+  );
+
+  if (selectedExtension) {
+    return extensionReasonsToFilter.filter(
+      (ex) =>
+        !publicBodyExtensions.has(ex.extensionreasonid) ||
+        selectedExtension.extensionreasonid === ex.extensionreasonid
+    );
+  }
+
+  if (publicBodyExtensions.size > 0) {
     return extensionReasonsToFilter.filter((ex) => {
       return ex.extensiontype !== "Public Body";
     });
