@@ -1,0 +1,105 @@
+
+from os import stat
+from re import VERBOSE
+import json
+from request_api.services.watcherservice import watcherservice
+from request_api.models.FOIRawRequestComments import FOIRawRequestComment
+from request_api.models.FOIRequestComments import FOIRequestComment
+from request_api.services.notifications.notificationconfig import notificationconfig
+
+class notificationuser:
+    """ Notfication user service
+
+    """
+    
+    def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, foicomment=None):
+        notificationusers = []
+        if 'Assignment' in notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype)
+        elif 'Reply Comment' in notificationtype:
+            _users = self.__getcommentusers(foicomment, requesttype)
+        elif 'Tagged Comment' in notificationtype:
+            _users = self.__gettaggedusers(foicomment)
+        else:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
+        for user in _users:
+            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged Comment" not in notificationtype and self.__istaggeduser(user, foicomment) == False) or "Tagged Comment" in notificationtype):
+                notificationusers.append(user)
+        return notificationusers     
+    
+    def __isignorable(self, notificationuser, users, userid):
+        if notificationuser["userid"] == userid:
+            return True
+        else: 
+            for user in users:
+                if notificationuser["userid"] == user["userid"]:
+                    return True
+        return False     
+     
+    def __istaggeduser(self, notificationuser, foicomment):
+        _users = self.__gettaggedusers(foicomment)
+        if _users is not None:
+            for user in _users:
+                if notificationuser["userid"] == user["userid"]:
+                    return True
+        return False
+        
+    def __getwatchers(self, foirequest, requesttype):
+        notificationusers = []
+        if requesttype == "ministryrequest":
+            watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"])
+        else:
+            watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
+        for watcher in watchers:
+                notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
+        return notificationusers        
+    
+    def __getassignees(self, foirequest, requesttype, notificationtype):
+        notificationusers = []
+        notificationtypeid = notificationconfig().getnotificationusertypeid("Assignee")
+        if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
+            notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})
+        if foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
+            notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
+        return notificationusers          
+    
+    def __getcommentusers(self, comment, requesttype):
+        commentusers = []
+        commentusers.append({"userid":comment["createdby"], "usertype":self.__getcommentusertype(comment)})
+        taggedusers = self.__gettaggedusers(comment)
+        if taggedusers is not None:
+            commentusers.extend(taggedusers)
+        if comment["parentcommentid"]:
+            _commentusers = self.__getrelatedusers(comment, requesttype)
+            for _commentuser in _commentusers:
+                commentusers.append({"userid":_commentuser["createdby"], "usertype":notificationconfig().getnotificationusertypeid("comment reply user")})
+                _skiptaguserforreplies = True
+                if _skiptaguserforreplies == False:
+                    taggedusers = self.__gettaggedusers(_commentuser)
+                    if taggedusers is not None:
+                        commentusers.extend(taggedusers)            
+        return commentusers  
+    
+    def __getrelatedusers(self, comment, requesttype):
+        if requesttype == "ministryrequest":
+            return FOIRequestComment.getcommentusers(comment["commentid"])
+        else:
+            return FOIRawRequestComment.getcommentusers(comment["commentid"])
+            
+    def __getcommentusertype(self, comment):
+        if comment["parentcommentid"]:
+            return notificationconfig().getnotificationusertypeid("comment reply user")
+        else:
+            notificationconfig().getnotificationusertypeid("comment user")
+
+    def __gettaggedusers(self, comment):               
+        if comment["taggedusers"] != '[]':
+            return self.__preparetaggeduser(json.loads(comment["taggedusers"]))          
+        return None   
+    
+    def __preparetaggeduser(self, data):
+        taggedusers = [] 
+        for entry in data:
+            taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypeid("tagged user")})
+        return taggedusers
+        
