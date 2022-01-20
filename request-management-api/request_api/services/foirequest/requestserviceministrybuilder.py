@@ -180,7 +180,6 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         return extensionarr
 
     def createextensiondocumentfromobject(self, extensiondocuments, activeversion, userid):
-        print(extensiondocuments)
         extdocumentarr = []
         for extensiondocument in extensiondocuments:
             extensiondocumentmapping = FOIRequestExtensionDocumentMapping()

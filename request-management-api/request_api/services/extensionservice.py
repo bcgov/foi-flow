@@ -60,35 +60,60 @@ class extensionservice:
         return extnsionresult
 
     def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid):
+       
         documents = []    
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
-        updatedduedate = self.getlatestapprovedduedate(extension, extensionschema, extensionid, ministryrequestid, ministryversion)
-        print("updatedduedate ------------------------", updatedduedate)
-        copyextension = self.__copyextensionproperties(extension, extensionschema, extension['version'])       
+        # gets the latest approved request
+        approvedextension = self.getlatestapprovedrequest(extension, extensionschema, extensionid, ministryrequestid, ministryversion)
+        # gets the latest approved due date if any else gets the original due date
+        updatedduedate = self.getlatestapprovedduedate(extension, ministryrequestid, approvedextension)
+       
+        isdeletedocument = self.__isdeletedocument(extensionschema, extension, extensionid)       
+        if isdeletedocument == True:         
+            self.deletedocuments(extensionid, extension, ministryrequestid, userid)  
+
+        copyextension = self.__copyextensionproperties(extension, extensionschema, extension['version'])        
+        # if current state is approved then gets the current extended due date
+        extendedduedate = self.getextendedduedate(copyextension)
+       
+        # save documents if it is part of current extension
         if 'documents' in copyextension and copyextension['extensionstatusid'] != 1:
             documentids = self.__savedocumentversion(ministryrequestid, ministryversion, copyextension['documents'], userid)
             for documentid in documentids:
-                documents.append(FOIMinistryRequestDocument().getdocument(documentid))
-        extensioresult = self.saveextensiondocumentversion(ministryrequestid, ministryversion, extensionid, documents, copyextension, userid)        
-        if extensioresult.success == True and updatedduedate:            
-            # requestservice().updateministryrequestduedate(ministryrequestid, copyextension['extendedduedate'], userid )            
+                documents.append(FOIMinistryRequestDocument().getdocument(documentid))        
+        extensioresult = self.saveextensiondocumentversion(ministryrequestid, ministryversion, extensionid, documents, copyextension, userid)
+        # updates the duedate to extendedduedate or updatedduedate
+        # new ministry, extension, extensionmapping and document version gets created
+        if extensioresult.success == True:
             ministryrequestschema = {
-                "duedate": updatedduedate
+                "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
         return extensioresult
 
-    def getlatestapprovedduedate(self, extension, extensionschema, extensionid, ministryrequestid, ministryversion):
-        print("extensionschema -----------------------", extensionschema)
-        approvedextension = None
+    def __isdeletedocument(self, extensionschema, extension, extensionid):
+        isdeletedocument = False
+        documents = self.__getextensiondocuments(extensionid, extension["version"])
+        # 1. if prev status is Approved and current status is Pending or Denied
+        # 2. Prev extension has documents
+        # if any of the above condition is true then deletedocuments
+        if (extension["extensionstatusid"] == 2 and extensionschema["extensionstatusid"] != extension["extensionstatusid"]) or (documents):
+            isdeletedocument = True            
+        return isdeletedocument
+
+    def deletedocuments(self,extensionid, extension, ministryrequestid, userid): 
+        documents = self.__getextensiondocuments(extensionid, extension["version"])        
+        for document in documents:
+            documentservice().deleterequestdocument(ministryrequestid, document["foiministrydocumentid"], userid, "ministryrequest")
+  
+    def getextendedduedate(self, extensionschema):
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
         # if status is Approved or reason is Public Body then directly take the extendedduedate
         if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == 'Public Body':
             return extensionschema['extendedduedate']
-        # if prev status is Approved and current status is Pending or Denied then get the latest Approved extendedduedate from FOIRequestExtensions Table
-        if extension["extensionstatusid"] == 2 and extensionschema["extensionstatusid"] != extension["extensionstatusid"]:
-            approvedextension = FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)
+
+    def getlatestapprovedduedate(self, extension, ministryrequestid, approvedextension):
         if approvedextension:
             return approvedextension['extendedduedate']
         # if no approved extension in FOIRequestExtension table and Prev extension status was Approved then get the original DueDate from FOIMinisrtRequests table   
@@ -97,6 +122,11 @@ class extensionservice:
         #if current and prev status is Pending or Denied
         else:
             return None
+    
+    def getlatestapprovedrequest(self, extension, extensionschema, extensionid, ministryrequestid, ministryversion):
+        # if prev status is Approved and current status is Pending or Denied then get the latest Approved extendedduedate from FOIRequestExtensions Table
+        if extension["extensionstatusid"] == 2 and extensionschema["extensionstatusid"] != extension["extensionstatusid"]:
+            return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)        
 
     def saveextensiondocumentversion(self, ministryrequestid, ministryversion, extensionid, documents, extension, userid):
         extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, extension, userid)      
