@@ -1,0 +1,23 @@
+    
+// .ministries-canvassed-div{
+// }
+
+.ministries-canvassed{
+
+    display: flex;
+    /* text-align: center; */
+    justify-content: center;
+
+    table{
+        min-width: 60%;
+    }
+    
+    td {
+        width: auto;
+    }
+    
+    td.row-width {
+        width: 0%;
+        white-space: nowrap;
+    }
+}

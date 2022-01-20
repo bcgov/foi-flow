@@ -14,9 +14,10 @@ import {
   setFOIMinistryRequestList,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
-import { catchError, fnDone, setRedirectUrl } from './foiServicesUtil';
+import { catchError, fnDone, setRedirectUrl,test1 } from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
+import MinistriesCanvassed from "../../../components/FOI/customComponents/MinistriesCanvassed/MinistriesCanvassed";
 
 export const fetchFOIRequestList = () => {
   return (dispatch) => {
@@ -275,7 +276,8 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId) => {
 };
 
 // TO DO: Need Refinement once the request state is removed from the page url of a request.
-export const fetchFOIRawRequestDetailsForNotification = (requestId, notification) => {
+export const fetchFOIRawRequestDetailsForNotification = (requestId, notification, ...rest) => {
+  const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_RAW_REQUEST_API,
     "<requestid>",
@@ -286,7 +288,11 @@ export const fetchFOIRawRequestDetailsForNotification = (requestId, notification
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          setRedirectUrl(foiRequest, notification);
+          dispatch(setFOIRequestDetail(foiRequest));
+          done(null, res.data);
+          //test1();
+          // <MinistriesCanvassed  openModal={true} ></MinistriesCanvassed>
+          //setRedirectUrl(foiRequest, notification);
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching raw request details for request# ${requestId}`);

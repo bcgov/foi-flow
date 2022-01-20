@@ -9,6 +9,7 @@ import {
 
 import { fetchFOIRequestAttachmentsList } from "./foiAttachmentServices";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import MinistriesCanvassed from "../../../components/FOI/customComponents/MinistriesCanvassed/MinistriesCanvassed";
 
 export const catchError = (error, dispatch) => {
   console.log(error);
@@ -56,4 +57,10 @@ export const setRedirectUrl = (foiRequest,notification,isMinistry) =>{
       window.location.href=url;
     }
   })
+}
+
+export const test1 = () =>{
+    return(
+      <MinistriesCanvassed  openModal={true} ></MinistriesCanvassed>
+    );
 }

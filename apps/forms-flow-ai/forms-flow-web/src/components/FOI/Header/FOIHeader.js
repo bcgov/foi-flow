@@ -12,6 +12,7 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
+import MinistriesCanvassed from "../customComponents/MinistriesCanvassed/MinistriesCanvassed";
 
 const FOIHeader = React.memo(() => { 
 
@@ -43,8 +44,6 @@ useEffect(() => {
       dispatch(fetchFOINotifications());
   }, 900000);
 },[dispatch]);
-
-
 
 const triggerPopup = () => {
   return(
@@ -97,7 +96,7 @@ const triggerPopup = () => {
                         contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup notifications={foiNotifications} ></NotificationPopup>
+                        <NotificationPopup notifications={foiNotifications}  setOpen={setOpen}></NotificationPopup>
                         </Popup>
                       </div>
                       </li>
