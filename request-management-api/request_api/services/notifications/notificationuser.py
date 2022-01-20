@@ -23,7 +23,7 @@ class notificationuser:
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
         for user in _users:
-            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged Comment" not in notificationtype and self.__istaggeduser(user, foicomment) == False) or "Tagged Comment" in notificationtype):
+            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged Comment" not in notificationtype and self.__istaggeduser(user, foicomment, notificationtype) == False) or "Tagged Comment" in notificationtype):
                 notificationusers.append(user)
         return notificationusers     
     
@@ -36,12 +36,13 @@ class notificationuser:
                     return True
         return False     
      
-    def __istaggeduser(self, notificationuser, foicomment):
-        _users = self.__gettaggedusers(foicomment)
-        if _users is not None:
-            for user in _users:
-                if notificationuser["userid"] == user["userid"]:
-                    return True
+    def __istaggeduser(self, notificationuser, foicomment, notificationtype):
+        if "Comment" in notificationtype:
+            _users = self.__gettaggedusers(foicomment)
+            if _users is not None:
+                for user in _users:
+                    if notificationuser["userid"] == user["userid"]:
+                        return True
         return False
         
     def __getwatchers(self, foirequest, requesttype):
@@ -100,6 +101,6 @@ class notificationuser:
     def __preparetaggeduser(self, data):
         taggedusers = [] 
         for entry in data:
-            taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypeid("tagged user")})
+            taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypeid("comment tagged user")})
         return taggedusers
         
