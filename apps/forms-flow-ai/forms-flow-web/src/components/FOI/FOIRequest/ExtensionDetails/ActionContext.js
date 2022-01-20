@@ -17,7 +17,7 @@ export const ActionProvider = ({ children, requestDetails }) => {
   const dispatch = useDispatch();
   const { requestId, ministryId } = useParams();
 
-  const [modalOpen, setModalOpen] = useState();
+  const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true)
   const [extensionReasons, setExtensionReasons] = useState()  
 
@@ -65,6 +65,7 @@ export const ActionProvider = ({ children, requestDetails }) => {
         data,
         extensionId,
         ministryId,
+        requestId,
         callback,
         errorCallback,
         dispatch,

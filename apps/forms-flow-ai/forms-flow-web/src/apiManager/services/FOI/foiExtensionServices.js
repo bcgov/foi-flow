@@ -28,10 +28,7 @@ export const fetchExtensionReasons = async ({
     });
 };
 
-
-
 export const fetchExtension = ({extensionId, callback, dispatch}) => {
-  console.log(extensionId);
   const apiUrl = replaceUrl(
     API.FOI_GET_EXTENSION,
     "<extensionId>",
@@ -109,19 +106,16 @@ export const updateExtensionRequest = ({
   data,
   extensionId,
   ministryId,
+  requestId,
   callback,
   errorCallback,
   dispatch,
 }) => {
-  if (!ministryId) {
-    dispatch(serviceActionError("No request id"));
-  }
 
-  const apiUrl = replaceUrl(
-    replaceUrl(API.FOI_POST_UPDATE_EXTENSION, "<extensionid>", extensionId),
-    "<ministryrequestid>",
-    ministryId
-  );
+  let apiUrl = API.FOI_POST_UPDATE_EXTENSION;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+  apiUrl = replaceUrl(apiUrl, "<extensionid>", extensionId);
 
   httpPOSTRequest(apiUrl, data)
     .then((res) => {

@@ -10,7 +10,6 @@ import {
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import ExtensionsTable from "./ExtensionsTable";
 import "./extensionscss.scss"
-import { extensionStatusId } from "../../../../constants/FOI/enum"
 import clsx from "clsx"
 import { makeStyles } from "@material-ui/core/styles";
 

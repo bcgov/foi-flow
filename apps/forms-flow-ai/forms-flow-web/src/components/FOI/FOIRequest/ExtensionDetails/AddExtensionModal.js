@@ -93,15 +93,20 @@ const AddExtensionModal = () => {
     saveExtensionRequest,
     extensionId,
     errorToast,
+    extensions
   } = useContext(ActionContext);
 
-  const filteredExtensionReasons = filterExtensionReason(extensionReasons, extensionId);
+  const filteredExtensionReasons = filterExtensionReason(
+    extensionReasons,
+    extensions,
+    selectedExtension
+  );
 
   const [reason, setReason] = useState("");
   const publicBodySelected = reason?.extensiontype === "Public Body";
 
   const [numberDays, setNumberDays] = useState("");
-  const maxExtendDays = reason?.defaultextendedduedays || 100;
+  const maxExtendDays = reason?.defaultextendedduedays || 999;
 
   const [extendedDate, setExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
@@ -116,7 +121,7 @@ const AddExtensionModal = () => {
   const updateFilesCb = (_files) => {
     setNewFiles(_files);
   };
-
+  
   const [saveLoading, setSaveLoading] = useState(false);
 
   useEffect(() => {
@@ -132,6 +137,7 @@ const AddExtensionModal = () => {
       setApprovedNumberDays(
         selectedExtension.approvednoofdays || selectedExtension.extendedduedays
       );
+      setNewFiles(selectedExtension.documents || []);
     }
     setLoading(false);
   }, [selectedExtension, extensionReasons]);
@@ -327,7 +333,7 @@ const AddExtensionModal = () => {
             <Grid
               container
               direction="row"
-              justify="flex-start"
+              justifyContent="flex-start"
               alignItems="flex-start"
               className={classes.gridContainer}
               spacing={2}
@@ -491,6 +497,7 @@ const AddExtensionModal = () => {
                       maxFileSize={MaxFileSizeInMB.extensionAttachment}
                       updateFilesCb={updateFilesCb}
                       customFormat={costumFormat}
+                      existingDocuments={existingFiles}
                     />
                   </Grid>
                 </ConditionalComponent>
@@ -501,7 +508,7 @@ const AddExtensionModal = () => {
             <Grid
               container
               direction="row"
-              justify="center"
+              justifyContent="center"
               alignItems="center"
               className={classes.gridContainer}
               spacing={2}
@@ -517,7 +524,7 @@ const AddExtensionModal = () => {
           <Grid
             container
             direction="row"
-            justify="flex-start"
+            justifyContent="flex-start"
             alignItems="flex-start"
             className={classes.gridContainer}
             spacing={2}

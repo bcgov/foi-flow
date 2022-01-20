@@ -1,12 +1,12 @@
 
-import { createMuiTheme , darken, lighten } from '@material-ui/core/styles';
+import { createTheme , darken, lighten } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/styles';
 
 function getThemePaletteMode(palette) {
   return palette.type || palette.mode;
 }
 
-const defaultTheme = createMuiTheme();
+const defaultTheme = createTheme();
 const useStyles = makeStyles(
   (theme) => {    
     const getBackgroundColor = (color) =>
