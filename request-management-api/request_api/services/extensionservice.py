@@ -54,20 +54,36 @@ class extensionservice:
     def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid):
         documents = []    
         ministryversion = self.__getversionforrequest(ministryrequestid)
-        extension = FOIRequestExtension.getextension(extensionid)        
+        extension = FOIRequestExtension.getextension(extensionid)
+        updatedduedate = self.getlatestapprovedduedate(extension, extensionschema, extensionid, ministryrequestid, ministryversion)
+        print("updatedduedate", updatedduedate)
         copyextension = self.__copyextensionproperties(extension, extensionschema, extension['version'])       
         if 'documents' in copyextension and copyextension['extensionstatusid'] != 1:
             documentids = self.__savedocumentversion(ministryrequestid, ministryversion, copyextension['documents'], userid)
             for documentid in documentids:
                 documents.append(FOIMinistryRequestDocument().getdocument(documentid))
-        extensioresult = self.saveextensiondocumentversion(ministryrequestid, ministryversion, extensionid, documents, copyextension, userid)  
-        if extensioresult.success == True and 'extensionstatusid' in copyextension and copyextension['extensionstatusid'] == 2:            
+        extensioresult = self.saveextensiondocumentversion(ministryrequestid, ministryversion, extensionid, documents, copyextension, userid)        
+        if extensioresult.success == True and updatedduedate:            
             # requestservice().updateministryrequestduedate(ministryrequestid, copyextension['extendedduedate'], userid )            
             ministryrequestschema = {
-                "duedate": copyextension['extendedduedate']
+                "duedate": updatedduedate
             }
-            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+            requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
         return extensioresult
+
+    def getlatestapprovedduedate(self, extension, extensionschema, extensionid, ministryrequestid, ministryversion):
+        approvedextension = None
+        if extension["extensionstatusid"] == 2 and extensionschema["extensionstatusid"] != extension["extensionstatusid"]:
+            approvedextension = FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)
+        extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
+        if approvedextension:
+            return approvedextension['extendedduedate']
+        elif ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ('extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'):
+            return extensionschema['extendedduedate']
+        elif approvedextension is None and extension["extensionstatusid"] == 2:
+            return FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
+        else:
+            return None
 
     def saveextensiondocumentversion(self, ministryrequestid, ministryversion, extensionid, documents, extension, userid):
         extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, extension, userid)      

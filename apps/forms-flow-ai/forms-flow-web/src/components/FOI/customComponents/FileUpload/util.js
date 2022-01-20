@@ -36,8 +36,8 @@
     return _file.name.endsWith(".msg") || _file.name.endsWith(".eml");
   }
 
-  export const allowedFileType = (_file, mimeTypes, multipleFiles) => {
-    return (mimeTypes.includes(_file.type) || (multipleFiles && isEmailFileType(_file)));
+  export const allowedFileType = (_file, mimeTypes) => {
+    return (mimeTypes.includes(_file.type) || ([".msg", ".eml"].some(mimetype => (mimeTypes.includes(mimetype))) && isEmailFileType(_file)));
   }
   
   export const allowedFileSize = (_totalFileSizeInMB, multipleFiles, totalFileSize) => {
