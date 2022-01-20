@@ -56,6 +56,8 @@ export const ActionProvider = ({ children, requestDetails }) => {
         },
         dispatch: dispatch,
       });
+    } else {
+        setSelectedExtension(null);
     }
   }, [modalOpen, extensionId]);
 
