@@ -189,6 +189,10 @@ const ActionsPopover = () => {
                         );
                         setSelectedExtension(extension);
                       }}
+                      disabled={
+                        index > 0 &&
+                        extension.extensionstatus !== extensionStatusId.pending
+                      }
                     >
                       <MoreHorizIcon />
                     </IconButton>
