@@ -3,6 +3,7 @@ from typing import Counter
 
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from dateutil.parser import parse
 import maya
 
@@ -60,6 +61,8 @@ class rawrequestservicegetter:
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             if request['status'] == 'Closed':
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
+            if request['status'] == 'Archived':
+                request['requestrawdata']['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(requestid)    
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
@@ -76,6 +79,8 @@ class rawrequestservicegetter:
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
+            if request['status'] == 'Archived':
+                request['requestrawdata']['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(requestid)
             return request['requestrawdata']
         else:
             return None
