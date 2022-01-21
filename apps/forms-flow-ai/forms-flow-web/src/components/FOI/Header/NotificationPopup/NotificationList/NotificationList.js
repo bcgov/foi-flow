@@ -83,7 +83,7 @@ const NotificationList = ({notification}) => {
     let idNumber = notification.idnumber;
     idNumber+='';
     let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
-    if(requestIdStart === 'U'){
+    if(requestIdStart === 'U'  && notification.notification.toLowerCase === "moved to open state"){
       setMinistryCanvassedModal(true);
       setModal(true);
     }
