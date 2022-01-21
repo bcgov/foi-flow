@@ -17,49 +17,45 @@ import {
 import MinistriesCanvassed from '../../../customComponents/MinistriesCanvassed/MinistriesCanvassed';
 
 
-const NotificationList = ({notification, setOpen}) => {
+const NotificationList = ({notification}) => {
 
   const dispatch = useDispatch();
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
   const userDetail = useSelector(state=> state.user.userDetail);
-  let isMinistry = false;
   const [openModal, setModal] = useState(false);
   const [ministryCanvassedModal, setMinistryCanvassedModal] = useState(false);
-  //let ministriesCanvassed = true;
   const [selectedMinistries,setSelectedMinistries]=useState([]);
-  
+  let isMinistry = false;
+
   if (Object.entries(userDetail).length !== 0) {
     const userGroups = userDetail && userDetail.groups?.map(group => group.slice(1));
     isMinistry = isMinistryLogin(userGroups);
   }
 
-    useEffect(() => {     
-      if(openModal){
-      dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification, (err, res) => {
-        if (!err && res) {
-          if(res && res.selectedMinistries?.length > 0){
-            setSelectedMinistries(res.selectedMinistries);
-            setModal(true);
-            //setOpen(false);
-          }
+  useEffect(() => {     
+    if(openModal){
+    dispatch(fetchFOIRawRequestDetailsForNotification(notification, true, (err, res) => {
+      if (!err && res) {
+        if(res?.selectedMinistries?.length > 0){
+          setSelectedMinistries(res.openedMinistries);
+          setModal(true);
         }
-      }));
-    }
-      // return () => { setModal(true) };
-    },[ministryCanvassedModal]);
+      }
+    }));
+  }
+  },[ministryCanvassedModal]);
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const {ministryId} = useParams();
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
 
-
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
     return user && user.fullname ? user.fullname : userId;
-
   }
+
   const getfullName = (userId) => {
       if (fullnameList && fullnameList !== null) {
         return finduserbyuserid(userId)
@@ -68,7 +64,6 @@ const NotificationList = ({notification, setOpen}) => {
           addToFullnameList(iaoassignedToList, "iao");
           setFullnameList(getFullnameList());
         }
-
         if (ministryAssignedToList.length > 0) {
           addToFullnameList(iaoassignedToList, bcgovcode);
           setFullnameList(getFullnameList());
@@ -88,57 +83,20 @@ const NotificationList = ({notification, setOpen}) => {
     let idNumber = notification.idnumber;
     idNumber+='';
     let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
-    if(requestIdStart === 'U' )
-    //&& notification.notification.toLowerCase === "moved to open state")
-    {
+    if(requestIdStart === 'U'){
       setMinistryCanvassedModal(true);
       setModal(true);
     }
-  //   //  ministriesCanvassed = true;
-    // setModal2Visible(true)
-    // setModal(true);
-    // dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification, ministriesCanvassed));
-    // setTimeout(() => {
-    //   if(requestDetails && requestDetails.selectedMinistries?.length > 0){
-    //     setSelectedMinistries(requestDetails.selectedMinistries);
-    //     setModal2Visible(true);
-    //     setModal(true);
-    //   }
-    // }
-    // , 5000);
-    // dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification, (err, res) => {
-    //   if (!err && res) {
-    //     if(requestDetails && requestDetails.selectedMinistries?.length > 0){
-    //       setSelectedMinistries(requestDetails.selectedMinistries);
-    //       setModal(true);
-    //     }
-    //   }
-    // }));
+    else{
+      if(notification.requesttype === 'rawrequest'){
+        dispatch(fetchFOIRawRequestDetailsForNotification(notification, false))
+      }
+      else if(notification.requesttype === 'ministryrequest'){
+        dispatch(fetchFOIRequestDetailsForNotification(notification, isMinistry, false));
+      }
+    }
   }
 
-// const getStatusAndRedirect = () =>{
-
-  //   let idNumber = notification.idnumber;
-  //   idNumber+='';
-  //   let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
-  //   ministriesCanvassed = true;
-  //   dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification, 
-  //     ministriesCanvassed, (err, res) => {
-  //     if(requestDetails && requestDetails.selectedMinistries?.length > 0){
-  //       setSelectedMinistries(requestDetails.selectedMinistries);
-  //       setModal2Visible(true);
-  //     }
-  //   }));
-
-  //   //  if(requestIdStart === 'U' && notification.notification.toLowerCase === "moved to open state")
-  //   //  ministriesCanvassed = true;
-  //   // else if(notification.requesttype === 'rawrequest'){
-  //   //   dispatch(fetchFOIRawRequestDetailsForNotification(notification.requestid, notification, ministriesCanvassed))
-  //   // }
-  //   // else if(notification.requesttype === 'ministryrequest'){
-  //   //   dispatch(fetchFOIRequestDetailsForNotification(notification.foirequestid,notification.requestid, notification, isMinistry, ministriesCanvassed));
-  //   // }
-  // }
 
   return(
     <ListGroup.Item>

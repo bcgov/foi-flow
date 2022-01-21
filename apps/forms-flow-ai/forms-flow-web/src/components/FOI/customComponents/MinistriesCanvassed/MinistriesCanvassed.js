@@ -3,13 +3,11 @@ import './ministriescanvassed.scss';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Table } from 'react-bootstrap';
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { makeStyles } from '@material-ui/styles';
-
 
 const useStyles = makeStyles({
   root: {
@@ -26,22 +24,23 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
     setModal(false);
   };
 
+  const redirectUrl =(ministry) => {
+    let url=`/foi/foirequests/${ministry.requestid}/ministryrequest/${ministry.ministryrequestid}/Open`;
+    window.location.href=url;
+  }
+
   const tableData = selectedMinistries?.map(function(ministry,index) {
     return (
       <tr key ={index}>
-        <td >{ministry.name}</td>
-        <td >Request Id here</td>
+        <td className='ministry-name'>{ministry.name}</td>
+       <td className='ministry-requestid' onClick={() => redirectUrl(ministry)} >{ministry.filenumber}</td>
       </tr>
     )
    });
 
 
-
-
-
  return( 
     <div className="dialog-style">     
-    {/* {requestDetails &&    */}
     <Dialog className={classes.root} open={openModal} id="dialog-style"
       onClose={handleClose}
       aria-labelledby="state-change-dialog-title"
@@ -57,20 +56,17 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
           </IconButton>
       </DialogTitle>
       <DialogContent>
-        {/* <DialogContentText id="state-change-description" component={'span'}> */}
-        <div className='ministries-canvassed'>
-        <Table bordered className='w-auto '>
-        <tbody>
-          {tableData}
-        </tbody>
-        </Table>
-        </div>
-        {/* </DialogContentText> */}
+      <div className='ministries-canvassed'>
+      <Table bordered className='w-auto'>
+      <tbody>
+        {tableData}
+      </tbody>
+      </Table>
+      </div>
       </DialogContent>
       <DialogActions>
       </DialogActions>
     </Dialog>
-  {/* } */}
   </div>
   )
 }

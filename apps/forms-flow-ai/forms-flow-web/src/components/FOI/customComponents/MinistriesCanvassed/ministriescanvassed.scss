@@ -5,7 +5,6 @@
 .ministries-canvassed{
 
     display: flex;
-    /* text-align: center; */
     justify-content: center;
 
     table{
@@ -20,4 +19,13 @@
         width: 0%;
         white-space: nowrap;
     }
+}
+
+.ministry-name{
+    font-weight: bold;
+}
+
+.ministry-requestid{
+    cursor: pointer;
+    text-decoration: underline;
 }

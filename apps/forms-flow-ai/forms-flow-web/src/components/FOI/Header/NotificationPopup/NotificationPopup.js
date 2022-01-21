@@ -7,7 +7,7 @@ import {
 } from "../../../../apiManager/services/FOI/foiNotificationServices";
 import {useDispatch } from "react-redux";
 
-const NotificationPopup = ({notifications, setOpen}) => {
+const NotificationPopup = ({notifications}) => {
 
   const [myRequestTitle, setMyRequestTitle] = useState();
   const [watchingRequestTitle, setWatchingRequestTitle] = useState();
@@ -25,13 +25,13 @@ const NotificationPopup = ({notifications, setOpen}) => {
 
   const assigmentNotifications = notifications?.map((notification,index) =>
     {return notification.notificationusertype === 'Assignee' &&
-      <NotificationList key= {index} notification={notification} setOpen={setOpen}></NotificationList>
+      <NotificationList key= {index} notification={notification}></NotificationList>
     }
   )
 
   const watchNotifications = notifications?.map((notification,index) =>
     {return notification.notificationusertype === 'Watcher' &&
-      <NotificationList key= {index} notification={notification} setOpen={setOpen}></NotificationList>
+      <NotificationList key= {index} notification={notification}></NotificationList>
     }
   )
 
