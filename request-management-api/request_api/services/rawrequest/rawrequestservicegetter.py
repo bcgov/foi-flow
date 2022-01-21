@@ -47,6 +47,8 @@ class rawrequestservicegetter:
 
     def getrawrequestforid(self, requestid):
         request = FOIRawRequest.get_request(requestid)
+        if request['status'] == 'Archived':
+            request['requestrawdata']['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(requestid)
         if request != {} and request['version'] == 1 and  request['sourceofsubmission'] != "intake":
             requestrawdata = request['requestrawdata']
             requesttype = requestrawdata['requestType']['requestType']
@@ -61,8 +63,6 @@ class rawrequestservicegetter:
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             if request['status'] == 'Closed':
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
-            if request['status'] == 'Archived':
-                request['requestrawdata']['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(requestid)    
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
@@ -79,11 +79,10 @@ class rawrequestservicegetter:
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
-            if request['status'] == 'Archived':
-                request['requestrawdata']['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(requestid)
             return request['requestrawdata']
         else:
             return None
+        
         
     def __preparebaserequestinfo(self, requestid, request, requesttype, requestrawdata):
         contactinfo = requestrawdata.get('contactInfo')
