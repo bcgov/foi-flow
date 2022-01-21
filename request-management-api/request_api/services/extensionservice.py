@@ -40,13 +40,12 @@ class extensionservice:
         documents = self.__getextensiondocumentsinfo(extensiondocuments)
         extensionreason = extensionreasonservice().getextensionreasonbyid(requestextension['extensionreasonid'])
         requestextensionwithdocuments = self.__createextensionobject(requestextension, documents, extensionreason)
-        print("requestextensionwithdocuments --------------", requestextensionwithdocuments)
         return requestextensionwithdocuments
 
     def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
         version = self.__getversionforrequest(ministryrequestid)
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
-        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body':            
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ('extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'):            
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
@@ -57,11 +56,12 @@ class extensionservice:
                 extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         else:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
+        if 'documents' in extensionschema and extensionschema['extensionstatusid'] != 1:
+            self.saveextensiondocument(extensionschema, ministryrequestid, version, userid, extnsionresult.identifier)
         return extnsionresult
 
     def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid):
-       
-        documents = []    
+ 
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
         # gets the latest approved request
@@ -77,20 +77,25 @@ class extensionservice:
         # if current state is approved then gets the current extended due date
         extendedduedate = self.getextendedduedate(copyextension)
        
-        # save documents if it is part of current extension
+        extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, extension, userid)
+        # save documents if it is part of current extension (update to the ministrydocuments table and extensiondocumentmapping table)
         if 'documents' in copyextension and copyextension['extensionstatusid'] != 1:
-            documentids = self.__savedocumentversion(ministryrequestid, ministryversion, copyextension['documents'], userid)
-            for documentid in documentids:
-                documents.append(FOIMinistryRequestDocument().getdocument(documentid))        
-        extensioresult = self.saveextensiondocumentversion(ministryrequestid, ministryversion, extensionid, documents, copyextension, userid)
+            self.saveextensiondocument(copyextension, ministryrequestid, ministryversion, userid, extensionid)
         # updates the duedate to extendedduedate or updatedduedate
         # new ministry, extension, extensionmapping and document version gets created
-        if extensioresult.success == True:
+        if extensionresult.success == True:
             ministryrequestschema = {
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
-        return extensioresult
+        return extensionresult
+
+    def saveextensiondocument(self, copyextension, ministryrequestid, ministryversion, userid, extensionid):
+        documents = []        
+        documentids = self.__savedocumentversion(ministryrequestid, ministryversion, copyextension['documents'], userid)
+        for documentid in documentids:
+            documents.append(FOIMinistryRequestDocument().getdocument(documentid))      
+        self.saveextensiondocumentversion(extensionid, documents, userid)
 
     def __isdeletedocument(self, extensionschema, extension, extensionid):
         isdeletedocument = False
@@ -117,7 +122,7 @@ class extensionservice:
         if approvedextension:
             return approvedextension['extendedduedate']
         # if no approved extension in FOIRequestExtension table and Prev extension status was Approved then get the original DueDate from FOIMinisrtRequests table   
-        elif approvedextension is None and extension["extensionstatusid"] == 2:
+        elif extension["extensionstatusid"] == 2 and not approvedextension:
             return FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
         #if current and prev status is Pending or Denied
         else:
@@ -128,13 +133,14 @@ class extensionservice:
         if extension["extensionstatusid"] == 2 and extensionschema["extensionstatusid"] != extension["extensionstatusid"]:
             return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)        
 
-    def saveextensiondocumentversion(self, ministryrequestid, ministryversion, extensionid, documents, extension, userid):
-        extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, extension, userid)      
+    def saveextensiondocumentversion(self, extensionid, documents, userid):
+        extensionversion = self.__getextensionversion(extensionid)
         if documents:
-            FOIRequestExtensionDocumentMapping.saveextensiondocument(extensionid, documents, extension['version'], userid)
-        return extensionresult
+           return FOIRequestExtensionDocumentMapping.saveextensiondocument(extensionid, documents, extensionversion, userid)
+        
 
-    
+    def __getextensionversion(self, extensionid):
+        return FOIRequestExtension().getversionforextension(extensionid)
 
     def __createextensionobject(self, requestextension, documents, extensionreason):
         
