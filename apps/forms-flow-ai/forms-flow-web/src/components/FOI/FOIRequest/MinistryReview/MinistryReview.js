@@ -381,7 +381,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const requestNumber = requestDetails && requestDetails.idNumber; 
   
   return (
-
+    !isLoading && requestDetails && Object.keys(requestDetails).length !== 0 ?
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -527,7 +527,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         </div>
       </div>
     </div>
-
+  : <Loading/>
   );
 
 })

@@ -450,7 +450,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const stateTransition = requestDetails?.stateTransition;
 
   return (
-
+  !isLoading && requestDetails && Object.keys(requestDetails).length !== 0 ?
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -606,7 +606,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleOpenRequest={handleOpenRequest} 
                         currentSelectedStatus={_currentrequestStatus} 
                         hasStatusRequestSaved={hasStatusRequestSaved} 
-                        disableInput={disableInput} 
+                        disableInput={disableInput}
                       />
                     </>
                   </ConditionalComponent>
@@ -667,7 +667,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
         </div>
       </div>
     </div>
-
+ : <Loading/>
   );
 
 
