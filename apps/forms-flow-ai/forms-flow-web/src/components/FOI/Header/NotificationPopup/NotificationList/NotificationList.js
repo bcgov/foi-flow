@@ -15,7 +15,7 @@ import {
   fetchFOIRawRequestDetailsForNotification 
 } from "../../../../../apiManager/services/FOI/foiRequestServices";
 import MinistriesCanvassed from '../../../customComponents/MinistriesCanvassed/MinistriesCanvassed';
-
+import { StateEnum } from '../../../../../constants/FOI/statusEnum';
 
 const NotificationList = ({notification}) => {
 
@@ -28,6 +28,7 @@ const NotificationList = ({notification}) => {
   const [ministryCanvassedModal, setMinistryCanvassedModal] = useState(false);
   const [selectedMinistries,setSelectedMinistries]=useState([]);
   let isMinistry = false;
+  let requestState = "";
 
   if (Object.entries(userDetail).length !== 0) {
     const userGroups = userDetail && userDetail.groups?.map(group => group.slice(1));
@@ -35,15 +36,23 @@ const NotificationList = ({notification}) => {
   }
 
   useEffect(() => {     
-    if(openModal){
-    dispatch(fetchFOIRawRequestDetailsForNotification(notification, true, (err, res) => {
-      if (!err && res) {
-        if(res?.selectedMinistries?.length > 0){
-          setSelectedMinistries(res.openedMinistries);
-          setModal(true);
-        }
+    console.log("Inside Useeffect!!");
+    if(ministryCanvassedModal){
+      console.log("Inside ministryCanvassedModal!!");
+      if(notification.requesttype === 'rawrequest'){
+        dispatch(fetchFOIRawRequestDetailsForNotification(notification, (err, res) => {
+          if (!err && res) {
+            getStatusAndRedirect(res);
+          }
+        }));
       }
-    }));
+      else if(notification.requesttype === 'ministryrequest'){
+        dispatch(fetchFOIRequestDetailsForNotification(notification, isMinistry, (err,res) => {
+        if (!err && res) {
+          getStatusAndRedirect(res);
+        }
+        }));
+      }
   }
   },[ministryCanvassedModal]);
 
@@ -51,26 +60,58 @@ const NotificationList = ({notification}) => {
   const {ministryId} = useParams();
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
 
+  const getStatusAndRedirect = (requestDetails) => {
+    Object.entries(StateEnum).forEach(([key, value]) =>{
+      if(key && value.id === requestDetails.requeststatusid){
+        requestState = value.name;
+      }
+    })
+    
+    if(requestState === 'Archived' && requestDetails?.selectedMinistries?.length > 0){
+      setSelectedMinistries(requestDetails.openedMinistries);
+      setModal(true);
+      setMinistryCanvassedModal(false);
+    }
+    else{
+      setRedirectUrl(requestState);
+      setMinistryCanvassedModal(false);
+    }
+  }
+
+  const setRedirectUrl = (requestState) =>{
+    let url = "";
+    if(notification.requesttype === 'rawrequest'){
+      url=`/foi/reviewrequest/${notification.requestid}/${requestState}`;
+    }
+    else if(notification.requesttype === 'ministryrequest'){
+      if(isMinistry)
+        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+      else
+        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+    }
+    window.location.href=url;
+  }
+
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
     return user && user.fullname ? user.fullname : userId;
   }
 
   const getfullName = (userId) => {
-      if (fullnameList && fullnameList !== null) {
-        return finduserbyuserid(userId)
-      } else {
-        if (iaoassignedToList.length > 0) {
-          addToFullnameList(iaoassignedToList, "iao");
-          setFullnameList(getFullnameList());
-        }
-        if (ministryAssignedToList.length > 0) {
-          addToFullnameList(iaoassignedToList, bcgovcode);
-          setFullnameList(getFullnameList());
-        }
-        if (fullnameList && fullnameList !== null)
-          return finduserbyuserid(userId)
+    if (fullnameList && fullnameList !== null) {
+      return finduserbyuserid(userId)
+    } else {
+      if (iaoassignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, "iao");
+        setFullnameList(getFullnameList());
       }
+      if (ministryAssignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, bcgovcode);
+        setFullnameList(getFullnameList());
+      }
+      if (fullnameList && fullnameList !== null)
+        return finduserbyuserid(userId)
+    }
   }
 
   const dismissNotification = () => {
@@ -79,31 +120,13 @@ const NotificationList = ({notification}) => {
     dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null));
   }
 
-  const getStatusAndRedirect = () =>{
-    let idNumber = notification.idnumber;
-    idNumber+='';
-    let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
-    if(requestIdStart === 'U'  && notification.notification.toLowerCase === "moved to open state"){
-      setMinistryCanvassedModal(true);
-      setModal(true);
-    }
-    else{
-      if(notification.requesttype === 'rawrequest'){
-        dispatch(fetchFOIRawRequestDetailsForNotification(notification, false))
-      }
-      else if(notification.requesttype === 'ministryrequest'){
-        dispatch(fetchFOIRequestDetailsForNotification(notification, isMinistry, false));
-      }
-    }
-  }
-
 
   return(
     <ListGroup.Item>
       <Row>
         <Col>
           <h6 className="notification-heading">
-            <div className="redirect-url" onClick={() => getStatusAndRedirect()}>{notification.idnumber}</div></h6>
+            <div className="redirect-url" onClick={() => setMinistryCanvassedModal(true)}>{notification.idnumber}</div></h6>
             {openModal && 
             <MinistriesCanvassed  openModal={openModal} selectedMinistries={selectedMinistries} setModal={setModal}/>
             }
