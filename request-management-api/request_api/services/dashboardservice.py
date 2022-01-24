@@ -2,12 +2,13 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestWatchers import FOIRequestWatcher
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
-from dateutil import parser
-from dateutil import tz
+from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
 import pytz
 import maya
+
+from flask import jsonify
 
 class dashboardservice:
     """ FOI dashboard management service
@@ -103,3 +104,82 @@ class dashboardservice:
             'version':version,
             'watchers':watchers
         }
+
+    def getrequestqueuepagination(self, groups=None, page=1, size=10, sort=None, desc=False, filterfields=[], keyword=None):
+        requests = FOIRawRequest.getrequestspagination(groups, page, size, sort, desc, filterfields, keyword)
+        
+        requestqueue = []
+        for request in requests.items:
+            firstname , lastname, requesttype = '','',''
+            _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+
+            if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
+                firstname = request.firstName
+                lastname =  request.lastName
+                requesttype = request.requestType
+                _receiveddate = parser.parse(request.receivedDateUF)
+            elif (request.sourceofsubmission!= "intake" and request.version == 1):               
+                firstname = request.contactFirstName
+                lastname = request.contactLastName
+                requesttype = request.requestTypeWebForm
+
+
+            if(request.ministryrequestid == None):
+                rawrequestwatchers = FOIRawRequestWatcher.getwatchers(request.id)
+                unopenrequest = self.__preparefoirequestinfo(request.id, firstname, lastname, requesttype,
+                                                            request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                            request.assignedTo, 'U-00' + request.idNumber, request.version, rawrequestwatchers)
+
+                requestqueue.append(unopenrequest)
+            else:
+                watchers = FOIRequestWatcher.getNonMinistrywatchers(request.id)
+                _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
+                                                            request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                            request.assignedGroup, request.idNumber, request.version, watchers)
+                _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                requestqueue.append(_openrequest)    
+
+        meta = {
+            'page': requests.page,
+            'pages': requests.pages,
+            'total': requests.total,
+            'prev_num': requests.prev_num,
+            'next_num': requests.next_num,
+            'has_next': requests.has_next,
+            'has_prev': requests.has_prev,
+        }
+
+        return jsonify({'data': requestqueue, 'meta': meta})
+
+    def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sort=None, desc=False, filterfields=[], keyword=None):
+        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sort, desc, filterfields, keyword)
+
+        requestqueue = []
+        for request in requests.items:
+            watchers = FOIRequestWatcher.getMinistrywatchers(request.id)
+            _openrequest = self.__preparebaserequestinfo(request.id, request.requestType, request.currentState, 
+                                                         request.receivedDate, request.receivedDateUF, request.assignedGroup, 
+                                                         request.assignedTo, request.idNumber, request.version, watchers)
+            _openrequest.update({'assignedministrygroup': request.assignedministrygroup})
+            _openrequest.update({'assignedministryperson': request.assignedministryperson})
+            _openrequest.update({'cfrstatus':'Select Division'})
+            _openrequest.update({'cfrduedate': request.cfrDueDate})
+            _openrequest.update({'duedate': request.dueDate})
+            _openrequest.update({'ministryrequestid': request.ministryrequestid})
+            _openrequest.update({'applicantcategory': request.applicantcategory})
+            requestqueue.append(_openrequest)
+
+        meta = {
+            'page': requests.page,
+            'pages': requests.pages,
+            'total': requests.total,
+            'prev_num': requests.prev_num,
+            'next_num': requests.next_num,
+            'has_next': requests.has_next,
+            'has_prev': requests.has_prev,
+        }
+
+        return jsonify({'data': requestqueue, 'meta': meta})
+
+    def getministryrequestqueuepagination(self, groups=None, page=1, size=10, sort=None, desc=False, filterfields=[], keyword=None):
+        return FOIMinistryRequest.getrequestspagination(groups, page, size, sort, desc, filterfields, keyword)
