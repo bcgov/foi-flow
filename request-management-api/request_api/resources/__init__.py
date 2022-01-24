@@ -32,6 +32,7 @@ from .request import API as REQUEST_API
 from .foirequest import API as FOIREQUEST_API
 from .foiflowmasterdata import API as FOIFLOWMASTERDATA_API
 from .dashboard import API as DASHBOARD_API
+from .dashboardpagination import API as DASHBOARDPAGINATION_API
 from .foiassignee import API as FOIASSIGNEE_API
 from .foiaudit import API as FOIAUDTI_API
 from .foiwatcher import API as FOIWATCHER_API
@@ -66,6 +67,7 @@ API.add_namespace(REQUEST_API ,path="/api")
 API.add_namespace(FOIREQUEST_API ,path="/api")
 API.add_namespace(FOIFLOWMASTERDATA_API ,path="/api")
 API.add_namespace(DASHBOARD_API,'/api')
+API.add_namespace(DASHBOARDPAGINATION_API,'/api')
 API.add_namespace(FOIASSIGNEE_API,'/api')
 API.add_namespace(FOIAUDTI_API,'/api')
 API.add_namespace(FOIWATCHER_API,'/api')

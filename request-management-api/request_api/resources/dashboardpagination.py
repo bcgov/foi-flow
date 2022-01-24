@@ -1,0 +1,53 @@
+from flask import g, request, jsonify
+import flask
+from flask_restx import Namespace, Resource
+from flask_cors import cross_origin
+
+from request_api.tracer import Tracer
+from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins,getrequiredmemberships
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup, UserGroup
+from request_api.auth import auth
+from request_api.tracer import Tracer
+from request_api.exceptions import BusinessException
+from request_api.services.dashboardservice import dashboardservice
+
+API = Namespace('FOI Flow Dashboard', description='Endpoints for Dashboard')
+TRACER = Tracer.get_instance()
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/dashboardpagination', defaults={'queuetype':None})
+@API.route('/dashboardpagination/<queuetype>')
+class DashboardPagination(Resource):
+    """ Retrives the foi request based on the queue type.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # #@auth.require
+    @cors_preflight('GET,POST,OPTIONS')
+    # @auth.ismemberofgroups(getrequiredmemberships())
+    def get(queuetype = "all"):
+        try:
+            DEFAULT_PAGE = 1
+            DEFAULT_SIZE = 10
+            DEFAULT_SORT = 'currentState'
+            DEFAULT_DESC = 0
+            DEFAULT_FILTER_FIELDS = ['idNumber', 'currentState', 'firstName', 'lastName', 'assignedTo', 'requestType']
+
+            _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
+            _size = flask.request.args.get('size', DEFAULT_SIZE, type=int)
+            _sort = flask.request.args.get('sort', DEFAULT_SORT, type=str)
+            _desc = flask.request.args.get('desc', DEFAULT_DESC, type=int)
+            _filterfields = flask.request.args.getlist('filterfields')
+            if(len(_filterfields) == 0):
+                _filterfields = DEFAULT_FILTER_FIELDS
+            _keyword = flask.request.args.get('keyword', None, type=str)
+
+            # 'Intake Team', 'Flex Team','Processing Team'
+            groups = ['Intake Team', 'Flex Team','Processing Team']
+            statuscode = 200
+            requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sort, _desc, _filterfields, _keyword)
+
+            return requests, statuscode
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
