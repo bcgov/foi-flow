@@ -1,5 +1,7 @@
 from enum import unique
 
+from sqlalchemy.sql.sqltypes import DateTime, String
+
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.expression import distinct
@@ -8,8 +10,9 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy.orm import relationship,backref
-from sqlalchemy import insert, and_, text
-from flask import jsonify
+from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc
+
+from .FOIMinistryRequests import FOIMinistryRequest
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -193,6 +196,83 @@ class FOIRawRequest(db.Model):
             requeststates.append(_requeststate[0])
         return requeststates    
     
+    @classmethod
+    def getrequestssubquery(cls, filterfields, keyword):
+        _session = db.session
+
+        #rawrequests
+        #subquery for getting the latest version
+        subquery_maxversion = _session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
+        joincondition = [
+            subquery_maxversion.c.requestid == FOIRawRequest.requestid,
+            subquery_maxversion.c.max_version == FOIRawRequest.version,
+        ]
+
+        selectedcolumns = [
+            FOIRawRequest.requestid.label('id'),
+            FOIRawRequest.version,
+            FOIRawRequest.sourceofsubmission,
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['firstName'], String), '"', '').label('firstName'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['lastName'], String), '"', '').label('lastName'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['requestType'], String), '"', '').label('requestType'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['requestType']['requestType'], String), '"', '').label('requestTypeWebForm'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['contactInfo']['firstName'], String), '"', '').label('contactFirstName'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['contactInfo']['lastName'], String), '"', '').label('contactLastName'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['receivedDate'], String), '"', '').label('receivedDate'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['receivedDateUF'], String), '"', '').label('receivedDateUF'),
+            FOIRawRequest.status.label('currentState'),
+            FOIRawRequest.assignedgroup.label('assignedGroup'),
+            FOIRawRequest.assignedto.label('assignedTo'),
+            cast(FOIRawRequest.requestid, String).label('idNumber'),
+            literal(None).label('ministryrequestid'),
+            literal(None).label('assignedministrygroup'),
+            literal(None).label('assignedministryperson'),
+            literal(None).label('cfrduedate'),
+            literal(None).label('duedate'),
+            func.REPLACE(cast(FOIRawRequest.requestrawdata['category'], String), '"', '').label('applicantcategory'),
+            FOIRawRequest.created_at.label('created_at')
+        ]
+
+        #filter/search
+        if(len(filterfields) > 0 and keyword is not None):
+            filtercondition = []
+            for field in filterfields:
+                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+            return _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived'])).filter(or_(*filtercondition))
+        else:
+            return _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived']))
+
+    @classmethod
+    def getrequestspagination(cls, groups, page, size, sort, _desc, filterfields, keyword):
+        #ministry requests
+        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword)
+
+        #rawrequests
+        if "Intake Team" in groups or groups is None:                
+            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword)
+
+            query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
+
+            if(_desc == 0):
+                return query_full_queue.order_by(asc(sort)).paginate(page=page, per_page=size)
+            else:
+                return query_full_queue.order_by(desc(sort)).paginate(page=page, per_page=size)
+        else:
+            if(_desc == 0):
+                return subquery_ministry_queue.order_by(asc(sort)).paginate(page=page, per_page=size)
+            else:
+                return subquery_ministry_queue.order_by(desc(sort)).paginate(page=page, per_page=size)
+
+    @classmethod
+    def findfield(cls, x):
+        return {
+            'firstName': cast(FOIRawRequest.requestrawdata['firstname'], String),
+            'lastName': cast(FOIRawRequest.requestrawdata['lastname'], String),
+            'requestType': cast(FOIRawRequest.requestrawdata['requestType'], String),
+            'idNumber': cast(FOIRawRequest.requestid, String),
+            'currentState': FOIRawRequest.status,
+            'assignedTo': FOIRawRequest.assignedto,
+        }.get(x, FOIRawRequest.assignedto)
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

@@ -6,9 +6,13 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_, and_, text
+from sqlalchemy import or_, and_, text, func, literal, cast
+from sqlalchemy.sql.sqltypes import String
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from .FOIRequestApplicants import FOIRequestApplicant
+from .FOIRequestStatus import FOIRequestStatus
+from .ApplicantCategories import ApplicantCategory
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -194,6 +198,171 @@ class FOIMinistryRequest(db.Model):
         for row in rs:
             requeststates.append(row["status"])
         return requeststates
+
+    @classmethod
+    def getrequestssubquery(cls, groups, filterfields, keyword):
+        _session = db.session
+
+        #ministry filter for group/team
+        if groups is None:
+            ministryfilter = FOIMinistryRequest.isactive == True
+        else:
+            groupfilter = []
+            for group in groups:
+                if (group == 'Flex Team'):
+                    groupfilter.append(
+                        and_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])
+                        )
+                    )
+                elif (group == 'Processing Team'):
+                    groupfilter.append(
+                        and_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])
+                        )
+                    )
+                else:
+                    groupfilter.append(
+                        or_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            and_(
+                                FOIMinistryRequest.assignedministrygroup == group,
+                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14])
+                            )
+                        )
+                    )
+
+            ministryfilter = and_(
+                                FOIMinistryRequest.isactive == True,
+                                FOIRequestStatus.isactive == True,
+                                or_(*groupfilter)
+                            )
+
+        #subquery for getting latest version & proper group/team for FOIMinistryRequest
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
+        joincondition_ministry = [
+            subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
+            subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
+        ]
+
+        #subquery for getting the first applicant mapping
+        subquery_applicantmapping_first = _session.query(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id, func.min(FOIRequestApplicantMapping.foirequestapplicantid).label('first_id')).group_by(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id).subquery()
+        joincondition_applicantmapping = [
+            subquery_applicantmapping_first.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
+            subquery_applicantmapping_first.c.foirequestversion_id == FOIRequestApplicantMapping.foirequestversion_id,
+            subquery_applicantmapping_first.c.first_id == FOIRequestApplicantMapping.foirequestapplicantid,
+        ]
+
+        #filter/search
+        if(len(filterfields) > 0 and keyword is not None):
+            filtercondition = []
+            for field in filterfields:
+                filtercondition.append(FOIMinistryRequest.findfield(field).ilike('%'+keyword+'%'))
+
+        selectedcolumns = [
+            FOIRequest.foirequestid.label('id'),
+            FOIMinistryRequest.version,
+            literal(None).label('sourceofsubmission'),
+            FOIRequestApplicant.firstname.label('firstName'),
+            FOIRequestApplicant.lastname.label('lastName'),
+            FOIRequest.requesttype.label('requestType'),
+            FOIRequest.requesttype.label('requestTypeWebForm'),
+            FOIRequestApplicant.firstname.label('contactFirstName'),
+            FOIRequestApplicant.lastname.label('contactLastName'),
+            cast(FOIRequest.receiveddate, String).label('receivedDate'),
+            cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            FOIRequestStatus.name.label('currentState'),
+            FOIMinistryRequest.assignedgroup.label('assignedGroup'),
+            FOIMinistryRequest.assignedto.label('assignedTo'),
+            cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
+            FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
+            FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
+            FOIMinistryRequest.cfrduedate.label('cfrduedate'),
+            FOIMinistryRequest.duedate.label('duedate'),
+            ApplicantCategory.name.label('applicantcategory'),
+            FOIRequest.created_at.label('created_at')
+        ]
+
+        if(keyword is None):
+            return _session.query(
+                                *selectedcolumns
+                            ).join(
+                                subquery_ministry_maxversion,
+                                and_(*joincondition_ministry)
+                            ).join(
+                                FOIRequest,
+                                and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
+                            # ).join(
+                            #     subquery_foirequest_maxversion,
+                            #     and_(*joincondition_foirequest)
+                            ).join(
+                                FOIRequestStatus,
+                                FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
+                            ).join(
+                                FOIRequestApplicantMapping,
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id)
+                            ).join(
+                                subquery_applicantmapping_first,
+                                and_(*joincondition_applicantmapping)
+                            ).join(
+                                FOIRequestApplicant,
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                            ).join(
+                                ApplicantCategory,
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                            ).filter(ministryfilter)
+        else:
+            return _session.query(
+                                *selectedcolumns
+                            ).join(
+                                subquery_ministry_maxversion,
+                                and_(*joincondition_ministry)
+                            ).join(
+                                FOIRequest,
+                                and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
+                            # ).join(
+                            #     subquery_foirequest_maxversion,
+                            #     and_(*joincondition_foirequest)
+                            ).join(
+                                FOIRequestStatus,
+                                FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
+                            ).join(
+                                FOIRequestApplicantMapping,
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id)
+                            ).join(
+                                subquery_applicantmapping_first,
+                                and_(*joincondition_applicantmapping)
+                            ).join(
+                                FOIRequestApplicant,
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                            ).join(
+                                ApplicantCategory,
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                            ).filter(ministryfilter).filter(or_(*filtercondition))
+
+    @classmethod
+    def getrequestspagination(cls, group, page, size, sort, desc, filterfields, keyword):
+        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword)
+
+        if(desc == 0):
+            return subquery.order_by(FOIMinistryRequest.findfield(sort).asc()).paginate(page=page, per_page=size)
+        else:
+            return subquery.order_by(FOIMinistryRequest.findfield(sort).desc()).paginate(page=page, per_page=size)
+
+    @classmethod
+    def findfield(cls, x):
+        #add more fields here if need sort/filter/search more columns
+        return {
+            'firstName': FOIRequestApplicant.firstname,
+            'lastName': FOIRequestApplicant.lastname,
+            'requestType': FOIRequest.requesttype,
+            'idNumber': FOIMinistryRequest.filenumber,
+            'currentState': FOIRequestStatus.name,
+            'assignedTo': FOIMinistryRequest.assignedto,
+        }.get(x, FOIMinistryRequest.filenumber)
 
 
 class FOIMinistryRequestSchema(ma.Schema):
