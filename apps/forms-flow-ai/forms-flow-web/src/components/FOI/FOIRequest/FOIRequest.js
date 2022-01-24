@@ -450,7 +450,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const stateTransition = requestDetails?.stateTransition;
 
   return (
-  !isLoading && requestDetails && Object.keys(requestDetails).length !== 0 ?
+  (!isLoading && requestDetails && Object.keys(requestDetails).length !== 0) || isAddRequest ?
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
