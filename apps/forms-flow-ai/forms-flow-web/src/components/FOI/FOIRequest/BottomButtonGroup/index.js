@@ -142,8 +142,6 @@ const BottomButtonGroup = React.memo(
                   progress: undefined,
                 }
               );
-              // setRequestState({requeststate: saveRequestObject.currentState},  
-              //   handleSaveRequest(requestState, true, ""))
               handleSaveRequest(requestState, true, "");
             }
           }

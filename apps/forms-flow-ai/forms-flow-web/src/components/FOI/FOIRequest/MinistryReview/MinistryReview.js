@@ -137,10 +137,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
       if (bcgovcode)
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
-    if(requestDetails){
-      setRequestState(requestDetails.currentState);
-      settabStatus(requestDetails.currentState);
-    }
+    // if(requestDetails){
+    //   setRequestState(requestDetails.currentState);
+    //   settabStatus(requestDetails.currentState);
+    // }
   }, [requestId]);
 
   const [headerValue, setHeader] = useState("");
@@ -160,6 +160,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setSaveMinistryRequestObject(requestDetailsValue);
     ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
+    setRequestState(requestDetails.currentState);
+    settabStatus(requestDetails.currentState);
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
@@ -437,9 +439,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
         </div>
         
         <div className="foileftpanelstatus">
-        {_requestStatus.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?  
+        {_requestStatus?.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?  
           <>
-          {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
+          {(_requestStatus?.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
           <h4>{bottomTextArray[0]}</h4>
           : null }
           <h4>{bottomTextArray[1]}</h4>
