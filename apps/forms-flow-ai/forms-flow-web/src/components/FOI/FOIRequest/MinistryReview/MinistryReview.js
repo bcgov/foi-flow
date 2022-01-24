@@ -137,10 +137,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       if (bcgovcode)
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
-    // if(requestDetails){
-    //   setRequestState(requestDetails.currentState);
-    //   settabStatus(requestDetails.currentState);
-    // }
   }, [requestId]);
 
   const [headerValue, setHeader] = useState("");
@@ -160,8 +156,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setSaveMinistryRequestObject(requestDetailsValue);
     ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
-    setRequestState(requestDetails.currentState);
-    settabStatus(requestDetails.currentState);
+    if(requestDetails && Object.keys(requestDetails).length !== 0){
+      setRequestState(requestDetails.currentState);
+      settabStatus(requestDetails.currentState);
+    }
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
@@ -214,7 +212,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}`
+        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`
       }
         , 1000);
     }
@@ -383,7 +381,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const requestNumber = requestDetails && requestDetails.idNumber; 
   
   return (
-    !isLoading && requestDetails && Object.keys(requestDetails).length !== 0 ?
+    !isLoading && requestDetails && Object.keys(requestDetails).length !== 0  && requestState != undefined?
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -392,7 +390,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown updateStateDropDown={updateStateDropDown} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
+            <StateDropDown requestState={requestState} updateStateDropDown={updateStateDropDown} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">
