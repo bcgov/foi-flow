@@ -72,9 +72,9 @@ class extensionservice:
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
         # gets the latest approved request
-        approvedextension = self.getlatestapprovedrequest(extension, extensionschema, extensionid, ministryrequestid, ministryversion)
+        approvedextension = self.getlatestapprovedrequest(extension, ministryrequestid, ministryversion)
         # gets the latest approved due date if any else gets the original due date
-        updatedduedate = self.getlatestapprovedduedate(extension, ministryrequestid, approvedextension)
+        updatedduedate = self.getlatestapprovedduedate(ministryrequestid, approvedextension)
        
         isdeletedocument = self.__isdeletedocument(extensionschema, extension, extensionid)       
         if isdeletedocument == True:         
@@ -126,22 +126,14 @@ class extensionservice:
         if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == 'Public Body':
             return extensionschema['extendedduedate']
 
-    def getlatestapprovedduedate(self, extension, ministryrequestid, approvedextension):
+    def getlatestapprovedduedate(self, ministryrequestid, approvedextension):
         if approvedextension:
             return approvedextension['extendedduedate']
-        # if no approved extension in FOIRequestExtension table and Prev extension status was Approved then get the original DueDate from FOIMinisrtRequests table   
-        # extension["extensionstatusid"] == 2 and not approvedextension
         else:
             return FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
-        #if current and prev status is Pending or Denied
-        # else:
-        #     return None
     
-    def getlatestapprovedrequest(self, extension, extensionschema, extensionid, ministryrequestid, ministryversion):
-        return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)
-        # # if prev status is Approved and current status is Pending or Denied then get the latest Approved extendedduedate from FOIRequestExtensions Table
-        # if extension["extensionstatusid"] == 2 and extensionschema["extensionstatusid"] != extension["extensionstatusid"]:
-        #     return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)        
+    def getlatestapprovedrequest(self, extensionid, ministryrequestid, ministryversion):
+        return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)      
 
     def saveextensiondocumentversion(self, extensionid, documents, userid):
         extensionversion = self.__getextensionversion(extensionid)
