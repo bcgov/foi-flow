@@ -25,4 +25,10 @@ const extensionStatusId = Object.freeze({
   approved: 2,
 });
 
+const extensionStatusLabel = Object.freeze({
+  denied: "Denied",
+  pending: "Pending",
+  approved: "Approved",
+});
+
 export { MimeTypeList, MaxFileSizeInMB, extensionStatusId };

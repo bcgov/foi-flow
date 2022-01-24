@@ -54,6 +54,10 @@ export const ActionProvider = ({ children, requestDetails }) => {
         callback: (data) => {
           setSelectedExtension(data);
         },
+        errorCallback: (errorMessage) => {
+          setModalOpen(false)
+          errorToast(errorMessage)
+        },
         dispatch: dispatch,
       });
     } else {

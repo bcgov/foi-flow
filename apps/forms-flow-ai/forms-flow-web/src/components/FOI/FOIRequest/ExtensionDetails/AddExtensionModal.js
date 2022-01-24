@@ -26,6 +26,7 @@ import {
 import clsx from "clsx";
 import {
   extensionStatusId,
+  extensionStatusLabel,
   MimeTypeList,
   MaxFileSizeInMB,
 } from "../../../../constants/FOI/enum";
@@ -134,22 +135,19 @@ const AddExtensionModal = () => {
       setExtendedDate(formatDate(selectedExtension.extendedduedate));
       setStatus(selectedExtension.extensionstatusid);
       setNewFiles(selectedExtension.documents || []);
-
-      if (selectedExtension.extensionstatusid === extensionStatusId.approved) {
-        setApprovedDate(
-          formatDate(selectedExtension.decisiondate) || formatDate(new Date())
-        );
-        setApprovedNumberDays(
-          selectedExtension.approvednoofdays ||
-            selectedExtension.extendedduedays
-        );
-        setPrevExtendedDate(
-          addBusinessDays(
-            formatDate(selectedExtension.extendedduedate),
-            selectedExtension.extendedduedays * -1
-          )
-        );
-      }
+      setApprovedDate(
+        formatDate(selectedExtension.decisiondate) || formatDate(new Date())
+      );
+      setApprovedNumberDays(
+        selectedExtension.approvednoofdays ||
+          selectedExtension.extendedduedays
+      );
+      setPrevExtendedDate(
+        addBusinessDays(
+          formatDate(selectedExtension.extendedduedate),
+          selectedExtension.extendedduedays * -1
+        )
+      );
 
     }
     setLoading(false);
@@ -285,8 +283,8 @@ const AddExtensionModal = () => {
   const errorExists = Object.values({
     reason: !reason,
     numberDays: checkPublicBodyError(numberDays, publicBodySelected),
-    approvedDate: status === extensionStatusId.approved && !approvedDate,
-    approvedNumberDays: status === extensionStatusId.approved && !approvedNumberDays,
+    approvedDate: status === extensionStatusId.approved && !publicBodySelected && !approvedDate,
+    approvedNumberDays: status === extensionStatusId.approved && !publicBodySelected && !approvedNumberDays,
   }).some((isErrorTrue) => isErrorTrue);
 
   const getExtensionReasonMenueItems = () => {
@@ -327,7 +325,7 @@ const AddExtensionModal = () => {
             setReason("");
             setExtendedDate("");
             setNewFiles([]);
-            setApprovedDate("");
+            setApprovedDate(formatDate(new Date()));
             setApprovedNumberDays("");
             setPrevExtendedDate("");
             setStatus(extensionStatusId.approved);

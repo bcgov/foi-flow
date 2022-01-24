@@ -28,7 +28,7 @@ export const fetchExtensionReasons = async ({
     });
 };
 
-export const fetchExtension = ({extensionId, callback, dispatch}) => {
+export const fetchExtension = ({extensionId, callback, errorCallback, dispatch}) => {
   const apiUrl = replaceUrl(
     API.FOI_GET_EXTENSION,
     "<extensionId>",
@@ -41,6 +41,7 @@ export const fetchExtension = ({extensionId, callback, dispatch}) => {
     })
     .catch((error) => {
       dispatch(serviceActionError(error));
+      errorCallback("Internal server error occurred while fetching extension details")
     });
 };
 
@@ -74,7 +75,9 @@ export const fetchExtensions = (
   }
 }
 
-export const createExtensionRequest = ({data, requestId, ministryId, callback, errorCallBack, dispatch}) => {
+export const createExtensionRequest = ({data, requestId, ministryId, callback, errorCallback, dispatch}) => {
+  console.log("create", data);
+
   if(!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
@@ -83,9 +86,7 @@ export const createExtensionRequest = ({data, requestId, ministryId, callback, e
     replaceUrl(API.FOI_POST_EXTENSION, "<requestid>", requestId),
     "<ministryrequestid>",
     ministryId
-  );
-
-  
+  );  
 
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
@@ -98,7 +99,7 @@ export const createExtensionRequest = ({data, requestId, ministryId, callback, e
     })
     .catch((error) => {
       catchError(error, dispatch)
-      errorCallBack("An error occured while trying to save this extension");
+      errorCallback("An error occured while trying to save this extension");
     });
 };
 
