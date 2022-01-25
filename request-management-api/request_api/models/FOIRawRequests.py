@@ -254,14 +254,14 @@ class FOIRawRequest(db.Model):
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
 
             if(_desc == 0):
-                return query_full_queue.order_by(asc(sort)).paginate(page=page, per_page=size)
+                return query_full_queue.order_by(asc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
             else:
-                return query_full_queue.order_by(desc(sort)).paginate(page=page, per_page=size)
+                return query_full_queue.order_by(desc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
         else:
             if(_desc == 0):
-                return subquery_ministry_queue.order_by(asc(sort)).paginate(page=page, per_page=size)
+                return subquery_ministry_queue.order_by(asc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
             else:
-                return subquery_ministry_queue.order_by(desc(sort)).paginate(page=page, per_page=size)
+                return subquery_ministry_queue.order_by(desc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
 
     @classmethod
     def findfield(cls, x):

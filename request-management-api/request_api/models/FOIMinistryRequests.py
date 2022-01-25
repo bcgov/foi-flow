@@ -348,9 +348,9 @@ class FOIMinistryRequest(db.Model):
         subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword)
 
         if(desc == 0):
-            return subquery.order_by(FOIMinistryRequest.findfield(sort).asc()).paginate(page=page, per_page=size)
+            return subquery.order_by(FOIMinistryRequest.findfield(sort).asc(), FOIRequest.receiveddate.desc()).paginate(page=page, per_page=size)
         else:
-            return subquery.order_by(FOIMinistryRequest.findfield(sort).desc()).paginate(page=page, per_page=size)
+            return subquery.order_by(FOIMinistryRequest.findfield(sort).desc(), FOIRequest.receiveddate.desc()).paginate(page=page, per_page=size)
 
     @classmethod
     def findfield(cls, x):
