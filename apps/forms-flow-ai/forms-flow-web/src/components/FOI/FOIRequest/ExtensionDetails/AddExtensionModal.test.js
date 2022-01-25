@@ -146,7 +146,7 @@ describe("FOI AddExtensionModal component", () => {
     );
 
     expect(
-      wrapper.find("#extended-due-datee div input")
+      wrapper.find("#extended-due-date div input")
       .prop("value"))
     .toBe("2022-03-02");
 
@@ -215,7 +215,7 @@ describe("FOI AddExtensionModal component", () => {
     );
 
     expect(
-      wrapper.find("#extended-due-datee div input")
+      wrapper.find("#extended-due-date div input")
       .prop("value"))
     .toBe(
       "2022-03-02"

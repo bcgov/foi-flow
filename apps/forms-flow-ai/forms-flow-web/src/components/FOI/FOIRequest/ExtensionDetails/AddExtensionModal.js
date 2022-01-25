@@ -144,7 +144,7 @@ const AddExtensionModal = () => {
       setPrevExtendedDate(
         addBusinessDays(
           formatDate(selectedExtension.extendedduedate),
-          selectedExtension.extendedduedays * -1
+          selectedExtension.approvednoofdays * -1
         )
       );
 
@@ -409,7 +409,7 @@ const AddExtensionModal = () => {
 
               <Grid item xs={6}>
                 <TextField
-                  id="extended-due-datee"
+                  id="extended-due-date"
                   label="Extended Due Date"
                   type="date"
                   value={extendedDate}
@@ -417,11 +417,6 @@ const AddExtensionModal = () => {
                     shrink: true,
                   }}
                   InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <DateRangeIcon />
-                      </InputAdornment>
-                    ),
                     readOnly: true,
                   }}
                   variant="outlined"
@@ -474,11 +469,6 @@ const AddExtensionModal = () => {
                         setApprovedDate(e.target.value);
                       }}
                       InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <DateRangeIcon />
-                          </InputAdornment>
-                        ),
                         inputProps: { max: formatDate(new Date()) },
                       }}
                       variant="outlined"
@@ -551,7 +541,6 @@ const AddExtensionModal = () => {
           >
             <Grid item xs={6}>
               <button
-                className={`btn-save`}
                 style={{ width: "100%" }}
                 className={clsx("btn-save", {
                   [classes.btnenabled]: !(saveLoading || errorExists),
