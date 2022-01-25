@@ -16,14 +16,14 @@ class notificationuser:
         notificationusers = []
         if 'Assignment' in notificationtype:
             _users = self.__getassignees(foirequest, requesttype, notificationtype)
-        elif 'Reply Comment' in notificationtype:
-            _users = self.__getcommentusers(foicomment, requesttype)
-        elif 'Tagged Comment' in notificationtype:
+        elif 'Reply User Comments' in notificationtype:
+            _users = self.__getcommentusers(foirequest, foicomment, requesttype)
+        elif 'Tagged User Comments' in notificationtype:
             _users = self.__gettaggedusers(foicomment)
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
         for user in _users:
-            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged Comment" not in notificationtype and self.__istaggeduser(user, foicomment, notificationtype) == False) or "Tagged Comment" in notificationtype):
+            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, foicomment, notificationtype) == False) or "Tagged User Comments" in notificationtype):
                 notificationusers.append(user)
         return notificationusers     
     
@@ -64,16 +64,17 @@ class notificationuser:
             notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
         return notificationusers          
     
-    def __getcommentusers(self, comment, requesttype):
+    def __getcommentusers(self, foirequest, comment, requesttype):
+        _requestusers = self.getnotificationusers("General", requesttype, "nouser", foirequest)
         commentusers = []
-        commentusers.append({"userid":comment["createdby"], "usertype":self.__getcommentusertype(comment)})
+        commentusers.append({"userid":comment["createdby"], "usertype":self.__getcommentusertype(comment, comment["createdby"],_requestusers)})
         taggedusers = self.__gettaggedusers(comment)
         if taggedusers is not None:
             commentusers.extend(taggedusers)
         if comment["parentcommentid"]:
             _commentusers = self.__getrelatedusers(comment, requesttype)
             for _commentuser in _commentusers:
-                commentusers.append({"userid":_commentuser["createdby"], "usertype":notificationconfig().getnotificationusertypeid("comment reply user")})
+                commentusers.append({"userid":_commentuser["createdby"], "usertype":self.__getcommentusertype(comment, comment["createdby"],_requestusers)})
                 _skiptaguserforreplies = True
                 if _skiptaguserforreplies == False:
                     taggedusers = self.__gettaggedusers(_commentuser)
@@ -81,19 +82,19 @@ class notificationuser:
                         commentusers.extend(taggedusers)            
         return commentusers  
     
+    def __getcommentusertype(self, comment, userid, requestusers):
+        for requestuser in requestusers:
+            if requestuser["userid"] == userid:  
+                return  requestuser["usertype"]   
+        return notificationconfig().getnotificationusertypeid("comment user")
+    
     def __getrelatedusers(self, comment, requesttype):
         if requesttype == "ministryrequest":
             return FOIRequestComment.getcommentusers(comment["commentid"])
         else:
             return FOIRawRequestComment.getcommentusers(comment["commentid"])
             
-    def __getcommentusertype(self, comment):
-        if comment["parentcommentid"]:
-            return notificationconfig().getnotificationusertypeid("comment reply user")
-        else:
-            notificationconfig().getnotificationusertypeid("comment user")
-
-    def __gettaggedusers(self, comment):               
+    def __gettaggedusers(self, comment): 
         if comment["taggedusers"] != '[]':
             return self.__preparetaggeduser(json.loads(comment["taggedusers"]))          
         return None   

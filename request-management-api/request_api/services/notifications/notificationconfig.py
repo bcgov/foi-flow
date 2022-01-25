@@ -20,8 +20,12 @@ class notificationconfig:
             return 7
         elif notificationtype == "Legislative Due Reminder":
             return 8 
-        elif "Comment" in notificationtype:
+        elif notificationtype == "New User Comments":
             return 3   
+        elif notificationtype == "Reply User Comments":
+            return 9  
+        elif notificationtype == "Tagged User Comments":
+            return 10  
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):
