@@ -1,4 +1,3 @@
-from datetime import datetime
 from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestExtensions import FOIRequestExtension
@@ -42,21 +41,17 @@ class extensionservice:
         extensionreason = extensionreasonservice().getextensionreasonbyid(requestextension['extensionreasonid'])
         requestextensionwithdocuments = self.__createextensionobject(requestextension, documents, extensionreason)
         return requestextensionwithdocuments
-        
+
     def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
         version = self.__getversionforrequest(ministryrequestid)
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
-        
+
         ispublicbodyextension = 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension:            
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:            
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
-            
-            if ispublicbodyextension:
-                extensionschema['decisiondate'] = self.__formatdate(datetime.now(), '%Y-%m-%d')
-                extensionschema['approvednoofdays'] = extensionschema['extendedduedays']
            
             if result.success == True:
                 version = self.__getversionforrequest(ministryrequestid)
@@ -64,7 +59,7 @@ class extensionservice:
         else:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         if 'documents' in extensionschema and extensionschema['extensionstatusid'] != 1:
-            self.saveextensiondocument(extensionschema, ministryrequestid, version, userid, extnsionresult.identifier)
+            self.saveextensiondocument(extensionschema['documents'], ministryrequestid, userid, extnsionresult.identifier)
         return extnsionresult
 
     def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid):
@@ -93,7 +88,7 @@ class extensionservice:
         extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
         # save documents if it is part of current extension (update to the ministrydocuments table and extensiondocumentmapping table)
         if 'documents' in updatedextension and updatedextension['extensionstatusid'] != 1:
-            self.saveextensiondocument(updatedextension['documents'], ministryrequestid, ministryversion, userid, extensionid)
+            self.saveextensiondocument(updatedextension['documents'], ministryrequestid, userid, extensionid)
         # updates the duedate to extendedduedate or updatedduedate
         # new ministry, extension, extensionmapping and document version gets created
         if extensionresult.success == True and (isstatuschangedfromapproved == True or updatedextension['extensionstatusid'] == 2):
@@ -114,9 +109,9 @@ class extensionservice:
         extendedduedate = self.getextendedduedate(updatedextension) 
         return extendedduedate if extendedduedate else updatedduedate
 
-    def saveextensiondocument(self, extensiondocuments, ministryrequestid, ministryversion, userid, extensionid):
+    def saveextensiondocument(self, extensiondocuments, ministryrequestid, userid, extensionid):
         documents = []        
-        documentids = self.__savedocumentversion(ministryrequestid, ministryversion, extensiondocuments, userid)
+        documentids = self.__savedocumentversion(ministryrequestid, extensiondocuments, userid)
         for documentid in documentids:
             documents.append(FOIMinistryRequestDocument().getdocument(documentid))      
         self.saveextensiondocumentversion(extensionid, documents, userid)
@@ -192,7 +187,7 @@ class extensionservice:
             reqdocuments.append({"foiministrydocumentid": document["foiministrydocumentid"], "filename": document["filename"], "documentpath": document["documentpath"], "category": document["category"]})
         return reqdocuments
 
-    def __savedocumentversion(self, ministryrequestid, ministryversion, extensiondocumentschema, userid):
+    def __savedocumentversion(self, ministryrequestid, extensiondocumentschema, userid):
         documentids = []        
         for document in extensiondocumentschema:
             if 'foiministrydocumentid' in document:
