@@ -41,7 +41,7 @@ class legislativedateevent(duecalculator):
         
     def __createnotification(self, message, requestid):
         if message is not None: 
-            return notificationservice().createremindernotification(message, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid())
+            return notificationservice().createremindernotification(json.dumps({"message" : message}), requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid())
                     
     def __upcomingduemessage(self, duedate):
         return 'Legislative Due Date due on ' + parse(str(duedate)).strftime("%Y %b %d").upper()  
