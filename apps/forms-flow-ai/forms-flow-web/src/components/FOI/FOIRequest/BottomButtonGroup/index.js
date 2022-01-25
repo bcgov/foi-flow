@@ -64,6 +64,7 @@ const BottomButtonGroup = React.memo(
     hasStatusRequestSaved,
     disableInput,
     stateChanged,
+    requestState
   }) => {
     
     /**
@@ -81,7 +82,7 @@ const BottomButtonGroup = React.memo(
     const [closingDate, setClosingDate] = useState(formatDate(new Date()));
     const [closingReasonId, setClosingReasonId] = useState();
 
-    const [requestState, setRequestState] = useState();
+    // const [requestState, setRequestState] = useState();
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
     };
@@ -90,13 +91,9 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
-    console.log("stateChanged",stateChanged);
     useEffect(() => {
-      console.log("Rendering!!");
-      console.log("Request state!!",requestState);
       if(stateChanged){
-        setRequestState(saveRequestObject.currentState);
-        console.log("Request state set!!:",requestState);
+        requestState= saveRequestObject.currentState;
       }
     }, [stateChanged]);
 
@@ -128,7 +125,7 @@ const BottomButtonGroup = React.memo(
                 saveRequestObject,
               });
               handleSaveRequest(_state, false, res.id);
-              hasStatusRequestSaved(currentSelectedStatus);
+             // hasStatusRequestSaved(currentSelectedStatus);
             } else {
               toast.error(
                 "Temporarily unable to save your request. Please try again in a few minutes.",

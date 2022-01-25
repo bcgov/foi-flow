@@ -470,7 +470,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                     <ExtensionDetails requestDetails={requestDetails}/>
                     <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
                     {/* <RequestNotes /> */}
-                    <BottomButtonGroup stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
+                    <BottomButtonGroup requestState={requestState} stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
                 : null }
                 </form>

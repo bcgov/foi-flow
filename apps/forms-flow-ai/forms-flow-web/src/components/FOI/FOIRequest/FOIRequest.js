@@ -300,7 +300,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setUnSavedRequest(_unSaved);
     if (!_unSaved) {
       setStateChanged(false);
-      console.log("Inside handleSaveRequest-FoiRequest.js",_state);
       setcurrentrequestStatus(_state);
 
       setTimeout(() => {
@@ -607,6 +606,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         currentSelectedStatus={_currentrequestStatus} 
                         hasStatusRequestSaved={hasStatusRequestSaved} 
                         disableInput={disableInput}
+                        requestState={requestState}
                       />
                     </>
                   </ConditionalComponent>
