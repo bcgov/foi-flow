@@ -12,6 +12,7 @@ import { extensionStatusId } from "../../../../constants/FOI/enum";
 import { toast } from "react-toastify";
 
 export const ActionContext = createContext();
+ActionContext.displayName = "ExtensionContext"
 export const ActionProvider = ({ children, requestDetails }) => {
 
   const dispatch = useDispatch();

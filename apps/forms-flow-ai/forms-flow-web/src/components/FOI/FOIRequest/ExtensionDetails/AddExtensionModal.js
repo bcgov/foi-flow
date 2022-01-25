@@ -26,7 +26,6 @@ import {
 import clsx from "clsx";
 import {
   extensionStatusId,
-  extensionStatusLabel,
   MimeTypeList,
   MaxFileSizeInMB,
 } from "../../../../constants/FOI/enum";
@@ -372,7 +371,7 @@ const AddExtensionModal = () => {
 
               <Grid item xs={12}>
                 <TextField
-                  id="outlined-extension-reasons"
+                  id="extension-reasons"
                   name="reason"
                   variant="outlined"
                   required
@@ -410,6 +409,7 @@ const AddExtensionModal = () => {
 
               <Grid item xs={6}>
                 <TextField
+                  id="extended-due-datee"
                   label="Extended Due Date"
                   type="date"
                   value={extendedDate}
@@ -433,6 +433,7 @@ const AddExtensionModal = () => {
                 <Grid item xs={12}>
                   <FormControl component="fieldset">
                     <RadioGroup
+                      id="status-options"
                       row
                       name="controlled-radio-buttons-group"
                       value={status}
