@@ -68,55 +68,71 @@ class extensionservice:
         return extnsionresult
 
     def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid):
- 
+        updatedduedate = None
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
-        # gets the latest approved request
-        approvedextension = self.getlatestapprovedrequest(extension, ministryrequestid, ministryversion)
-        # gets the latest approved due date if any else gets the original due date
-        updatedduedate = self.getlatestapprovedduedate(ministryrequestid, approvedextension)
+        extensionversion = extension['version']
+        prevstatus = extension["extensionstatusid"]
+        currentstatus = extensionschema["extensionstatusid"]
+        isstatuschangedfromapproved = self.__isstatuschangedfromapproved(prevstatus, currentstatus)
+        if isstatuschangedfromapproved == True:
+            # gets the latest approved request
+            approvedextension = self.getlatestapprovedrequest(extensionid, ministryrequestid, ministryversion)
+            # gets the latest approved due date if any else gets the original due date
+            updatedduedate = self.getlatestapprovedduedate(prevstatus, ministryrequestid, approvedextension)
        
-        isdeletedocument = self.__isdeletedocument(extensionschema, extension, extensionid)       
-        if isdeletedocument == True:         
-            self.deletedocuments(extensionid, extension, ministryrequestid, userid) 
-
-        extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
-        copyextension = self.__copyextensionproperties(extension, extensionschema, extension['version'], extensionreason)        
+        isdeletedocument = self.__isdeletedocument(isstatuschangedfromapproved, extensionid, extensionversion)
+        if isdeletedocument == True:
+            self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)  
+       
+        #copyextension has the updated extension with data passed from FE with the new version of extension       
+        updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
         # if current state is approved then gets the current extended due date
-        extendedduedate = self.getextendedduedate(copyextension)
-        
-        extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, extension, userid)
+        extendedduedate = self.getextendedduedate(updatedextension)
+ 
+        extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
         # save documents if it is part of current extension (update to the ministrydocuments table and extensiondocumentmapping table)
-        if 'documents' in copyextension and copyextension['extensionstatusid'] != 1:
-            self.saveextensiondocument(copyextension, ministryrequestid, ministryversion, userid, extensionid)
+        if 'documents' in updatedextension and updatedextension['extensionstatusid'] != 1:
+            self.saveextensiondocument(updatedextension['documents'], ministryrequestid, ministryversion, userid, extensionid)
         # updates the duedate to extendedduedate or updatedduedate
         # new ministry, extension, extensionmapping and document version gets created
-        if extensionresult.success == True:
+        if extensionresult.success == True and (isstatuschangedfromapproved == True or updatedextension['extensionstatusid'] == 2):
             ministryrequestschema = {
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
         return extensionresult
+    
+    def __isstatuschangedfromapproved(self, prevstatus,  currentstatus):        
+        if prevstatus == 2 and currentstatus != prevstatus:
+            return True
 
-    def saveextensiondocument(self, copyextension, ministryrequestid, ministryversion, userid, extensionid):
+    def getduedatetoupdate(self, extension, ministryrequestid, updatedextension, approvedextension):        
+        # gets the latest approved due date if any else gets the original due date
+        updatedduedate = self.getlatestapprovedduedate(extension, ministryrequestid, approvedextension)
+        # if current state is approved then gets the current extended due date
+        extendedduedate = self.getextendedduedate(updatedextension) 
+        return extendedduedate if extendedduedate else updatedduedate
+
+    def saveextensiondocument(self, extensiondocuments, ministryrequestid, ministryversion, userid, extensionid):
         documents = []        
-        documentids = self.__savedocumentversion(ministryrequestid, ministryversion, copyextension['documents'], userid)
+        documentids = self.__savedocumentversion(ministryrequestid, ministryversion, extensiondocuments, userid)
         for documentid in documentids:
             documents.append(FOIMinistryRequestDocument().getdocument(documentid))      
         self.saveextensiondocumentversion(extensionid, documents, userid)
 
-    def __isdeletedocument(self, extensionschema, extension, extensionid):
+    def __isdeletedocument(self, isstatuschangedfromapproved, extensionid, extensionversion):
         isdeletedocument = False
-        documents = self.__getextensiondocuments(extensionid, extension["version"])
+        documents = self.__getextensiondocuments(extensionid, extensionversion)
         # 1. if prev status is Approved and current status is Pending or Denied
         # 2. Prev extension has documents
         # if any of the above condition is true then deletedocuments
-        if (extension["extensionstatusid"] == 2 and extensionschema["extensionstatusid"] != extension["extensionstatusid"]) or (documents):
+        if isstatuschangedfromapproved == True or documents:
             isdeletedocument = True            
         return isdeletedocument
 
-    def deletedocuments(self,extensionid, extension, ministryrequestid, userid): 
-        documents = self.__getextensiondocuments(extensionid, extension["version"])        
+    def deletedocuments(self,extensionid, extensionversion, ministryrequestid, userid): 
+        documents = self.__getextensiondocuments(extensionid, extensionversion)        
         for document in documents:
             documentservice().deleterequestdocument(ministryrequestid, document["foiministrydocumentid"], userid, "ministryrequest")
   
@@ -126,14 +142,19 @@ class extensionservice:
         if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == 'Public Body':
             return extensionschema['extendedduedate']
 
-    def getlatestapprovedduedate(self, ministryrequestid, approvedextension):
-        if approvedextension:
-            return approvedextension['extendedduedate']
-        else:
-            return FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
-    
     def getlatestapprovedrequest(self, extensionid, ministryrequestid, ministryversion):
-        return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)      
+            return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)
+
+    def getlatestapprovedduedate(self, prevstatus, ministryrequestid, approvedextension):       
+        if approvedextension and len(approvedextension) != 0:            
+            return approvedextension['extendedduedate']
+        # if Prev extension status was Approved and no approved extension in FOIRequestExtension table then get the original DueDate from FOIMinisrtRequests table   
+        elif prevstatus == 2 and not approvedextension:           
+            duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)           
+            return duedate
+        #if current and prev status is Pending or Denied
+        else:
+            return None
 
     def saveextensiondocumentversion(self, extensionid, documents, userid):
         extensionversion = self.__getextensionversion(extensionid)
@@ -182,24 +203,20 @@ class extensionservice:
             documentids.append(documentresult.identifier)
         return documentids
 
-    def __copyextensionproperties(self, extension, extensionschema, version, extensionreason):
-        extension['version'] = version +1
-        extension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else extension['extensionreasonid']
-        extension['extensionstatusid'] = extensionschema['extensionstatusid'] if 'extensionstatusid' in extensionschema  else extension['extensionstatusid']
-        extension['extendedduedays'] = extensionschema['extendedduedays'] if 'extendedduedays' in extensionschema  else extension['extendedduedays']
-        extension['extendedduedate'] = extensionschema['extendedduedate'] if 'extendedduedate' in extensionschema  else extension['extendedduedate']
+    def __copyextensionproperties(self, copyextension, extensionschema, version):
+        copyextension['version'] = version +1
+        copyextension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else copyextension['extensionreasonid']
+        copyextension['extensionstatusid'] = extensionschema['extensionstatusid'] if 'extensionstatusid' in extensionschema  else copyextension['extensionstatusid']
+        copyextension['extendedduedays'] = extensionschema['extendedduedays'] if 'extendedduedays' in extensionschema  else copyextension['extendedduedays']
+        copyextension['extendedduedate'] = extensionschema['extendedduedate'] if 'extendedduedate' in extensionschema  else copyextension['extendedduedate']
+        copyextension['decisiondate'] = extensionschema['decisiondate'] if 'decisiondate' in extensionschema  else copyextension['decisiondate']
+        copyextension['approvednoofdays'] = extensionschema['approvednoofdays'] if 'approvednoofdays' in extensionschema  else copyextension['approvednoofdays']
         
-        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] != 'Public Body':
-            extension['approvednoofdays'] = extension['extendedduedays']
-        else:
-            extension['decisiondate'] = extensionschema['decisiondate'] if 'decisiondate' in extensionschema  else extension['decisiondate']
-            extension['approvednoofdays'] = extensionschema['approvednoofdays'] if 'approvednoofdays' in extensionschema  else extension['approvednoofdays']
-        
-        extension['documents'] = extensionschema['documents'] if 'documents' in extensionschema  else None
-        extension['isactive'] =  extensionschema['isactive'] if 'isactive' in extensionschema  else True
-        extension['created_at'] =  extensionschema['created_at'] if 'created_at' in extensionschema  else None
-        extension['createdby'] = extensionschema['createdby'] if 'createdby' in extensionschema  else None
-        return extension
+        copyextension['documents'] = extensionschema['documents'] if 'documents' in extensionschema  else None
+        copyextension['isactive'] =  extensionschema['isactive'] if 'isactive' in extensionschema  else True
+        copyextension['created_at'] =  extensionschema['created_at'] if 'created_at' in extensionschema  else None
+        copyextension['createdby'] = extensionschema['createdby'] if 'createdby' in extensionschema  else None
+        return copyextension
 
     def __getversionforrequest(self, requestid):
         """ Returns the active version of the request id based on type.
