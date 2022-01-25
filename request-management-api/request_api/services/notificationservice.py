@@ -43,6 +43,9 @@ class notificationservice:
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid, notificationconfig().getnotificationdays())
 
+    def getcommentnotifications(self, commentid):
+        return FOIRequestNotification.getcommentnotifications(commentid)
+
     def dismissnotification(self, userid, type, idnumber, notificationid):    
         if type is not None:
             return self.__dismissnotificationbytype(userid, type)
@@ -183,7 +186,7 @@ class notificationservice:
         notification.version = foirequest["version"]        
         notification.createdby = userid
         notification.created_at = datetime2.now()
-        notification.notification = message  
+        notification.notification = message
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest, foicomment)
         users = []
         for _notificationuser in notificationusers:
