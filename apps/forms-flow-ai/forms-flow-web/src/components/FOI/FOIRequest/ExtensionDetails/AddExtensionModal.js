@@ -108,7 +108,7 @@ const AddExtensionModal = () => {
   const maxExtendDays = reason?.defaultextendedduedays || 999;
 
   const [extendedDate, setExtendedDate] = useState("");
-  const [prevExtendedDate, setPrevExtendedDate] = useState("");
+  const [preExtendedDate, setPreExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
 
   const [approvedDate, setApprovedDate] = useState(formatDate(new Date()));
@@ -141,10 +141,12 @@ const AddExtensionModal = () => {
         selectedExtension.approvednoofdays ||
           selectedExtension.extendedduedays
       );
-      setPrevExtendedDate(
+
+      const daysToSubtract = selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
+      setPreExtendedDate(
         addBusinessDays(
           formatDate(selectedExtension.extendedduedate),
-          selectedExtension.approvednoofdays * -1
+          daysToSubtract * -1
         )
       );
 
@@ -170,11 +172,11 @@ const AddExtensionModal = () => {
   };
 
   const getCurrentDueDate = () => {
-    if (!selectedExtension || !prevExtendedDate) {
+    if (!selectedExtension || !preExtendedDate) {
       return currentDueDate;
     }
 
-    return prevExtendedDate;
+    return preExtendedDate;
   };
 
   const handleApprovedNumberDaysChange = (e) => {
@@ -326,7 +328,7 @@ const AddExtensionModal = () => {
             setNewFiles([]);
             setApprovedDate(formatDate(new Date()));
             setApprovedNumberDays("");
-            setPrevExtendedDate("");
+            setPreExtendedDate("");
             setStatus(extensionStatusId.approved);
           },
         }}
