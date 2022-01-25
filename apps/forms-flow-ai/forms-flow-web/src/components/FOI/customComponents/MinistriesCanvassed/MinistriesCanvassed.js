@@ -40,7 +40,7 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
 
 
  return( 
-    <div className="dialog-style">     
+    <div>     
     <Dialog className={classes.root} open={openModal} id="dialog-style"
       onClose={handleClose}
       aria-labelledby="state-change-dialog-title"

@@ -1,7 +1,4 @@
     
-// .ministries-canvassed-div{
-// }
-
 .ministries-canvassed{
 
     display: flex;
@@ -28,4 +25,18 @@
 .ministry-requestid{
     cursor: pointer;
     text-decoration: underline;
+}
+
+.title-col3 {
+    flex-basis: 5% !important
+}
+
+.state-change-header {
+    margin-left: 30px;
+    color: #036 ;
+    font-size: xx-large;
+    font-weight: bold;
+    font-family: "BCSans-Bold", sans-serif !important;
+    flex-direction: column;
+    flex-basis: 70% 
 }
