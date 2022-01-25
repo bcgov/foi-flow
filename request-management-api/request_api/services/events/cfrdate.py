@@ -40,7 +40,7 @@ class cfrdateevent(duecalculator):
         
     def __createnotification(self, message, requestid):
         if message is not None: 
-            return notificationservice().createremindernotification(json.dumps({"message" : message}), requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid())
+            return notificationservice().createremindernotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid())
                     
     def __upcomingduemessage(self, duedate):
         return 'Call for Records due on ' + parse(str(duedate)).strftime("%Y %b %d").upper()

@@ -14,7 +14,7 @@ import maya
 import os
 from flask import current_app
 from dateutil.parser import parse
-
+from request_api import socketio
 class commentevent:
     """ FOI Event management service
 
@@ -22,22 +22,19 @@ class commentevent:
     def createcommentevent(self, commentid, requesttype, userid):
         try: 
             _comment = self.__getcomment(commentid,requesttype)
-            notificationservice().createcommentnotification(self.getcommentmessage(_comment), _comment, self.__getcommenttype(_comment), requesttype, userid)
-            if _comment["taggedusers"] != '[]':
-                notificationservice().createcommentnotification(self.getcommentmessage(_comment, True), _comment, "Tagged Comment", requesttype, userid)    
+            notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, self.__getcommenttype(_comment), requesttype, userid)
+            if _comment["taggedusers"] != '[]':                
+                notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, "Tagged User Comments", requesttype, userid)    
+            _pushnotifications = notificationservice().getcommentnotifications(commentid)
+            for _pushnotification in _pushnotifications:
+                socketio.emit(_pushnotification["userid"], _pushnotification)
             return DefaultMethodResult(True,'Comment notifications created',commentid)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Comment Notification Error', exception.message))
             return DefaultMethodResult(False,'Comment notifications failed',commentid)     
         
-    def getcommentmessage(self, comment, istaggeduser=False):
-        if istaggeduser == True:
-            return "You've been tagged in a comment: " + self.__formatmessage(comment)
-        else:
-            if not comment["parentcommentid"]:
-                return "New Comment: " + self.__formatmessage(comment)
-            else:
-                return "New Reply to Your comment: "+ self.__formatmessage(comment)
+    def getcommentmessage(self, commentid, comment):
+        return {"commentid":commentid, "message" :self.__formatmessage(comment)}
         
     def __formatmessage(self, comment):
         _comment = json.loads(comment["comment"])
@@ -45,7 +42,7 @@ class commentevent:
         if comment["taggedusers"] != '[]':
             msg = self.__formattaggedmessage(msg, json.loads(comment["taggedusers"]))
         msg = msg.strip()
-        return msg[0:90] if len(msg) >=90 else msg
+        return msg
     
     def __formattaggedmessage(self, message, taggedusers):
         for _taguser in taggedusers:
@@ -60,7 +57,7 @@ class commentevent:
     
     def __getcommenttype(self, comment):
         if not comment["parentcommentid"]:
-            return "Comment"
+            return "New User Comments"
         else:
-            return "Reply Comment"
+            return "Reply User Comments"
         
