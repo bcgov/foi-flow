@@ -174,10 +174,9 @@ const ActionsPopover = () => {
                 <TableRow key={`extenstion-row-${index}`} hover>
                   <TableCell>{extension.extensionreson}</TableCell>
                   <TableCell>
-                    {extension.extensionstatusid === extensionStatusId.approved 
-                      ? extension.approvednoofdays 
-                      : extension.extendedduedays
-                    }
+                    {extension.extensionstatusid === extensionStatusId.approved
+                      ? extension.approvednoofdays || extension.extendedduedays
+                      : extension.extendedduedays}
                   </TableCell>
                   <TableCell>{extension.extendedduedate}</TableCell>
                   <TableCell>{extension.extensionstatus}</TableCell>
