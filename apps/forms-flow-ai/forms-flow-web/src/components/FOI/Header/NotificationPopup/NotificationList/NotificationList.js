@@ -1,4 +1,4 @@
-import React, {useState,useEffect } from 'react';
+import React, {useState } from 'react';
 import {useSelector, useDispatch } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
@@ -27,7 +27,7 @@ const NotificationList = ({notification}) => {
   const [openModal, setModal] = useState(false);
   const [selectedMinistries,setSelectedMinistries]=useState([]);
   let isMinistry = false;
-  let requestState = "";
+  
 
   if (Object.entries(userDetail).length !== 0) {
     const userGroups = userDetail && userDetail.groups?.map(group => group.slice(1));
@@ -66,36 +66,36 @@ const NotificationList = ({notification}) => {
     dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null));
   }
 
-  const handleClick = (notification) => {
-      if(notification.requesttype === 'rawrequest'){
-        dispatch(fetchFOIRawRequestDetailsForNotification(notification, (err, res) => {
-          if (!err && res) {
-            getStatusAndRedirect(res);
-          }
+  const handleClick = (notificationVal) => {
+      if(notificationVal.requesttype === 'rawrequest'){
+        dispatch(fetchFOIRawRequestDetailsForNotification(notificationVal, (err, res) => {
+            getStatusAndRedirect(err, res);
         }));
       }
-      else if(notification.requesttype === 'ministryrequest'){
-        dispatch(fetchFOIRequestDetailsForNotification(notification, isMinistry, (err,res) => {
-        if (!err && res) {
-          getStatusAndRedirect(res);
-        }
+      else if(notificationVal.requesttype === 'ministryrequest'){
+        dispatch(fetchFOIRequestDetailsForNotification(notificationVal, isMinistry, (err,res) => {
+          getStatusAndRedirect(err, res);
         }));
       }
   }
 
-  const getStatusAndRedirect = (requestDetails) => {
-    Object.entries(StateEnum).forEach(([key, value]) =>{
-      if(key && value.id === requestDetails.requeststatusid){
-        requestState = value.name;
+
+  const getStatusAndRedirect = (err, res) => {
+    if (!err && res) {
+      let requestState = "";
+      Object.entries(StateEnum).forEach(([key, value]) =>{
+        if(key && value.id === res.requeststatusid){
+          requestState = value.name;
+        }
+      })
+      
+      if(requestState === 'Archived' && res?.openedMinistries?.length > 0){
+        setSelectedMinistries(res.openedMinistries);
+        setModal(true);
       }
-    })
-    
-    if(requestState === 'Archived' && requestDetails?.openedMinistries?.length > 0){
-      setSelectedMinistries(requestDetails.openedMinistries);
-      setModal(true);
-    }
-    else{
-      setRedirectUrl(requestState);
+      else{
+        setRedirectUrl(requestState);
+      }
     }
   }
 

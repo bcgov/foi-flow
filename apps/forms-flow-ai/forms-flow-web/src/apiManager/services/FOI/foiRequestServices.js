@@ -17,7 +17,6 @@ import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMas
 import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
-import MinistriesCanvassed from "../../../components/FOI/customComponents/MinistriesCanvassed/MinistriesCanvassed";
 
 export const fetchFOIRequestList = () => {
   return (dispatch) => {
