@@ -17,7 +17,6 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
@@ -76,7 +75,7 @@ class CreateFOIRawRequestComment(Resource):
             result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
             if result.success == True:
                 asyncio.run(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
