@@ -232,6 +232,18 @@ class FOIMinistryRequest(db.Model):
         setattr(currequest,'updatedby',userid)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',ministryrequestid)
+    def getministriesopenedbyuid(cls, rawrequestid):
+        sql = """select distinct filenumber, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
+                    inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 
+                    inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
+                    where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;""" 
+        rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})
+        ministries = []
+        for row in rs:
+            ministries.append({"filenumber": row["filenumber"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+        return ministries    
+
+
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson','assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name')

@@ -183,8 +183,9 @@ class extensionservice:
     def __getextensiondocumentsinfo(self, extensiondocuments):
         reqdocuments = []
         for extensiondocument in extensiondocuments:
-            document = FOIMinistryRequestDocument().getdocument(extensiondocument["foiministrydocumentid"])            
-            reqdocuments.append({"foiministrydocumentid": document["foiministrydocumentid"], "filename": document["filename"], "documentpath": document["documentpath"], "category": document["category"]})
+            document = FOIMinistryRequestDocument().getdocument(extensiondocument["foiministrydocumentid"])
+            if document["isactive"] == True:           
+                reqdocuments.append({"foiministrydocumentid": document["foiministrydocumentid"], "filename": document["filename"], "documentpath": document["documentpath"], "category": document["category"]})
         return reqdocuments
 
     def __savedocumentversion(self, ministryrequestid, extensiondocumentschema, userid):
