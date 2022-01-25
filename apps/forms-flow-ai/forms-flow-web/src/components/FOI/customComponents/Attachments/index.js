@@ -258,10 +258,8 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
         return "signoff - response";
       case "harms-review":
         return "harms assessment - review";
-      case "personal":
-        return "personal";
       default:
-        return "general";
+        return category || "general";
     }
   }
 

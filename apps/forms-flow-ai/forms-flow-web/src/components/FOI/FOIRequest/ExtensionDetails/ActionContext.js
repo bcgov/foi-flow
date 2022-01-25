@@ -12,6 +12,7 @@ import { extensionStatusId } from "../../../../constants/FOI/enum";
 import { toast } from "react-toastify";
 
 export const ActionContext = createContext();
+ActionContext.displayName = "ExtensionContext"
 export const ActionProvider = ({ children, requestDetails }) => {
 
   const dispatch = useDispatch();
@@ -54,8 +55,14 @@ export const ActionProvider = ({ children, requestDetails }) => {
         callback: (data) => {
           setSelectedExtension(data);
         },
+        errorCallback: (errorMessage) => {
+          setModalOpen(false)
+          errorToast(errorMessage)
+        },
         dispatch: dispatch,
       });
+    } else {
+        setSelectedExtension(null);
     }
   }, [modalOpen, extensionId]);
 

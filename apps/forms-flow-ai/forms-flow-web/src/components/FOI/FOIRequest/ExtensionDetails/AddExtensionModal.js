@@ -91,9 +91,8 @@ const AddExtensionModal = () => {
     loading,
     setLoading,
     saveExtensionRequest,
-    extensionId,
     errorToast,
-    extensions
+    extensions,
   } = useContext(ActionContext);
 
   const filteredExtensionReasons = filterExtensionReason(
@@ -109,19 +108,20 @@ const AddExtensionModal = () => {
   const maxExtendDays = reason?.defaultextendedduedays || 999;
 
   const [extendedDate, setExtendedDate] = useState("");
+  const [prevExtendedDate, setPrevExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
 
   const [approvedDate, setApprovedDate] = useState(formatDate(new Date()));
   const [approvedNumberDays, setApprovedNumberDays] = useState("");
 
-  const existingFiles = selectedExtension?.documents || []
+  const existingFiles = selectedExtension?.documents || [];
   const [newFiles, setNewFiles] = useState([]);
-  const attchmentFileNameList = existingFiles.map(file => file.filename)
+  const attchmentFileNameList = existingFiles.map((file) => file.filename);
 
   const updateFilesCb = (_files) => {
     setNewFiles(_files);
   };
-  
+
   const [saveLoading, setSaveLoading] = useState(false);
 
   useEffect(() => {
@@ -133,11 +133,21 @@ const AddExtensionModal = () => {
       setNumberDays(selectedExtension.extendedduedays);
       setExtendedDate(formatDate(selectedExtension.extendedduedate));
       setStatus(selectedExtension.extensionstatusid);
-      setApprovedDate(formatDate(selectedExtension.decisiondate) || formatDate(new Date()));
-      setApprovedNumberDays(
-        selectedExtension.approvednoofdays || selectedExtension.extendedduedays
-      );
       setNewFiles(selectedExtension.documents || []);
+      setApprovedDate(
+        formatDate(selectedExtension.decisiondate) || formatDate(new Date())
+      );
+      setApprovedNumberDays(
+        selectedExtension.approvednoofdays ||
+          selectedExtension.extendedduedays
+      );
+      setPrevExtendedDate(
+        addBusinessDays(
+          formatDate(selectedExtension.extendedduedate),
+          selectedExtension.extendedduedays * -1
+        )
+      );
+
     }
     setLoading(false);
   }, [selectedExtension, extensionReasons]);
@@ -159,7 +169,17 @@ const AddExtensionModal = () => {
     updateExtendedDate(numDays);
   };
 
+  const getCurrentDueDate = () => {
+    if (!selectedExtension || !prevExtendedDate) {
+      return currentDueDate;
+    }
+
+    return prevExtendedDate;
+  };
+
   const handleApprovedNumberDaysChange = (e) => {
+    const dueDate = getCurrentDueDate();
+
     const days = Number(e.target.value);
 
     if (days > numberDays) {
@@ -167,28 +187,29 @@ const AddExtensionModal = () => {
     }
 
     setApprovedNumberDays(days);
-    setExtendedDate(addBusinessDays(currentDueDate, days));
+    setExtendedDate(addBusinessDays(dueDate, days));
   };
 
   const updateExtendedDate = (days) => {
+    const dueDate = getCurrentDueDate();
     if (days > maxExtendDays) {
       return;
     }
 
     setNumberDays(days);
     setApprovedNumberDays(days);
-    setExtendedDate(addBusinessDays(currentDueDate, days));
+    setExtendedDate(addBusinessDays(dueDate, days));
   };
 
   const handleClose = () => {
     setModalOpen(false);
-  }
+  };
 
   const handleFileChanges = async () => {
-    if(publicBodySelected) {
-      return []
+    if (publicBodySelected) {
+      return [];
     }
-    
+
     const existingFilesNameSet = new Set(
       existingFiles.map((EF) => EF.filename)
     );
@@ -197,24 +218,19 @@ const AddExtensionModal = () => {
       (NF) => !existingFilesNameSet.has(NF.filename)
     );
 
-    const filesToKeep = newFiles.filter(
-      (NF) => existingFilesNameSet.has(NF.filename)
+    const filesToKeep = newFiles.filter((NF) =>
+      existingFilesNameSet.has(NF.filename)
     );
 
     if (filesToUpload.length < 1) {
       return [...filesToKeep];
     }
 
-    const uploadedFiles = await uploadFiles(
-      filesToUpload,
-      idNumber,
-      dispatch
-    );
+    const uploadedFiles = await uploadFiles(filesToUpload, idNumber, dispatch);
     return [...uploadedFiles, ...filesToKeep];
   };
 
   const getStatusOptions = async () => {
-    
     const documents = await handleFileChanges();
 
     const allOptions = {
@@ -225,10 +241,10 @@ const AddExtensionModal = () => {
         extensionstatusid: status,
         documents,
       },
-      [extensionStatusId.denied]: {}
+      [extensionStatusId.denied]: {},
     };
 
-    return allOptions[status] || {}
+    return allOptions[status] || {};
   };
 
   const handleSave = async () => {
@@ -243,7 +259,7 @@ const AddExtensionModal = () => {
         extensionstatusid: status,
         ...statusOptions,
       };
-  
+
       saveExtensionRequest({
         data: extensionRequest,
         callback: () => {
@@ -256,21 +272,21 @@ const AddExtensionModal = () => {
           errorToast(errorMessage);
         },
       });
-
-    } catch(error) {
-      errorToast(error.message || "Error occured while saving extension details")
+    } catch (error) {
+      errorToast(
+        error.message || "Error occured while saving extension details"
+      );
     }
   };
 
   const errorExists = Object.values({
     reason: !reason,
     numberDays: checkPublicBodyError(numberDays, publicBodySelected),
-    approvedDate: status === extensionStatusId.approved && !approvedDate,
-    approvedNumberDays: status === extensionStatusId.approved && !approvedNumberDays,
+    approvedDate: status === extensionStatusId.approved && !publicBodySelected && !approvedDate,
+    approvedNumberDays: status === extensionStatusId.approved && !publicBodySelected && !approvedNumberDays,
   }).some((isErrorTrue) => isErrorTrue);
 
   const getExtensionReasonMenueItems = () => {
-
     const reasons = filteredExtensionReasons.map((extensionReason) => {
       return (
         <MenuItem
@@ -308,8 +324,10 @@ const AddExtensionModal = () => {
             setReason("");
             setExtendedDate("");
             setNewFiles([]);
-            setApprovedDate("");
+            setApprovedDate(formatDate(new Date()));
             setApprovedNumberDays("");
+            setPrevExtendedDate("");
+            setStatus(extensionStatusId.approved);
           },
         }}
       >
@@ -353,7 +371,7 @@ const AddExtensionModal = () => {
 
               <Grid item xs={12}>
                 <TextField
-                  id="outlined-extension-reasons"
+                  id="extension-reasons"
                   name="reason"
                   variant="outlined"
                   required
@@ -391,6 +409,7 @@ const AddExtensionModal = () => {
 
               <Grid item xs={6}>
                 <TextField
+                  id="extended-due-datee"
                   label="Extended Due Date"
                   type="date"
                   value={extendedDate}
@@ -414,6 +433,7 @@ const AddExtensionModal = () => {
                 <Grid item xs={12}>
                   <FormControl component="fieldset">
                     <RadioGroup
+                      id="status-options"
                       row
                       name="controlled-radio-buttons-group"
                       value={status}
@@ -540,7 +560,7 @@ const AddExtensionModal = () => {
                 disabled={saveLoading || errorExists}
                 onClick={handleSave}
               >
-                Save
+                {saveLoading ? <CircularProgress size="2em" /> : "Save"}
               </button>
             </Grid>
             <Grid item xs={6}>
@@ -558,6 +578,6 @@ const AddExtensionModal = () => {
       </Dialog>
     </>
   );
-}
+};
 
-export default AddExtensionModal
+export default AddExtensionModal;
