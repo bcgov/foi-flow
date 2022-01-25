@@ -3,6 +3,7 @@ from typing import Counter
 
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from dateutil.parser import parse
 import maya
 
@@ -46,6 +47,7 @@ class rawrequestservicegetter:
 
     def getrawrequestforid(self, requestid):
         request = FOIRawRequest.get_request(requestid)
+        request = self.__attachministriesinfo(request)
         if request != {} and request['version'] == 1 and  request['sourceofsubmission'] != "intake":
             requestrawdata = request['requestrawdata']
             requesttype = requestrawdata['requestType']['requestType']
@@ -79,6 +81,11 @@ class rawrequestservicegetter:
             return request['requestrawdata']
         else:
             return None
+     
+    def __attachministriesinfo(self,request):        
+        if request != {} and request['status'] == 'Archived':
+            request['requestrawdata']['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(request["requestid"])
+        return request
         
     def __preparebaserequestinfo(self, requestid, request, requesttype, requestrawdata):
         contactinfo = requestrawdata.get('contactInfo')
