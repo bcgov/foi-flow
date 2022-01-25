@@ -25,7 +25,6 @@ const NotificationList = ({notification}) => {
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
   const userDetail = useSelector(state=> state.user.userDetail);
   const [openModal, setModal] = useState(false);
-  const [ministryCanvassedModal, setMinistryCanvassedModal] = useState(false);
   const [selectedMinistries,setSelectedMinistries]=useState([]);
   let isMinistry = false;
   let requestState = "";
@@ -35,62 +34,9 @@ const NotificationList = ({notification}) => {
     isMinistry = isMinistryLogin(userGroups);
   }
 
-  useEffect(() => {     
-    console.log("Inside Useeffect!!");
-    if(ministryCanvassedModal){
-      console.log("Inside ministryCanvassedModal!!");
-      if(notification.requesttype === 'rawrequest'){
-        dispatch(fetchFOIRawRequestDetailsForNotification(notification, (err, res) => {
-          if (!err && res) {
-            getStatusAndRedirect(res);
-          }
-        }));
-      }
-      else if(notification.requesttype === 'ministryrequest'){
-        dispatch(fetchFOIRequestDetailsForNotification(notification, isMinistry, (err,res) => {
-        if (!err && res) {
-          getStatusAndRedirect(res);
-        }
-        }));
-      }
-  }
-  },[ministryCanvassedModal]);
-
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const {ministryId} = useParams();
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
-
-  const getStatusAndRedirect = (requestDetails) => {
-    Object.entries(StateEnum).forEach(([key, value]) =>{
-      if(key && value.id === requestDetails.requeststatusid){
-        requestState = value.name;
-      }
-    })
-    
-    if(requestState === 'Archived' && requestDetails?.selectedMinistries?.length > 0){
-      setSelectedMinistries(requestDetails.openedMinistries);
-      setModal(true);
-      setMinistryCanvassedModal(false);
-    }
-    else{
-      setRedirectUrl(requestState);
-      setMinistryCanvassedModal(false);
-    }
-  }
-
-  const setRedirectUrl = (requestState) =>{
-    let url = "";
-    if(notification.requesttype === 'rawrequest'){
-      url=`/foi/reviewrequest/${notification.requestid}/${requestState}`;
-    }
-    else if(notification.requesttype === 'ministryrequest'){
-      if(isMinistry)
-        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
-      else
-        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
-    }
-    window.location.href=url;
-  }
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -120,13 +66,60 @@ const NotificationList = ({notification}) => {
     dispatch(deleteFOINotifications(idNumber.toLowerCase(), notification.notificationid,null));
   }
 
+  const handleClick = (notification) => {
+      if(notification.requesttype === 'rawrequest'){
+        dispatch(fetchFOIRawRequestDetailsForNotification(notification, (err, res) => {
+          if (!err && res) {
+            getStatusAndRedirect(res);
+          }
+        }));
+      }
+      else if(notification.requesttype === 'ministryrequest'){
+        dispatch(fetchFOIRequestDetailsForNotification(notification, isMinistry, (err,res) => {
+        if (!err && res) {
+          getStatusAndRedirect(res);
+        }
+        }));
+      }
+  }
+
+  const getStatusAndRedirect = (requestDetails) => {
+    Object.entries(StateEnum).forEach(([key, value]) =>{
+      if(key && value.id === requestDetails.requeststatusid){
+        requestState = value.name;
+      }
+    })
+    
+    if(requestState === 'Archived' && requestDetails?.openedMinistries?.length > 0){
+      setSelectedMinistries(requestDetails.openedMinistries);
+      setModal(true);
+    }
+    else{
+      setRedirectUrl(requestState);
+    }
+  }
+
+  const setRedirectUrl = (requestState) =>{
+    let url = "";
+    if(notification.requesttype === 'rawrequest'){
+      url=`/foi/reviewrequest/${notification.requestid}/${requestState}`;
+    }
+    else if(notification.requesttype === 'ministryrequest'){
+      if(isMinistry)
+        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+      else
+        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+    }
+    window.location.href=url;
+  }
+
 
   return(
     <ListGroup.Item>
       <Row>
         <Col>
           <h6 className="notification-heading">
-            <div className="redirect-url" onClick={() => setMinistryCanvassedModal(true)}>{notification.idnumber}</div></h6>
+            <div className="redirect-url" onClick={() => handleClick(notification)}>{notification.idnumber}</div></h6>
             {openModal && 
             <MinistriesCanvassed  openModal={openModal} selectedMinistries={selectedMinistries} setModal={setModal}/>
             }
