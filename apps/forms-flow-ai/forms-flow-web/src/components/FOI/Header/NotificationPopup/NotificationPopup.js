@@ -19,8 +19,8 @@ const NotificationPopup = ({notifications}) => {
   const tabTitle = () =>{
     let myRequestList = notifications?.filter(x => x.notificationusertype === 'Assignee');
     let watchingRequestList = notifications?.filter(x => x.notificationusertype === 'Watcher');
-    setMyRequestTitle(myRequestList?.length > 0 ? "My Requests ("+myRequestList.length+")": "My Requests");
-    setWatchingRequestTitle(watchingRequestList?.length > 0 ? "Watching Requests ("+watchingRequestList.length+")": "Watching Requests");
+    setMyRequestTitle(myRequestList?.length > 0 ? "My Notifications ("+myRequestList.length+")": "My Notifications");
+    setWatchingRequestTitle(watchingRequestList?.length > 0 ? "Watching Notifications ("+watchingRequestList.length+")": "Watching Notifications");
   }
 
   const assigmentNotifications = notifications?.map((notification,index) =>
