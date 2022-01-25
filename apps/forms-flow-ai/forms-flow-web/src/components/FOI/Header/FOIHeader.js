@@ -13,6 +13,7 @@ import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
 
+
 const FOIHeader = React.memo(() => { 
 
   const dispatch = useDispatch();
@@ -43,8 +44,6 @@ useEffect(() => {
       dispatch(fetchFOINotifications());
   }, 900000);
 },[dispatch]);
-
-
 
 const triggerPopup = () => {
   return(
@@ -97,7 +96,7 @@ const triggerPopup = () => {
                         contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup notifications={foiNotifications} ></NotificationPopup>
+                        <NotificationPopup notifications={foiNotifications}></NotificationPopup>
                         </Popup>
                       </div>
                       </li>
