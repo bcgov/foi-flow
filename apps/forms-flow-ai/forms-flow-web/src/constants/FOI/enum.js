@@ -20,15 +20,20 @@ const MaxFileSizeInMB = Object.freeze({
 });
 
 const extensionStatusId = Object.freeze({
-  denied: 3,
   pending: 1,
   approved: 2,
+  denied: 3,
 });
 
 const extensionStatusLabel = Object.freeze({
-  denied: "Denied",
-  pending: "Pending",
-  approved: "Approved",
+  1: "Pending",
+  2: "Approved",
+  3: "Denied",
 });
 
-export { MimeTypeList, MaxFileSizeInMB, extensionStatusId };
+export {
+  MimeTypeList,
+  MaxFileSizeInMB,
+  extensionStatusId,
+  extensionStatusLabel,
+};

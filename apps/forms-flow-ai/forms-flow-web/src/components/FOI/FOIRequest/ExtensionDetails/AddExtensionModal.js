@@ -26,6 +26,7 @@ import {
 import clsx from "clsx";
 import {
   extensionStatusId,
+  extensionStatusLabel,
   MimeTypeList,
   MaxFileSizeInMB,
 } from "../../../../constants/FOI/enum";
@@ -228,7 +229,12 @@ const AddExtensionModal = () => {
       return [...filesToKeep];
     }
 
-    const uploadedFiles = await uploadFiles(filesToUpload, idNumber, dispatch);
+    const uploadedFiles = await uploadFiles(
+      filesToUpload,
+      idNumber,
+      dispatch,
+      extensionStatusLabel[status]
+    );
     return [...uploadedFiles, ...filesToKeep];
   };
 

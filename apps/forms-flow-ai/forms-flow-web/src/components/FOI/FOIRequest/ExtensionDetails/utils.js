@@ -3,19 +3,19 @@ import {
   saveFilesinS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 
-export const getFileInfoList = (files, idNumber) => {
+export const getFileInfoList = (files, idNumber, statusLabel) => {
   return files.map((file) => {
     return {
       ministrycode: idNumber.split("-")[0],
       requestnumber: idNumber,
-      filestatustransition: "extension",
+      filestatustransition: !statusLabel ? "extension" : `extension - ${statusLabel?.toLowerCase()}`,
       filename: file.filename || file.name,
     };
   });
 };
 
-export const uploadFiles = async (filesToUpload, idNumber, dispatch) => {
-  const fileInfoList = getFileInfoList(filesToUpload, idNumber);
+export const uploadFiles = async (filesToUpload, idNumber, dispatch, statusLabel) => {
+  const fileInfoList = getFileInfoList(filesToUpload, idNumber, statusLabel);
 
   const headers = await new Promise((resolve, reject) => {
     getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
