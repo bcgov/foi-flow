@@ -105,8 +105,8 @@ class dashboardservice:
             'watchers':watchers
         }
 
-    def getrequestqueuepagination(self, groups=None, page=1, size=10, sort=None, desc=False, filterfields=[], keyword=None):
-        requests = FOIRawRequest.getrequestspagination(groups, page, size, sort, desc, filterfields, keyword)
+    def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None):
+        requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword)
         
         requestqueue = []
         for request in requests.items:
@@ -151,8 +151,8 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sort=None, desc=False, filterfields=[], keyword=None):
-        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sort, desc, filterfields, keyword)
+    def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None):
+        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword)
 
         requestqueue = []
         for request in requests.items:

@@ -243,25 +243,20 @@ class FOIRawRequest(db.Model):
             return _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived']))
 
     @classmethod
-    def getrequestspagination(cls, groups, page, size, sort, _desc, filterfields, keyword):
+    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword):
         #ministry requests
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword)
+
+        #sorting
+        sortingcondition = FOIRawRequest.getSorting(sortingitems, sortingorders)
 
         #rawrequests
         if "Intake Team" in groups or groups is None:                
             subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword)
-
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
-
-            if(_desc == 0):
-                return query_full_queue.order_by(asc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
-            else:
-                return query_full_queue.order_by(desc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
+            return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
-            if(_desc == 0):
-                return subquery_ministry_queue.order_by(asc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
-            else:
-                return subquery_ministry_queue.order_by(desc(sort), desc('receivedDateUF')).paginate(page=page, per_page=size)
+            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
     def findfield(cls, x):
@@ -272,7 +267,31 @@ class FOIRawRequest(db.Model):
             'idNumber': cast(FOIRawRequest.requestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
-        }.get(x, FOIRawRequest.assignedto)
+        }.get(x, cast(FOIRawRequest.requestid, String))
+    
+    @classmethod
+    def validatefield(cls, x):
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate']
+        if x in validfields:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def getSorting(cls, sortingitems, sortingorders):
+        sortingcondition = []
+        if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
+            for field in sortingitems:
+                if(FOIRawRequest.validatefield(field)):
+                    order = sortingitems.pop()
+                    if(order == 'desc'):
+                        sortingcondition.append(desc(field))
+                    else:
+                        sortingcondition.append(asc(field))
+        #default sorting
+        if(len(sortingcondition) == 0):
+            sortingcondition.append(asc('idNumber'))
+        sortingcondition.append(desc('receivedDateUF'))
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

@@ -42,6 +42,43 @@ export const fetchFOIRequestList = () => {
   };
 };
 
+export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'idNumber', order:'asc'}], filters = null, keyword = null) => {
+  let sortingItems = [];
+  let sortingOrders = [];
+  sort.forEach((item)=>{
+    sortingItems.push(item.field);
+    sortingOrders.push(item.order);
+  });
+
+  return (dispatch) => {
+    httpGETRequest(
+          API.FOI_GET_REQUESTS_PAGE_API,
+          {
+            "page": page,
+            "size": size,
+            "sortingitems": sortingItems,
+            "sortingorders": sortingOrders,
+            "filters": filters,
+            "keyword": keyword
+          },
+          UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(clearRequestDetails({}));
+          dispatch(fetchFOIAssignedToList("", ""));
+          dispatch(setFOIRequestList(res.data));
+          dispatch(setFOILoader(false)); 
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error in fetching dashboard data for IAO");
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
+};
+
 export const fetchFOIMinistryRequestList = () => {
   return (dispatch) => {
     httpGETRequest(API.FOI_GET_MINISTRY_REQUESTS_API, {}, UserService.getToken())

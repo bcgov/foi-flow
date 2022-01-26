@@ -344,13 +344,25 @@ class FOIMinistryRequest(db.Model):
                             ).filter(ministryfilter).filter(or_(*filtercondition))
 
     @classmethod
-    def getrequestspagination(cls, group, page, size, sort, desc, filterfields, keyword):
+    def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword):
         subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword)
 
-        if(desc == 0):
-            return subquery.order_by(FOIMinistryRequest.findfield(sort).asc(), FOIRequest.receiveddate.desc()).paginate(page=page, per_page=size)
-        else:
-            return subquery.order_by(FOIMinistryRequest.findfield(sort).desc(), FOIRequest.receiveddate.desc()).paginate(page=page, per_page=size)
+        #sorting
+        sortingcondition = []
+        if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
+            for field in sortingitems:
+                order = sortingitems.pop()
+                if(order == 'desc'):
+                    sortingcondition.append(FOIMinistryRequest.findfield(field).desc())
+                else:
+                    sortingcondition.append(FOIMinistryRequest.findfield(field).asc())
+
+        #default sorting
+        if(len(sortingcondition) == 0):
+            sortingcondition.append(FOIMinistryRequest.findfield('idNumber').asc())
+        sortingcondition.append(FOIRequest.receiveddate.desc())
+
+        return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
     def findfield(cls, x):
