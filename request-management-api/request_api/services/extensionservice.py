@@ -173,7 +173,7 @@ class extensionservice:
 
     def __createextensionobject(self, requestextension, documents, extensionreason):
         
-        decisiondate = requestextension['decisiondate'] if 'decisiondate' in requestextension  else None
+        decisiondate =requestextension['decisiondate'] if 'decisiondate' in requestextension  else None
         approvednoofdays = requestextension['approvednoofdays'] if 'approvednoofdays' in requestextension  else None
         extension = {
             "foirequestextensionid": requestextension["foirequestextensionid"],
@@ -181,11 +181,14 @@ class extensionservice:
             "extensionstatusid": requestextension["extensionstatusid"],
             "extendedduedays": requestextension["extendedduedays"],
             "extendedduedate": requestextension["extendedduedate"],
-            "extensiontype": extensionreason["extensiontype"],
-            "decisiondate": decisiondate,
+            "extensiontype": extensionreason["extensiontype"],           
             "approvednoofdays": approvednoofdays,
             "documents": documents
         }
+        if requestextension["extensionstatusid"] == 2:
+            extension["approveddate"] = decisiondate
+        elif requestextension["extensionstatusid"] == 3:
+            extension["denieddate"] = decisiondate
         return extension
 
     def __getextensiondocuments(self, extensionid, extensionversion):
