@@ -34,6 +34,11 @@ class extensionservice:
                     "created_at": self.__formatdate(entry["created_at"], created_atdateformat),  
                     "createdby": entry["createdby"]})        
         return extensions
+
+    def __ispublicbodyextension(self, reasonid):
+        extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
+        return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'
+
     def getrequestextension(self, extensionid):
         requestextension = FOIRequestExtension().getextension(extensionid)
         extensiondocuments = self.__getextensiondocuments(requestextension["foirequestextensionid"], requestextension["version"])
@@ -44,9 +49,9 @@ class extensionservice:
 
     def createrequestextension(self, foirequestid, ministryrequestid, extensionschema, userid):
         version = self.__getversionforrequest(ministryrequestid)
-        extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
-
-        ispublicbodyextension = 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'
+        reasonid = extensionschema['extensionreasonid']
+        extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
+        ispublicbodyextension = self.__ispublicbodyextension(reasonid)
         if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:            
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
@@ -93,7 +98,7 @@ class extensionservice:
  
         extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
         # save documents if it is part of current extension (update to the ministrydocuments table and extensiondocumentmapping table)
-        if 'documents' in updatedextension and updatedextension['extensionstatusid'] != 1:
+        if 'documents' in updatedextension and updatedextension['documents'] and updatedextension['extensionstatusid'] != 1:
             self.saveextensiondocument(updatedextension['documents'], ministryrequestid, userid, extensionid)
         # updates the duedate to extendedduedate or updatedduedate
         # new ministry, extension, extensionmapping and document version gets created
@@ -246,8 +251,13 @@ class extensionservice:
 
     def __copyextensionproperties(self, copyextension, extensionschema, version):
         copyextension['version'] = version +1
-        copyextension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else copyextension['extensionreasonid']
-        copyextension['extensionstatusid'] = extensionschema['extensionstatusid'] if 'extensionstatusid' in extensionschema  else copyextension['extensionstatusid']
+        copyextension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else copyextension['extensionreasonid']   
+        ispublicbodyextension = self.__ispublicbodyextension(copyextension['extensionreasonid'])
+        if ispublicbodyextension == True:
+            extensionstatusid = 2
+        else:
+            extensionstatusid = extensionschema['extensionstatusid'] if 'extensionstatusid' in extensionschema  else copyextension['extensionstatusid']
+        copyextension['extensionstatusid'] = extensionstatusid
         copyextension['extendedduedays'] = extensionschema['extendedduedays'] if 'extendedduedays' in extensionschema  else copyextension['extendedduedays']
         copyextension['extendedduedate'] = extensionschema['extendedduedate'] if 'extendedduedate' in extensionschema  else copyextension['extendedduedate']
         copyextension['decisiondate'] = extensionschema['decisiondate'] if 'decisiondate' in extensionschema  else copyextension['decisiondate']
