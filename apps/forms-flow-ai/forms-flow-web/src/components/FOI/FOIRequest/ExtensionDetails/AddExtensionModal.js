@@ -12,7 +12,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
 import "./extensionscss.scss";
-import DateRangeIcon from "@material-ui/icons/DateRange";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
