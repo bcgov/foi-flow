@@ -58,6 +58,7 @@ const DeleteExtensionModal = () => {
   const [loading, setLoading] = useState(false);
 
   const handleDelete = () => {
+    setLoading(true)
     deleteExtensionRequest({
       extensionId,
       ministryId,

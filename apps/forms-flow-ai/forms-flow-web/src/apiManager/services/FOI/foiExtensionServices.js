@@ -141,12 +141,12 @@ export const deleteExtensionRequest = ({
   errorCallback,
   dispatch,
 }) => {
-  let apiUrl = API.FOI_POST_UPDATE_EXTENSION;
+  let apiUrl = API.FOI_POST_DELETE_EXTENSION;
   apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
   apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
   apiUrl = replaceUrl(apiUrl, "<extensionid>", extensionId);
 
-  httpDELETERequest(apiUrl, UserService.getToken())
+  httpPOSTRequest(apiUrl, {})
     .then((res) => {
       callback(res.data);
     })
