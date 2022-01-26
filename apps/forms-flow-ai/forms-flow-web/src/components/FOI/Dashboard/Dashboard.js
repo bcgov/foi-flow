@@ -31,15 +31,16 @@ const Dashboard = ({userDetail}) => {
 
   const defaultSortModel = [{ field: 'currentState', sort: 'desc' }];
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  const [serverSortModel, setServerSortModel] = React.useState(defaultSortModel);
   const [filterModel, setFilterModel] = React.useState({
     fields: ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
     keyword: null 
   });
 
   useEffect(() => {
-    updateSortModel(sortModel);
+    updateSortModel();
     // page+1 here, because initial page value is 0 for mui-data-grid
-    dispatch(fetchFOIRequestListByPage(rowsState.page+1, rowsState.pageSize, sortModel, filterModel.fields, filterModel.keyword));
+    dispatch(fetchFOIRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword));
   }, [rowsState, sortModel, filterModel]);
 
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
@@ -52,17 +53,18 @@ const Dashboard = ({userDetail}) => {
   }
 
   // update sortModel for applicantName & assignedTo
-  const updateSortModel = ((smodel) => {
+  const updateSortModel = (() => {
+    let smodel = JSON.parse(JSON.stringify(sortModel));
     if(smodel) {
       let field = smodel[0]?.field;
       let order = smodel[0]?.sort;
       if(field == 'applicantName') {
         smodel.shift();
         smodel.unshift({field: 'firstName', sort: order},{field: 'lastName', sort: order})
-        setSortModel(smodel);
       }
+      setServerSortModel(smodel);
     } else {
-      setSortModel(defaultSortModel);
+      setServerSortModel(defaultSortModel);
     }
   });
 

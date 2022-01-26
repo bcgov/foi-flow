@@ -248,7 +248,7 @@ class FOIRawRequest(db.Model):
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword)
 
         #sorting
-        sortingcondition = FOIRawRequest.getSorting(sortingitems, sortingorders)
+        sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
 
         #rawrequests
         if "Intake Team" in groups or groups is None:                
@@ -278,12 +278,12 @@ class FOIRawRequest(db.Model):
             return False
 
     @classmethod
-    def getSorting(cls, sortingitems, sortingorders):
+    def getsorting(cls, sortingitems, sortingorders):
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
                 if(FOIRawRequest.validatefield(field)):
-                    order = sortingitems.pop()
+                    order = sortingorders.pop()
                     if(order == 'desc'):
                         sortingcondition.append(desc(field))
                     else:
