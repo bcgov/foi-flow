@@ -115,6 +115,8 @@ const AddExtensionModal = () => {
   const [approvedDate, setApprovedDate] = useState(formatDate(new Date()));
   const [approvedNumberDays, setApprovedNumberDays] = useState("");
 
+  const [deniedDate, setDeniedDate] = useState(formatDate(new Date()));
+
   const existingFiles = selectedExtension?.documents || [];
   const [newFiles, setNewFiles] = useState([]);
   const attchmentFileNameList = existingFiles.map((file) => file.filename);
@@ -149,6 +151,9 @@ const AddExtensionModal = () => {
           formatDate(selectedExtension.extendedduedate),
           daysToSubtract * -1
         )
+      );
+      setDeniedDate(
+        formatDate(selectedExtension.decisiondate) || formatDate(new Date())
       );
 
     }
@@ -249,7 +254,10 @@ const AddExtensionModal = () => {
         extensionstatusid: status,
         documents,
       },
-      [extensionStatusId.denied]: {},
+      [extensionStatusId.denied]: {
+        decisiondate: deniedDate,
+        documents,
+      },
     };
 
     return allOptions[status] || {};
@@ -292,6 +300,7 @@ const AddExtensionModal = () => {
     numberDays: checkPublicBodyError(numberDays, publicBodySelected),
     approvedDate: status === extensionStatusId.approved && !publicBodySelected && !approvedDate,
     approvedNumberDays: status === extensionStatusId.approved && !publicBodySelected && !approvedNumberDays,
+    deniedDate: status === extensionStatusId.denied && !publicBodySelected && !deniedDate,
   }).some((isErrorTrue) => isErrorTrue);
 
   const getExtensionReasonMenueItems = () => {
@@ -333,6 +342,7 @@ const AddExtensionModal = () => {
             setExtendedDate("");
             setNewFiles([]);
             setApprovedDate(formatDate(new Date()));
+            setDeniedDate(formatDate(new Date()));
             setApprovedNumberDays("");
             setPreExtendedDate("");
             setStatus(extensionStatusId.approved);
@@ -362,7 +372,7 @@ const AddExtensionModal = () => {
               justifyContent="flex-start"
               alignItems="flex-start"
               className={classes.gridContainer}
-              spacing={2}
+              spacing={3}
             >
               <Grid item xs={12}>
                 <span className={classes.DialogLable}>Start Date: </span>
@@ -433,7 +443,7 @@ const AddExtensionModal = () => {
               </Grid>
 
               <ConditionalComponent condition={showStatusOptions}>
-                <Grid item xs={12}>
+                <Grid item xs={12} lg={6}>
                   <FormControl component="fieldset">
                     <RadioGroup
                       id="status-options"
@@ -465,6 +475,7 @@ const AddExtensionModal = () => {
                 <ConditionalComponent
                   condition={status === extensionStatusId.approved}
                 >
+                  <Grid item xs={6}/>
                   <Grid item xs={6}>
                     <TextField
                       label="Approved Date"
@@ -505,7 +516,33 @@ const AddExtensionModal = () => {
                       error={!approvedNumberDays}
                     />
                   </Grid>
-
+                </ConditionalComponent>
+                <ConditionalComponent
+                  condition={status === extensionStatusId.denied}
+                >
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Denied Date"
+                      type="date"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      value={deniedDate}
+                      onChange={(e) => {
+                        setDeniedDate(e.target.value);
+                      }}
+                      InputProps={{
+                        inputProps: { max: formatDate(new Date()) },
+                      }}
+                      variant="outlined"
+                      fullWidth
+                      error={!deniedDate}
+                    />
+                  </Grid>
+                </ConditionalComponent>
+                <ConditionalComponent
+                  condition={status !== extensionStatusId.pending}
+                >
                   <Grid item xs={12}>
                     <FileUpload
                       className={classes.fullWidth}
