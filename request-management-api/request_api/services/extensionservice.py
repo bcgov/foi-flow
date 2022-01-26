@@ -216,6 +216,7 @@ class extensionservice:
     def __copyextensionproperties(self, copyextension, extensionschema, version):
         copyextension['version'] = version +1
         copyextension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else copyextension['extensionreasonid']   
+
         ispublicbodyextension = self.__ispublicbodyextension(copyextension['extensionreasonid'])
         if ispublicbodyextension == True:
             extensionstatusid = 2
@@ -224,7 +225,10 @@ class extensionservice:
         copyextension['extensionstatusid'] = extensionstatusid
         copyextension['extendedduedays'] = extensionschema['extendedduedays'] if 'extendedduedays' in extensionschema  else copyextension['extendedduedays']
         copyextension['extendedduedate'] = extensionschema['extendedduedate'] if 'extendedduedate' in extensionschema  else copyextension['extendedduedate']
-        copyextension['decisiondate'] = extensionschema['decisiondate'] if 'decisiondate' in extensionschema  else copyextension['decisiondate']
+        approveddate = extensionschema['approveddate'] if 'approveddate' in extensionschema else copyextension['decisiondate']
+        denieddate = extensionschema['denieddate'] if 'denieddate' in extensionschema else copyextension['decisiondate']
+        decisiondate = approveddate if approveddate else denieddate
+        copyextension['decisiondate'] = decisiondate
         copyextension['approvednoofdays'] = extensionschema['approvednoofdays'] if 'approvednoofdays' in extensionschema  else copyextension['approvednoofdays']
         
         copyextension['documents'] = extensionschema['documents'] if 'documents' in extensionschema  else None

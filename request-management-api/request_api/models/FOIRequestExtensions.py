@@ -46,7 +46,9 @@ class FOIRequestExtension(db.Model):
         
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
-        decisiondate = extension['decisiondate'] if 'decisiondate' in extension else None
+        approveddate = extension['approveddate'] if 'approveddate' in extension else None
+        denieddate = extension['denieddate'] if 'denieddate' in extension else None
+        decisiondate = approveddate if approveddate else denieddate
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
 
         if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body': 
