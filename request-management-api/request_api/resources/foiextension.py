@@ -120,4 +120,5 @@ class EditFOIRequestExtension(Resource):
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500        
+            return {'status': exception.status_code, 'message':exception.message}, 500   
+    
