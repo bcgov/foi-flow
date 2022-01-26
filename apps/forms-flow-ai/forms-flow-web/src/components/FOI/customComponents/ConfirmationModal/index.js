@@ -118,7 +118,13 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       }
       else if ((currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id))) {
         return (
-          <FileUpload attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={MimeTypeList.stateTransition} maxFileSize={MaxFileSizeInMB.stateTransition} updateFilesCb={updateFilesCb} />
+          <FileUpload 
+            attchmentFileNameList={attchmentFileNameList}  
+            multipleFiles={multipleFiles} 
+            mimeTypes={MimeTypeList.stateTransition} 
+            maxFileSize={MaxFileSizeInMB.stateTransition} 
+            updateFilesCb={updateFilesCb} 
+          />
         );
       }
       else {
