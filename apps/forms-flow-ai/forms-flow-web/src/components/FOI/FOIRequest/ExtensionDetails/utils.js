@@ -75,7 +75,7 @@ export const filterExtensionReason = (
       .map((ex) => ex.extensionreasonid)
   );
 
-  if (selectedExtension) {
+  if (selectedExtension?.extensiontype === "Public Body") {
     return extensionReasonsToFilter.filter(
       (ex) =>
         !publicBodyExtensions.has(ex.extensionreasonid) ||
