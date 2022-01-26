@@ -29,6 +29,8 @@ class FOIRequestExtensionSchema(Schema):
     extensionstatusid = fields.Int(data_key="extensionstatusid")
     extendedduedate = fields.Str(data_key="extendedduedate")
     decisiondate = fields.Str(data_key="decisiondate",required=False, allow_none=True)
+    denieddate = fields.Str(data_key="denieddate",required=False, allow_none=True)
+    approveddate = fields.Str(data_key="approveddate",required=False, allow_none=True)
     approvednoofdays = fields.Int(data_key="approvednoofdays", required=False, allow_none=True)
     version = fields.Int(data_key="version")
     foiministryrequest_id = fields.Int(data_key="foiministryrequest_id")
