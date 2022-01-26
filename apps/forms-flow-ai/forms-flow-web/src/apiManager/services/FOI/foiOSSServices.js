@@ -63,8 +63,8 @@ import {
         if (res) {
           done(null, res.status);
         } else {
-          dispatch(serviceActionError(res));
           done("Error in saving files to S3");
+          dispatch(serviceActionError(res));
         }
       })
       .catch((error) => {
