@@ -14,7 +14,7 @@ import {
   setFOIMinistryRequestList,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
-import { catchError, fnDone, setRedirectUrl } from './foiServicesUtil';
+import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
 
@@ -275,21 +275,23 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId) => {
 };
 
 // TO DO: Need Refinement once the request state is removed from the page url of a request.
-export const fetchFOIRawRequestDetailsForNotification = (requestId, notification) => {
+export const fetchFOIRawRequestDetailsForNotification = (notification, ...rest) => {
+  const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_RAW_REQUEST_API,
     "<requestid>",
-    requestId
+    notification.requestid
   );
   return (dispatch) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          setRedirectUrl(foiRequest, notification);
+          dispatch(setFOIRequestDetail(foiRequest));
+          done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error in fetching raw request details for request# ${requestId}`);
+          throw new Error(`Error in fetching raw request details for request# ${notification.requestId}`);
         }
       })
       .catch((error) => {
@@ -299,7 +301,10 @@ export const fetchFOIRawRequestDetailsForNotification = (requestId, notification
 };
 
 // TO DO: Need Refinement once the request state is removed from the page url of a request.
-export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, notification, isMinistry) => {
+export const fetchFOIRequestDetailsForNotification = (notification, isMinistry, ...rest) => {
+  const done = fnDone(rest);
+  const requestId = notification.foirequestid;
+  const ministryId = notification.requestid;
   let apiUrlgetRequestDetails ="";
   if(isMinistry){
     apiUrlgetRequestDetails = replaceUrl(replaceUrl(
@@ -320,7 +325,8 @@ export const fetchFOIRequestDetailsForNotification = (requestId, ministryId, not
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          setRedirectUrl(foiRequest, notification, isMinistry);
+          dispatch(setFOIRequestDetail(foiRequest));
+          done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`)
