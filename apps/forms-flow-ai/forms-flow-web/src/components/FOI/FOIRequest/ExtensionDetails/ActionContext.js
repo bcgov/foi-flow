@@ -9,7 +9,7 @@ import {
   updateExtensionRequest,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import { extensionStatusId } from "../../../../constants/FOI/enum";
-import { toast } from "react-toastify";
+import { errorToast } from "./utils";
 
 export const ActionContext = createContext();
 ActionContext.displayName = "ExtensionContext"
@@ -18,9 +18,11 @@ export const ActionProvider = ({ children, requestDetails }) => {
   const dispatch = useDispatch();
   const { requestId, ministryId } = useParams();
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true)
-  const [extensionReasons, setExtensionReasons] = useState()  
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [extensionLoading, setExtensionLoading] = useState(true)
+  const [extensionReasons, setExtensionReasons] = useState()
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   const [extensionId, setExtensionId] = useState(null)
   const [selectedExtension, setSelectedExtension] = useState(null)
@@ -48,15 +50,15 @@ export const ActionProvider = ({ children, requestDetails }) => {
   }, [extensions]);
 
   useEffect(() => {
-    if (extensionId && modalOpen) {
-      setLoading(true);
+    if (extensionId && saveModalOpen) {
+      setExtensionLoading(true);
       fetchExtension({
         extensionId: extensionId,
         callback: (data) => {
           setSelectedExtension(data);
         },
         errorCallback: (errorMessage) => {
-          setModalOpen(false)
+          setSaveModalOpen(false)
           errorToast(errorMessage)
         },
         dispatch: dispatch,
@@ -64,7 +66,7 @@ export const ActionProvider = ({ children, requestDetails }) => {
     } else {
         setSelectedExtension(null);
     }
-  }, [modalOpen, extensionId]);
+  }, [saveModalOpen, extensionId]);
 
   const saveExtensionRequest = ({ data, callback, errorCallback }) => {
     if (extensionId) {
@@ -89,25 +91,13 @@ export const ActionProvider = ({ children, requestDetails }) => {
     }
   };
 
-  const errorToast = (errorMessage) => {
-    return toast.error(errorMessage, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
   return (
     <ActionContext.Provider
       value={{
-        modalOpen,
-        setModalOpen,
-        loading,
-        setLoading,
+        saveModalOpen,
+        setSaveModalOpen,
+        extensionLoading,
+        setExtensionLoading,
         extensionId,
         setExtensionId,
         selectedExtension,
@@ -121,7 +111,8 @@ export const ActionProvider = ({ children, requestDetails }) => {
         idNumber,
         saveExtensionRequest,
         pendingExtensionExists,
-        errorToast,
+        deleteModalOpen,
+        setDeleteModalOpen,
       }}
     >
       {children}

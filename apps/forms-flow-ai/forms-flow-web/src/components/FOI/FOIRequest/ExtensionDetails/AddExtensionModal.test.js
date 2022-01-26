@@ -51,8 +51,8 @@ describe("FOI AddExtensionModal component", () => {
   it("FOI AddExtensionModal Rendering Unit test - shallow check", () => {
     store = mockStore({});
     const localState = {
-      modalOpen: true,
-      setModalOpen: jest.fn(),
+      saveModalOpen: true,
+      setSaveModalOpen: jest.fn(),
       extensionReasons: [
         {
           isactive: true,
@@ -97,8 +97,8 @@ describe("FOI AddExtensionModal component", () => {
   it("FOI AddExtensionModal Rendering Unit test - render check", () => {
     store = mockStore({});
     const localState = {
-      modalOpen: true,
-      setModalOpen: jest.fn(),
+      saveModalOpen: true,
+      setSaveModalOpen: jest.fn(),
       extensionReasons: [
         {
           isactive: true,
@@ -166,8 +166,8 @@ describe("FOI AddExtensionModal component", () => {
   it("FOI AddExtensionModal Rendering Unit test - render check OIPC", () => {
     store = mockStore({});
     const localState = {
-      modalOpen: true,
-      setModalOpen: jest.fn(),
+      saveModalOpen: true,
+      setSaveModalOpen: jest.fn(),
       extensionReasons: [
         {
           isactive: true,

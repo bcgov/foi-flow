@@ -12,7 +12,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 import Grid from "@material-ui/core/Grid";
 import "./extensionscss.scss";
-import DateRangeIcon from "@material-ui/icons/DateRange";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -35,6 +34,7 @@ import {
   uploadFiles,
   checkPublicBodyError,
   filterExtensionReason,
+  errorToast
 } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -80,8 +80,8 @@ const AddExtensionModal = () => {
   });
 
   const {
-    modalOpen,
-    setModalOpen,
+    saveModalOpen,
+    setSaveModalOpen,
     extensionReasons,
     dispatch,
     startDate,
@@ -89,10 +89,9 @@ const AddExtensionModal = () => {
     originalDueDate,
     idNumber,
     selectedExtension,
-    loading,
-    setLoading,
+    extensionLoading,
+    setExtensionLoading,
     saveExtensionRequest,
-    errorToast,
     extensions,
   } = useContext(ActionContext);
 
@@ -157,7 +156,7 @@ const AddExtensionModal = () => {
       );
 
     }
-    setLoading(false);
+    setExtensionLoading(false);
   }, [selectedExtension, extensionReasons]);
 
   const handleReasonChange = (e) => {
@@ -210,7 +209,7 @@ const AddExtensionModal = () => {
   };
 
   const handleClose = () => {
-    setModalOpen(false);
+    setSaveModalOpen(false);
   };
 
   const handleFileChanges = async () => {
@@ -279,7 +278,7 @@ const AddExtensionModal = () => {
       saveExtensionRequest({
         data: extensionRequest,
         callback: () => {
-          setModalOpen(false);
+          setSaveModalOpen(false);
           setSaveLoading(false);
           window.history.go(0);
         },
@@ -329,8 +328,8 @@ const AddExtensionModal = () => {
   return (
     <>
       <Dialog
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        open={saveModalOpen}
+        onClose={() => setSaveModalOpen(false)}
         aria-labelledby="extension-dialog-title"
         maxWidth={"md"}
         fullWidth={true}
@@ -353,7 +352,7 @@ const AddExtensionModal = () => {
           <h2 className="extension-header">Extension</h2>
           <IconButton
             className="title-col3"
-            onClick={() => setModalOpen(false)}
+            onClick={() => setSaveModalOpen(false)}
           >
             <CloseIcon />
           </IconButton>
@@ -365,7 +364,7 @@ const AddExtensionModal = () => {
             overflowX: "hidden",
           }}
         >
-          <ConditionalComponent condition={!loading}>
+          <ConditionalComponent condition={!extensionLoading}>
             <Grid
               container
               direction="row"
@@ -559,7 +558,7 @@ const AddExtensionModal = () => {
               </ConditionalComponent>
             </Grid>
           </ConditionalComponent>
-          <ConditionalComponent condition={loading}>
+          <ConditionalComponent condition={extensionLoading}>
             <Grid
               container
               direction="row"
