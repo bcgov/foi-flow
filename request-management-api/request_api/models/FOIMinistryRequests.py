@@ -374,6 +374,7 @@ class FOIMinistryRequest(db.Model):
             'idNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
+            'receivedDate': FOIRequest.receiveddate,
         }.get(x, FOIMinistryRequest.filenumber)
 
 

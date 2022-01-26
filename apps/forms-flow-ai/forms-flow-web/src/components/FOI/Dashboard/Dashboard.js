@@ -28,15 +28,17 @@ const Dashboard = ({userDetail}) => {
     page: 0,
     pageSize: 10,
   });
-  const [sortModel, setSortModel] = React.useState([
-    { field: 'idNumber', sort: 'asc' },
-  ]);
+
+  const defaultSortModel = [{ field: 'currentState', sort: 'desc' }];
+  const [sortModel, setSortModel] = React.useState(defaultSortModel);
   const [filterModel, setFilterModel] = React.useState({
     fields: ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
     keyword: null 
   });
 
   useEffect(() => {
+    updateSortModel(sortModel);
+    // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(fetchFOIRequestListByPage(rowsState.page+1, rowsState.pageSize, sortModel, filterModel.fields, filterModel.keyword));
   }, [rowsState, sortModel, filterModel]);
 
@@ -48,6 +50,21 @@ const Dashboard = ({userDetail}) => {
       params.row.firstName || ''
     }`;
   }
+
+  // update sortModel for applicantName & assignedTo
+  const updateSortModel = ((smodel) => {
+    if(smodel) {
+      let field = smodel[0]?.field;
+      let order = smodel[0]?.sort;
+      if(field == 'applicantName') {
+        smodel.shift();
+        smodel.unshift({field: 'firstName', sort: order},{field: 'lastName', sort: order})
+        setSortModel(smodel);
+      }
+    } else {
+      setSortModel(defaultSortModel);
+    }
+  });
 
   function getAssigneeValue(row) {
     const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";

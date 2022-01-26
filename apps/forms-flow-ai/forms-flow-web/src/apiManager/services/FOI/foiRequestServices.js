@@ -42,12 +42,12 @@ export const fetchFOIRequestList = () => {
   };
 };
 
-export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'idNumber', order:'asc'}], filters = null, keyword = null) => {
+export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null) => {
   let sortingItems = [];
   let sortingOrders = [];
   sort.forEach((item)=>{
     sortingItems.push(item.field);
-    sortingOrders.push(item.order);
+    sortingOrders.push(item.sort);
   });
 
   return (dispatch) => {

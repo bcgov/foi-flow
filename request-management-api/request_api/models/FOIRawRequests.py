@@ -290,9 +290,9 @@ class FOIRawRequest(db.Model):
                         sortingcondition.append(asc(field))
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(asc('idNumber'))
-        sortingcondition.append(desc('receivedDateUF'))
-
+            sortingcondition.append(asc('currentState'))
+        
+        return sortingcondition
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
         fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted')
