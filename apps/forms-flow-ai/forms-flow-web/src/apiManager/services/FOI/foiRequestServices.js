@@ -42,7 +42,7 @@ export const fetchFOIRequestList = () => {
   };
 };
 
-export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null) => {
+export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
   let sortingItems = [];
   let sortingOrders = [];
   sort.forEach((item)=>{
@@ -59,7 +59,9 @@ export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'c
             "sortingitems": sortingItems,
             "sortingorders": sortingOrders,
             "filters": filters,
-            "keyword": keyword
+            "keyword": keyword,
+            "additionalfilter": additionalFilter,
+            "userid": userID
           },
           UserService.getToken())
       .then((res) => {

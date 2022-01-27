@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import text
+from sqlalchemy import text, and_
 
 import json
 class FOIRequestWatcher(db.Model):
@@ -59,6 +59,10 @@ class FOIRequestWatcher(db.Model):
             if row["isactive"] == True:
                 watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
         return watchers 
+
+    @classmethod
+    def getrequestidsbyuserid(cls, userid):
+        return db.session.query(FOIRequestWatcher.ministryrequestid.distinct().label('ministryrequestid')).filter(and_(FOIRequestWatcher.watchedby == userid, FOIRequestWatcher.isactive == True)).subquery()
 
     @classmethod
     def disablewatchers(cls, ministryrequestid, userid):   

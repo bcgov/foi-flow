@@ -13,6 +13,7 @@ from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
+from .FOIRequestWatchers import FOIRequestWatcher
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -200,7 +201,7 @@ class FOIMinistryRequest(db.Model):
         return requeststates
 
     @classmethod
-    def getrequestssubquery(cls, groups, filterfields, keyword):
+    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid):
         _session = db.session
 
         #ministry filter for group/team
@@ -286,8 +287,7 @@ class FOIMinistryRequest(db.Model):
             FOIRequest.created_at.label('created_at')
         ]
 
-        if(keyword is None):
-            return _session.query(
+        basequery = _session.query(
                                 *selectedcolumns
                             ).join(
                                 subquery_ministry_maxversion,
@@ -313,39 +313,27 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 ApplicantCategory,
                                 and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
-                            ).filter(ministryfilter)
+                            )
+
+        if(additionalfilter == 'watchingRequests'):
+            #watchby
+            subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
+            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(ministryfilter)
+        elif(additionalfilter == 'myRequests'):
+            #myrequest
+            dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
         else:
-            return _session.query(
-                                *selectedcolumns
-                            ).join(
-                                subquery_ministry_maxversion,
-                                and_(*joincondition_ministry)
-                            ).join(
-                                FOIRequest,
-                                and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
-                            # ).join(
-                            #     subquery_foirequest_maxversion,
-                            #     and_(*joincondition_foirequest)
-                            ).join(
-                                FOIRequestStatus,
-                                FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
-                            ).join(
-                                FOIRequestApplicantMapping,
-                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id)
-                            ).join(
-                                subquery_applicantmapping_first,
-                                and_(*joincondition_applicantmapping)
-                            ).join(
-                                FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
-                            ).join(
-                                ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
-                            ).filter(ministryfilter).filter(or_(*filtercondition))
+            dbquery = basequery.filter(ministryfilter)
+
+
+        if(keyword is None):
+            return dbquery
+        else:
+            return dbquery.filter(or_(*filtercondition))
 
     @classmethod
-    def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword):
-        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword)
+    def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
+        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid)
 
         #sorting
         sortingcondition = []

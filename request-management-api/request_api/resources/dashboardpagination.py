@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins,getrequiredmemberships
+from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins, getrequiredmemberships
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, UserGroup
 from request_api.auth import auth
 from request_api.tracer import Tracer
@@ -30,15 +30,21 @@ class DashboardPagination(Resource):
         try:
             DEFAULT_PAGE = 1
             DEFAULT_SIZE = 10
-            DEFAULT_SORT = 'currentState'
-            DEFAULT_DESC = 0
+            DEFAULT_SORT_ITEMS = ['currentState']
+            DEFAULT_SORT_ORDERS = ['desc']
             DEFAULT_FILTER_FIELDS = ['idNumber', 'currentState', 'firstName', 'lastName', 'assignedTo', 'requestType']
-
+            DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
             _size = flask.request.args.get('size', DEFAULT_SIZE, type=int)
-            _sort = flask.request.args.get('sort', DEFAULT_SORT, type=str)
-            _desc = flask.request.args.get('desc', DEFAULT_DESC, type=int)
-            _filterfields = flask.request.args.getlist('filterfields')
+            _sortingitems = flask.request.args.getlist('sortingitems[]')
+            _sortingorders = flask.request.args.getlist('sortingorders[]')
+            _filterfields = flask.request.args.getlist('filterfields[]')
+            _additionalfilter = flask.request.args.get('additionalfilter', DEFAULT_ADDITIONAL_FILTER, type=str)
+            _userid = flask.request.args.get('userid', None, type=str)
+            if(len(_sortingitems) == 0):
+                _sortingitems = DEFAULT_SORT_ITEMS
+            if(len(_sortingorders) == 0):
+                _sortingorders = DEFAULT_SORT_ORDERS
             if(len(_filterfields) == 0):
                 _filterfields = DEFAULT_FILTER_FIELDS
             _keyword = flask.request.args.get('keyword', None, type=str)
@@ -46,7 +52,7 @@ class DashboardPagination(Resource):
             # 'Intake Team', 'Flex Team','Processing Team'
             groups = ['Intake Team', 'Flex Team','Processing Team']
             statuscode = 200
-            requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sort, _desc, _filterfields, _keyword)
+            requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
 
             return requests, statuscode
         except BusinessException as exception:

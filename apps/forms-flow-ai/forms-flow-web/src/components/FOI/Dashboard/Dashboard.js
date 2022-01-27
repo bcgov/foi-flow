@@ -15,9 +15,9 @@ const Dashboard = ({userDetail}) => {
 
   const dispatch = useDispatch();
   const requestQueue = useSelector(state=> state.foiRequests.foiRequestsList);
+  console.log(requestQueue);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
-  const [requestFilter, setRequestFilter] = useState("All");
-  const [searchText, setSearchText] = useState("");
+  
   const classes = useStyles();
   useEffect(()=>{
     dispatch(fetchFOIFullAssignedToList());
@@ -36,12 +36,13 @@ const Dashboard = ({userDetail}) => {
     fields: ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
     keyword: null 
   });
+  const [requestFilter, setRequestFilter] = useState("All");
 
   useEffect(() => {
     updateSortModel();
     // page+1 here, because initial page value is 0 for mui-data-grid
-    dispatch(fetchFOIRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword));
-  }, [rowsState, sortModel, filterModel]);
+    dispatch(fetchFOIRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword, requestFilter, userDetail.preferred_username));
+  }, [rowsState, sortModel, filterModel, requestFilter]);
 
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
@@ -140,7 +141,7 @@ const Dashboard = ({userDetail}) => {
     },
     { 
       field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
-    ]);  
+  ]);  
       
   const requestFilterChange = (e) => { 
     setRequestFilter(e.target.value);
@@ -151,31 +152,9 @@ const Dashboard = ({userDetail}) => {
     setFilterModel((prev) => ({ ...prev, keyword}));
   }
 
-const search = (data) => {  
-  const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
-  let dashboardData = updatedRows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
-  (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  ) ); 
-
-  if (requestFilter === "myRequests" ) {
-    dashboardData = dashboardData.filter(row => row.assignedTo === userDetail.preferred_username)
+  const updateAssigneeName = (data) => {  
+    return data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
   }
-  else if (requestFilter === "watchingRequests") {
-    dashboardData = dashboardData.filter(row => {
-      if (row.watchers && !!row.watchers.find(watcher => watcher.watchedby === userDetail.preferred_username)){        
-        return row;
-      }      
-    })
-  }  
-  return dashboardData;
-
-}
  
 
   const renderReviewRequest = (e) => {
@@ -217,7 +196,7 @@ const search = (data) => {
               <DataGrid 
                 className="foi-data-grid"
                 getRowId={(row) => row.idNumber}
-                rows={requestQueue.data} 
+                rows={updateAssigneeName(requestQueue.data)} 
                 columns={columns.current}                
                 rowHeight={30}
                 headerHeight={50}

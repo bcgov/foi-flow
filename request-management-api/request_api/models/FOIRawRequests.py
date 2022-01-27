@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship,backref
 from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc
 
 from .FOIMinistryRequests import FOIMinistryRequest
+from .FOIRawRequestWatchers import FOIRawRequestWatcher
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -197,7 +198,7 @@ class FOIRawRequest(db.Model):
         return requeststates    
     
     @classmethod
-    def getrequestssubquery(cls, filterfields, keyword):
+    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
         _session = db.session
 
         #rawrequests
@@ -233,6 +234,16 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.created_at.label('created_at')
         ]
 
+        if(additionalfilter == 'watchingRequests'):
+            #watchby
+            subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+        elif(additionalfilter == 'myRequests'):
+            #myrequest
+            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+        else:
+            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived']))
+
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
@@ -242,22 +253,21 @@ class FOIRawRequest(db.Model):
                     filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
                 if(field == 'lastName'):
                     filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            print(or_(*filtercondition))
-            return _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived'])).filter(or_(*filtercondition))
+            return dbquery.filter(or_(*filtercondition))
         else:
-            return _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived']))
+            return dbquery
 
     @classmethod
-    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword):
+    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
         #ministry requests
-        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword)
+        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
 
         #rawrequests
         if "Intake Team" in groups or groups is None:                
-            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword)
+            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid)
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
             return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:

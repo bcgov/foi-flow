@@ -51,6 +51,10 @@ class FOIRawRequestWatcher(db.Model):
         return watchers 
 
     @classmethod
+    def getrequestidsbyuserid(cls, userid):
+        return db.session.query(FOIRawRequestWatcher.requestid.distinct().label('requestid')).filter(and_(FOIRawRequestWatcher.watchedby == userid, FOIRawRequestWatcher.isactive == True)).subquery()
+
+    @classmethod
     def disablewatchers(cls, requestid, userid):   
         dbquery = db.session.query(FOIRawRequestWatcher)
         requestraqw = dbquery.filter_by(requestid=requestid)
