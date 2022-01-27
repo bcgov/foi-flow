@@ -24,6 +24,7 @@ import {
   alertUser
 } from "./utils";
 import clsx from "clsx";
+import { findRequestState } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -109,6 +110,7 @@ const BottomButtonGroup = React.memo(
           ministryId,
           (err, res) => {
             if (!err) {
+              requestState = findRequestState(res.requeststatusid);
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -125,7 +127,7 @@ const BottomButtonGroup = React.memo(
                 saveRequestObject,
               });
               handleSaveRequest(_state, false, res.id);
-             // hasStatusRequestSaved(currentSelectedStatus);
+              hasStatusRequestSaved(currentSelectedStatus);
             } else {
               toast.error(
                 "Temporarily unable to save your request. Please try again in a few minutes.",

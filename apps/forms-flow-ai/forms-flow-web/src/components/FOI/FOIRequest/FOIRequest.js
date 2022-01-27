@@ -55,7 +55,8 @@ import {
   checkContactGiven,
   getBCgovCode,
   checkValidationError,
-  alertUser
+  alertUser,
+  findRequestState
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
@@ -168,11 +169,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
-    if(requestDetails){
-      setRequestState(requestDetails.currentState);
-      settabStatus(requestDetails.currentState);
+    if(requestDetails && Object.entries(requestDetails).length !== 0){
+      var requestStateFromId = findRequestState(requestDetails.requeststatusid);
+      setRequestState(requestStateFromId);
+      settabStatus(requestStateFromId);
     }
   }, [requestDetails]);
+
+
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -298,6 +302,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
+    setRequestState(_state);
     if (!_unSaved) {
       setStateChanged(false);
       setcurrentrequestStatus(_state);

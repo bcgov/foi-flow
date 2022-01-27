@@ -67,16 +67,18 @@ const NotificationList = ({notification}) => {
   }
 
   const handleClick = (notificationVal) => {
-      if(notificationVal.requesttype === 'rawrequest'){
+    let idNumber = notification.idnumber;
+    idNumber+='';
+    let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
+    if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
+     notification.notification.toLowerCase() === "moved to open state"){
         dispatch(fetchFOIRawRequestDetailsForNotification(notificationVal, (err, res) => {
             getStatusAndRedirect(err, res);
         }));
-      }
-      else if(notificationVal.requesttype === 'ministryrequest'){
-        dispatch(fetchFOIRequestDetailsForNotification(notificationVal, isMinistry, (err,res) => {
-          getStatusAndRedirect(err, res);
-        }));
-      }
+    }
+    else{
+      setRedirectUrl();
+    }
   }
 
 
@@ -94,21 +96,21 @@ const NotificationList = ({notification}) => {
         setModal(true);
       }
       else{
-        setRedirectUrl(requestState);
+        setRedirectUrl();
       }
     }
   }
 
-  const setRedirectUrl = (requestState) =>{
+  const setRedirectUrl = () =>{
     let url = "";
     if(notification.requesttype === 'rawrequest'){
-      url=`/foi/reviewrequest/${notification.requestid}/${requestState}`;
+      url=`/foi/reviewrequest/${notification.requestid}`;
     }
     else if(notification.requesttype === 'ministryrequest'){
       if(isMinistry)
-        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}`;
       else
-        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}`;
     }
     window.location.href=url;
   }

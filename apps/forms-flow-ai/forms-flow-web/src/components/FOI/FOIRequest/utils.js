@@ -243,3 +243,10 @@ export const alertUser = (e) => {
   e.preventDefault();
   e.returnValue = "";
 };
+
+export const findRequestState= (requestStatusId) =>{
+  if(requestStatusId != undefined){
+    var stateArray = Object.entries(StateEnum).find(value => value[1].id === requestStatusId);
+    return stateArray[1].name;
+  }
+}
