@@ -93,6 +93,7 @@ const BottomButtonGroup = React.memo(
     };
 
     console.log("RequestState in bottombuttongroup", requestState);
+    console.log("currentSelectedStatus in bottombuttongroup :",currentSelectedStatus);
     useEffect(() => {
       if(stateChanged){
         requestState= saveRequestObject.currentState;
@@ -111,8 +112,6 @@ const BottomButtonGroup = React.memo(
           ministryId,
           (err, res) => {
             if (!err) {
-              console.log("REsponse json:", JSON.stringify(res));
-              console.log("RequestStatusId:", res.requeststatusid);
               // requestState = findRequestState(res.requeststatusid);
               console.log("Request state from enum in index.js:", requestState);
               toast.success("The request has been saved successfully.", {
@@ -132,6 +131,7 @@ const BottomButtonGroup = React.memo(
               });
               console.log("Inside SaveRequest in index.js", _state);
               handleSaveRequest(_state, false, res.id);
+              console.log("Inside saveRequest- :",currentSelectedStatus);
               hasStatusRequestSaved(currentSelectedStatus);
             } else {
               toast.error(

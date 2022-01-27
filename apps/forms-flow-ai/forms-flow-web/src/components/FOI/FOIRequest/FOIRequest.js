@@ -306,7 +306,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (!_unSaved) {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
-
+      console.log("Inside handleSaveRequest:",_state);
+      console.log("Inside handleSaveRequest- :",_currentrequestStatus);
       // setTimeout(() => {
       //   const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
 
