@@ -79,6 +79,9 @@ class rawrequestservice:
 
     def getrawrequest(self, requestid):
         return rawrequestservicegetter().getrawrequestforid(requestid)
+    
+    def getrawrequestfields(self, requestid, fields):
+        return rawrequestservicegetter().getrawrequestfieldsforid(requestid, fields) 
         
     def getstatus(self, foirequest):
         statusid = foirequest["requeststatusid"] if "requeststatusid" in foirequest else None
