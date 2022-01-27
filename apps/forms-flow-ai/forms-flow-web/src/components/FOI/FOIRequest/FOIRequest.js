@@ -307,17 +307,17 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
 
-      setTimeout(() => {
-        const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
+      // setTimeout(() => {
+      //   const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
 
-        if (redirectUrl) {
-          window.location.href = redirectUrl
-        } else {
-          dispatch(push(`/foi/reviewrequest/${id}`))
-        }
+      //   if (redirectUrl) {
+      //     window.location.href = redirectUrl
+      //   } else {
+      //     dispatch(push(`/foi/reviewrequest/${id}`))
+      //   }
 
-      }
-        , 1000);
+      // }
+      //   , 1000);
     }
     else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -452,7 +452,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const isAttachmentListLoading = useSelector(state => state.foiRequests.isAttachmentListLoading);
 
   const stateTransition = requestDetails?.stateTransition;
-
+  console.log("StateDropDown in FoiRequest:", requestState);
   return (
   (!isLoading && requestDetails && Object.keys(requestDetails).length !== 0) || isAddRequest ?
     <div className="foiformcontent">

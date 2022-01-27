@@ -126,6 +126,7 @@ const BottomButtonGroup = React.memo(
                 urlIndexCreateRequest,
                 saveRequestObject,
               });
+              console.log("Inside SaveRequest in index.js", _state);
               handleSaveRequest(_state, false, res.id);
               hasStatusRequestSaved(currentSelectedStatus);
             } else {
