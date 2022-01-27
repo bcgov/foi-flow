@@ -108,7 +108,7 @@ class extensionservice:
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
         return extensionresult
-
+        
     def deleterequestextension(self, requestid, ministryrequestid, extensionid, userid):
         extensionschema = {'isactive':False}
         return self.createrequestextensionversionfordelete(requestid, ministryrequestid, extensionid, extensionschema, userid)
@@ -146,7 +146,6 @@ class extensionservice:
         if extensionresult.success == True and isdeletedocument == True:
             self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)
         return extensionresult
-
 
     def __isstatuschangedfromapproved(self, prevstatus,  currentstatus):        
         if prevstatus == 2 and currentstatus != prevstatus:
@@ -212,7 +211,7 @@ class extensionservice:
 
     def __createextensionobject(self, requestextension, documents, extensionreason):
         
-        decisiondate = requestextension['decisiondate'] if 'decisiondate' in requestextension  else None
+        decisiondate =requestextension['decisiondate'] if 'decisiondate' in requestextension  else None
         approvednoofdays = requestextension['approvednoofdays'] if 'approvednoofdays' in requestextension  else None
         extension = {
             "foirequestextensionid": requestextension["foirequestextensionid"],
@@ -220,11 +219,14 @@ class extensionservice:
             "extensionstatusid": requestextension["extensionstatusid"],
             "extendedduedays": requestextension["extendedduedays"],
             "extendedduedate": requestextension["extendedduedate"],
-            "extensiontype": extensionreason["extensiontype"],
-            "decisiondate": decisiondate,
+            "extensiontype": extensionreason["extensiontype"],           
             "approvednoofdays": approvednoofdays,
             "documents": documents
         }
+        if requestextension["extensionstatusid"] == 2:
+            extension["approveddate"] = decisiondate
+        elif requestextension["extensionstatusid"] == 3:
+            extension["denieddate"] = decisiondate
         return extension
 
     def __getextensiondocuments(self, extensionid, extensionversion):
@@ -252,6 +254,7 @@ class extensionservice:
     def __copyextensionproperties(self, copyextension, extensionschema, version):
         copyextension['version'] = version +1
         copyextension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else copyextension['extensionreasonid']   
+
         ispublicbodyextension = self.__ispublicbodyextension(copyextension['extensionreasonid'])
         if ispublicbodyextension == True:
             extensionstatusid = 2
@@ -260,7 +263,10 @@ class extensionservice:
         copyextension['extensionstatusid'] = extensionstatusid
         copyextension['extendedduedays'] = extensionschema['extendedduedays'] if 'extendedduedays' in extensionschema  else copyextension['extendedduedays']
         copyextension['extendedduedate'] = extensionschema['extendedduedate'] if 'extendedduedate' in extensionschema  else copyextension['extendedduedate']
-        copyextension['decisiondate'] = extensionschema['decisiondate'] if 'decisiondate' in extensionschema  else copyextension['decisiondate']
+        approveddate = extensionschema['approveddate'] if 'approveddate' in extensionschema else copyextension['decisiondate']
+        denieddate = extensionschema['denieddate'] if 'denieddate' in extensionschema else copyextension['decisiondate']
+        decisiondate = approveddate if approveddate else denieddate
+        copyextension['decisiondate'] = decisiondate
         copyextension['approvednoofdays'] = extensionschema['approvednoofdays'] if 'approvednoofdays' in extensionschema  else copyextension['approvednoofdays']
         
         copyextension['documents'] = extensionschema['documents'] if 'documents' in extensionschema  else None

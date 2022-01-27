@@ -232,6 +232,8 @@ class FOIMinistryRequest(db.Model):
         setattr(currequest,'updatedby',userid)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',ministryrequestid)
+    
+    @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
         sql = """select distinct filenumber, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
                     inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 

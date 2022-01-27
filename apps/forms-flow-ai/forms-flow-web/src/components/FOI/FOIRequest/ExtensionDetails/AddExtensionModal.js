@@ -137,7 +137,7 @@ const AddExtensionModal = () => {
       setStatus(selectedExtension.extensionstatusid);
       setNewFiles(selectedExtension.documents || []);
       setApprovedDate(
-        formatDate(selectedExtension.decisiondate) || formatDate(new Date())
+        formatDate(selectedExtension.approveddate) || formatDate(new Date())
       );
       setApprovedNumberDays(
         selectedExtension.approvednoofdays ||
@@ -152,7 +152,7 @@ const AddExtensionModal = () => {
         )
       );
       setDeniedDate(
-        formatDate(selectedExtension.decisiondate) || formatDate(new Date())
+        formatDate(selectedExtension.denieddate) || formatDate(new Date())
       );
 
     }
@@ -248,13 +248,13 @@ const AddExtensionModal = () => {
     const allOptions = {
       [extensionStatusId.pending]: {},
       [extensionStatusId.approved]: {
-        decisiondate: approvedDate,
+        approveddate: approvedDate,
         approvednoofdays: approvedNumberDays,
         extensionstatusid: status,
         documents,
       },
       [extensionStatusId.denied]: {
-        decisiondate: deniedDate,
+        denieddate: deniedDate,
         documents,
       },
     };

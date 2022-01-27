@@ -122,7 +122,6 @@ class EditFOIRequestExtension(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 
-
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>/extension/<extensionid>/delete')
 class DeleteFOIRequestExtension(Resource):
@@ -142,4 +141,4 @@ class DeleteFOIRequestExtension(Resource):
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500       
+            return {'status': exception.status_code, 'message':exception.message}, 500    
