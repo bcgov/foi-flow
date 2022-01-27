@@ -113,7 +113,6 @@ const BottomButtonGroup = React.memo(
           (err, res) => {
             if (!err) {
               // requestState = findRequestState(res.requeststatusid);
-              console.log("Request state from enum in index.js:", requestState);
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -129,9 +128,9 @@ const BottomButtonGroup = React.memo(
                 urlIndexCreateRequest,
                 saveRequestObject,
               });
-              console.log("Inside SaveRequest in index.js", _state);
+              console.log("_state Inside SaveRequest in index.js", _state);
               handleSaveRequest(_state, false, res.id);
-              console.log("Inside saveRequest- :",currentSelectedStatus);
+              console.log("currentSelectedStatus Inside saveRequest- :",currentSelectedStatus);
               hasStatusRequestSaved(currentSelectedStatus);
             } else {
               toast.error(

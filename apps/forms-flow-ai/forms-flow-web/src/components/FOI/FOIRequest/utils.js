@@ -247,7 +247,6 @@ export const alertUser = (e) => {
 export const findRequestState= (requestStatusId) =>{
   if(requestStatusId != undefined){
     var stateArray = Object.entries(StateEnum).find(value => value[1].id === requestStatusId);
-    console.log("stateArray",stateArray);
     return stateArray[1].name;
   }
 }

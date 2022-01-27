@@ -18,7 +18,6 @@ export const getRequestState = ({
   saveRequestObject,
 }) => {
   if (currentSelectedStatus) {
-    console.log("Inside currentSelectedStatus");
     return currentSelectedStatus;
   }
 
@@ -26,15 +25,12 @@ export const getRequestState = ({
     requestState === StateEnum.unopened.name &&
     saveRequestObject.sourceOfSubmission === "onlineform"
   ) {
-    console.log("Inside 2nd of currentSelectedStatus(StateEnum.unopened)");
     return StateEnum.intakeinprogress.name;
   }
 
   if (urlIndexCreateRequest > -1) {
-    console.log("Inside urlIndexCreateRequest");
     return StateEnum.intakeinprogress.name;
   }
-  console.log("Just requestState!!");
   return requestState;
 };
 

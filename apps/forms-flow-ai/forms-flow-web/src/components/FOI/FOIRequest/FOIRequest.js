@@ -176,7 +176,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [requestDetails]);
 
-
+  console.log("_currentrequestStatus in FoiRequest!!:", _currentrequestStatus);
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -306,8 +306,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (!_unSaved) {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
-      console.log("Inside handleSaveRequest:",_state);
-      console.log("Inside handleSaveRequest- :",_currentrequestStatus);
+      console.log("_state Inside handleSaveRequest of FoiRequest:",_state);
+      console.log("_currentrequestStatus Inside handleSaveRequest: :",_currentrequestStatus);
       // setTimeout(() => {
       //   const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
 
