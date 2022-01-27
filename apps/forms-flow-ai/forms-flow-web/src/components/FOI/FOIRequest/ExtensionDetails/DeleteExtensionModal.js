@@ -15,7 +15,6 @@ import clsx from "clsx";
 import { deleteExtensionRequest } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import { useParams } from "react-router-dom";
 import { errorToast } from "./utils";
-import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   btndisabled: {
