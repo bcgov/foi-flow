@@ -69,6 +69,7 @@ const DeleteExtensionModal = () => {
         window.history.go(0);
       },
       errorCallback: (errorMessage) => {
+        setLoading(false);
         errorToast(errorMessage);
       },
       dispatch
@@ -114,7 +115,7 @@ const DeleteExtensionModal = () => {
           }}
         >
           <DialogContentText variant="h4">
-            Are you sure you want to delete the attachment?
+            Are you sure you want to delete this extension?
           </DialogContentText>
         </DialogContent>
 
