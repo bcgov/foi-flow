@@ -113,7 +113,7 @@ const BottomButtonGroup = React.memo(
             if (!err) {
               console.log("REsponse json:", JSON.stringify(res));
               console.log("RequestStatusId:", res.requeststatusid);
-              requestState = findRequestState(res.requeststatusid);
+              // requestState = findRequestState(res.requeststatusid);
               console.log("Request state from enum in index.js:", requestState);
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
