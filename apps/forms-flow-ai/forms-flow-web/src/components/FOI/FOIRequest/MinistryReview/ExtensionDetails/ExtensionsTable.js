@@ -1,13 +1,10 @@
 import React, { useContext } from "react";
-import PropTypes from "prop-types";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { makeStyles } from "@material-ui/core/styles";
 import { ActionContext } from "./ActionContext";
 
@@ -29,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const ExtensionsTable = ({showActions = true}) => {
+const ExtensionsTable = () => {
 
 const classes = useStyles()
 
@@ -43,7 +40,7 @@ const ConditionalTableBody = ({empty, children}) => {
         return (
           <>
             <TableBody>
-              <TableRow key={`key-empty`}>
+              <TableRow key={`extension-row-empty`}>
                 <TableCell colSpan={5} align="center">
                   No extensions taken.
                 </TableCell>
@@ -58,18 +55,6 @@ const ConditionalTableBody = ({empty, children}) => {
         <TableBody>{children}</TableBody>
       </>
     );
-}
-
-const ConditionalTableCell = ({condition, children, ...rest}) => {
-  if(!condition) {
-    return null;
-  }
-
-  return <>
-    <TableCell {...rest}>
-      {children}
-    </TableCell>
-  </>
 }
 
   return (
@@ -89,28 +74,16 @@ const ConditionalTableCell = ({condition, children, ...rest}) => {
             <TableCell className={classes.columnLabel} numeric>
               STATUS
             </TableCell>
-            <ConditionalTableCell
-              condition={showActions}
-            ></ConditionalTableCell>
           </TableRow>
         </TableHead>
         <ConditionalTableBody empty={!extensions || extensions.length < 1}>
           {extensions.map((extension) => {
             return (
-              <TableRow key={`key-${extension.extensionstatusid}`}>
+              <TableRow key={`extension-row-${extension.extensionstatusid}`}>
                 <TableCell numeric>{extension.extensionreson}</TableCell>
                 <TableCell numeric>{extension.extendedduedays}</TableCell>
                 <TableCell>{extension.extendedduedate}</TableCell>
                 <TableCell>{extension.extensionstatus}</TableCell>
-                <ConditionalTableCell condition={showActions}>
-                  <button className="actionsBtn">
-                    <FontAwesomeIcon
-                      icon={faEllipsisH}
-                      size="1x"
-                      color="darkblue"
-                    />
-                  </button>
-                </ConditionalTableCell>
               </TableRow>
             );
           })}
@@ -119,9 +92,5 @@ const ConditionalTableCell = ({condition, children, ...rest}) => {
     </Paper>
   );
 }
-
-ExtensionsTable.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default ExtensionsTable;

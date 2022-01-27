@@ -28,6 +28,23 @@ export const fetchExtensionReasons = async ({
     });
 };
 
+export const fetchExtension = ({extensionId, callback, errorCallback, dispatch}) => {
+  const apiUrl = replaceUrl(
+    API.FOI_GET_EXTENSION,
+    "<extensionId>",
+    extensionId
+  );
+
+  httpGETRequest(apiUrl, {}, UserService.getToken())
+    .then((res) => {
+      callback(res.data);
+    })
+    .catch((error) => {
+      dispatch(serviceActionError(error));
+      errorCallback("Internal server error occurred while fetching extension details")
+    });
+};
+
 export const fetchExtensions = (
   ministryId,
   ...rest
@@ -58,16 +75,18 @@ export const fetchExtensions = (
   }
 }
 
-export const saveExtensionRequest = ({data, ministryId, requestId, callback, errorCallBack, dispatch}) => {
+export const createExtensionRequest = ({data, requestId, ministryId, callback, errorCallback, dispatch}) => {
+  console.log("create", data);
+
   if(!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
   
   const apiUrl = replaceUrl(
-    replaceUrl(API.FOI_POST_EXTENSION, "<ministryrequestid>", ministryId),
-    "<requestid>",
-    requestId
-  );
+    replaceUrl(API.FOI_POST_EXTENSION, "<requestid>", requestId),
+    "<ministryrequestid>",
+    ministryId
+  );  
 
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
@@ -80,6 +99,36 @@ export const saveExtensionRequest = ({data, ministryId, requestId, callback, err
     })
     .catch((error) => {
       catchError(error, dispatch)
-      errorCallBack("An error occured while trying to save this extension");
+      errorCallback("An error occured while trying to save this extension");
+    });
+};
+
+export const updateExtensionRequest = ({
+  data,
+  extensionId,
+  ministryId,
+  requestId,
+  callback,
+  errorCallback,
+  dispatch,
+}) => {
+
+  let apiUrl = API.FOI_POST_UPDATE_EXTENSION;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+  apiUrl = replaceUrl(apiUrl, "<extensionid>", extensionId);
+
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        callback(res.data);
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      catchError(error, dispatch);
+      errorCallback("An error occured while trying to save this extension");
     });
 };
