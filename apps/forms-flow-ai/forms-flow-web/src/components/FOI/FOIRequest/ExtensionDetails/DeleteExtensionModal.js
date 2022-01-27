@@ -78,12 +78,12 @@ const DeleteExtensionModal = () => {
   return (
     <>
       <Dialog
+        id="delete-extension-dialog"
         open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         aria-labelledby="extension-dialog-title"
         maxWidth={"md"}
         fullWidth={true}
-        id="add-extension-dialog"
         TransitionProps={{
           onExited: () => {
             setLoading(false);
@@ -113,10 +113,8 @@ const DeleteExtensionModal = () => {
             overflowX: "hidden",
           }}
         >
-          <DialogContentText>
-            <Typography variant="h4">
-              Are you sure you want to delete the attachment?
-            </Typography>
+          <DialogContentText variant="h4">
+            Are you sure you want to delete the attachment?
           </DialogContentText>
         </DialogContent>
 

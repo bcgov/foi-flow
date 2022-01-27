@@ -48,52 +48,6 @@ describe("FOI AddExtensionModal component", () => {
   const mockStore = configureStore();
   let store;
 
-  it("FOI AddExtensionModal Rendering Unit test - shallow check", () => {
-    store = mockStore({});
-    const localState = {
-      saveModalOpen: true,
-      setSaveModalOpen: jest.fn(),
-      extensionReasons: [
-        {
-          isactive: true,
-          reason:
-            "Public Body - Large Volume and/or Volume of Search and Consultation",
-          extensiontype: "Public Body",
-          defaultextendedduedays: 30,
-          extensionreasonid: 5,
-        },
-        {
-          isactive: true,
-          reason: "OIPC - Applicant Consent",
-          extensiontype: "OIPC",
-          defaultextendedduedays: 0,
-          extensionreasonid: 6,
-        },
-      ],
-      dispatch: jest.fn(),
-      startDate: "2020-12-01",
-      currentDueDate: formatDate(new Date()),
-      originalDueDate: formatDate(new Date()),
-      idNumber: "EDU-",
-      selectedExtension: null,
-      loading: false,
-      setLoading: jest.fn(),
-      saveExtensionRequest: jest.fn(),
-      errorToast: jest.fn(),
-      extensions: [],
-    };
-
-    mockExtensionContext(localState);
-
-    const wrapper = shallow(
-      <Provider store={store}>
-        <AddExtensionModal />
-      </Provider>
-    );
-
-    expect(wrapper.exists()).toBe(true);
-  });
-
   it("FOI AddExtensionModal Rendering Unit test - render check", () => {
     store = mockStore({});
     const localState = {
@@ -130,8 +84,8 @@ describe("FOI AddExtensionModal component", () => {
         decisiondate: "2022-01-18T00:00:00+00:00",
         approvednoofdays: 2,
       },
-      loading: false,
-      setLoading: jest.fn(),
+      extensionLoading: false,
+      setExtensionLoading: jest.fn(),
       saveExtensionRequest: jest.fn(),
       errorToast: jest.fn(),
       extensions: [],
@@ -199,8 +153,8 @@ describe("FOI AddExtensionModal component", () => {
         decisiondate: "2022-01-18T00:00:00+00:00",
         approvednoofdays: 2,
       },
-      loading: false,
-      setLoading: jest.fn(),
+      extensionLoading: false,
+      setExtensionLoading: jest.fn(),
       saveExtensionRequest: jest.fn(),
       errorToast: jest.fn(),
       extensions: [],
