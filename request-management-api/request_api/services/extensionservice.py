@@ -137,7 +137,7 @@ class extensionservice:
         extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
         # once soft deleted, revert back the due date to prev due date
         # creates a new version of ministry request, extension, extensiondocuments(if any) and documents(if any)
-        if extensionresult.success == True:
+        if extensionresult.success == True and prevstatus == 2:
             ministryrequestschema = {
                 "duedate": updatedduedate
             }
