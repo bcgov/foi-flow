@@ -111,6 +111,7 @@ const BottomButtonGroup = React.memo(
           (err, res) => {
             if (!err) {
               requestState = findRequestState(res.requeststatusid);
+              console.log("Request state from enum in index.js:", requestState);
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,
