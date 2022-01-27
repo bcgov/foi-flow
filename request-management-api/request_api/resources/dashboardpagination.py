@@ -23,9 +23,9 @@ class DashboardPagination(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # #@auth.require
+    @auth.require
     @cors_preflight('GET,POST,OPTIONS')
-    # @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(queuetype = "all"):
         try:
             DEFAULT_PAGE = 1
@@ -49,13 +49,8 @@ class DashboardPagination(Resource):
                 _filterfields = DEFAULT_FILTER_FIELDS
             _keyword = flask.request.args.get('keyword', None, type=str)
 
-            # groups = getgroupsfromtoken()
-            # 'Intake Team', 'Flex Team','Processing Team'
-            # groups = ['Intake Team', 'Flex Team','Processing Team']
-            groups = []
-            # ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
-            ministrygroups = ['EDUC Ministry Team']
-
+            groups = getgroupsfromtoken()
+            ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
             statuscode = 200
             if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups) and (queuetype is None or queuetype == "all"):                                                                                           
                 requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
