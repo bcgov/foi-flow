@@ -176,6 +176,3 @@ class dashboardservice:
         }
 
         return jsonify({'data': requestqueue, 'meta': meta})
-
-    def getministryrequestqueuepagination(self, groups=None, page=1, size=10, sort=None, desc=False, filterfields=[], keyword=None):
-        return FOIMinistryRequest.getrequestspagination(groups, page, size, sort, desc, filterfields, keyword)
