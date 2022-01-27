@@ -1,5 +1,4 @@
 import React, { useEffect, useState }  from 'react';
-// import { DataGrid } from '@material-ui/data-grid';
 import { DataGrid } from '@mui/x-data-grid';
 import "./dashboard.scss";
 import useStyles from './CustomStyle';
@@ -14,8 +13,11 @@ import Loading from "../../../containers/Loading";
 const Dashboard = ({userDetail}) => {
 
   const dispatch = useDispatch();
+
+  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
+  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
+
   const requestQueue = useSelector(state=> state.foiRequests.foiRequestsList);
-  console.log(requestQueue);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   
   const classes = useStyles();
@@ -41,9 +43,6 @@ const Dashboard = ({userDetail}) => {
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(fetchFOIRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword, requestFilter, userDetail.preferred_username));
   }, [rowsState, sortModel, filterModel, requestFilter]);
-
-  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
-  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
 
   function getFullName(params) {    
     return `${params.row.lastName || ''}, ${
@@ -86,7 +85,7 @@ const Dashboard = ({userDetail}) => {
   }
 
   function getReceivedDate(params) {
-    let receivedDateString = params.getValue(params.id, 'receivedDateUF');    
+    let receivedDateString = params.row.receivedDateUF;    
     const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
     receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
 
@@ -217,7 +216,7 @@ const Dashboard = ({userDetail}) => {
                 sortingMode={'server'}
                 onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}`
+                  `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}`
                 }
                 onRowClick={renderReviewRequest}
                 loading={isLoading}

@@ -38,7 +38,7 @@ class DashboardPagination(Resource):
             _size = flask.request.args.get('size', DEFAULT_SIZE, type=int)
             _sortingitems = flask.request.args.getlist('sortingitems[]')
             _sortingorders = flask.request.args.getlist('sortingorders[]')
-            _filterfields = flask.request.args.getlist('filterfields[]')
+            _filterfields = flask.request.args.getlist('filters[]')
             _additionalfilter = flask.request.args.get('additionalfilter', DEFAULT_ADDITIONAL_FILTER, type=str)
             _userid = flask.request.args.get('userid', None, type=str)
             if(len(_sortingitems) == 0):
@@ -49,10 +49,21 @@ class DashboardPagination(Resource):
                 _filterfields = DEFAULT_FILTER_FIELDS
             _keyword = flask.request.args.get('keyword', None, type=str)
 
+            # groups = getgroupsfromtoken()
             # 'Intake Team', 'Flex Team','Processing Team'
-            groups = ['Intake Team', 'Flex Team','Processing Team']
+            # groups = ['Intake Team', 'Flex Team','Processing Team']
+            groups = []
+            # ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
+            ministrygroups = ['EDUC Ministry Team']
+
             statuscode = 200
-            requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+            if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups) and (queuetype is None or queuetype == "all"):                                                                                           
+                requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+            elif  queuetype is not None and queuetype == "ministry" and len(ministrygroups) > 0:
+                requests = dashboardservice().getministryrequestqueuepagination(ministrygroups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+            else:
+                if len(ministrygroups) == 0 :
+                  statuscode = 401   
 
             return requests, statuscode
         except BusinessException as exception:

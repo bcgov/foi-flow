@@ -231,7 +231,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('cfrduedate'),
             literal(None).label('duedate'),
             FOIRawRequest.requestrawdata['category'].astext.label('applicantcategory'),
-            FOIRawRequest.created_at.label('created_at')
+            FOIRawRequest.created_at.label('created_at'),
+            literal(None).label('bcgovcode')
         ]
 
         if(additionalfilter == 'watchingRequests'):

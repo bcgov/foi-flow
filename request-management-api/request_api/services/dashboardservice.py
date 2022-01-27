@@ -148,8 +148,8 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None):
-        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword)
+    def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
+        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
 
         requestqueue = []
         for request in requests.items:
@@ -159,10 +159,11 @@ class dashboardservice:
             _openrequest.update({'assignedministrygroup': request.assignedministrygroup})
             _openrequest.update({'assignedministryperson': request.assignedministryperson})
             _openrequest.update({'cfrstatus':'Select Division'})
-            _openrequest.update({'cfrduedate': request.cfrDueDate})
-            _openrequest.update({'duedate': request.dueDate})
+            _openrequest.update({'cfrduedate': request.cfrduedate})
+            _openrequest.update({'duedate': request.duedate})
             _openrequest.update({'ministryrequestid': request.ministryrequestid})
             _openrequest.update({'applicantcategory': request.applicantcategory})
+            _openrequest.update({'bcgovcode': request.bcgovcode})
             requestqueue.append(_openrequest)
 
         meta = {

@@ -14,6 +14,7 @@ from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
+from .ProgramAreas import ProgramArea
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -281,10 +282,11 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
-            FOIMinistryRequest.cfrduedate.label('cfrduedate'),
-            FOIMinistryRequest.duedate.label('duedate'),
+            cast(FOIMinistryRequest.cfrduedate, String).label('cfrduedate'),
+            cast(FOIMinistryRequest.duedate, String).label('duedate'),
             ApplicantCategory.name.label('applicantcategory'),
-            FOIRequest.created_at.label('created_at')
+            FOIRequest.created_at.label('created_at'),
+            func.lower(ProgramArea.bcgovcode).label('bcgovcode')
         ]
 
         basequery = _session.query(
@@ -313,6 +315,9 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 ApplicantCategory,
                                 and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                            ).join(
+                                ProgramArea,
+                                FOIMinistryRequest.programareaid == ProgramArea.programareaid
                             )
 
         if(additionalfilter == 'watchingRequests'):
@@ -339,7 +344,7 @@ class FOIMinistryRequest(db.Model):
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
-                order = sortingitems.pop()
+                order = sortingorders.pop()
                 if(order == 'desc'):
                     sortingcondition.append(FOIMinistryRequest.findfield(field).desc())
                 else:
@@ -347,8 +352,7 @@ class FOIMinistryRequest(db.Model):
 
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIMinistryRequest.findfield('idNumber').asc())
-        sortingcondition.append(FOIRequest.receiveddate.desc())
+            sortingcondition.append(FOIMinistryRequest.findfield('currentState').asc())
 
         return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
@@ -363,6 +367,7 @@ class FOIMinistryRequest(db.Model):
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
             'receivedDate': FOIRequest.receiveddate,
+            'applicantcategory': ApplicantCategory.name
         }.get(x, FOIMinistryRequest.filenumber)
 
 
