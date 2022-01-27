@@ -212,14 +212,14 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
             FOIRawRequest.sourceofsubmission,
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['firstName'], String), '"', '').label('firstName'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['lastName'], String), '"', '').label('lastName'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['requestType'], String), '"', '').label('requestType'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['requestType']['requestType'], String), '"', '').label('requestTypeWebForm'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['contactInfo']['firstName'], String), '"', '').label('contactFirstName'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['contactInfo']['lastName'], String), '"', '').label('contactLastName'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['receivedDate'], String), '"', '').label('receivedDate'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['receivedDateUF'], String), '"', '').label('receivedDateUF'),
+            FOIRawRequest.requestrawdata['firstName'].astext.label('firstName'),
+            FOIRawRequest.requestrawdata['lastName'].astext.label('lastName'),
+            FOIRawRequest.requestrawdata['requestType'].astext.label('requestType'),
+            FOIRawRequest.requestrawdata['requestType']['requestType'].astext.label('requestTypeWebForm'),
+            FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext.label('contactFirstName'),
+            FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext.label('contactLastName'),
+            FOIRawRequest.requestrawdata['receivedDate'].astext.label('receivedDate'),
+            FOIRawRequest.requestrawdata['receivedDateUF'].astext.label('receivedDateUF'),
             FOIRawRequest.status.label('currentState'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
@@ -229,7 +229,7 @@ class FOIRawRequest(db.Model):
             literal(None).label('assignedministryperson'),
             literal(None).label('cfrduedate'),
             literal(None).label('duedate'),
-            func.REPLACE(cast(FOIRawRequest.requestrawdata['category'], String), '"', '').label('applicantcategory'),
+            FOIRawRequest.requestrawdata['category'].astext.label('applicantcategory'),
             FOIRawRequest.created_at.label('created_at')
         ]
 
@@ -238,6 +238,11 @@ class FOIRawRequest(db.Model):
             filtercondition = []
             for field in filterfields:
                 filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'firstName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                if(field == 'lastName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+            print(or_(*filtercondition))
             return _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived'])).filter(or_(*filtercondition))
         else:
             return _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived']))
@@ -261,9 +266,11 @@ class FOIRawRequest(db.Model):
     @classmethod
     def findfield(cls, x):
         return {
-            'firstName': cast(FOIRawRequest.requestrawdata['firstname'], String),
-            'lastName': cast(FOIRawRequest.requestrawdata['lastname'], String),
-            'requestType': cast(FOIRawRequest.requestrawdata['requestType'], String),
+            'firstName': FOIRawRequest.requestrawdata['firstName'].astext,
+            'lastName': FOIRawRequest.requestrawdata['lastName'].astext,
+            'contactFirstName': FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext,
+            'contactLastName': FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext,
+            'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
