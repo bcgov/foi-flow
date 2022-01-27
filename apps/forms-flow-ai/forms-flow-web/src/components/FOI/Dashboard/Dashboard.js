@@ -24,11 +24,9 @@ const Dashboard = ({userDetail}) => {
     dispatch(fetchFOIRequestListByPage());
   },[dispatch]);
 
-  const [rowsState, setRowsState] = React.useState({
-    page: 0,
-    pageSize: 10,
-  });
-
+  const defaultRowsState = {page: 0, pageSize: 10};
+  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  
   const defaultSortModel = [{ field: 'currentState', sort: 'desc' }];
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
   const [serverSortModel, setServerSortModel] = React.useState(defaultSortModel);
@@ -143,12 +141,14 @@ const Dashboard = ({userDetail}) => {
       field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
   ]);  
       
-  const requestFilterChange = (e) => { 
+  const requestFilterChange = (e) => {
+    setRowsState(defaultRowsState);
     setRequestFilter(e.target.value);
   }
 
   const setSearch = (e) => {
     var keyword = e.target.value;
+    setRowsState(defaultRowsState);
     setFilterModel((prev) => ({ ...prev, keyword}));
   }
 
