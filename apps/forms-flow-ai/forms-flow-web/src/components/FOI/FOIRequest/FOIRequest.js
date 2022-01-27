@@ -100,7 +100,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(state => state.foiRequests.foiRequestAttachments);
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
-  const [requestState, setRequestState] = useState(StateEnum.intakeinprogress.name);
+  const [requestState, setRequestState] = useState();
   
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);

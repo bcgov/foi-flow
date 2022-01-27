@@ -92,6 +92,7 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
+    console.log("RequestState in bottombuttongroup", requestState);
     useEffect(() => {
       if(stateChanged){
         requestState= saveRequestObject.currentState;
