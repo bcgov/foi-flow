@@ -121,4 +121,24 @@ class EditFOIRequestExtension(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
-    
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>/extension/<extensionid>/delete')
+class DeleteFOIRequestExtension(Resource):
+    """deletes extension for ministry(opened) request."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require    
+    def post(requestid, ministryrequestid, extensionid):
+        try:         
+            if (AuthHelper.isministrymember() == False):           
+                result = extensionservice().deleterequestextension(requestid, ministryrequestid, extensionid, AuthHelper.getuserid())
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
+            else:
+                return {'status': False, 'message':'Unautherized user','id':-1} , 403
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500    
