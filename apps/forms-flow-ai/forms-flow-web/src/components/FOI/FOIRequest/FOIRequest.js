@@ -175,7 +175,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       var requestStateFromId = findRequestState(requestDetails.requeststatusid);
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
-      setcurrentrequestStatus(requestStateFromId);
+      //setcurrentrequestStatus(requestStateFromId);
     }
   }, [requestDetails]);
 
@@ -305,7 +305,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
-    setRequestState(_state);
+    //setRequestState(_state);
     if (!_unSaved) {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
