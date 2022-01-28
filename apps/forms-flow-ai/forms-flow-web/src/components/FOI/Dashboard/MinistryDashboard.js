@@ -216,6 +216,7 @@ const renderReviewRequest = (e) => {
                 pageSize={rowsState.pageSize}
                 rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
+                disableColumnMenu={true}
 
                 pagination
                 paginationMode='server'

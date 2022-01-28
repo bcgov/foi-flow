@@ -203,6 +203,7 @@ const Dashboard = ({userDetail}) => {
                 pageSize={rowsState.pageSize}
                 rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
+                disableColumnMenu={true}
 
                 pagination
                 paginationMode='server'
