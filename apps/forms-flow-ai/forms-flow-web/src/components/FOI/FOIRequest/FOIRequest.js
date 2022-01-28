@@ -96,7 +96,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const isAddRequest = urlIndexCreateRequest > -1;
   //gets the request detail from the store
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
-  console.log("Currentstatus!!", requestDetails.currentState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
   let requestAttachments = useSelector(state => state.foiRequests.foiRequestAttachments);
@@ -175,11 +174,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
       var requestStateFromId = findRequestState(requestDetails.requeststatusid);
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
-      //setcurrentrequestStatus(requestStateFromId);
+      setcurrentrequestStatus(requestStateFromId);
     }
   }, [requestDetails]);
 
-  console.log("_currentrequestStatus in FoiRequest!!:", _currentrequestStatus);
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -305,23 +303,21 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
-    //setRequestState(_state);
+    
     if (!_unSaved) {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
-      console.log("_state Inside handleSaveRequest of FoiRequest:",_state);
-      console.log("_currentrequestStatus Inside handleSaveRequest: :",_currentrequestStatus);
-      // setTimeout(() => {
-      //   const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
+      setTimeout(() => {
+        const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
 
-      //   if (redirectUrl) {
-      //     window.location.href = redirectUrl
-      //   } else {
-      //     dispatch(push(`/foi/reviewrequest/${id}`))
-      //   }
+        if (redirectUrl) {
+          window.location.href = redirectUrl
+        } else {
+          dispatch(push(`/foi/reviewrequest/${id}`))
+        }
 
-      // }
-      //   , 1000);
+      }
+        , 1000);
     }
     else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -456,7 +452,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const isAttachmentListLoading = useSelector(state => state.foiRequests.isAttachmentListLoading);
 
   const stateTransition = requestDetails?.stateTransition;
-  console.log("StateDropDown in FoiRequest:", requestState);
+
   return (
   (!isLoading && requestDetails && Object.keys(requestDetails).length !== 0) || isAddRequest ?
     <div className="foiformcontent">

@@ -24,7 +24,6 @@ import {
   alertUser
 } from "./utils";
 import clsx from "clsx";
-import { findRequestState } from "../utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,7 +82,6 @@ const BottomButtonGroup = React.memo(
     const [closingDate, setClosingDate] = useState(formatDate(new Date()));
     const [closingReasonId, setClosingReasonId] = useState();
 
-    // const [requestState, setRequestState] = useState();
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
     };
@@ -92,8 +90,6 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
-    console.log("RequestState in bottombuttongroup", requestState);
-    console.log("currentSelectedStatus in bottombuttongroup :",currentSelectedStatus);
     useEffect(() => {
       if(stateChanged){
         requestState= saveRequestObject.currentState;
@@ -112,7 +108,6 @@ const BottomButtonGroup = React.memo(
           ministryId,
           (err, res) => {
             if (!err) {
-              // requestState = findRequestState(res.requeststatusid);
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -128,9 +123,7 @@ const BottomButtonGroup = React.memo(
                 urlIndexCreateRequest,
                 saveRequestObject,
               });
-              console.log("_state Inside SaveRequest in index.js", _state);
               handleSaveRequest(_state, false, res.id);
-              console.log("currentSelectedStatus Inside saveRequest- :",currentSelectedStatus);
               hasStatusRequestSaved(currentSelectedStatus);
             } else {
               toast.error(
