@@ -140,6 +140,7 @@ const isMinistryLogin = (userGroups) => {
 
 const getMinistryByValue = (userGroups) => {
 	const ministryGroup = Object.values(MINISTRYGROUPS).filter(element => userGroups.includes(element));
+	console.log("!!!",MINISTRYGROUPS);
 	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
 }
 
@@ -254,6 +255,11 @@ const ConditionalComponent = ({condition, children}) => {
 	</>
 }
 
+const getMinistryCode = (userGroups) => {
+	const ministryGroup = Object.values(MINISTRYGROUPS).find(element => userGroups?.includes(element));
+	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
+}
+
 export {
   replaceUrl,
   formatDate,
@@ -268,4 +274,5 @@ export {
   getAssignToList,
   getFullnameTeamList,
   ConditionalComponent,
+  getMinistryCode,
 };

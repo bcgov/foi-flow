@@ -26,7 +26,8 @@ const initialState = {
   foiWatcherList: [],
   foiRequestComments:[],
   foiRequestAttachments:[],
-  foiRequestExtesions: []
+  foiRequestExtesions: [],
+  foiOpenedMinistries: []
 };
 
 const foiRequests = (state = initialState, action)=> {
@@ -81,6 +82,8 @@ const foiRequests = (state = initialState, action)=> {
       return { ...state, foiRequestAttachments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:
+      return { ...state, foiOpenedMinistries: action.payload };
     default:
       return state;
   }

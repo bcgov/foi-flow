@@ -12,6 +12,7 @@ import {
   clearRequestDetails,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
+  setOpenedMinistries
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -274,20 +275,20 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId) => {
   };
 };
 
-// TO DO: Need Refinement once the request state is removed from the page url of a request.
-export const fetchFOIRawRequestDetailsForNotification = (notification, ...rest) => {
+export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
   const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
-    API.FOI_RAW_REQUEST_API,
+    API.FOI_GET_OPENED_MINISTRIES,
     "<requestid>",
-    notification.requestid
+    notification.requestid,
+    "<names>",
+    "ministries"
   );
   return (dispatch) => {
-    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlgetRequestDetails, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          const foiRequest = res.data;
-          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setOpenedMinistries(res.data));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
