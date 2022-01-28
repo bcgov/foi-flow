@@ -84,7 +84,7 @@ const useStyles = makeStyles((theme) => ({
 
 const FOIRequest = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
-  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
+  // const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const { requestId, ministryId} = useParams();
   const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -96,6 +96,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const isAddRequest = urlIndexCreateRequest > -1;
   //gets the request detail from the store
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
+  console.log("Currentstatus!!", requestDetails.currentStatus);
+  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState(requestDetails.currentStatus);
   let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
   let requestAttachments = useSelector(state => state.foiRequests.foiRequestAttachments);
   const [attachments, setAttachments] = useState(requestAttachments);
