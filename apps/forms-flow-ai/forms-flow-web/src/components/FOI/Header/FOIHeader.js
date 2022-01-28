@@ -39,13 +39,11 @@ const openModal = (coordinates) => {
 
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
 
-useEffect(() => {     
-  if (Object.entries(user).length !== 0) {
-    const userGroups = user && user.groups?.map(group => group.slice(1));
-    isMinistry = isMinistryLogin(userGroups);
-    ministryCode = getMinistryCode(userGroups);
-  }
-},[]);
+if (Object.entries(user).length !== 0) {
+  const userGroups = user && user.groups?.map(group => group.slice(1));
+  isMinistry = isMinistryLogin(userGroups);
+  ministryCode = getMinistryCode(userGroups);
+}
 
 useEffect(() => {     
   if(isAuthenticated)
