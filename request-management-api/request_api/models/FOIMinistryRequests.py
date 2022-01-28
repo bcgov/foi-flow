@@ -206,41 +206,7 @@ class FOIMinistryRequest(db.Model):
         _session = db.session
 
         #ministry filter for group/team
-        if groups is None:
-            ministryfilter = FOIMinistryRequest.isactive == True
-        else:
-            groupfilter = []
-            for group in groups:
-                if (group == 'Flex Team'):
-                    groupfilter.append(
-                        and_(
-                            FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])
-                        )
-                    )
-                elif (group == 'Processing Team'):
-                    groupfilter.append(
-                        and_(
-                            FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])
-                        )
-                    )
-                else:
-                    groupfilter.append(
-                        or_(
-                            FOIMinistryRequest.assignedgroup == group,
-                            and_(
-                                FOIMinistryRequest.assignedministrygroup == group,
-                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14])
-                            )
-                        )
-                    )
-
-            ministryfilter = and_(
-                                FOIMinistryRequest.isactive == True,
-                                FOIRequestStatus.isactive == True,
-                                or_(*groupfilter)
-                            )
+        ministryfilter = FOIMinistryRequest.getgroupfilters(groups)
 
         #subquery for getting latest version & proper group/team for FOIMinistryRequest
         subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
@@ -370,6 +336,46 @@ class FOIMinistryRequest(db.Model):
             'applicantcategory': ApplicantCategory.name
         }.get(x, FOIMinistryRequest.filenumber)
 
+    @classmethod
+    def getgroupfilters(cls, groups):
+        #ministry filter for group/team
+        if groups is None:
+            ministryfilter = FOIMinistryRequest.isactive == True
+        else:
+            groupfilter = []
+            for group in groups:
+                if (group == 'Flex Team'):
+                    groupfilter.append(
+                        and_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])
+                        )
+                    )
+                elif (group == 'Processing Team'):
+                    groupfilter.append(
+                        and_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])
+                        )
+                    )
+                else:
+                    groupfilter.append(
+                        or_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            and_(
+                                FOIMinistryRequest.assignedministrygroup == group,
+                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14])
+                            )
+                        )
+                    )
+
+            ministryfilter = and_(
+                                FOIMinistryRequest.isactive == True,
+                                FOIRequestStatus.isactive == True,
+                                or_(*groupfilter)
+                            )
+        
+        return ministryfilter
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

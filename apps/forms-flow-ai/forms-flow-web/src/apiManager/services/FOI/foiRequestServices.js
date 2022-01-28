@@ -131,12 +131,11 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
           UserService.getToken())
       .then((res) => {
         if (res.data) {
-          console.log(res.data);
           dispatch(clearRequestDetails({}));
-          if (res.data?.data[0]?.bcgovcode)
-            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
           dispatch(setFOIMinistryRequestList(res.data));
           dispatch(setFOILoader(false));
+          if (res.data?.data[0]?.bcgovcode)
+            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");

@@ -18,7 +18,6 @@ const MinistryDashboard = ({userDetail}) => {
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);  
 
   const requestQueue = useSelector(state=> state.foiRequests.foiMinistryRequestsList);
-  console.log(requestQueue);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
 
   const classes = useStyles();
@@ -41,7 +40,6 @@ const MinistryDashboard = ({userDetail}) => {
 
   useEffect(() => {
     updateSortModel();
-    console.log(serverSortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(fetchFOIMinistryRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword, requestFilter, userDetail.preferred_username));
   }, [rowsState, sortModel, filterModel, requestFilter]);
