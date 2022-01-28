@@ -4,10 +4,9 @@ import API from "../../endpoints";
   import {
     serviceActionError,
     setRequestExtensions,
-  } from "../../../actions/FOI/foiRequestActions";
+  } from "../../../actions/FOI/foiRequestActions";  
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { fnDone, catchError } from "./foiServicesUtil";
-
 
 export const fetchExtensionReasons = async ({
   callback,
@@ -130,5 +129,28 @@ export const updateExtensionRequest = ({
     .catch((error) => {
       catchError(error, dispatch);
       errorCallback("An error occured while trying to save this extension");
+    });
+};
+
+export const deleteExtensionRequest = ({
+  extensionId,
+  ministryId,
+  requestId,
+  callback,
+  errorCallback,
+  dispatch,
+}) => {
+  let apiUrl = API.FOI_POST_DELETE_EXTENSION;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+  apiUrl = replaceUrl(apiUrl, "<extensionid>", extensionId);
+
+  httpPOSTRequest(apiUrl, {})
+    .then((res) => {
+      callback(res.data);
+    })
+    .catch((error) => {
+      catchError(error, dispatch);
+      errorCallback("An error occured while trying to delete this extension");
     });
 };
