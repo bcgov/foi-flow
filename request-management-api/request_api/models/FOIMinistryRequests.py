@@ -225,6 +225,15 @@ class FOIMinistryRequest(db.Model):
         return upcomingduerecords    
 
     @classmethod
+    def updateduedate(cls, ministryrequestid, duedate, userid)->DefaultMethodResult:
+        currequest = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
+        setattr(currequest,'duedate',duedate)
+        setattr(currequest,'updated_at',datetime.now().isoformat())
+        setattr(currequest,'updatedby',userid)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Request updated',ministryrequestid)
+    
+    @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
         sql = """select distinct filenumber, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
                     inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 

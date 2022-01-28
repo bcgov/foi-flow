@@ -28,6 +28,9 @@ class requestservice:
      
     def updaterequest(self,foirequestschema,foirequestid,userid):
         return requestserviceupdate().updaterequest(foirequestschema,foirequestid,userid) 
+
+    def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
+        return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
         
     def getrequest(self,foirequestid,foiministryrequestid):  
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
