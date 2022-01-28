@@ -87,6 +87,26 @@ const addBusinessDays = (dateText, days) => {
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
 
+const revertReconciledPublicHolidays = (startDate, endDate) => {
+  let publicHoliDays = getPublicHoliDays(startDate, endDate);
+  endDate = endDate.businessDaysSubtract(publicHoliDays);
+  startDate = endDate;
+  if (publicHoliDays != 0) {
+    reconcilePublicHoliDays(startDate, endDate);
+  }
+  return endDate;
+};
+
+const removeBusinessDays = (dateText, days) => {
+  if (!dateText) {
+    return 0;
+  }
+  let startDate = dayjs(dateText);
+  let endDate = startDate.businessDaysSubtract(days);
+
+  return revertReconciledPublicHolidays(startDate, endDate).format("YYYY-MM-DD");
+};
+
 const countWeekendDays = (startDate, endDate) =>
 {  
   var ndays = 1 + Math.round((endDate.getTime()-startDate.getTime())/(24*3600*1000));
@@ -274,5 +294,6 @@ export {
   getAssignToList,
   getFullnameTeamList,
   ConditionalComponent,
-  getMinistryCode,
+  removeBusinessDays,
+  getMinistryCode
 };
