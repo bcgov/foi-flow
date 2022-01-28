@@ -12,9 +12,7 @@ import { ActionContext } from "./ActionContext";
 import Popover from "@material-ui/core/Popover";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
-import {
-  extensionStatusId
-} from "../../../../constants/FOI/enum";
+import { extensionStatusId } from "../../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,41 +22,42 @@ const useStyles = makeStyles((theme) => ({
   },
   table: {
     minWidth: 700,
-    border: "none"
+    border: "none",
   },
   columnLabel: {
-      fontWeight: theme.typography.fontWeightBold
+    fontWeight: theme.typography.fontWeightBold,
   },
   labelRow: {
-      borderBottom: "2px solid black"
-  }
-}))
+    borderBottom: "2px solid black",
+  },
+}));
 
-const ExtensionsTable = ({showActions = true}) => {
+const ExtensionsTable = ({ showActions = true }) => {
+  const classes = useStyles();
 
-const classes = useStyles()
+  const {
+    extensions,
+    setSaveModalOpen,
+    setDeleteModalOpen,
+    setExtensionId,
+  } = useContext(ActionContext);
 
-const { extensions, setModalOpen, setExtensionId, pendingExtensionExists, errorToast } = useContext(ActionContext);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [anchorPosition, setAnchorPosition] = useState(null);
 
-const [popoverOpen, setPopoverOpen] = useState(false)
-const [selectedIndex, setSelectedIndex] = useState(null)
-const [anchorPosition, setAnchorPosition] = useState(null)
-const [selectedExtension, setSelectedExtension] = useState(null)
-
-const ConditionalTableBody = ({empty, children}) => {
-
+  const ConditionalTableBody = ({ empty, children }) => {
     if (empty) {
-        return (
-          <>
-            <TableBody>
-              <TableRow key={`extension-row-empty`}>
-                <TableCell colSpan={5} align="center">
-                  No extensions taken.
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </>
-        );
+      return (
+        <>
+          <TableBody>
+            <TableRow key={`extension-row-empty`}>
+              <TableCell colSpan={5} align="center">
+                No extensions taken.
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </>
+      );
     }
 
     return (
@@ -66,74 +65,62 @@ const ConditionalTableBody = ({empty, children}) => {
         <TableBody>{children}</TableBody>
       </>
     );
-}
+  };
 
-const handleRowClick = () => {
-  if(selectedExtension.extensionstatusid !== extensionStatusId.pending && pendingExtensionExists) {
-    errorToast(
-      "Changes to approved/denied extensions can not be made when there is a pending extension"
+  const ConditionalTableCell = ({ condition, children, ...rest }) => {
+    if (!condition) {
+      return null;
+    }
+
+    return (
+      <>
+        <TableCell {...rest}>{children}</TableCell>
+      </>
     );
-    return;
-  }
+  };
 
-  if (selectedIndex > 0) {
-    return;
-  }
-
-  setExtensionId(selectedExtension.foirequestextensionid);
-  setModalOpen(true)
-}
-
-const ConditionalTableCell = ({condition, children, ...rest}) => {
-  if(!condition) {
-    return null;
-  }
-
-  return <>
-    <TableCell {...rest}>
-      {children}
-    </TableCell>
-  </>
-}
-
-const ActionsPopover = () => {
-
-  return (
-    <Popover
-      anchorReference="anchorPosition"
-      anchorPosition={anchorPosition && {
-        top: anchorPosition.top,
-        left: anchorPosition.left,
-      }}
-      open={popoverOpen}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "left",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "left",
-      }}
-      onClose={() => setPopoverOpen(false)}
-    >
-      <MenuList>
-        <MenuItem
-          onClick={() => {
-            handleRowClick();
-            setPopoverOpen(false);
-          }}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          disabled={true}
-        >
-          Delete
-        </MenuItem>
-      </MenuList>
-    </Popover>
-  );
-}
+  const ActionsPopover = () => {
+    return (
+      <Popover
+        anchorReference="anchorPosition"
+        anchorPosition={
+          anchorPosition && {
+            top: anchorPosition.top,
+            left: anchorPosition.left,
+          }
+        }
+        open={popoverOpen}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        onClose={() => setPopoverOpen(false)}
+      >
+        <MenuList>
+          <MenuItem
+            onClick={() => {
+              setSaveModalOpen(true);
+              setPopoverOpen(false);
+            }}
+          >
+            Edit
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setDeleteModalOpen(true);
+              setPopoverOpen(false);
+            }}
+          >
+            Delete
+          </MenuItem>
+        </MenuList>
+      </Popover>
+    );
+  };
 
   return (
     <Paper className={classes.root} elevation={0}>
@@ -143,15 +130,9 @@ const ActionsPopover = () => {
             <TableCell className={classes.columnLabel}>
               EXTENSION REASON
             </TableCell>
-            <TableCell className={classes.columnLabel}>
-              DAYS
-            </TableCell>
-            <TableCell className={classes.columnLabel}>
-              NEW DUE DATE
-            </TableCell>
-            <TableCell className={classes.columnLabel}>
-              STATUS
-            </TableCell>
+            <TableCell className={classes.columnLabel}>DAYS</TableCell>
+            <TableCell className={classes.columnLabel}>NEW DUE DATE</TableCell>
+            <TableCell className={classes.columnLabel}>STATUS</TableCell>
             <ConditionalTableCell
               condition={showActions}
             ></ConditionalTableCell>
@@ -187,11 +168,10 @@ const ActionsPopover = () => {
                       color="primary"
                       onClick={(e) => {
                         setPopoverOpen(true);
-                        setSelectedIndex(index);
                         setAnchorPosition(
                           e.currentTarget.getBoundingClientRect()
                         );
-                        setSelectedExtension(extension);
+                        setExtensionId(extension.foirequestextensionid);
                       }}
                       disabled={
                         index > 0 &&
@@ -206,9 +186,9 @@ const ActionsPopover = () => {
             })}
         </ConditionalTableBody>
       </Table>
-      <ActionsPopover/>
+      <ActionsPopover />
     </Paper>
   );
-}
+};
 
 export default ExtensionsTable;
