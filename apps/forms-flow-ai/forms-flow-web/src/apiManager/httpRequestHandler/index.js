@@ -54,8 +54,8 @@ export const httpPUTRequest = (url, data, token, isBearer = true) => {
   });
 };
 
-export const httpDELETERequest = (url, data, token, isBearer = true) => {
-  return axios.delete(url, data, {
+export const httpDELETERequest = (url, token, isBearer = true) => {
+  return axios.delete(url, {
     headers: {
       Authorization: isBearer
         ? `Bearer ${token || UserService.getToken()}`

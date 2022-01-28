@@ -23,11 +23,14 @@ class requestservice:
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
         return requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid)     
     
-    def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype):
-         return requestservicecreate().saveministryrequestversion(ministryrequestschema, foirequestid , ministryid, userid, usertype)      
+    def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid):
+         return requestservicecreate().saveministryrequestversion(ministryrequestschema, foirequestid , ministryid, userid)      
      
     def updaterequest(self,foirequestschema,foirequestid,userid):
         return requestserviceupdate().updaterequest(foirequestschema,foirequestid,userid) 
+
+    def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
+        return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
         
     def getrequest(self,foirequestid,foiministryrequestid):  
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)

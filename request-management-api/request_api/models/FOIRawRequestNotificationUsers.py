@@ -38,6 +38,12 @@ class FOIRawRequestNotificationUser(db.Model):
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
 
+    @classmethod
+    def dismissnotificationbyuserandtype(cls, userid, notificationusertypeid):
+        db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotificationUser.notificationusertypeid == notificationusertypeid).delete()
+        db.session.commit()  
+        return DefaultMethodResult(True,'Notifications deleted for user',userid)
+
     @classmethod 
     def getnotificationsbyid(cls, notificationuserid):
         sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
@@ -58,8 +64,18 @@ class FOIRawRequestNotificationUser(db.Model):
             notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
         return notifications
 
+    @classmethod 
+    def getnotificationsbyuserandtype(cls, userid, notificationusertypeid):
+        sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
+                    where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where userid = :userid and notificationusertypeid = :notificationusertypeid) group by notificationid """
+        rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypeid': notificationusertypeid})
+        notifications = []
+        for row in rs:
+            notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        return notifications
+
     @classmethod
-    def deletebynotificationid(cls, notificationids):
+    def dismissbynotificationid(cls, notificationids):
         db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.notificationid.in_(notificationids)).delete(synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for id',notificationids)  

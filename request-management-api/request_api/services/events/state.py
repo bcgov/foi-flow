@@ -45,6 +45,8 @@ class stateevent:
 
     def __createnotification(self, requestid, state, requesttype, userid):
         notification = self.__preparenotification(state)
+        if state == 'Closed':
+            notificationservice().dismissnotificationsbyid(requestid, requesttype)
         return notificationservice().createnotification(notification, requestid, requesttype, "State", userid)
 
     def __preparenotification(self, state):

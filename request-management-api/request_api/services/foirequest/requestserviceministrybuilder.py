@@ -7,6 +7,8 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
 from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDocument
+from request_api.models.FOIRequestExtensions import FOIRequestExtension
+from request_api.models.FOIRequestExtensionDocumentMappings import FOIRequestExtensionDocumentMapping
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from datetime import datetime as datetime2
 
@@ -31,7 +33,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foirequest.createdby = userid
         return foirequest
     
-    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):
+    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):  
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
         foiministryrequest.version = ministryschema["version"] + 1
@@ -43,7 +45,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.filenumber = ministryschema["filenumber"]
         foiministryrequest.cfrduedate = ministryschema['cfrduedate'] if 'cfrduedate' in ministryschema  else None
         foiministryrequest.startdate = ministryschema['startdate'] if 'startdate' in ministryschema  else None
-        foiministryrequest.duedate =ministryschema['duedate'] if 'duedate' in ministryschema  else None
+        foiministryrequest.duedate = requestschema['duedate'] if 'duedate' in requestschema else ministryschema["duedate"] #and isextension == True 
         foiministryrequest.assignedministrygroup = requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"]
         foiministryrequest.assignedministryperson = requestschema['assignedministryperson'] if 'assignedministryperson' in requestschema  else ministryschema["assignedministryperson"]
         foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"]
@@ -56,7 +58,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         else:
             divisions = FOIMinistryRequestDivision().getdivisions(ministryschema["foiministryrequestid"] ,ministryschema["version"])
             foiministryrequest.divisions = self.createfoirequestdivisionfromobject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
-        foiministryrequest.documents = self.createfoirequestdocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)       
+        foiministryrequest.documents = self.createfoirequestdocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)
+        foiministryrequest.extensions = self.createfoirequestextensions(ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)       
         foiministryrequest.closedate = requestschema['closedate'] if 'closedate' in requestschema  else None
         foiministryrequest.closereasonid = requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
         return foiministryrequest
@@ -70,6 +73,15 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             newdocuments = self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
             documentarr = newdocuments + existingdocuments
         return documentarr
+
+    def createfoirequestextensions(self, ministryrequestid, activeversion, userid):
+        extensions = FOIRequestExtension().getextensions(ministryrequestid, activeversion-1)
+                 
+        existingextensions = self.createfoirequestextensionfromobject(extensions,ministryrequestid ,activeversion, userid)
+        if existingextensions is not None:
+            return existingextensions
+        else:
+            return []
     
     def createfoirequestappplicantfromobject(self, requestapplicants, requestid, version, userid): 
         requestapplicantarr = []
@@ -124,18 +136,60 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         documentarr = []
         for document in documents:
             ministrydocument = FOIMinistryRequestDocument()
+            ministrydocument.foiministrydocumentid = document["foiministrydocumentid"]
             ministrydocument.documentpath = document["documentpath"]
             if 'filename' in document:
                 ministrydocument.filename = document["filename"]
             if 'category' in document:
                 ministrydocument.category = document['category']
-            ministrydocument.version = 1
+            ministrydocument.version = document['version'] + 1
             ministrydocument.foiministryrequest_id = requestid
             ministrydocument.foiministryrequestversion_id = activeversion
-            ministrydocument.created_at = document["created_at"] if 'created_at' in document else None
-            ministrydocument.createdby =  document["createdby"] if 'createdby' in document else userid
+            ministrydocument.created_at = document["created_at"]
+            ministrydocument.createdby =  document["createdby"]
+            ministrydocument.updated_at = datetime2.now().isoformat()
+            ministrydocument.updatedby =  userid
             documentarr.append(ministrydocument)
-        return documentarr   
+        return documentarr       
+
+    def createfoirequestextensionfromobject(self, extensions, requestid, activeversion, userid):
+        extensionarr = [] 
+        for extension in extensions:
+            requestextension = FOIRequestExtension()
+            requestextension.foirequestextensionid = extension["foirequestextensionid"]
+            requestextension.extensionreasonid = extension["extensionreasonid"]
+            requestextension.extensionstatusid = extension["extensionstatusid"]
+            if 'extendedduedays' in extension:
+                requestextension.extendedduedays = extension["extendedduedays"]
+            if 'extendedduedate' in extension:
+                requestextension.extendedduedate = extension["extendedduedate"]
+            if 'decisiondate' in extension:
+                requestextension.decisiondate = extension["decisiondate"]
+            if 'approvednoofdays' in extension:
+                requestextension.approvednoofdays = extension["approvednoofdays"]
+            requestextension.version = extension["version"] + 1
+            requestextension.foiministryrequest_id = requestid
+            requestextension.foiministryrequestversion_id = activeversion
+            requestextension.created_at = extension["created_at"]
+            requestextension.createdby =  extension["createdby"]
+            requestextension.updated_at = datetime2.now().isoformat()
+            requestextension.updatedby =  userid            
+            documets = self.createextensiondocumentfromobject(FOIRequestExtensionDocumentMapping().getextensiondocuments(extension["foirequestextensionid"], extension["version"]), extension["version"] + 1, userid)
+            requestextension.extensiondocuments = documets
+            extensionarr.append(requestextension)
+        return extensionarr
+
+    def createextensiondocumentfromobject(self, extensiondocuments, activeversion, userid):
+        extdocumentarr = []
+        for extensiondocument in extensiondocuments:
+            extensiondocumentmapping = FOIRequestExtensionDocumentMapping()
+            extensiondocumentmapping.foirequestextensionid = extensiondocument["foirequestextensionid"]
+            extensiondocumentmapping.extensionversion = activeversion
+            extensiondocumentmapping.foiministrydocumentid = extensiondocument["foiministrydocumentid"]
+            extensiondocumentmapping.created_at = datetime2.now().isoformat()
+            extensiondocumentmapping.createdby = userid
+            extdocumentarr.append(extensiondocumentmapping)
+        return extdocumentarr
 
     def createfoirequestdocument(self, requestschema, requestid, version, userid):
         documentarr = []

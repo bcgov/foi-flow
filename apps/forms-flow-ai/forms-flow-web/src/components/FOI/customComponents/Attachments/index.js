@@ -89,25 +89,25 @@ export const AttachmentSection = ({
     if (value) {
         if (files.length !== 0) {
           setAttachmentLoading(true);
-          dispatch(getOSSHeaderDetails(fileInfoList, (err, res) => {
-            let _documents = [];
-            if (!err) {
-              res.map((header, index) => {
-                const _file = files.find(file => file.filename === header.filename);
-                const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
-                _documents.push(documentDetails);
-                setDocuments(_documents);
-                dispatch(saveFilesinS3(header, _file, (err, res) => {
-                  if (res === 200) {
-                    setSuccessCount(index+1);
-                  }
-                  else {
-                    setSuccessCount(0);
-                  }
-                }));
-              });
-            }
-          }));
+          getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+          let _documents = [];
+          if (!err) {
+            res.map((header, index) => {
+              const _file = files.find(file => file.filename === header.filename);
+              const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
+              _documents.push(documentDetails);
+              setDocuments(_documents);
+              saveFilesinS3(header, _file, dispatch, (err, res) => {
+              if (res === 200) {
+                setSuccessCount(index+1);
+              }
+              else {
+                setSuccessCount(0);
+              }
+            })
+            });
+          }
+        })
         }             
     }
   }
@@ -214,7 +214,17 @@ export const AttachmentSection = ({
         <div className="addAttachmentBox">
             <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
         </div>
-        <AttachmentModal modalFor={modalFor} openModal={openModal} handleModal={handleContinueModal} multipleFiles={multipleFiles} requestNumber={requestNumber} requestId={requestId} attachment={updateAttachment} attachmentsArray={attachmentsArray} handleRename={handleRename} />
+        <AttachmentModal 
+          modalFor={modalFor} 
+          openModal={openModal} 
+          handleModal={handleContinueModal} 
+          multipleFiles={multipleFiles} 
+          requestNumber={requestNumber} 
+          requestId={requestId} 
+          attachment={updateAttachment} 
+          attachmentsArray={attachmentsArray} 
+          handleRename={handleRename} 
+          />
         <div className="displayAttachments">
           {attachmentsList}
         </div>
@@ -248,10 +258,8 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
         return "signoff - response";
       case "harms-review":
         return "harms assessment - review";
-      case "personal":
-        return "personal";
       default:
-        return "general";
+        return category || "general";
     }
   }
 
@@ -265,7 +273,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
                 {attachment.filename}
               </div>
               <div className="attachment-badge">
-                <span class={`badge ${disabled? "badge-secondary":"badge-primary"}`}>{getCategory(attachment.category)}</span>
+                <span className={`badge ${disabled? "badge-secondary":"badge-primary"}`}>{getCategory(attachment.category)}</span>
               </div>
             </div>
             <div className="col-sm-2" style={{display:'inline-block'}}>

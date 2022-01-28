@@ -2,6 +2,7 @@
 .close-btn-align{
     text-align: right;
     cursor: pointer;
+    color: #003366;
 }
 
 .list-group-item:first-child {
@@ -28,12 +29,7 @@
     margin-bottom: 10px;
 }
 
-.notification-heading > a {
-    text-decoration: none!important;
-    color: #000000;
-}
-
-.notification-heading > a:hover {
-    text-decoration: none!important;
+.redirect-url {
+    cursor: pointer;
     color: #000000;
 }

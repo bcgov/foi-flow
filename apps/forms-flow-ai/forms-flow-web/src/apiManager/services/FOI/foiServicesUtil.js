@@ -9,6 +9,7 @@ import {
 
 import { fetchFOIRequestAttachmentsList } from "./foiAttachmentServices";
 
+
 export const catchError = (error, dispatch) => {
   console.log(error);
   dispatch(serviceActionError(error));
@@ -38,3 +39,4 @@ export const postAttachment = (dispatch, apiUrl, data, requestId, ministryId, er
           catchError(error, dispatch);
         });
 }
+
