@@ -97,7 +97,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   //gets the request detail from the store
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
   console.log("Currentstatus!!", requestDetails.currentState);
-  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState(requestDetails.currentState);
+  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
   let requestAttachments = useSelector(state => state.foiRequests.foiRequestAttachments);
   const [attachments, setAttachments] = useState(requestAttachments);
@@ -175,6 +175,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       var requestStateFromId = findRequestState(requestDetails.requeststatusid);
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
+      setcurrentrequestStatus(requestStateFromId);
     }
   }, [requestDetails]);
 
