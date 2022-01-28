@@ -377,8 +377,10 @@ class FOIMinistryRequest(db.Model):
                             )
         
         return ministryfilter
+
+    @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
-        return db.session.query(FOIMinistryRequest.duedate).filter(and_(FOIMinistryRequest.foiministryrequestid == ministryrequestid), and_(FOIMinistryRequest.requeststatusid == 1)).order_by(FOIMinistryRequest.version).first()[0]
+        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatusid == 1).order_by(FOIMinistryRequest.version).first()[0]
          
     @classmethod
     def getupcomingcfrduerecords(cls):
