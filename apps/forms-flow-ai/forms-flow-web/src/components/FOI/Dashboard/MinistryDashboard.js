@@ -31,7 +31,7 @@ const MinistryDashboard = ({userDetail}) => {
   
   const defaultSortModel = [{field: 'currentState', sort: 'desc'}, {field: 'cfrduedate', sort: 'asc'}];
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
-  const [serverSortModel, setServerSortModel] = React.useState(defaultSortModel);
+  let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
     fields: ['applicantcategory', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
     keyword: null 
@@ -39,7 +39,7 @@ const MinistryDashboard = ({userDetail}) => {
   const [requestFilter, setRequestFilter] = useState("All");
 
   useEffect(() => {
-    updateSortModel();
+    serverSortModel = updateSortModel();
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(fetchFOIMinistryRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword, requestFilter, userDetail.preferred_username));
   }, [rowsState, sortModel, filterModel, requestFilter]);
@@ -61,10 +61,9 @@ const MinistryDashboard = ({userDetail}) => {
       //   smodel.shift();
       //   smodel.unshift({field: 'ministryAssignedFirstName', sort: order},{field: 'ministryAssignedLastName', sort: order})
       // }
-      setServerSortModel(smodel);
-    } else {
-      setServerSortModel(defaultSortModel);
     }
+
+    return smodel;
   });
 
   function getAssigneeValue(row) {
