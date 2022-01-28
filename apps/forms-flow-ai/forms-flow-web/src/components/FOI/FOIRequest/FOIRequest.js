@@ -33,7 +33,7 @@ import {
 import {
   fetchFOIRequestNotesList
 } from "../../../apiManager/services/FOI/foiRequestNoteServices";
-
+import { fetchExtensions } from "../../../apiManager/services/FOI/foiExtensionServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { push } from "connected-react-router";
@@ -95,7 +95,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const isAddRequest = urlIndexCreateRequest > -1;
   //gets the request detail from the store
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
-  let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
+  let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);  
+  let requestExtensions = useSelector(state => state.foiRequests.foiRequestExtesions);
+
   let requestAttachments = useSelector(state => state.foiRequests.foiRequestAttachments);
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
@@ -155,6 +157,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
+    dispatch(fetchExtensions(ministryId));
 
     if (bcgovcode)
       dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
@@ -339,13 +342,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
       settabStatus(StateEnum.callforrecordsoverdue.name)
     }
 
-    const bottomText = getTabBottomText({
+    const mappedBottomText = getTabBottomText({
       _daysRemaining,
       _cfrDaysRemaining,
-      _status
+      _status,
+      requestExtensions,
     });
 
-    setRequestStatus(bottomText);
+    setRequestStatus(mappedBottomText);
   }
 
   const hasStatusRequestSaved = (state) => {
@@ -503,18 +507,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
           <div className="foileftpanelstatus">
             {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days")) &&
-              <>
-                <h4>
-                  {
-                    (_tabStatus?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || _tabStatus?.toLowerCase() === StateEnum.closed.name.toLowerCase())
-                      ? ""
-                      : bottomTextArray[0]
-                  }
-                </h4>
-                {
-                  bottomTextArray.length > 1 && <h4>{bottomTextArray[1]}</h4>
-                }
-              </>
+              bottomTextArray.map(text => {
+                return (
+                  <h4>{text}</h4>
+                )
+              })
             }
           </div>
 
