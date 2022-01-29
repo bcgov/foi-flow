@@ -243,3 +243,16 @@ export const alertUser = (e) => {
   e.preventDefault();
   e.returnValue = "";
 };
+
+export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
+  if(!requestStatus) {
+    return false
+  }
+
+  if(requestStatus !== StateEnum.unopened.name && requestStatus !== StateEnum.intakeinprogress.name) {
+    console.log(requestStatus);
+    console.log(StateEnum.unopened.name);
+
+    return true
+  }
+}

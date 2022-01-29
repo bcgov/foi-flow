@@ -539,6 +539,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
                       <ApplicantDetails
                         requestDetails={requestDetails}
+                        requestStatus={_requestStatus}
                         contactDetailsNotGiven={contactDetailsNotGiven}
                         handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue}
                         handleEmailValidation={handleEmailValidation}
@@ -575,7 +576,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject} 
                         disableInput={disableInput} 
                       />
-                      <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
+                      <RequestDetails 
+                        requestDetails={requestDetails} 
+                        requestStatus={_requestStatus}
+                        handleRequestDetailsValue={handleRequestDetailsValue} 
+                        handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} 
+                        createSaveRequestObject={createSaveRequestObject} 
+                        disableInput={disableInput} 
+                        
+                      />
                       
                       <ExtensionDetails requestDetails={requestDetails}/>
                       {
