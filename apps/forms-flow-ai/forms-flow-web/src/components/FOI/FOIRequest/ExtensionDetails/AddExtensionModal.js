@@ -20,6 +20,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   formatDate,
   addBusinessDays,
+  removeBusinessDays,
   ConditionalComponent,
 } from "../../../../helper/FOI/helper";
 import clsx from "clsx";
@@ -34,6 +35,7 @@ import {
   uploadFiles,
   checkPublicBodyError,
   filterExtensionReason,
+  errorToast
 } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -79,8 +81,8 @@ const AddExtensionModal = () => {
   });
 
   const {
-    modalOpen,
-    setModalOpen,
+    saveModalOpen,
+    setSaveModalOpen,
     extensionReasons,
     dispatch,
     startDate,
@@ -88,10 +90,9 @@ const AddExtensionModal = () => {
     originalDueDate,
     idNumber,
     selectedExtension,
-    loading,
-    setLoading,
+    extensionLoading,
+    setExtensionLoading,
     saveExtensionRequest,
-    errorToast,
     extensions,
   } = useContext(ActionContext);
 
@@ -146,17 +147,18 @@ const AddExtensionModal = () => {
 
       const daysToSubtract = selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
       setPreExtendedDate(
-        addBusinessDays(
+        removeBusinessDays(
           formatDate(selectedExtension.extendedduedate),
-          daysToSubtract * -1
+          daysToSubtract
         )
       );
+
       setDeniedDate(
         formatDate(selectedExtension.denieddate) || formatDate(new Date())
       );
 
     }
-    setLoading(false);
+    setExtensionLoading(false);
   }, [selectedExtension, extensionReasons]);
 
   const handleReasonChange = (e) => {
@@ -209,7 +211,7 @@ const AddExtensionModal = () => {
   };
 
   const handleClose = () => {
-    setModalOpen(false);
+    setSaveModalOpen(false);
   };
 
   const handleFileChanges = async () => {
@@ -278,7 +280,7 @@ const AddExtensionModal = () => {
       saveExtensionRequest({
         data: extensionRequest,
         callback: () => {
-          setModalOpen(false);
+          setSaveModalOpen(false);
           setSaveLoading(false);
           window.history.go(0);
         },
@@ -328,8 +330,8 @@ const AddExtensionModal = () => {
   return (
     <>
       <Dialog
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        open={saveModalOpen}
+        onClose={() => setSaveModalOpen(false)}
         aria-labelledby="extension-dialog-title"
         maxWidth={"md"}
         fullWidth={true}
@@ -352,7 +354,7 @@ const AddExtensionModal = () => {
           <h2 className="extension-header">Extension</h2>
           <IconButton
             className="title-col3"
-            onClick={() => setModalOpen(false)}
+            onClick={() => setSaveModalOpen(false)}
           >
             <CloseIcon />
           </IconButton>
@@ -364,7 +366,7 @@ const AddExtensionModal = () => {
             overflowX: "hidden",
           }}
         >
-          <ConditionalComponent condition={!loading}>
+          <ConditionalComponent condition={!extensionLoading}>
             <Grid
               container
               direction="row"
@@ -558,7 +560,7 @@ const AddExtensionModal = () => {
               </ConditionalComponent>
             </Grid>
           </ConditionalComponent>
-          <ConditionalComponent condition={loading}>
+          <ConditionalComponent condition={extensionLoading}>
             <Grid
               container
               direction="row"
