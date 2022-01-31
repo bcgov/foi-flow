@@ -54,13 +54,6 @@ const MinistryDashboard = ({userDetail}) => {
         if(row.field === 'assignedToName')
           row.field = 'assignedministryperson';
       });
-
-      // let field = smodel[0]?.field;
-      // let order = smodel[0]?.sort;
-      // if(field == 'assignedministryperson') {
-      //   smodel.shift();
-      //   smodel.unshift({field: 'ministryAssignedFirstName', sort: order},{field: 'ministryAssignedLastName', sort: order})
-      // }
     }
 
     return smodel;

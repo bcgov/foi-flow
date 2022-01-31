@@ -101,7 +101,7 @@ class FOIRawRequestLoadTest(Resource):
                 asyncio.run(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+            return {'status': 500, 'message':"Invalid Request ID"}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
