@@ -29,7 +29,7 @@ const MinistryDashboard = ({userDetail}) => {
   const defaultRowsState = {page: 0, pageSize: 10};
   const [rowsState, setRowsState] = React.useState(defaultRowsState);
   
-  const defaultSortModel = [{field: 'currentState', sort: 'desc'}, {field: 'cfrduedate', sort: 'asc'}];
+  const defaultSortModel = [{field: 'currentState', sort: 'asc'}, {field: 'cfrduedate', sort: 'asc'}];
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
   let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
