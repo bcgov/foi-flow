@@ -63,7 +63,7 @@ const Dashboard = ({userDetail}) => {
       let order = smodel[0]?.sort;
       if(field == 'applicantName') {
         smodel.shift();
-        smodel.unshift({field: 'firstName', sort: order},{field: 'lastName', sort: order})
+        smodel.unshift({field: 'lastName', sort: order},{field: 'firstName', sort: order})
       }
     }
 
