@@ -9,6 +9,7 @@ import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foi
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import { debounce } from './utils';
 
 const MinistryDashboard = ({userDetail}) => {
 
@@ -155,11 +156,11 @@ const requestFilterChange = (e) => {
   setRequestFilter(e.target.value);
 }
 
-const setSearch = (e) => {
+const setSearch = debounce((e) => {
   var keyword = e.target.value;
-  setRowsState(defaultRowsState);
   setFilterModel((prev) => ({ ...prev, keyword}));
-}
+  setRowsState(defaultRowsState);
+}, 500)
 
 const updateAssigneeName = (data) => {
   if(data)

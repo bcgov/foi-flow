@@ -237,9 +237,6 @@ class FOIMinistryRequest(db.Model):
             FOIRequestApplicant.firstname.label('firstName'),
             FOIRequestApplicant.lastname.label('lastName'),
             FOIRequest.requesttype.label('requestType'),
-            FOIRequest.requesttype.label('requestTypeWebForm'),
-            FOIRequestApplicant.firstname.label('contactFirstName'),
-            FOIRequestApplicant.lastname.label('contactLastName'),
             cast(FOIRequest.receiveddate, String).label('receivedDate'),
             cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
             FOIRequestStatus.name.label('currentState'),
@@ -293,7 +290,7 @@ class FOIMinistryRequest(db.Model):
             dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(ministryfilter)
         elif(additionalfilter == 'myRequests'):
             #myrequest
-            dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
+            dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
         else:
             dbquery = basequery.filter(ministryfilter)
 
@@ -334,7 +331,8 @@ class FOIMinistryRequest(db.Model):
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
             'receivedDate': FOIRequest.receiveddate,
-            'applicantcategory': ApplicantCategory.name
+            'applicantcategory': ApplicantCategory.name,
+            'assignedministryperson': FOIMinistryRequest.assignedministryperson
         }.get(x, FOIMinistryRequest.filenumber)
 
     @classmethod

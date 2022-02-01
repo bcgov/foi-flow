@@ -45,18 +45,10 @@ class dashboardservice:
             _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
 
             if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
-                firstname = request.firstName
-                lastname =  request.lastName
-                requesttype = request.requestType
                 _receiveddate = parser.parse(request.receivedDateUF)
-            elif (request.sourceofsubmission!= "intake" and request.version == 1):               
-                firstname = request.contactFirstName
-                lastname = request.contactLastName
-                requesttype = request.requestTypeWebForm
-
 
             if(request.ministryrequestid == None):
-                unopenrequest = self.__preparefoirequestinfo(request.id, firstname, lastname, requesttype,
+                unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
                                                             request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
                                                             request.assignedTo, 'U-00' + request.idNumber, request.version)
 
