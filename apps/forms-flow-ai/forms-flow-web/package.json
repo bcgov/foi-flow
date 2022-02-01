@@ -96,7 +96,8 @@
     "sass": "^1.32.13",
     "semantic-ui-css": "^2.4.1",
     "sockjs-client": "^1.5.1",
-    "source-map-explorer": "^2.5.2"
+    "source-map-explorer": "^2.5.2",
+    "socket.io-client": "^4.4.1"
   },
   "resolutions": {
     "xmldom": "^0.6.0",
