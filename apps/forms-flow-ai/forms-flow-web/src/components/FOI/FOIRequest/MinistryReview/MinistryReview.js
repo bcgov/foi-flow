@@ -437,14 +437,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
         </div>
         
         <div className="foileftpanelstatus">
-        {_requestStatus?.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?  
+        {_requestStatus?.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.closed.name.toLowerCase() &&  
           <>
-          {(_requestStatus?.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
+          {(_requestStatus?.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.response.name.toLowerCase()) &&
           <h4>{bottomTextArray[0]}</h4>
-          : null }
+          }
           <h4>{bottomTextArray[1]}</h4>
           </>
-        : null }
+        }
         </div>  
      
         </div>
@@ -461,7 +461,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
+                  { (Object.entries(requestDetails).length >0  && requestDetails !== undefined) && 
                   <>
                     <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
                     <ApplicantDetails requestDetails={requestDetails} /> 
@@ -472,7 +472,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                     {/* <RequestNotes /> */}
                     <BottomButtonGroup requestState={requestState} stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
-                : null }
+                  }
                 </form>
               </div>
             </div>

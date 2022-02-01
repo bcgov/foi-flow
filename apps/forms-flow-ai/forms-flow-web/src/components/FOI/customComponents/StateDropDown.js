@@ -43,7 +43,14 @@ export default function StateDropDown({requestState, requestStatus, handleStateC
     }
 
     const getStatusList = (_status) => {   
-        let  _state =  requestState ? requestState : requestStatus?.toLowerCase().includes("days")? "Open": requestStatus;
+        let  _state = "";
+        if(requestState)
+            _state =  requestState;
+        else if(requestStatus && requestStatus != undefined && requestStatus.toLowerCase().includes("days"))
+            _state = "Open";
+        else
+            _state = requestStatus;
+
         let _stateList = StateList;
         if(_isMinistryCoordinator) {
             _stateList = MinistryStateList;
