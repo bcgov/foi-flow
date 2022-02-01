@@ -91,9 +91,7 @@ class CreateFOIRequestExtension(Resource):
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
-            else:
-                return {'status': False, 'message':'Unautherized user','id':-1} , 403
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -114,9 +112,7 @@ class EditFOIRequestExtension(Resource):
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().createrequestextensionversion(requestid, ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
-            else:
-                return {'status': False, 'message':'Unautherized user','id':-1} , 403
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -135,9 +131,7 @@ class DeleteFOIRequestExtension(Resource):
         try:         
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().deleterequestextension(requestid, ministryrequestid, extensionid, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
-            else:
-                return {'status': False, 'message':'Unautherized user','id':-1} , 403
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

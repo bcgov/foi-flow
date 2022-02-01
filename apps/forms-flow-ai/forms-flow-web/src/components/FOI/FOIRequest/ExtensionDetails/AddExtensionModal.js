@@ -20,6 +20,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   formatDate,
   addBusinessDays,
+  removeBusinessDays,
   ConditionalComponent,
 } from "../../../../helper/FOI/helper";
 import clsx from "clsx";
@@ -146,11 +147,12 @@ const AddExtensionModal = () => {
 
       const daysToSubtract = selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
       setPreExtendedDate(
-        addBusinessDays(
+        removeBusinessDays(
           formatDate(selectedExtension.extendedduedate),
-          daysToSubtract * -1
+          daysToSubtract
         )
       );
+
       setDeniedDate(
         formatDate(selectedExtension.denieddate) || formatDate(new Date())
       );

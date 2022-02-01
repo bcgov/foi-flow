@@ -54,7 +54,7 @@ class FOIRequest(Resource):
             jsondata = {}
             statuscode = 200
             if ('Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups) and (usertype is None or (usertype == "iao")):
-                jsondata = requestservice().getrequest(foirequestid=foirequestid,foiministryrequestid=foiministryrequestid)
+                jsondata = requestservice().getrequest(foirequestid,foiministryrequestid)
             elif  usertype is not None and usertype == "ministry" and len(ministrygroups) > 0:
                 jsondata = requestservice().getrequestdetailsforministry(foirequestid,foiministryrequestid,ministrygroups)
             else:

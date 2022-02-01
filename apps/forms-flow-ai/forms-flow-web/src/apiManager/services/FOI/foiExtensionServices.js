@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest, httpDELETERequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {
@@ -7,7 +7,6 @@ import API from "../../endpoints";
   } from "../../../actions/FOI/foiRequestActions";  
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { fnDone, catchError } from "./foiServicesUtil";
-
 
 export const fetchExtensionReasons = async ({
   callback,
