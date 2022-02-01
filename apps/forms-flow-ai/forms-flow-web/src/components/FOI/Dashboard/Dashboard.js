@@ -29,7 +29,7 @@ const Dashboard = ({userDetail}) => {
   const defaultRowsState = {page: 0, pageSize: 10};
   const [rowsState, setRowsState] = React.useState(defaultRowsState);
   
-  const defaultSortModel = [{ field: 'idNumber', sort: 'asc' }];
+  const defaultSortModel = [{ field: 'currentState', sort: 'desc' }, { field: 'receivedDateUF', sort: 'desc' }];
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
   let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
