@@ -84,7 +84,6 @@ const useStyles = makeStyles((theme) => ({
 
 const FOIRequest = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
-  // const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const { requestId, ministryId} = useParams();
   const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);

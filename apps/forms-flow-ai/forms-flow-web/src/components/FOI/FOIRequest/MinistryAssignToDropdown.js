@@ -28,7 +28,6 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    // const {requestState} = useParams();
 
     //local state management for assignedTo
     //------- update this later when $567 is ready

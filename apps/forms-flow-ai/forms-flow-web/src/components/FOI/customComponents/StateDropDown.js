@@ -11,8 +11,6 @@ import { useSelector } from "react-redux";
 
 export default function StateDropDown({requestState, requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition, updateStateDropDown}) {
 
-    //const {requestState} = useParams();
-
     let userDetail = useSelector(state=> state.user.userDetail);
    
     const _isMinistryCoordinator = isMinistryCoordinator;
