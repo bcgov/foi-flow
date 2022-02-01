@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     backgroundColor: "#38598A",
     color: "#FFFFFF",
+    fontFamily: " BCSans-Bold, sans-serif !important",
   },
   chip: {
     fontWeight: "bold",
@@ -34,15 +35,17 @@ const useStyles = makeStyles((theme) => ({
     color: "#38598A",
   },
   container: {
-    margin: "1em"
+    marginTop: "3em",
+    marginLeft: "1em",
+    marginRight: "1em",
   },
   headerSection: {
     marginBottom: "2em",
   },
   attachmentLog: {
     marginTop: "1em",
-    marginLeft: "1em"
-  }
+    marginLeft: "1em",
+  },
 }));
 
 export const AttachmentSection = ({
