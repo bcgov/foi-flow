@@ -20,6 +20,8 @@ const useStyles = makeStyles((theme) => ({
   createButton: {
     margin: 0,
     width: "100%",
+    backgroundColor: "#38598A",
+    color: "#FFFFFF",
   },
   chip: {
     fontWeight: "bold",
@@ -31,8 +33,15 @@ const useStyles = makeStyles((theme) => ({
   ellipses: {
     color: "#38598A",
   },
+  container: {
+    margin: "1em"
+  },
   headerSection: {
-    marginBottom: "2em"
+    marginBottom: "2em",
+  },
+  attachmentLog: {
+    marginTop: "1em",
+    marginLeft: "1em"
   }
 }));
 
@@ -236,23 +245,17 @@ export const AttachmentSection = ({
   }
   
   return (
-    <div style={{ margin: "2em" }}>
+    <div className={classes.container}>
       {isAttachmentLoading ? (
         <Loading />
       ) : (
-        <Grid
-          container
-          direction="row"
-          spacing={1}
-        >
+        <>
           <Grid
             container
-            item
             direction="row"
             justify="flex-start"
             alignItems="flex-start"
             spacing={1}
-            className={classes.headerSection}
           >
             <Grid item xs={9}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext">
@@ -263,7 +266,6 @@ export const AttachmentSection = ({
               <button
                 className={clsx(
                   "btn",
-                  "foi-btn-create",
                   "addAttachment",
                   classes.createButton
                 )}
@@ -274,10 +276,17 @@ export const AttachmentSection = ({
                 + Add Attachment
               </button>
             </Grid>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              spacing={1}
+              className={classes.attachmentLog}     
+            >
+              {attachmentsList}
+            </Grid>
           </Grid>
-
-
-          {attachmentsList}
 
           <AttachmentModal
             modalFor={modalFor}
@@ -290,7 +299,7 @@ export const AttachmentSection = ({
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
           />
-        </Grid>
+        </>
       )}
     </div>
   );
@@ -335,7 +344,6 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
       justify="flex-start"
       alignItems="flex-start"
       spacing={1}
-      className={classes.attachment}
     >
       <Grid item xs={11}>
         <div
@@ -351,7 +359,14 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
           })}
         />
       </Grid>
-      <Grid item xs={1}>
+      <Grid 
+        item 
+        xs={1}
+        container
+        direction="row-reverse"
+        justifyContent="flex-start"
+        alignItems="flex-start"
+      >
         <AttachmentPopup
           attachment={attachment}
           handlePopupButtonClick={handlePopupButtonClick}
