@@ -40,9 +40,10 @@ let foiNotifications = useSelector(state=> state.notifications.foiNotifications)
 
 useEffect(() => {     
   if(isAuthenticated){
-    var socket = io('ws://10.0.0.70:15000', { path: '/api/v1/socket.io', transports: ['websocket'] });
+    var socket = io('url', { path: '/api/v1/socket.io', transports: ['websocket'] });
     console.log("Socket!!",socket);
     socket.emit('joinroom', {'token':user.preferred_username})
+    console.log("Username",user.preferred_username);
     socket.on(user.preferred_username,function(data){
       console.log(data);
       console.log("Data received "+user.preferred_username+" :", data);
