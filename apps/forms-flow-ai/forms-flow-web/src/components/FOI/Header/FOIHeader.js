@@ -12,6 +12,8 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
+import socketIOClient from "socket.io-client";
+import io from "socket.io-client"; 
 
 
 const FOIHeader = React.memo(() => { 
@@ -35,6 +37,19 @@ const openModal = (coordinates) => {
 }
 
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
+
+useEffect(() => {     
+  if(isAuthenticated){
+    var socket = io('ws://10.0.0.70:15000', { path: '/api/v1/socket.io', transports: ['websocket'] });
+    console.log("Socket!!",socket);
+    socket.emit('joinroom', {'token':user.preferred_username})
+    socket.on(user.preferred_username,function(data){
+      console.log(data);
+      console.log("Data received "+user.preferred_username+" :", data);
+   });
+  } 
+},[]);
+
 
 useEffect(() => {     
   if(isAuthenticated)
