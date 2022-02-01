@@ -1,36 +1,75 @@
 import React, { useEffect, useState }  from 'react';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-import { fetchFOIRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIRequestListByPage } from "../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
+import { debounce } from './utils';
 
 const Dashboard = ({userDetail}) => {
 
   const dispatch = useDispatch();
-  const rows = useSelector(state=> state.foiRequests.foiRequestsList);  
-  const isLoading = useSelector(state=> state.foiRequests.isLoading);
-  const [requestFilter, setRequestFilter] = useState("All");
-  const [searchText, setSearchText] = useState("");
-  const classes = useStyles();
-  useEffect(()=>{
-    dispatch(fetchFOIFullAssignedToList());
-    dispatch(fetchFOIRequestList());
-  },[dispatch]);
 
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
+
+  const requestQueue = useSelector(state=> state.foiRequests.foiRequestsList);
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
+  
+  const classes = useStyles();
+  useEffect(()=>{
+    dispatch(fetchFOIFullAssignedToList());
+    dispatch(fetchFOIRequestListByPage());
+  },[dispatch]);
+
+  const defaultRowsState = {page: 0, pageSize: 10};
+  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  
+  const defaultSortModel = [{ field: 'currentState', sort: 'desc' }, { field: 'receivedDateUF', sort: 'desc' }];
+  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  let serverSortModel;
+  const [filterModel, setFilterModel] = React.useState({
+    fields: ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
+    keyword: null 
+  });
+  const [requestFilter, setRequestFilter] = useState("All");
+
+  useEffect(() => {
+    serverSortModel = updateSortModel();
+    // page+1 here, because initial page value is 0 for mui-data-grid
+    dispatch(fetchFOIRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword, requestFilter, userDetail.preferred_username));
+  }, [rowsState, sortModel, filterModel, requestFilter]);
 
   function getFullName(params) {    
     return `${params.row.lastName || ''}, ${
       params.row.firstName || ''
     }`;
   }
+
+  // update sortModel for applicantName & assignedTo
+  const updateSortModel = (() => {
+    let smodel = JSON.parse(JSON.stringify(sortModel));
+    if(smodel) {
+      smodel.map( (row) => {
+        if(row.field === 'assignedToName')
+          row.field = 'assignedTo';
+      });
+
+      let field = smodel[0]?.field;
+      let order = smodel[0]?.sort;
+      if(field == 'applicantName') {
+        smodel.shift();
+        smodel.unshift({field: 'lastName', sort: order},{field: 'firstName', sort: order})
+      }
+    }
+
+    return smodel;
+  });
 
   function getAssigneeValue(row) {
     const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";
@@ -51,7 +90,7 @@ const Dashboard = ({userDetail}) => {
   }
 
   function getReceivedDate(params) {
-    let receivedDateString = params.getValue(params.id, 'receivedDateUF');    
+    let receivedDateString = params.row.receivedDateUF;    
     const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
     receivedDateString = receivedDateString ? new Date(receivedDateString): "";    
 
@@ -60,7 +99,8 @@ const Dashboard = ({userDetail}) => {
     }    
     return formatDate(receivedDateString, 'yyyy MMM, dd');    
   }
-   const columns = React.useRef([    
+   
+  const columns = React.useRef([    
     {
       field: 'applicantName',
       headerName: 'APPLICANT NAME',
@@ -103,66 +143,35 @@ const Dashboard = ({userDetail}) => {
     },
     { 
       field: 'receivedDateUF', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
-    ]);  
-    
-    const [sortModel, setSortModel]= useState([
-      {
-        field: 'currentState',
-        sort: 'desc',
-      },
-      {
-        field: 'receivedDateUF',
-        sort: 'desc',
-      },   
-    ]);
-
-    const requestFilterChange = (e) => { 
-      setRequestFilter(e.target.value);
+  ]);  
       
-    }
-
-const setSearch = (e) => {
-  setSearchText(e.target.value);
-}
-
-const search = (data) => {  
-  const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
-  let dashboardData = updatedRows.filter(row => ((row.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
-  (row.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  (row.assignedTo && row.assignedTo.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  (!row.assignedTo && row.assignedGroup && row.assignedGroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  ) ); 
-
-  if (requestFilter === "myRequests" ) {
-    dashboardData = dashboardData.filter(row => row.assignedTo === userDetail.preferred_username)
+  const requestFilterChange = (e) => {
+    setRowsState(defaultRowsState);
+    setRequestFilter(e.target.value);
   }
-  else if (requestFilter === "watchingRequests") {
-    dashboardData = dashboardData.filter(row => {
-      if (row.watchers && !!row.watchers.find(watcher => watcher.watchedby === userDetail.preferred_username)){        
-        return row;
-      }      
-    })
-  }  
-  return dashboardData;
 
-}
+  const setSearch = debounce((e) => {
+    var keyword = e.target.value;
+    setFilterModel((prev) => ({ ...prev, keyword}));
+    setRowsState(defaultRowsState);
+  }, 500);
+
+  const updateAssigneeName = (data) => {  
+    return data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
+  }
  
 
-const renderReviewRequest = (e) => {
-  if (e.row.ministryrequestid) {
-    dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
+  const renderReviewRequest = (e) => {
+    if (e.row.ministryrequestid) {
+      dispatch(push(`/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
+    }
+    else {
+      dispatch(push(`/foi/reviewrequest/${e.row.id}/${e.row.currentState}`));
+    }
   }
-  else {
-    dispatch(push(`/foi/reviewrequest/${e.row.id}/${e.row.currentState}`));
+  const addRequest = (e) => {
+    dispatch(push(`/foi/addrequest`));
   }
-}
-const addRequest = (e) => {
-  dispatch(push(`/foi/addrequest`));
-}
 
      return (  
             
@@ -191,21 +200,32 @@ const addRequest = (e) => {
               <DataGrid 
                 className="foi-data-grid"
                 getRowId={(row) => row.idNumber}
-                rows={search(rows)} 
+                rows={updateAssigneeName(requestQueue.data)} 
                 columns={columns.current}                
                 rowHeight={30}
                 headerHeight={50}
-                pageSize={10}
+                rowCount = {requestQueue.meta.total}
+                pageSize={rowsState.pageSize}
                 rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
+                disableColumnMenu={true}
+
+                pagination
+                paginationMode='server'
+                onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
+                onPageSizeChange={(pageSize) =>
+                  setRowsState((prev) => ({ ...prev, pageSize }))
+                }
+
                 sortingOrder={['desc', 'asc']}
                 sortModel={sortModel}
-                sortingMode={'client'}
+                sortingMode={'server'}
                 onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}`
-                } 
+                  `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}`
+                }
                 onRowClick={renderReviewRequest}
+                loading={isLoading}
                 />
             </div> </>):<Loading/> }
             </>

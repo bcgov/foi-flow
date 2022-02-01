@@ -62,7 +62,7 @@ class FOIRawRequest(Resource):
     @auth.require
     def post(requestid=None):
         try :                        
-            updaterequest = request.get_json()                        
+            updaterequest = request.get_json()
             if int(requestid) and str(requestid) != "-1" :
                 status = rawrequestservice().getstatus(updaterequest)
                 rawrequest = rawrequestservice().getrawrequest(requestid)     
@@ -80,7 +80,7 @@ class FOIRawRequest(Resource):
             return {'status': 500, 'message':"Invalid Request Id"}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-        
+
 @cors_preflight('GET,POST,PUT,OPTIONS')
 @API.route('/foirawrequestbpm/addwfinstanceid/<_requestid>')
 class FOIRawRequestBPMProcess(Resource):
