@@ -9,79 +9,75 @@ import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
 from request_api.exceptions import BusinessException
+import dateutil.parser
 
 class extensionevent:
     """ FOI Event management service
 
     """
-    def createextensionevent(self, requestid, userid, username):        
-        version = FOIMinistryRequest.getversionforrequest(requestid)
-        approvedextension = FOIRequestExtension().getlatestapprovedextension(requestid, version)
-        try:
-            if approvedextension and len(approvedextension) != 0:
-                extensionreason = extensionreasonservice().getextensionreasonbyid(approvedextension['extensionreasonid'])
-                self.createcomment(requestid, userid, username, extensionreason['extensiontype'],  EventType.add.value)
-            else:
-                return  DefaultMethodResult(True,'No change',requestid)        
-        except BusinessException as exception:
-            return DefaultMethodResult(False,'unable to post comment - '+exception.message,requestid)        
+    def createextensionevent(self, ministryrequestid, extensionid, userid, username, event):        
+        version = FOIRequestExtension.getversionforextension(extensionid)       
+        curextension = FOIRequestExtension().getextensionforversion(extensionid, version)
+        prevextension = FOIRequestExtension().getextensionforversion(extensionid, version[0]-1)
+        extensionsummary = self.__maintained(curextension, prevextension, event)
+
+        if extensionsummary is None or (extensionsummary and len(extensionsummary) <1):
+            return  DefaultMethodResult(True,'No change',extensionid)
+        else:
+            try:
+                self.createcomment(ministryrequestid, userid, username, extensionsummary)
+                return DefaultMethodResult(True,'Comment posted',extensionid)
+            except BusinessException as exception:
+                return DefaultMethodResult(False,'unable to post comment - '+exception.message,extensionid)  
+            
         
                 
         
-    def createcomment(self, requestid, division, stage, event, userid):
-        comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division, stage, event)}
+    def createcomment(self, ministryrequestid, userid, username, extensionsummary):        
+        comment = {"ministryrequestid": ministryrequestid, "comment": self.__preparemessage(username, extensionsummary)}
         commentservice().createministryrequestcomment(comment, userid, 2)
 
+    # work on denied or approved with modify
+    def __maintained(self, curextension, prevextension, event):
+            if event == EventType.delete.value:    
+                return self.__createextensionsummary(prevextension, event)
+            else: 
+                return self.__createextensionsummary(curextension, event)
     
-    def __maintained(self,cdivisions, pdivisions):
-        divisions = []
-        for cdivision in cdivisions:
-            if self.__isdivisionpresent(self.__getdivisioname(cdivision), pdivisions) == False:
-               divisions.append(self.__createdivisionsummary(cdivision, EventType.add.value)) 
-            else:
-                if self.__isstagechanged(self.__getdivisioname(cdivision), self.__getstagename(cdivision), pdivisions) == True :
-                   divisions.append(self.__createdivisionsummary(cdivision, EventType.modify.value))                      
-        return divisions            
-    
-    def __deleted(self,cdivisions, pdivisions):
-        divisions = []
-        for pdivision in pdivisions:
-            if self.__isdivisionpresent(self.__getdivisioname(pdivision), cdivisions) == False:      
-                divisions.append(self.__createdivisionsummary(pdivision, EventType.delete.value))   
-        return divisions      
-    
-    def __isdivisionpresent(self, divisionid, divisionlist):
-        for division in divisionlist:
-            if self.__getdivisioname(division) == divisionid:
-                return True
-        return False
-    
-    def __isstagechanged(self, divisionid, stageid, divisionlist):
-        for division in divisionlist:
-            if self.__getdivisioname(division) == divisionid and self.__getstagename(division) != stageid:
-                return True
-        return False
-                               
-    def __createdivisionsummary(self, division, event):
-        return {'division': self.__getdivisioname(division), 'stage': self.__getstagename(division), 'event': event}
-        
-    def __getdivisioname(self, dataschema):
-        return dataschema['division.name']
+    def __createextensionsummary(self, extension, event):
+        extnreson = extensionreasonservice().getextensionreasonbyid(extension['extensionreasonid'])
+        return {'extension': extension, 'extensiontype': self.__getextensiontype(extnreson), 'reason': self.__getextensionreason(extnreson), 'event': event}
 
-    def __getstagename(self, dataschema):
-        return dataschema['stage.name']    
+    def __getextensionreason(self, extnreson):       
+       return extnreson["reason"]
 
-    def __preparemessage(self, division, stage, event): 
-        if event == EventType.modify.value:
-            return self.__formatmessage(division)+' division has been updated to stage '+ self.__formatmessage(stage)
-        elif event == EventType.add.value:
-            return self.__formatmessage(division)+' division has been added with stage '+ self.__formatmessage(stage) 
+    def __getextensiontype(self, extnreson):       
+       return extnreson["extensiontype"]
+
+    def __preparemessage(self, username, extensionsummary):        
+        extension = extensionsummary["extension"] if 'extension' in extensionsummary else None
+        event = extensionsummary["event"] if 'event' in extensionsummary else None
+        extensiontype = extensionsummary["extensiontype"] if 'extensiontype' in extensionsummary else None         
+        extensionreason = extensionsummary["reason"] if 'reason' in extensionsummary else None         
+        approveddays = extension["approvednoofdays"] if 'approvednoofdays' in extension else extension["extendedduedays"]
+        extendedduedays = extension["extendedduedays"] if 'extendedduedays' in extension else approveddays
+        newduedate = extension["extendedduedate"] if 'extendedduedate' in extension else None
+        statusid = extension["extensionstatusid"] if 'extensionstatusid' in extension else None
+
+        # add status condition based on the US update
+        if event == EventType.add.value and extensiontype == 'Public Body':
+            return  username + " has taken a "+ str(extendedduedays) +" day Public Body extension. The new legislated due date is "+ self.__formatdate(newduedate, '%Y %b %d') + "."
+        elif event == EventType.add.value and extensiontype == 'OIPC' and statusid == 2:            
+            return  "The OIPC has granted a "+ str(approveddays) +" day extension. The new legislated due date is "+ self.__formatdate(newduedate, '%Y %b %d')
+        elif statusid == 3:            
+            return  "The OIPC has denied a "+ str(extendedduedays) +" day extension."
+        elif event == EventType.modify.value:
+            return "Extension for " + extensionreason + " has been edited."
         else:
-            return self.__formatmessage(division)+' division with stage '+ self.__formatmessage(stage) +' has been removed'  
-             
-        
-    def __formatmessage(self, data):
-        return '<i>'+data+'</i>'    
+            return "Extension for " + extensionreason + " has been deleted."
+
+    def __formatdate(self, datevalue, format):
+        return dateutil.parser.parse(datevalue).strftime(format) if datevalue is not None else None         
 
 class EventType(Enum):
     add = "add"    

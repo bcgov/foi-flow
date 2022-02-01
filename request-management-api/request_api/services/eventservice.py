@@ -20,10 +20,17 @@ class eventservice:
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
-            assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser)
-            extensioneventresponse = extensionevent().createextensionevent(requestid, userid, username)
+            assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser)           
             if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message))
+        except BusinessException as exception:            
+            current_app.logger.error("%s,%s" % ('FOI Notification Error', exception.message))
+
+    async def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
+        try:
+            extensioneventresponse = extensionevent().createextensionevent(ministryrequestid, extensionid, userid, username, event)
+            if extensioneventresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('FOI Notification Error', exception.message))
             

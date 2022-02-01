@@ -104,6 +104,12 @@ class FOIRequestExtension(db.Model):
     @classmethod
     def getversionforextension(cls,extensionid):   
         return db.session.query(FOIRequestExtension.version).filter_by(foirequestextensionid=extensionid).order_by(FOIRequestExtension.version.desc()).first() 
+    
+    @classmethod
+    def getextensionforversion(cls, foirequestextensionid, version):   
+        document_schema = FOIRequestExtensionSchema()            
+        request = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid, FOIRequestExtension.version == version).order_by(FOIRequestExtension.version.desc()).first()
+        return document_schema.dump(request)
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
