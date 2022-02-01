@@ -10,13 +10,35 @@ import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../a
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
+import Grid from "@material-ui/core/Grid";
+import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx"
+import Chip from "@material-ui/core/Chip";
+import Divider from "@material-ui/core/Divider";
+
+const useStyles = makeStyles((theme) => ({
+  createButton: {
+    margin: 0,
+    width: "100%",
+  },
+  chip: {
+    fontWeight: "bold",
+  },
+  chipPrimary: {
+    color: "#fff",
+    backgroundColor: "#003366",
+  },
+  ellipses: {
+    color: "#38598A",
+  },
+  headerSection: {
+    marginBottom: "2em"
+  }
+}));
 
 export const AttachmentSection = ({
   requestNumber,
-  requestState,
   attachmentsArray,
-  currentUser,
-  setAttachment,
   requestId,
   ministryId,
   bcgovcode,
@@ -24,6 +46,7 @@ export const AttachmentSection = ({
   ministryAssignedToList,
   isMinistryCoordinator
 }) => {
+  const classes = useStyles();
   const [attachments, setAttachments] = useState(attachmentsArray)
   const [iaoList, setIaoList] = useState(iaoassignedToList)
   const [ministryList, setMinistryList] = useState(ministryAssignedToList)
@@ -201,42 +224,82 @@ export const AttachmentSection = ({
 
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
-    attachmentsList.push(<Attachment key={i} attachment={attachments[i]} handlePopupButtonClick={handlePopupButtonClick} getFullname={getFullname} isMinistryCoordinator={isMinistryCoordinator} />);
+    attachmentsList.push(
+    <Attachment 
+      key={i} 
+      attachment={attachments[i]} 
+      handlePopupButtonClick={handlePopupButtonClick} 
+      getFullname={getFullname} 
+      isMinistryCoordinator={isMinistryCoordinator}
+      classes={classes} 
+    />);
   }
   
   return (
-    <div>
-      { isAttachmentLoading ? <Loading /> : 
-      <div className="section">
-        <div className="foi-request-number-header">
-          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{`Request #${requestNumber ? requestNumber :`U-00${requestId}`}`}</h1>
-        </div>
-        <div className="addAttachmentBox">
-            <button type="button" className="btn foi-btn-create addAttachment" onClick={addAttachments}>+ Add Attachment</button>
-        </div>
-        <AttachmentModal 
-          modalFor={modalFor} 
-          openModal={openModal} 
-          handleModal={handleContinueModal} 
-          multipleFiles={multipleFiles} 
-          requestNumber={requestNumber} 
-          requestId={requestId} 
-          attachment={updateAttachment} 
-          attachmentsArray={attachmentsArray} 
-          handleRename={handleRename} 
-          />
-        <div className="displayAttachments">
+    <div style={{ margin: "2em" }}>
+      {isAttachmentLoading ? (
+        <Loading />
+      ) : (
+        <Grid
+          container
+          direction="row"
+          spacing={1}
+        >
+          <Grid
+            container
+            item
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+            className={classes.headerSection}
+          >
+            <Grid item xs={9}>
+              <h1 className="foi-review-request-text foi-ministry-requestheadertext">
+                {`Request #${requestNumber ? requestNumber : `U-00${requestId}`}`}
+              </h1>
+            </Grid>
+            <Grid item xs={3}>
+              <button
+                className={clsx(
+                  "btn",
+                  "foi-btn-create",
+                  "addAttachment",
+                  classes.createButton
+                )}
+                variant="contained"
+                onClick={addAttachments}
+                color="primary"
+              >
+                + Add Attachment
+              </button>
+            </Grid>
+          </Grid>
+
+
           {attachmentsList}
-        </div>
-      </div>
-      }
+
+          <AttachmentModal
+            modalFor={modalFor}
+            openModal={openModal}
+            handleModal={handleContinueModal}
+            multipleFiles={multipleFiles}
+            requestNumber={requestNumber}
+            requestId={requestId}
+            attachment={updateAttachment}
+            attachmentsArray={attachmentsArray}
+            handleRename={handleRename}
+          />
+        </Grid>
+      )}
     </div>
-  )
+  );
 }
 
 
 const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
-
+  
+  const classes = useStyles();
   const [filename, setFilename] = useState("");
   const [disabled, setDisabled] = useState(isMinistryCoordinator && attachment.category == 'personal');
   let lastIndex = 0;
@@ -264,46 +327,66 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
   }
 
   return (
-    <div className="container-fluid">
-      <div className="row foi-details-row">
-        <div className="row foi-details-row">
-          <div className="col-sm-12 foi-details-col">
-            <div className="col-sm-10" style={{display:'inline-block',paddingLeft:'0px'}}>
-              <div className={`attachment-name ${disabled? "attachment-disabled":""}`}>
-                {attachment.filename}
-              </div>
-              <div className="attachment-badge">
-                <span className={`badge ${disabled? "badge-secondary":"badge-primary"}`}>{getCategory(attachment.category)}</span>
-              </div>
-            </div>
-            <div className="col-sm-2" style={{display:'inline-block'}}>
-              <div className="col-sm-1" style={{marginLeft:'auto'}}>
-                <AttachmentPopup attachment={attachment} handlePopupButtonClick={handlePopupButtonClick} disabled={disabled} />
-              </div>                      
-            </div>
-          </div>
+    <Grid
+      container
+      item
+      xs={12}
+      direction="row"
+      justify="flex-start"
+      alignItems="flex-start"
+      spacing={1}
+      className={classes.attachment}
+    >
+      <Grid item xs={11}>
+        <div
+          className={`attachment-name ${disabled ? "attachment-disabled" : ""}`}
+        >
+          {attachment.filename}
         </div>
-        <div className="row foi-details-row">
-          <div className={`col-sm-12 foi-details-col attachment-time ${disabled? "attachment-disabled":""}`}>                      
-            {attachment.created_at}
-          </div>
+        <Chip
+          label={getCategory(attachment.category).toUpperCase()}
+          size="small"
+          className={clsx(classes.chip, {
+            [classes.chipPrimary]: !disabled,
+          })}
+        />
+      </Grid>
+      <Grid item xs={1}>
+        <AttachmentPopup
+          attachment={attachment}
+          handlePopupButtonClick={handlePopupButtonClick}
+          disabled={disabled}
+        />
+      </Grid>
+
+      <Grid item xs={12}>
+        <div
+          className={`attachment-time ${disabled ? "attachment-disabled" : ""}`}
+        >
+          {attachment.created_at}
         </div>
-        <div className="row foi-details-row">
-          <div className={`col-sm-12 foi-details-col attachment-owner ${disabled? "attachment-disabled":""}`}>                      
-            {getFullname(attachment.createdby)}
-          </div>
+      </Grid>
+
+      <Grid item xs={12}>
+        <div
+          className={`attachment-owner ${
+            disabled ? "attachment-disabled" : ""
+          }`}
+        >
+          {getFullname(attachment.createdby)}
         </div>
-        <div className="row foi-details-row">
-          <div className="col-sm-12 foi-details-col">                      
-            <hr className="solid" />
-          </div>
-        </div>
-      </div>
-    </div>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Divider />
+      </Grid>
+    </Grid>
   );
 })
 
 const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disabled}) => {
+  
+  const classes = useStyles();
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
@@ -341,15 +424,19 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
 
   return (
     <Popup
-      role='tooltip'
+      role="tooltip"
       ref={ref}
       trigger={
         <button className="actionsBtn" disabled={disabled}>
-          <FontAwesomeIcon icon={faEllipsisH} size='1x' color='darkblue' />
+          <FontAwesomeIcon
+            icon={faEllipsisH}
+            size="1x"
+            className={classes.ellipses}
+          />
         </button>
       }
       className="attachment-popup"
-      position={'bottom right'}
+      position={"bottom right"}
       closeOnDocumentClick
       disabled={disabled}
       // keepTooltipInside=".tooltipBoundary"
@@ -361,16 +448,17 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
         <button className="childActionsBtn" onClick={handleRename}>
           Rename
         </button>
-        {attachment.category === "personal"?"":
-          showReplace(attachment.category)?
-            <button className="childActionsBtn" onClick={handleReplace}>
-              Replace
-            </button>
-            :
-            <button className="childActionsBtn" onClick={handleDelete}>
-              Delete
-            </button>
-        }
+        {attachment.category === "personal" ? (
+          ""
+        ) : showReplace(attachment.category) ? (
+          <button className="childActionsBtn" onClick={handleReplace}>
+            Replace
+          </button>
+        ) : (
+          <button className="childActionsBtn" onClick={handleDelete}>
+            Delete
+          </button>
+        )}
       </div>
     </Popup>
   );
