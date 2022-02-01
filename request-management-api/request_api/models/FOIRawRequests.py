@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy.orm import relationship,backref
-from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc
+from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
@@ -209,16 +209,29 @@ class FOIRawRequest(db.Model):
             subquery_maxversion.c.max_version == FOIRawRequest.version,
         ]
 
+        requesttype = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['requestType']['requestType'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['requestType'].astext).label('requestType')
+        firstname = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['firstName'].astext).label('firstName')
+        lastname = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['lastName'].astext).label('lastName')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
             FOIRawRequest.sourceofsubmission,
-            FOIRawRequest.requestrawdata['firstName'].astext.label('firstName'),
-            FOIRawRequest.requestrawdata['lastName'].astext.label('lastName'),
-            FOIRawRequest.requestrawdata['requestType'].astext.label('requestType'),
-            FOIRawRequest.requestrawdata['requestType']['requestType'].astext.label('requestTypeWebForm'),
-            FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext.label('contactFirstName'),
-            FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext.label('contactLastName'),
+            firstname,
+            lastname,
+            requesttype,
             FOIRawRequest.requestrawdata['receivedDate'].astext.label('receivedDate'),
             FOIRawRequest.requestrawdata['receivedDateUF'].astext.label('receivedDateUF'),
             FOIRawRequest.status.label('currentState'),
