@@ -13,11 +13,16 @@ def pytest_namespace():
     return {'requestidtoupdate': 0}
 
 def test_create_extension(session):
-    #ministryrequestid, version, extensionschema['extension'], userid
     ministryrequestid = 1
     response = extensionservice().createrequestextnesion(ministryrequestid, requestjson, userid='dviswana@idir')
     requestid = response.identifier
     pytest.approxrequestidtoupdate = requestid    
-    assert response.success == True      
+    assert response.success == True 
+
+def test_get_request_extensions(session):
+    requestid = 1
+    extensions = extensionservice().getrequestextensions(requestid)
+    for extension in extensions:
+      assert extension["extensionreson"]     
 
 

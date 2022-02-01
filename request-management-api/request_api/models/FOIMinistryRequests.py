@@ -224,6 +224,27 @@ class FOIMinistryRequest(db.Model):
             upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         return upcomingduerecords    
 
+    @classmethod
+    def updateduedate(cls, ministryrequestid, duedate, userid)->DefaultMethodResult:
+        currequest = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
+        setattr(currequest,'duedate',duedate)
+        setattr(currequest,'updated_at',datetime.now().isoformat())
+        setattr(currequest,'updatedby',userid)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Request updated',ministryrequestid)
+    
+    @classmethod   
+    def getministriesopenedbyuid(cls, rawrequestid):
+        sql = """select distinct filenumber, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
+                    inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 
+                    inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
+                    where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;""" 
+        rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})
+        ministries = []
+        for row in rs:
+            ministries.append({"filenumber": row["filenumber"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+        return ministries    
+
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

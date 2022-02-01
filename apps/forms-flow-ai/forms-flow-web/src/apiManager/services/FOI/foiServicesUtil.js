@@ -8,7 +8,7 @@ import {
   } from "../../../actions/FOI/foiRequestActions";
 
 import { fetchFOIRequestAttachmentsList } from "./foiAttachmentServices";
-import { StateEnum } from '../../../constants/FOI/statusEnum';
+
 
 export const catchError = (error, dispatch) => {
   console.log(error);
@@ -40,20 +40,3 @@ export const postAttachment = (dispatch, apiUrl, data, requestId, ministryId, er
         });
 }
 
-export const setRedirectUrl = (foiRequest,notification,isMinistry) =>{
-  Object.entries(StateEnum).forEach(([key, value]) =>{
-    if(key && value.id === foiRequest.requeststatusid){
-      let url = "";
-      if(notification.requesttype === 'rawrequest'){
-        url=`/foi/reviewrequest/${notification.requestid}/${value.name}`;
-      }
-      else if(notification.requesttype === 'ministryrequest'){
-        if(isMinistry)
-          url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
-        else
-          url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${value.name}`;
-      }
-      window.location.href=url;
-    }
-  })
-}

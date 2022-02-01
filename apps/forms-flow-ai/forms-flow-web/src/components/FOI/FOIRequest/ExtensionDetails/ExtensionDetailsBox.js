@@ -5,12 +5,12 @@ import { ActionContext } from "./ActionContext";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import AddExtensionModal from "./AddExtensionModal"
+import DeleteExtensionModal from "./DeleteExtensionModal";
 import {
   fetchExtensions,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import ExtensionsTable from "./ExtensionsTable";
 import "./extensionscss.scss"
-import { extensionStatusId } from "../../../../constants/FOI/enum"
 import clsx from "clsx"
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -23,12 +23,14 @@ const useStyles = makeStyles((theme) => ({
 const ExtensionDetailsBox = React.memo(() => {
   const classes = useStyles();
 
-  const { setModalOpen, dispatch, extensions} = useContext(ActionContext);
+  const {
+    setSaveModalOpen,
+    dispatch,
+    setExtensionId,
+    pendingExtensionExists,
+  } = useContext(ActionContext);
 
-  const pendingExtensionExists = extensions.some(
-    (ex) => ex.extensionstatusid === extensionStatusId.pending
-  );
-  const { ministryId } = useParams();
+    const { ministryId } = useParams();
 
   useEffect(() => {
     if (ministryId) {
@@ -40,17 +42,18 @@ const ExtensionDetailsBox = React.memo(() => {
     <>
       <Card className="foi-details-card">
         <div className="row foi-details-row">
-          <div className="col-lg-8 foi-details-col ">
+          <div className="col-lg-8 foi-details-col">
             <label className="foi-details-label">EXTENSION DETAILS</label>
           </div>
-          <div className="col-lg-4 foi-details-col ">
+          <div className="col-lg-4 foi-details-col">
             <button
               className={clsx("btn", "btn-link", "btn-description-history", {
                 [classes.btndisabled]: pendingExtensionExists,
               })}
               onClick={(e) => {
                 e.preventDefault();
-                setModalOpen(true);
+                setSaveModalOpen(true);
+                setExtensionId(null);
               }}
               disabled={pendingExtensionExists}
             >
@@ -59,10 +62,11 @@ const ExtensionDetailsBox = React.memo(() => {
           </div>
         </div>
         <CardContent>
-          <ExtensionsTable />
+          <ExtensionsTable/>
         </CardContent>
       </Card>
-      <AddExtensionModal />
+      <AddExtensionModal/>
+      <DeleteExtensionModal/>
     </>
   );
 });

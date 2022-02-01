@@ -210,7 +210,15 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
               </div>
               {
                 (['replace','add'].includes(modalFor)) ?
-                <FileUpload attachment={attachment}  attchmentFileNameList={attchmentFileNameList}  multipleFiles={multipleFiles} mimeTypes={mimeTypes} maxFileSize={maxFileSize} totalFileSize={totalFileSize} updateFilesCb={updateFilesCb} /> 
+                <FileUpload 
+                  attachment={attachment}  
+                  attchmentFileNameList={attchmentFileNameList}  
+                  multipleFiles={multipleFiles} 
+                  mimeTypes={mimeTypes} 
+                  maxFileSize={maxFileSize} 
+                  totalFileSize={totalFileSize} 
+                  updateFilesCb={updateFilesCb} 
+                /> 
                 :
                 (modalFor === 'rename'?
                 <div className="row">
