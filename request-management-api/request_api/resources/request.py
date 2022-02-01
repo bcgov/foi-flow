@@ -81,30 +81,6 @@ class FOIRawRequest(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-
-@cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirawrequest/loadtest/<requestid>')
-class FOIRawRequestLoadTest(Resource):
-    """Consolidates create and retrival of raw request"""
-
-    @staticmethod
-    #@Tracer.trace()
-    @cross_origin(origins=allowedorigins())
-    #@auth.require
-    def post(requestid=None):
-        try:
-            updaterequest = request.get_json()
-            userid = updaterequest['assignedTo']
-            username = 'Super Tester'
-            if int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.run(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request ID"}, 500    
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
-
 @cors_preflight('GET,POST,PUT,OPTIONS')
 @API.route('/foirawrequestbpm/addwfinstanceid/<_requestid>')
 class FOIRawRequestBPMProcess(Resource):
