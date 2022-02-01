@@ -6,7 +6,7 @@ from .db import  db, ma
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
-from sqlalchemy import insert, and_, text
+from sqlalchemy import insert, and_, text, func
 from flask import jsonify
 
 class FOIRawRequestWatcher(db.Model):
@@ -49,6 +49,23 @@ class FOIRawRequestWatcher(db.Model):
             if row["isactive"] == True:
                 watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
         return watchers 
+
+    @classmethod
+    def getrequestidsbyuserid(cls, userid):
+        #subquery for getting latest watching status
+        subquery_max = db.session.query(FOIRawRequestWatcher.requestid, FOIRawRequestWatcher.watchedby ,func.max(FOIRawRequestWatcher.watcherid).label('max_watcherid')).group_by(FOIRawRequestWatcher.requestid, FOIRawRequestWatcher.watchedby).subquery()
+        joincondition = [
+            subquery_max.c.requestid == FOIRawRequestWatcher.requestid,
+            subquery_max.c.watchedby == FOIRawRequestWatcher.watchedby,
+            subquery_max.c.max_watcherid == FOIRawRequestWatcher.watcherid,
+        ]
+
+        return db.session.query(
+                                FOIRawRequestWatcher.requestid
+                            ).join(
+                                subquery_max,
+                                and_(*joincondition)
+                            ).filter(and_(FOIRawRequestWatcher.watchedby == userid, FOIRawRequestWatcher.isactive == True)).subquery()
 
     @classmethod
     def disablewatchers(cls, requestid, userid):   
