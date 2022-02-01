@@ -9,6 +9,7 @@ import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foi
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
+import { debounce } from './utils';
 
 const Dashboard = ({userDetail}) => {
 
@@ -149,11 +150,11 @@ const Dashboard = ({userDetail}) => {
     setRequestFilter(e.target.value);
   }
 
-  const setSearch = (e) => {
+  const setSearch = debounce((e) => {
     var keyword = e.target.value;
-    setRowsState(defaultRowsState);
     setFilterModel((prev) => ({ ...prev, keyword}));
-  }
+    setRowsState(defaultRowsState);
+  }, 500);
 
   const updateAssigneeName = (data) => {  
     return data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
