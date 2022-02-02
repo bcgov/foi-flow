@@ -85,7 +85,7 @@ const MinistryDashboard = ({userDetail}) => {
       return "N/A"
     }
     else {
-      return formatDate(receivedDateString, 'yyyy MMM, dd');
+      return formatDate(receivedDateString, "MMM dd yyyy");
     }
         
   }
