@@ -1,11 +1,8 @@
 import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import TextField from '@material-ui/core/TextField';
-import { InputLabel } from '@material-ui/core';
 import { formatDate } from "../../../../helper/FOI/helper";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
-
 
 const RequestDetails = React.memo((requestDetails) => {
 
@@ -34,15 +31,15 @@ const RequestDetails = React.memo((requestDetails) => {
                   
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                     <span><b>Request Opened</b></span>                      
-                    <span className="foi-rowtoppadding">{formatDate(_requestDetails.requestProcessStart,'yyyy MMM, dd')}</span>
+                    <span className="foi-rowtoppadding">{formatDate(_requestDetails.requestProcessStart,'MMM dd yyyy')}</span>
                   </div>
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                   <span><b>Records Due Date</b></span>                      
-                  <span className="foi-rowtoppadding">{_requestDetails.currentState && _requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase() ? formatDate(_requestDetails.cfrDueDate,'yyyy MMM, dd') : "N/A"}</span>
+                  <span className="foi-rowtoppadding">{_requestDetails.currentState && _requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase() ? formatDate(_requestDetails.cfrDueDate,'MMM dd yyyy') : "N/A"}</span>
                   </div>
                   <div className="col-lg-4 foi-details-col foi-inline-grid">
                   <span><b>Legislated Due Date</b></span>                      
-                  <span className="foi-rowtoppadding">{_requestDetails.currentState && _requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase() ? formatDate(_requestDetails.dueDate,'yyyy MMM, dd'): "N/A"}</span>
+                  <span className="foi-rowtoppadding">{_requestDetails.currentState && _requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase() ? formatDate(_requestDetails.dueDate,'MMM dd yyyy'): "N/A"}</span>
                   </div>
               </div>               
             </CardContent>

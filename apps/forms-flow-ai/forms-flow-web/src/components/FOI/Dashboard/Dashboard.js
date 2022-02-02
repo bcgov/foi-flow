@@ -12,7 +12,6 @@ import Loading from "../../../containers/Loading";
 import { debounce } from './utils';
 
 const Dashboard = ({userDetail}) => {
-
   const dispatch = useDispatch();
 
   const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
@@ -97,7 +96,7 @@ const Dashboard = ({userDetail}) => {
     if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {    
         receivedDateString = addBusinessDays(receivedDateString, 1);     
     }    
-    return formatDate(receivedDateString, 'yyyy MMM, dd');    
+    return formatDate(receivedDateString, "MMM dd yyyy");    
   }
    
   const columns = React.useRef([    
