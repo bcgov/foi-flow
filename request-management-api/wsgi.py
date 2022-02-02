@@ -8,6 +8,7 @@ from distutils.log import debug
 
 import os
 from request_api import create_app, socketio
+from flask_socketio import ConnectionRefusedError
 from flask_socketio import emit
 from request_api.auth import AuthHelper
 from flask import g, request
@@ -21,7 +22,7 @@ def connect(message):
     if userid is not None:
         emit(request.sid, {"message": userid+" successfully connected"})
     else:
-        disconnect() 
+        raise ConnectionRefusedError('unauthorized!')
 
   
 @socketio.on('disconnect')
