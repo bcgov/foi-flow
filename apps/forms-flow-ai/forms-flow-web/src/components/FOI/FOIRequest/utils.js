@@ -54,13 +54,13 @@ export const confirmChangesLost = (positiveCallback, negativeCallback) => {
   }
 };
 
-export const getRedirectAfterSaveUrl = (_state, ministryId, requestId) => {
+export const getRedirectAfterSaveUrl = (ministryId, requestId) => {
   if(ministryId) {
-    return `/foi/foirequests/${requestId}/ministryrequest/${ministryId}/${_state}`;
+    return `/foi/foirequests/${requestId}/ministryrequest/${ministryId}`;
   }
 
   if(requestId) {
-    return `/foi/reviewrequest/${requestId}/${_state}`;
+    return `/foi/reviewrequest/${requestId}`;
   }
 
   return null;
@@ -243,3 +243,10 @@ export const alertUser = (e) => {
   e.preventDefault();
   e.returnValue = "";
 };
+
+export const findRequestState= (requestStatusId) =>{
+  if(requestStatusId != undefined){
+    var stateArray = Object.entries(StateEnum).find(value => value[1].id === requestStatusId);
+    return stateArray[1].name;
+  }
+}

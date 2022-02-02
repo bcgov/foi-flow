@@ -25,7 +25,7 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
   };
 
   const redirectUrl =(ministry) => {
-    let url=`/foi/foirequests/${ministry.requestid}/ministryrequest/${ministry.ministryrequestid}/Open`;
+    let url=`/foi/foirequests/${ministry.requestid}/ministryrequest/${ministry.ministryrequestid}`;
     window.location.href=url;
   }
 

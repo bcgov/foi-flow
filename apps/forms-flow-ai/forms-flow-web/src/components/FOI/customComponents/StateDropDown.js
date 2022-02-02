@@ -9,9 +9,7 @@ import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
 import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 
-export default function StateDropDown({requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition, updateStateDropDown}) {
-
-    const {requestState} = useParams();
+export default function StateDropDown({requestState, requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition, updateStateDropDown}) {
 
     let userDetail = useSelector(state=> state.user.userDetail);
    
@@ -44,8 +42,15 @@ export default function StateDropDown({requestStatus, handleStateChange, isMinis
         return resultArray;
     }
 
-    const getStatusList = (_status) => {        
-        let  _state =  requestState ? requestState : requestStatus.toLowerCase().includes("days")? "Open": requestStatus;
+    const getStatusList = (_status) => {   
+        let  _state = "";
+        if(requestState)
+            _state =  requestState;
+        else if(requestStatus && requestStatus != undefined && requestStatus.toLowerCase().includes("days"))
+            _state = "Open";
+        else
+            _state = requestStatus;
+
         let _stateList = StateList;
         if(_isMinistryCoordinator) {
             _stateList = MinistryStateList;

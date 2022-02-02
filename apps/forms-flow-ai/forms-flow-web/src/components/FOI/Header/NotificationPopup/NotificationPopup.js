@@ -5,12 +5,13 @@ import NotificationList from './NotificationList/NotificationList'
 import {
   deleteFOINotifications
 } from "../../../../apiManager/services/FOI/foiNotificationServices";
-import {useDispatch } from "react-redux";
+import {useDispatch} from "react-redux";
 
-const NotificationPopup = ({notifications}) => {
+const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const [myRequestTitle, setMyRequestTitle] = useState();
   const [watchingRequestTitle, setWatchingRequestTitle] = useState();
+ 
 
   useEffect(() => {     
     tabTitle();
@@ -25,13 +26,15 @@ const NotificationPopup = ({notifications}) => {
 
   const assigmentNotifications = notifications?.map((notification,index) =>
     {return notification.notificationusertype === 'Assignee' &&
-      <NotificationList key= {index} notification={notification}></NotificationList>
+      <NotificationList key= {index} notification={notification} isMinistry ={isMinistry}
+      ministryCode ={ministryCode}></NotificationList>
     }
   )
 
   const watchNotifications = notifications?.map((notification,index) =>
     {return notification.notificationusertype === 'Watcher' &&
-      <NotificationList key= {index} notification={notification}></NotificationList>
+      <NotificationList key= {index} notification={notification} isMinistry ={isMinistry}
+      ministryCode ={ministryCode}></NotificationList>
     }
   )
 
