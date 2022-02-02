@@ -11,15 +11,34 @@ from request_api import create_app, socketio
 from flask_socketio import emit
 from request_api.auth import AuthHelper
 from flask import g, request
+from request_api.auth import AuthHelper
+from request_api.exceptions import BusinessException
+from flask import current_app
 
 @socketio.on('connect')
-def connect():
-    emit(request.sid, {"message": request.sid+" successfully connected"})
+def connect(message):
+    userid = __getauthenticateduserid(message)
+    if userid is not None:
+        emit(request.sid, {"message": userid+" successfully connected"})
+    else:
+        disconnect() 
+
   
 @socketio.on('disconnect')
-def disconnect():
-    emit(request.sid, {"message": request.sid+" successfully disconnected"})
+def disconnect(message):
+    userid = __getauthenticateduserid(message)
+    messageid = userid if userid is not None else request.sid
+    emit(request.sid, {"message": messageid+" successfully disconnected"})
     
+
+def __getauthenticateduserid(message):
+    if message.get("x-jwt-token") is not None:
+        try:
+            return AuthHelper.getwsuserid(message.get("x-jwt-token"))            
+        except BusinessException as exception: 
+            current_app.logger.error("%s,%s" % ('Unable to get user details', exception.message)) 
+    return None   
+
 @socketio.on_error()
 def error_handler(e):
     print('Socket error ', e)  
