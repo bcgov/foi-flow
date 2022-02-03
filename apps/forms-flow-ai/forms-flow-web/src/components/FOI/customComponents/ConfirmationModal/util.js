@@ -41,7 +41,6 @@ import { getFullnameList } from "../../../../helper/FOI/helper"
   }
 
   export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId) => {
-    console.log(`_currentState = ${_currentState} _state = ${_state}`)
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> <span className="confirm-message-2"> The request will be re-opened to the previous state: {_state}</span> </>}; 
     }

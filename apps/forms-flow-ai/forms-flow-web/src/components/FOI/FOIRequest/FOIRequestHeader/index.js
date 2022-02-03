@@ -68,7 +68,8 @@ const FOIRequestHeader = React.memo(
     const [menuItems, setMenuItems] = useState([])
 
     const preventDefault = (event) => event.preventDefault();
-
+    const requestState = requestDetails?.currentState;
+    
     useEffect(() => {
       setMenuItems(
         getMenuItems({ classes, assignedToList, selectedAssignedTo })
@@ -151,6 +152,7 @@ const FOIRequestHeader = React.memo(
           {showMinistryAssignedTo && (
             <>
               <MinistryAssignToDropdown
+                requestState = {requestState}
                 requestDetails={requestDetails}
                 ministryAssignedToList={ministryAssignedToList}
                 handleMinistryAssignedToValue={handleMinistryAssignedToValue}

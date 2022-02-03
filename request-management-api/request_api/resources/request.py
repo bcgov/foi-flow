@@ -136,3 +136,23 @@ class FOIRawRequests(Resource):
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirawrequest/<requestid>/fields')
+class FOIRawRequestFields(Resource):
+    """Consolidates create and retrival of raw request"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())       
+    @auth.require
+    def get(requestid):
+        try : 
+            # here we want to get the value of names (i.e. ?names=ministries)
+            if request.args['names'] == "ministries":
+                baserequestinfo = rawrequestservice().getrawrequestfields(requestid,["ministries"])                                    
+                return json.dumps(baserequestinfo), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500

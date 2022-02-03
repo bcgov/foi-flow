@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
@@ -64,13 +64,14 @@ const BottomButtonGroup = React.memo(
     hasStatusRequestSaved,
     disableInput,
     stateChanged,
+    requestState
   }) => {
     
     /**
      * Bottom Button Group of Review request Page
      * Button enable/disable is handled here based on the validation
      */
-    const { requestId, ministryId, requestState } = useParams();
+    const { requestId, ministryId } = useParams();
 
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -89,7 +90,14 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
+    useEffect(() => {
+      if(stateChanged){
+        requestState= saveRequestObject.currentState;
+      }
+    }, [stateChanged]);
+
     const saveRequest = async () => {
+      
       if (urlIndexCreateRequest > -1)
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
       dispatch(
@@ -195,7 +203,8 @@ const BottomButtonGroup = React.memo(
         setsaveModal(true);
     };
 
-    const handleModal = (value) => {     
+    const handleModal = (value) => {  
+        
       setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);
