@@ -24,7 +24,7 @@ class eventservice:
             if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message))
         except BusinessException as exception:            
-            current_app.logger.error("%s,%s" % ('FOI Notification Error', exception.message))
+            current_app.logger.error(self.__formexcpetionmessage(exception.message))
 
     async def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
         try:
@@ -32,7 +32,7 @@ class eventservice:
             if extensioneventresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
         except BusinessException as exception:            
-            current_app.logger.error("%s,%s" % ('FOI Extension Notification Error', exception.message))
+            current_app.logger.error(self.__formexcpetionmessage(exception.message))
             
     def postreminderevent(self):
         try:
@@ -43,5 +43,8 @@ class eventservice:
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
-            current_app.logger.error("%s,%s" % ('FOI Notification Error', exception.message))
+            current_app.logger.error(self.__formexcpetionmessage(exception.message))
+    
+    def __formexcpetionmessage(self, message):
+        return ("%s,%s" % ('FOI Notification Error', message))
     
