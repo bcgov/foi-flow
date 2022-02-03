@@ -71,13 +71,15 @@ class extensionevent:
         isreasonchanged = self.__reasonchanged(curextension, prevextension, event)
         prevreasonid = prevextension["extensionreasonid"] if prevextension else None
         curreasonid = curextension["extensionreasonid"] if curextension else None
-        
-        if event == EventType.delete.value:  
-            return {'extension': curextension, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': True}
-        elif event == EventType.modify.value:
-            return {'extension': curextension, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'prevreason': self.__getextensionreasonvalue(self.__getextensionreason(prevreasonid)), 'ismodified': ismodified, 'isreasonchanged': isreasonchanged, 'isdelete': False}   
-        else:
-            return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'ismodified': ismodified, 'isreasonchanged': isreasonchanged, 'isdelete': False}
+        curreason = self.__getextensionreasonvalue(self.__getextensionreason(curreasonid))
+        curreasontype = self.__getextensiontype(self.__getextensionreason(curreasonid))
+
+        if event == EventType.delete.value:
+            return {'extension': curextension, 'reason': curreason, 'isdelete': True}
+        elif event == EventType.modify.value and not ismodified:
+            return {'extension': curextension, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}   
+        elif event == EventType.add.value and curreasontype != ExtensionType.oipc.value and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
+            return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}
 
     def __getextensionreasonvalue(self, extnreson):       
        return extnreson["reason"]
