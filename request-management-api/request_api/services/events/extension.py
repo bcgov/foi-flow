@@ -42,10 +42,10 @@ class extensionevent:
     def __getextensionreason(self, reasonid):
         return extensionreasonservice().getextensionreasonbyid(reasonid)
 
-    def __findpublicbody(self, curextension, event):
+    def __findpublicbody(self, curextension):
         extnreson = extensionreasonservice().getextensionreasonbyid(curextension['extensionreasonid'])
         extntype = self.__getextensiontype(extnreson)
-        if event == EventType.add.value and extntype == ExtensionType.publicbody.value:
+        if extntype == ExtensionType.publicbody.value:
             return True        
         
     def __finddenied(self, curextension, prevextension, event):
@@ -65,19 +65,17 @@ class extensionevent:
     
     def __createextensionsummary(self, curextension, prevextension, event):
         isdenied = self.__finddenied(curextension, prevextension, event)
-        ispublicbody = self.__findpublicbody(curextension, event)
-        isapproved = self.__findapproved(curextension, prevextension, event)        
-        ismodified = self.__findmodify(curextension, prevextension, event)
-        isreasonchanged = self.__reasonchanged(curextension, prevextension, event)
-        prevreasonid = prevextension["extensionreasonid"] if prevextension else None
+        ispublicbody = self.__findpublicbody(curextension)
+        isapproved = self.__findapproved(curextension, prevextension, event)
+        ismodified = self.__findmodify(curextension, prevextension, event)        
         curreasonid = curextension["extensionreasonid"] if curextension else None
         curreason = self.__getextensionreasonvalue(self.__getextensionreason(curreasonid))
         curreasontype = self.__getextensiontype(self.__getextensionreason(curreasonid))
 
         if event == EventType.delete.value:
             return {'extension': curextension, 'reason': curreason, 'isdelete': True}
-        elif event == EventType.modify.value and not ismodified:
-            return {'extension': curextension, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}   
+        elif event == EventType.modify.value and not ismodified and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
+            return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}   
         elif event == EventType.add.value and curreasontype != ExtensionType.oipc.value and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}
 
@@ -90,44 +88,29 @@ class extensionevent:
     def __valueexists(self, key, extensionsummary):
         return extensionsummary[key] if key in extensionsummary else None
 
-    def __reasonchanged(self, curextension, prevextension, event):        
-        curreason = self.__getextensionreasonvalue(self.__getextensionreason(self.__valueexists('extensionreasonid', curextension)))
-        prevreason = None
-        prevreasonid = self.__valueexists('extensionreasonid', prevextension)
-        if prevreasonid:
-            prevreason = self.__getextensionreasonvalue(self.__getextensionreason(prevreasonid))
-        if event == EventType.modify.value and curreason and  prevreason and curreason != prevreason:
-            return True
-
     def __preparemessage(self, username, extensionsummary):        
         isdelete = self.__valueexists('isdelete', extensionsummary)
         ispublicbody = self.__valueexists('ispublicbody', extensionsummary)
         isdenied = self.__valueexists('isdenied', extensionsummary)
         isapproved = self.__valueexists('isapproved', extensionsummary)
-        ismodified = self.__valueexists('ismodified', extensionsummary)       
-        isreasonchanged = self.__valueexists('isreasonchanged', extensionsummary)
+        
         extension = self.__valueexists('extension', extensionsummary)       
         extensionreason = self.__valueexists('reason', extensionsummary)       
-        prevreason = self.__valueexists('prevreason', extensionsummary)
-
+        
         approveddays = self.__valueexists('approvednoofdays', extension) 
         extendedduedays = self.__valueexists('extendedduedays', extension) 
         newduedate = self.__valueexists('extendedduedate', extension)
 
         if isdelete == True:
-            return "Extension for " + extensionreason + " has been deleted."
-        elif ismodified == True:
-            return "Extension for " + extensionreason + " has been edited."
+            return "Extension for " + extensionreason + " has been deleted."       
         elif isdenied == True:
             return  "The OIPC has denied a "+ str(extendedduedays) +" day extension."
-        elif ispublicbody == True:
+        elif ispublicbody == True and isapproved == True:
             return  username + " has taken a "+ str(extendedduedays) +" day Public Body extension. The new legislated due date is "+ self.__formatdate(newduedate, '%Y %b %d') + "."
-        elif isapproved == True:
+        elif isapproved == True and not ispublicbody:
             return  "The OIPC has granted a "+ str(approveddays) +" day extension. The new legislated due date is "+ self.__formatdate(newduedate, '%Y %b %d')
-        elif isreasonchanged == True:
-            return "Extensions for " + prevreason + " has been edited to " + extensionreason + "."
         else:
-            return "PENDING Extension for " + extensionreason + " added."
+            return "Extension for " + extensionreason + " has been edited."
    
 
     def __formatdate(self, datevalue, format):
