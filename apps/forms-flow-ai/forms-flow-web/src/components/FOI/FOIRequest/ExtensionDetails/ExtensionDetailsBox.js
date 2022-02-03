@@ -24,7 +24,7 @@ const ExtensionDetailsBox = React.memo(() => {
   const classes = useStyles();
 
   const {
-    setModalOpen,
+    setSaveModalOpen,
     setExtensionId,
     pendingExtensionExists,
   } = useContext(ActionContext);
