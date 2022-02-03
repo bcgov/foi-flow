@@ -115,9 +115,9 @@ class EditFOIRequestExtension(Resource):
             requestjson = request.get_json()
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
-                result = extensionservice().createrequestextensionversion(requestid, ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
+                result = extensionservice().createrequestextensionversion(requestid, ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid(), AuthHelper.getusername())
                 if result.success == True:
-                    asyncio.run(eventservice().posteventforextension(ministryrequestid, extensionid, AuthHelper.getuserid(), AuthHelper.getusername(), "modify"))
+                    # posteventforextension moved to createrequestextensionversion to generate the comments before updating the ministry table with new due date
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
