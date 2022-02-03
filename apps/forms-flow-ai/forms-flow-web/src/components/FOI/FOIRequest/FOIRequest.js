@@ -583,7 +583,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       />
                       <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
                       
-                      <ExtensionDetails requestDetails={requestDetails}/>
+                      <ExtensionDetails requestDetails={requestDetails} requestState={requestState}/>
                       {
                         requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
                         <AdditionalApplicantDetails
