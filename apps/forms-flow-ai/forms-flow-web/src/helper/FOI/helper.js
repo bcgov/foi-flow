@@ -155,11 +155,12 @@ const isMinistryCoordinator = (userdetail, ministryteam) =>
 }
 
 const isMinistryLogin = (userGroups) => {
-	return Object.values(MINISTRYGROUPS).some(group => userGroups.includes(group));
+	return Object.values(MINISTRYGROUPS).some(group => userGroups?.includes(group));
 }
 
 const getMinistryByValue = (userGroups) => {
 	const ministryGroup = Object.values(MINISTRYGROUPS).filter(element => userGroups.includes(element));
+	console.log("!!!",MINISTRYGROUPS);
 	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
 }
 
@@ -274,6 +275,11 @@ const ConditionalComponent = ({condition, children}) => {
 	</>
 }
 
+const getMinistryCode = (userGroups) => {
+	const ministryGroup = Object.values(MINISTRYGROUPS).find(element => userGroups?.includes(element));
+	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
+}
+
 export {
   replaceUrl,
   formatDate,
@@ -289,4 +295,5 @@ export {
   getFullnameTeamList,
   ConditionalComponent,
   removeBusinessDays,
+  getMinistryCode
 };

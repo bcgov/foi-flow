@@ -55,7 +55,8 @@ import {
   checkContactGiven,
   getBCgovCode,
   checkValidationError,
-  alertUser
+  alertUser,
+  findRequestState
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
@@ -83,8 +84,7 @@ const useStyles = makeStyles((theme) => ({
 
 const FOIRequest = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
-  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
-  const { requestId, ministryId, requestState } = useParams();
+  const { requestId, ministryId} = useParams();
   const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
 
@@ -95,11 +95,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const isAddRequest = urlIndexCreateRequest > -1;
   //gets the request detail from the store
   let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
+  const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
   let requestAttachments = useSelector(state => state.foiRequests.foiRequestAttachments);
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
-
+  const [requestState, setRequestState] = useState(StateEnum.unopened.name);
+  
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -137,6 +139,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase());
 
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
+  
   const dispatch = useDispatch();
   useEffect(() => {
     if (isAddRequest) {
@@ -166,7 +169,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
+    if(requestDetails && Object.entries(requestDetails).length !== 0){
+      var requestStateFromId = findRequestState(requestDetails.requeststatusid);
+      setRequestState(requestStateFromId);
+      settabStatus(requestStateFromId);
+      setcurrentrequestStatus(requestStateFromId);
+    }
   }, [requestDetails]);
+
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -292,17 +302,17 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
+    
     if (!_unSaved) {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
-
       setTimeout(() => {
-        const redirectUrl = getRedirectAfterSaveUrl(_state, ministryId, requestId);
+        const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
 
         if (redirectUrl) {
           window.location.href = redirectUrl
         } else {
-          dispatch(push(`/foi/reviewrequest/${id}/${_state}`))
+          dispatch(push(`/foi/reviewrequest/${id}`))
         }
 
       }
@@ -321,7 +331,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setStateChanged(false);
       setcurrentrequestStatus(StateEnum.open.name);
 
-      dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${_ministryId}/Open`));
+      dispatch(push(`/foi/foirequests/${parendId}/ministryrequest/${_ministryId}`));
     }
     else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -443,7 +453,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const stateTransition = requestDetails?.stateTransition;
 
   return (
-
+  (!isLoading && requestDetails && Object.keys(requestDetails).length !== 0) || isAddRequest ?
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -452,7 +462,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
+            <StateDropDown requestState={requestState} updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
           </div>
 
           <div className="tab">
@@ -599,7 +609,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleOpenRequest={handleOpenRequest} 
                         currentSelectedStatus={_currentrequestStatus} 
                         hasStatusRequestSaved={hasStatusRequestSaved} 
-                        disableInput={disableInput} 
+                        disableInput={disableInput}
+                        requestState={requestState}
                       />
                     </>
                   </ConditionalComponent>
@@ -660,7 +671,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
         </div>
       </div>
     </div>
-
+ : <Loading/>
   );
 
 
