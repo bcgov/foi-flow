@@ -5,6 +5,7 @@ import { ActionContext } from "./ActionContext";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import AddExtensionModal from "./AddExtensionModal"
+import DeleteExtensionModal from "./DeleteExtensionModal";
 import {
   fetchExtensions,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
@@ -32,18 +33,18 @@ const ExtensionDetailsBox = React.memo(() => {
     <>
       <Card className="foi-details-card">
         <div className="row foi-details-row">
-          <div className="col-lg-8 foi-details-col ">
+          <div className="col-lg-8 foi-details-col">
             <label className="foi-details-label">EXTENSION DETAILS</label>
           </div>
-          <div className="col-lg-4 foi-details-col ">
+          <div className="col-lg-4 foi-details-col">
             <button
               className={clsx("btn", "btn-link", "btn-description-history", {
                 [classes.btndisabled]: pendingExtensionExists,
               })}
               onClick={(e) => {
                 e.preventDefault();
-                setModalOpen(true);
-                setExtensionId(null)
+                setSaveModalOpen(true);
+                setExtensionId(null);
               }}
               disabled={pendingExtensionExists}
             >
@@ -52,10 +53,11 @@ const ExtensionDetailsBox = React.memo(() => {
           </div>
         </div>
         <CardContent>
-          <ExtensionsTable />
+          <ExtensionsTable/>
         </CardContent>
       </Card>
-      <AddExtensionModal />
+      <AddExtensionModal/>
+      <DeleteExtensionModal/>
     </>
   );
 });

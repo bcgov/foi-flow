@@ -81,6 +81,14 @@ class rawrequestservicegetter:
             return request['requestrawdata']
         else:
             return None
+        
+    def getrawrequestfieldsforid(self, requestid, fields):   
+        request = FOIRawRequest.get_request(requestid)    
+        fieldsresp = {}
+        for field in fields:
+            if field == "ministries" and request['status'] == 'Archived':
+                fieldsresp['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(request["requestid"])
+        return fieldsresp         
      
     def __attachministriesinfo(self,request):        
         if request != {} and request['status'] == 'Archived':

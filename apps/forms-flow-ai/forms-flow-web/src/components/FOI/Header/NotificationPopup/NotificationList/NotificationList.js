@@ -1,42 +1,24 @@
-import React, {useState } from 'react';
+import React, {useState} from 'react';
 import {useSelector, useDispatch } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
-import {addToFullnameList, getFullnameList, isMinistryLogin } from '../../../../../helper/FOI/helper'
+import {addToFullnameList, getFullnameList} from '../../../../../helper/FOI/helper'
 import {
   deleteFOINotifications
 } from "../../../../../apiManager/services/FOI/foiNotificationServices";
-import { useParams } from 'react-router-dom';
 import {
-  getBCgovCode
-} from "../../../FOIRequest/utils";
-import {
-  fetchFOIRequestDetailsForNotification,
-  fetchFOIRawRequestDetailsForNotification 
+  fetchOpenedMinistriesForNotification
 } from "../../../../../apiManager/services/FOI/foiRequestServices";
 import MinistriesCanvassed from '../../../customComponents/MinistriesCanvassed/MinistriesCanvassed';
-import { StateEnum } from '../../../../../constants/FOI/statusEnum';
 
-const NotificationList = ({notification}) => {
+const NotificationList = ({notification, isMinistry, ministryCode}) => {
 
   const dispatch = useDispatch();
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
-  let requestDetails = useSelector(state => state.foiRequests.foiRequestDetail);
-  const userDetail = useSelector(state=> state.user.userDetail);
   const [openModal, setModal] = useState(false);
   const [selectedMinistries,setSelectedMinistries]=useState([]);
-  let isMinistry = false;
-  
-
-  if (Object.entries(userDetail).length !== 0) {
-    const userGroups = userDetail && userDetail.groups?.map(group => group.slice(1));
-    isMinistry = isMinistryLogin(userGroups);
-  }
-
   const [fullnameList, setFullnameList] = useState(getFullnameList);
-  const {ministryId} = useParams();
-  let bcgovcode = getBCgovCode(ministryId, requestDetails);
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -52,7 +34,7 @@ const NotificationList = ({notification}) => {
         setFullnameList(getFullnameList());
       }
       if (ministryAssignedToList.length > 0) {
-        addToFullnameList(iaoassignedToList, bcgovcode);
+        addToFullnameList(iaoassignedToList, ministryCode);
         setFullnameList(getFullnameList());
       }
       if (fullnameList && fullnameList !== null)
@@ -67,48 +49,43 @@ const NotificationList = ({notification}) => {
   }
 
   const handleClick = (notificationVal) => {
-      if(notificationVal.requesttype === 'rawrequest'){
-        dispatch(fetchFOIRawRequestDetailsForNotification(notificationVal, (err, res) => {
+    let idNumber = notification.idnumber;
+    idNumber+='';
+    let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
+    if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
+     notification.notification.toLowerCase() === "moved to open state"){
+        dispatch(fetchOpenedMinistriesForNotification(notificationVal, (err, res) => {
             getStatusAndRedirect(err, res);
         }));
-      }
-      else if(notificationVal.requesttype === 'ministryrequest'){
-        dispatch(fetchFOIRequestDetailsForNotification(notificationVal, isMinistry, (err,res) => {
-          getStatusAndRedirect(err, res);
-        }));
-      }
+    }
+    else{
+      setRedirectUrl();
+    }
   }
 
 
   const getStatusAndRedirect = (err, res) => {
     if (!err && res) {
-      let requestState = "";
-      Object.entries(StateEnum).forEach(([key, value]) =>{
-        if(key && value.id === res.requeststatusid){
-          requestState = value.name;
-        }
-      })
-      
-      if(requestState === 'Archived' && res?.openedMinistries?.length > 0){
+      if(res?.openedMinistries?.length > 0){
         setSelectedMinistries(res.openedMinistries);
         setModal(true);
       }
       else{
-        setRedirectUrl(requestState);
+        setRedirectUrl();
       }
     }
   }
 
-  const setRedirectUrl = (requestState) =>{
+  const setRedirectUrl = () =>{
     let url = "";
     if(notification.requesttype === 'rawrequest'){
-      url=`/foi/reviewrequest/${notification.requestid}/${requestState}`;
+      url=`/foi/reviewrequest/${notification.requestid}`;
     }
     else if(notification.requesttype === 'ministryrequest'){
       if(isMinistry)
-        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}`;
       else
-        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/${requestState}`;
+        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}`;
     }
     window.location.href=url;
   }

@@ -87,6 +87,26 @@ const addBusinessDays = (dateText, days) => {
 	return reconcilePublicHoliDays(startDate,endDate).format('YYYY-MM-DD');	
 }
 
+const revertReconciledPublicHolidays = (startDate, endDate) => {
+  let publicHoliDays = getPublicHoliDays(startDate, endDate);
+  endDate = endDate.businessDaysSubtract(publicHoliDays);
+  startDate = endDate;
+  if (publicHoliDays != 0) {
+    reconcilePublicHoliDays(startDate, endDate);
+  }
+  return endDate;
+};
+
+const removeBusinessDays = (dateText, days) => {
+  if (!dateText) {
+    return 0;
+  }
+  let startDate = dayjs(dateText);
+  let endDate = startDate.businessDaysSubtract(days);
+
+  return revertReconciledPublicHolidays(startDate, endDate).format("YYYY-MM-DD");
+};
+
 const countWeekendDays = (startDate, endDate) =>
 {  
   var ndays = 1 + Math.round((endDate.getTime()-startDate.getTime())/(24*3600*1000));
@@ -135,11 +155,12 @@ const isMinistryCoordinator = (userdetail, ministryteam) =>
 }
 
 const isMinistryLogin = (userGroups) => {
-	return Object.values(MINISTRYGROUPS).some(group => userGroups.includes(group));
+	return Object.values(MINISTRYGROUPS).some(group => userGroups?.includes(group));
 }
 
 const getMinistryByValue = (userGroups) => {
 	const ministryGroup = Object.values(MINISTRYGROUPS).filter(element => userGroups.includes(element));
+	console.log("!!!",MINISTRYGROUPS);
 	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
 }
 
@@ -254,6 +275,11 @@ const ConditionalComponent = ({condition, children}) => {
 	</>
 }
 
+const getMinistryCode = (userGroups) => {
+	const ministryGroup = Object.values(MINISTRYGROUPS).find(element => userGroups?.includes(element));
+	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
+}
+
 export {
   replaceUrl,
   formatDate,
@@ -268,4 +294,6 @@ export {
   getAssignToList,
   getFullnameTeamList,
   ConditionalComponent,
+  removeBusinessDays,
+  getMinistryCode
 };

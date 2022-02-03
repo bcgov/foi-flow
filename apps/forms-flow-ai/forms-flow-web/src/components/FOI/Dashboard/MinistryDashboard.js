@@ -1,30 +1,64 @@
 import React, { useEffect, useState }  from 'react';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
 import {push} from "connected-react-router";
-import { fetchFOIMinistryRequestList } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIMinistryRequestListByPage } from "../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import { debounce } from './utils';
 
 const MinistryDashboard = ({userDetail}) => {
 
-  const dispatch = useDispatch();  
+  const dispatch = useDispatch(); 
+ 
   const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
-  const rows = useSelector(state=> state.foiRequests.foiMinistryRequestsList);  
-  const isLoading = useSelector(state=> state.foiRequests.isLoading);
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);  
-  const [requestFilter, setRequestFilter] = useState("All");
-  const [searchText, setSearchText] = useState("");  
-  const classes = useStyles();
 
+  const requestQueue = useSelector(state=> state.foiRequests.foiMinistryRequestsList);
+  const isLoading = useSelector(state=> state.foiRequests.isLoading);
+
+  const classes = useStyles();
   useEffect(()=>{
     dispatch(fetchFOIFullAssignedToList());
-    dispatch(fetchFOIMinistryRequestList());    
+    dispatch(fetchFOIMinistryRequestListByPage());
   },[dispatch]);
+
+  const defaultRowsState = {page: 0, pageSize: 10};
+  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  
+  const defaultSortModel = [{field: 'currentState', sort: 'asc'}, {field: 'cfrduedate', sort: 'asc'}];
+  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  let serverSortModel;
+  const [filterModel, setFilterModel] = React.useState({
+    fields: ['applicantcategory', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
+    keyword: null 
+  });
+  const [requestFilter, setRequestFilter] = useState("All");
+
+  useEffect(() => {
+    serverSortModel = updateSortModel();
+    // page+1 here, because initial page value is 0 for mui-data-grid
+    dispatch(fetchFOIMinistryRequestListByPage(rowsState.page+1, rowsState.pageSize, serverSortModel, filterModel.fields, filterModel.keyword, requestFilter, userDetail.preferred_username));
+  }, [rowsState, sortModel, filterModel, requestFilter]);
+
+  // update sortModel for records due, ldd & assignedTo
+  const updateSortModel = (() => {
+    let smodel = JSON.parse(JSON.stringify(sortModel));
+    if(smodel) {
+      smodel.map( (row) => {
+        if(row.field === 'CFRDueDateValue' || row.field === 'DueDateValue')
+          row.field = 'cfrduedate';
+        if(row.field === 'assignedToName')
+          row.field = 'assignedministryperson';
+      });
+    }
+
+    return smodel;
+  });
 
   function getAssigneeValue(row) {
     const groupName = row.assignedministrygroup ? row.assignedministrygroup : "Unassigned";
@@ -45,8 +79,8 @@ const MinistryDashboard = ({userDetail}) => {
   }
 
   function getRecordsDue(params) {
-    let receivedDateString = params.getValue(params.id, 'cfrduedate');
-    const currentStatus = params.getValue(params.id, 'currentState');
+    let receivedDateString = params.row.cfrduedate;
+    const currentStatus = params.row.currentState;
     if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) { 
       return "N/A"
     }
@@ -55,9 +89,10 @@ const MinistryDashboard = ({userDetail}) => {
     }
         
   }
+
   function getLDD(params) {
-    let receivedDateString = params.getValue(params.id, 'duedate');
-    const currentStatus = params.getValue(params.id, 'currentState');
+    let receivedDateString = params.row.duedate;
+    const currentStatus = params.row.currentState;
     if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
       return "N/A"
     }
@@ -66,7 +101,8 @@ const MinistryDashboard = ({userDetail}) => {
     } 
        
   }
-   const columns = React.useRef([
+
+  const columns = React.useRef([
     { 
       field: 'idNumber', 
       headerName: 'ID NUMBER',
@@ -112,62 +148,32 @@ const MinistryDashboard = ({userDetail}) => {
       valueGetter: getLDD,
     },
     { field: 'cfrduedate', headerName: '', width: 0, hide: true, renderCell:(params)=>(<span></span>)}
-    ]);
+  ]);
 
-    const [sortModel, setSortModel]= useState([
-      {
-        field: 'currentState',
-        sort: 'asc',
-      },
-      {
-        field: 'cfrduedate',
-        sort: 'asc',
-      },        
-    ]);
-    
 
 const requestFilterChange = (e) => { 
+  setRowsState(defaultRowsState);
   setRequestFilter(e.target.value);
-  
 }
 
-const setSearch = (e) => {
-  setSearchText(e.target.value);
-}
+const setSearch = debounce((e) => {
+  var keyword = e.target.value;
+  setFilterModel((prev) => ({ ...prev, keyword}));
+  setRowsState(defaultRowsState);
+}, 500)
 
-const search = (data) => {
-
-  const updatedRows = data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
-  let dashboardData = updatedRows.filter(row => (
-  row.idNumber.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.applicantcategory.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.requestType.toLowerCase().indexOf(searchText.toLowerCase()) > -1  ||
-  row.currentState.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  row.assignedToName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-  (row.assignedministryperson && row.assignedministryperson.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-  (!row.assignedministryperson && row.assignedministrygroup && row.assignedministrygroup.toLowerCase().indexOf(searchText.toLowerCase()) > -1)
-  )  
-  );
-  if (requestFilter === "myRequests" ) {
-    dashboardData = dashboardData.filter(row => row.assignedministryperson === userDetail.preferred_username)
-  }
-  else if (requestFilter === "watchingRequests") {
-    dashboardData = dashboardData.filter(row => {
-      if (row.watchers && !!row.watchers.find(watcher => watcher.watchedby === userDetail.preferred_username)){
-        return row;
-      }
-    })
-  }
-  return dashboardData;
+const updateAssigneeName = (data) => {
+  if(data)
+    return data.map(row=> ({ ...row, assignedToName: getAssigneeValue(row) }));
+  else
+    return data;
 }
- 
 
 const renderReviewRequest = (e) => {
   if (e.row.ministryrequestid) {    
-    dispatch(push(`/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}/${e.row.currentState}`));
+    dispatch(push(`/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`));
   }
 }
-
 
      return (  
             
@@ -195,21 +201,32 @@ const renderReviewRequest = (e) => {
               <DataGrid 
                 className="foi-data-grid"
                 getRowId={(row) => row.idNumber}
-                rows={search(rows)} 
+                rows={updateAssigneeName(requestQueue.data)} 
                 columns={columns.current}                
                 rowHeight={30}
                 headerHeight={50}                
-                pageSize={10}
+                rowCount = {requestQueue.meta.total}
+                pageSize={rowsState.pageSize}
                 rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
+                disableColumnMenu={true}
+
+                pagination
+                paginationMode='server'
+                onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
+                onPageSizeChange={(pageSize) =>
+                  setRowsState((prev) => ({ ...prev, pageSize }))
+                }
+
                 sortingOrder={['desc', 'asc']}
                 sortModel={sortModel}
-                sortingMode={'client'}
+                sortingMode={'server'}
                 onSortModelChange={(model) => setSortModel(model)}
                 getRowClassName={(params) =>
-                  `super-app-theme--${params.getValue(params.id, 'currentState').toLowerCase().replace(/ +/g, "")}-${params.getValue(params.id, 'cfrstatus').toLowerCase().replace(/ +/g, "")}`
+                  `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}-${params.row.cfrstatus.toLowerCase().replace(/ +/g, "")}`
                 } 
                 onRowClick={renderReviewRequest}
+                loading={isLoading}
                 />
             </div> </>):<Loading/> }
             </>

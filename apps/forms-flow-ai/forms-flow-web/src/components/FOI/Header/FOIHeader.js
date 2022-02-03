@@ -12,6 +12,7 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
+import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper"
 
 
 const FOIHeader = React.memo(() => { 
@@ -24,6 +25,8 @@ const FOIHeader = React.memo(() => {
 }
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
+let isMinistry = false;
+let ministryCode ="";
 const [screenPosition, setScreenPosition] = useState(0);
 const [open, setOpen] = useState(false);
 const closeModal = () => setOpen(false);
@@ -35,6 +38,12 @@ const openModal = (coordinates) => {
 }
 
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
+
+if (Object.entries(user).length !== 0) {
+  const userGroups = user && user.groups?.map(group => group.slice(1));
+  isMinistry = isMinistryLogin(userGroups);
+  ministryCode = getMinistryCode(userGroups);
+}
 
 useEffect(() => {     
   if(isAuthenticated)
@@ -96,7 +105,8 @@ const triggerPopup = () => {
                         contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup notifications={foiNotifications}></NotificationPopup>
+                        <NotificationPopup notifications={foiNotifications} isMinistry ={isMinistry}
+                        ministryCode ={ministryCode}></NotificationPopup>
                         </Popup>
                       </div>
                       </li>

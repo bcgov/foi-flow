@@ -1,5 +1,7 @@
 from enum import unique
 
+from sqlalchemy.sql.sqltypes import DateTime, String
+
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.expression import distinct
@@ -8,8 +10,10 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy.orm import relationship,backref
-from sqlalchemy import insert, and_, text
-from flask import jsonify
+from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case
+
+from .FOIMinistryRequests import FOIMinistryRequest
+from .FOIRawRequestWatchers import FOIRawRequestWatcher
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -193,7 +197,133 @@ class FOIRawRequest(db.Model):
             requeststates.append(_requeststate[0])
         return requeststates    
     
+    @classmethod
+    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
+        _session = db.session
 
+        #rawrequests
+        #subquery for getting the latest version
+        subquery_maxversion = _session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
+        joincondition = [
+            subquery_maxversion.c.requestid == FOIRawRequest.requestid,
+            subquery_maxversion.c.max_version == FOIRawRequest.version,
+        ]
+
+        requesttype = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['requestType']['requestType'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['requestType'].astext).label('requestType')
+        firstname = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['firstName'].astext).label('firstName')
+        lastname = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['lastName'].astext).label('lastName')
+
+        selectedcolumns = [
+            FOIRawRequest.requestid.label('id'),
+            FOIRawRequest.version,
+            FOIRawRequest.sourceofsubmission,
+            firstname,
+            lastname,
+            requesttype,
+            FOIRawRequest.requestrawdata['receivedDate'].astext.label('receivedDate'),
+            FOIRawRequest.requestrawdata['receivedDateUF'].astext.label('receivedDateUF'),
+            FOIRawRequest.status.label('currentState'),
+            FOIRawRequest.assignedgroup.label('assignedGroup'),
+            FOIRawRequest.assignedto.label('assignedTo'),
+            cast(FOIRawRequest.requestid, String).label('idNumber'),
+            literal(None).label('ministryrequestid'),
+            literal(None).label('assignedministrygroup'),
+            literal(None).label('assignedministryperson'),
+            literal(None).label('cfrduedate'),
+            literal(None).label('duedate'),
+            FOIRawRequest.requestrawdata['category'].astext.label('applicantcategory'),
+            FOIRawRequest.created_at.label('created_at'),
+            literal(None).label('bcgovcode')
+        ]
+
+        if(additionalfilter == 'watchingRequests'):
+            #watchby
+            subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+        elif(additionalfilter == 'myRequests'):
+            #myrequest
+            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+        else:
+            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived']))
+
+        #filter/search
+        if(len(filterfields) > 0 and keyword is not None):
+            filtercondition = []
+            for field in filterfields:
+                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'firstName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                if(field == 'lastName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+            return dbquery.filter(or_(*filtercondition))
+        else:
+            return dbquery
+
+    @classmethod
+    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
+        #ministry requests
+        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid)
+
+        #sorting
+        sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
+
+        #rawrequests
+        if "Intake Team" in groups or groups is None:                
+            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid)
+            query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
+            return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+        else:
+            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+
+    @classmethod
+    def findfield(cls, x):
+        return {
+            'firstName': FOIRawRequest.requestrawdata['firstName'].astext,
+            'lastName': FOIRawRequest.requestrawdata['lastName'].astext,
+            'contactFirstName': FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext,
+            'contactLastName': FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext,
+            'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
+            'idNumber': cast(FOIRawRequest.requestid, String),
+            'currentState': FOIRawRequest.status,
+            'assignedTo': FOIRawRequest.assignedto,
+        }.get(x, cast(FOIRawRequest.requestid, String))
+    
+    @classmethod
+    def validatefield(cls, x):
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate']
+        if x in validfields:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def getsorting(cls, sortingitems, sortingorders):
+        sortingcondition = []
+        if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
+            for field in sortingitems:
+                if(FOIRawRequest.validatefield(field)):
+                    order = sortingorders.pop()
+                    if(order == 'desc'):
+                        sortingcondition.append(desc(field))
+                    else:
+                        sortingcondition.append(asc(field))
+        #default sorting
+        if(len(sortingcondition) == 0):
+            sortingcondition.append(asc('currentState'))
+        
+        return sortingcondition
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
         fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted')

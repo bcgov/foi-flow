@@ -117,7 +117,7 @@ input[type='radio'] {
 .MuiDataGrid-iconSeparator {
     visibility: hidden;
 }
-.MuiDataGrid-columnsContainer {
+.MuiDataGrid-columnsContainer, .MuiDataGrid-columnHeaders {
     font-family: 'BCSans-Bold', sans-serif !important;
     border-top: 2px solid;
     border-bottom: 2px solid !important;
@@ -156,6 +156,10 @@ div.MuiDataGrid-row >div:last-child {
 
 div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     width:1px!important;
+}
+
+.MuiTablePagination-displayedRows {
+    margin-bottom: 0px;
 }
 
 .scrollable-page {
