@@ -32,7 +32,7 @@ class eventservice:
             if extensioneventresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
         except BusinessException as exception:            
-            current_app.logger.error("%s,%s" % ('FOI Notification Error', exception.message))
+            current_app.logger.error("%s,%s" % ('FOI Extension Notification Error', exception.message))
             
     def postreminderevent(self):
         try:
