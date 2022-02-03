@@ -6,7 +6,6 @@ import './statedropdown.scss';
 import { StateList, MinistryStateList, StateEnum } from '../../../constants/FOI/statusEnum';
 import { isMinistryCoordinator } from '../../../helper/FOI/helper';
 import MINISTRYGROUPS from '../../../constants/FOI/foiministrygroupConstants';
-import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 
 export default function StateDropDown({requestState, requestStatus, handleStateChange, isMinistryCoordinator, isValidationError, stateTransition, updateStateDropDown}) {
