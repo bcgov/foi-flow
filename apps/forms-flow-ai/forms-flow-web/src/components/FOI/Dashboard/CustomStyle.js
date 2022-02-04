@@ -6,16 +6,7 @@ function getThemePaletteMode(palette) {
   return palette.type || palette.mode;
 }
 
-const defaultTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#0052cc',
-    },
-    secondary: {
-      main: '#edf2ff',
-    },
-  },
-});
+const defaultTheme = createTheme();
 const useStyles = makeStyles(
   (theme) => {    
     const getBackgroundColor = (color) =>
