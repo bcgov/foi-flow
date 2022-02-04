@@ -97,13 +97,19 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def getlatestapprovedextension(cls, extensionid, ministryrequestid, ministryrequestversion):   
-        document_schema = FOIRequestExtensionSchema()            
+        extension_schema = FOIRequestExtensionSchema()            
         request = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid != extensionid, FOIRequestExtension.foiministryrequest_id == ministryrequestid, FOIRequestExtension.foiministryrequestversion_id == ministryrequestversion, FOIRequestExtension.extensionstatusid == 2).order_by(FOIRequestExtension.created_at.desc()).first()
-        return document_schema.dump(request)  
+        return extension_schema.dump(request)  
 
     @classmethod
     def getversionforextension(cls,extensionid):   
         return db.session.query(FOIRequestExtension.version).filter_by(foirequestextensionid=extensionid).order_by(FOIRequestExtension.version.desc()).first() 
+    
+    @classmethod
+    def getextensionforversion(cls, foirequestextensionid, version):   
+        document_schema = FOIRequestExtensionSchema()            
+        request = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid, FOIRequestExtension.version == version).order_by(FOIRequestExtension.version.desc()).first()
+        return document_schema.dump(request)
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
