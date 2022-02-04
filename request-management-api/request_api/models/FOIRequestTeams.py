@@ -22,7 +22,7 @@ class FOIRequestTeam(db.Model):
     
     @classmethod
     def getteamsbystatusandprogramarea(cls, requesttype, status, bcgovcode):                
-        sql = """select ot."name" as name from "FOIRequestTeams" ft inner join "FOIRequestStatuses" fs2 on ft.requeststatusid = fs2.requeststatusid 
+        sql = """select ot."name" as name, ot."type" as type from "FOIRequestTeams" ft inner join "FOIRequestStatuses" fs2 on ft.requeststatusid = fs2.requeststatusid 
                     inner join "OperatingTeams" ot on ft.teamid = ot.teamid 
                     left join "ProgramAreas" pa on ft.programareaid = pa.programareaid 
                     where ft.isactive = true and lower(ft.requesttype) = :requesttype 
@@ -31,7 +31,7 @@ class FOIRequestTeam(db.Model):
         rs = db.session.execute(text(sql), {'requesttype': requesttype, 'status': status,'bcgovcode':bcgovcode})
         teams = []
         for row in rs:
-            teams.append(row["name"])
+            teams.append({"name":row["name"], "type":row["type"]})
         return teams
     
 class FOIRequestTeamSchema(ma.Schema):
