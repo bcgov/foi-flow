@@ -25,18 +25,9 @@ const ExtensionDetailsBox = React.memo(() => {
 
   const {
     setSaveModalOpen,
-    dispatch,
     setExtensionId,
     pendingExtensionExists,
   } = useContext(ActionContext);
-
-    const { ministryId } = useParams();
-
-  useEffect(() => {
-    if (ministryId) {
-      dispatch(fetchExtensions(ministryId));
-    }
-  }, [ministryId]);
   
   return (
     <>
