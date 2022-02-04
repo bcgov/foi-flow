@@ -7,6 +7,8 @@ from request_api.models.FOIRequestExtensionDocumentMappings import FOIRequestExt
 from request_api.services.requestservice import requestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.extensionreasonservice import extensionreasonservice
+from request_api.services.eventservice import eventservice
+import asyncio
 import json
 import base64
 
@@ -73,7 +75,7 @@ class extensionservice:
     # if Pending -> Approved then the due date needs to be updated (new ministry version will get created), documents need to be mapped (if any)
     # if Approved -> Pending/Denied then, due date needs to be reverted back (new ministry version will get created), documents need to be deleted (if any)
     # any new ministry version created will create a new entry in FOIRequestExtensions, FOIMinistryDocuments (if any), FOIRequestExtensionDocumentsMapping (if any) tables
-    def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid):
+    def createrequestextensionversion(self, foirequestid, ministryrequestid, extensionid, extensionschema, userid, username):
         updatedduedate = None
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
@@ -100,6 +102,8 @@ class extensionservice:
         # save documents if it is part of current extension (update to the ministrydocuments table and extensiondocumentmapping table)
         if 'documents' in updatedextension and updatedextension['documents'] and updatedextension['extensionstatusid'] != 1:
             self.saveextensiondocument(updatedextension['documents'], ministryrequestid, userid, extensionid)
+        # Post event for system generated comments
+        asyncio.run(eventservice().posteventforextension(ministryrequestid, extensionid, userid, username, "modify"))
         # updates the duedate to extendedduedate or updatedduedate
         # new ministry, extension, extensionmapping and document version gets created
         if extensionresult.success == True and (isstatuschangedfromapproved == True or updatedextension['extensionstatusid'] == 2):
