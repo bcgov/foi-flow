@@ -31,8 +31,7 @@ TRACER = Tracer.get_instance()
 
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiassignees', defaults={'requestype':None, 'status': None})
-@API.route('/foiassignees/<requestype>', defaults={'status': None})
+@API.route('/foiassignees')
 @API.route('/foiassignees/<requestype>/<status>')
 @API.route('/foiassignees/<requestype>/<status>/<bcgovcode>')
 class FOIAssigneesByTypeAndStatus(Resource):
