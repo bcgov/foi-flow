@@ -5,7 +5,6 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-import { useParams } from 'react-router-dom';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,14 +20,13 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const MinistryAssignToDropdown  = React.memo(({requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
+const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
    
      /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
-    const {requestState} = useParams();
 
     //local state management for assignedTo
     //------- update this later when $567 is ready

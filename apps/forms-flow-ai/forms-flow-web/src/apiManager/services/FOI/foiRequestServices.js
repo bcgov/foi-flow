@@ -12,6 +12,7 @@ import {
   clearRequestDetails,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
+  setOpenedMinistries
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -30,6 +31,45 @@ export const fetchFOIRequestList = () => {
           dispatch(clearRequestDetails({}));
           dispatch(fetchFOIAssignedToList("", ""));
           dispatch(setFOIRequestList(data));
+          dispatch(setFOILoader(false)); 
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error in fetching dashboard data for IAO");
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
+};
+
+export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+  let sortingItems = [];
+  let sortingOrders = [];
+  sort.forEach((item)=>{
+    sortingItems.push(item.field);
+    sortingOrders.push(item.sort);
+  });
+
+  return (dispatch) => {
+    httpGETRequest(
+          API.FOI_GET_REQUESTS_PAGE_API,
+          {
+            "page": page,
+            "size": size,
+            "sortingitems": sortingItems,
+            "sortingorders": sortingOrders,
+            "filters": filters,
+            "keyword": keyword,
+            "additionalfilter": additionalFilter,
+            "userid": userID
+          },
+          UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(clearRequestDetails({}));
+          dispatch(fetchFOIAssignedToList("", ""));
+          dispatch(setFOIRequestList(res.data));
           dispatch(setFOILoader(false)); 
         } else {
           dispatch(serviceActionError(res));
@@ -63,6 +103,46 @@ export const fetchFOIMinistryRequestList = () => {
         }
       })
       .catch((error) => {        
+        catchError(error, dispatch);
+      });
+  };
+};
+
+export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+  let sortingItems = [];
+  let sortingOrders = [];
+  sort.forEach((item)=>{
+    sortingItems.push(item.field);
+    sortingOrders.push(item.sort);
+  });
+
+  return (dispatch) => {
+    httpGETRequest(
+          API.FOI_GET_MINISTRY_REQUESTS_PAGE_API,
+          {
+            "page": page,
+            "size": size,
+            "sortingitems": sortingItems,
+            "sortingorders": sortingOrders,
+            "filters": filters,
+            "keyword": keyword,
+            "additionalfilter": additionalFilter,
+            "userid": userID
+          },
+          UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(clearRequestDetails({}));
+          dispatch(setFOIMinistryRequestList(res.data));
+          dispatch(setFOILoader(false));
+          if (res.data?.data[0]?.bcgovcode)
+            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error in fetching dashboard data for IAO");
+        }
+      })
+      .catch((error) => {
         catchError(error, dispatch);
       });
   };
@@ -274,20 +354,20 @@ export const fetchFOIRequestDescriptionList = (requestId, ministryId) => {
   };
 };
 
-// TO DO: Need Refinement once the request state is removed from the page url of a request.
-export const fetchFOIRawRequestDetailsForNotification = (notification, ...rest) => {
+export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
   const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
-    API.FOI_RAW_REQUEST_API,
+    API.FOI_GET_OPENED_MINISTRIES,
     "<requestid>",
-    notification.requestid
+    notification.requestid,
+    "<names>",
+    "ministries"
   );
   return (dispatch) => {
-    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlgetRequestDetails, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          const foiRequest = res.data;
-          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setOpenedMinistries(res.data));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
@@ -300,40 +380,3 @@ export const fetchFOIRawRequestDetailsForNotification = (notification, ...rest) 
   }
 };
 
-// TO DO: Need Refinement once the request state is removed from the page url of a request.
-export const fetchFOIRequestDetailsForNotification = (notification, isMinistry, ...rest) => {
-  const done = fnDone(rest);
-  const requestId = notification.foirequestid;
-  const ministryId = notification.requestid;
-  let apiUrlgetRequestDetails ="";
-  if(isMinistry){
-    apiUrlgetRequestDetails = replaceUrl(replaceUrl(
-      API.FOI_MINISTRYVIEW_REQUEST_API,
-      "<requestid>",
-      requestId
-    ), "<ministryid>", ministryId);
-  }
-  else{
-    apiUrlgetRequestDetails = replaceUrl(replaceUrl(
-      API.FOI_REQUEST_API,
-      "<requestid>",
-      requestId
-    ), "<ministryid>", ministryId);
-  }
-  return (dispatch) => {
-    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          const foiRequest = res.data;
-          dispatch(setFOIRequestDetail(foiRequest));
-          done(null, res.data);
-        } else {
-          dispatch(serviceActionError(res));
-          throw new Error(`Error in fetching request details for request# ${requestId} ministry# ${ministryId}`)
-        }
-      })
-      .catch((error) => {
-        catchError(error, dispatch);
-      });
-  };
-};

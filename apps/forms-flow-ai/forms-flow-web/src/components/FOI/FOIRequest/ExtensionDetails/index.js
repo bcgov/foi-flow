@@ -1,14 +1,13 @@
 import React from "react";
-import { useParams } from "react-router-dom";
 import { ActionProvider } from "./ActionContext";
 import ExtensionDetailsBox from "./ExtensionDetailsBox"
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
+
 const ExtensionDetails = React.memo(
   ({
     requestDetails,
+    requestState
   }) => {
-
-    const { requestState } = useParams();
 
     const statusesToNotAppearIn = [
       StateEnum.unopened.name.toLowerCase(),

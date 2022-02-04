@@ -4,6 +4,8 @@ import { FOI_BASE_API_URL } from "./config";
 const API = {
   FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard`,
   FOI_GET_MINISTRY_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard/ministry`,
+  FOI_GET_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination`,
+  FOI_GET_MINISTRY_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination/ministry`,
   FOI_GET_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/applicantcategories`,
   FOI_GET_PROGRAMAREAS_API: `${FOI_BASE_API_URL}/api/foiflow/programareas`,
   FOI_RAW_REQUEST_API: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>`,
@@ -59,5 +61,7 @@ const API = {
 
   FOI_GET_EXTENSIONS: `${FOI_BASE_API_URL}/api/foiextension/ministryrequest/<ministryrequestid>`,
   FOI_GET_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/<extensionId>`,
+
+  FOI_GET_OPENED_MINISTRIES: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/fields?names=ministries`
 };
 export default API;
