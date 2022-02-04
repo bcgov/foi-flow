@@ -10,6 +10,12 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import Loading from "../../../containers/Loading";
 import { debounce } from './utils';
+import Grid from "@material-ui/core/Grid"
+import Radio from "@material-ui/core/Radio"
+import RadioGroup from "@material-ui/core/RadioGroup"
+import TextField from "@material-ui/core/TextField"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import SearchIcon from '@material-ui/icons/Search';
 
 const Dashboard = ({userDetail}) => {
   const dispatch = useDispatch();
@@ -172,65 +178,106 @@ const Dashboard = ({userDetail}) => {
     dispatch(push(`/foi/addrequest`));
   }
 
-     return (  
-            
-        <div className="container foi-container">
-           
-          <div className="col-sm-12 col-md-12 foi-grid-container">
-            <div className="foi-dashboard-row2">
+    return (            
+      <div className="container foi-container">          
+        <Grid
+          container
+          direction="row"
+          className="foi-grid-container"
+          spacing={1}
+        >
+          <Grid
+            item
+            container
+            direction="row"
+            alignItems="center"
+            xs={12} 
+            className="foi-dashboard-row2" 
+          >
+            <Grid item lg={6} xs={12}>
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
-              <button type="button" className="btn foi-btn-create" onClick={addRequest} >{FOI_COMPONENT_CONSTANTS.ADD_REQUEST}</button>
-            </div>
-            <> { !isLoading && !isAssignedToListLoading ? (<>
-            <div className="foi-dashboard-row2">             
-              <div className="form-group has-search">
-                <span className="fa fa-search form-control-search"></span>
-                <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />               
-              </div>
-             
-              <div className="foi-request-type">
-                <input className="foi-general-radio" type="radio" value="myRequests" name="requestFilter" onChange={requestFilterChange} /> My Requests
-                <input className="foi-personal-radio" type="radio" value="watchingRequests" name="requestFilter" onChange={requestFilterChange} /> Watching Requests
-                <input className="foi-all-radio" type="radio" value="All" name="requestFilter" onChange={requestFilterChange} defaultChecked  /> My Team Requests            
-              </div>            
-              
-            </div>
-            <div style={{ height: 450 }} className={classes.root}>
-              <DataGrid 
-                className="foi-data-grid"
-                getRowId={(row) => row.idNumber}
-                rows={updateAssigneeName(requestQueue.data)} 
-                columns={columns.current}                
-                rowHeight={30}
-                headerHeight={50}
-                rowCount = {requestQueue.meta.total}
-                pageSize={rowsState.pageSize}
-                rowsPerPageOptions={[10]}
-                hideFooterSelectedRowCount={true}
-                disableColumnMenu={true}
+            </Grid>
+            <Grid item container lg={6} xs={12} justifyContent="flex-end">
+              <button type="button" className="btn foi-btn-create" onClick={addRequest}>
+                {FOI_COMPONENT_CONSTANTS.ADD_REQUEST}
+              </button>
+            </Grid>
+          </Grid>
+          <> { !isLoading && !isAssignedToListLoading ? (<>
+          <Grid 
+            item 
+            container
+            alignItems="center"
+            xs={12}
+          >
+            <Grid item lg={6} xs={12} className="form-group has-search">
+              <SearchIcon className="form-control-search"/>
+              <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />
+            </Grid>
 
-                pagination
-                paginationMode='server'
-                onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-                onPageSizeChange={(pageSize) =>
-                  setRowsState((prev) => ({ ...prev, pageSize }))
-                }
-
-                sortingOrder={['desc', 'asc']}
-                sortModel={sortModel}
-                sortingMode={'server'}
-                onSortModelChange={(model) => setSortModel(model)}
-                getRowClassName={(params) =>
-                  `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}`
-                }
-                onRowClick={renderReviewRequest}
-                loading={isLoading}
+            <Grid item container lg={6} xs={12} justifyContent="flex-end">
+              <RadioGroup
+                name="controlled-radio-buttons-group"
+                value={requestFilter}
+                onChange={requestFilterChange}
+                row
+              >
+                <FormControlLabel 
+                  className="form-control-label" 
+                  value="myRequests"
+                  control={<Radio className="mui-radio" color="primary"/>}
+                  label="My Requests" 
                 />
-            </div> </>):<Loading/> }
-            </>
-          </div>
-        </div> 
-      
+                <FormControlLabel
+                  className="form-control-label" 
+                  value="watchingRequests"
+                  control={<Radio className="mui-radio" color="primary"/>}
+                  label="Watching Requests" 
+                />
+                <FormControlLabel
+                  className="form-control-label" 
+                  value="All"
+                  control={<Radio className="mui-radio" color="primary"/>}
+                  label="My Team Requests" 
+                />
+              </RadioGroup>
+            </Grid>     
+          </Grid>
+          <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
+            <DataGrid 
+              className="foi-data-grid"
+              getRowId={(row) => row.idNumber}
+              rows={updateAssigneeName(requestQueue.data)} 
+              columns={columns.current}                
+              rowHeight={30}
+              headerHeight={50}
+              rowCount = {requestQueue.meta.total}
+              pageSize={rowsState.pageSize}
+              rowsPerPageOptions={[10]}
+              hideFooterSelectedRowCount={true}
+              disableColumnMenu={true}
+
+              pagination
+              paginationMode='server'
+              onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
+              onPageSizeChange={(pageSize) =>
+                setRowsState((prev) => ({ ...prev, pageSize }))
+              }
+
+              sortingOrder={['desc', 'asc']}
+              sortModel={sortModel}
+              sortingMode={'server'}
+              onSortModelChange={(model) => setSortModel(model)}
+              getRowClassName={(params) =>
+                `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}`
+              }
+              onRowClick={renderReviewRequest}
+              loading={isLoading}
+              />
+          </Grid> </>):<Loading/> }
+          </>
+        </Grid>
+      </div>      
     );
 };
 
