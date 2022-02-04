@@ -20,12 +20,14 @@ from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
+from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getgroupsfromtoken, getrequiredmemberships
 from request_api.utils.enums import UserGroup
 from request_api.exceptions import BusinessException, Error
 from request_api.services.extensionservice import extensionservice
 from request_api.schemas.foiextension import  FOIRequestExtensionSchema
+import asyncio
 
 import json
 from flask_cors import cross_origin
@@ -91,7 +93,9 @@ class CreateFOIRequestExtension(Resource):
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                if result.success == True:
+                    asyncio.run(eventservice().posteventforextension(ministryrequestid, result.identifier, AuthHelper.getuserid(), AuthHelper.getusername(), "add"))
+                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -111,8 +115,10 @@ class EditFOIRequestExtension(Resource):
             requestjson = request.get_json()
             rquesextensionschema = FOIRequestExtensionSchema().load(requestjson)            
             if (AuthHelper.isministrymember() == False):           
-                result = extensionservice().createrequestextensionversion(requestid, ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                result = extensionservice().createrequestextensionversion(requestid, ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid(), AuthHelper.getusername())
+                if result.success == True:
+                    # posteventforextension moved to createrequestextensionversion to generate the comments before updating the ministry table with new due date
+                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -131,7 +137,9 @@ class DeleteFOIRequestExtension(Resource):
         try:         
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().deleterequestextension(requestid, ministryrequestid, extensionid, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                if result.success == True:
+                    asyncio.run(eventservice().posteventforextension(ministryrequestid, extensionid, AuthHelper.getuserid(), AuthHelper.getusername(), "delete"))
+                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
