@@ -243,7 +243,7 @@ const Dashboard = ({userDetail}) => {
               </RadioGroup>
             </Grid>     
           </Grid>
-          <Grid item xs={12} style={{ height: 470 }} className={classes.root}>
+          <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
             <DataGrid 
               className="foi-data-grid"
               getRowId={(row) => row.idNumber}

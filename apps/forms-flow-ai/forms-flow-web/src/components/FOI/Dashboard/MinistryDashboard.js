@@ -196,7 +196,7 @@ return (
         xs={12} 
         className="foi-dashboard-row2" 
       >
-        <Grid item lg={6} xs={12}>
+        <Grid item xs={12}>
           <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
         </Grid>
       </Grid>
@@ -207,7 +207,7 @@ return (
         alignItems="center"
         xs={12}
       >
-        <Grid item xs={12} className="form-group has-search">
+        <Grid item xs={12} lg={6} className="form-group has-search">
           <SearchIcon className="form-control-search"/>
           <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />
         </Grid>
@@ -240,7 +240,7 @@ return (
           </RadioGroup>
         </Grid>     
       </Grid>
-      <Grid item xs={12} style={{ height: 470 }} className={classes.root}>
+      <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
         <DataGrid 
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
