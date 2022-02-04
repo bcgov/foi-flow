@@ -1,14 +1,9 @@
-import React, { useEffect, useContext } from "react";
-
-import { useParams } from "react-router-dom";
+import React, { useContext } from "react";
 import { ActionContext } from "./ActionContext";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import AddExtensionModal from "./AddExtensionModal"
 import DeleteExtensionModal from "./DeleteExtensionModal";
-import {
-  fetchExtensions,
-} from "../../../../apiManager/services/FOI/foiExtensionServices";
 import ExtensionsTable from "./ExtensionsTable";
 import "./extensionscss.scss"
 import clsx from "clsx"
