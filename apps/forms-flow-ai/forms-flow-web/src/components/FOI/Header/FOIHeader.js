@@ -48,7 +48,7 @@ if (Object.entries(user).length !== 0) {
 var socket;
 useEffect(() => {     
   if(isAuthenticated && (!socket || socket == undefined)){
-    socket = io('ws://10.0.0.70:15000', { path: '/api/v1/socket.io', transports: ['websocket'] });
+    socket = io('url', { path: '/api/v1/socket.io', transports: ['websocket'] });
     console.log("Socket Connection Established!!",socket);
   } 
   // if(socket && socket != undefined){
