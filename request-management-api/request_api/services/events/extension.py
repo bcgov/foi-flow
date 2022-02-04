@@ -69,14 +69,13 @@ class extensionevent:
         isapproved = self.__findapproved(curextension, prevextension, event)
         ismodified = self.__findmodify(curextension, prevextension, event)        
         curreasonid = curextension["extensionreasonid"] if curextension else None
-        curreason = self.__getextensionreasonvalue(self.__getextensionreason(curreasonid))
-        curreasontype = self.__getextensiontype(self.__getextensionreason(curreasonid))
+        curreason = self.__getextensionreasonvalue(self.__getextensionreason(curreasonid))        
 
         if event == EventType.delete.value:
             return {'extension': curextension, 'reason': curreason, 'isdelete': True}
         elif event == EventType.modify.value and not ismodified and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}   
-        elif event == EventType.add.value and curreasontype != ExtensionType.oipc.value and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
+        elif event == EventType.add.value and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}
 
     def __getextensionreasonvalue(self, extnreson):       
