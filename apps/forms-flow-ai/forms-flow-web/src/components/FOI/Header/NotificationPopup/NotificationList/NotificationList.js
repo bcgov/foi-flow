@@ -63,6 +63,13 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
     }
   }
 
+  const checkCommentType = (type) => {
+    if(type === 'New User Comments' || type === 'Reply User Comments' ||
+      type === 'Tagged User Comments'){
+      return true;
+    }
+    return false;
+  }
 
   const getStatusAndRedirect = (err, res) => {
     if (!err && res) {
@@ -105,9 +112,20 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
           <i className="fa fa-times"></i>
         </Col>
       </Row>
-      <div>
-      {notification.notification}
-      </div>
+      { checkCommentType(notification.notificationtype) ?
+      <>
+        <div style={{fontSize:"16px"}}>New Comment:</div> 
+        <div style={{fontStyle: "italic"}} >
+          {notification.notification.length() > 90 ? `"${notification.notification.substring(0, 90)}..."` : 
+          `"${notification.notification}"`}
+        </div>
+      </> 
+        :
+        <div>
+          {notification.notification}
+        </div>
+      }        
+      
       <Row className="notification-item-footer">
         <Col>{getfullName(notification.createdby)}</Col>
         <Col>{notification.created_at}</Col>

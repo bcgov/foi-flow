@@ -34,10 +34,9 @@ const closeModal = () => setOpen(false);
 const openModal = (coordinates) => {
   const screenX = coordinates.pageX;
   setScreenPosition(screenX);
-  console.log(screenX);
   setOpen(!open);
 }
-
+const [messageData, setMessageData] = useState("");
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
 
 if (Object.entries(user).length !== 0) {
@@ -46,33 +45,50 @@ if (Object.entries(user).length !== 0) {
   ministryCode = getMinistryCode(userGroups);
 }
 
+var socket;
 useEffect(() => {     
-  if(isAuthenticated){
-    var socket = io('url', { path: '/api/v1/socket.io', transports: ['websocket'] });
-    console.log("Socket!!",socket);
-    socket.emit('joinroom', {'token':user.preferred_username})
-    console.log("Username",user.preferred_username);
-    socket.on(user.preferred_username,function(data){
-      console.log(data);
-      console.log("Data received "+user.preferred_username+" :", data);
-   });
+  if(isAuthenticated && (!socket || socket == undefined)){
+    socket = io('ws://10.0.0.70:15000', { path: '/api/v1/socket.io', transports: ['websocket'] });
+    console.log("Socket Connection Established!!",socket);
   } 
+  // if(socket && socket != undefined){
+  //   console.log("Inside socket!!");
+  //   socket.on(user.preferred_username,function(data){
+  //     console.log("Data received "+user.preferred_username+" :", data);
+  //     foiNotifications.push(data);
+  //     console.log("Pushed to foiNotifications",foiNotifications);
+  //   });
+  // }
 },[]);
 
 
+
+useEffect(() => {     
+  if(socket && socket != undefined){
+    // socket.on(user.preferred_username,function(data){
+    //   console.log("Data received "+user.preferred_username+" :", data);
+    //   foiNotifications.push(data);
+    //   console.log("Pushed to foiNotifications",foiNotifications);
+    // });
+    //socket.on(user.preferred_username, data => setMessageData([...messageData, data]));
+    socket.on(user.preferred_username, data => setMessageData(oldMessageData => [...oldMessageData, data]));
+  }
+},[socket]);
+
 useEffect(() => {     
   if(isAuthenticated)
-    dispatch(fetchFOINotifications());
+    dispatch(fetchFOINotifications());   
   setInterval(() => {
     if(isAuthenticated)
       dispatch(fetchFOINotifications());
   }, 900000);
+  setMessageData(foiNotifications);
 },[dispatch]);
 
 const triggerPopup = () => {
   return(
     <> 
-    <Badge badgeContent={foiNotifications?.length} color="secondary">
+    <Badge badgeContent={messageData?.length} color="secondary">
       <i style={{color: open? "#003366" : "white",cursor: "pointer"}} className="fa fa-bell-o foi-bell"></i>
     </Badge>
    </>
@@ -120,8 +136,7 @@ const triggerPopup = () => {
                         contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup notifications={foiNotifications} isMinistry ={isMinistry}
-                        ministryCode ={ministryCode}></NotificationPopup>
+                        <NotificationPopup notifications={messageData}></NotificationPopup>
                         </Popup>
                       </div>
                       </li>
