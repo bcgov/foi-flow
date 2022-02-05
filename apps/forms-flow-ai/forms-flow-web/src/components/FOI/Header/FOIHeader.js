@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect,useState, useContext } from "react";
 import Badge from '@material-ui/core/Badge';
 import {Navbar, Nav} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
@@ -12,8 +12,9 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
-import io from "socket.io-client"; 
-import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper"
+//import io from "socket.io-client"; 
+import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
+import io from "socket.io-client";
 
 
 const FOIHeader = React.memo(() => { 
@@ -23,6 +24,11 @@ const FOIHeader = React.memo(() => {
     localStorage.removeItem('authToken');
     dispatch(push(`/`));
     UserService.userLogout();
+    socket.disconnect();
+    console.log("Socket Disconnected??",socket);
+    // socket.on("disconnect", (reason) => {
+    //  console.log("Socket Disconnected",socket);
+    // });
 }
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
@@ -38,52 +44,39 @@ const openModal = (coordinates) => {
 }
 const [messageData, setMessageData] = useState("");
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
-
+var socket;
 if (Object.entries(user).length !== 0) {
   const userGroups = user && user.groups?.map(group => group.slice(1));
   isMinistry = isMinistryLogin(userGroups);
   ministryCode = getMinistryCode(userGroups);
 }
 
-var socket;
 useEffect(() => {     
-  if(isAuthenticated && (!socket || socket == undefined)){
-    socket = io('url', { path: '/api/v1/socket.io', transports: ['websocket'] });
-    console.log("Socket Connection Established!!",socket);
-  } 
-  // if(socket && socket != undefined){
-  //   console.log("Inside socket!!");
-  //   socket.on(user.preferred_username,function(data){
-  //     console.log("Data received "+user.preferred_username+" :", data);
-  //     foiNotifications.push(data);
-  //     console.log("Pushed to foiNotifications",foiNotifications);
-  //   });
-  // }
-},[]);
-
-
-
-useEffect(() => {     
-  if(socket && socket != undefined){
-    // socket.on(user.preferred_username,function(data){
-    //   console.log("Data received "+user.preferred_username+" :", data);
-    //   foiNotifications.push(data);
-    //   console.log("Pushed to foiNotifications",foiNotifications);
-    // });
-    //socket.on(user.preferred_username, data => setMessageData([...messageData, data]));
-    socket.on(user.preferred_username, data => setMessageData(oldMessageData => [...oldMessageData, data]));
+  if(isAuthenticated){
+    dispatch(fetchFOINotifications());  
+    socket = io('ws://ip:15000', { path: '/api/v1/socket.io', transports: ['websocket'] });
+    console.log("Socket Connection Established!!",socket); 
   }
-},[socket]);
-
-useEffect(() => {     
-  if(isAuthenticated)
-    dispatch(fetchFOINotifications());   
   setInterval(() => {
     if(isAuthenticated)
       dispatch(fetchFOINotifications());
   }, 900000);
-  setMessageData(foiNotifications);
-},[dispatch]);
+},[]);
+
+useEffect(() => {     
+  if(socket && socket != undefined){
+    socket.on(user.preferred_username, data => setMessageData(oldMessageData => [...oldMessageData, data]));
+    console.log("Data:", messageData);
+  }
+},[socket]);
+
+useEffect(() => {     
+  if(foiNotifications){
+    setMessageData(foiNotifications);
+  }
+},[foiNotifications]);
+
+
 
 const triggerPopup = () => {
   return(

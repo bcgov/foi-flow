@@ -116,7 +116,7 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
       <>
         <div style={{fontSize:"16px"}}>New Comment:</div> 
         <div style={{fontStyle: "italic"}} >
-          {notification.notification.length() > 90 ? `"${notification.notification.substring(0, 90)}..."` : 
+          {notification.notification.length > 90 ? `"${notification.notification.substring(0, 90)}..."` : 
           `"${notification.notification}"`}
         </div>
       </> 
