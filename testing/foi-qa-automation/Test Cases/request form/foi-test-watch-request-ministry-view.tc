@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>foi-test-watch-request-ministry-view</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>47ec9572-7ed1-4999-83f1-d6760440cf6f</testCaseGuid>
+   <variable>
+      <defaultValue>findTestData('New Test Data').getValue('First Name', 8)</defaultValue>
+      <description></description>
+      <id>637459fa-45f0-466e-82c4-e0ddb045d262</id>
+      <masked>false</masked>
+      <name>firstname</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('New Test Data').getValue('Last Name', 8)</defaultValue>
+      <description></description>
+      <id>6f27ee28-2c2b-4c35-b7fd-7fcdcb7a6cbc</id>
+      <masked>false</masked>
+      <name>lastname</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('New Test Data').getValue('Last Name', 9) + ', ' + findTestData('New Test Data').getValue('First Name', 9)</defaultValue>
+      <description></description>
+      <id>6f27ee28-2c2b-4c35-b7fd-7fcdcb7a6cbc</id>
+      <masked>false</masked>
+      <name>teammate</name>
+   </variable>
+</TestCaseEntity>

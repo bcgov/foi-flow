@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>test logging in with valid credentials leads to main dashboard</description>
+   <name>foi-test-valid-login-content</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>f9bdbea4-4eec-4f06-bcc5-c6602afa7f00</testCaseGuid>
+   <variable>
+      <defaultValue>GlobalVariable.username</defaultValue>
+      <description></description>
+      <id>94827f55-a251-4025-9719-11c192cf9bf1</id>
+      <masked>false</masked>
+      <name>username</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.password</defaultValue>
+      <description></description>
+      <id>9f013253-ef8b-4088-ac4e-034a93f87198</id>
+      <masked>false</masked>
+      <name>password</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.firstname</defaultValue>
+      <description></description>
+      <id>c97fd75e-a2ad-42ab-9bbd-d9dc42260a7d</id>
+      <masked>false</masked>
+      <name>firstname</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.lastname</defaultValue>
+      <description></description>
+      <id>ed9c7b40-9cee-4260-9823-ac9df645252f</id>
+      <masked>false</masked>
+      <name>lastname</name>
+   </variable>
+</TestCaseEntity>

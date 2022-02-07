@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_No_MuiTablePagination-actions</name>
+   <tag></tag>
+   <elementGuidId>20e2cc1a-ab8e-4d0a-8502-6b69bb5c3d1f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.MuiTablePagination-actions</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;col-sm-12 col-md-12 foi-grid-container&quot;]/div[@class=&quot;jss1&quot;]/div[@class=&quot;MuiDataGrid-root MuiDataGrid-root foi-data-grid&quot;]/div[3]/div[@class=&quot;MuiDataGrid-footerContainer&quot;]/div[@class=&quot;MuiTablePagination-root&quot;]/div[@class=&quot;MuiToolbar-root MuiToolbar-regular MuiTablePagination-toolbar MuiToolbar-gutters&quot;]/div[@class=&quot;MuiTablePagination-actions&quot;]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div[3]/div/div[3]/div/div[2]/div/div[2]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiTablePagination-actions</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;col-sm-12 col-md-12 foi-grid-container&quot;]/div[@class=&quot;jss1&quot;]/div[@class=&quot;MuiDataGrid-root MuiDataGrid-root foi-data-grid&quot;]/div[3]/div[@class=&quot;MuiDataGrid-footerContainer&quot;]/div[@class=&quot;MuiTablePagination-root&quot;]/div[@class=&quot;MuiToolbar-root MuiToolbar-regular MuiTablePagination-toolbar MuiToolbar-gutters&quot;]/div[@class=&quot;MuiTablePagination-actions&quot;]</value>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div/div[3]/div/div[3]/div/div[2]/div/div[2]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='No'])[1]/following::div[12]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Andrews, Arielle'])[1]/following::div[14]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div/div[3]/div/div[3]/div/div[2]/div/div[2]</value>
+   </webElementXpaths>
+</WebElementEntity>

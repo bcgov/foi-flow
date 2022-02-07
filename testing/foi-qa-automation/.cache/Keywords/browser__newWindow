@@ -1,0 +1,16 @@
+{
+  "keywordFileContentHash": "B76694483BF174D2FBE177D25BE8AF6A",
+  "keywordClasses": [
+    {
+      "name": "browser.newWindow",
+      "keywordMethods": [
+        {
+          "name": "open",
+          "parameters": [],
+          "javadoc": ""
+        }
+      ]
+    }
+  ],
+  "javadocParsed": true
+}

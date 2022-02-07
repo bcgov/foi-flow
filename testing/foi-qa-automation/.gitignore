@@ -1,0 +1,18 @@
+.gradle
+
+bin
+
+Reports
+
+Libs
+
+Test Attachments
+
+output
+
+!output/.gitkeep
+build
+
+.classpath
+
+.project

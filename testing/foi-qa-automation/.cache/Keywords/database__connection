@@ -1,0 +1,10 @@
+{
+  "keywordFileContentHash": "5A752EC14D9FFED6B01BF03E284B74BD",
+  "keywordClasses": [
+    {
+      "name": "database.connection",
+      "keywordMethods": []
+    }
+  ],
+  "javadocParsed": true
+}

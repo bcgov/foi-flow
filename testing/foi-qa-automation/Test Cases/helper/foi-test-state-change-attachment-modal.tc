@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>foi-test-state-change-attachment-modal</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>2276e672-13c6-4daf-a0ac-5a3e4cf42194</testCaseGuid>
+   <variable>
+      <defaultValue>'test.docx'</defaultValue>
+      <description></description>
+      <id>ab020fa3-b0f3-4a12-b7da-8882a0c73e84</id>
+      <masked>false</masked>
+      <name>filename</name>
+   </variable>
+</TestCaseEntity>

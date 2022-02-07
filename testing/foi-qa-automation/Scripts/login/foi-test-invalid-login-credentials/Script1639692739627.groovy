@@ -1,0 +1,47 @@
+import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
+import static com.kms.katalon.core.testcase.TestCaseFactory.findTestCase
+import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
+import static com.kms.katalon.core.testobject.ObjectRepository.findWindowsObject
+import com.kms.katalon.core.checkpoint.Checkpoint as Checkpoint
+import com.kms.katalon.core.cucumber.keyword.CucumberBuiltinKeywords as CucumberKW
+import com.kms.katalon.core.mobile.keyword.MobileBuiltInKeywords as Mobile
+import com.kms.katalon.core.model.FailureHandling as FailureHandling
+import com.kms.katalon.core.testcase.TestCase as TestCase
+import com.kms.katalon.core.testdata.TestData as TestData
+import com.kms.katalon.core.testng.keyword.TestNGBuiltinKeywords as TestNGKW
+import com.kms.katalon.core.testobject.TestObject as TestObject
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
+import internal.GlobalVariable as GlobalVariable
+import org.openqa.selenium.Keys as Keys
+
+WebUI.openBrowser(GlobalVariable.BASE_URL)
+
+WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Log In'))
+
+WebUI.setText(findTestObject('Object Repository/Page_Log in to FOI/input_Username or email_username'), 'foiintake@idi')
+
+WebUI.setEncryptedText(findTestObject('Object Repository/Page_Log in to FOI/input_Password_password'), 'Q22vFhnwC8s=')
+
+WebUI.click(findTestObject('Object Repository/Page_Log in to FOI/input_Password_login'))
+
+WebUI.verifyElementVisible(findTestObject('Object Repository/Page_Log in to FOI/div_Invalid username or password'))
+
+WebUI.verifyElementVisible(findTestObject('Object Repository/Page_Log in to FOI/span_Log In_pficon pficon-error-circle-o'))
+
+WebUI.verifyElementText(findTestObject('Object Repository/Page_Log in to FOI/span_Invalid username or password'), 'Invalid username or password.')
+
+WebUI.setText(findTestObject('Object Repository/Page_Log in to FOI/input_Username or email_username'), 'foiintake@idir')
+
+WebUI.setEncryptedText(findTestObject('Object Repository/Page_Log in to FOI/input_Password_password'), 'ZSlrh+Ig8SU=')
+
+WebUI.click(findTestObject('Object Repository/Page_Log in to FOI/input_Password_login'))
+
+WebUI.verifyElementVisible(findTestObject('Object Repository/Page_Log in to FOI/div_Invalid username or password'))
+
+WebUI.verifyElementVisible(findTestObject('Object Repository/Page_Log in to FOI/span_Log In_pficon pficon-error-circle-o'))
+
+WebUI.verifyElementText(findTestObject('Object Repository/Page_Log in to FOI/span_Invalid username or password'), 'Invalid username or password.')
+
