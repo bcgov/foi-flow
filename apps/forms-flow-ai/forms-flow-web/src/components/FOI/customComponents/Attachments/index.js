@@ -250,7 +250,9 @@ export const AttachmentSection = ({
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
-        <Loading />
+        <Grid container alignItems="center">
+          <Loading costumStyle={{ position: "relative" }} />
+        </Grid>
       ) : (
         <>
           <Grid
@@ -262,16 +264,14 @@ export const AttachmentSection = ({
           >
             <Grid item xs={9}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext">
-                {`Request #${requestNumber ? requestNumber : `U-00${requestId}`}`}
+                {`Request #${
+                  requestNumber ? requestNumber : `U-00${requestId}`
+                }`}
               </h1>
             </Grid>
             <Grid item xs={3}>
               <button
-                className={clsx(
-                  "btn",
-                  "addAttachment",
-                  classes.createButton
-                )}
+                className={clsx("btn", "addAttachment", classes.createButton)}
                 variant="contained"
                 onClick={addAttachments}
                 color="primary"
@@ -285,7 +285,7 @@ export const AttachmentSection = ({
               justify="flex-start"
               alignItems="flex-start"
               spacing={1}
-              className={classes.attachmentLog}     
+              className={classes.attachmentLog}
             >
               {attachmentsList}
             </Grid>
