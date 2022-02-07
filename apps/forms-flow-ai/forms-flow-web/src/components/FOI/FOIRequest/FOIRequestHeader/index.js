@@ -72,7 +72,8 @@ const FOIRequestHeader = React.memo(
     
     useEffect(() => {
       
-      const iaoAssignedToList = assignedToList.map(assignedTo => assignedTo.type === 'iao')
+      let iaoAssignedToList = assignedToList.map(assignedTo => assignedTo.type === 'iao');
+      iaoAssignedToList = iaoAssignedToList ? iaoAssignedToList : assignedToList;
       setMenuItems(
         getMenuItems({ classes, iaoAssignedToList, selectedAssignedTo })
       );
