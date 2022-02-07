@@ -14,9 +14,10 @@ class OperatingTeam(db.Model):
     @classmethod
     def getalloperatingteams(cls):
         teams = []
-        allteams = db.session.query(OperatingTeam).filter_by(isactive=True).all()
-        for team in allteams:
-            teams.append(team.name)
+        sql = """select name, type from "OperatingTeams" ot where ot.isactive = true"""
+        rs = db.session.execute(text(sql))
+        for row in rs:
+             teams.append({"name":row["name"], "type":row["type"]})
         return teams
     
     @classmethod
