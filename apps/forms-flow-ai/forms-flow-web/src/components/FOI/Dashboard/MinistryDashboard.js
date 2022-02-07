@@ -86,25 +86,21 @@ const MinistryDashboard = ({userDetail}) => {
   function getRecordsDue(params) {
     let receivedDateString = params.row.cfrduedate;
     const currentStatus = params.row.currentState;
-    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) { 
-      return "N/A"
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+      return "N/A";
+    } else {
+      return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
     }
-    else {
-      return formatDate(receivedDateString, "MMM dd yyyy");
-    }
-        
   }
 
   function getLDD(params) {
     let receivedDateString = params.row.duedate;
     const currentStatus = params.row.currentState;
     if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
-      return "N/A"
+      return "N/A";
+    } else {
+      return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
     }
-    else {
-      return formatDate(receivedDateString, 'yyyy MMM, dd'); 
-    } 
-       
   }
 
   const columns = React.useRef([
