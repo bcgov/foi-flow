@@ -16,7 +16,7 @@ jobs:
       with:
           version: '8.2.5'
           projectPath: '${{ github.workspace }}/testing/foi-qa-automation/foi-qa-automation.prj'
-          args: '-noSplash -retry=0 -testSuiteCollectionPath="Test Suites/foi-test-homepage-and-login" -apiKey=${{ secrets.KATALON_API_KEY }} --config -webui.autoUpdateDrivers=true -licenseRelease=true'
+          args: '-noSplash -retry=0 -testSuitePath="Test Suites/foi-test-homepage-and-login" -apiKey=${{ secrets.KATALON_API_KEY }} --config -webui.autoUpdateDrivers=true -licenseRelease=true'
   # katalon-mac:
   #   runs-on: macos-latest
   #   steps:
