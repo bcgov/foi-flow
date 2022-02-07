@@ -73,3 +73,31 @@ class FOIAssigneesByTypeAndStatus(Resource):
                 return {'status': False, 'message':'Not Found'}, 404 
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
+        
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiassignees/processingteams/<requestype>')
+class FOIAssigneesTeams(Resource):
+    """Resource for retriving FOI assignees based on group.
+        Response is sent with value defaulting to Fee Estimate state"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(requestype):
+        """ POST Method for capturing FOI requests before processing"""
+        try:
+            if requestype is None:
+                return {'status': False, 'message':'Bad Request'}, 400   
+            if requestype is not None and (requestype != "personal" and requestype != "general"):
+                return {'status': False, 'message':'Bad Request'}, 400   
+            result = assigneeservice().getprocessingteamsbyrequesttype(requestype)
+            print(result)
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':'Not Found'}, 404 
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500    
+        

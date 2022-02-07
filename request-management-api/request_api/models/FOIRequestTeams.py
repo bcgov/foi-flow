@@ -34,6 +34,20 @@ class FOIRequestTeam(db.Model):
             teams.append({"name":row["name"], "type":row["type"]})
         return teams
     
+    @classmethod
+    def getprocessingteamsbytype(cls, requesttype):                
+        sql = """select ot."name" as team, pa."name" as ministry, pa.bcgovcode, pa.iaocode from "FOIRequestTeams" ft 
+                    inner join  "OperatingTeams" ot on ft.teamid = ot.teamid
+                    inner join "ProgramAreas" pa on ft.programareaid = pa.programareaid 
+                    where lower(ft.requesttype) = :requesttype and ft.programareaid is not null
+                    and ot."type" = 'iao'
+                    and ft.requeststatusid = 8"""
+        rs = db.session.execute(text(sql), {'requesttype': requesttype})
+        teams = []
+        for row in rs:
+            teams.append({"team":row["team"], "ministry":row["ministry"], "bcgovcode":row["bcgovcode"], "iaocode":row["iaocode"]})
+        return teams
+    
 class FOIRequestTeamSchema(ma.Schema):
     class Meta:
         fields = ('requestteamid', 'requesttype', 'requeststatusid','teamid','programareaid','isactive')

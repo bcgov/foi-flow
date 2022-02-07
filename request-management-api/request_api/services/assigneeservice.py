@@ -26,7 +26,10 @@ class assigneeservice:
         _groups.append({"name":groupname, "type": OperatingTeam.gettype(groupname)})
         return KeycloakAdminService().getgroupsandmembers(_groups) 
     
-
+    def getprocessingteamsbyrequesttype(self,requesttype):
+        return FOIRequestTeam.getprocessingteamsbytype(requesttype)
+            
+    
     def __getgroups(self,requesttype, status=None, bcgovcode=None):
         return FOIRequestTeam.getteamsbystatusandprogramarea(requesttype,status,bcgovcode)
                 
