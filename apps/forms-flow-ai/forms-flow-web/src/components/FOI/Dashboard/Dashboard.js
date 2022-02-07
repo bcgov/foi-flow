@@ -178,8 +178,8 @@ const Dashboard = ({userDetail}) => {
     dispatch(push(`/foi/addrequest`));
   }
 
-    return (            
-      <div className="container foi-container">          
+    return (
+      <div className="container foi-container">
         <Grid
           container
           direction="row"
@@ -191,93 +191,120 @@ const Dashboard = ({userDetail}) => {
             container
             direction="row"
             alignItems="center"
-            xs={12} 
-            className="foi-dashboard-row2" 
+            xs={12}
+            className="foi-dashboard-row2"
           >
             <Grid item lg={6} xs={12}>
               <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
             </Grid>
             <Grid item container lg={6} xs={12} justifyContent="flex-end">
-              <button type="button" className="btn foi-btn-create" onClick={addRequest}>
+              <button
+                type="button"
+                className="btn foi-btn-create"
+                onClick={addRequest}
+              >
                 {FOI_COMPONENT_CONSTANTS.ADD_REQUEST}
               </button>
             </Grid>
           </Grid>
-          <> { !isLoading && !isAssignedToListLoading ? (<>
-          <Grid 
-            item 
-            container
-            alignItems="center"
-            xs={12}
-          >
-            <Grid item lg={6} xs={12} className="form-group has-search">
-              <SearchIcon className="form-control-search"/>
-              <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />
-            </Grid>
+          <>
+            {!isLoading && !isAssignedToListLoading ? (
+              <>
+                <Grid item container alignItems="center" xs={12}>
+                  <Grid item lg={6} xs={12} className="form-group has-search">
+                    <SearchIcon className="form-control-search" />
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Search . . ."
+                      onChange={setSearch}
+                    />
+                  </Grid>
 
-            <Grid item container lg={6} xs={12} justifyContent="flex-end">
-              <RadioGroup
-                name="controlled-radio-buttons-group"
-                value={requestFilter}
-                onChange={requestFilterChange}
-                row
-              >
-                <FormControlLabel 
-                  className="form-control-label" 
-                  value="myRequests"
-                  control={<Radio className="mui-radio" color="primary"/>}
-                  label="My Requests" 
+                  <Grid item container lg={6} xs={12} justifyContent="flex-end">
+                    <RadioGroup
+                      name="controlled-radio-buttons-group"
+                      value={requestFilter}
+                      onChange={requestFilterChange}
+                      row
+                    >
+                      <FormControlLabel
+                        className="form-control-label"
+                        value="myRequests"
+                        control={
+                          <Radio className="mui-radio" color="primary" />
+                        }
+                        label="My Requests"
+                      />
+                      <FormControlLabel
+                        className="form-control-label"
+                        value="watchingRequests"
+                        control={
+                          <Radio className="mui-radio" color="primary" />
+                        }
+                        label="Watching Requests"
+                      />
+                      <FormControlLabel
+                        className="form-control-label"
+                        value="All"
+                        control={
+                          <Radio className="mui-radio" color="primary" />
+                        }
+                        label="My Team Requests"
+                      />
+                    </RadioGroup>
+                  </Grid>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  style={{ height: 450 }}
+                  className={classes.root}
+                >
+                  <DataGrid
+                    className="foi-data-grid"
+                    getRowId={(row) => row.idNumber}
+                    rows={[]}
+                    columns={columns.current}
+                    rowHeight={30}
+                    headerHeight={50}
+                    rowCount={requestQueue.meta.total}
+                    pageSize={rowsState.pageSize}
+                    rowsPerPageOptions={[10]}
+                    hideFooterSelectedRowCount={true}
+                    disableColumnMenu={true}
+                    pagination
+                    paginationMode="server"
+                    onPageChange={(page) =>
+                      setRowsState((prev) => ({ ...prev, page }))
+                    }
+                    onPageSizeChange={(pageSize) =>
+                      setRowsState((prev) => ({ ...prev, pageSize }))
+                    }
+                    sortingOrder={["desc", "asc"]}
+                    sortModel={sortModel}
+                    sortingMode={"server"}
+                    onSortModelChange={(model) => setSortModel(model)}
+                    getRowClassName={(params) =>
+                      `super-app-theme--${params.row.currentState
+                        .toLowerCase()
+                        .replace(/ +/g, "")}`
+                    }
+                    onRowClick={renderReviewRequest}
+                    loading={isLoading}
+                  />
+                </Grid>
+              </>
+            ) : (
+              <Grid item xs={12} container alignItems="center">
+                <Loading
+                  costumStyle={{ position: "relative", marginTop: "4em" }}
                 />
-                <FormControlLabel
-                  className="form-control-label" 
-                  value="watchingRequests"
-                  control={<Radio className="mui-radio" color="primary"/>}
-                  label="Watching Requests" 
-                />
-                <FormControlLabel
-                  className="form-control-label" 
-                  value="All"
-                  control={<Radio className="mui-radio" color="primary"/>}
-                  label="My Team Requests" 
-                />
-              </RadioGroup>
-            </Grid>     
-          </Grid>
-          <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
-            <DataGrid 
-              className="foi-data-grid"
-              getRowId={(row) => row.idNumber}
-              rows={updateAssigneeName(requestQueue.data)} 
-              columns={columns.current}                
-              rowHeight={30}
-              headerHeight={50}
-              rowCount = {requestQueue.meta.total}
-              pageSize={rowsState.pageSize}
-              rowsPerPageOptions={[10]}
-              hideFooterSelectedRowCount={true}
-              disableColumnMenu={true}
-
-              pagination
-              paginationMode='server'
-              onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-              onPageSizeChange={(pageSize) =>
-                setRowsState((prev) => ({ ...prev, pageSize }))
-              }
-
-              sortingOrder={['desc', 'asc']}
-              sortModel={sortModel}
-              sortingMode={'server'}
-              onSortModelChange={(model) => setSortModel(model)}
-              getRowClassName={(params) =>
-                `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}`
-              }
-              onRowClick={renderReviewRequest}
-              loading={isLoading}
-              />
-          </Grid> </>):<Loading/> }
+              </Grid>
+            )}
           </>
         </Grid>
-      </div>      
+      </div>
     );
 };
 
