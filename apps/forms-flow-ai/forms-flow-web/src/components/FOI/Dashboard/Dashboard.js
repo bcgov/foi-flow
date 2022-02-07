@@ -101,7 +101,7 @@ const Dashboard = ({userDetail}) => {
     if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {    
         receivedDateString = addBusinessDays(receivedDateString, 1);     
     }    
-    return formatDate(receivedDateString, "MMM dd yyyy");    
+    return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();    
   }
    
   const columns = React.useRef([    
