@@ -28,7 +28,7 @@ export const getMenuItems = ({
       {"Unassigned"}
     </MenuItem>
   );
-
+  console.log(assignedToList)
   if (assignedToList && assignedToList.length < 1) {
     return menuItems;
   }

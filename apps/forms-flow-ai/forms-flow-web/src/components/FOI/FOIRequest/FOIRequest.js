@@ -144,10 +144,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (isAddRequest) {
-      dispatch(fetchFOIAssignedToList("", ""));
+      dispatch(fetchFOIAssignedToList("", "", ""));
     }
     else {
-      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId, bcgovcode));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));

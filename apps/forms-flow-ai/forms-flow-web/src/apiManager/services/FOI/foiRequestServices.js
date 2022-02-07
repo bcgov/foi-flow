@@ -29,7 +29,7 @@ export const fetchFOIRequestList = () => {
             return { ...foiRequest };
           });
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", ""));
+          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false)); 
         } else {
@@ -68,7 +68,7 @@ export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'c
       .then((res) => {
         if (res.data) {
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", ""));
+          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(res.data));
           dispatch(setFOILoader(false)); 
         } else {
@@ -148,9 +148,9 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
   };
 };
 
-export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
+export const fetchFOIRequestDetailsWrapper = (requestId, ministryId, bcgovcode) => {
   if(ministryId) {
-    return fetchFOIRequestDetails(requestId, ministryId);
+    return fetchFOIRequestDetails(requestId, ministryId, bcgovcode);
   }
   else {
     return fetchFOIRawRequestDetails(requestId);
@@ -170,7 +170,7 @@ export const fetchFOIRawRequestDetails = (requestId) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ""));
           dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));
@@ -183,7 +183,8 @@ export const fetchFOIRawRequestDetails = (requestId) => {
   }
 };
 
-export const fetchFOIRequestDetails = (requestId, ministryId) => {
+export const fetchFOIRequestDetails = (requestId, ministryId, bcgovcode) => {
+  
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
@@ -196,7 +197,8 @@ export const fetchFOIRequestDetails = (requestId, ministryId) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          const govcode = bcgovcode ? bcgovcode : foiRequest.selectedMinistries[0].code.toLowerCase();
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), govcode));
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
