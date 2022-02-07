@@ -30,10 +30,7 @@ import {
 import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
-import {
-  fetchFOIRequestNotesList
-} from "../../../apiManager/services/FOI/foiRequestNoteServices";
-import { fetchExtensions } from "../../../apiManager/services/FOI/foiExtensionServices";
+import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { push } from "connected-react-router";
@@ -145,8 +142,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   useEffect(() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", ""));
-    }
-    else {
+    } else {
       dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
@@ -159,7 +155,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
-    dispatch(fetchExtensions(ministryId));
 
     if (bcgovcode)
       dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
@@ -545,6 +540,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
                       <ApplicantDetails
                         requestDetails={requestDetails}
+                        requestStatus={_requestStatus}
                         contactDetailsNotGiven={contactDetailsNotGiven}
                         handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue}
                         handleEmailValidation={handleEmailValidation}
@@ -581,7 +577,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject} 
                         disableInput={disableInput} 
                       />
-                      <RequestDetails requestDetails={requestDetails} handleRequestDetailsValue={handleRequestDetailsValue} handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} createSaveRequestObject={createSaveRequestObject} disableInput={disableInput} />
+                      <RequestDetails 
+                        requestDetails={requestDetails} 
+                        requestStatus={_requestStatus}
+                        handleRequestDetailsValue={handleRequestDetailsValue} 
+                        handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} 
+                        createSaveRequestObject={createSaveRequestObject} 
+                        disableInput={disableInput} 
+                        
+                      />
                       
                       <ExtensionDetails requestDetails={requestDetails} requestState={requestState}/>
                       {

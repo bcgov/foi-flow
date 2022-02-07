@@ -10,6 +10,11 @@ import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { debounce } from './utils';
+import Grid from "@material-ui/core/Grid"
+import Radio from "@material-ui/core/Radio"
+import RadioGroup from "@material-ui/core/RadioGroup"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import SearchIcon from '@material-ui/icons/Search';
 
 const MinistryDashboard = ({userDetail}) => {
 
@@ -85,7 +90,7 @@ const MinistryDashboard = ({userDetail}) => {
       return "N/A"
     }
     else {
-      return formatDate(receivedDateString, 'yyyy MMM, dd');
+      return formatDate(receivedDateString, "MMM dd yyyy");
     }
         
   }
@@ -175,65 +180,102 @@ const renderReviewRequest = (e) => {
   }
 }
 
-     return (  
-            
-        <div className="container foi-container">
-           
-          <div className="col-sm-12 col-md-12 foi-grid-container">
-            <div className="foi-dashboard-row2">
-              <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
-            </div>
-            <> { !isLoading  && !isAssignedToListLoading  ? (<>
-            <div className="foi-dashboard-row2">             
-              <div className="form-group has-search">
-                <span className="fa fa-search form-control-search"></span>
-                <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />               
-              </div>
-             
-              <div className="foi-request-type">
-                <input className="foi-general-radio" type="radio" value="myRequests" name="requestFilter" onChange={requestFilterChange} /> My Requests
-                <input className="foi-personal-radio" type="radio" value="watchingRequests" name="requestFilter" onChange={requestFilterChange} /> Watching Requests
-                <input className="foi-all-radio" type="radio" value="All" name="requestFilter" onChange={requestFilterChange} defaultChecked  /> My Team Requests            
-              </div>            
-              
-            </div>
-            <div style={{ height: 450 }} className={classes.root}>
-              <DataGrid 
-                className="foi-data-grid"
-                getRowId={(row) => row.idNumber}
-                rows={updateAssigneeName(requestQueue.data)} 
-                columns={columns.current}                
-                rowHeight={30}
-                headerHeight={50}                
-                rowCount = {requestQueue.meta.total}
-                pageSize={rowsState.pageSize}
-                rowsPerPageOptions={[10]}
-                hideFooterSelectedRowCount={true}
-                disableColumnMenu={true}
+return (            
+  <div className="container foi-container">          
+    <Grid
+      container
+      direction="row"
+      className="foi-grid-container"
+      spacing={1}
+    >
+      <Grid
+        item
+        container
+        direction="row"
+        alignItems="center"
+        xs={12} 
+        className="foi-dashboard-row2" 
+      >
+        <Grid item xs={12}>
+          <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
+        </Grid>
+      </Grid>
+      <> { !isLoading && !isAssignedToListLoading ? (<>
+      <Grid 
+        item 
+        container
+        alignItems="center"
+        xs={12}
+      >
+        <Grid item xs={12} lg={6} className="form-group has-search">
+          <SearchIcon className="form-control-search"/>
+          <input type="text" className="form-control" placeholder="Search . . ." onChange={setSearch} />
+        </Grid>
 
-                pagination
-                paginationMode='server'
-                onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-                onPageSizeChange={(pageSize) =>
-                  setRowsState((prev) => ({ ...prev, pageSize }))
-                }
+        <Grid item container lg={6} xs={12} justifyContent="flex-end">
+          <RadioGroup
+            name="controlled-radio-buttons-group"
+            value={requestFilter}
+            onChange={requestFilterChange}
+            row
+          >
+            <FormControlLabel 
+              className="form-control-label" 
+              value="myRequests"
+              control={<Radio className="mui-radio" color="primary"/>}
+              label="My Requests" 
+            />
+            <FormControlLabel
+              className="form-control-label" 
+              value="watchingRequests"
+              control={<Radio className="mui-radio" color="primary"/>}
+              label="Watching Requests" 
+            />
+            <FormControlLabel
+              className="form-control-label" 
+              value="All"
+              control={<Radio className="mui-radio" color="primary"/>}
+              label="My Team Requests" 
+            />
+          </RadioGroup>
+        </Grid>     
+      </Grid>
+      <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
+        <DataGrid 
+          className="foi-data-grid"
+          getRowId={(row) => row.idNumber}
+          rows={updateAssigneeName(requestQueue.data)} 
+          columns={columns.current}                
+          rowHeight={30}
+          headerHeight={50}
+          rowCount = {requestQueue.meta.total}
+          pageSize={rowsState.pageSize}
+          rowsPerPageOptions={[10]}
+          hideFooterSelectedRowCount={true}
+          disableColumnMenu={true}
 
-                sortingOrder={['desc', 'asc']}
-                sortModel={sortModel}
-                sortingMode={'server'}
-                onSortModelChange={(model) => setSortModel(model)}
-                getRowClassName={(params) =>
-                  `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}-${params.row.cfrstatus.toLowerCase().replace(/ +/g, "")}`
-                } 
-                onRowClick={renderReviewRequest}
-                loading={isLoading}
-                />
-            </div> </>):<Loading/> }
-            </>
-          </div>
-        </div> 
-      
-    );
+          pagination
+          paginationMode='server'
+          onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
+          onPageSizeChange={(pageSize) =>
+            setRowsState((prev) => ({ ...prev, pageSize }))
+          }
+
+          sortingOrder={['desc', 'asc']}
+          sortModel={sortModel}
+          sortingMode={'server'}
+          onSortModelChange={(model) => setSortModel(model)}
+          getRowClassName={(params) =>
+            `super-app-theme--${params.row.currentState.toLowerCase().replace(/ +/g, "")}-${params.row.cfrstatus.toLowerCase().replace(/ +/g, "")}`
+          }
+          onRowClick={renderReviewRequest}
+          loading={isLoading}
+          />
+      </Grid> </>):<Loading/> }
+      </>
+    </Grid>
+  </div>      
+);
   };
 
 export default MinistryDashboard;

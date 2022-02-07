@@ -62,8 +62,8 @@ const RequestDescription = React.memo((requestDetails) => {
                         <div className="ministry-request-description-row">
                             <Typography className="ministry-heading"><b>Date Range for Record Search</b></Typography>
                             <div className="ministry-request-dates">
-                                <Typography className="ministry-start-date ministry-heading"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
-                                <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
+                                <Typography className="ministry-start-date ministry-heading"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'MMM dd yyyy') : ""}</Typography>
+                                <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'MMM dd yyyy') : ""}</Typography>
                             </div>
                         </div>
                         <Typography className="ministry-bottom-request-description-header ministry-heading"><b>Request Description</b></Typography>
