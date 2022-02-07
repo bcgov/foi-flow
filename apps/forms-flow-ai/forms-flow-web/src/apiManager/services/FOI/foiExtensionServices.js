@@ -74,18 +74,23 @@ export const fetchExtensions = (
   }
 }
 
-export const createExtensionRequest = ({data, requestId, ministryId, callback, errorCallback, dispatch}) => {
-  console.log("create", data);
-
-  if(!ministryId) {
+export const createExtensionRequest = ({
+  data,
+  requestId,
+  ministryId,
+  callback,
+  errorCallback,
+  dispatch,
+}) => {
+  if (!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
-  
+
   const apiUrl = replaceUrl(
     replaceUrl(API.FOI_POST_EXTENSION, "<requestid>", requestId),
     "<ministryrequestid>",
     ministryId
-  );  
+  );
 
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
@@ -93,11 +98,11 @@ export const createExtensionRequest = ({data, requestId, ministryId, callback, e
         callback(res.data);
       } else {
         dispatch(serviceActionError(res));
-        throw new Error()
+        throw new Error();
       }
     })
     .catch((error) => {
-      catchError(error, dispatch)
+      catchError(error, dispatch);
       errorCallback("An error occured while trying to save this extension");
     });
 };

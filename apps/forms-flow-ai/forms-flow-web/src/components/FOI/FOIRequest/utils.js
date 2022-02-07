@@ -291,10 +291,10 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
     return false
   }
 
-  if(requestStatus !== StateEnum.unopened.name && requestStatus !== StateEnum.intakeinprogress.name) {
-    console.log(requestStatus);
-    console.log(StateEnum.unopened.name);
-
-    return true
+  if (
+    requestStatus !== StateEnum.unopened.name &&
+    requestStatus !== StateEnum.intakeinprogress.name
+  ) {
+    return true;
   }
 }
