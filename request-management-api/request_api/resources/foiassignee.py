@@ -93,7 +93,6 @@ class FOIAssigneesTeams(Resource):
             if requestype is not None and (requestype != "personal" and requestype != "general"):
                 return {'status': False, 'message':'Bad Request'}, 400   
             result = assigneeservice().getprocessingteamsbyrequesttype(requestype)
-            print(result)
             if result is not None:
                 return json.dumps(result), 200
             else:
