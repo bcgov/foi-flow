@@ -159,7 +159,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
-    dispatch(fetchExtensions(ministryId));
+    if (ministryId) {
+      dispatch(fetchExtensions(ministryId));
+    }
 
     if (bcgovcode)
       dispatch(fetchFOIMinistryAssignedToList(bcgovcode));

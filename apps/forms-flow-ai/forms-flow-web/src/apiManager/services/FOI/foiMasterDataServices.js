@@ -76,11 +76,20 @@ import {
   export const fetchFOIAssignedToList = (requestType, status, bcgovcode) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
     if (requestType && status) {
+      if (bcgovcode) {
       apiUrlGETAssignedToList = replaceUrl(replaceUrl(replaceUrl(
-        API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
+        API.FOI_GET_ASSIGNEDTOGROUPLIST_WITHGOVCODE_API,
         "<requesttype>",
         requestType
       ), "<curentstate>", status), "<bcgovcode>", bcgovcode);
+      }
+      else {
+        apiUrlGETAssignedToList = replaceUrl(replaceUrl(
+          API.FOI_GET_ASSIGNEDTOGROUPLIST_API,
+          "<requesttype>",
+          requestType
+        ), "<curentstate>", status);
+      }
     }
     console.log(apiUrlGETAssignedToList)
     return (dispatch) => {
