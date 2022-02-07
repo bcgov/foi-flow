@@ -264,7 +264,7 @@ const Dashboard = ({userDetail}) => {
                   <DataGrid
                     className="foi-data-grid"
                     getRowId={(row) => row.idNumber}
-                    rows={[]}
+                    rows={updateAssigneeName(requestQueue.data)}
                     columns={columns.current}
                     rowHeight={30}
                     headerHeight={50}
