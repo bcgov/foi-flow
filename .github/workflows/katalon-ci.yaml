@@ -1,0 +1,30 @@
+name: Katalon
+on:
+  push:
+    branches: [ dev-NK-automationscripts ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  katalon-win:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.2
+    - name: Katalon Studio Github Action
+      uses: katalon-studio/katalon-studio-github-action@v2
+      with:
+          version: '8.2.5'
+          projectPath: '/testing/foi-qa-automation/foi-qa-automation.prj'
+          args: '-noSplash -retry=0 -testSuiteCollectionPath="Test Suites/foi-test-homepage-and-login" -apiKey= ${{ secrets.KATALON_API_KEY }} --config -webui.autoUpdateDrivers=true'
+  # katalon-mac:
+  #   runs-on: macos-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v2
+  #   - name: Katalon Studio Github Action
+  #     uses: katalon-studio/katalon-studio-github-action@v2.1
+  #     with:
+  #         version: '7.5.5'
+  #         projectPath: '${{ github.workspace }}'
+  #         args: '-noSplash -retry=0 -browserType=Chrome -statusDelay=15 -testSuitePath="Test Suites/TS_RegressionTest" -apiKey= ${{ secrets.API_KEY }} --config -webui.autoUpdateDrivers=true'
