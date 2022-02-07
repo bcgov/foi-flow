@@ -1,6 +1,6 @@
 from .db import  db, ma
 from .default_method_result import DefaultMethodResult
-
+from sqlalchemy import text
 
 class OperatingTeam(db.Model):
     __tablename__ = 'OperatingTeams' 
@@ -18,6 +18,16 @@ class OperatingTeam(db.Model):
         for team in allteams:
             teams.append(team.name)
         return teams
+    
+    @classmethod
+    def gettype(cls, team):                
+        sql = """select type from "OperatingTeams" ot 
+                    where replace(lower(name),' ','') = replace(:team,' ','')"""
+        rs = db.session.execute(text(sql), {'team': team})
+        for row in rs:
+            return row["type"]
+        return None
+    
 
 class OperatingTeamSchema(ma.Schema):
     class Meta:
