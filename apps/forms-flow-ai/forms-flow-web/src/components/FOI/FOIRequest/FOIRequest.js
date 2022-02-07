@@ -30,10 +30,7 @@ import {
 import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
-import {
-  fetchFOIRequestNotesList
-} from "../../../apiManager/services/FOI/foiRequestNoteServices";
-import { fetchExtensions } from "../../../apiManager/services/FOI/foiExtensionServices";
+import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { push } from "connected-react-router";
