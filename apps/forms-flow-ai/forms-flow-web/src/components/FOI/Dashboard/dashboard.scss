@@ -19,19 +19,15 @@ div .foi-dashboard {
 }
 
 .foi-grid-container {
-    padding-top: 30px;    
+    padding: 6em 1em 1em 1em !important;    
     width: 75%!important;
     position: relative;
     margin-left: auto!important;
     margin-right: auto!important;
-    right: 0px;
-    left: 0px;
     background-color: white;   
-    height: inherit; 
 }
 
 .foi-dashboard-row2 {
-    display: flex;
     margin-top: 40px;
 }
 
@@ -45,7 +41,6 @@ div .foi-dashboard {
 .has-search .form-control {
     padding-left: 2.375rem;
     display: inline-block;
-    width: 200%;
     color: #5a7296;   
     border: 1px solid #38598A;
 }
@@ -112,7 +107,7 @@ input[type='radio'] {
     background:#38598A;
   }
 .foi-data-grid {
-    border: none !important;   
+    border: none !important;
 }
 .MuiDataGrid-iconSeparator {
     visibility: hidden;
@@ -170,11 +165,7 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     display: flex;
 }
 .foi-btn-create {
-    margin-right: 20px;
-    margin-top: 10px;
-    margin-left: auto;
-    position: relative;
-    width: 20% !important;
+    width: 50% !important;
     font-family: "BCSans-Bold", sans-serif!important;
     border: none !important;
     background-color: #38598A !important;
@@ -188,4 +179,12 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
         width: 62%!important;
     }
 
+}
+
+.form-control-label {
+    margin:0 !important
+}
+
+.mui-radio {
+    color: #38598A !important
 }
