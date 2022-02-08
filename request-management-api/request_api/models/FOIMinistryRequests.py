@@ -357,6 +357,13 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])
                         )
                     )
+                elif (group == 'Intake Team'):
+                    groupfilter.append(
+                        and_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            FOIMinistryRequest.requeststatusid.in_([1])
+                        )
+                    )
                 else:
                     groupfilter.append(
                         or_(

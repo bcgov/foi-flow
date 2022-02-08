@@ -49,7 +49,7 @@ class FOIRequestTeam(db.Model):
         return teams
     
     @classmethod
-    def getdefaultprocessingteamforpersonal(cls, bcgovcode):                
+    def getdefaultprocessingteamforpersonal(cls, bcgovcode):    
         sql = """select ot."name" as name from "FOIRequestTeams" ft inner join "FOIRequestStatuses" fs2 on ft.requeststatusid = fs2.requeststatusid 
                     inner join "OperatingTeams" ot on ft.teamid = ot.teamid 
                     left join "ProgramAreas" pa on ft.programareaid = pa.programareaid 
@@ -57,7 +57,7 @@ class FOIRequestTeam(db.Model):
                     and replace(lower(fs2."name"),' ','') = 'open'
                     and ot."name" <> 'Intake Team'
                     and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null)"""
-        rs = db.session.execute(text(sql), {'bcgovcode':bcgovcode})
+        rs = db.session.execute(text(sql), {'bcgovcode':bcgovcode.lower()})
         for row in rs:
             return row["name"]
         return None
