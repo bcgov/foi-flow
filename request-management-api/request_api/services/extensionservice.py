@@ -269,7 +269,7 @@ class extensionservice:
         copyextension['extendedduedate'] = extensionschema['extendedduedate'] if 'extendedduedate' in extensionschema  else copyextension['extendedduedate']
         approveddate = extensionschema['approveddate'] if 'approveddate' in extensionschema else copyextension['decisiondate']
         denieddate = extensionschema['denieddate'] if 'denieddate' in extensionschema else copyextension['decisiondate']
-        decisiondate = approveddate if approveddate else denieddate
+        decisiondate = approveddate if extensionstatusid == 2 else denieddate
         copyextension['decisiondate'] = decisiondate
         copyextension['approvednoofdays'] = extensionschema['approvednoofdays'] if 'approvednoofdays' in extensionschema  else copyextension['approvednoofdays']
         
