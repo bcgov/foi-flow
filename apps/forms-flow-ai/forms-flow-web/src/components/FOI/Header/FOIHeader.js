@@ -33,7 +33,6 @@ const closeModal = () => setOpen(false);
 const openModal = (coordinates) => {
   const screenX = coordinates.pageX;
   setScreenPosition(screenX);
-  console.log(screenX);
   setOpen(!open);
 }
 
