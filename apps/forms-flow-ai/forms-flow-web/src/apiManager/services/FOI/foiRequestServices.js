@@ -14,7 +14,7 @@ import {
   setFOIMinistryRequestList,
   setOpenedMinistries
 } from "../../../actions/FOI/foiRequestActions";
-import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
+import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
@@ -171,6 +171,7 @@ export const fetchFOIRawRequestDetails = (requestId) => {
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ""));
+          dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));
@@ -200,6 +201,7 @@ export const fetchFOIRequestDetails = (requestId, ministryId, bcgovcode) => {
           const govcode = bcgovcode ? bcgovcode : foiRequest.selectedMinistries[0].code.toLowerCase();
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), govcode));
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
+          dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));

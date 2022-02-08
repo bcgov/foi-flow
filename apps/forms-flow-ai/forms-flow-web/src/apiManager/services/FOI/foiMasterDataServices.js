@@ -9,6 +9,7 @@ import {
     setFOICategoryList,
     setFOIProgramAreaList,
     setFOIAssignedToList,
+    setFOIProcessingTeamList,
     setFOIFullAssignedToList,
     setFOIMinistryAssignedToList,
     setFOIDeliveryModeList,
@@ -74,7 +75,6 @@ import {
   
   
   export const fetchFOIAssignedToList = (requestType, status, bcgovcode) => {
-    console.log(`requestType = ${requestType}, status = ${status}, bcgovcode = ${bcgovcode}`)
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
     if (requestType && status) {
       if (bcgovcode) {
@@ -85,7 +85,6 @@ import {
       ), "<curentstate>", status), "<bcgovcode>", bcgovcode);
       }     
     }
-    console.log(apiUrlGETAssignedToList)
     return (dispatch) => {
       httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
         .then((res) => {
@@ -104,6 +103,39 @@ import {
         })
         .catch((error) => {
           console.log("Error while fetching assigned to master data based on requestType ${requestType} and state ${status}", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchFOIProcessingTeamList = (requestType) => {
+    let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API;
+    if (requestType) {     
+      apiUrlGETAssignedToList = replaceUrl(
+        API.FOI_GET_PROCESSINGTEAMLIST_API,
+        "<requesttype>",
+        requestType
+      );      
+    }
+    return (dispatch) => {
+      httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiAssignedToList = res.data;
+            let data = foiAssignedToList.map((assignedTo) => {
+              return { ...assignedTo };
+            });
+            dispatch(setFOIProcessingTeamList(data));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log(`Error while fetching assigned to master data based on requestType ${requestType} `, res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log(`Error while fetching assigned to master data based on requestType ${requestType}`, error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });
