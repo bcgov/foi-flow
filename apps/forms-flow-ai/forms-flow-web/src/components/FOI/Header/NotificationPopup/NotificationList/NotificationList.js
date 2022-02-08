@@ -71,6 +71,23 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
     return false;
   }
 
+  const commentTitle = (type) => {
+    if(type === "New User Comments")
+      return "New Comment:";
+    else if(type === "Tagged User Comments")
+      return "You've been tagged in a comment:";
+    else
+      return "New Reply to Your comment:";
+  }
+
+  const commentText = (message) => {
+    console.log(message);
+    if(message.length > 90)
+      return `"`+message.substring(0, 90)+`..."`;
+    else
+      return `"`+message+`"`;
+   }
+
   const getStatusAndRedirect = (err, res) => {
     if (!err && res) {
       if(res?.openedMinistries?.length > 0){
@@ -114,10 +131,9 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
       </Row>
       { checkCommentType(notification.notificationtype) ?
       <>
-        <div style={{fontSize:"16px"}}>New Comment:</div> 
+        <div style={{fontSize:"16px"}}>{commentTitle(notification.notificationtype)}</div> 
         <div style={{fontStyle: "italic"}} >
-          {notification.notification.length > 90 ? `"${notification.notification.substring(0, 90)}..."` : 
-          `"${notification.notification}"`}
+          {commentText(notification.notification)}
         </div>
       </> 
         :
