@@ -23,7 +23,6 @@ from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
-from request_api.utils.enums import UserGroup
 from request_api.exceptions import BusinessException, Error
 from request_api.services.extensionservice import extensionservice
 from request_api.schemas.foiextension import  FOIRequestExtensionSchema

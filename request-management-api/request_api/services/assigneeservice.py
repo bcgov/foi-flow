@@ -1,7 +1,6 @@
 
 from os import stat
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
-from request_api.utils.enums import UserGroup
 from request_api.models.OperatingTeams import OperatingTeam
 from request_api.models.FOIRequestTeams import FOIRequestTeam
 
