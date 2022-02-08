@@ -6,32 +6,6 @@
   background-color:white;
 }
 
-.section{
-  flex-direction: column;
-  overflow-x: hidden;;
-  background-color: white;
-  margin-bottom: 100px;
-      
-  .addAttachmentBox{
-    width:100%;
-    margin-left:25px;
-    margin-top:5px;
-    padding-right:25px;
-    padding-bottom:25px;
-
-    button.addAttachment {
-      float: right; 
-      padding-top: 8px;
-      padding-bottom: 8px;    
-    }
-  }
-}
-
-.displayAttachments{
-  margin:25px;
-  margin-top:10px;
-}
-
 .actionsBtn, .childActionsBtn{
   background-color: transparent;
   border: none;
@@ -45,10 +19,6 @@
 
 .childActionsBtn{
   padding: 10px 10px;
-}
-
-.attachment-popup-arrow {
-  display: none;
 }
 
 .attachment-popup-content {
@@ -88,10 +58,6 @@
   padding-top: 9px;
   text-align: center;
   font-size: 23px;
-}
-
-.attachment-badge {
-  display: inline;
 }
 
 .attachment-disabled {

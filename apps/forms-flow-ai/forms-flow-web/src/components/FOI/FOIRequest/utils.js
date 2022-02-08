@@ -285,3 +285,16 @@ export const findRequestState= (requestStatusId) =>{
     return stateArray[1].name;
   }
 }
+
+export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
+  if(!requestStatus) {
+    return false
+  }
+
+  if (
+    requestStatus !== StateEnum.unopened.name &&
+    requestStatus !== StateEnum.intakeinprogress.name
+  ) {
+    return true;
+  }
+}

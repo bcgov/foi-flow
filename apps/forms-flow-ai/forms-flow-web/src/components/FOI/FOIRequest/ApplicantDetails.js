@@ -7,9 +7,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
+import { shouldDisableFieldForMinistryRequests } from "./utils";
 
 const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, handleApplicantDetailsInitialValue, 
-    handleApplicantDetailsValue, handleEmailValidation, createSaveRequestObject, disableInput}) => {
+    handleApplicantDetailsValue, handleEmailValidation, createSaveRequestObject, disableInput, requestStatus}) => {
+
+    const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
     /**
      *  Applicant Details box in the UI
      *  FirstName, LastName and Category - Mandatory fields
@@ -186,7 +189,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             variant="outlined"
                             fullWidth
                             required
-                            disabled={disableInput}
+                            disabled={disableInput || disableFieldForMinistryRequest}
                             error={selectedCategory.toLowerCase().includes("select")}
                         >            
                         {menuItems}

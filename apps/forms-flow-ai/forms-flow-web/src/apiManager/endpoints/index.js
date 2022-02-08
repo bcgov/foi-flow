@@ -15,6 +15,7 @@ const API = {
   FOI_GET_ASSIGNEDTO_REQUESTTYPELIST_API: `${FOI_BASE_API_URL}/api/foiassignees/<requesttype>`,
   FOI_GET_ASSIGNEDTOGROUPLIST_API: `${FOI_BASE_API_URL}/api/foiassignees/<requesttype>/<curentstate>`,
   FOI_GET_ASSIGNEDTOGROUPLIST_WITHGOVCODE_API: `${FOI_BASE_API_URL}/api/foiassignees/<requesttype>/<curentstate>/<bcgovcode>`,
+  FOI_GET_PROCESSINGTEAMLIST_API: `${FOI_BASE_API_URL}/api/foiassignees/processingteams/<requesttype>`,
   FOI_GET_ASSIGNEDTO_MINISTRYGROUP_LIST_API: `${FOI_BASE_API_URL}/api/foiassignees/group/<govcode>ministryteam`,
   FOI_GET_DELIVERY_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/deliverymodes`,
   FOI_GET_RECEIVED_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/receivedmodes`,
