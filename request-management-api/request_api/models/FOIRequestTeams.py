@@ -48,6 +48,20 @@ class FOIRequestTeam(db.Model):
             teams.append({"team":row["team"], "ministry":row["ministry"], "bcgovcode":row["bcgovcode"], "iaocode":row["iaocode"]})
         return teams
     
+    @classmethod
+    def getdefaultprocessingteamforpersonal(cls, bcgovcode):                
+        sql = """select ot."name" as name from "FOIRequestTeams" ft inner join "FOIRequestStatuses" fs2 on ft.requeststatusid = fs2.requeststatusid 
+                    inner join "OperatingTeams" ot on ft.teamid = ot.teamid 
+                    left join "ProgramAreas" pa on ft.programareaid = pa.programareaid 
+                    where ft.isactive = true and lower(ft.requesttype) = 'personal' 
+                    and replace(lower(fs2."name"),' ','') = 'open'
+                    and ot."name" <> 'Intake Team'
+                    and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null)"""
+        rs = db.session.execute(text(sql), {'bcgovcode':bcgovcode})
+        for row in rs:
+            return row["name"]
+        return None
+    
 class FOIRequestTeamSchema(ma.Schema):
     class Meta:
         fields = ('requestteamid', 'requesttype', 'requeststatusid','teamid','programareaid','isactive')
