@@ -2,7 +2,7 @@
 from os import stat
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import UserGroup
-
+from request_api.models.FOIAssignees import FOIAssignee
 
 class assigneeservice:
     """ FOI Assignee management service
@@ -127,5 +127,12 @@ class assigneeservice:
     def __getministrygroupname(self, group, bcgovcode):
         return group.replace('@bcgovcode', bcgovcode) if bcgovcode is not None else None
                   
-         
+    def saveassignee(self, username, firstname, middlename, lastname):
+        # FOIAssignee
+        newassignee = FOIAssignee()
+        newassignee.username = username
+        newassignee.firstname = firstname
+        newassignee.middlename = middlename
+        newassignee.lastname = lastname
+        return FOIAssignee.saveassignee(newassignee)
     

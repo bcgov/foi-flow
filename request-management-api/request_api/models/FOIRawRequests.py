@@ -14,6 +14,7 @@ from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, 
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
+from .FOIAssignees import FOIAssignee
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -26,7 +27,7 @@ class FOIRawRequest(db.Model):
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
-    assignedto = db.Column(db.String(120), unique=False, nullable=True)    
+    assignedto = db.Column(db.String(120), ForeignKey('FOIAssignee.username'), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
@@ -38,11 +39,17 @@ class FOIRawRequest(db.Model):
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
+
+    assignee = relationship('FOIAssignee', primaryjoin="FOIRawRequest.assignedto==FOIAssignee.username")
+
     @classmethod
-    def saverawrequest(cls,_requestrawdata,sourceofsubmission, ispiiredacted, userid, notes, requirespayment ,assigneegroup= None,assignee= None)->DefaultMethodResult:
+    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:
         createdat = datetime.now()        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
+        if assignee is not None:
+            _assignee = FOIAssignee(username=assignee, firstname=assigneefirstname, middlename=assigneemiddlename, lastname=assigneelastname)
+            # FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment, assignee=_assignee)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -57,9 +64,12 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid, assigneegroup, assignee,status,ispiiredacted, userid)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid,assigneegroup,assignee,status,ispiiredacted,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
+            if assignee is not None:
+                FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
+
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
             closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None                
             _version = request.version+1           

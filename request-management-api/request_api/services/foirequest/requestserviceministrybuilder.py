@@ -9,6 +9,7 @@ from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDiv
 from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDocument
 from request_api.models.FOIRequestExtensions import FOIRequestExtension
 from request_api.models.FOIRequestExtensionDocumentMappings import FOIRequestExtensionDocumentMapping
+from request_api.models.FOIAssignees import FOIAssignee
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from datetime import datetime as datetime2
 
@@ -47,9 +48,19 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.startdate = ministryschema['startdate'] if 'startdate' in ministryschema  else None
         foiministryrequest.duedate = requestschema['duedate'] if 'duedate' in requestschema else ministryschema["duedate"] #and isextension == True 
         foiministryrequest.assignedministrygroup = requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"]
-        foiministryrequest.assignedministryperson = requestschema['assignedministryperson'] if 'assignedministryperson' in requestschema  else ministryschema["assignedministryperson"]
+        if 'assignedministryperson' in requestschema:
+            foiministryrequest.assignedministryperson = requestschema['assignedministryperson']
+            foiministryrequest.ministryassignee = self.createfoiassigneefromobject(requestschema['assignedministryperson'], requestschema['assignedministrypersonFirstName'], requestschema['assignedministrypersonMiddleName'], requestschema['assignedministrypersonLastName'])
+        else:
+            foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
+
         foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"]
-        foiministryrequest.assignedto = requestschema['assignedto'] if 'assignedto' in requestschema  else ministryschema["assignedto"]
+        if 'assignedto' in requestschema:
+            foiministryrequest.assignedto = requestschema['assignedto']
+            foiministryrequest.assignee = self.createfoiassigneefromobject(requestschema['assignedto'], requestschema['assignedtoFirstName'], requestschema['assignedtoMiddleName'], requestschema['assignedtoLastName'])
+        else:
+            foiministryrequest.assignedto = ministryschema["assignedto"]
+
         foiministryrequest.requeststatusid = requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"]
         foiministryrequest.programareaid = ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None
         foiministryrequest.createdby = userid
@@ -220,3 +231,12 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydivision.createdby = userid
                 divisionarr.append(ministrydivision)
             return divisionarr
+
+    def createfoiassigneefromobject(self, username, firstname, middlename, lastname):
+        assignee = FOIAssignee()
+        assignee.username = username
+        assignee.firstname = firstname
+        assignee.middlename = middlename
+        assignee.lastname = lastname
+
+        return assignee
