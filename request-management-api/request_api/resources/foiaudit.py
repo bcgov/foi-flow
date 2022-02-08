@@ -18,9 +18,9 @@ from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
-from request_api.auth import auth
+from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.auditservice import auditservice
 import json
@@ -47,7 +47,7 @@ class FOIAuditByField(Resource):
 
         try:
             isall = False if request.url.endswith('summary') else True      
-            result = auditservice().getauditforfield(type, id, field, getgroupsfromtoken(),isall)
+            result = auditservice().getauditforfield(type, id, field, AuthHelper.getusergroups(),isall)
             if result is not None:
                 return {"audit": result}, 200
             else:

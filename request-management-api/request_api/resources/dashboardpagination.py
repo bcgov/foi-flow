@@ -4,9 +4,9 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins, getrequiredmemberships
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, UserGroup
-from request_api.auth import auth
+from request_api.auth import AuthHelper, auth
 from request_api.tracer import Tracer
 from request_api.exceptions import BusinessException
 from request_api.services.dashboardservice import dashboardservice
@@ -49,7 +49,7 @@ class DashboardPagination(Resource):
                 _filterfields = DEFAULT_FILTER_FIELDS
             _keyword = flask.request.args.get('keyword', None, type=str)
 
-            groups = getgroupsfromtoken()
+            groups = AuthHelper.getusergroups()
             ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
             statuscode = 200
             if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups) and (queuetype is None or queuetype == "all"):                                                                                           
