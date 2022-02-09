@@ -17,7 +17,7 @@ import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/
 import FileUpload from '../FileUpload'
 import { formatDate, calculateDaysRemaining } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
-import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo } from './util';
+import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,8 +44,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ConfirmationModal({requestId, openModal, handleModal, state, saveRequestObject, 
   handleClosingDateChange, handleClosingReasonChange, attachmentsArray }) {    
-    const classes = useStyles();
+    const classes = useStyles();    
+    const processingTeamList = useSelector(reduxstate=> reduxstate.foiRequests.foiProcessingTeamList);
+    const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
+    const updatedProcessingTeamList = getProcessingTeams(processingTeamList, selectedMinistries);
     const assignedTo= getAssignedTo(saveRequestObject);
+    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType)    
     const ministryGroup = getMinistryGroup(saveRequestObject);
     const selectedMinistry = getSelectedMinistry(saveRequestObject, ministryGroup);
     const selectedMinistryAssignedTo = getSelectedMinistryAssignedTo(saveRequestObject, selectedMinistry);
@@ -58,7 +62,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const updateFilesCb = (_files) => {
       setFiles(_files);
     }
-
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
 
     React.useEffect(() => {  
@@ -136,7 +139,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               <tbody>
                 <tr>
                   <th scope="row">IAO Assigned To</th>
-                  <td>{assignedTo}</td>
+                  <td>{updatedAssignedTo}</td>
                 </tr>
               </tbody>
           </table> : null }

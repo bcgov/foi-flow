@@ -15,7 +15,7 @@ from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .ProgramAreas import ProgramArea
-
+from request_api.utils.enums import ProcessingTeamWithKeycloackGroup
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIMinistryRequests'
@@ -112,7 +112,7 @@ class FOIMinistryRequest(db.Model):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
         elif (group == 'Flex Team'):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])))).all()
-        elif (group == 'Processing Team'):
+        elif (group in ProcessingTeamWithKeycloackGroup.list()):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])))).all()           
         else:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14]))))).all()
@@ -350,11 +350,18 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])
                         )
                     )
-                elif (group == 'Processing Team'):
+                elif (group in ProcessingTeamWithKeycloackGroup.list()):
                     groupfilter.append(
                         and_(
+                            FOIMinistryRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()),
+                            FOIMinistryRequest.requeststatusid.in_([1,2,12,13,7,9,10,14,3])
+                        )
+                    )
+                elif (group == 'Intake Team'):
+                    groupfilter.append(
+                        or_(
                             FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])
+                            FOIMinistryRequest.requeststatusid.in_([1])
                         )
                     )
                 else:
