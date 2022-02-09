@@ -353,7 +353,7 @@ class FOIMinistryRequest(db.Model):
                 elif (group in ProcessingTeamWithKeycloackGroup.list()):
                     groupfilter.append(
                         and_(
-                            FOIMinistryRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()),
+                            FOIMinistryRequest.assignedgroup == group,
                             FOIMinistryRequest.requeststatusid.in_([1,2,12,13,7,9,10,14,3])
                         )
                     )
