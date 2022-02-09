@@ -148,9 +148,9 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
   };
 };
 
-export const fetchFOIRequestDetailsWrapper = (requestId, ministryId, bcgovcode) => {
+export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
   if(ministryId) {
-    return fetchFOIRequestDetails(requestId, ministryId, bcgovcode);
+    return fetchFOIRequestDetails(requestId, ministryId);
   }
   else {
     return fetchFOIRawRequestDetails(requestId);
@@ -184,7 +184,7 @@ export const fetchFOIRawRequestDetails = (requestId) => {
   }
 };
 
-export const fetchFOIRequestDetails = (requestId, ministryId, bcgovcode) => {
+export const fetchFOIRequestDetails = (requestId, ministryId) => {
   
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_REQUEST_API,
@@ -198,9 +198,9 @@ export const fetchFOIRequestDetails = (requestId, ministryId, bcgovcode) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          const govcode = bcgovcode ? bcgovcode : foiRequest.selectedMinistries[0].code.toLowerCase();
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), govcode));
-          dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
+          const ministryCode = foiRequest.selectedMinistries[0].code.toLowerCase();
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode));
+          dispatch(fetchFOIMinistryAssignedToList(ministryCode));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
