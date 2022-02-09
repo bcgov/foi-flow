@@ -14,7 +14,7 @@ down_revision = '6ffb804efde9'
 branch_labels = None
 depends_on = None
 
-columnname_username = 'FOIAssignees.username'
+# columnname_username = 'FOIAssignees.username'
 
 def upgrade():
     op.create_table(
@@ -25,24 +25,35 @@ def upgrade():
         sa.Column('middlename', sa.String(length=100), nullable=True),
         sa.Column('lastname', sa.String(length=100), nullable=False),
         sa.Column('isactive', sa.Boolean(), nullable=False, default=True),
-        sa.PrimaryKeyConstraint('foiassigneeid')
+        sa.PrimaryKeyConstraint('foiassigneeid'),
     )
 
     op.create_foreign_key(
-        None,
+        'FOIRawRequests_assignedto_fkey',
         'FOIRawRequests',
         'FOIAssignees',
-        ['FOIRawRequests.assignedto'],
-        [columnname_username],
+        ['assignedto'],
+        ['username'],
     )
 
     op.create_foreign_key(
-        None,
+        'FOIMinistryRequests_assignedto_fkey',
         'FOIMinistryRequests',
         'FOIAssignees',
-        ['FOIMinistryRequests.assignedto', 'FOIMinistryRequests.assignedministryperson'],
-        [columnname_username, columnname_username],
+        ['assignedto'],
+        ['username'],
     )
 
-def downgrade():    
+    op.create_foreign_key(
+        'FOIMinistryRequests_assignedministryperson_fkey',
+        'FOIMinistryRequests',
+        'FOIAssignees',
+        ['assignedministryperson'],
+        ['username'],
+    )
+
+def downgrade():
+    op.drop_constraint('FOIRawRequests_assignedto_fkey', 'FOIRawRequests', type_='foreignkey')
+    op.drop_constraint('FOIMinistryRequests_assignedto_fkey', 'FOIMinistryRequests', type_='foreignkey')
+    op.drop_constraint('FOIMinistryRequests_assignedministryperson_fkey', 'FOIMinistryRequests', type_='foreignkey')
     op.drop_table('FOIAssignees')
