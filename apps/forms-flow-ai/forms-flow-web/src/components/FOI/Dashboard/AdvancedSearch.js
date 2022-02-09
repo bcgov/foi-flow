@@ -17,6 +17,27 @@ import { makeStyles } from "@material-ui/core/styles";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select from '@mui/material/Select';
+import { publicBodies } from "./constants"
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 const useStyles = makeStyles((theme) => ({
   search: {
@@ -36,7 +57,24 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const dispatch = useDispatch();
 
+  const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState(["keyword1", "keyword2"]);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl) && Boolean(searchText);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleKeywordAdd = () => {
+    setAnchorEl(null);
+    setKeywords([...keywords, searchText]);
+    setSearchText("");
+  };
+
+  const handleSearchChange = (e) => {
+    setAnchorEl(e.currentTarget);
+    setSearchText(e.target.value);
+  };
 
   if (false) {
     return (
@@ -96,13 +134,22 @@ const AdvancedSearch = ({ userDetail }) => {
               <IconButton>
                 <SearchIcon />
               </IconButton>
-              <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Search" />
+              <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="Search"
+                onChange={handleSearchChange}
+                value={searchText}
+              />
               {keywords.map((keyword, index) => (
-                <Grid item>
+                <Grid item key={`grid-keyword-${index}`}>
                   <Chip
                     key={`keyword-${index}`}
                     label={keyword}
-                    onDelete={() => {}}
+                    onDelete={() => {
+                      setKeywords(
+                        keywords.filter((kw, i) => index !== i)
+                      )
+                    }}
                     color="primary"
                     sx={{
                       backgroundColor: "#38598A",
@@ -111,6 +158,20 @@ const AdvancedSearch = ({ userDetail }) => {
                   />
                 </Grid>
               ))}
+            </Grid>
+            <Grid>
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleKeywordAdd}
+                disableAutoFocus={true}
+                autoFocus={false}
+              >
+                <MenuItem
+                  onClick={handleKeywordAdd}
+                >{`Add ${searchText}`}</MenuItem>
+              </Menu>
             </Grid>
 
             <Grid
@@ -144,7 +205,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
               <Grid item xs={2}>
                 <ClickableChip
-                  key={`filter-request-description`}
+                  key={`filter-raw-request`}
                   label={"RAW REQUEST #"}
                   color="primary"
                   onClick={() => {}}
@@ -153,7 +214,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
               <Grid item xs={2}>
                 <ClickableChip
-                  key={`filter-request-description`}
+                  key={`filter-axis-request`}
                   label={"AXIS REQUEST #"}
                   color="primary"
                   onClick={() => {}}
@@ -162,7 +223,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
               <Grid item xs={2}>
                 <ClickableChip
-                  key={`filter-request-description`}
+                  key={`filter-applicant-name`}
                   label={"APPLICANT NAME"}
                   color="primary"
                   onClick={() => {}}
@@ -171,8 +232,8 @@ const AdvancedSearch = ({ userDetail }) => {
 
               <Grid item xs={2}>
                 <ClickableChip
-                  key={`filter-request-description`}
-                  label={"IAO ANALYST NAME"}
+                  key={`filter-assignee-name`}
+                  label={"ASSIGNEE NAME"}
                   color="primary"
                   onClick={() => {}}
                 />
@@ -180,58 +241,107 @@ const AdvancedSearch = ({ userDetail }) => {
 
               <Grid item xs={2}>
                 <ClickableChip
-                  key={`filter-request-description`}
+                  key={`filter-search-filter`}
                   label={"SEARCH FILTER"}
                   color="primary"
                   onClick={() => {}}
                 />
               </Grid>
 
-              <Grid item xs={4}>
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                    marginBottom: "2em",
-                  }}
-                >
-                  Request State Criteria
-                </Typography>
+              <Grid item xs={3} container direction="row" spacing={2}>
+                <Grid item xs={12}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                      marginBottom: "2em",
+                    }}
+                  >
+                    Request State Criteria
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormGroup
+                  >
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Unopened Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Open Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Deduplication Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Call for Records Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Records Review Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Sign Off Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Closed Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Overdue Requests"
+                    />
+                  </FormGroup>
+                </Grid>
 
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox size="small" />}
-                    label="Unopened Requests"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox size="small" />}
-                    label="Open Requests"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox size="small" />}
-                    label="On Hold Requests"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox size="small" />}
-                    label="Closed Requests"
-                  />
-                </FormGroup>
               </Grid>
 
-              <Grid item xs={6}>
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                    marginBottom: "2em",
-                  }}
-                >
-                  Search by Date Range
-                </Typography>
+              <Grid item xs={3} container direction="row" spacing={2}>
+                <Grid item xs={12}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Request Type
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="Personal Requests"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox size="small" />}
+                      label="General Requests"
+                    />
+                  </FormGroup>
+                </Grid>
+              </Grid>
+
+              <Grid item xs={6} container direction="row" spacing={2}>
+                <Grid item xs={12}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Search by Date Range
+                  </Typography>
+                </Grid>
 
                 <Grid
                   container
+                  item
                   direction="row"
                   justifyContent="flex-start"
                   alignItems="center"
+                  xs={12}
                 >
                   <Grid item xs={5}>
                     <TextField
@@ -267,8 +377,43 @@ const AdvancedSearch = ({ userDetail }) => {
                       variant="outlined"
                       fullWidth
                     />
-                  </Grid>
+                  </Grid>                   
                 </Grid>
+
+                <Grid item xs={12}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Search by Public Body
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
+                  <Select
+                    labelId="demo-multiple-checkbox-label"
+                    id="demo-multiple-checkbox"
+                    multiple
+                    value={[]}
+                    // onChange={handleChange}
+                    input={<OutlinedInput label="Tag" />}
+                    renderValue={(selected) => selected.join(', ')}
+                    MenuProps={MenuProps}
+                  >
+                    {publicBodies.map((publicBody) => (
+                      <MenuItem key={publicBody} value={publicBody}>
+                        {/* checked={personName.indexOf(publicBody) > -1} */}
+                        <Checkbox  />
+                        <ListItemText primary={publicBody} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                </Grid>
+
               </Grid>
             </Grid>
           </Paper>
@@ -279,3 +424,33 @@ const AdvancedSearch = ({ userDetail }) => {
 };
 
 export default AdvancedSearch;
+
+// const SearchBar = ({keywords}) => {
+//   return (
+//     <>
+//       <IconButton>
+//         <SearchIcon />
+//       </IconButton>
+//       <InputBase
+//         sx={{ ml: 1, flex: 1 }}
+//         placeholder="Search"
+//         onChange={handleSearchChange}
+//         value={searchText}
+//       />
+//       {keywords.map((keyword, index) => (
+//         <Grid item>
+//           <Chip
+//             key={`keyword-${index}`}
+//             label={keyword}
+//             onDelete={() => {}}
+//             color="primary"
+//             sx={{
+//               backgroundColor: "#38598A",
+//               marginRight: "1em",
+//             }}
+//           />
+//         </Grid>
+//       ))}
+//     </>
+//   );
+// };
