@@ -350,16 +350,16 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])
                         )
                     )
-                elif (group in  ProcessingTeamWithKeycloackGroup.list()):
+                elif (group in ProcessingTeamWithKeycloackGroup.list()):
                     groupfilter.append(
                         and_(
-                            FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])
+                            FOIMinistryRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()),
+                            FOIMinistryRequest.requeststatusid.in_([1,2,12,13,7,9,10,14,3])
                         )
                     )
                 elif (group == 'Intake Team'):
                     groupfilter.append(
-                        and_(
+                        or_(
                             FOIMinistryRequest.assignedgroup == group,
                             FOIMinistryRequest.requeststatusid.in_([1])
                         )
