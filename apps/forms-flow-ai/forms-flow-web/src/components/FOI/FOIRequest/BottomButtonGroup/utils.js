@@ -31,7 +31,6 @@ export const getRequestState = ({
   if (urlIndexCreateRequest > -1) {
     return StateEnum.intakeinprogress.name;
   }
-
   return requestState;
 };
 

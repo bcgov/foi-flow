@@ -76,7 +76,22 @@ def test_post_foirawrequestsredirect(app, client):
     updatejson['requeststatusid'] = 4
     wfupdateresponse = client.post('/api/foirawrequest/'+str(jsondata["id"]),data=json.dumps(updatejson), headers=factory_auth_header(app, client), content_type='application/json')
     assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
-   
+ 
+with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
+  generalrequestjson = json.load(y)
+  generalupdaterequestjson = json.load(z)
+  rawrequestjson = json.load(x)
+def test_post_foirequest_general(app, client):
+    rawresponse = client.post('/api/foirawrequests',data=json.dumps(rawrequestjson), headers=factory_auth_header(app, client), content_type='application/json')
+    jsondata = json.loads(rawresponse.data)    
+    getrawresponse = client.get('/api/foirawrequest/'+str(jsondata["id"]), headers=factory_auth_header(app, client), content_type='application/json') 
+    foirequest = generalrequestjson
+    foirequest["id"] = str(jsondata["id"])
+    foirequest["requeststatusid"] = 1
+    foiresponse = client.post('/api/foirequests',data=json.dumps(foirequest), headers=factory_auth_header(app, client), content_type='application/json')
+    getrawresponsefields = client.get('/api/foirawrequest/'+str(jsondata["id"])+'/fields?names=ministries', headers=factory_auth_header(app, client), content_type='application/json') 
+    assert rawresponse.status_code == 200 and getrawresponse.status_code == 200  and foiresponse.status_code == 200 and getrawresponsefields.status_code == 200
+      
 
 def test_get_programareas(app,client):    
     response = client.get('api/foiflow/programareas', headers=factory_auth_header(app, client), content_type='application/json')    

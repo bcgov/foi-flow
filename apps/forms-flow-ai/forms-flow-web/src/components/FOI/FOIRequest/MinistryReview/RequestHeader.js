@@ -14,7 +14,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
     const {ministryId} = useParams();
     const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
-
+    const requestState = requestDetails?.currentState;
     const preventDefault = (event) => event.preventDefault();
 
     const dispatch = useDispatch();
@@ -77,7 +77,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
 
             
                     <>
-                      <MinistryAssignToDropdown requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
                     </>
                 
             </div>

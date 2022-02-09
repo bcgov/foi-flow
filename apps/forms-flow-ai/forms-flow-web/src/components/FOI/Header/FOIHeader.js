@@ -12,18 +12,13 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
-import socketIOClient from "socket.io-client";
-import io from "socket.io-client"; 
+import io from "socket.io-client";
+import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX} from "../../../constants/constants";
 
 
 const FOIHeader = React.memo(() => { 
 
-  const dispatch = useDispatch();
-  const signout = () => {
-    localStorage.removeItem('authToken');
-    dispatch(push(`/`));
-    UserService.userLogout();
-}
+const dispatch = useDispatch(); 
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
 const [screenPosition, setScreenPosition] = useState(0);
@@ -32,38 +27,63 @@ const closeModal = () => setOpen(false);
 const openModal = (coordinates) => {
   const screenX = coordinates.pageX;
   setScreenPosition(screenX);
-  console.log(screenX);
   setOpen(!open);
 }
-
+const [messageData, setMessageData] = useState("");
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
+var socket;
+
+if(isAuthenticated){
+  const options = {
+    reconnectionDelay:SOCKETIO_RECONNECTION_DELAY,
+    reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX,
+    path: '/api/v1/socket.io',
+    transports: ['websocket'],
+    auth: { "x-jwt-token": UserService.getToken() }
+  };
+  socket = io.connect(SOCKETIO_CONNECT_URL, options);
+  socket.on('connect', () => { 
+    console.log("Socket connected!");
+  })
+  socket.on('disconnect', () => { 
+    socket.disconnect();
+    console.log("Socket disconnected!");
+  })
+}
 
 useEffect(() => {     
   if(isAuthenticated){
-    var socket = io('ws://10.0.0.70:15000', { path: '/api/v1/socket.io', transports: ['websocket'] });
-    console.log("Socket!!",socket);
-    socket.emit('joinroom', {'token':user.preferred_username})
-    socket.on(user.preferred_username,function(data){
-      console.log(data);
-      console.log("Data received "+user.preferred_username+" :", data);
-   });
-  } 
-},[]);
-
-
-useEffect(() => {     
-  if(isAuthenticated)
-    dispatch(fetchFOINotifications());
+    dispatch(fetchFOINotifications());  
+  }
   setInterval(() => {
     if(isAuthenticated)
       dispatch(fetchFOINotifications());
   }, 900000);
-},[dispatch]);
+},[]);
+
+useEffect(() => {     
+    socket?.on(user.preferred_username, data => setMessageData(oldMessageData => [data, ...oldMessageData]));
+  },[socket]);
+
+useEffect(() => {     
+  if(foiNotifications){
+    setMessageData(foiNotifications);
+  }
+},[foiNotifications]);
+
+ const signout = () => {
+    console.log("Socket value in signout", socket);
+    socket?.disconnect();
+    console.log("Socket disconnected?", socket.disconnected);
+    localStorage.removeItem('authToken');
+    dispatch(push(`/`));
+    UserService.userLogout(); 
+}
 
 const triggerPopup = () => {
   return(
     <> 
-    <Badge badgeContent={foiNotifications?.length} color="secondary">
+    <Badge badgeContent={messageData?.length} color="secondary">
       <i style={{color: open? "#003366" : "white",cursor: "pointer"}} className="fa fa-bell-o foi-bell"></i>
     </Badge>
    </>
@@ -111,7 +131,7 @@ const triggerPopup = () => {
                         contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup notifications={foiNotifications}></NotificationPopup>
+                        <NotificationPopup notifications={messageData}></NotificationPopup>
                         </Popup>
                       </div>
                       </li>
@@ -128,7 +148,6 @@ const triggerPopup = () => {
       </Nav>      
     </Container>    
          </Navbar>   
-      {/* {isAuthenticated ?  <HomeMenu /> : null} */}
          </div>
          </div>
   );

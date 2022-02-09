@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MinistryReview = React.memo(({ userDetail }) => {
 
-  const { requestId, ministryId, requestState} = useParams();
+  const { requestId, ministryId} = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
@@ -93,7 +93,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
   let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
   const [comment, setComment] = useState([]);
-
+  const [requestState, setRequestState] = useState();
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
   
@@ -137,7 +137,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       if (bcgovcode)
         dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
-    
   }, [requestId]);
 
   const [headerValue, setHeader] = useState("");
@@ -157,6 +156,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setSaveMinistryRequestObject(requestDetailsValue);
     ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
+    if(requestDetails && Object.keys(requestDetails).length !== 0){
+      setRequestState(requestDetails.currentState);
+      settabStatus(requestDetails.currentState);
+    }
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
@@ -209,7 +212,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}/${_state}`
+        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`
       }
         , 1000);
     }
@@ -378,7 +381,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const requestNumber = requestDetails && requestDetails.idNumber; 
   
   return (
-
+    !isLoading && requestDetails && Object.keys(requestDetails).length !== 0  && requestState != undefined?
     <div className="foiformcontent">
       <div className="foitabbedContainer">
 
@@ -387,7 +390,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             <h1><a href="/foi/dashboard">FOI</a></h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown updateStateDropDown={updateStateDropDown} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
+            <StateDropDown requestState={requestState} updateStateDropDown={updateStateDropDown} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
           </div>
           
         <div className="tab">
@@ -434,14 +437,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
         </div>
         
         <div className="foileftpanelstatus">
-        {_requestStatus.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.closed.name.toLowerCase() ?  
+        {_requestStatus?.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.closed.name.toLowerCase() &&  
           <>
-          {(_requestStatus.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus.toLowerCase() !== StateEnum.response.name.toLowerCase()  )?
+          {(_requestStatus?.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.response.name.toLowerCase()) &&
           <h4>{bottomTextArray[0]}</h4>
-          : null }
+          }
           <h4>{bottomTextArray[1]}</h4>
           </>
-        : null }
+        }
         </div>  
      
         </div>
@@ -458,18 +461,18 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  { Object.entries(requestDetails).length >0  && requestDetails !== undefined ? 
+                  { (Object.entries(requestDetails).length >0  && requestDetails !== undefined) && 
                   <>
                     <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
                     <ApplicantDetails requestDetails={requestDetails} /> 
                     <RequestDescription requestDetails={requestDetails} />
                     <RequestDetails requestDetails={requestDetails}/>
-                    <ExtensionDetails requestDetails={requestDetails}/>
+                    <ExtensionDetails requestDetails={requestDetails} requestState={requestState}/>
                     <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
                     {/* <RequestNotes /> */}
-                    <BottomButtonGroup stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
+                    <BottomButtonGroup requestState={requestState} stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
                   </>
-                : null }
+                  }
                 </form>
               </div>
             </div>
@@ -524,7 +527,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         </div>
       </div>
     </div>
-
+  : <Loading/>
   );
 
 })
