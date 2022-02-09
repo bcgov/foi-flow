@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AdvancedDashboard = ({ userDetail }) => {
+const Dashboard = ({ userDetail }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -86,4 +86,4 @@ const AdvancedDashboard = ({ userDetail }) => {
   );
 };
 
-export default AdvancedDashboard;
+export default Dashboard;

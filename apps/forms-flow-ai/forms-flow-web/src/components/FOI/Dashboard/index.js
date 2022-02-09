@@ -1,4 +1,4 @@
 
-import AdvancedDashboard from "./AdvancedDashboard";
+import Dashboard from "./Dashboard";
 import MinistryDashboard from "./MinistryDashboard";
-export { AdvancedDashboard, MinistryDashboard };
+export { Dashboard, MinistryDashboard };
