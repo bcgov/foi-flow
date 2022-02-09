@@ -49,10 +49,14 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   }
 
   const handleClick = (notificationVal) => {
-    let idNumber = notification.idnumber;
+    let idNumber = notificationVal.idnumber;
     idNumber+='';
     let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
-    if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
+    if(checkCommentType(notificationVal.notificationtype)){
+      setCommentUrl();
+      console.log("Inside comment");
+    }
+    else if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
      notification.notification.toLowerCase() === "moved to open state"){
         dispatch(fetchOpenedMinistriesForNotification(notificationVal, (err, res) => {
             getStatusAndRedirect(err, res);
@@ -109,6 +113,20 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
         url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}`;
       else
         url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}`;
+    }
+    window.location.href=url;
+  }
+
+  const setCommentUrl = () =>{
+    let url = "";
+    if(notification.requesttype === 'rawrequest'){
+      url=`/foi/reviewrequest/${notification.requestid}/comments`;
+    }
+    else if(notification.requesttype === 'ministryrequest'){
+      if(isMinistry)
+        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/comments`;
+      else
+        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/comments`;
     }
     window.location.href=url;
   }

@@ -140,6 +140,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   
+  useEffect(()=>{
+    if(window.location.href.indexOf("comments") > -1){
+      tabclick('Comments');
+    }
+  },[])
+  
   const dispatch = useDispatch();
   useEffect(() => {
     if (isAddRequest) {
@@ -169,7 +175,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
-    if(requestDetails && Object.entries(requestDetails).length !== 0){
+    if(Object.entries(requestDetails)?.length !== 0){
       var requestStateFromId = findRequestState(requestDetails.requeststatusid);
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
