@@ -81,7 +81,6 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   }
 
   const commentText = (message) => {
-    console.log(message);
     if(message.length > 90)
       return `"`+message.substring(0, 90)+`..."`;
     else
