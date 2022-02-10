@@ -18,7 +18,7 @@ from http import HTTPStatus
 from flask import g, request
 from flask_jwt_oidc import JwtManager
 from jose import jwt as josejwt
-
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 jwt = (
     JwtManager()
 )  # pylint: disable=invalid-name; lower case name as used by convention in most Flask apps
@@ -96,12 +96,21 @@ class AuthHelper:
     
     @classmethod
     def isministrymember(cls):
-        token = request.headers.get("Authorization", None)
-        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
-        usergroups = unverified_claims['groups']
-        usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
-        for group in usergroups:
-            if group.endswith("Ministry Team"):
+        usergroups = cls.getusergroups()
+        ministrygroups = list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list())) 
+        if len(ministrygroups) > 0:
+            return True
+        return False
+    
+    @classmethod
+    def isprocesingteammember(cls):
+        usergroups = cls.getusergroups()
+        ministrygroups = list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list())) 
+        if len(ministrygroups) > 0:
+            return False    
+        else:
+            processinggroups = list(set(usergroups).intersection(ProcessingTeamWithKeycloackGroup.list())) 
+            if len(processinggroups) > 0:
                 return True
         return False
     
@@ -112,3 +121,41 @@ class AuthHelper:
         usergroups = unverified_claims['groups']
         usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
         return usergroups
+    
+    @classmethod        
+    def getusertype(cls): 
+        usergroups = cls.getusergroups()
+        ministrygroups = list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list())) 
+        if len(ministrygroups) > 0:
+            return "ministry"    
+        else:
+            iaogroups = list(set(usergroups).intersection(IAOTeamWithKeycloackGroup.list()))
+            if len(iaogroups) > 0:
+                return "iao"
+        return None
+    
+    @classmethod        
+    def getiaotype(cls): 
+        usergroups = cls.getusergroups()
+        _groups = set(usergroups)
+        if cls.isministrymember() == False:
+            processinggroups = list(_groups.intersection(ProcessingTeamWithKeycloackGroup.list())) 
+            if len(processinggroups) > 0:
+                return "processing"
+            else:
+                if 'Flex Team' in _groups:
+                    return "flex"
+                elif 'Intake Team' in _groups:
+                    return "intake"
+                else:
+                    return None
+        else:
+            return None
+    
+    @classmethod        
+    def getministrygroups(cls): 
+        usergroups = cls.getusergroups()
+        return list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list()))   
+      
+
+        

@@ -28,7 +28,7 @@ from sqlalchemy.sql.expression import false
 from request_api.auth import jwt as _authjwt
 import jwt
 import os
-from request_api.utils.enums import MinistryTeamWithKeycloackGroup
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup
 
 
 def cors_preflight(methods):
@@ -49,13 +49,6 @@ def cors_preflight(methods):
     return wrapper
 
 
-def getgroupsfromtoken():
-    tokenjson = jwt.decode(_authjwt.get_token_auth_header(),audience=os.getenv('JWT_OIDC_AUDIENCE'), options={"verify_signature": False})
-    groups = tokenjson['groups']
-    groups = [group.replace('/','',1) if group.startswith('/') else group for group in groups]
-    return groups
-
-
 def camelback2snake(camel_dict: dict):
     """Convert the passed dictionary's keys from camelBack case to snake_case."""
     return decamelize(camel_dict)
@@ -69,8 +62,9 @@ def getrequiredmemberships():
     membership =''
     for group in MinistryTeamWithKeycloackGroup:
         membership+='{0},'.format(group.value)
-
-    membership+='Intake Team,Flex Team,Processing Team'    
+    for procgroup in ProcessingTeamWithKeycloackGroup:
+        membership+='{0},'.format(procgroup.value)
+    membership+='Intake Team,Flex Team'   
     return membership
 
 def allowedorigins():

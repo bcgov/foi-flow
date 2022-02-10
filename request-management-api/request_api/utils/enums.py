@@ -70,9 +70,30 @@ class MinistryTeamWithKeycloackGroup(Enum):
     def list():
         return list(map(lambda c: c.value, MinistryTeamWithKeycloackGroup))
 
+class ProcessingTeamWithKeycloackGroup(Enum):
+    scanningteam = "Scanning Team"
+    businessteam = "Business Team"
+    centralteam = "Central Team"
+    justicehealthteam = "Justice Health Team"
+    mcfdpersonalteam = "MCFD Personals Team"
+    resouceteam = "Resource Team"
+    socialtechteam = "Social Tech Team"
+
+    @staticmethod
+    def list():
+        return list(map(lambda c: c.value, ProcessingTeamWithKeycloackGroup))
+
+class IAOTeamWithKeycloackGroup(Enum):
+    intake = "Intake Team"    
+    flex = "Flex Team"
+    
+    @staticmethod
+    def list():
+        return list(map(lambda c: c.value, IAOTeamWithKeycloackGroup)) + list(map(lambda c: c.value, ProcessingTeamWithKeycloackGroup))
+    
 class UserGroup(Enum):
     intake = "Intake Team"    
     flex = "Flex Team"
-    processing = "Processing Team"
+    processing = "@processing"
     ministry = "@bcgovcode Ministry Team" 
     

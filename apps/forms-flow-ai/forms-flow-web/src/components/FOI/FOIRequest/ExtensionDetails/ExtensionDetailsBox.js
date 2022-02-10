@@ -1,17 +1,14 @@
-import React, { useEffect, useContext } from "react";
-
+import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ActionContext } from "./ActionContext";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import AddExtensionModal from "./AddExtensionModal"
+import AddExtensionModal from "./AddExtensionModal";
 import DeleteExtensionModal from "./DeleteExtensionModal";
-import {
-  fetchExtensions,
-} from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { fetchExtensions } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import ExtensionsTable from "./ExtensionsTable";
-import "./extensionscss.scss"
-import clsx from "clsx"
+import "./extensionscss.scss";
+import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -23,21 +20,17 @@ const useStyles = makeStyles((theme) => ({
 const ExtensionDetailsBox = React.memo(() => {
   const classes = useStyles();
 
-  const {
-    setSaveModalOpen,
-    dispatch,
-    setExtensionId,
-    pendingExtensionExists,
-  } = useContext(ActionContext);
+  const { setSaveModalOpen, setExtensionId, pendingExtensionExists, dispatch } =
+    useContext(ActionContext);
 
-    const { ministryId } = useParams();
+  const { ministryId } = useParams();
 
   useEffect(() => {
     if (ministryId) {
       dispatch(fetchExtensions(ministryId));
     }
   }, [ministryId]);
-  
+
   return (
     <>
       <Card className="foi-details-card">
@@ -62,11 +55,11 @@ const ExtensionDetailsBox = React.memo(() => {
           </div>
         </div>
         <CardContent>
-          <ExtensionsTable/>
+          <ExtensionsTable />
         </CardContent>
       </Card>
-      <AddExtensionModal/>
-      <DeleteExtensionModal/>
+      <AddExtensionModal />
+      <DeleteExtensionModal />
     </>
   );
 });
