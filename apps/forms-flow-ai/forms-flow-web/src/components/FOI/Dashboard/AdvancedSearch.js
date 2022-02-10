@@ -20,15 +20,17 @@ import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import InputAdornment from "@mui/material/InputAdornment";
 
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import ListItemText from '@mui/material/ListItemText';
-import Select from '@mui/material/Select';
-import { publicBodies } from "./constants"
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import ListItemText from "@mui/material/ListItemText";
+import Select from "@mui/material/Select";
+import { publicBodiesNames } from "./constants";
 import { SearchFilter } from "./enum";
 import { ConditionalComponent } from "../../../helper/FOI/helper";
+import { formatDate } from "../../../helper/FOI/helper";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -60,7 +62,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
 
   const [searchText, setSearchText] = useState("");
-  const [keywords, setKeywords] = useState([]);
+  const [keywords, setKeywords] = useState([""]);
   const [searchFilterSelected, setSearchFilterSelected] = useState(
     SearchFilter.REQUEST_DESCRIPTION
   );
@@ -81,11 +83,20 @@ const AdvancedSearch = ({ userDetail }) => {
     intitialRequestStateCriteria
   );
 
+  const initialRequestTypes = {
+    personal: false,
+    general: false,
+  };
+  const [requestTypes, setRequestTypes] = useState(initialRequestTypes);
+
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const [selectedPublicBodies, setSelectedPublicBodies] = useState([]);
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl) && Boolean(searchText);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+
   const handleKeywordAdd = () => {
     setAnchorEl(null);
     setKeywords([...keywords, searchText]);
@@ -108,6 +119,23 @@ const AdvancedSearch = ({ userDetail }) => {
       ...requestStateCriteria,
       [event.target.name]: event.target.checked,
     });
+  };
+
+  const handleRequestTypeChange = (event) => {
+    setRequestTypes({
+      ...requestTypes,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  const handleSelectedPublicBodiesChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedPublicBodies(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
   };
 
   const ClickableChip = ({ clicked, ...rest }) => {
@@ -165,23 +193,29 @@ const AdvancedSearch = ({ userDetail }) => {
               xs={12}
               className={classes.search}
             >
-              <IconButton>
-                <SearchIcon />
-              </IconButton>
-              <InputBase
-                sx={{ ml: 1, flex: 1 }}
-                placeholder="Search"
-                onChange={handleSearchChange}
-                value={searchText}
-                onKeyPress={(e) => {
-                  if (keywordsMode && e.key === "Enter") {
-                    handleKeywordAdd();
+              <Grid item xs={keywordsMode ? 6 : 12}>
+                <InputBase
+                  placeholder="Search"
+                  onChange={handleSearchChange}
+                  value={searchText}
+                  onKeyPress={(e) => {
+                    if (keywordsMode && e.key === "Enter") {
+                      handleKeywordAdd();
+                    }
+                  }}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <IconButton>
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
                   }
-                }}
-              />
+                  fullWidth
+                />
+              </Grid>
               <ConditionalComponent condition={keywordsMode}>
-                {keywords.map((keyword, index) => (
-                  <Grid item key={`grid-keyword-${index}`}>
+                <Grid item container direction="row-reverse" xs={6}>
+                  {keywords.map((keyword, index) => (
                     <Chip
                       key={`keyword-${index}`}
                       label={keyword}
@@ -194,8 +228,8 @@ const AdvancedSearch = ({ userDetail }) => {
                         marginRight: "1em",
                       }}
                     />
-                  </Grid>
-                ))}
+                  ))}
+                </Grid>
               </ConditionalComponent>
             </Grid>
             <ConditionalComponent condition={keywordsMode}>
@@ -426,11 +460,25 @@ const AdvancedSearch = ({ userDetail }) => {
                 <Grid item xs={12}>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="personal"
+                          onChange={handleRequestTypeChange}
+                          checked={requestTypes.personal}
+                        />
+                      }
                       label="Personal Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="general"
+                          onChange={handleRequestTypeChange}
+                          checked={requestTypes.general}
+                        />
+                      }
                       label="General Requests"
                     />
                   </FormGroup>
@@ -465,6 +513,11 @@ const AdvancedSearch = ({ userDetail }) => {
                         shrink: true,
                       }}
                       variant="outlined"
+                      value={fromDate}
+                      InputProps={{
+                        inputProps: { max: toDate || formatDate(new Date()) },
+                      }}
+                      onChange={(e) => setFromDate(formatDate(e.target.value))}
                       fullWidth
                     />
                   </Grid>
@@ -487,6 +540,14 @@ const AdvancedSearch = ({ userDetail }) => {
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      InputProps={{
+                        inputProps: {
+                          min: fromDate,
+                          max: formatDate(new Date()),
+                        },
+                      }}
+                      value={toDate}
+                      onChange={(e) => setToDate(formatDate(e.target.value))}
                       variant="outlined"
                       fullWidth
                     />
@@ -505,23 +566,36 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="demo-multiple-checkbox-label">
-                      Tag
+                    <InputLabel id="demo-multiple-checkbox-label" shrink>
+                      Public Body
                     </InputLabel>
                     <Select
                       labelId="demo-multiple-checkbox-label"
                       id="demo-multiple-checkbox"
                       multiple
-                      value={[]}
-                      // onChange={handleChange}
-                      input={<OutlinedInput label="Tag" />}
-                      renderValue={(selected) => selected.join(", ")}
+                      displayEmpty
+                      value={selectedPublicBodies}
+                      onChange={handleSelectedPublicBodiesChange}
+                      input={<OutlinedInput label="Public Body" notched />}
+                      renderValue={(selected) => {
+                        if (selected.length === 0) {
+                          return <em>All</em>;
+                        }
+
+                        return selected.join(", ");
+                      }}
                       MenuProps={MenuProps}
                     >
-                      {publicBodies.map((publicBody) => (
+                      <MenuItem disabled value="">
+                        <em>All</em>
+                      </MenuItem>
+                      {publicBodiesNames.map((publicBody) => (
                         <MenuItem key={publicBody} value={publicBody}>
-                          {/* checked={personName.indexOf(publicBody) > -1} */}
-                          <Checkbox />
+                          <Checkbox
+                            checked={
+                              selectedPublicBodies.indexOf(publicBody) > -1
+                            }
+                          />
                           <ListItemText primary={publicBody} />
                         </MenuItem>
                       ))}

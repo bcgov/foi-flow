@@ -1,4 +1,4 @@
-export const publicBodies = [
+export const publicBodiesNames = [
   "Advanced Education and Skills Training",
   "Agriculture, Foods, Fisheries",
   "Attorney General (and Minister Responsible for Housing)",
