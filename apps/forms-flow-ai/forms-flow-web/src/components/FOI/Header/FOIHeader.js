@@ -31,29 +31,19 @@ const openModal = (coordinates) => {
 }
 const [messageData, setMessageData] = useState("");
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
-var socket;
-
-if(isAuthenticated){
-  const options = {
-    reconnectionDelay:SOCKETIO_RECONNECTION_DELAY,
-    reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX,
-    path: '/api/v1/socket.io',
-    transports: ['websocket'],
-    auth: { "x-jwt-token": UserService.getToken() }
-  };
-  socket = io.connect(SOCKETIO_CONNECT_URL, options);
-  socket.on('connect', () => { 
-    console.log("Socket connected!");
-  })
-  socket.on('disconnect', () => { 
-    socket.disconnect();
-    console.log("Socket disconnected!");
-  })
-}
+const [socket, setSocket] = useState(null);
 
 useEffect(() => {     
   if(isAuthenticated){
     dispatch(fetchFOINotifications());  
+    const options = {
+      reconnectionDelay:SOCKETIO_RECONNECTION_DELAY,
+      reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX,
+      path: '/api/v1/socket.io',
+      transports: ['websocket'],
+      auth: { "x-jwt-token": UserService.getToken() }
+    };
+    setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
   }
   setInterval(() => {
     if(isAuthenticated)
