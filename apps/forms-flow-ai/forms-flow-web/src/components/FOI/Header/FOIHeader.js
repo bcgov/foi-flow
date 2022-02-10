@@ -12,6 +12,7 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
+import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
 import io from "socket.io-client";
 import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX} from "../../../constants/constants";
 
@@ -21,6 +22,8 @@ const FOIHeader = React.memo(({unauthorized=false}) => {
 const dispatch = useDispatch(); 
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
+let isMinistry = false;
+let ministryCode ="";
 const [screenPosition, setScreenPosition] = useState(0);
 const [open, setOpen] = useState(false);
 const closeModal = () => setOpen(false);
@@ -32,6 +35,12 @@ const openModal = (coordinates) => {
 const [messageData, setMessageData] = useState("");
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
 const [socket, setSocket] = useState(null);
+
+if (Object.entries(user)?.length !== 0) {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  isMinistry = isMinistryLogin(userGroups);
+  ministryCode = getMinistryCode(userGroups);
+}
 
 useEffect(() => {     
   if(!unauthorized && isAuthenticated){
@@ -62,9 +71,7 @@ useEffect(() => {
 },[foiNotifications]);
 
  const signout = () => {
-    console.log("Socket value in signout", socket);
     socket?.disconnect();
-    console.log("Socket disconnected?", socket.disconnected);
     localStorage.removeItem('authToken');
     dispatch(push(`/`));
     UserService.userLogout(); 
@@ -96,10 +103,9 @@ const triggerPopup = () => {
           <h2>FOI</h2>
           </div>
             <div className="col-md-6 col-sm-4 foiheaderUserStatusSection">
-          {isAuthenticated?
+          { isAuthenticated &&
+          <>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" className="foiNavBarToggle" />
-          :null}
-          { isAuthenticated?
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="ml-auto">
                 <div className="ml-auto banner-right foihamburgermenu">       
@@ -121,7 +127,8 @@ const triggerPopup = () => {
                         contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup notifications={messageData}></NotificationPopup>
+                        <NotificationPopup notifications={messageData} isMinistry ={isMinistry}
+                        ministryCode ={ministryCode} ></NotificationPopup>
                         </Popup>
                       </div>
                       </li>
@@ -131,8 +138,9 @@ const triggerPopup = () => {
                   </ul>
                 </div>
               </Nav>
-            </Navbar.Collapse>       
-          :null}
+            </Navbar.Collapse>   
+            </>    
+          }
           </div>
           </div>
       </Nav>      
