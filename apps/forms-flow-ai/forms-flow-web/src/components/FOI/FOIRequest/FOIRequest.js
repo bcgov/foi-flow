@@ -334,6 +334,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     else {
       setUpdateStateDropdown(!updateStateDropDown);
       setcurrentrequestStatus(requestState); // should be revisited
+      setStateChanged(false);
     }
   }
 

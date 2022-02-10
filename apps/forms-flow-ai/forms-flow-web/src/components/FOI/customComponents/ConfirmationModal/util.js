@@ -86,7 +86,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper"
 
 
   export const getProcessingTeams = (_processingTeamList, _selectedMinistries) => {
-    return _processingTeamList.filter(listItem => _selectedMinistries.includes(listItem.bcgovcode))?.map(item => item.team)
+    const updatedList = _processingTeamList.filter(listItem => _selectedMinistries.includes(listItem.bcgovcode))?.map(item => item.team);
+    return updatedList?.filter((v, i, a) => a.indexOf(v) === i);
   }
 
   export const getUpdatedAssignedTo = (_assignedTo, _processingTeamList, _state, _requestType) => {
