@@ -50,7 +50,7 @@ export const getMenuItems = ({
       <MenuItem
         key={`${assignee.id}`}
         className={classes.item}
-        value={`${group.name}|${assignee.username}`}
+        value={`${group.name}|${assignee.username}|${assignee.firstname}|${assignee.lastname}`}
       >
         {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
       </MenuItem>

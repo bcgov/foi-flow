@@ -78,7 +78,7 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
           <MenuItem
             key={`${assignee.id}`}
             className={classes.item}
-            value={`${group.name}|${assignee.username}`}
+            value={`${group.name}|${assignee.username}|${assignee.firstname}|${assignee.lastname}`}
             disabled={assignee.username.toLowerCase().includes("unassigned")}
           >
             {getFullName(
