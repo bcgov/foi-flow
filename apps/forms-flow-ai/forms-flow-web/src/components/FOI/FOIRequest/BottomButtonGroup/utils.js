@@ -34,13 +34,11 @@ export const getRequestState = ({
   return requestState;
 };
 
+
 export const fillAssignmentFields = (request) => {
   if (request.requestType === "general") {
     request.assignedTo = "";
     request.assignedGroup = "Flex Team";
-  } else if (request.requestType === "personal") {
-    request.assignedTo = "";
-    request.assignedGroup = "Processing Team";
   }
 };
 

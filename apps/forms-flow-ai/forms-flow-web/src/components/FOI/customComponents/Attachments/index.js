@@ -158,17 +158,13 @@ export const AttachmentSection = ({
         s3sourceuri: file.documentpath
       },
     ];
-    dispatch(
-      getOSSHeaderDetails(fileInfoList, (err, res) => {
-        if (!err) {
-          res.map((header, index) => {
-            dispatch(
-              getFileFromS3(header, file, (err, res) => {
-              })
-            );
-          });
-        }
-      }));
+    getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+      if (!err) {
+        res.map((header, index) => {
+          dispatch(getFileFromS3(header, file, (err, res) => {}));
+        });
+      }
+    });
   }
 
   const handlePopupButtonClick = (action, _attachment) => {

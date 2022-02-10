@@ -14,7 +14,7 @@ import {
   setFOIMinistryRequestList,
   setOpenedMinistries
 } from "../../../actions/FOI/foiRequestActions";
-import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList } from "./foiMasterDataServices";
+import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper"; 
@@ -29,7 +29,7 @@ export const fetchFOIRequestList = () => {
             return { ...foiRequest };
           });
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", ""));
+          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(data));
           dispatch(setFOILoader(false)); 
         } else {
@@ -68,7 +68,7 @@ export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'c
       .then((res) => {
         if (res.data) {
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", ""));
+          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(res.data));
           dispatch(setFOILoader(false)); 
         } else {
@@ -170,7 +170,8 @@ export const fetchFOIRawRequestDetails = (requestId) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ""));
+          dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));
@@ -184,6 +185,7 @@ export const fetchFOIRawRequestDetails = (requestId) => {
 };
 
 export const fetchFOIRequestDetails = (requestId, ministryId) => {
+  
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
@@ -196,8 +198,10 @@ export const fetchFOIRequestDetails = (requestId, ministryId) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase()));
-          dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
+          const ministryCode = foiRequest.selectedMinistries[0].code.toLowerCase();
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode));
+          dispatch(fetchFOIMinistryAssignedToList(ministryCode));
+          dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));

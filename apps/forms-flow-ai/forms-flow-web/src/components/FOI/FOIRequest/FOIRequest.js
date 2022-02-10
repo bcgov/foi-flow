@@ -141,8 +141,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (isAddRequest) {
-      dispatch(fetchFOIAssignedToList("", ""));
-    } else {
+      dispatch(fetchFOIAssignedToList("", "", ""));
+    }
+    else {
       dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
@@ -333,6 +334,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     else {
       setUpdateStateDropdown(!updateStateDropDown);
       setcurrentrequestStatus(requestState); // should be revisited
+      setStateChanged(false);
     }
   }
 
