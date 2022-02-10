@@ -40,11 +40,10 @@ cache = Cache(app)
 
 SOCKETIO_PING_TIMEOUT = int(os.getenv('SOCKETIO_PING_TIMEOUT', 5))
 SOCKETIO_PING_INTERVAL = int(os.getenv('SOCKETIO_PING_INTERVAL', 25))
-SOCKETIO_LOG_LEVEL = bool(os.getenv('SOCKETIO_LOG_LEVEL', False))
-ENGINEIO_LOG_LEVEL = bool(os.getenv('ENGINEIO_LOG_LEVEL', False))
+SOCKETIO_LOG_ENABLED = True if os.getenv('SOCKETIO_LOG_ENABLED').lower() == "true" else False
 SOCKETIO_CORS_ORIGIN= os.getenv('CORS_ORIGIN').split(",")
 
-socketio = SocketIO(logger=SOCKETIO_LOG_LEVEL, engineio_logger=ENGINEIO_LOG_LEVEL,ping_timeout=SOCKETIO_PING_TIMEOUT,ping_interval=SOCKETIO_PING_INTERVAL,cors_allowed_origins=SOCKETIO_CORS_ORIGIN)
+socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_ENABLED,ping_timeout=SOCKETIO_PING_TIMEOUT,ping_interval=SOCKETIO_PING_INTERVAL,cors_allowed_origins=SOCKETIO_CORS_ORIGIN)
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   

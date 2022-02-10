@@ -20,16 +20,16 @@ from flask import current_app
 def connect(message):
     userid = __getauthenticateduserid(message)
     if userid is not None:
-        emit(request.sid, {"message": userid+" successfully connected"})
+        current_app.logger.info('socket connection established for user: '+ userid + ' | sid: '+request.sid)
     else:
+        disconnect()
         raise ConnectionRefusedError('unauthorized!')
+
 
   
 @socketio.on('disconnect')
-def disconnect(message):
-    userid = __getauthenticateduserid(message)
-    messageid = userid if userid is not None else request.sid
-    emit(request.sid, {"message": messageid+" successfully disconnected"})
+def disconnect():
+    current_app.logger.info('socket disconnected for sid: '+request.sid)
     
 
 def __getauthenticateduserid(message):
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     else:
         socketio.init_app(APP, async_mode='eventlet', 
                       path='/api/v1/socket.io')
-    socketio.run(APP, port=port,host='0.0.0.0', debug=True, log_output=True, use_reloader=False)  
+    socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
     
 
 
