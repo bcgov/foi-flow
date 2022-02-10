@@ -7,6 +7,7 @@ from request_api.services.events.assignment import assignmentevent
 from request_api.services.events.cfrdate import cfrdateevent
 from request_api.services.events.comment import commentevent
 from request_api.services.events.legislativedate import legislativedateevent
+from request_api.services.events.extension import extensionevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 import json
@@ -20,9 +21,17 @@ class eventservice:
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
-            assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser)
+            assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser)           
             if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message))
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+
+    async def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
+        try:
+            extensioneventresponse = extensionevent().createextensionevent(ministryrequestid, extensionid, userid, username, event)
+            if extensioneventresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
             
@@ -36,7 +45,7 @@ class eventservice:
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
-    
+       
     async def postcommentevent(self, commentid, requesttype, userid):
         try:
             commentresponse = commentevent().createcommentevent(commentid, requesttype, userid) 

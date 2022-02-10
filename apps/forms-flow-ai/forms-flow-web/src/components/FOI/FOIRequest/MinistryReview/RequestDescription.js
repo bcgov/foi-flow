@@ -41,39 +41,67 @@ const RequestDescription = React.memo((requestDetails) => {
         setOpenModal(false);
     }
     return (
-
-        <Card className="foi-details-card">
-            <RequestDescriptionHistory requestDescriptionHistoryList={sortedList} openModal={openModal} handleModalClose={handleModalClose} />
-            <div className="row foi-details-row">
-                <div className="col-lg-8 foi-details-col">
-                    <label className="foi-details-label">REQUEST DESCRIPTION</label>
-                </div>
-                <div className="col-lg-4 foi-details-col">
-                    <div className="foi-request-description-history">
-                        <button type="button" className={`btn btn-link btn-description-history ${!(sortedList.length > 1) ? classes.btndisabled : ""}`} disabled={!(sortedList.length > 1)} onClick={handleDescriptionHistoryClick}>
-                            Description History
-                        </button>
-                    </div>
-                </div>
+      <Card className="foi-details-card">
+        <RequestDescriptionHistory
+          requestDescriptionHistoryList={sortedList}
+          openModal={openModal}
+          handleModalClose={handleModalClose}
+        />
+        <div className="row foi-details-row">
+          <div className="col-lg-8 foi-details-col">
+            <label className="foi-details-label">REQUEST DESCRIPTION</label>
+          </div>
+          <div className="col-lg-4 foi-details-col">
+            <div className="foi-request-description-history">
+              <button
+                type="button"
+                className={`btn btn-link btn-description-history ${
+                  !(sortedList.length > 1) ? classes.btndisabled : ""
+                }`}
+                disabled={!(sortedList.length > 1)}
+                onClick={handleDescriptionHistoryClick}
+              >
+                Description History
+              </button>
             </div>
-            <CardContent>
-                <div className="row foi-details-row">
-                    <div className="col-lg-12 foi-details-col">
-                        <div className="ministry-request-description-row">
-                            <Typography className="ministry-heading"><b>Date Range for Record Search</b></Typography>
-                            <div className="ministry-request-dates">
-                                <Typography className="ministry-start-date ministry-heading"><b>Start Date: </b>{_requestDetails.fromDate ? formatDate(_requestDetails.fromDate, 'yyyy MMM dd') : ""}</Typography>
-                                <Typography><b>End Date: </b>{_requestDetails.toDate ? formatDate(_requestDetails.toDate, 'yyyy MMM dd') : ""}</Typography>
-                            </div>
-                        </div>
-                        <Typography className="ministry-bottom-request-description-header ministry-heading"><b>Request Description</b></Typography>
-                        <Typography>
-                            {_requestDetails.description}
-                        </Typography>
-                    </div>
+          </div>
+        </div>
+        <CardContent>
+          <div className="row foi-details-row">
+            <div className="col-lg-12 foi-details-col">
+              <div className="ministry-request-description-row">
+                <Typography className="ministry-heading">
+                  <b>Date Range for Record Search</b>
+                </Typography>
+                <div className="ministry-request-dates">
+                  <Typography className="ministry-start-date ministry-heading">
+                    <b>Start Date: </b>
+                    {_requestDetails.fromDate
+                      ? formatDate(
+                          _requestDetails.fromDate,
+                          "MMM dd yyyy"
+                        ).toUpperCase()
+                      : ""}
+                  </Typography>
+                  <Typography>
+                    <b>End Date: </b>
+                    {_requestDetails.toDate
+                      ? formatDate(
+                          _requestDetails.toDate,
+                          "MMM dd yyyy"
+                        ).toUpperCase()
+                      : ""}
+                  </Typography>
                 </div>
-            </CardContent>
-        </Card>
+              </div>
+              <Typography className="ministry-bottom-request-description-header ministry-heading">
+                <b>Request Description</b>
+              </Typography>
+              <Typography>{_requestDetails.description}</Typography>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
 
 

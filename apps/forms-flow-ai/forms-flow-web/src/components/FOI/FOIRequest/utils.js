@@ -1,11 +1,19 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { formatDate } from "../../../helper/FOI/helper";
+import { extensionStatusId } from '../../../constants/FOI/enum';
 
-export const getTabBottomText = ({ _daysRemaining, _cfrDaysRemaining, _status }) => {
+export const getTabBottomText = ({
+  _daysRemaining,
+  _cfrDaysRemaining,
+  _status,
+  requestExtensions,
+}) => {
   const _daysRemainingText = getDaysRemainingText(_daysRemaining);
   const _cfrDaysRemainingText = getcfrDaysRemainingText(_cfrDaysRemaining);
+  const _extensionsCountText = getExtensionsCountText(requestExtensions);
 
+  let bottomTextArray = []
   const generalStates = [
     StateEnum.open.name,
     StateEnum.review.name,
@@ -13,25 +21,36 @@ export const getTabBottomText = ({ _daysRemaining, _cfrDaysRemaining, _status })
     StateEnum.consult.name,
     StateEnum.signoff.name,
     StateEnum.response.name,
-    StateEnum.closed.name
   ];
 
-  if( generalStates.includes(_status) ) {
-    return _daysRemainingText;
+  if (generalStates.includes(_status)) {
+    bottomTextArray.push(_daysRemainingText);
   }
 
   const cfrStates = [
     StateEnum.callforrecords.name,
     StateEnum.feeassessed.name,
     StateEnum.deduplication.name,
-    StateEnum.harms.name
+    StateEnum.harms.name,
   ];
 
-  if ( cfrStates.includes(_status) ) {
-    return `${_cfrDaysRemainingText}|${_daysRemainingText}`;
+  if (cfrStates.includes(_status)) {
+    bottomTextArray.push(_cfrDaysRemainingText);
   }
 
-  return _status;
+  const statusesToNotAppearIn = [
+    StateEnum.unopened.name,
+    StateEnum.onhold.name,
+    StateEnum.closed.name,
+    StateEnum.intakeinprogress.name,
+    StateEnum.redirect.name,
+  ];
+
+  if (!statusesToNotAppearIn.includes(_status)) {
+    bottomTextArray.push(_extensionsCountText);
+  }
+
+  return bottomTextArray.join('|');
 };
 
 const getDaysRemainingText = (_daysRemaining) => {
@@ -41,6 +60,22 @@ const getDaysRemainingText = (_daysRemaining) => {
 const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
   return _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
 };
+
+const getExtensionsCountText = (extensions) => {
+  if(!extensions || extensions.length < 1) {
+    return `Extensions 0`
+  }
+
+  const approved = extensions.filter(
+    (extension) => extension.extensionstatusid === extensionStatusId.approved
+  ).length
+
+  const pending = extensions.filter(
+    (extension) => extension.extensionstatusid === extensionStatusId.pending
+  ).length
+
+  return [`Extensions ${approved || 0}`, pending ? ` (${pending})` : null].join("");
+}
 
 export const confirmChangesLost = (positiveCallback, negativeCallback) => {
   if (
@@ -248,5 +283,18 @@ export const findRequestState= (requestStatusId) =>{
   if(requestStatusId != undefined){
     var stateArray = Object.entries(StateEnum).find(value => value[1].id === requestStatusId);
     return stateArray[1].name;
+  }
+}
+
+export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
+  if(!requestStatus) {
+    return false
+  }
+
+  if (
+    requestStatus !== StateEnum.unopened.name &&
+    requestStatus !== StateEnum.intakeinprogress.name
+  ) {
+    return true;
   }
 }

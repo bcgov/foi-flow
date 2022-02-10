@@ -36,10 +36,10 @@ class KeycloakAdminService:
         for group in globalgroups:
             if allowedgroups is not None:
                 for allowedgroup in allowedgroups:
-                    if self.formatgroupname(group["name"]) == self.formatgroupname(allowedgroup):   
-                        groups.append({'id': group['id'],'name':group['name']})
+                    if self.formatgroupname(group["name"]) == self.formatgroupname(allowedgroup["name"]):   
+                        groups.append({'id': group['id'],'name':group['name'], 'type': allowedgroup["type"] })
             else:
-                groups.append({'id': group['id'],'name':group['name']})
+                groups.append({'id': group['id'],'name':group['name'], 'type':None})
         return groups  
     
     

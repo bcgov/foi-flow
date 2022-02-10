@@ -31,9 +31,19 @@ const extensionStatusLabel = Object.freeze({
   3: "Denied",
 });
 
+const KCProcessingTeams = [
+  "Scanning Team", 
+  "Business Team", 
+  "Central Team", 
+  "Justice Health Team", 
+  "MCFD Personals Team", 
+  "Resource Team", 
+  "Social Tech Team"]
+
 export {
   MimeTypeList,
   MaxFileSizeInMB,
   extensionStatusId,
   extensionStatusLabel,
+  KCProcessingTeams,
 };

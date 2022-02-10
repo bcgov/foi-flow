@@ -102,6 +102,14 @@ export const setFOIAssignedToList = (data) => dispatch =>{
         payload:data
     })
 }
+
+export const setFOIProcessingTeamList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PROCESSING_TEAM_LIST,
+        payload:data
+    })
+}
+
 export const setFOIFullAssignedToList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_FULL_ASSIGNED_TOLIST,

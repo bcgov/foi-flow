@@ -29,10 +29,14 @@ from flask_cors import cross_origin
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
 
+"""Custom exception messages
+"""
+EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+EXCEPTION_MESSAGE_NOT_FOUND='Not Found'
+
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiassignees', defaults={'requestype':None, 'status': None})
-@API.route('/foiassignees/<requestype>', defaults={'status': None})
+@API.route('/foiassignees')
 @API.route('/foiassignees/<requestype>/<status>')
 @API.route('/foiassignees/<requestype>/<status>/<bcgovcode>')
 class FOIAssigneesByTypeAndStatus(Resource):
@@ -44,13 +48,13 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @auth.require
     def get(requestype=None, status=None, bcgovcode=None):
         if requestype is not None and (requestype != "personal" and requestype != "general"):
-            return {'status': False, 'message':'Bad Request'}, 400   
+            return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
         try:
             result = assigneeservice().getgroupsandmembersbytypeandstatus(requestype, status, bcgovcode)
             if result is not None:
                 return json.dumps(result), 200
             else:
-                return {'status': False, 'message':'Not Found'}, 404   
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404   
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
         
@@ -71,6 +75,33 @@ class FOIAssigneesByTypeAndStatus(Resource):
             if result is not None:
                 return json.dumps(result), 200
             else:
-                return {'status': False, 'message':'Not Found'}, 404 
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404 
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
+        
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiassignees/processingteams/<requestype>')
+class FOIAssigneesTeams(Resource):
+    """Resource for retriving FOI assignees based on group.
+        Response is sent with value defaulting to Fee Estimate state"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(requestype):
+        """ POST Method for capturing FOI requests before processing"""
+        try:
+            if requestype is None:
+                return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
+            if requestype is not None and (requestype != "personal" and requestype != "general"):
+                return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
+            result = assigneeservice().getprocessingteamsbyrequesttype(requestype)
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404 
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500    
+        

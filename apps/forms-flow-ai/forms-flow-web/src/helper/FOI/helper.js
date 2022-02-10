@@ -159,8 +159,9 @@ const isMinistryLogin = (userGroups) => {
 }
 
 const getMinistryByValue = (userGroups) => {
-	const ministryGroup = Object.values(MINISTRYGROUPS).filter(element => userGroups.includes(element));
-	console.log("!!!",MINISTRYGROUPS);
+	const ministryGroup = Object.values(MINISTRYGROUPS).filter((element) =>
+    userGroups.includes(element)
+  );
 	return Object.keys(MINISTRYGROUPS).find(key => MINISTRYGROUPS[key] === ministryGroup);
 }
 
