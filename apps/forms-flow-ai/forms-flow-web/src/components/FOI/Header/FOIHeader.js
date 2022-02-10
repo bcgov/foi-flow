@@ -16,7 +16,7 @@ import io from "socket.io-client";
 import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX} from "../../../constants/constants";
 
 
-const FOIHeader = React.memo(() => { 
+const FOIHeader = React.memo(({unauthorized=false}) => { 
 
 const dispatch = useDispatch(); 
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
@@ -34,7 +34,7 @@ let foiNotifications = useSelector(state=> state.notifications.foiNotifications)
 const [socket, setSocket] = useState(null);
 
 useEffect(() => {     
-  if(isAuthenticated){
+  if(!unauthorized && isAuthenticated){
     dispatch(fetchFOINotifications());  
     const options = {
       reconnectionDelay:SOCKETIO_RECONNECTION_DELAY,
@@ -46,7 +46,7 @@ useEffect(() => {
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
   }
   setInterval(() => {
-    if(isAuthenticated)
+    if(!unauthorized && isAuthenticated)
       dispatch(fetchFOINotifications());
   }, 900000);
 },[]);
