@@ -18,6 +18,7 @@ const initialState = {
   foiReceivedModeList: [],
   foiDeliveryModeList: [],
   foiAssignedToList: [],
+  foiProcessingTeamList: [],
   foiFullAssignedToList: [],
   foiMinistryAssignedToList: [],
   foiProgramAreaList: [],
@@ -60,6 +61,8 @@ const foiRequests = (state = initialState, action)=> {
       return { ...state, foiDeliveryModeList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ASSIGNED_TOLIST:
       return { ...state, foiAssignedToList: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PROCESSING_TEAM_LIST:
+      return { ...state, foiProcessingTeamList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_FULL_ASSIGNED_TOLIST:
       return { ...state, foiFullAssignedToList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_ASSIGNED_TOLIST:

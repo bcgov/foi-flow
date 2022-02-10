@@ -28,12 +28,13 @@ export const getMenuItems = ({
       {"Unassigned"}
     </MenuItem>
   );
-
   if (assignedToList && assignedToList.length < 1) {
     return menuItems;
   }
-
-  assignedToList.forEach((group) => {
+  else {
+    assignedToList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
+  }  
+  assignedToList?.forEach((group) => {
     const groupItem = (
       <MenuItem
         className={classes.group}
@@ -45,7 +46,7 @@ export const getMenuItems = ({
     );
     menuItems.push(groupItem);
 
-    const assigneeItems = group.members.map((assignee) => (
+    const assigneeItems = group?.members.map((assignee) => (
       <MenuItem
         key={`${assignee.id}`}
         className={classes.item}
