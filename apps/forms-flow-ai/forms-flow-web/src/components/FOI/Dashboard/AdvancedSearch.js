@@ -27,6 +27,8 @@ import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select from '@mui/material/Select';
 import { publicBodies } from "./constants"
+import { SearchFilter } from "./enum";
+import { ConditionalComponent } from "../../../helper/FOI/helper";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -58,7 +60,26 @@ const AdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
 
   const [searchText, setSearchText] = useState("");
-  const [keywords, setKeywords] = useState(["keyword1", "keyword2"]);
+  const [keywords, setKeywords] = useState([]);
+  const [searchFilterSelected, setSearchFilterSelected] = useState(
+    SearchFilter.REQUEST_DESCRIPTION
+  );
+  const keywordsMode =
+    searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
+
+  const intitialRequestStateCriteria = {
+    unopenedRequests: false,
+    openRequests: false,
+    deduplicationRequests: false,
+    cfrRequests: false,
+    recordsReviewRequests: false,
+    signoffRequests: false,
+    closedRequests: false,
+    overdueRequests: false,
+  };
+  const [requestStateCriteria, setRequestStateCriteria] = useState(
+    intitialRequestStateCriteria
+  );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl) && Boolean(searchText);
@@ -76,14 +97,20 @@ const AdvancedSearch = ({ userDetail }) => {
     setSearchText(e.target.value);
   };
 
-  if (false) {
-    return (
-      <Grid item xs={12} container alignItems="center">
-        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
-      </Grid>
-    );
-  }
-  const ClickableChip = ({ clicked = false, ...rest }) => {
+  const clickSearchFilter = (SearchFilterType) => {
+    if (searchFilterSelected !== SearchFilterType) {
+      setSearchFilterSelected(SearchFilterType);
+    }
+  };
+
+  const handleRequestStateCriteriaChange = (event) => {
+    setRequestStateCriteria({
+      ...requestStateCriteria,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  const ClickableChip = ({ clicked, ...rest }) => {
     if (!clicked) {
       return (
         <Chip
@@ -92,8 +119,8 @@ const AdvancedSearch = ({ userDetail }) => {
             border: "1px solid #38598A",
             width: "100%",
           }}
-          {...rest}
           variant="outlined"
+          {...rest}
         />
       );
     }
@@ -109,6 +136,13 @@ const AdvancedSearch = ({ userDetail }) => {
     );
   };
 
+  if (false) {
+    return (
+      <Grid item xs={12} container alignItems="center">
+        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
+      </Grid>
+    );
+  }
   return (
     <>
       <Grid item container xs={12}>
@@ -139,40 +173,47 @@ const AdvancedSearch = ({ userDetail }) => {
                 placeholder="Search"
                 onChange={handleSearchChange}
                 value={searchText}
+                onKeyPress={(e) => {
+                  if (keywordsMode && e.key === "Enter") {
+                    handleKeywordAdd();
+                  }
+                }}
               />
-              {keywords.map((keyword, index) => (
-                <Grid item key={`grid-keyword-${index}`}>
-                  <Chip
-                    key={`keyword-${index}`}
-                    label={keyword}
-                    onDelete={() => {
-                      setKeywords(
-                        keywords.filter((kw, i) => index !== i)
-                      )
-                    }}
-                    color="primary"
-                    sx={{
-                      backgroundColor: "#38598A",
-                      marginRight: "1em",
-                    }}
-                  />
-                </Grid>
-              ))}
+              <ConditionalComponent condition={keywordsMode}>
+                {keywords.map((keyword, index) => (
+                  <Grid item key={`grid-keyword-${index}`}>
+                    <Chip
+                      key={`keyword-${index}`}
+                      label={keyword}
+                      onDelete={() => {
+                        setKeywords(keywords.filter((kw, i) => index !== i));
+                      }}
+                      color="primary"
+                      sx={{
+                        backgroundColor: "#38598A",
+                        marginRight: "1em",
+                      }}
+                    />
+                  </Grid>
+                ))}
+              </ConditionalComponent>
             </Grid>
-            <Grid>
-              <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleKeywordAdd}
-                disableAutoFocus={true}
-                autoFocus={false}
-              >
-                <MenuItem
-                  onClick={handleKeywordAdd}
-                >{`Add ${searchText}`}</MenuItem>
-              </Menu>
-            </Grid>
+            <ConditionalComponent condition={keywordsMode}>
+              <Grid>
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleKeywordAdd}
+                  disableAutoFocus={true}
+                  autoFocus={false}
+                >
+                  <MenuItem
+                    onClick={handleKeywordAdd}
+                  >{`Add "${searchText}"`}</MenuItem>
+                </Menu>
+              </Grid>
+            </ConditionalComponent>
 
             <Grid
               item
@@ -199,7 +240,12 @@ const AdvancedSearch = ({ userDetail }) => {
                   key={`filter-request-description`}
                   label={"REQUEST DESCRIPTION"}
                   color="primary"
-                  onClick={() => {}}
+                  onClick={() =>
+                    clickSearchFilter(SearchFilter.REQUEST_DESCRIPTION)
+                  }
+                  clicked={
+                    searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION
+                  }
                 />
               </Grid>
 
@@ -208,7 +254,12 @@ const AdvancedSearch = ({ userDetail }) => {
                   key={`filter-raw-request`}
                   label={"RAW REQUEST #"}
                   color="primary"
-                  onClick={() => {}}
+                  onClick={() =>
+                    clickSearchFilter(SearchFilter.RAW_REQUEST_NUM)
+                  }
+                  clicked={
+                    searchFilterSelected === SearchFilter.RAW_REQUEST_NUM
+                  }
                 />
               </Grid>
 
@@ -217,7 +268,12 @@ const AdvancedSearch = ({ userDetail }) => {
                   key={`filter-axis-request`}
                   label={"AXIS REQUEST #"}
                   color="primary"
-                  onClick={() => {}}
+                  onClick={() =>
+                    clickSearchFilter(SearchFilter.AXIS_REQUEST_NUM)
+                  }
+                  clicked={
+                    searchFilterSelected === SearchFilter.AXIS_REQUEST_NUM
+                  }
                 />
               </Grid>
 
@@ -226,7 +282,8 @@ const AdvancedSearch = ({ userDetail }) => {
                   key={`filter-applicant-name`}
                   label={"APPLICANT NAME"}
                   color="primary"
-                  onClick={() => {}}
+                  onClick={() => clickSearchFilter(SearchFilter.APPLICANT_NAME)}
+                  clicked={searchFilterSelected === SearchFilter.APPLICANT_NAME}
                 />
               </Grid>
 
@@ -235,7 +292,8 @@ const AdvancedSearch = ({ userDetail }) => {
                   key={`filter-assignee-name`}
                   label={"ASSIGNEE NAME"}
                   color="primary"
-                  onClick={() => {}}
+                  onClick={() => clickSearchFilter(SearchFilter.ASSIGNEE_NAME)}
+                  clicked={searchFilterSelected === SearchFilter.ASSIGNEE_NAME}
                 />
               </Grid>
 
@@ -244,7 +302,8 @@ const AdvancedSearch = ({ userDetail }) => {
                   key={`filter-search-filter`}
                   label={"SEARCH FILTER"}
                   color="primary"
-                  onClick={() => {}}
+                  onClick={() => clickSearchFilter(SearchFilter.SEARCH_FILTER)}
+                  clicked={searchFilterSelected === SearchFilter.SEARCH_FILTER}
                 />
               </Grid>
 
@@ -260,43 +319,97 @@ const AdvancedSearch = ({ userDetail }) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormGroup
-                  >
+                  <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="unopenedRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.unopenedRequests}
+                        />
+                      }
                       label="Unopened Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="openRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.openRequests}
+                        />
+                      }
                       label="Open Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="deduplicationRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.deduplicationRequests}
+                        />
+                      }
                       label="Deduplication Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="cfrRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.cfrRequests}
+                        />
+                      }
                       label="Call for Records Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="recordsReviewRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.recordsReviewRequests}
+                        />
+                      }
                       label="Records Review Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="signoffRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.signoffRequests}
+                        />
+                      }
                       label="Sign Off Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="closedRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.closedRequests}
+                        />
+                      }
                       label="Closed Requests"
                     />
                     <FormControlLabel
-                      control={<Checkbox size="small" />}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="overdueRequests"
+                          onChange={handleRequestStateCriteriaChange}
+                          checked={requestStateCriteria.overdueRequests}
+                        />
+                      }
                       label="Overdue Requests"
                     />
                   </FormGroup>
                 </Grid>
-
               </Grid>
 
               <Grid item xs={3} container direction="row" spacing={2}>
@@ -377,7 +490,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       variant="outlined"
                       fullWidth
                     />
-                  </Grid>                   
+                  </Grid>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -391,29 +504,30 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
 
                 <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
-                  <Select
-                    labelId="demo-multiple-checkbox-label"
-                    id="demo-multiple-checkbox"
-                    multiple
-                    value={[]}
-                    // onChange={handleChange}
-                    input={<OutlinedInput label="Tag" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                  >
-                    {publicBodies.map((publicBody) => (
-                      <MenuItem key={publicBody} value={publicBody}>
-                        {/* checked={personName.indexOf(publicBody) > -1} */}
-                        <Checkbox  />
-                        <ListItemText primary={publicBody} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-multiple-checkbox-label">
+                      Tag
+                    </InputLabel>
+                    <Select
+                      labelId="demo-multiple-checkbox-label"
+                      id="demo-multiple-checkbox"
+                      multiple
+                      value={[]}
+                      // onChange={handleChange}
+                      input={<OutlinedInput label="Tag" />}
+                      renderValue={(selected) => selected.join(", ")}
+                      MenuProps={MenuProps}
+                    >
+                      {publicBodies.map((publicBody) => (
+                        <MenuItem key={publicBody} value={publicBody}>
+                          {/* checked={personName.indexOf(publicBody) > -1} */}
+                          <Checkbox />
+                          <ListItemText primary={publicBody} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
-
               </Grid>
             </Grid>
           </Paper>
