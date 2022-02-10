@@ -25,7 +25,7 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
   }
 
   const assigmentNotifications = notifications?.map((notification,index) =>
-    {return notification.notificationusertype === 'Assignee' &&
+    {return (notification.notificationusertype === 'Assignee' || notification.notificationusertype === "Comment User") &&
       <NotificationList key= {index} notification={notification} isMinistry ={isMinistry}
       ministryCode ={ministryCode}></NotificationList>
     }
@@ -40,7 +40,7 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const checkIfNotificationExists = (type) => {
     if(type ==='assignee' && notifications.find(notification => 
-      notification.notificationusertype === 'Assignee')){
+      (notification.notificationusertype === 'Assignee'|| notification.notificationusertype === "Comment User"))){
         return true;
       }
     if(type ==='watcher' && notifications.find(notification => 
