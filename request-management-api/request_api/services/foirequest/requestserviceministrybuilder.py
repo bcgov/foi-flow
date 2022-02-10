@@ -50,14 +50,14 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.assignedministrygroup = requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"]
         if 'assignedministryperson' in requestschema:
             foiministryrequest.assignedministryperson = requestschema['assignedministryperson']
-            foiministryrequest.ministryassignee = self.createfoiassigneefromobject(requestschema['assignedministryperson'], requestschema['assignedministrypersonFirstName'], requestschema['assignedministrypersonMiddleName'], requestschema['assignedministrypersonLastName'])
+            self.createfoiassigneefromobject(requestschema['assignedministryperson'], requestschema['assignedministrypersonFirstName'], requestschema['assignedministrypersonMiddleName'], requestschema['assignedministrypersonLastName'])
         else:
             foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
 
         foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"]
         if 'assignedto' in requestschema:
             foiministryrequest.assignedto = requestschema['assignedto']
-            foiministryrequest.assignee = self.createfoiassigneefromobject(requestschema['assignedto'], requestschema['assignedtoFirstName'], requestschema['assignedtoMiddleName'], requestschema['assignedtoLastName'])
+            self.createfoiassigneefromobject(requestschema['assignedto'], requestschema['assignedtoFirstName'], requestschema['assignedtoMiddleName'], requestschema['assignedtoLastName'])
         else:
             foiministryrequest.assignedto = ministryschema["assignedto"]
 
@@ -233,10 +233,4 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             return divisionarr
 
     def createfoiassigneefromobject(self, username, firstname, middlename, lastname):
-        assignee = FOIAssignee()
-        assignee.username = username
-        assignee.firstname = firstname
-        assignee.middlename = middlename
-        assignee.lastname = lastname
-
-        return assignee
+        return FOIAssignee.saveassignee(username, firstname, middlename, lastname)

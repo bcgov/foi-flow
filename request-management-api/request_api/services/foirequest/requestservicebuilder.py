@@ -47,12 +47,12 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.assignedgroup = requestschema.get("assignedGroup")
         if self.isNotBlankorNone(requestschema,"assignedTo","main") == True:
             foiministryrequest.assignedto = requestschema.get("assignedTo")
-            foiministryrequest.assignee = requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
         if self.isNotBlankorNone(requestschema,"assignedministrygroup","main") == True:
             foiministryrequest.assignedministrygroup = requestschema.get("assignedministrygroup")
         if self.isNotBlankorNone(requestschema,"assignedministryperson","main") == True:
             foiministryrequest.assignedministryperson = requestschema.get("assignedministryperson")
-            foiministryrequest.ministryassignee = requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedministryperson"), requestschema.get("assignedministrypersonFirstName"), requestschema.get("assignedministrypersonMiddleName"), requestschema.get("assignedministrypersonLastName"))
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedministryperson"), requestschema.get("assignedministrypersonFirstName"), requestschema.get("assignedministrypersonMiddleName"), requestschema.get("assignedministrypersonLastName"))
         if(ministryid is None and filenumber is None and status == "Open"):
             foiministryrequest.assignedto =''
             foiministryrequest.assignedgroup = self.__getgroupname(requestschema)

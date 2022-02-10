@@ -40,13 +40,13 @@ class FOIMinistryRequest(db.Model):
     duedate = db.Column(db.DateTime, nullable=False)
     cfrduedate = db.Column(db.DateTime, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
-    assignedto = db.Column(db.String(120), ForeignKey('FOIAssignee.username'), unique=False, nullable=True)
+    assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
                 
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    assignedministryperson = db.Column(db.String(120), ForeignKey('FOIAssignee.username'), unique=False, nullable=True)
+    assignedministryperson = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
     assignedministrygroup = db.Column(db.String(120), unique=False, nullable=True)
     closedate = db.Column(db.DateTime, nullable=True) 
     #ForeignKey References
@@ -71,8 +71,8 @@ class FOIMinistryRequest(db.Model):
                         "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
     extensions = relationship('FOIRequestExtension', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestExtension.foiministryrequest_id, "
                          "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
-    assignee = relationship('FOIAssignee', primaryjoin="FOIMinistryRequest.assignedto==FOIAssignee.username")
-    ministryassignee = relationship('FOIAssignee', primaryjoin="FOIMinistryRequest.assignedministryperson==FOIAssignee.username")
+    assignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedto]")
+    ministryassignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedministryperson]")
 
 
     @classmethod

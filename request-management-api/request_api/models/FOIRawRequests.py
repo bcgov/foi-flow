@@ -27,7 +27,7 @@ class FOIRawRequest(db.Model):
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
-    assignedto = db.Column(db.String(120), ForeignKey('FOIAssignee.username'), unique=False, nullable=True)    
+    assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
@@ -40,16 +40,17 @@ class FOIRawRequest(db.Model):
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
 
-    assignee = relationship('FOIAssignee', primaryjoin="FOIRawRequest.assignedto==FOIAssignee.username")
+    assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
     def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:
         createdat = datetime.now()        
         version = 1
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
+
         if assignee is not None:
-            _assignee = FOIAssignee(username=assignee, firstname=assigneefirstname, middlename=assigneemiddlename, lastname=assigneelastname)
-            # FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment, assignee=_assignee)
+            FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
+
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
