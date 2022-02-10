@@ -16,6 +16,7 @@ const StateDropDown = ({
   isMinistryCoordinator,
   isValidationError,
   stateTransition,
+  updateStateDropDown
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -25,7 +26,7 @@ const StateDropDown = ({
     if (requestState && requestState !== status) {
       setStatus(requestState);
     }
-  }, [requestState]);
+  }, [requestState, updateStateDropDown]);
 
   const handleChange = (event) => {
     setStatus(event.target.value);
