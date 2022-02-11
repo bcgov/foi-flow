@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import "./dashboard.scss";
+import "../dashboard.scss";
 import { useDispatch, useSelector } from "react-redux";
 
-import Loading from "../../../containers/Loading";
+import Loading from "../../../../containers/Loading";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
@@ -29,8 +29,10 @@ import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
 import { publicBodiesNames } from "./constants";
 import { SearchFilter } from "./enum";
-import { ConditionalComponent } from "../../../helper/FOI/helper";
-import { formatDate } from "../../../helper/FOI/helper";
+import {
+  ConditionalComponent,
+  formatDate,
+} from "../../../../helper/FOI/helper";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -54,6 +56,11 @@ const useStyles = makeStyles((theme) => ({
   label: {
     marginBottom: "1em",
   },
+  chip: {
+    color: "#38598A",
+    border: "1px solid #38598A",
+    width: "100%",
+  },
 }));
 
 const AdvancedSearch = ({ userDetail }) => {
@@ -62,7 +69,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
 
   const [searchText, setSearchText] = useState("");
-  const [keywords, setKeywords] = useState([""]);
+  const [keywords, setKeywords] = useState([]);
   const [searchFilterSelected, setSearchFilterSelected] = useState(
     SearchFilter.REQUEST_DESCRIPTION
   );
@@ -602,6 +609,35 @@ const AdvancedSearch = ({ userDetail }) => {
                     </Select>
                   </FormControl>
                 </Grid>
+              </Grid>
+
+              <Grid item xs={3}>
+                <Button
+                  color="primary"
+                  sx={{
+                    backgroundColor: "#38598A",
+                    width: "100%",
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                  fullWidth
+                >
+                  Apply Search
+                </Button>
+              </Grid>
+              <Grid item xs={3}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#38598A",
+                    border: "1px solid #38598A",
+                    width: "100%",
+                    fontWeight: "bold",
+                  }}
+                  fullWidth
+                >
+                  Outlined
+                </Button>
               </Grid>
             </Grid>
           </Paper>

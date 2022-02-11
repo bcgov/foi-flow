@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import "./dashboard.scss";
-import useStyles from "./CustomStyle";
+import "../dashboard.scss";
+import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIRequestListByPage } from "../../../apiManager/services/FOI/foiRequestServices";
-import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
+import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   formatDate,
   addBusinessDays,
   businessDay,
-} from "../../../helper/FOI/helper";
-import Loading from "../../../containers/Loading";
-import { debounce } from "./utils";
+} from "../../../../helper/FOI/helper";
+import Loading from "../../../../containers/Loading";
+import { debounce } from "../utils";
 import Grid from "@material-ui/core/Grid";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";

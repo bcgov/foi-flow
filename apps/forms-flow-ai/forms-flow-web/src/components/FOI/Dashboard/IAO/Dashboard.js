@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Grid from "@material-ui/core/Grid";
 import Queue from "./Queue";
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
+import Divider from "@mui/material/Divider";
 
 const useStyles = makeStyles((theme) => ({
   displayed: {
@@ -42,8 +43,21 @@ const Dashboard = ({ userDetail }) => {
           xs={12}
           className="foi-dashboard-row2"
         >
-          <Grid item lg={6} xs={12}>
+          <Grid
+            item
+            lg={6}
+            xs={12}
+            container
+            direction="row"
+            justifyContent="flex-start"
+            alignItems="flex-start"
+          >
             <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
+            <Divider
+              sx={{ m: 0.5, borderRightWidth: 3 }}
+              flexItem
+              orientation="vertical"
+            />
           </Grid>
           <Grid item container lg={6} xs={12} justifyContent="flex-end">
             <button
