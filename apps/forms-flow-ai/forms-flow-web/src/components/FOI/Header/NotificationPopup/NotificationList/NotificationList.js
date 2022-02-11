@@ -54,7 +54,6 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
     let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
     if(checkCommentType(notificationVal.notificationtype)){
       setCommentUrl();
-      console.log("Inside comment");
     }
     else if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
      notification.notification.toLowerCase() === "moved to open state"){
