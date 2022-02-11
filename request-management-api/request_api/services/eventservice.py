@@ -5,6 +5,7 @@ from request_api.services.events.state import stateevent
 from request_api.services.events.division import divisionevent
 from request_api.services.events.assignment import assignmentevent
 from request_api.services.events.cfrdate import cfrdateevent
+from request_api.services.events.comment import commentevent
 from request_api.services.events.legislativedate import legislativedateevent
 from request_api.services.events.extension import extensionevent
 from request_api.models.default_method_result import DefaultMethodResult
@@ -24,7 +25,7 @@ class eventservice:
             if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message))
         except BusinessException as exception:            
-            current_app.logger.error(self.__formexcpetionmessage(exception.message))
+            self.__logbusinessexception(exception)
 
     async def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
         try:
@@ -32,7 +33,7 @@ class eventservice:
             if extensioneventresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
         except BusinessException as exception:            
-            current_app.logger.error(self.__formexcpetionmessage(exception.message))
+            self.__logbusinessexception(exception)
             
     def postreminderevent(self):
         try:
@@ -43,8 +44,17 @@ class eventservice:
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
-            current_app.logger.error(self.__formexcpetionmessage(exception.message))
-    
-    def __formexcpetionmessage(self, message):
-        return ("%s,%s" % ('FOI Notification Error', message))
-    
+            self.__logbusinessexception(exception)
+       
+    async def postcommentevent(self, commentid, requesttype, userid):
+        try:
+            commentresponse = commentevent().createcommentevent(commentid, requesttype, userid) 
+            if commentresponse.success == False :
+                current_app.logger.error("FOI Notification failed for comment event=%s" % (commentresponse.message))     
+                return DefaultMethodResult(False,'Comment notifications failed',commentresponse.identifier)
+            return DefaultMethodResult(True,'Comment notifications created',commentresponse.identifier)
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+        
+    def __logbusinessexception(self, exception):
+        current_app.logger.error("%s,%s" % ('FOI Comment Notification Error', exception.message))
