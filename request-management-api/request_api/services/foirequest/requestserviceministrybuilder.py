@@ -50,14 +50,20 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.assignedministrygroup = requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"]
         if 'assignedministryperson' in requestschema:
             foiministryrequest.assignedministryperson = requestschema['assignedministryperson']
-            self.createfoiassigneefromobject(requestschema['assignedministryperson'], requestschema['assignedministrypersonFirstName'], requestschema['assignedministrypersonMiddleName'], requestschema['assignedministrypersonLastName'])
+            firstname = requestschema['assignedministrypersonFirstName'] if requestschema['assignedministryperson'] != None else None
+            middlename = None
+            lastname = requestschema['assignedministrypersonLastName'] if requestschema['assignedministryperson'] != None else None
+            self.createfoiassigneefromobject(requestschema['assignedministryperson'], firstname, middlename, lastname)
         else:
             foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
 
         foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"]
         if 'assignedto' in requestschema:
             foiministryrequest.assignedto = requestschema['assignedto']
-            self.createfoiassigneefromobject(requestschema['assignedto'], requestschema['assignedtoFirstName'], requestschema['assignedtoMiddleName'], requestschema['assignedtoLastName'])
+            fn = requestschema['assignedtoFirstName'] if requestschema['assignedto'] != None else None
+            mn = None
+            ln = requestschema['assignedtoLastName'] if requestschema['assignedto'] != None else None
+            self.createfoiassigneefromobject(requestschema['assignedto'], fn, mn, ln)
         else:
             foiministryrequest.assignedto = ministryschema["assignedto"]
 
