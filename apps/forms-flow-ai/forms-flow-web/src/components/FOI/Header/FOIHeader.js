@@ -14,7 +14,7 @@ import {
 } from "../../../apiManager/services/FOI/foiNotificationServices";
 import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
 import io from "socket.io-client";
-import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX, SOCKETIO_PATH} from "../../../constants/constants";
+import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX} from "../../../constants/constants";
 
 
 const FOIHeader = React.memo(({unauthorized=false}) => { 
@@ -46,7 +46,7 @@ useEffect(() => {
     const options = {
       reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
       reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
-      path: SOCKETIO_PATH,
+      path:'/api/v1/socket.io',
       transports: ['websocket'],
       auth: { "x-jwt-token": UserService.getToken() }
     };
