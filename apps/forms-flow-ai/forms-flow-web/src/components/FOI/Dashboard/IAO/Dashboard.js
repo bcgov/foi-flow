@@ -8,6 +8,8 @@ import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
+import { Typography } from "@mui/material";
+import { ButtonBase } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   displayed: {
@@ -17,11 +19,16 @@ const useStyles = makeStyles((theme) => ({
   hidden: {
     display: "none",
   },
+  disabledTitle: {
+    opacity: "0.3",
+  },
 }));
 
 const Dashboard = ({ userDetail }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+
+  const [advnacedSearchEnabled, setAdvancedSearchEnabled] = useState(false);
 
   const addRequest = (e) => {
     dispatch(push(`/foi/addrequest`));
@@ -50,14 +57,31 @@ const Dashboard = ({ userDetail }) => {
             container
             direction="row"
             justifyContent="flex-start"
-            alignItems="flex-start"
+            alignItems="center"
           >
-            <h3 className="foi-request-queue-text">Your FOI Request Queue</h3>
+            <ButtonBase onClick={() => setAdvancedSearchEnabled(false)}>
+              <h3
+                className={clsx("foi-request-queue-text", {
+                  [classes.disabledTitle]: advnacedSearchEnabled,
+                })}
+              >
+                Your FOI Request Queue
+              </h3>
+            </ButtonBase>
             <Divider
-              sx={{ m: 0.5, borderRightWidth: 3 }}
+              sx={{ m: 1, borderRightWidth: 3 }}
               flexItem
               orientation="vertical"
             />
+            <ButtonBase onClick={() => setAdvancedSearchEnabled(true)}>
+              <h3
+                className={clsx("foi-request-queue-text", {
+                  [classes.disabledTitle]: !advnacedSearchEnabled,
+                })}
+              >
+                Advanced Search
+              </h3>
+            </ButtonBase>
           </Grid>
           <Grid item container lg={6} xs={12} justifyContent="flex-end">
             <button
@@ -74,8 +98,8 @@ const Dashboard = ({ userDetail }) => {
           direction="row"
           spacing={1}
           className={clsx({
-            [classes.hidden]: !false,
-            [classes.displayed]: !true,
+            [classes.hidden]: advnacedSearchEnabled,
+            [classes.displayed]: !advnacedSearchEnabled,
           })}
           sx={{
             marginTop: "2em",
@@ -89,8 +113,8 @@ const Dashboard = ({ userDetail }) => {
           direction="row"
           spacing={1}
           className={clsx({
-            [classes.hidden]: false,
-            [classes.displayed]: true,
+            [classes.hidden]: !advnacedSearchEnabled,
+            [classes.displayed]: advnacedSearchEnabled,
           })}
         >
           <AdvancedSearch userDetail={userDetail} />

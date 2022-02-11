@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import "../dashboard.scss";
+import "../../dashboard.scss";
 import { useDispatch, useSelector } from "react-redux";
 
-import Loading from "../../../../containers/Loading";
+import Loading from "../../../../../containers/Loading";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
@@ -32,7 +32,7 @@ import { SearchFilter } from "./enum";
 import {
   ConditionalComponent,
   formatDate,
-} from "../../../../helper/FOI/helper";
+} from "../../../../../helper/FOI/helper";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -621,6 +621,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     fontWeight: "bold",
                   }}
                   fullWidth
+                  variant="contained"
                 >
                   Apply Search
                 </Button>
@@ -636,7 +637,7 @@ const AdvancedSearch = ({ userDetail }) => {
                   }}
                   fullWidth
                 >
-                  Outlined
+                  Reset Filters
                 </Button>
               </Grid>
             </Grid>
@@ -648,33 +649,3 @@ const AdvancedSearch = ({ userDetail }) => {
 };
 
 export default AdvancedSearch;
-
-// const SearchBar = ({keywords}) => {
-//   return (
-//     <>
-//       <IconButton>
-//         <SearchIcon />
-//       </IconButton>
-//       <InputBase
-//         sx={{ ml: 1, flex: 1 }}
-//         placeholder="Search"
-//         onChange={handleSearchChange}
-//         value={searchText}
-//       />
-//       {keywords.map((keyword, index) => (
-//         <Grid item>
-//           <Chip
-//             key={`keyword-${index}`}
-//             label={keyword}
-//             onDelete={() => {}}
-//             color="primary"
-//             sx={{
-//               backgroundColor: "#38598A",
-//               marginRight: "1em",
-//             }}
-//           />
-//         </Grid>
-//       ))}
-//     </>
-//   );
-// };
