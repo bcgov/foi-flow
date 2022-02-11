@@ -1,11 +1,13 @@
 import React from "react";
 import { ActionProvider } from "./ActionContext";
 import SearchComponent from "./SearchComponent";
+import DataGridAdvancedSearch from "./DataGridAdvancedSearch";
 
-const AdvancedSearch = React.memo(() => {
+const AdvancedSearch = React.memo(({ userDetail }) => {
   return (
     <ActionProvider>
       <SearchComponent />
+      <DataGridAdvancedSearch userDetail={userDetail} />
     </ActionProvider>
   );
 });

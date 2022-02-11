@@ -1,0 +1,194 @@
+import React, { useEffect, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import "../../dashboard.scss";
+import useStyles from "../../CustomStyle";
+import { useDispatch, useSelector } from "react-redux";
+import { push } from "connected-react-router";
+import { fetchFOIRequestListByPage } from "../../../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIFullAssignedToList } from "../../../../../apiManager/services/FOI/foiMasterDataServices";
+import Loading from "../../../../../containers/Loading";
+import Grid from "@mui/material/Grid";
+import {
+  getAssigneeValue,
+  updateSortModel,
+  getFullName,
+  getLDD,
+} from "../../utils";
+
+const DataGridAdvancedSearch = ({ userDetail }) => {
+  const dispatch = useDispatch();
+
+  const assignedToList = useSelector(
+    (state) => state.foiRequests.foiFullAssignedToList
+  );
+  const isAssignedToListLoading = useSelector(
+    (state) => state.foiRequests.isAssignedToListLoading
+  );
+
+  const requestQueue = useSelector(
+    (state) => state.foiRequests.foiRequestsList
+  );
+  const isLoading = useSelector((state) => state.foiRequests.isLoading);
+
+  const classes = useStyles();
+  useEffect(() => {
+    dispatch(fetchFOIFullAssignedToList());
+    dispatch(fetchFOIRequestListByPage());
+  }, [dispatch]);
+
+  const defaultRowsState = { page: 0, pageSize: 10 };
+  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+
+  const defaultSortModel = [
+    { field: "currentState", sort: "desc" },
+    { field: "receivedDateUF", sort: "desc" },
+  ];
+  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  let serverSortModel;
+  const [filterModel, setFilterModel] = React.useState({
+    fields: [
+      "firstName",
+      "lastName",
+      "requestType",
+      "idNumber",
+      "currentState",
+      "assignedTo",
+    ],
+    keyword: null,
+  });
+  const [requestFilter, setRequestFilter] = useState("All");
+
+  useEffect(() => {
+    serverSortModel = updateSortModel(sortModel);
+    // page+1 here, because initial page value is 0 for mui-data-grid
+    dispatch(
+      fetchFOIRequestListByPage(
+        rowsState.page + 1,
+        rowsState.pageSize,
+        serverSortModel,
+        filterModel.fields,
+        filterModel.keyword,
+        requestFilter,
+        userDetail.preferred_username
+      )
+    );
+  }, [rowsState, sortModel, filterModel, requestFilter]);
+
+  const columns = React.useRef([
+    {
+      field: "applicantName",
+      headerName: "APPLICANT NAME",
+      width: 170,
+      headerAlign: "left",
+      valueGetter: getFullName,
+    },
+    {
+      field: "requestType",
+      headerName: "REQUEST TYPE",
+      width: 150,
+      headerAlign: "left",
+    },
+    {
+      field: "idNumber",
+      headerName: "ID NUMBER",
+      width: 150,
+      headerAlign: "left",
+    },
+    {
+      field: "currentState",
+      headerName: "CURRENT STATE",
+      headerAlign: "left",
+      width: 180,
+    },
+    {
+      field: "assignedToName",
+      headerName: "ASSIGNED TO",
+      width: 180,
+      headerAlign: "left",
+    },
+    {
+      field: "DueDateValue",
+      headerName: "LDD",
+      width: 150,
+      headerAlign: "left",
+      valueGetter: getLDD,
+    },
+    { field: "xgov", headerName: "XGOV", width: 100, headerAlign: "left" },
+  ]);
+
+  const updateAssigneeName = (data) => {
+    return data.map((row) => ({
+      ...row,
+      assignedToName: getAssigneeValue(row, assignedToList),
+    }));
+  };
+
+  const renderReviewRequest = (e) => {
+    if (e.row.ministryrequestid) {
+      dispatch(
+        push(
+          `/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
+        )
+      );
+    } else {
+      dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+    }
+  };
+
+  if (isLoading || isAssignedToListLoading) {
+    return (
+      <Grid item xs={12} container alignItems="center">
+        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
+      </Grid>
+    );
+  }
+
+  return (
+    <Grid
+      item
+      xs={12}
+      className={classes.root}
+      container
+      direction="row"
+      spacing={1}
+    >
+      <Grid item xs={12}>
+        <h4 className="foi-request-queue-text">Search Results</h4>
+      </Grid>
+      <Grid item xs={12} style={{ height: 450 }}>
+        <DataGrid
+          className="foi-data-grid"
+          getRowId={(row) => row.idNumber}
+          rows={updateAssigneeName(requestQueue.data)}
+          columns={columns.current}
+          rowHeight={30}
+          headerHeight={50}
+          rowCount={requestQueue.meta.total}
+          pageSize={rowsState.pageSize}
+          rowsPerPageOptions={[10]}
+          hideFooterSelectedRowCount={true}
+          disableColumnMenu={true}
+          pagination
+          paginationMode="server"
+          onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
+          onPageSizeChange={(pageSize) =>
+            setRowsState((prev) => ({ ...prev, pageSize }))
+          }
+          sortingOrder={["desc", "asc"]}
+          sortModel={sortModel}
+          sortingMode={"server"}
+          onSortModelChange={(model) => setSortModel(model)}
+          getRowClassName={(params) =>
+            `super-app-theme--${params.row.currentState
+              .toLowerCase()
+              .replace(/ +/g, "")}`
+          }
+          onRowClick={renderReviewRequest}
+          loading={isLoading}
+        />
+      </Grid>
+    </Grid>
+  );
+};
+
+export default DataGridAdvancedSearch;

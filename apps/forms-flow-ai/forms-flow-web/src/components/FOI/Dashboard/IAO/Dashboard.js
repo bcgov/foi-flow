@@ -69,7 +69,7 @@ const Dashboard = ({ userDetail }) => {
               </h3>
             </ButtonBase>
             <Divider
-              sx={{ m: 1, borderRightWidth: 3 }}
+              sx={{ m: 1, borderRightWidth: 3, height: 28 }}
               flexItem
               orientation="vertical"
             />
@@ -111,7 +111,7 @@ const Dashboard = ({ userDetail }) => {
         <Grid
           container
           direction="row"
-          spacing={1}
+          spacing={2}
           className={clsx({
             [classes.hidden]: !advnacedSearchEnabled,
             [classes.displayed]: advnacedSearchEnabled,
