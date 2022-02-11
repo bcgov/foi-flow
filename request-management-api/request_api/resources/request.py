@@ -67,7 +67,7 @@ class FOIRawRequest(Resource):
                 status = rawrequestservice().getstatus(updaterequest)
                 rawrequest = rawrequestservice().getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
-                assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None
+                assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest else None
                 assigneefirstname = updaterequest["assignedToFirstName"] if updaterequest.get("assignedToFirstName") != None else None
                 assigneemiddlename = updaterequest["assignedToMiddleName"] if updaterequest.get("assignedToMiddleName") != None else None
                 assigneelastname = updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
