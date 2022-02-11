@@ -18,7 +18,7 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
   },[notifications]);
 
   const tabTitle = () =>{
-    let myRequestList = notifications?.filter(x => x.notificationusertype === 'Assignee');
+    let myRequestList = notifications?.filter(x => (x.notificationusertype === 'Assignee' || x.notificationusertype === 'Comment User'));
     let watchingRequestList = notifications?.filter(x => x.notificationusertype === 'Watcher');
     setMyRequestTitle(myRequestList?.length > 0 ? "My Notifications ("+myRequestList.length+")": "My Notifications");
     setWatchingRequestTitle(watchingRequestList?.length > 0 ? "Watching Notifications ("+watchingRequestList.length+")": "Watching Notifications");
