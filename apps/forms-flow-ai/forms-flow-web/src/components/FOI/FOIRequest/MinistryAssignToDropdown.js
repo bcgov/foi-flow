@@ -31,7 +31,7 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
     //local state management for assignedTo
     //------- update this later when $567 is ready
     const minsitryAssignedToGroup = requestDetails.assignedministrygroup ? requestDetails.assignedministrygroup : "";
-    const ministryAssignedTo = requestDetails.assignedministryperson ? `${minsitryAssignedToGroup}|${requestDetails.assignedministryperson}` : `|Unassigned`;
+    const ministryAssignedTo = requestDetails.assignedministryperson ? `${minsitryAssignedToGroup}|${requestDetails.assignedministryperson}|${requestDetails.assignedministrypersonFirstName}|${requestDetails.assignedministrypersonLastName}` : `|Unassigned`;
     const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
     
     const getFullName = (lastName, firstName, username) => {
