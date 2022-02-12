@@ -9,7 +9,7 @@ from .db import  db, ma
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
-from sqlalchemy.orm import relationship,backref
+from sqlalchemy.orm import relationship, backref, aliased
 from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case
 
 from .FOIMinistryRequests import FOIMinistryRequest
@@ -290,7 +290,9 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
         #ministry requests
-        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid)
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)

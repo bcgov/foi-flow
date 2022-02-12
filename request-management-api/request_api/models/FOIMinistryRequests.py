@@ -27,7 +27,6 @@ class FOIMinistryRequest(db.Model):
         ),
     )
     
-    
     # Defining the columns
     foiministryrequestid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     version = db.Column(db.Integer, primary_key=True,nullable=False)    
@@ -75,7 +74,6 @@ class FOIMinistryRequest(db.Model):
                          "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
     assignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedto]")
     ministryassignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedministryperson]")
-
 
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -207,7 +205,7 @@ class FOIMinistryRequest(db.Model):
         return requeststates
 
     @classmethod
-    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid):
+    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee):
         _session = db.session
 
         #ministry filter for group/team
@@ -232,10 +230,7 @@ class FOIMinistryRequest(db.Model):
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
             for field in filterfields:
-                filtercondition.append(FOIMinistryRequest.findfield(field).ilike('%'+keyword+'%'))
-
-        iaoassignee = aliased(FOIAssignee)
-        ministryassignee = aliased(FOIAssignee)
+                filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -272,9 +267,6 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 FOIRequest,
                                 and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
-                            # ).join(
-                            #     subquery_foirequest_maxversion,
-                            #     and_(*joincondition_foirequest)
                             ).join(
                                 FOIRequestStatus,
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
@@ -295,10 +287,12 @@ class FOIMinistryRequest(db.Model):
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
                             ).join(
                                 iaoassignee,
-                                iaoassignee.username == FOIMinistryRequest.assignedto
+                                iaoassignee.username == FOIMinistryRequest.assignedto,
+                                isouter=True
                             ).join(
                                 ministryassignee,
-                                ministryassignee.username == FOIMinistryRequest.assignedministryperson
+                                ministryassignee.username == FOIMinistryRequest.assignedministryperson,
+                                isouter=True
                             )
 
         if(additionalfilter == 'watchingRequests'):
@@ -319,7 +313,10 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
-        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid)
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+
+        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee)
 
         #sorting
         sortingcondition = []
@@ -327,21 +324,18 @@ class FOIMinistryRequest(db.Model):
             for field in sortingitems:
                 order = sortingorders.pop()
                 if(order == 'desc'):
-                    sortingcondition.append(FOIMinistryRequest.findfield(field).desc())
+                    sortingcondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
                 else:
-                    sortingcondition.append(FOIMinistryRequest.findfield(field).asc())
+                    sortingcondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc())
 
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIMinistryRequest.findfield('currentState').asc())
+            sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
         return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
-    def findfield(cls, x):
+    def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
-
-        iaoassignee = aliased(FOIAssignee)
-        ministryassignee = aliased(FOIAssignee)
 
         return {
             'firstName': FOIRequestApplicant.firstname,
