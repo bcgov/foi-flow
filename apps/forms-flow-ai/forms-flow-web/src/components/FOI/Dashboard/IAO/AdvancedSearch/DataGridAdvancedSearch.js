@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIRequestListByPage } from "../../../../../apiManager/services/FOI/foiRequestServices";
-import { fetchFOIFullAssignedToList } from "../../../../../apiManager/services/FOI/foiMasterDataServices";
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
 import {
@@ -14,9 +12,13 @@ import {
   getFullName,
   getLDD,
 } from "../../utils";
+import { ActionContext } from "./ActionContext";
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
+
+  const { handleUpdateSearchFilter, searchResults, searchLoading } =
+    useContext(ActionContext);
 
   const assignedToList = useSelector(
     (state) => state.foiRequests.foiFullAssignedToList
@@ -25,16 +27,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     (state) => state.foiRequests.isAssignedToListLoading
   );
 
-  const requestQueue = useSelector(
-    (state) => state.foiRequests.foiRequestsList
-  );
-  const isLoading = useSelector((state) => state.foiRequests.isLoading);
-
   const classes = useStyles();
-  useEffect(() => {
-    dispatch(fetchFOIFullAssignedToList());
-    dispatch(fetchFOIRequestListByPage());
-  }, [dispatch]);
 
   const defaultRowsState = { page: 0, pageSize: 10 };
   const [rowsState, setRowsState] = React.useState(defaultRowsState);
@@ -44,35 +37,16 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     { field: "receivedDateUF", sort: "desc" },
   ];
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
-  let serverSortModel;
-  const [filterModel, setFilterModel] = React.useState({
-    fields: [
-      "firstName",
-      "lastName",
-      "requestType",
-      "idNumber",
-      "currentState",
-      "assignedTo",
-    ],
-    keyword: null,
-  });
-  const [requestFilter, setRequestFilter] = useState("All");
 
   useEffect(() => {
-    serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
-    dispatch(
-      fetchFOIRequestListByPage(
-        rowsState.page + 1,
-        rowsState.pageSize,
-        serverSortModel,
-        filterModel.fields,
-        filterModel.keyword,
-        requestFilter,
-        userDetail.preferred_username
-      )
-    );
-  }, [rowsState, sortModel, filterModel, requestFilter]);
+    handleUpdateSearchFilter({
+      page: rowsState.page + 1,
+      size: rowsState.pageSize,
+      serverSortModel: updateSortModel(sortModel),
+      userId: userDetail.preferred_username,
+    });
+  }, [rowsState, sortModel]);
 
   const columns = React.useRef([
     {
@@ -117,6 +91,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   ]);
 
   const updateAssigneeName = (data) => {
+    if (!data) {
+      return [];
+    }
     return data.map((row) => ({
       ...row,
       assignedToName: getAssigneeValue(row, assignedToList),
@@ -135,7 +112,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   };
 
-  if (isLoading || isAssignedToListLoading) {
+  if (searchLoading || isAssignedToListLoading) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -159,11 +136,11 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         <DataGrid
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(requestQueue.data)}
+          rows={updateAssigneeName(searchResults?.data)}
           columns={columns.current}
           rowHeight={30}
           headerHeight={50}
-          rowCount={requestQueue.meta.total}
+          rowCount={searchResults?.meta?.total}
           pageSize={rowsState.pageSize}
           rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
@@ -184,7 +161,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
               .replace(/ +/g, "")}`
           }
           onRowClick={renderReviewRequest}
-          loading={isLoading}
+          loading={searchLoading}
         />
       </Grid>
     </Grid>

@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 const AdvancedSearch = ({ userDetail }) => {
   const classes = useStyles();
 
-  const { handleApplyFilterData, searchLoading, setSearchLoading } =
+  const { handleUpdateSearchFilter, searchLoading, setSearchLoading } =
     useContext(ActionContext);
 
   const [searchText, setSearchText] = useState("");
@@ -124,15 +124,14 @@ const AdvancedSearch = ({ userDetail }) => {
   };
   const handleApplySearchFilters = () => {
     setSearchLoading(true);
-    handleApplyFilterData({
+    handleUpdateSearchFilter({
       search: searchFilterSelected.replace("_", "").toLowerCase(),
       keywords: keywordsMode ? keywords : [searchText],
-      requeststate: getTrueKeysFromCheckboxObject(requestState),
-      requesttype: getTrueKeysFromCheckboxObject(requestTypes),
-      fromdate: fromDate,
+      requestState: getTrueKeysFromCheckboxObject(requestState),
+      requestType: getTrueKeysFromCheckboxObject(requestTypes),
+      fromDate: fromDate,
       toDate: toDate,
-      publicbodies: selectedPublicBodies,
-      //...paginationStuff
+      publicBodies: selectedPublicBodies,
     });
   };
 

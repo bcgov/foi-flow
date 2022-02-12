@@ -69,7 +69,12 @@ const Dashboard = ({ userDetail }) => {
               </h3>
             </ButtonBase>
             <Divider
-              sx={{ m: 1, borderRightWidth: 3, height: 28 }}
+              sx={{
+                m: 1,
+                borderRightWidth: 3,
+                height: 28,
+                borderColor: "black",
+              }}
               flexItem
               orientation="vertical"
             />
