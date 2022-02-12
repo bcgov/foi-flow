@@ -19,7 +19,6 @@ import SearchIcon from '@material-ui/icons/Search';
 const Dashboard = ({userDetail}) => {
   const dispatch = useDispatch();
 
-  const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);  
   const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
 
   const requestQueue = useSelector(state=> state.foiRequests.foiRequestsList);
@@ -38,7 +37,7 @@ const Dashboard = ({userDetail}) => {
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
   let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
-    fields: ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
+    fields: ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedToLastName', 'assignedToFirstName'],
     keyword: null 
   });
   const [requestFilter, setRequestFilter] = useState("All");
@@ -59,16 +58,17 @@ const Dashboard = ({userDetail}) => {
   const updateSortModel = (() => {
     let smodel = JSON.parse(JSON.stringify(sortModel));
     if(smodel) {
-      smodel.map( (row) => {
-        if(row.field === 'assignedToName')
-          row.field = 'assignedTo';
-      });
-
       let field = smodel[0]?.field;
       let order = smodel[0]?.sort;
+
       if(field == 'applicantName') {
         smodel.shift();
         smodel.unshift({field: 'lastName', sort: order},{field: 'firstName', sort: order})
+      }
+
+      if(field == 'assignedToName') {
+        smodel.shift();
+        smodel.unshift({field: 'assignedToLastName', sort: order},{field: 'assignedToFirstName', sort: order})
       }
     }
 
@@ -77,20 +77,7 @@ const Dashboard = ({userDetail}) => {
 
   function getAssigneeValue(row) {
     const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";
-    const assignedTo = row.assignedTo ? row.assignedTo : groupName;
-    if (assignedToList && assignedToList.length > 0) {
-      const assigneeDetails = assignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);
-      if (groupName === assignedTo) {
-        return assignedTo;
-      }
-      else {        
-        return  assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
-      }
-    }
-    else {
-      return assignedTo;
-    }
+    return row.assignedTo && row.assignedToFirstName && row.assignedToLastName ? `${row.assignedToLastName}, ${row.assignedToFirstName}` : groupName;
   }
 
   function getReceivedDate(params) {

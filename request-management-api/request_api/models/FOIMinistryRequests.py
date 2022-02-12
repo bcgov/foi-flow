@@ -2,7 +2,7 @@ from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
-from sqlalchemy.orm import relationship,backref
+from sqlalchemy.orm import relationship, backref, aliased
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
@@ -16,6 +16,8 @@ from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .ProgramAreas import ProgramArea
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup
+from .FOIAssignees import FOIAssignee
+
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIMinistryRequests'
@@ -232,6 +234,9 @@ class FOIMinistryRequest(db.Model):
             for field in filterfields:
                 filtercondition.append(FOIMinistryRequest.findfield(field).ilike('%'+keyword+'%'))
 
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -252,7 +257,11 @@ class FOIMinistryRequest(db.Model):
             cast(FOIMinistryRequest.duedate, String).label('duedate'),
             ApplicantCategory.name.label('applicantcategory'),
             FOIRequest.created_at.label('created_at'),
-            func.lower(ProgramArea.bcgovcode).label('bcgovcode')
+            func.lower(ProgramArea.bcgovcode).label('bcgovcode'),
+            iaoassignee.firstname.label('assignedToFirstName'),
+            iaoassignee.lastname.label('assignedToLastName'),
+            ministryassignee.firstname.label('assignedministrypersonFirstName'),
+            ministryassignee.lastname.label('assignedministrypersonLastName')
         ]
 
         basequery = _session.query(
@@ -284,6 +293,12 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
+                            ).join(
+                                iaoassignee,
+                                iaoassignee.username == FOIMinistryRequest.assignedto
+                            ).join(
+                                ministryassignee,
+                                ministryassignee.username == FOIMinistryRequest.assignedministryperson
                             )
 
         if(additionalfilter == 'watchingRequests'):
@@ -319,12 +334,15 @@ class FOIMinistryRequest(db.Model):
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState').asc())
-
         return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
     def findfield(cls, x):
         #add more fields here if need sort/filter/search more columns
+
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+
         return {
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
@@ -334,7 +352,11 @@ class FOIMinistryRequest(db.Model):
             'assignedTo': FOIMinistryRequest.assignedto,
             'receivedDate': FOIRequest.receiveddate,
             'applicantcategory': ApplicantCategory.name,
-            'assignedministryperson': FOIMinistryRequest.assignedministryperson
+            'assignedministryperson': FOIMinistryRequest.assignedministryperson,
+            'assignedToFirstName': iaoassignee.firstname,
+            'assignedToLastName': iaoassignee.lastname,
+            'assignedministrypersonFirstName': ministryassignee.firstname,
+            'assignedministrypersonLastName': ministryassignee.lastname
         }.get(x, FOIMinistryRequest.filenumber)
 
     @classmethod

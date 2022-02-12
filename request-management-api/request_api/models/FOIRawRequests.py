@@ -256,18 +256,23 @@ class FOIRawRequest(db.Model):
             literal(None).label('duedate'),
             FOIRawRequest.requestrawdata['category'].astext.label('applicantcategory'),
             FOIRawRequest.created_at.label('created_at'),
-            literal(None).label('bcgovcode')
+            literal(None).label('bcgovcode'),
+            FOIAssignee.firstname.label('assignedToFirstName'),
+            FOIAssignee.lastname.label('assignedToLastName'),
+            literal(None).label('assignedministrypersonFirstName'),
+            literal(None).label('assignedministrypersonLastName')
         ]
 
+        basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
         if(additionalfilter == 'watchingRequests'):
             #watchby
             subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
         elif(additionalfilter == 'myRequests'):
             #myrequest
-            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+            dbquery = basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
         else:
-            dbquery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).filter(FOIRawRequest.status.notin_(['Archived']))
+            dbquery = basequery.filter(FOIRawRequest.status.notin_(['Archived']))
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -309,11 +314,13 @@ class FOIRawRequest(db.Model):
             'idNumber': cast(FOIRawRequest.requestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
+            'assignedToFirstName': FOIAssignee.firstname,
+            'assignedToLastName': FOIAssignee.lastname
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName']
         if x in validfields:
             return True
         else:
