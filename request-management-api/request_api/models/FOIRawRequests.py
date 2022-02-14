@@ -397,11 +397,18 @@ class FOIRawRequest(db.Model):
         filtercondition = []
 
         #request state: unopened, call for records, etc.
-        # if(len(params['requeststate']) > 0):
-        #     requeststatecondition = []
-        #     for state in params['requeststate']:
-        #         requeststatecondition.append(FOIRawRequest.status == state)
-        #     filtercondition.append(or_(*requeststatecondition))
+        if(len(params['requeststate']) > 0):
+            requeststatecondition = []
+            for state in params['requeststate']:
+                if(state == 3):
+                    requeststatecondition.append(FOIRawRequest.status == 'Closed')
+                elif(state == 5):
+                    requeststatecondition.append(FOIRawRequest.status == 'Unopened')
+            
+            if(len(requeststatecondition) == 0):
+                requeststatecondition.append(FOIRawRequest.status == 'Closed')
+                requeststatecondition.append(FOIRawRequest.status == 'Unopened')
+            filtercondition.append(or_(*requeststatecondition))
         
         #request status: all active, overdue, on time - no due date for unopen & intake in progress
         
