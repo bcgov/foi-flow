@@ -8,8 +8,7 @@ import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
-import { Typography } from "@mui/material";
-import { ButtonBase } from "@mui/material";
+import { Typography, ButtonBase } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   displayed: {

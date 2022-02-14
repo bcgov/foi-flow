@@ -17,7 +17,7 @@ import { ActionContext } from "./ActionContext";
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
 
-  const { handleUpdateSearchFilter, searchResults, searchLoading } =
+  const { handleUpdateSearchFilter, searchResults, searchLoading, queryData } =
     useContext(ActionContext);
 
   const assignedToList = useSelector(
@@ -39,13 +39,15 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
 
   useEffect(() => {
-    // page+1 here, because initial page value is 0 for mui-data-grid
-    handleUpdateSearchFilter({
-      page: rowsState.page + 1,
-      size: rowsState.pageSize,
-      serverSortModel: updateSortModel(sortModel),
-      userId: userDetail.preferred_username,
-    });
+    if (queryData) {
+      // page+1 here, because initial page value is 0 for mui-data-grid
+      handleUpdateSearchFilter({
+        page: rowsState.page + 1,
+        size: rowsState.pageSize,
+        sort: updateSortModel(sortModel),
+        userId: userDetail.preferred_username,
+      });
+    }
   }, [rowsState, sortModel]);
 
   const columns = React.useRef([

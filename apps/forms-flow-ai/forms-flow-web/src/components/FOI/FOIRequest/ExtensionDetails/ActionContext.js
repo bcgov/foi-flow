@@ -9,7 +9,7 @@ import {
   updateExtensionRequest,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import { extensionStatusId } from "../../../../constants/FOI/enum";
-import { errorToast } from "./utils";
+import { errorToast } from "../../../../helper/FOI/helper";
 
 export const ActionContext = createContext();
 ActionContext.displayName = "ExtensionContext"

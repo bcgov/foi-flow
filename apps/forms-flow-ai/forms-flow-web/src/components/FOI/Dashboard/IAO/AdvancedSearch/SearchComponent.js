@@ -223,13 +223,13 @@ const AdvancedSearch = ({ userDetail }) => {
     );
   };
 
-  if (searchLoading) {
-    return (
-      <Grid item xs={12} container alignItems="center">
-        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
-      </Grid>
-    );
-  }
+  // if (searchLoading) {
+  //   return (
+  //     <Grid item xs={12} container alignItems="center">
+  //       <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
+  //     </Grid>
+  //   );
+  // }
   return (
     <>
       <Grid item container xs={12}>
@@ -481,7 +481,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       marginBottom: "2em",
                     }}
                   >
-                    Request State
+                    Request Status
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -694,6 +694,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     fullWidth
                     variant="contained"
                     onClick={handleApplySearchFilters}
+                    disabled={searchLoading}
                   >
                     Apply Search
                   </Button>
@@ -710,7 +711,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     fullWidth
                     onClick={handleResetSearchFilters}
                   >
-                    Reset Filters
+                    Clear All Filters
                   </Button>
                 </Grid>
               </Grid>
