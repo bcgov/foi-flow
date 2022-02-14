@@ -25,7 +25,7 @@ class assignmentevent:
 
     def __createnotification(self, requestid, requesttype, userid, isministryuser):
         notification = self.__preparenotification()
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser), userid)
+        return notificationservice().createnotification(notification, requestid, requesttype, self.__assignmenttype(isministryuser), userid)
 
     def __preparenotification(self):
         return self.__notificationmessage()

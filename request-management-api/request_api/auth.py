@@ -84,11 +84,6 @@ class AuthHelper:
         return unverified_claims['preferred_username']
     
     @classmethod
-    def getwsuserid(cls, token):
-        unverified_claims = josejwt.get_unverified_claims(token.strip())
-        return unverified_claims['preferred_username']  
-
-    @classmethod
     def getusername(cls):
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())

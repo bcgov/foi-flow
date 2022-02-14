@@ -49,13 +49,10 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   }
 
   const handleClick = (notificationVal) => {
-    let idNumber = notificationVal.idnumber;
+    let idNumber = notification.idnumber;
     idNumber+='';
     let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
-    if(checkCommentType(notificationVal.notificationtype)){
-      setCommentUrl();
-    }
-    else if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
+    if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
      notification.notification.toLowerCase() === "moved to open state"){
         dispatch(fetchOpenedMinistriesForNotification(notificationVal, (err, res) => {
             getStatusAndRedirect(err, res);
@@ -66,29 +63,6 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
     }
   }
 
-  const checkCommentType = (type) => {
-    if(type === 'New User Comments' || type === 'Reply User Comments' ||
-      type === 'Tagged User Comments'){
-      return true;
-    }
-    return false;
-  }
-
-  const commentTitle = (type) => {
-    if(type === "New User Comments")
-      return "New Comment:";
-    else if(type === "Tagged User Comments")
-      return "You've been tagged in a comment:";
-    else
-      return "New Reply to Your comment:";
-  }
-
-  const commentText = (message) => {
-    if(message.length > 90)
-      return `"`+message.substring(0, 90)+`..."`;
-    else
-      return `"`+message+`"`;
-   }
 
   const getStatusAndRedirect = (err, res) => {
     if (!err && res) {
@@ -116,20 +90,6 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
     window.location.href=url;
   }
 
-  const setCommentUrl = () =>{
-    let url = "";
-    if(notification.requesttype === 'rawrequest'){
-      url=`/foi/reviewrequest/${notification.requestid}/comments`;
-    }
-    else if(notification.requesttype === 'ministryrequest'){
-      if(isMinistry)
-        url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/comments`;
-      else
-        url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/comments`;
-    }
-    window.location.href=url;
-  }
-
 
   return(
     <ListGroup.Item>
@@ -145,19 +105,9 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
           <i className="fa fa-times"></i>
         </Col>
       </Row>
-      { checkCommentType(notification.notificationtype) ?
-      <>
-        <div style={{fontSize:"16px"}}>{commentTitle(notification.notificationtype)}</div> 
-        <div style={{fontStyle: "italic"}} >
-          {commentText(notification.notification)}
-        </div>
-      </> 
-        :
-        <div>
-          {notification.notification}
-        </div>
-      }        
-      
+      <div>
+      {notification.notification}
+      </div>
       <Row className="notification-item-footer">
         <Col>{getfullName(notification.createdby)}</Col>
         <Col>{notification.created_at}</Col>
