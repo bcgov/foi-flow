@@ -207,9 +207,9 @@ class FOIRawRequest(db.Model):
         for _requeststate in _requeststates:
             requeststates.append(_requeststate[0])
         return requeststates    
-    
+
     @classmethod
-    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
+    def getbasequery(cls, additionalfilter=None, userid=None):
         _session = db.session
 
         #rawrequests
@@ -235,6 +235,11 @@ class FOIRawRequest(db.Model):
                              FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['lastName'].astext).label('lastName')
+        description = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['description'].astext).label('description')
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -260,19 +265,28 @@ class FOIRawRequest(db.Model):
             FOIAssignee.firstname.label('assignedToFirstName'),
             FOIAssignee.lastname.label('assignedToLastName'),
             literal(None).label('assignedministrypersonFirstName'),
-            literal(None).label('assignedministrypersonLastName')
+            literal(None).label('assignedministrypersonLastName'),
+            description
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
-        if(additionalfilter == 'watchingRequests'):
-            #watchby
-            subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
-        elif(additionalfilter == 'myRequests'):
-            #myrequest
-            dbquery = basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+
+        if additionalfilter is None:
+            return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
         else:
-            dbquery = basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            if(additionalfilter == 'watchingRequests' and userid is not None):
+                #watchby
+                subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+            elif(additionalfilter == 'myRequests'):
+                #myrequest
+                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+            else:
+                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+
+    @classmethod
+    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
+        basequery = FOIRawRequest.getbasequery(additionalfilter, userid)
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -283,9 +297,12 @@ class FOIRawRequest(db.Model):
                     filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
                 if(field == 'lastName'):
                     filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            return dbquery.filter(or_(*filtercondition))
+                if(field == 'requestType'):
+                    filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+
+            return basequery.filter(or_(*filtercondition))
         else:
-            return dbquery
+            return basequery
 
     @classmethod
     def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
@@ -313,11 +330,15 @@ class FOIRawRequest(db.Model):
             'contactFirstName': FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext,
             'contactLastName': FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext,
             'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
+            'requestTypeRequestType': FOIRawRequest.requestrawdata['requestType']['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
             'assignedToFirstName': FOIAssignee.firstname,
-            'assignedToLastName': FOIAssignee.lastname
+            'assignedToLastName': FOIAssignee.lastname,
+            'receivedDate': FOIRawRequest.requestrawdata['receivedDate'].astext,
+            'description': FOIRawRequest.requestrawdata['description'].astext,
+            'descriptionDescription': FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
@@ -344,6 +365,86 @@ class FOIRawRequest(db.Model):
             sortingcondition.append(asc('currentState'))
         
         return sortingcondition
+
+
+    @classmethod
+    def advancedsearch(cls, params):
+        basequery = FOIRawRequest.getbasequery()
+
+        #filter/search
+        filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
+        searchquery = basequery.filter(and_(*filtercondition))
+
+        #ministry requests
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+        subquery_ministry_queue = FOIMinistryRequest.advancedsearch(params, iaoassignee, ministryassignee)
+
+        #sorting
+        sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])
+
+        #rawrequests
+        if "Intake Team" in params['groups'] or params['groups'] is None:                
+            query_full_queue = searchquery.union(subquery_ministry_queue)
+            return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+        else:
+            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+
+    @classmethod
+    def getfilterforadvancedsearch(cls, params):
+
+        #filter/search
+        filtercondition = []
+
+        #request state: unopened, call for records, etc.
+        if(len(params['requeststate']) > 0):
+            requeststatecondition = []
+            for state in params['requeststate']:
+                requeststatecondition.append(FOIRawRequest.status == state)
+            filtercondition.append(or_(*requeststatecondition))
+        
+        #request status: all active, overdue, on time - no due date for unopen & intake in progress
+        
+        #request type: personal, general
+        if(len(params['requesttype']) > 0):
+            requesttypecondition = []
+            for type in params['requesttype']:
+                requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
+                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
+            filtercondition.append(or_(*requesttypecondition))
+        
+        #public body: EDUC, etc.
+        # if(len(params['publicbody']) > 0):
+        #     publicbodycondition = []
+        #     for type in params['requesttype']:
+        #         publicbodycondition.append(FOIRawRequest.findfield('requestType') == type)
+        #         publicbodycondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
+        #     filtercondition.append(or_(*publicbodycondition))
+
+        #axis request #, raw request #, applicant name, assignee name, request description, subject code
+        if(len(params['keywords']) > 0 and params['search'] is not None):
+            if(params['search'] == 'description'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
+                filtercondition.append(or_(and_(*searchcondition1), and_(*searchcondition2)))
+            else:
+                searchcondition = []
+                for keyword in params['keywords']:
+                    searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
+                filtercondition.append(and_(*searchcondition))
+
+        if(params['fromdate'] is not None):
+            filtercondition.append(FOIRawRequest.findfield('receivedDate') >= params['fromdate'])
+
+        # no duedate for unopened & intake in progress
+        # if(params['todate'] is not None):
+        #     filtercondition.append(FOIRawRequest.findfield('receivedDate') <= params['todate'])
+        
+        return filtercondition
+
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
         fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname')

@@ -43,7 +43,6 @@ class dashboardservice:
         
         requestqueue = []
         for request in requests.items:
-            firstname , lastname, requesttype = '','',''
             _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
 
             if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
@@ -95,6 +94,40 @@ class dashboardservice:
             _openrequest.update({'assignedministrypersonFirstName': request.assignedministrypersonFirstName})
             _openrequest.update({'assignedministrypersonLastName': request.assignedministrypersonLastName})
             requestqueue.append(_openrequest)
+
+        meta = {
+            'page': requests.page,
+            'pages': requests.pages,
+            'total': requests.total,
+            'prev_num': requests.prev_num,
+            'next_num': requests.next_num,
+            'has_next': requests.has_next,
+            'has_prev': requests.has_prev,
+        }
+
+        return jsonify({'data': requestqueue, 'meta': meta})
+
+    def advancedsearch(self, params={'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+        requests = FOIRawRequest.advancedsearch(params)
+        
+        requestqueue = []
+        for request in requests.items:
+            _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+
+            if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
+                _receiveddate = parser.parse(request.receivedDateUF)
+
+            if(request.ministryrequestid == None):
+                unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
+                                                             request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                             request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                requestqueue.append(unopenrequest)
+            else:
+                _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
+                                                            request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                            request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                requestqueue.append(_openrequest)    
 
         meta = {
             'page': requests.page,
