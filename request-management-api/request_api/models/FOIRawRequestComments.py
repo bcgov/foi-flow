@@ -69,27 +69,7 @@ class FOIRawRequestComment(db.Model):
         query = db.session.query(FOIRawRequestComment).filter_by(
             requestid=requestid, isactive=True).order_by(FOIRawRequestComment.commentid.asc()).all()
         return comment_schema.dump(query)
-    
-    @classmethod
-    def getcommentbyid(cls, commentid) -> DefaultMethodResult:
-        comment_schema = FOIRawRequestCommentSchema()
-        query = db.session.query(FOIRawRequestComment).filter_by(
-            commentid=commentid, isactive=True).first()
-        return comment_schema.dump(query)
 
-
-    @classmethod 
-    def getcommentusers(cls, commentid):
-        sql = """select commentid, createdby, taggedusers from (
-                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid)
-                    union all 
-                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid)
-                ) cmt where commenttypeid =1"""
-        rs = db.session.execute(text(sql), {'commentid': commentid})
-        users = []
-        for row in rs:
-            users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
-        return users
 
 class FOIRawRequestCommentSchema(ma.Schema):
     class Meta:
