@@ -354,6 +354,7 @@ class FOIMinistryRequest(db.Model):
             'assignedministrypersonFirstName': ministryassignee.firstname,
             'assignedministrypersonLastName': ministryassignee.lastname,
             'description': FOIMinistryRequest.description,
+            'requestdescription': FOIMinistryRequest.description,
             'duedate': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode)
         }.get(x, FOIMinistryRequest.filenumber)
@@ -565,11 +566,11 @@ class FOIMinistryRequest(db.Model):
             filtercondition.append(or_(*requeststatecondition))
         
         #request status: overdue || on time
-        if(len(params['requeststatus']) == 1):
-            if(params['requeststatus'][0] == 'overdue'):
-                filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now())
-            else:
-                filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now())
+        # if(len(params['requeststatus']) == 1):
+        #     if(params['requeststatus'][0] == 'overdue'):
+        #         filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now())
+        #     else:
+        #         filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now())
 
         #request type: personal, general
         if(len(params['requesttype']) > 0):
@@ -607,11 +608,11 @@ class FOIMinistryRequest(db.Model):
                     searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 filtercondition.append(and_(*searchcondition))
 
-        if(params['fromdate'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield('receivedDate', iaoassignee, ministryassignee) >= params['fromdate'])
+        # if(params['fromdate'] is not None):
+        #     filtercondition.append(FOIMinistryRequest.findfield('receivedDate', iaoassignee, ministryassignee) >= params['fromdate'])
 
-        if(params['todate'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) <= params['todate'])
+        # if(params['todate'] is not None):
+        #     filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) <= params['todate'])
         
         return filtercondition
 class FOIMinistryRequestSchema(ma.Schema):

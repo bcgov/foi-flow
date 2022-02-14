@@ -397,11 +397,11 @@ class FOIRawRequest(db.Model):
         filtercondition = []
 
         #request state: unopened, call for records, etc.
-        if(len(params['requeststate']) > 0):
-            requeststatecondition = []
-            for state in params['requeststate']:
-                requeststatecondition.append(FOIRawRequest.status == state)
-            filtercondition.append(or_(*requeststatecondition))
+        # if(len(params['requeststate']) > 0):
+        #     requeststatecondition = []
+        #     for state in params['requeststate']:
+        #         requeststatecondition.append(FOIRawRequest.status == state)
+        #     filtercondition.append(or_(*requeststatecondition))
         
         #request status: all active, overdue, on time - no due date for unopen & intake in progress
         
@@ -423,7 +423,7 @@ class FOIRawRequest(db.Model):
 
         #axis request #, raw request #, applicant name, assignee name, request description, subject code
         if(len(params['keywords']) > 0 and params['search'] is not None):
-            if(params['search'] == 'description'):
+            if(params['search'] == 'requestdescription'):
                 searchcondition1 = []
                 searchcondition2 = []
                 for keyword in params['keywords']:
