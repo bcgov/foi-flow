@@ -338,7 +338,9 @@ class FOIRawRequest(db.Model):
             'assignedToLastName': FOIAssignee.lastname,
             'receivedDate': FOIRawRequest.requestrawdata['receivedDate'].astext,
             'description': FOIRawRequest.requestrawdata['description'].astext,
-            'descriptionDescription': FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext
+            'descriptionDescription': FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext,
+            'ministry': FOIRawRequest.requestrawdata['selectedMinistries'].astext,
+            'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
@@ -395,6 +397,7 @@ class FOIRawRequest(db.Model):
 
         #filter/search
         filtercondition = []
+        includeclosed = False
 
         #request state: unopened, call for records, etc.
         if(len(params['requeststate']) > 0):
@@ -402,6 +405,7 @@ class FOIRawRequest(db.Model):
             for state in params['requeststate']:
                 if(state == 3):
                     requeststatecondition.append(FOIRawRequest.status == 'Closed')
+                    includeclosed = True
                 elif(state == 5):
                     requeststatecondition.append(FOIRawRequest.status == 'Unopened')
             
@@ -410,7 +414,9 @@ class FOIRawRequest(db.Model):
                 requeststatecondition.append(FOIRawRequest.status == 'Unopened')
             filtercondition.append(or_(*requeststatecondition))
         
-        #request status: all active, overdue, on time - no due date for unopen & intake in progress
+        #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
+        if(len(params['requeststatus']) > 0 and includeclosed == False):
+            filtercondition.append(FOIRawRequest.status != 'Closed')
         
         #request type: personal, general
         if(len(params['requesttype']) > 0):
@@ -421,12 +427,12 @@ class FOIRawRequest(db.Model):
             filtercondition.append(or_(*requesttypecondition))
         
         #public body: EDUC, etc.
-        # if(len(params['publicbody']) > 0):
-        #     publicbodycondition = []
-        #     for type in params['requesttype']:
-        #         publicbodycondition.append(FOIRawRequest.findfield('requestType') == type)
-        #         publicbodycondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
-        #     filtercondition.append(or_(*publicbodycondition))
+        if(len(params['publicbody']) > 0):
+            ministrycondition = []
+            for ministry in params['publicbody']:
+                ministrycondition.append(FOIRawRequest.findfield('ministry').ilike('%"'+ministry+'"%'))
+                ministrycondition.append(FOIRawRequest.findfield('ministryMinistry').ilike('%"'+ministry+'"%'))
+            filtercondition.append(or_(*ministrycondition))
 
         #axis request #, raw request #, applicant name, assignee name, request description, subject code
         if(len(params['keywords']) > 0 and params['search'] is not None):
@@ -447,8 +453,6 @@ class FOIRawRequest(db.Model):
             filtercondition.append(FOIRawRequest.findfield('receivedDate') >= params['fromdate'])
 
         # no duedate for unopened & intake in progress
-        # if(params['todate'] is not None):
-        #     filtercondition.append(FOIRawRequest.findfield('receivedDate') <= params['todate'])
         
         return filtercondition
 

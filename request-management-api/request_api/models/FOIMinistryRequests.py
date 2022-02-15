@@ -557,12 +557,15 @@ class FOIMinistryRequest(db.Model):
 
         #filter/search
         filtercondition = []
+        includeclosed = False
 
         #request state: unopened, call for records, etc.
         if(len(params['requeststate']) > 0):
             requeststatecondition = []
             for stateid in params['requeststate']:
                 requeststatecondition.append(FOIMinistryRequest.requeststatusid == stateid)
+                if(stateid == 3):
+                    includeclosed = True
             filtercondition.append(or_(*requeststatecondition))
         
         #request status: overdue || on time
@@ -571,6 +574,12 @@ class FOIMinistryRequest(db.Model):
                 filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now())
             else:
                 filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now())
+            # return all except closed
+            if(includeclosed == False):
+                filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
+        elif(len(params['requeststatus']) > 1 and includeclosed == False):
+            # return all except closed
+            filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
 
         #request type: personal, general
         if(len(params['requesttype']) > 0):

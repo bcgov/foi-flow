@@ -22,9 +22,9 @@ class DashboardPagination(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
+    @auth.require
     @cors_preflight('GET,POST,OPTIONS')
-    # @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get():
         try:
             DEFAULT_PAGE = 1
@@ -33,8 +33,7 @@ class DashboardPagination(Resource):
             DEFAULT_SORT_ORDERS = ['desc']
 
             params = {
-                # 'groups': AuthHelper.getusergroups(),
-                'groups': ['Intake Team','Flex Team','Processing Team'],
+                'groups': AuthHelper.getusergroups(),
                 'page': flask.request.args.get('page', DEFAULT_PAGE, type=int),
                 'size': flask.request.args.get('size', DEFAULT_SIZE, type=int),
                 'sortingitems': flask.request.args.getlist('sortingitems[]'),
