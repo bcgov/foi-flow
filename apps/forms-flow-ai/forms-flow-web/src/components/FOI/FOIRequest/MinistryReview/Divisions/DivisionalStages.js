@@ -31,6 +31,7 @@ const DivisionalStages = React.memo(({
     const handleDivisionStageChange = (e, id) => {
       updateDivisionsState(e, id, minDivStages, (newStages) => {
         setMinDivStages([...newStages]);
+        appendStageIterator([...newStages]);
       });
     };
    
