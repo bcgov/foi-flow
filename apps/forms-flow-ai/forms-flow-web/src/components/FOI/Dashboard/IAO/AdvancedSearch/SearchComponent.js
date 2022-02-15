@@ -271,6 +271,7 @@ const AdvancedSearch = ({ userDetail }) => {
             sx={{
               display: "flex",
               width: "100%",
+              backgroundColor: "#F9FBFD",
             }}
             alignItems="flex-start"
             direction="row"
