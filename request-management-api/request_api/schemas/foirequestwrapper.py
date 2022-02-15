@@ -80,6 +80,12 @@ class FOIRequestWrapperSchema(Schema):
     startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])  
     assignedministrygroup = fields.Str(data_key="assignedministrygroup",allow_none=True)
     assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True)        
+    assignedToFirstName = fields.Str(data_key="assignedToFirstName",allow_none=True)
+    assignedToMiddleName = fields.Str(data_key="assignedToMiddleName",allow_none=True)
+    assignedToLastName = fields.Str(data_key="assignedToLastName",allow_none=True)
+    assignedministrypersonFirstName = fields.Str(data_key="assignedministrypersonFirstName",allow_none=True)
+    assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True)
+    assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True)
 
     
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True)    
@@ -137,3 +143,9 @@ class FOIRequestMinistrySchema(Schema):
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
     divisions = fields.Nested(FOIMinistryRequestDivisionSchema, many=True,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
+    assignedToFirstName = fields.Str(data_key="assignedToFirstName",allow_none=True)
+    assignedToMiddleName = fields.Str(data_key="assignedToMiddleName",allow_none=True)
+    assignedToLastName = fields.Str(data_key="assignedToLastName",allow_none=True)
+    assignedministrypersonFirstName = fields.Str(data_key="assignedministrypersonFirstName",allow_none=True)
+    assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True)
+    assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True)

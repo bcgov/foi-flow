@@ -4,9 +4,9 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, getgroupsfromtoken, allowedorigins, getrequiredmemberships
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, UserGroup
-from request_api.auth import auth
+from request_api.auth import AuthHelper, auth
 from request_api.tracer import Tracer
 from request_api.exceptions import BusinessException
 from request_api.services.dashboardservice import dashboardservice
@@ -32,7 +32,17 @@ class DashboardPagination(Resource):
             DEFAULT_SIZE = 10
             DEFAULT_SORT_ITEMS = ['currentState']
             DEFAULT_SORT_ORDERS = ['desc']
-            DEFAULT_FILTER_FIELDS = ['idNumber', 'currentState', 'firstName', 'lastName', 'assignedTo', 'requestType']
+            DEFAULT_FILTER_FIELDS = [
+                                        'idNumber',
+                                        'currentState',
+                                        'firstName',
+                                        'lastName',
+                                        'assignedToFirstName',
+                                        'assignedToLastName',
+                                        'assignedministrypersonFirstName',
+                                        'assignedministrypersonLastName',
+                                        'requestType'
+                                    ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
             _size = flask.request.args.get('size', DEFAULT_SIZE, type=int)
@@ -49,16 +59,14 @@ class DashboardPagination(Resource):
                 _filterfields = DEFAULT_FILTER_FIELDS
             _keyword = flask.request.args.get('keyword', None, type=str)
 
-            groups = getgroupsfromtoken()
-            ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))
+            groups = AuthHelper.getusergroups()
             statuscode = 200
-            if (UserGroup.intake.value in groups or UserGroup.flex.value in groups or UserGroup.processing.value in groups) and (queuetype is None or queuetype == "all"):                                                                                           
+            if (AuthHelper.getusertype() == "iao") and (queuetype is None or queuetype == "all"):                                                                                           
                 requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
-            elif  queuetype is not None and queuetype == "ministry" and len(ministrygroups) > 0:
-                requests = dashboardservice().getministryrequestqueuepagination(ministrygroups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+            elif  queuetype is not None and queuetype == "ministry" and AuthHelper.getusertype() == "ministry":
+                requests = dashboardservice().getministryrequestqueuepagination(AuthHelper.getministrygroups(), _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
-                if len(ministrygroups) == 0 :
-                  statuscode = 401   
+                statuscode = 401   
 
             return requests, statuscode
         except BusinessException as exception:

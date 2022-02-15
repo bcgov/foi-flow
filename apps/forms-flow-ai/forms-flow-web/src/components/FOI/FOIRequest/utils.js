@@ -194,9 +194,11 @@ export const createRequestDetailsObjectFunc = (requestObject, requiredRequestDet
         requestObject.assignedGroup = assignedTo[0];
         requestObject.assignedTo = "";
       }
-      else if (assignedTo.length > 1) {
+      else if (assignedTo.length > 3) {
         requestObject.assignedGroup = assignedTo[0];
         requestObject.assignedTo = assignedTo[1];
+        requestObject.assignedToFirstName = assignedTo[2];
+        requestObject.assignedToLastName = assignedTo[3];
       }
       else {
         requestObject.assignedGroup = "Unassigned";

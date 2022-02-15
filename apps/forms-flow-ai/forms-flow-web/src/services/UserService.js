@@ -1,7 +1,6 @@
 import {
   Keycloak_Client,
-  ANONYMOUS_USER,
-  ANONYMOUS_ID,
+  ANONYMOUS_USER
 } from "../constants/constants";
 import {
   setUserRole,
@@ -15,6 +14,8 @@ import {WEB_BASE_URL} from "../apiManager/endpoints/config";
 import {_kc} from "../constants/tenantConstant";
 import { isMinistryLogin } from '../helper/FOI/helper';
 
+import { KCProcessingTeams } from '../constants/FOI/enum';
+
 const jwt = require("jsonwebtoken");
 
 /**
@@ -22,7 +23,6 @@ const jwt = require("jsonwebtoken");
  *
  * @param onAuthenticatedCallback
  */
-// const KeycloakData = new Keycloak(tenantDetail);
 
 const initKeycloak = (store, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
@@ -50,13 +50,10 @@ const initKeycloak = (store, ...rest) => {
             const userGroups = res.groups.map(group => group.slice(1));
             const authorized = userGroups.indexOf("Intake Team") !== -1
                 || userGroups.indexOf("Flex Team") !== -1
-                || userGroups.indexOf("Processing Team") !== -1
+                || isProcessingTeam(userGroups)
                 || isMinistryLogin(userGroups)
             store.dispatch(setUserAuthorization(authorized));
           });
-          const email = KeycloakData.tokenParsed.email || "external";
-          
-          // onAuthenticatedCallback();
           done(null, KeycloakData);
           refreshToken(store);
         } else {
@@ -106,6 +103,9 @@ const authenticateAnonymousUser = (store) => {
   store.dispatch(setUserRole([user]));  
 };
 
+const isProcessingTeam = (userGroups) => {
+  return userGroups.some(usergroup => KCProcessingTeams.includes(usergroup))
+}
 
 
 

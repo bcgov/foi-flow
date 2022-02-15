@@ -83,3 +83,16 @@ import { getFullnameList } from "../../../../helper/FOI/helper"
           return {title: "", body: ""};
     }
   }
+
+
+  export const getProcessingTeams = (_processingTeamList, _selectedMinistries) => {
+    const updatedList = _processingTeamList.filter(listItem => _selectedMinistries.includes(listItem.bcgovcode))?.map(item => item.team);
+    return updatedList?.filter((v, i, a) => a.indexOf(v) === i);
+  }
+
+  export const getUpdatedAssignedTo = (_assignedTo, _processingTeamList, _state, _requestType) => {
+    if (_requestType?.toLowerCase() === 'personal' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase()) 
+      return _processingTeamList.join(", ");    
+    else 
+      return _assignedTo;
+  }

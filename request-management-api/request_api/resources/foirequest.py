@@ -21,7 +21,7 @@ from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,getgroupsfromtoken
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
@@ -49,17 +49,14 @@ class FOIRequest(Resource):
     @auth.ismemberofgroups(getrequiredmemberships())
     def get(foirequestid,foiministryrequestid,usertype = None):
         try :
-            groups = getgroupsfromtoken()           
-            ministrygroups = list(set(groups).intersection(MinistryTeamWithKeycloackGroup.list()))            
             jsondata = {}
             statuscode = 200
-            if ('Intake Team' in groups or 'Flex Team' in groups or 'Processing Team' in groups) and (usertype is None or (usertype == "iao")):
+            if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
                 jsondata = requestservice().getrequest(foirequestid,foiministryrequestid)
-            elif  usertype is not None and usertype == "ministry" and len(ministrygroups) > 0:
-                jsondata = requestservice().getrequestdetailsforministry(foirequestid,foiministryrequestid,ministrygroups)
+            elif  usertype is not None and usertype == "ministry" and AuthHelper.getusertype() == "ministry":
+                jsondata = requestservice().getrequestdetailsforministry(foirequestid,foiministryrequestid,AuthHelper.getministrygroups())
             else:
-                if len(ministrygroups) == 0 :
-                  statuscode = 401 
+                statuscode = 401 
             return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
@@ -85,7 +82,10 @@ class FOIRequests(Resource):
             foirequestschema = FOIRequestWrapperSchema().load(request_json)       
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
-            rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), AuthHelper.getusername(),AuthHelper.isministrymember())               
+            assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
+            assignedtomiddlename = request_json["assignedToMiddleName"] if request_json.get("assignedToMiddleName") != None else None
+            assignedtolastname = request_json["assignedToLastName"] if request_json.get("assignedToLastName") != None else None
+            rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), AuthHelper.getusername(),AuthHelper.isministrymember(),assignedtofirstname,assignedtomiddlename,assignedtolastname)               
             if rawresult.success == True:   
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:

@@ -28,12 +28,13 @@ export const getMenuItems = ({
       {"Unassigned"}
     </MenuItem>
   );
-
   if (assignedToList && assignedToList.length < 1) {
     return menuItems;
   }
-
-  assignedToList.forEach((group) => {
+  else {
+    assignedToList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
+  }  
+  assignedToList?.forEach((group) => {
     const groupItem = (
       <MenuItem
         className={classes.group}
@@ -45,11 +46,11 @@ export const getMenuItems = ({
     );
     menuItems.push(groupItem);
 
-    const assigneeItems = group.members.map((assignee) => (
+    const assigneeItems = group?.members.map((assignee) => (
       <MenuItem
         key={`${assignee.id}`}
         className={classes.item}
-        value={`${group.name}|${assignee.username}`}
+        value={`${group.name}|${assignee.username}|${assignee.firstname}|${assignee.lastname}`}
       >
         {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
       </MenuItem>
@@ -75,13 +76,13 @@ export const getHeaderText = ({requestDetails, ministryId}) => {
 };
 
 export const getAssignedTo = (requestDetails) => {
-  if (!requestDetails.assignedGroup || requestDetails === "Unassigned") {
+  if (!requestDetails.assignedGroup || requestDetails.assignedTo === "Unassigned") {
     return "|Unassigned";
   }
 
   return requestDetails.assignedTo
-    ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}`
-    : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
+    ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}|${requestDetails.assignedToFirstName}|${requestDetails.assignedToLastName}`
+    : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}|`;
 };
 
 export const getStatus = ({ headerValue, requestDetails }) => {

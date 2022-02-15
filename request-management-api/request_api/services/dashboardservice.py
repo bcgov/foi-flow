@@ -17,11 +17,13 @@ class dashboardservice:
 
     """
 
-    def __preparefoirequestinfo(self, id, firstname, lastname, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version):
+    def __preparefoirequestinfo(self, id, firstname, lastname, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, assignedtofirstname, assignedtolastname):
         baserequestinfo = self.__preparebaserequestinfo(id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version)
         baserequestinfo.update({'firstName': firstname})
         baserequestinfo.update({'lastName': lastname})
         baserequestinfo.update({'xgov': 'No'})
+        baserequestinfo.update({'assignedToFirstName': assignedtofirstname})
+        baserequestinfo.update({'assignedToLastName': assignedtolastname})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version):
@@ -41,7 +43,6 @@ class dashboardservice:
         
         requestqueue = []
         for request in requests.items:
-            firstname , lastname, requesttype = '','',''
             _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
 
             if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
@@ -50,13 +51,13 @@ class dashboardservice:
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
                                                             request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
-                                                            request.assignedTo, 'U-00' + request.idNumber, request.version)
+                                                            request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
 
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
                                                             request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
-                                                            request.assignedGroup, request.idNumber, request.version)
+                                                            request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 requestqueue.append(_openrequest)    
 
@@ -88,7 +89,47 @@ class dashboardservice:
             _openrequest.update({'ministryrequestid': request.ministryrequestid})
             _openrequest.update({'applicantcategory': request.applicantcategory})
             _openrequest.update({'bcgovcode': request.bcgovcode})
+            _openrequest.update({'assignedToFirstName': request.assignedToFirstName})
+            _openrequest.update({'assignedToLastName': request.assignedToLastName})
+            _openrequest.update({'assignedministrypersonFirstName': request.assignedministrypersonFirstName})
+            _openrequest.update({'assignedministrypersonLastName': request.assignedministrypersonLastName})
             requestqueue.append(_openrequest)
+
+        meta = {
+            'page': requests.page,
+            'pages': requests.pages,
+            'total': requests.total,
+            'prev_num': requests.prev_num,
+            'next_num': requests.next_num,
+            'has_next': requests.has_next,
+            'has_prev': requests.has_prev,
+        }
+
+        return jsonify({'data': requestqueue, 'meta': meta})
+
+    def advancedsearch(self, params={'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+        requests = FOIRawRequest.advancedsearch(params)
+        
+        requestqueue = []
+        for request in requests.items:
+            _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+
+            if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
+                _receiveddate = parser.parse(request.receivedDateUF)
+
+            if(request.ministryrequestid == None):
+                unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
+                                                             request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                             request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                unopenrequest.update({'description':request.description})
+                requestqueue.append(unopenrequest)
+            else:
+                _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
+                                                            request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                            request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                _openrequest.update({'description':request.description})
+                requestqueue.append(_openrequest)    
 
         meta = {
             'page': requests.page,

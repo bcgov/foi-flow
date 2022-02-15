@@ -7,6 +7,7 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.models.FOIRequestTeams import FOIRequestTeam
 from datetime import datetime as datetime2
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
@@ -47,14 +48,17 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.assignedgroup = requestschema.get("assignedGroup")
         if self.isNotBlankorNone(requestschema,"assignedTo","main") == True:
             foiministryrequest.assignedto = requestschema.get("assignedTo")
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
+        else:
+            foiministryrequest.assignedto = None
         if self.isNotBlankorNone(requestschema,"assignedministrygroup","main") == True:
             foiministryrequest.assignedministrygroup = requestschema.get("assignedministrygroup")
         if self.isNotBlankorNone(requestschema,"assignedministryperson","main") == True:
             foiministryrequest.assignedministryperson = requestschema.get("assignedministryperson")
-
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedministryperson"), requestschema.get("assignedministrypersonFirstName"), requestschema.get("assignedministrypersonMiddleName"), requestschema.get("assignedministrypersonLastName"))
         if(ministryid is None and filenumber is None and status == "Open"):
-            foiministryrequest.assignedto =''
-            foiministryrequest.assignedgroup = self.__getgroupname(requestschema)
+            foiministryrequest.assignedto = None
+            foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
 
         if ministryid is not None:
             divisions = FOIMinistryRequestDivision().getdivisions(ministryid , activeversion-1)
@@ -72,8 +76,8 @@ class requestservicebuilder(requestserviceconfigurator):
         else:
             return False
         
-    def __getgroupname(self,requestschema):
-        return 'Flex Team' if requestschema.get("requestType") == "general" else 'Processing Team'
+    def __getgroupname(self, requesttype, bcgovcode):
+        return 'Flex Team' if  requesttype == "general" else FOIRequestTeam.getdefaultprocessingteamforpersonal(bcgovcode)
     
     def createcontactinformation(self,dataformat, name, value, contacttypes, userid):
         contactinformation = FOIRequestContactInformation()

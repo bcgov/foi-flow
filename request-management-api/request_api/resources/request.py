@@ -67,9 +67,12 @@ class FOIRawRequest(Resource):
                 status = rawrequestservice().getstatus(updaterequest)
                 rawrequest = rawrequestservice().getrawrequest(requestid)     
                 assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
-                assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest  else None                                         
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup, assignee,status,AuthHelper.getuserid(), AuthHelper.getusername(),AuthHelper.isministrymember())                
-                if result.success == True:   
+                assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest else None
+                assigneefirstname = updaterequest["assignedToFirstName"] if updaterequest.get("assignedToFirstName") != None else None
+                assigneemiddlename = updaterequest["assignedToMiddleName"] if updaterequest.get("assignedToMiddleName") != None else None
+                assigneelastname = updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneefirstname,assigneemiddlename,assigneelastname)
+                if result.success == True:
                     asyncio.run(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
