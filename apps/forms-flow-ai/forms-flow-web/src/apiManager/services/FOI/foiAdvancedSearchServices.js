@@ -12,6 +12,7 @@ export const fetchAdvancedSearchData = ({
   search = "",
   keywords = [],
   requestState = [],
+  requestStatus = [],
   requestType = [],
   fromDate = null,
   toDate = null,
@@ -27,21 +28,6 @@ export const fetchAdvancedSearchData = ({
     sortingOrders.push(item.sort);
   });
 
-  console.log({
-    page: page,
-    size: size,
-    sortingitems: sortingItems,
-    sortingorders: sortingOrders,
-    userid: userID,
-    search: search,
-    keywords: keywords,
-    requestState: requestState,
-    requestType: requestType,
-    fromDate: fromDate,
-    toDate: toDate,
-    publicBodies: publicBodies,
-  });
-
   httpGETRequest(
     API.FOI_GET_ADVANCED_SEARCH,
     {
@@ -53,6 +39,7 @@ export const fetchAdvancedSearchData = ({
       search: search,
       keywords: keywords,
       requestState: requestState,
+      requestStatus: requestStatus,
       requestType: requestType,
       fromDate: fromDate,
       toDate: toDate,

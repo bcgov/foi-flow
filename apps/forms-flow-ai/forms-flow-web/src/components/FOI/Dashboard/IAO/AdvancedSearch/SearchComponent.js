@@ -34,6 +34,7 @@ import {
   formatDate,
 } from "../../../../../helper/FOI/helper";
 import { ActionContext } from "./ActionContext";
+import { StateEnum } from "../../../../../constants/FOI/statusEnum";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -70,6 +71,10 @@ const AdvancedSearch = ({ userDetail }) => {
   const { handleUpdateSearchFilter, searchLoading, setSearchLoading } =
     useContext(ActionContext);
 
+  const programAreaList = useSelector(
+    (state) => state.foiRequests.foiProgramAreaList
+  );
+
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
   const [searchFilterSelected, setSearchFilterSelected] = useState(
@@ -79,19 +84,38 @@ const AdvancedSearch = ({ userDetail }) => {
     searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
 
   const intitialRequestState = {
-    unopened: false,
-    open: false,
-    deduplication: false,
-    cfr: false,
-    recordsReview: false,
-    ministrySignOff: false,
-    closed: false,
-    overdue: false,
+    unopened: {
+      checked: false,
+      id: StateEnum.unopened.id,
+    },
+    open: {
+      checked: false,
+      id: StateEnum.open.id,
+    },
+    callforrecords: {
+      checked: false,
+      id: StateEnum.callforrecords.id,
+    },
+    review: {
+      checked: false,
+      id: StateEnum.review.id,
+    },
+    signoff: {
+      checked: false,
+      id: StateEnum.signoff.id,
+    },
+    closed: {
+      checked: false,
+      id: StateEnum.closed.id,
+    },
+    callforrecordsoverdue: {
+      checked: false,
+      id: StateEnum.callforrecordsoverdue.id,
+    },
   };
   const [requestState, setRequestState] = useState(intitialRequestState);
 
   const intitialRequestStatus = {
-    allActive: false,
     overdue: false,
     onTime: false,
   };
@@ -114,11 +138,10 @@ const AdvancedSearch = ({ userDetail }) => {
   const getTrueKeysFromCheckboxObject = (checkboxObject) => {
     return Object.entries(checkboxObject)
       .map(([key, value]) => {
-        if (value) {
-          return key.toLowerCase();
+        if (value instanceof Object) {
+          return value.checked ? value.id : null;
         }
-
-        return null;
+        return value ? key.toLowerCase() : null;
       })
       .filter((value) => value);
   };
@@ -129,6 +152,7 @@ const AdvancedSearch = ({ userDetail }) => {
       keywords: keywordsMode ? keywords : [searchText],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
+      requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
       fromDate: fromDate,
       toDate: toDate,
       publicBodies: selectedPublicBodies,
@@ -169,7 +193,10 @@ const AdvancedSearch = ({ userDetail }) => {
   const handleRequestStateChange = (event) => {
     setRequestState({
       ...requestState,
-      [event.target.name]: event.target.checked,
+      [event.target.name]: {
+        ...requestState[event.target.name],
+        checked: event.target.checked,
+      },
     });
   };
 
@@ -420,7 +447,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           size="small"
                           name="unopened"
                           onChange={handleRequestStateChange}
-                          checked={requestState.unopened}
+                          checked={requestState.unopened.checked}
                         />
                       }
                       label="Unopened"
@@ -429,9 +456,9 @@ const AdvancedSearch = ({ userDetail }) => {
                       control={
                         <Checkbox
                           size="small"
-                          name="cfr"
+                          name="callforrecords"
                           onChange={handleRequestStateChange}
-                          checked={requestState.cfr}
+                          checked={requestState.callforrecords.checked}
                         />
                       }
                       label="Call for Records"
@@ -440,9 +467,9 @@ const AdvancedSearch = ({ userDetail }) => {
                       control={
                         <Checkbox
                           size="small"
-                          name="recordsReview"
+                          name="review"
                           onChange={handleRequestStateChange}
-                          checked={requestState.recordsReview}
+                          checked={requestState.review.checked}
                         />
                       }
                       label="Records Review"
@@ -451,9 +478,9 @@ const AdvancedSearch = ({ userDetail }) => {
                       control={
                         <Checkbox
                           size="small"
-                          name="ministrySignOff"
+                          name="signoff"
                           onChange={handleRequestStateChange}
-                          checked={requestState.ministrySignOff}
+                          checked={requestState.signoff.checked}
                         />
                       }
                       label="Ministry Sign Off"
@@ -464,7 +491,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           size="small"
                           name="closed"
                           onChange={handleRequestStateChange}
-                          checked={requestState.closed}
+                          checked={requestState.closed.checked}
                         />
                       }
                       label="Closed"
@@ -486,17 +513,6 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="allActive"
-                          onChange={handleRequestStatusChange}
-                          checked={requestStatus.allActive}
-                        />
-                      }
-                      label="All Active"
-                    />
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -666,14 +682,19 @@ const AdvancedSearch = ({ userDetail }) => {
                       <MenuItem disabled value="">
                         <em>All</em>
                       </MenuItem>
-                      {publicBodiesNames.map((publicBody) => (
-                        <MenuItem key={publicBody} value={publicBody}>
+                      {programAreaList.map((programArea) => (
+                        <MenuItem
+                          key={programArea.programareaid}
+                          value={programArea.bcgovcode}
+                        >
                           <Checkbox
                             checked={
-                              selectedPublicBodies.indexOf(publicBody) > -1
+                              selectedPublicBodies.indexOf(
+                                programArea.bcgovcode
+                              ) > -1
                             }
                           />
-                          <ListItemText primary={publicBody} />
+                          <ListItemText primary={programArea.name} />
                         </MenuItem>
                       ))}
                     </Select>

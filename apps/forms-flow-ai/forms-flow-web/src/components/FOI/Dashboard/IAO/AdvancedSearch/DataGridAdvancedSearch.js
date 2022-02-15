@@ -13,6 +13,7 @@ import {
   getLDD,
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
+import { ConditionalComponent } from "../../../../../helper/FOI/helper";
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -39,7 +40,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
 
   useEffect(() => {
-    if (queryData) {
+    if (searchResults) {
+      console.log("called ");
       // page+1 here, because initial page value is 0 for mui-data-grid
       handleUpdateSearchFilter({
         page: rowsState.page + 1,
@@ -123,50 +125,52 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   }
 
   return (
-    <Grid
-      item
-      xs={12}
-      className={classes.root}
-      container
-      direction="row"
-      spacing={1}
-    >
-      <Grid item xs={12}>
-        <h4 className="foi-request-queue-text">Search Results</h4>
+    <ConditionalComponent condition={!!queryData}>
+      <Grid
+        item
+        xs={12}
+        className={classes.root}
+        container
+        direction="row"
+        spacing={1}
+      >
+        <Grid item xs={12}>
+          <h4 className="foi-request-queue-text">Search Results</h4>
+        </Grid>
+        <Grid item xs={12} style={{ height: 450 }}>
+          <DataGrid
+            className="foi-data-grid"
+            getRowId={(row) => row.idNumber}
+            rows={updateAssigneeName(searchResults?.data)}
+            columns={columns.current}
+            rowHeight={30}
+            headerHeight={50}
+            rowCount={searchResults?.meta?.total}
+            pageSize={rowsState.pageSize}
+            rowsPerPageOptions={[10]}
+            hideFooterSelectedRowCount={true}
+            disableColumnMenu={true}
+            pagination
+            paginationMode="server"
+            onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
+            onPageSizeChange={(pageSize) =>
+              setRowsState((prev) => ({ ...prev, pageSize }))
+            }
+            sortingOrder={["desc", "asc"]}
+            sortModel={sortModel}
+            sortingMode={"server"}
+            onSortModelChange={(model) => setSortModel(model)}
+            getRowClassName={(params) =>
+              `super-app-theme--${params.row.currentState
+                .toLowerCase()
+                .replace(/ +/g, "")}`
+            }
+            onRowClick={renderReviewRequest}
+            loading={searchLoading}
+          />
+        </Grid>
       </Grid>
-      <Grid item xs={12} style={{ height: 450 }}>
-        <DataGrid
-          className="foi-data-grid"
-          getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(searchResults?.data)}
-          columns={columns.current}
-          rowHeight={30}
-          headerHeight={50}
-          rowCount={searchResults?.meta?.total}
-          pageSize={rowsState.pageSize}
-          rowsPerPageOptions={[10]}
-          hideFooterSelectedRowCount={true}
-          disableColumnMenu={true}
-          pagination
-          paginationMode="server"
-          onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-          onPageSizeChange={(pageSize) =>
-            setRowsState((prev) => ({ ...prev, pageSize }))
-          }
-          sortingOrder={["desc", "asc"]}
-          sortModel={sortModel}
-          sortingMode={"server"}
-          onSortModelChange={(model) => setSortModel(model)}
-          getRowClassName={(params) =>
-            `super-app-theme--${params.row.currentState
-              .toLowerCase()
-              .replace(/ +/g, "")}`
-          }
-          onRowClick={renderReviewRequest}
-          loading={searchLoading}
-        />
-      </Grid>
-    </Grid>
+    </ConditionalComponent>
   );
 };
 

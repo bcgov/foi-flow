@@ -1,7 +1,10 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { fetchFOIFullAssignedToList } from "../../../../../apiManager/services/FOI/foiMasterDataServices";
+import {
+  fetchFOIFullAssignedToList,
+  fetchFOIProgramAreaList,
+} from "../../../../../apiManager/services/FOI/foiMasterDataServices";
 import { fetchAdvancedSearchData } from "../../../../../apiManager/services/FOI/foiAdvancedSearchServices";
 import { errorToast } from "../../../../../helper/FOI/helper";
 export const ActionContext = createContext();
@@ -19,8 +22,11 @@ export const ActionProvider = ({ children, requestDetails }) => {
   };
 
   useEffect(() => {
+    dispatch(fetchFOIProgramAreaList());
+  }, [dispatch]);
+
+  useEffect(() => {
     if (queryData) {
-      console.log("not empty", queryData);
       fetchAdvancedSearchData({
         ...queryData,
         callback: (data) => {

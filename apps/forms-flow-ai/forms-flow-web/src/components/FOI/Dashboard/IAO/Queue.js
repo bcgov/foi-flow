@@ -209,6 +209,9 @@ const Queue = ({ userDetail }) => {
   }, 500);
 
   const updateAssigneeName = (data) => {
+    if (!data) {
+      return data;
+    }
     return data.map((row) => ({
       ...row,
       assignedToName: getAssigneeValue(row),
@@ -284,7 +287,7 @@ const Queue = ({ userDetail }) => {
           columns={columns.current}
           rowHeight={30}
           headerHeight={50}
-          rowCount={requestQueue.meta.total}
+          rowCount={requestQueue?.meta?.total}
           pageSize={rowsState.pageSize}
           rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
