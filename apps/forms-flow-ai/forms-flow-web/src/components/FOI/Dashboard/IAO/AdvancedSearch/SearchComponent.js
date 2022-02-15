@@ -75,6 +75,11 @@ const AdvancedSearch = ({ userDetail }) => {
     (state) => state.foiRequests.foiProgramAreaList
   );
 
+  const isLoading = useSelector((state) => state.foiRequests.isLoading);
+  const isAssignedToListLoading = useSelector(
+    (state) => state.foiRequests.isAssignedToListLoading
+  );
+
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
   const [searchFilterSelected, setSearchFilterSelected] = useState(
@@ -250,13 +255,13 @@ const AdvancedSearch = ({ userDetail }) => {
     );
   };
 
-  // if (searchLoading) {
-  //   return (
-  //     <Grid item xs={12} container alignItems="center">
-  //       <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
-  //     </Grid>
-  //   );
-  // }
+  if (isLoading || isAssignedToListLoading) {
+    return (
+      <Grid item xs={12} container alignItems="center">
+        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
+      </Grid>
+    );
+  }
   return (
     <>
       <Grid item container xs={12}>
