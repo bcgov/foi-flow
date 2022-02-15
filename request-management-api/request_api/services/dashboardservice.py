@@ -122,6 +122,7 @@ class dashboardservice:
                                                              request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
                                                              request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
                 unopenrequest.update({'description':request.description})
+                unopenrequest.update({'duedate':request.duedate})
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
@@ -129,6 +130,7 @@ class dashboardservice:
                                                             request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 _openrequest.update({'description':request.description})
+                _openrequest.update({'duedate':request.duedate})
                 requestqueue.append(_openrequest)    
 
         meta = {
