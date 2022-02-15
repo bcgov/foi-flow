@@ -11,6 +11,7 @@ import {
   updateSortModel,
   getFullName,
   getLDD,
+  getDaysLeft,
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
@@ -87,9 +88,16 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     {
       field: "DueDateValue",
       headerName: "LDD",
-      width: 150,
+      width: 100,
       headerAlign: "left",
       valueGetter: getLDD,
+    },
+    {
+      field: "DaysLeftValue",
+      headerName: "DAYS LEFT",
+      width: 100,
+      headerAlign: "left",
+      valueGetter: getDaysLeft,
     },
     { field: "xgov", headerName: "XGOV", width: 100, headerAlign: "left" },
   ]);

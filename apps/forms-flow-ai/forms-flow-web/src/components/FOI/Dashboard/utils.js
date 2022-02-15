@@ -2,6 +2,7 @@ import {
   formatDate,
   addBusinessDays,
   businessDay,
+  calculateDaysRemaining,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 
@@ -97,4 +98,8 @@ export const getLDD = (params) => {
   } else {
     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
   }
+};
+
+export const getDaysLeft = (params) => {
+  return calculateDaysRemaining(params.row.duedate);
 };
