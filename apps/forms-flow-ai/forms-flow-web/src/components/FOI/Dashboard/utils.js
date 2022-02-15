@@ -101,5 +101,12 @@ export const getLDD = (params) => {
 };
 
 export const getDaysLeft = (params) => {
-  return calculateDaysRemaining(params.row.duedate);
+  if (
+    params.row.currentState.toLowerCase() ===
+    StateEnum.onhold.name.toLowerCase()
+  ) {
+    return "N/A";
+  } else {
+    return calculateDaysRemaining(params.row.duedate);
+  }
 };
