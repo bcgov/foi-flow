@@ -684,12 +684,12 @@ const AdvancedSearch = ({ userDetail }) => {
                       }}
                       MenuProps={MenuProps}
                     >
-                      <MenuItem disabled value="">
+                      <MenuItem disabled value="" key="program-area-all">
                         <em>All</em>
                       </MenuItem>
                       {programAreaList.map((programArea) => (
                         <MenuItem
-                          key={programArea.programareaid}
+                          key={`program-area-${programArea.programareaid}`}
                           value={programArea.bcgovcode}
                         >
                           <Checkbox
@@ -699,7 +699,10 @@ const AdvancedSearch = ({ userDetail }) => {
                               ) > -1
                             }
                           />
-                          <ListItemText primary={programArea.name} />
+                          <ListItemText
+                            primary={programArea.name}
+                            key={`program-area-label-${programArea.programareaid}`}
+                          />
                         </MenuItem>
                       ))}
                     </Select>
