@@ -158,8 +158,8 @@ const AdvancedSearch = ({ userDetail }) => {
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
-      fromDate: fromDate,
-      toDate: toDate,
+      fromDate: fromDate || null,
+      toDate: toDate || null,
       publicBodies: selectedPublicBodies,
     });
   };
