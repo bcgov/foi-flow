@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import "../../dashboard.scss";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
@@ -62,6 +61,9 @@ const useStyles = makeStyles((theme) => ({
     color: "#38598A",
     border: "1px solid #38598A",
     width: "100%",
+  },
+  paper: {
+    backgroundColor: "#F9FBFD",
   },
 }));
 

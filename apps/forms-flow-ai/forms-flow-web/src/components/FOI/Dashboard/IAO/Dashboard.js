@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Queue from "./Queue";
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "2em",
   },
   hidden: {
-    display: "none",
+    display: "none !important",
   },
   disabledTitle: {
     opacity: "0.3",
@@ -103,7 +103,6 @@ const Dashboard = ({ userDetail }) => {
           spacing={1}
           className={clsx({
             [classes.hidden]: advnacedSearchEnabled,
-            [classes.displayed]: !advnacedSearchEnabled,
           })}
           sx={{
             marginTop: "2em",
@@ -116,9 +115,11 @@ const Dashboard = ({ userDetail }) => {
           container
           direction="row"
           spacing={2}
+          sx={{
+            marginTop: "2em",
+          }}
           className={clsx({
             [classes.hidden]: !advnacedSearchEnabled,
-            [classes.displayed]: advnacedSearchEnabled,
           })}
         >
           <AdvancedSearch userDetail={userDetail} />
