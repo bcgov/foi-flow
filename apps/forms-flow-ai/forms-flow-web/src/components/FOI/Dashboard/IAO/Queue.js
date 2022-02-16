@@ -7,7 +7,14 @@ import { push } from "connected-react-router";
 import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import Loading from "../../../../containers/Loading";
-import { debounce, ClickableChip } from "../utils";
+import { 
+  debounce,
+  ClickableChip,
+  getAssigneeValue,
+  updateSortModel,
+  getFullName,
+  getReceivedDate,
+} from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
@@ -15,12 +22,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import {
-  getAssigneeValue,
-  updateSortModel,
-  getFullName,
-  getReceivedDate,
-} from "../../utils";
 
 const Queue = ({ userDetail }) => {
   const dispatch = useDispatch();
