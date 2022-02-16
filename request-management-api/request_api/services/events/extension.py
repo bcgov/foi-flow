@@ -52,7 +52,7 @@ class extensionevent:
         elif onlycleanuprequired == True:
             notificationservice().cleanupnotifications(ministryrequestid, "ministryrequest", "Extension", extensionid)
             return DefaultMethodResult(True, "Delete Extension", ministryrequestid)
-        elif onlynotificationrequired == True or notificationandcleanup == True:
+        elif extensionsummary and (onlynotificationrequired == True or notificationandcleanup == True):
             notification = self.__preparenotification(extensionsummary)
             return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, notificationandcleanup)
 
@@ -61,16 +61,23 @@ class extensionevent:
         isdenied = self.__valueexists('isdenied', extensionsummary)
         isapproved = self.__valueexists('isapproved', extensionsummary)
         
-        extension = self.__valueexists('extension', extensionsummary) 
-        approveddays = self.__valueexists('approvednoofdays', extension) 
+        extension = self.__valueexists('extension', extensionsummary)
+        prevextension = self.__valueexists('prevextension', extensionsummary)
+        prevapprovedays =  self.__valueexists('approvednoofdays', prevextension) if prevextension else None
+        approveddays = self.__valueexists('approvednoofdays', extension)
+        prevextendeddays = self.__valueexists('extendedduedays', prevextension) if prevextension else None
         extendedduedays = self.__valueexists('extendedduedays', extension) 
-        newduedate = self.__formatdate(self.__valueexists('extendedduedate', extension), '%Y %b %d')        
+        newduedate = self.__formatdate(self.__valueexists('extendedduedate', extension), '%Y %b %d')
+
+        approveddayschanged = True if prevapprovedays and prevapprovedays != approveddays else False
+        extendeddayschanged = True if prevextendeddays and prevextendeddays != extendedduedays else False
+
       
         if isdenied == True:
             return  "Extension request to OIPC has been denied."
-        elif ispublicbody == True and isapproved == True:
+        elif ispublicbody == True and isapproved == True or (extendeddayschanged == True):
             return "Extension taken for " + str(extendedduedays) + " days. The new legislated due date is "+ newduedate + "."
-        elif isapproved == True and not ispublicbody:
+        elif isapproved == True and not ispublicbody or (approveddayschanged == True):
             return "Extension taken for " + str(approveddays) + " days. The new legislated due date is "+ newduedate + "."            
         else:
             return "Extension has been edited."
@@ -102,14 +109,16 @@ class extensionevent:
             return True
 
     def __nonotificationrequired(self, curextension, prevextension, event):
-        ismodified = self.__findmodify(curextension, prevextension, event)
-        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
-        if (event == EventType.add.value and curextensionstatusid == 1) or ismodified == True:
+        curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
+        prevextensionstatusid = self.__valueexists('extensionstatusid', prevextension)
+        curapproveddays = self.__valueexists('approvednoofdays', curextension)
+        prevapproveddays = self.__valueexists('approvednoofdays', prevextension)
+        if (event == EventType.add.value and curextensionstatusid == 1) or (event == EventType.modify.value and curextensionstatusid ==  prevextensionstatusid and curapproveddays == prevapproveddays):
             return True
     
     def __onlycleanuprequired(self, curextension, prevextension, event):
-        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
-        prevextensionstatusid = prevextension["extensionstatusid"] if 'extensionstatusid' in prevextension else None
+        curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
+        prevextensionstatusid = self.__valueexists('extensionstatusid', prevextension)
         if event == EventType.delete.value or (event == EventType.modify.value and str(prevextensionstatusid)  in [str(ExtensionStatus.denied.value), str(ExtensionStatus.approved.value)] and curextensionstatusid == 1):
             return True
     def __onlynotificationrequired(self, curextension, prevextension, event):
@@ -120,9 +129,11 @@ class extensionevent:
             return True
 
     def __bothnotificationandcleanup(self, curextension, prevextension, event):
-        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
-        prevextensionstatusid = prevextension["extensionstatusid"] if 'extensionstatusid' in prevextension else None
-        if event == EventType.modify.value and curextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value] and prevextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value]:
+        curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
+        prevextensionstatusid = self.__valueexists('extensionstatusid', prevextension)
+        curapproveddays = self.__valueexists('approvednoofdays', curextension)
+        prevapproveddays = self.__valueexists('approvednoofdays', prevextension)
+        if (event == EventType.modify.value and curextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value] and prevextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value]) or (event == EventType.modify.value and curextensionstatusid == ExtensionStatus.approved.value and curextensionstatusid == prevextensionstatusid and prevapproveddays != curapproveddays):
             return True
 
     def __maintained(self, curextension, prevextension, event, summaryfor):        
@@ -133,12 +144,14 @@ class extensionevent:
         ispublicbody = self.__findpublicbody(curextension)
         isapproved = self.__findapproved(curextension, prevextension, event)
         ismodified = self.__findmodify(curextension, prevextension, event)        
-        curreasonid = curextension["extensionreasonid"] if curextension else None
+        curreasonid = self.__valueexists("extensionreasonid", curextension)        
         curreason = self.__getextensionreasonvalue(self.__getextensionreason(curreasonid))        
         if event == EventType.delete.value and summaryfor == ExtensionSummaryFor.comments.value:
             return {'extension': curextension, 'reason': curreason, 'isdelete': True}
         elif event == EventType.modify.value and not ismodified and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}   
+        elif event == EventType.modify.value and ismodified and summaryfor == ExtensionSummaryFor.notification.value:
+            return {'extension': curextension, 'prevextension': prevextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}
         elif event == EventType.add.value and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}
 
