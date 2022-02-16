@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegrationWebAPI", "MCS.FOI.AXISIntegrationWebAPI\MCS.FOI.AXISIntegrationWebAPI.csproj", "{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A86B51CB-9178-46DC-BB23-D0F741836E24}
+	EndGlobalSection
+EndGlobal
