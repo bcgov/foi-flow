@@ -25,13 +25,6 @@ import { getAssigneeValue, updateSortModel, getFullName } from "../../utils";
 const Queue = ({ userDetail }) => {
   const dispatch = useDispatch();
 
-  const assignedToList = useSelector(
-    (state) => state.foiRequests.foiFullAssignedToList
-  );
-  const isAssignedToListLoading = useSelector(
-    (state) => state.foiRequests.isAssignedToListLoading
-  );
-
   const requestQueue = useSelector(
     (state) => state.foiRequests.foiRequestsList
   );
@@ -59,7 +52,8 @@ const Queue = ({ userDetail }) => {
       "requestType",
       "idNumber",
       "currentState",
-      "assignedTo",
+      "assignedToLastName",
+      "assignedToFirstName"
     ],
     keyword: null,
   });
@@ -169,7 +163,7 @@ const Queue = ({ userDetail }) => {
     }
     return data.map((row) => ({
       ...row,
-      assignedToName: getAssigneeValue(row, assignedToList),
+      assignedToName: getAssigneeValue(row),
     }));
   };
 
@@ -185,7 +179,7 @@ const Queue = ({ userDetail }) => {
     }
   };
 
-  if (isLoading || isAssignedToListLoading) {
+  if (isLoading) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
