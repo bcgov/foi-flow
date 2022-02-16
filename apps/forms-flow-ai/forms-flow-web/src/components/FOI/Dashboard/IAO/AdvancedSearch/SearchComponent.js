@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import React, { useState, useContext } from "react";
 import "../../dashboard.scss";
 import { useSelector } from "react-redux";
 
@@ -26,7 +25,6 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
-import { publicBodiesNames } from "./constants";
 import { SearchFilter } from "./enum";
 import {
   ConditionalComponent,
@@ -67,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AdvancedSearch = ({ userDetail }) => {
+const AdvancedSearch = () => {
   const classes = useStyles();
 
   const { handleUpdateSearchFilter, searchLoading, setSearchLoading } =

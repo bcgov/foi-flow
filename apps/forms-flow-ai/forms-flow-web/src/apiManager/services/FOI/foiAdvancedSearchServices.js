@@ -1,8 +1,7 @@
-import { httpPOSTRequest, httpGETRequest } from "../../httpRequestHandler";
+import { httpGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
-import { catchError, fnDone } from "./foiServicesUtil";
+import { catchError } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
-import { replaceUrl } from "../../../helper/FOI/helper";
 
 export const fetchAdvancedSearchData = ({
   page = 1,

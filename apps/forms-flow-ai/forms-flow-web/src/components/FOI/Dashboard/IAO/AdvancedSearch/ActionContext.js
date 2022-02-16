@@ -1,17 +1,12 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import {
-  fetchFOIFullAssignedToList,
-  fetchFOIProgramAreaList,
-} from "../../../../../apiManager/services/FOI/foiMasterDataServices";
+import { useDispatch } from "react-redux";
+import { fetchFOIProgramAreaList } from "../../../../../apiManager/services/FOI/foiMasterDataServices";
 import { fetchAdvancedSearchData } from "../../../../../apiManager/services/FOI/foiAdvancedSearchServices";
 import { errorToast } from "../../../../../helper/FOI/helper";
 export const ActionContext = createContext();
 ActionContext.displayName = "AdvancedSearchContext";
-export const ActionProvider = ({ children, requestDetails }) => {
+export const ActionProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const { requestId, ministryId } = useParams();
 
   const [queryData, setQueryData] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);

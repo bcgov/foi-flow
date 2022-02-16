@@ -107,6 +107,6 @@ export const getDaysLeft = (params) => {
   ) {
     return "N/A";
   } else {
-    return calculateDaysRemaining(params.row.duedate);
+    return `${calculateDaysRemaining(params.row.duedate)}`;
   }
 };
