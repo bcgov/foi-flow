@@ -48,13 +48,7 @@ APP = create_app()
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))    
     RedisSubscriberService().register_subscription()
-    if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
-        socketio.init_app(APP, async_mode='eventlet',
-                      message_queue=os.getenv("FOI_REQUESTQUEUE_REDISURL"),
-                      redis_options={'REDIS_OPTIONS'},  
-                      path='/api/v1/socket.io')
-    else:
-        socketio.init_app(APP, async_mode='eventlet', 
+    socketio.init_app(APP, async_mode='eventlet', 
                       path='/api/v1/socket.io')
     socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
     
