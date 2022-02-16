@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  gridPageCountSelector,
+  gridPageSelector,
+  useGridApiContext,
+  useGridSelector,
+} from '@mui/x-data-grid';
+import Pagination from '@mui/material/Pagination';
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
@@ -269,6 +276,9 @@ const Queue = ({ userDetail }) => {
           onPageSizeChange={(pageSize) =>
             setRowsState((prev) => ({ ...prev, pageSize }))
           }
+          components={{
+            Pagination: CustomPagination,
+          }}
           sortingOrder={["desc", "asc"]}
           sortModel={sortModel}
           sortingMode={"server"}
@@ -285,5 +295,20 @@ const Queue = ({ userDetail }) => {
     </>
   );
 };
+
+const CustomPagination = () => {
+  const apiRef = useGridApiContext();
+  const page = useGridSelector(apiRef, gridPageSelector);
+  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+  return (
+    <Pagination
+      color="primary"
+      count={pageCount}
+      page={page + 1}
+      onChange={(event, value) => apiRef.current.setPage(value - 1)}
+    />
+  );
+}
 
 export default Queue;
