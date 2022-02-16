@@ -19,9 +19,6 @@ import SearchIcon from '@material-ui/icons/Search';
 const MinistryDashboard = ({userDetail}) => {
 
   const dispatch = useDispatch(); 
- 
-  const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
-  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);  
 
   const requestQueue = useSelector(state=> state.foiRequests.foiMinistryRequestsList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
@@ -184,7 +181,7 @@ return (
         </Grid>
       </Grid>
       <>
-        {!isLoading && !isAssignedToListLoading ? (
+        {!isLoading ? (
           <>
             <Grid item container alignItems="center" xs={12}>
               <Grid item xs={12} lg={6} className="form-group has-search">

@@ -19,8 +19,6 @@ import SearchIcon from '@material-ui/icons/Search';
 const Dashboard = ({userDetail}) => {
   const dispatch = useDispatch();
 
-  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);
-
   const requestQueue = useSelector(state=> state.foiRequests.foiRequestsList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
   
@@ -194,7 +192,7 @@ const Dashboard = ({userDetail}) => {
             </Grid>
           </Grid>
           <>
-            {!isLoading && !isAssignedToListLoading ? (
+            {!isLoading ? (
               <>
                 <Grid item container alignItems="center" xs={12}>
                   <Grid item lg={6} xs={12} className="form-group has-search">
