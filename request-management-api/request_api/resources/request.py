@@ -34,6 +34,8 @@ TRACER = Tracer.get_instance()
 with open('request_api/schemas/schemas/rawrequest.json') as f:
         schema = json.load(f)
 
+INVALID_REQUEST_ID = 'Invalid Request Id'
+
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
 class FOIRawRequest(Resource):
@@ -52,7 +54,7 @@ class FOIRawRequest(Resource):
                 jsondata = json.dumps(baserequestinfo)
             return jsondata , 200 
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -65,12 +67,14 @@ class FOIRawRequest(Resource):
             updaterequest = request.get_json()
             if int(requestid) and str(requestid) != "-1" :
                 status = rawrequestservice().getstatus(updaterequest)
-                rawrequest = rawrequestservice().getrawrequest(requestid)     
-                assigneegroup = updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None
-                assignee = updaterequest["assignedTo"] if 'assignedTo' in updaterequest else None
-                assigneefirstname = updaterequest["assignedToFirstName"] if updaterequest.get("assignedToFirstName") != None else None
-                assigneemiddlename = updaterequest["assignedToMiddleName"] if updaterequest.get("assignedToMiddleName") != None else None
-                assigneelastname = updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
+                rawrequest = rawrequestservice().getrawrequest(requestid)
+                requestdata = getparams(updaterequest)
+
+                assigneegroup = requestdata['assigneegroup']
+                assignee = requestdata['assignee']
+                assigneefirstname = requestdata['assigneefirstname']
+                assigneemiddlename = requestdata['assigneemiddlename']
+                assigneelastname = requestdata['assigneelastname']
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneefirstname,assigneemiddlename,assigneelastname)
                 if result.success == True:
                     asyncio.run(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
@@ -80,9 +84,18 @@ class FOIRawRequest(Resource):
                 asyncio.run(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+    
+def getparams(updaterequest):
+    return {
+        'assigneegroup': updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None,
+        'assignee': updaterequest["assignedTo"] if 'assignedTo' in updaterequest else None,
+        'assigneefirstname': updaterequest["assignedToFirstName"] if updaterequest.get("assignedToFirstName") != None else None,
+        'assigneemiddlename': updaterequest["assignedToMiddleName"] if updaterequest.get("assignedToMiddleName") != None else None,
+        'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
+    }
 
 
 @cors_preflight('GET,POST,OPTIONS')
@@ -104,7 +117,7 @@ class FOIRawRequestLoadTest(Resource):
                 asyncio.run(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request Id"}, 500    
+            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 

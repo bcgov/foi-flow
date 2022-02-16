@@ -34,20 +34,22 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foirequest.createdby = userid
         return foirequest
     
-    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):  
+    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):
+        requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
+
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
         foiministryrequest.version = ministryschema["version"] + 1
         foiministryrequest.foirequest_id = ministryschema["foirequest_id"] 
         foiministryrequest.foirequestversion_id = ministryschema["foirequestversion_id"] 
         foiministryrequest.description = ministryschema["description"]
-        foiministryrequest.recordsearchfromdate = ministryschema['recordsearchfromdate'] if 'recordsearchfromdate' in ministryschema  else None
-        foiministryrequest.recordsearchtodate = ministryschema['recordsearchtodate'] if 'recordsearchtodate' in ministryschema  else None
+        foiministryrequest.recordsearchfromdate = requestdict['recordsearchfromdate']
+        foiministryrequest.recordsearchtodate = requestdict['recordsearchtodate']
         foiministryrequest.filenumber = ministryschema["filenumber"]
-        foiministryrequest.cfrduedate = ministryschema['cfrduedate'] if 'cfrduedate' in ministryschema  else None
-        foiministryrequest.startdate = ministryschema['startdate'] if 'startdate' in ministryschema  else None
-        foiministryrequest.duedate = requestschema['duedate'] if 'duedate' in requestschema else ministryschema["duedate"] #and isextension == True 
-        foiministryrequest.assignedministrygroup = requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"]
+        foiministryrequest.cfrduedate = requestdict['cfrduedate']
+        foiministryrequest.startdate = requestdict['startdate']
+        foiministryrequest.duedate = requestdict['duedate']
+        foiministryrequest.assignedministrygroup = requestdict['assignedministrygroup']
         if 'assignedministryperson' in requestschema:
             foiministryrequest.assignedministryperson = requestschema['assignedministryperson']
             firstname = requestschema['assignedministrypersonFirstName'] if requestschema['assignedministryperson'] != None else None
@@ -57,7 +59,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         else:
             foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
 
-        foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"]
+        foiministryrequest.assignedgroup = requestdict['assignedgroup']
         if 'assignedto' in requestschema:
             foiministryrequest.assignedto = requestschema['assignedto']
             fn = requestschema['assignedtoFirstName'] if requestschema['assignedto'] != None else None
@@ -67,8 +69,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         else:
             foiministryrequest.assignedto = ministryschema["assignedto"]
 
-        foiministryrequest.requeststatusid = requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"]
-        foiministryrequest.programareaid = ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None
+        foiministryrequest.requeststatusid = requestdict['requeststatusid']
+        foiministryrequest.programareaid = requestdict['programareaid']
         foiministryrequest.createdby = userid
         if 'divisions' in requestschema:
             foiministryrequest.divisions = self.createfoirequestdivision(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
@@ -77,9 +79,24 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             foiministryrequest.divisions = self.createfoirequestdivisionfromobject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
         foiministryrequest.documents = self.createfoirequestdocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)
         foiministryrequest.extensions = self.createfoirequestextensions(ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)       
-        foiministryrequest.closedate = requestschema['closedate'] if 'closedate' in requestschema  else None
-        foiministryrequest.closereasonid = requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
+        foiministryrequest.closedate = requestdict['closedate']
+        foiministryrequest.closereasonid = requestdict['closereasonid']
         return foiministryrequest
+
+    def createfoiministryrequestfromobject1(self, ministryschema, requestschema):  
+        return {
+            'recordsearchfromdate': ministryschema['recordsearchfromdate'] if 'recordsearchfromdate' in ministryschema  else None,
+            'recordsearchtodate': ministryschema['recordsearchtodate'] if 'recordsearchtodate' in ministryschema  else None,
+            'cfrduedate': ministryschema['cfrduedate'] if 'cfrduedate' in ministryschema  else None,
+            'startdate': ministryschema['startdate'] if 'startdate' in ministryschema  else None,
+            'duedate': requestschema['duedate'] if 'duedate' in requestschema else ministryschema["duedate"], #and isextension':= True 
+            'assignedministrygroup': requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"],
+            'assignedgroup': requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"],
+            'requeststatusid': requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"],
+            'programareaid': ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None,
+            'closedate': requestschema['closedate'] if 'closedate' in requestschema  else None,
+            'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
+        }
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
         documentarr = []
