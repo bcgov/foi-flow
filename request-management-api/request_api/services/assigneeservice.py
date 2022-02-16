@@ -30,10 +30,6 @@ class assigneeservice:
     def getprocessingteamsbyrequesttype(self,requesttype):
         return FOIRequestTeam.getprocessingteamsbytype(requesttype)
             
-    
-    def __getministrygroupname(self, group, bcgovcode):
-        return group.replace('@bcgovcode', bcgovcode) if bcgovcode is not None else None
-                  
     def saveassignee(self, username, firstname, middlename, lastname):
         # FOIAssignee
         newassignee = FOIAssignee()

@@ -10,6 +10,9 @@ import maya
 
 from flask import jsonify
 
+SHORT_DATEFORMAT = '%Y %b, %d'
+LONG_DATEFORMAT = '%Y-%m-%d %H:%M:%S.%f'
+
 class dashboardservice:
     """ FOI dashboard management service
 
@@ -50,13 +53,13 @@ class dashboardservice:
 
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                            request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                            request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
                                                             request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
 
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                            request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                            request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
                                                             request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 requestqueue.append(_openrequest)    
@@ -119,14 +122,14 @@ class dashboardservice:
 
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                             request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                             request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
                                                              request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'duedate':request.duedate})
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                            request.currentState, _receiveddate.strftime('%Y %b, %d'), _receiveddate.strftime('%Y-%m-%d %H:%M:%S.%f'), request.assignedGroup,
+                                                            request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
                                                             request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 _openrequest.update({'description':request.description})
