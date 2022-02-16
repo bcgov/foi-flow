@@ -34,7 +34,7 @@ class rawrequestservice:
             data['assignedGroup'] = assigneegroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
-            asyncio.run(redispubservice.publishtoredischannel(json_data))
+            asyncio.create_task(redispubservice.publishrequest(json_data))
         return result
 
     @staticmethod
@@ -61,7 +61,7 @@ class rawrequestservice:
         #Get documents
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid)
         documentservice().createrawrequestdocumentversion(_requestid)
-        asyncio.run(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
+        asyncio.create_task(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
         return result
 
    
