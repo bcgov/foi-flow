@@ -20,6 +20,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import { getAssigneeValue, updateSortModel, getFullName } from "../../utils";
 
 const Queue = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -79,57 +80,6 @@ const Queue = ({ userDetail }) => {
       )
     );
   }, [rowsState, sortModel, filterModel, requestFilter]);
-
-  function getFullName(params) {
-    return `${params.row.lastName || ""}, ${params.row.firstName || ""}`;
-  }
-
-  // update sortModel for applicantName & assignedTo
-  const updateSortModel = () => {
-    let smodel = JSON.parse(JSON.stringify(sortModel));
-    if (smodel) {
-      smodel.map((row) => {
-        if (row.field === "assignedToName") row.field = "assignedTo";
-      });
-
-      let field = smodel[0]?.field;
-      let order = smodel[0]?.sort;
-      if (field == "applicantName") {
-        smodel.shift();
-        smodel.unshift(
-          { field: "lastName", sort: order },
-          { field: "firstName", sort: order }
-        );
-      }
-    }
-
-    return smodel;
-  };
-
-  function getAssigneeValue(row) {
-    const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";
-    const assignedTo = row.assignedTo ? row.assignedTo : groupName;
-    if (assignedToList && assignedToList.length > 0) {
-      const assigneeDetails = assignedToList.find(
-        (assigneeGroup) => assigneeGroup.name === groupName
-      );
-      const assignee =
-        assigneeDetails &&
-        assigneeDetails.members &&
-        assigneeDetails.members.find(
-          (_assignee) => _assignee.username === assignedTo
-        );
-      if (groupName === assignedTo) {
-        return assignedTo;
-      } else {
-        return assignee !== undefined
-          ? `${assignee.lastname}, ${assignee.firstname}`
-          : "invalid user";
-      }
-    } else {
-      return assignedTo;
-    }
-  }
 
   function getReceivedDate(params) {
     let receivedDateString = params.row.receivedDateUF;
@@ -219,7 +169,7 @@ const Queue = ({ userDetail }) => {
     }
     return data.map((row) => ({
       ...row,
-      assignedToName: getAssigneeValue(row),
+      assignedToName: getAssigneeValue(row, assignedToList),
     }));
   };
 
@@ -258,6 +208,7 @@ const Queue = ({ userDetail }) => {
           container
           item
           xs={12}
+          elevation={0}
         >
           <Grid
             item
