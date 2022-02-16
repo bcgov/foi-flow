@@ -37,13 +37,9 @@ const Queue = ({ userDetail }) => {
     (state) => state.foiRequests.foiRequestsList
   );
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
-  const isAssignedToListLoading = useSelector(
-    (state) => state.foiRequests.isAssignedToListLoading
-  );
 
   const classes = useStyles();
   useEffect(() => {
-    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOIRequestListByPage());
   }, [dispatch]);
 
@@ -171,7 +167,7 @@ const Queue = ({ userDetail }) => {
     }
   };
 
-  if (isLoading || isAssignedToListLoading) {
+  if (isLoading) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -267,7 +263,7 @@ const Queue = ({ userDetail }) => {
           columns={columns.current}
           rowHeight={30}
           headerHeight={50}
-          rowCount={requestQueue?.meta?.total}
+          rowCount={requestQueue?.meta?.total || 0}
           pageSize={rowsState.pageSize}
           rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}

@@ -25,9 +25,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   const assignedToList = useSelector(
     (state) => state.foiRequests.foiFullAssignedToList
   );
-  const isAssignedToListLoading = useSelector(
-    (state) => state.foiRequests.isAssignedToListLoading
-  );
 
   const classes = useStyles();
 
@@ -124,7 +121,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   };
 
-  if (searchLoading || isAssignedToListLoading) {
+  if (searchLoading) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -153,7 +150,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             columns={columns.current}
             rowHeight={30}
             headerHeight={50}
-            rowCount={searchResults?.meta?.total}
+            rowCount={searchResults?.meta?.total || 0}
             pageSize={rowsState.pageSize}
             rowsPerPageOptions={[10]}
             hideFooterSelectedRowCount={true}
