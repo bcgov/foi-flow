@@ -12,12 +12,14 @@ import {
   businessDay,
 } from "../../../../helper/FOI/helper";
 import Loading from "../../../../containers/Loading";
-import { debounce } from "../utils";
-import Grid from "@material-ui/core/Grid";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { debounce, ClickableChip } from "../utils";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputBase from "@mui/material/InputBase";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
 
 const Queue = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -197,9 +199,12 @@ const Queue = ({ userDetail }) => {
     },
   ]);
 
-  const requestFilterChange = (e) => {
+  const requestFilterChange = (filter) => {
+    if (filter === requestFilter) {
+      return;
+    }
     setRowsState(defaultRowsState);
-    setRequestFilter(e.target.value);
+    setRequestFilter(filter);
   };
 
   const setSearch = debounce((e) => {
@@ -241,43 +246,82 @@ const Queue = ({ userDetail }) => {
   return (
     <>
       <Grid item container alignItems="center" xs={12}>
-        <Grid item lg={6} xs={12} className="form-group has-search">
-          <SearchIcon className="form-control-search" />
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search . . ."
-            onChange={setSearch}
-          />
-        </Grid>
-
-        <Grid item container lg={6} xs={12} justifyContent="flex-end">
-          <RadioGroup
-            name="controlled-radio-buttons-group"
-            value={requestFilter}
-            onChange={requestFilterChange}
-            row
+        <Paper
+          component={Grid}
+          sx={{
+            border: "1px solid #38598A",
+            color: "#38598A",
+          }}
+          alignItems="center"
+          justifyContent="center"
+          direction="row"
+          container
+          item
+          xs={12}
+        >
+          <Grid
+            item
+            container
+            alignItems="center"
+            direction="row"
+            xs={7}
+            sx={{
+              borderRight: "2px solid #38598A",
+              backgroundColor: "rgba(56,89,138,0.1)",
+            }}
+            fullWidth
           >
-            <FormControlLabel
-              className="form-control-label"
-              value="myRequests"
-              control={<Radio className="mui-radio" color="primary" />}
-              label="My Requests"
+            <InputBase
+              placeholder="Search in Queue ..."
+              onChange={setSearch}
+              sx={{
+                color: "#38598A",
+              }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <IconButton sx={{ color: "#38598A" }}>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+              fullWidth
             />
-            <FormControlLabel
-              className="form-control-label"
-              value="watchingRequests"
-              control={<Radio className="mui-radio" color="primary" />}
-              label="Watching Requests"
-            />
-            <FormControlLabel
-              className="form-control-label"
-              value="All"
-              control={<Radio className="mui-radio" color="primary" />}
-              label="My Team Requests"
-            />
-          </RadioGroup>
-        </Grid>
+          </Grid>
+          <Grid
+            item
+            container
+            alignItems="flex-start"
+            justifyContent="space-around"
+            xs={5}
+          >
+            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={2}>
+              <ClickableChip
+                key={`filter-request-description`}
+                label={"MY REQUESTS"}
+                color="primary"
+                size="small"
+                onClick={() => requestFilterChange("myRequests")}
+                clicked={requestFilter === "myRequests"}
+              />
+              <ClickableChip
+                key={`filter-request-description`}
+                label={"MY TEAM'S REQUESTS"}
+                color="primary"
+                size="small"
+                onClick={() => requestFilterChange("All")}
+                clicked={requestFilter === "All"}
+              />
+              <ClickableChip
+                key={`filter-request-description`}
+                label={"WATCHING REQUESTS"}
+                color="primary"
+                size="small"
+                onClick={() => requestFilterChange("watchingRequests")}
+                clicked={requestFilter === "watchingRequests"}
+              />
+            </Stack>
+          </Grid>
+        </Paper>
       </Grid>
       <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
         <DataGrid

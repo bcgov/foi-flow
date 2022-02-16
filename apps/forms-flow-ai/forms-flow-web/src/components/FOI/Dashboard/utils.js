@@ -5,6 +5,7 @@ import {
   calculateDaysRemaining,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
+import Chip from "@mui/material/Chip";
 
 export const debounce = (func, wait) => {
   let timeout;
@@ -109,4 +110,25 @@ export const getDaysLeft = (params) => {
   } else {
     return `${calculateDaysRemaining(params.row.duedate)}`;
   }
+};
+
+export const ClickableChip = ({ clicked, ...rest }) => {
+  return (
+    <Chip
+      sx={{
+        ...(clicked
+          ? {
+              backgroundColor: "#38598A",
+              width: "100%",
+            }
+          : {
+              color: "#38598A",
+              border: "1px solid #38598A",
+              width: "100%",
+            }),
+      }}
+      variant={!clicked && "outlined"}
+      {...rest}
+    />
+  );
 };

@@ -272,6 +272,7 @@ const AdvancedSearch = () => {
               display: "flex",
               width: "100%",
               backgroundColor: "#F9FBFD",
+              border: "1px solid #38598A",
             }}
             alignItems="flex-start"
             direction="row"
@@ -317,8 +318,9 @@ const AdvancedSearch = () => {
                       color="primary"
                       sx={{
                         backgroundColor: "#38598A",
-                        marginRight: "1em",
+                        margin: "1px",
                       }}
+                      size="small"
                     />
                   ))}
                 </Grid>
