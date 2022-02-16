@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy.orm import relationship, backref, aliased
-from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case
+from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
@@ -359,9 +359,9 @@ class FOIRawRequest(db.Model):
                 if(FOIRawRequest.validatefield(field)):
                     order = sortingorders.pop()
                     if(order == 'desc'):
-                        sortingcondition.append(desc(field))
+                        sortingcondition.append(nullslast(desc(field)))
                     else:
-                        sortingcondition.append(asc(field))
+                        sortingcondition.append(nullsfirst(asc(field)))
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(asc('currentState'))
