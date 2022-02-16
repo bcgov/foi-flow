@@ -70,3 +70,5 @@ axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/bin/*
 axisintegrationapi/MCS.FOI.AXISIntegration/.vs/*
 axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/obj/*
 axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/*.user
+axisintegrationapi/MCS.FOI.AXISIntegration/*/bin/*
+axisintegrationapi/MCS.FOI.AXISIntegration/*/obj/*

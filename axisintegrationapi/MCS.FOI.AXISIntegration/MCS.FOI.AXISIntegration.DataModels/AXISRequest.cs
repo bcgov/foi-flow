@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MCS.FOI.AXISIntegrationWebAPI.Models
+namespace MCS.FOI.AXISIntegration.DataModels
 {
     public class AXISRequest
     {

@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegrationWebAPI", "MCS.FOI.AXISIntegrationWebAPI\MCS.FOI.AXISIntegrationWebAPI.csproj", "{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.DAL", "MCS.FOI.AXISIntegration.DAL\MCS.FOI.AXISIntegration.DAL.csproj", "{3463E76B-BB61-4AC7-AB10-A49AA14903AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.DataModels", "MCS.FOI.AXISIntegration.DataModels\MCS.FOI.AXISIntegration.DataModels.csproj", "{E44B48B1-9A31-441F-B58E-5CB3211D3E88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3463E76B-BB61-4AC7-AB10-A49AA14903AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3463E76B-BB61-4AC7-AB10-A49AA14903AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3463E76B-BB61-4AC7-AB10-A49AA14903AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3463E76B-BB61-4AC7-AB10-A49AA14903AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E44B48B1-9A31-441F-B58E-5CB3211D3E88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E44B48B1-9A31-441F-B58E-5CB3211D3E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E44B48B1-9A31-441F-B58E-5CB3211D3E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E44B48B1-9A31-441F-B58E-5CB3211D3E88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

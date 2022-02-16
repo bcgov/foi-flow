@@ -1,11 +1,9 @@
-﻿using MCS.FOI.AXISIntegrationWebAPI.Models;
-using Microsoft.AspNetCore.Http;
+﻿using MCS.FOI.AXISIntegration.DataModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {

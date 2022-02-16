@@ -8,4 +8,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MCS.FOI.AXISIntegration.DAL\MCS.FOI.AXISIntegration.DAL.csproj" />
+    <ProjectReference Include="..\MCS.FOI.AXISIntegration.DataModels\MCS.FOI.AXISIntegration.DataModels.csproj" />
+  </ItemGroup>
+
 </Project>
