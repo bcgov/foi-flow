@@ -111,7 +111,7 @@ export const ClickableChip = ({ clicked, ...rest }) => {
               width: "100%",
             }),
       }}
-      variant={!clicked && "outlined"}
+      variant={clicked ? "filled" : "outlined"}
       {...rest}
     />
   );
