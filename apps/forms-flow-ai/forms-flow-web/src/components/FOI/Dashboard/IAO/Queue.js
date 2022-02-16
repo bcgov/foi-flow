@@ -37,6 +37,9 @@ const Queue = ({ userDetail }) => {
     (state) => state.foiRequests.foiRequestsList
   );
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
+  const isAssignedToListLoading = useSelector(
+    (state) => state.foiRequests.isAssignedToListLoading
+  );
 
   const classes = useStyles();
   useEffect(() => {
@@ -61,7 +64,7 @@ const Queue = ({ userDetail }) => {
       "idNumber",
       "currentState",
       "assignedToLastName",
-      "assignedToFirstName"
+      "assignedToFirstName",
     ],
     keyword: null,
   });
@@ -168,7 +171,7 @@ const Queue = ({ userDetail }) => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isAssignedToListLoading) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -203,7 +206,6 @@ const Queue = ({ userDetail }) => {
               borderRight: "2px solid #38598A",
               backgroundColor: "rgba(56,89,138,0.1)",
             }}
-            fullWidth
           >
             <InputBase
               placeholder="Search in Queue ..."
@@ -230,7 +232,7 @@ const Queue = ({ userDetail }) => {
           >
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={2}>
               <ClickableChip
-                key={`filter-request-description`}
+                key={`my-requests`}
                 label={"MY REQUESTS"}
                 color="primary"
                 size="small"
@@ -238,7 +240,7 @@ const Queue = ({ userDetail }) => {
                 clicked={requestFilter === "myRequests"}
               />
               <ClickableChip
-                key={`filter-request-description`}
+                key={`team-requests`}
                 label={"MY TEAM'S REQUESTS"}
                 color="primary"
                 size="small"
@@ -246,7 +248,7 @@ const Queue = ({ userDetail }) => {
                 clicked={requestFilter === "All"}
               />
               <ClickableChip
-                key={`filter-request-description`}
+                key={`watching-requests`}
                 label={"WATCHING REQUESTS"}
                 color="primary"
                 size="small"
@@ -261,7 +263,7 @@ const Queue = ({ userDetail }) => {
         <DataGrid
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(requestQueue.data)}
+          rows={updateAssigneeName(requestQueue?.data) || []}
           columns={columns.current}
           rowHeight={30}
           headerHeight={50}
