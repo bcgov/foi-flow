@@ -401,18 +401,9 @@ class FOIRawRequest(db.Model):
 
         #request state: unopened, call for records, etc.
         if(len(params['requeststate']) > 0):
-            requeststatecondition = []
-            for state in params['requeststate']:
-                if(state == 3):
-                    requeststatecondition.append(FOIRawRequest.status == 'Closed')
-                    includeclosed = True
-                elif(state == 5):
-                    requeststatecondition.append(FOIRawRequest.status == 'Unopened')
-            
-            if(len(requeststatecondition) == 0):
-                requeststatecondition.append(FOIRawRequest.status == 'Closed')
-                requeststatecondition.append(FOIRawRequest.status == 'Unopened')
-            filtercondition.append(or_(*requeststatecondition))
+            requeststatecondition = FOIRawRequest.getfilterforrequeststate(params, includeclosed)
+            filtercondition.append(requeststatecondition['condition'])
+            includeclosed = requeststatecondition['includeclosed']
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):
@@ -420,34 +411,18 @@ class FOIRawRequest(db.Model):
         
         #request type: personal, general
         if(len(params['requesttype']) > 0):
-            requesttypecondition = []
-            for type in params['requesttype']:
-                requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
-                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
+            requesttypecondition = FOIRawRequest.getfilterforrequesttype(params)
             filtercondition.append(or_(*requesttypecondition))
         
         #public body: EDUC, etc.
         if(len(params['publicbody']) > 0):
-            ministrycondition = []
-            for ministry in params['publicbody']:
-                ministrycondition.append(FOIRawRequest.findfield('ministry').ilike('%"'+ministry+'"%'))
-                ministrycondition.append(FOIRawRequest.findfield('ministryMinistry').ilike('%"'+ministry+'"%'))
-            filtercondition.append(or_(*ministrycondition))
+            ministrycondition = FOIRawRequest.getfilterforpublicbody(params)
+            filtercondition.append(ministrycondition)
 
         #axis request #, raw request #, applicant name, assignee name, request description, subject code
         if(len(params['keywords']) > 0 and params['search'] is not None):
-            if(params['search'] == 'requestdescription'):
-                searchcondition1 = []
-                searchcondition2 = []
-                for keyword in params['keywords']:
-                    searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
-                    searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
-                filtercondition.append(or_(and_(*searchcondition1), and_(*searchcondition2)))
-            else:
-                searchcondition = []
-                for keyword in params['keywords']:
-                    searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
-                filtercondition.append(and_(*searchcondition))
+            searchcondition = FOIRawRequest.getfilterforsearch(params)
+            filtercondition.append(searchcondition)
 
         if(params['fromdate'] is not None):
             filtercondition.append(FOIRawRequest.findfield('receivedDate') >= params['fromdate'])
@@ -455,6 +430,59 @@ class FOIRawRequest(db.Model):
         # no duedate for unopened & intake in progress
         
         return filtercondition
+
+    @classmethod
+    def getfilterforrequeststate(cls, params, includeclosed):
+        #request state: unopened, call for records, etc.
+        requeststatecondition = []
+        for state in params['requeststate']:
+            if(state == 3):
+                requeststatecondition.append(FOIRawRequest.status == 'Closed')
+                includeclosed = True
+            elif(state == 5):
+                requeststatecondition.append(FOIRawRequest.status == 'Unopened')
+        
+        if(len(requeststatecondition) == 0):
+            requeststatecondition.append(FOIRawRequest.status == 'Closed')
+            requeststatecondition.append(FOIRawRequest.status == 'Unopened')
+        
+        return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
+    
+    @classmethod
+    def getfilterforrequesttype(cls, params):
+        #request type: personal, general
+        requesttypecondition = []
+        for type in params['requesttype']:
+            requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
+            requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
+
+        return or_(*requesttypecondition)
+
+    @classmethod
+    def getfilterforpublicbody(cls, params):
+        #public body: EDUC, etc.
+        ministrycondition = []
+        for ministry in params['publicbody']:
+            ministrycondition.append(FOIRawRequest.findfield('ministry').ilike('%"'+ministry+'"%'))
+            ministrycondition.append(FOIRawRequest.findfield('ministryMinistry').ilike('%"'+ministry+'"%'))
+        
+        return or_(*ministrycondition)
+
+    @classmethod
+    def getfilterforsearch(cls, params):
+        #axis request #, raw request #, applicant name, assignee name, request description, subject code
+        if(params['search'] == 'requestdescription'):
+            searchcondition1 = []
+            searchcondition2 = []
+            for keyword in params['keywords']:
+                searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
+                searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2))
+        else:
+            searchcondition = []
+            for keyword in params['keywords']:
+                searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
+            return and_(*searchcondition)
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

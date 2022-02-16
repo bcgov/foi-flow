@@ -561,19 +561,15 @@ class FOIMinistryRequest(db.Model):
 
         #request state: unopened, call for records, etc.
         if(len(params['requeststate']) > 0):
-            requeststatecondition = []
-            for stateid in params['requeststate']:
-                requeststatecondition.append(FOIMinistryRequest.requeststatusid == stateid)
-                if(stateid == 3):
-                    includeclosed = True
-            filtercondition.append(or_(*requeststatecondition))
+            requeststatecondition = FOIMinistryRequest.getfilterforrequeststate(params, includeclosed)
+            filtercondition.append(requeststatecondition['condition'])
+            includeclosed = requeststatecondition['includeclosed']
         
         #request status: overdue || on time
         if(len(params['requeststatus']) == 1):
-            if(params['requeststatus'][0] == 'overdue'):
-                filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now())
-            else:
-                filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now())
+            requeststatuscondition = FOIMinistryRequest.getfilterforrequeststatus(params, iaoassignee, ministryassignee)
+            filtercondition.append(requeststatuscondition)
+
             # return all except closed
             if(includeclosed == False):
                 filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
@@ -583,39 +579,18 @@ class FOIMinistryRequest(db.Model):
 
         #request type: personal, general
         if(len(params['requesttype']) > 0):
-            requesttypecondition = []
-            for type in params['requesttype']:
-                requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
-            filtercondition.append(or_(*requesttypecondition))
+            requesttypecondition = FOIMinistryRequest.getfilterforrequesttype(params, iaoassignee, ministryassignee)
+            filtercondition.append(requesttypecondition)
         
         #public body: EDUC, etc.
         if(len(params['publicbody']) > 0):
-            publicbodycondition = []
-            for ministry in params['publicbody']:
-                publicbodycondition.append(FOIMinistryRequest.findfield('ministry', iaoassignee, ministryassignee) == ministry)
-            filtercondition.append(or_(*publicbodycondition))
+            publicbodycondition = FOIMinistryRequest.getfilterforpublicbody(params, iaoassignee, ministryassignee)
+            filtercondition.append(publicbodycondition)
 
         #axis request #, raw request #, applicant name, assignee name, request description, subject code
         if(len(params['keywords']) > 0 and params['search'] is not None):
-            if(params['search'] == 'applicantname'):
-                searchcondition1 = []
-                searchcondition2 = []
-                for keyword in params['keywords']:
-                    searchcondition1.append(FOIMinistryRequest.findfield('firstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                    searchcondition2.append(FOIMinistryRequest.findfield('lastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                filtercondition.append(or_(and_(*searchcondition1), and_(*searchcondition2)))
-            elif(params['search'] == 'assigneename'):
-                searchcondition1 = []
-                searchcondition2 = []
-                for keyword in params['keywords']:
-                    searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                    searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                filtercondition.append(or_(and_(*searchcondition1), and_(*searchcondition2)))
-            else:
-                searchcondition = []
-                for keyword in params['keywords']:
-                    searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                filtercondition.append(and_(*searchcondition))
+            searchcondition = FOIMinistryRequest.getfilterforsearch(params, iaoassignee, ministryassignee)
+            filtercondition.append(searchcondition)
 
         if(params['fromdate'] is not None):
             filtercondition.append(FOIMinistryRequest.findfield('receivedDate', iaoassignee, ministryassignee) >= params['fromdate'])
@@ -624,6 +599,65 @@ class FOIMinistryRequest(db.Model):
             filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) <= params['todate'])
         
         return filtercondition
+
+    @classmethod
+    def getfilterforrequeststate(cls, params, includeclosed):
+        #request state: unopened, call for records, etc.
+        requeststatecondition = []
+        for stateid in params['requeststate']:
+            requeststatecondition.append(FOIMinistryRequest.requeststatusid == stateid)
+            if(stateid == 3):
+                includeclosed = True
+        return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
+
+    @classmethod
+    def getfilterforrequeststatus(cls, params, iaoassignee, ministryassignee):        
+        #request status: overdue || on time
+        if(params['requeststatus'][0] == 'overdue'):
+            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now()
+        else:
+            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now()
+
+    @classmethod
+    def getfilterforrequesttype(cls, params, iaoassignee, ministryassignee):  
+        #request type: personal, general
+        requesttypecondition = []
+        for type in params['requesttype']:
+            requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
+        return or_(*requesttypecondition)
+
+    @classmethod
+    def getfilterforpublicbody(cls, params, iaoassignee, ministryassignee):
+        #public body: EDUC, etc.
+        publicbodycondition = []
+        for ministry in params['publicbody']:
+            publicbodycondition.append(FOIMinistryRequest.findfield('ministry', iaoassignee, ministryassignee) == ministry)
+        return or_(*publicbodycondition)
+
+    @classmethod
+    def getfilterforsearch(cls, params, iaoassignee, ministryassignee):
+        #axis request #, raw request #, applicant name, assignee name, request description, subject code
+        if(len(params['keywords']) > 0 and params['search'] is not None):
+            if(params['search'] == 'applicantname'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIMinistryRequest.findfield('firstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('lastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'assigneename'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            else:
+                searchcondition = []
+                for keyword in params['keywords']:
+                    searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return and_(*searchcondition)
+
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
