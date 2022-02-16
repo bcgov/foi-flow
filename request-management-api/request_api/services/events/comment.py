@@ -14,10 +14,11 @@ import maya
 import os
 from flask import current_app
 from dateutil.parser import parse
-from request_api import socketio
+
+import asyncio
+from request_api.utils.redispublisher import RedisPublisherService
 class commentevent:
     """ FOI Event management service
-
     """
     def createcommentevent(self, commentid, requesttype, userid):
         try: 
@@ -27,7 +28,7 @@ class commentevent:
                 notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, "Tagged User Comments", requesttype, userid)    
             _pushnotifications = notificationservice().getcommentnotifications(commentid)
             for _pushnotification in _pushnotifications:
-                socketio.emit(_pushnotification["userid"], _pushnotification)
+                asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))
             return DefaultMethodResult(True,'Comment notifications created',commentid)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Comment Notification Error', exception.message))
@@ -35,7 +36,9 @@ class commentevent:
         
     def getcommentmessage(self, commentid, comment):
         return {"commentid":commentid, "message" :self.__formatmessage(comment)}
-        
+    
+    
+  
     def __formatmessage(self, comment):
         _comment = json.loads(comment["comment"])
         msg = _comment["blocks"][0]["text"]
