@@ -4,6 +4,7 @@ from re import VERBOSE
 from request_api.models.FOIRequestExtensions import FOIRequestExtension
 from request_api.services.commentservice import commentservice
 from request_api.services.extensionreasonservice import extensionreasonservice
+from request_api.services.notificationservice import notificationservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 import json
 from request_api.models.default_method_result import DefaultMethodResult
@@ -19,20 +20,60 @@ class extensionevent:
         version = FOIRequestExtension.getversionforextension(extensionid)       
         curextension = FOIRequestExtension().getextensionforversion(extensionid, version)
         prevextension = FOIRequestExtension().getextensionforversion(extensionid, version[0]-1)
-        extensionsummary = self.__maintained(curextension, prevextension, event)
-
-        if extensionsummary is None or (extensionsummary and len(extensionsummary) < 1):
-            return  DefaultMethodResult(True,'No change',extensionid)
-        else:
-            try:
-                self.createcomment(ministryrequestid, userid, username, extensionsummary)
-                return DefaultMethodResult(True,'Comment posted',extensionid)
-            except BusinessException as exception:
-                return DefaultMethodResult(False,'unable to post comment - '+exception.message,extensionid) 
+        extensionsummaryforcomment = self.__maintained(curextension, prevextension, event, ExtensionSummaryFor.comments.value)
+        message = ""
+        try:
+            notificationresponse = self.createnotification(ministryrequestid, extensionid, curextension, prevextension, userid, event)
+            if extensionsummaryforcomment is None or (extensionsummaryforcomment and len(extensionsummaryforcomment) < 1):
+                return  DefaultMethodResult(True,'No change',extensionid)
+            else:
+                commentresponse = self.createcomment(ministryrequestid, userid, username, extensionsummaryforcomment)
+                if commentresponse.success == True:                    
+                    message += 'Comment posted' 
+            if notificationresponse.success == True and event != EventType.delete.value:
+                    message += 'Notification posted' 
+            return DefaultMethodResult(True, message, extensionid)             
+        except BusinessException as exception:
+            return DefaultMethodResult(False,'unable to post comment - '+exception.message,extensionid) 
         
     def createcomment(self, ministryrequestid, userid, username, extensionsummary):        
         comment = {"ministryrequestid": ministryrequestid, "comment": self.__preparemessage(username, extensionsummary)}
-        commentservice().createministryrequestcomment(comment, userid, 2)
+        return commentservice().createministryrequestcomment(comment, userid, 2)
+
+    def createnotification(self, ministryrequestid, extensionid, curextension, prevextension, userid, event):         
+        extensionsummary = self.__maintained(curextension, prevextension, event, ExtensionSummaryFor.notification.value)
+        nootificationrequired = self.__nonotificationrequired(curextension, prevextension, event)
+        onlycleanuprequired = self.__onlycleanuprequired(curextension, prevextension, event)
+        onlynotificationrequired = self.__onlynotificationrequired(curextension, prevextension, event)
+        notificationandcleanup = self.__bothnotificationandcleanup(curextension, prevextension, event)
+       
+        if nootificationrequired == True:
+            return DefaultMethodResult(True, "No Notification", ministryrequestid)
+        elif onlycleanuprequired == True:
+            notificationservice().cleanupnotifications(ministryrequestid, "ministryrequest", "Extension", extensionid)
+            return DefaultMethodResult(True, "Delete Extension", ministryrequestid)
+        elif onlynotificationrequired == True or notificationandcleanup == True:
+            notification = self.__preparenotification(extensionsummary)
+            return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, notificationandcleanup)
+
+    def __preparenotification(self, extensionsummary):
+        ispublicbody = self.__valueexists('ispublicbody', extensionsummary)
+        isdenied = self.__valueexists('isdenied', extensionsummary)
+        isapproved = self.__valueexists('isapproved', extensionsummary)
+        
+        extension = self.__valueexists('extension', extensionsummary) 
+        approveddays = self.__valueexists('approvednoofdays', extension) 
+        extendedduedays = self.__valueexists('extendedduedays', extension) 
+        newduedate = self.__formatdate(self.__valueexists('extendedduedate', extension), '%Y %b %d')        
+      
+        if isdenied == True:
+            return  "Extension request to OIPC has been denied."
+        elif ispublicbody == True and isapproved == True:
+            return "Extension taken for " + str(extendedduedays) + " days. The new legislated due date is "+ newduedate + "."
+        elif isapproved == True and not ispublicbody:
+            return "Extension taken for " + str(approveddays) + " days. The new legislated due date is "+ newduedate + "."            
+        else:
+            return "Extension has been edited."
 
     def __findmodify(self, curextension, prevextension, event):
         curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
@@ -60,18 +101,41 @@ class extensionevent:
         if (event == EventType.modify.value and curextensionstatusid == ExtensionStatus.approved.value and  curextensionstatusid !=  prevextensionstatusid) or (event == EventType.add.value and curextensionstatusid == ExtensionStatus.approved.value):
             return True
 
-    def __maintained(self, curextension, prevextension, event):        
-        return self.__createextensionsummary(curextension, prevextension, event)
+    def __nonotificationrequired(self, curextension, prevextension, event):
+        ismodified = self.__findmodify(curextension, prevextension, event)
+        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
+        if (event == EventType.add.value and curextensionstatusid == 1) or ismodified == True:
+            return True
     
-    def __createextensionsummary(self, curextension, prevextension, event):
+    def __onlycleanuprequired(self, curextension, prevextension, event):
+        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
+        prevextensionstatusid = prevextension["extensionstatusid"] if 'extensionstatusid' in prevextension else None
+        if event == EventType.delete.value or (event == EventType.modify.value and str(prevextensionstatusid)  in [str(ExtensionStatus.denied.value), str(ExtensionStatus.approved.value)] and curextensionstatusid == 1):
+            return True
+    def __onlynotificationrequired(self, curextension, prevextension, event):
+        isdenied = self.__finddenied(curextension, prevextension, event)
+        ispublicbody = self.__findpublicbody(curextension)
+        isapproved = self.__findapproved(curextension, prevextension, event)
+        if isdenied == True or isapproved == True or ispublicbody == True:
+            return True
+
+    def __bothnotificationandcleanup(self, curextension, prevextension, event):
+        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
+        prevextensionstatusid = prevextension["extensionstatusid"] if 'extensionstatusid' in prevextension else None
+        if event == EventType.modify.value and curextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value] and prevextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value]:
+            return True
+
+    def __maintained(self, curextension, prevextension, event, summaryfor):        
+        return self.__createextensionsummary(curextension, prevextension, event, summaryfor)
+    
+    def __createextensionsummary(self, curextension, prevextension, event, summaryfor):
         isdenied = self.__finddenied(curextension, prevextension, event)
         ispublicbody = self.__findpublicbody(curextension)
         isapproved = self.__findapproved(curextension, prevextension, event)
         ismodified = self.__findmodify(curextension, prevextension, event)        
         curreasonid = curextension["extensionreasonid"] if curextension else None
         curreason = self.__getextensionreasonvalue(self.__getextensionreason(curreasonid))        
-
-        if event == EventType.delete.value:
+        if event == EventType.delete.value and summaryfor == ExtensionSummaryFor.comments.value:
             return {'extension': curextension, 'reason': curreason, 'isdelete': True}
         elif event == EventType.modify.value and not ismodified and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}   
@@ -128,3 +192,8 @@ class ExtensionStatus(Enum):
 class ExtensionType(Enum):
     publicbody = "Public Body"
     oipc = "OIPC"
+
+class ExtensionSummaryFor(Enum):
+    comments = "comments"
+    notification = "notification"
+

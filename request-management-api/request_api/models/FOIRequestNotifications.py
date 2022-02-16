@@ -82,6 +82,14 @@ class FOIRequestNotification(db.Model):
         for row in rs:
             notificationids.append(row["notificationid"])
         return notificationids
+    @classmethod
+    def getnotificationidsbynumberandtypeandextensionid(cls, idnumber, notificationtypeid, extensionid):
+        sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid and notification->>'extensionid' = :extensionid """
+        rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeid': notificationtypeid, 'extensionid': extensionid})
+        notificationids = []
+        for row in rs:
+            notificationids.append(row["notificationid"])
+        return notificationids
 
     @classmethod
     def getnotificationidsbynumber(cls, idnumber):

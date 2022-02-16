@@ -12,6 +12,8 @@ class notificationconfig:
     def getnotificationtypeid(self, notificationtype):
         if notificationtype == "State":
             return 1
+        elif notificationtype == "Extension":
+            return 4 
         elif "IAO Assignment" in notificationtype:
             return 5   
         elif "Ministry Assignment" in notificationtype:

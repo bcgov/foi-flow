@@ -21,14 +21,19 @@ import json
 from datetime import datetime
 from dateutil.parser import parse
 from pytz import timezone
+from enum import Enum
 
 class notificationservice:
     """ FOI notification management service
     """
     
-    def createnotification(self, message, requestid, requesttype, notificationtype, userid):
+    def createnotification(self, message, requestid, requesttype, notificationtype, userid, cleanup):
+        extensionid = None
         foirequest = self.__getrequest(requestid, requesttype)
-        self.__cleanupnotifications(requesttype, notificationtype, foirequest)
+        if notificationtype == NotificationType.extension.value:
+            extensionid = self.__getextensionidfrommesage(message)
+        if cleanup == True:
+            self.__cleanupnotifications(requesttype, notificationtype, foirequest, extensionid)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
     
     def createremindernotification(self, message, requestid, requesttype, notificationtype, userid):
@@ -39,6 +44,10 @@ class notificationservice:
         requestid = comment["ministryrequestid"] if requesttype == "ministryrequest" else comment["requestid"]
         foirequest = self.__getrequest(requestid, requesttype)        
         return  self.__createnotification(message, requestid, requesttype, commenttype, userid, foirequest, comment)
+    
+    def cleanupnotifications(self, requestid, requesttype, notificationtype, extensionid=None):
+        foirequest = self.__getrequest(requestid, requesttype)
+        self.__cleanupnotifications(requesttype, notificationtype, foirequest, extensionid)
 
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid, notificationconfig().getnotificationdays())
@@ -86,9 +95,11 @@ class notificationservice:
                 return FOIRawRequestNotification.savenotification(notification)
         return  DefaultMethodResult(True,'No change',requestid) 
     
-    def __cleanupnotifications(self, requesttype, notificationtype, foirequest):
-        notificationid = notificationconfig().getnotificationtypeid(notificationtype)        
-        if requesttype == "ministryrequest":
+    def __cleanupnotifications(self, requesttype, notificationtype, foirequest, extensionid=None):
+        notificationid = notificationconfig().getnotificationtypeid(notificationtype) 
+        if requesttype == "ministryrequest" and notificationid == 4:
+            _ids = FOIRequestNotification.getnotificationidsbynumberandtypeandextensionid(foirequest["filenumber"], notificationid, extensionid)       
+        elif requesttype == "ministryrequest":
             _ids = FOIRequestNotification.getnotificationidsbynumberandtype(foirequest["filenumber"], notificationid)
         else:
             _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationid)
@@ -210,8 +221,23 @@ class notificationservice:
             return FOIMinistryRequest.getrequestbyministryrequestid(requestid)
         else:
             return FOIRawRequest.get_request(requestid)
+    
+    def __getextensionidfrommesage(self, message):
+        return self.__valueexists('extensionid', message)
 
-  
+    def __valueexists(self, key, jsonobj):
+        return jsonobj[key] if key in jsonobj else None
+
+class NotificationType(Enum):
+    state = "State"
+    extension = "Extension"
+    iaoassignment = "IAO Assignment"
+    ministryassignment = "Ministry Assignment"
+    cfrduereminder = "CFR Due Reminder"
+    legislativeduereminder = "Legislative Due Reminder"   
+    newusercomments = "New User Comments"
+    replyusercomments = "Reply User Comments"
+    taggedusercomments = "Tagged User Comments"
        
     
     
