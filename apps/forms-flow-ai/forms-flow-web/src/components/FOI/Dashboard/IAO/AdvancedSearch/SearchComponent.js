@@ -76,9 +76,6 @@ const AdvancedSearch = () => {
   );
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
-  const isAssignedToListLoading = useSelector(
-    (state) => state.foiRequests.isAssignedToListLoading
-  );
 
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
@@ -255,7 +252,7 @@ const AdvancedSearch = () => {
     );
   };
 
-  if (isLoading || isAssignedToListLoading) {
+  if (isLoading) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
