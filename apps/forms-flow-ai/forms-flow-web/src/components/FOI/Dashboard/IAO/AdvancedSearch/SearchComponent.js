@@ -298,11 +298,14 @@ const AdvancedSearch = () => {
                   }}
                   startAdornment={
                     <InputAdornment position="start">
-                      <IconButton>
+                      <IconButton sx={{ color: "#38598A" }}>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
                   }
+                  sx={{
+                    color: "#38598A",
+                  }}
                   fullWidth
                 />
               </Grid>
