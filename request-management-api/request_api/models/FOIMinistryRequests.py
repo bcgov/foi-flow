@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref, aliased
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_, and_, text, func, literal, cast
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst
 from sqlalchemy.sql.sqltypes import String
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -325,9 +325,9 @@ class FOIMinistryRequest(db.Model):
             for field in sortingitems:
                 order = sortingorders.pop()
                 if(order == 'desc'):
-                    sortingcondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
+                    sortingcondition.append(nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc()))
                 else:
-                    sortingcondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc())
+                    sortingcondition.append(nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc()))
 
         #default sorting
         if(len(sortingcondition) == 0):
