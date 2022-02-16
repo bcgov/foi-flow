@@ -20,7 +20,7 @@ class extensionevent:
         version = FOIRequestExtension.getversionforextension(extensionid)       
         curextension = FOIRequestExtension().getextensionforversion(extensionid, version)
         prevextension = FOIRequestExtension().getextensionforversion(extensionid, version[0]-1)
-        extensionsummaryforcomment = self.__maintained(curextension, prevextension, event, ExtensionSummaryFor.comments.value)
+        extensionsummaryforcomment = self.__maintained(curextension, prevextension, event)
         message = ""
         try:
             notificationresponse = self.createnotification(ministryrequestid, extensionid, curextension, prevextension, userid, event)
@@ -40,8 +40,8 @@ class extensionevent:
         comment = {"ministryrequestid": ministryrequestid, "comment": self.__preparemessage(username, extensionsummary)}
         return commentservice().createministryrequestcomment(comment, userid, 2)
 
-    def createnotification(self, ministryrequestid, extensionid, curextension, prevextension, userid, event):         
-        extensionsummary = self.__maintained(curextension, prevextension, event, ExtensionSummaryFor.notification.value)
+    def createnotification(self, ministryrequestid, extensionid, curextension, prevextension, userid, event):       
+        
         nootificationrequired = self.__nonotificationrequired(curextension, prevextension, event)
         onlycleanuprequired = self.__onlycleanuprequired(curextension, prevextension, event)
         onlynotificationrequired = self.__onlynotificationrequired(curextension, prevextension, event)
@@ -52,22 +52,23 @@ class extensionevent:
         elif onlycleanuprequired == True:
             notificationservice().cleanupnotifications(ministryrequestid, "ministryrequest", "Extension", extensionid)
             return DefaultMethodResult(True, "Delete Extension", ministryrequestid)
-        elif extensionsummary and (onlynotificationrequired == True or notificationandcleanup == True):
+        elif onlynotificationrequired == True or notificationandcleanup == True:
+            extensionsummary = self.__createnotificationsummary(curextension, prevextension, event)
             notification = self.__preparenotification(extensionsummary)
             return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, notificationandcleanup)
 
     def __preparenotification(self, extensionsummary):
         ispublicbody = self.__valueexists('ispublicbody', extensionsummary)
         isdenied = self.__valueexists('isdenied', extensionsummary)
-        isapproved = self.__valueexists('isapproved', extensionsummary)
-        
+        isapproved = self.__valueexists('isapproved', extensionsummary)        
         extension = self.__valueexists('extension', extensionsummary)
         prevextension = self.__valueexists('prevextension', extensionsummary)
+
         prevapprovedays =  self.__valueexists('approvednoofdays', prevextension) if prevextension else None
         approveddays = self.__valueexists('approvednoofdays', extension)
         prevextendeddays = self.__valueexists('extendedduedays', prevextension) if prevextension else None
         extendedduedays = self.__valueexists('extendedduedays', extension) 
-        newduedate = self.__formatdate(self.__valueexists('extendedduedate', extension), '%Y %b %d')
+        newduedate = self.__formatdate(self.__valueexists('extendedduedate', extension), self.__genericdateformat())
 
         approveddayschanged = True if prevapprovedays and prevapprovedays != approveddays else False
         extendeddayschanged = True if prevextendeddays and prevextendeddays != extendedduedays else False
@@ -82,11 +83,13 @@ class extensionevent:
         else:
             return "Extension has been edited."
 
+    # modify any state
     def __findmodify(self, curextension, prevextension, event):
-        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
-        prevextensionstatusid = prevextension["extensionstatusid"] if 'extensionstatusid' in prevextension else None  
+        curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
+        prevextensionstatusid = self.__valueexists('extensionstatusid', prevextension) 
         if (event == EventType.modify.value and curextensionstatusid ==  prevextensionstatusid):           
             return True
+
     def __getextensionreason(self, reasonid):
         return extensionreasonservice().getextensionreasonbyid(reasonid)
 
@@ -94,14 +97,16 @@ class extensionevent:
         extnreson = extensionreasonservice().getextensionreasonbyid(curextension['extensionreasonid'])
         extntype = self.__getextensiontype(extnreson)
         if extntype == ExtensionType.publicbody.value:
-            return True        
-        
+            return True  
+
+    # add denied or modify to denied    
     def __finddenied(self, curextension, prevextension, event):
-        curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
-        prevextensionstatusid = prevextension["extensionstatusid"] if 'extensionstatusid' in prevextension else None
+        curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
+        prevextensionstatusid = self.__valueexists('extensionstatusid', prevextension)
         if (event == EventType.modify.value and curextensionstatusid == ExtensionStatus.denied.value and  curextensionstatusid !=  prevextensionstatusid) or (event == EventType.add.value and curextensionstatusid == ExtensionStatus.denied.value ):
             return True
 
+    # add approved or modify to approved
     def __findapproved(self, curextension, prevextension, event):
         curextensionstatusid = curextension["extensionstatusid"] if 'extensionstatusid' in curextension else None
         prevextensionstatusid = prevextension["extensionstatusid"] if 'extensionstatusid' in prevextension else None
@@ -136,24 +141,32 @@ class extensionevent:
         if (event == EventType.modify.value and curextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value] and prevextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value]) or (event == EventType.modify.value and curextensionstatusid == ExtensionStatus.approved.value and curextensionstatusid == prevextensionstatusid and prevapproveddays != curapproveddays):
             return True
 
-    def __maintained(self, curextension, prevextension, event, summaryfor):        
-        return self.__createextensionsummary(curextension, prevextension, event, summaryfor)
+    def __maintained(self, curextension, prevextension, event):        
+        return self.__createextensionsummary(curextension, prevextension, event)
     
-    def __createextensionsummary(self, curextension, prevextension, event, summaryfor):
+    def __createextensionsummary(self, curextension, prevextension, event):
         isdenied = self.__finddenied(curextension, prevextension, event)
         ispublicbody = self.__findpublicbody(curextension)
         isapproved = self.__findapproved(curextension, prevextension, event)
         ismodified = self.__findmodify(curextension, prevextension, event)        
         curreasonid = self.__valueexists("extensionreasonid", curextension)        
         curreason = self.__getextensionreasonvalue(self.__getextensionreason(curreasonid))        
-        if event == EventType.delete.value and summaryfor == ExtensionSummaryFor.comments.value:
+        if event == EventType.delete.value:
             return {'extension': curextension, 'reason': curreason, 'isdelete': True}
         elif event == EventType.modify.value and not ismodified and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}   
-        elif event == EventType.modify.value and ismodified and summaryfor == ExtensionSummaryFor.notification.value:
-            return {'extension': curextension, 'prevextension': prevextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}
         elif event == EventType.add.value and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
             return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved, 'reason': self.__getextensionreasonvalue(self.__getextensionreason(curreasonid)), 'isdelete': False}
+    
+    def __createnotificationsummary(self, curextension, prevextension, event):
+        isdenied = self.__finddenied(curextension, prevextension, event)
+        ispublicbody = self.__findpublicbody(curextension)
+        isapproved = self.__findapproved(curextension, prevextension, event)
+    
+        if event == EventType.modify.value:
+            return {'extension': curextension, 'prevextension': prevextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved}
+        elif event == EventType.add.value and curextension["extensionstatusid"] != ExtensionStatus.pending.value:
+            return {'extension': curextension, 'ispublicbody': ispublicbody, 'isdenied': isdenied, 'isapproved': isapproved}
 
     def __getextensionreasonvalue(self, extnreson):       
        return extnreson["reason"]
@@ -182,15 +195,18 @@ class extensionevent:
         elif isdenied == True:
             return  "The OIPC has denied a "+ str(extendedduedays) +" day extension."
         elif ispublicbody == True and isapproved == True:
-            return  username + " has taken a "+ str(extendedduedays) +" day Public Body extension. The new legislated due date is "+ self.__formatdate(newduedate, '%Y %b %d') + "."
+            return  username + " has taken a "+ str(extendedduedays) +" day Public Body extension. The new legislated due date is "+ self.__formatdate(newduedate, self.__genericdateformat()) + "."
         elif isapproved == True and not ispublicbody:
-            return  "The OIPC has granted a "+ str(approveddays) +" day extension. The new legislated due date is "+ self.__formatdate(newduedate, '%Y %b %d')
+            return  "The OIPC has granted a "+ str(approveddays) +" day extension. The new legislated due date is "+ self.__formatdate(newduedate, self.__genericdateformat())
         else:
             return "Extension for " + extensionreason + " has been edited."
    
 
     def __formatdate(self, datevalue, format):
-        return dateutil.parser.parse(datevalue).strftime(format) if datevalue is not None else None         
+        return dateutil.parser.parse(datevalue).strftime(format) if datevalue is not None else None
+
+    def __genericdateformat(self):
+        return '%Y %b %d'       
 
 class EventType(Enum):
     add = "add"    
