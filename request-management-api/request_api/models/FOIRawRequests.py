@@ -407,7 +407,11 @@ class FOIRawRequest(db.Model):
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):
-            filtercondition.append(FOIRawRequest.status != 'Closed')
+            if(params['requeststatus'][0] == 'overdue'):
+                #no rawrequest returned for this case
+                filtercondition.append(FOIRawRequest.status == 'ReturnNothing')
+            else:
+                filtercondition.append(FOIRawRequest.status != 'Closed')
         
         #request type: personal, general
         if(len(params['requesttype']) > 0):
