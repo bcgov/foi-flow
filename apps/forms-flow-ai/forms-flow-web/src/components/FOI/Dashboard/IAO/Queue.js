@@ -6,11 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
-import {
-  formatDate,
-  addBusinessDays,
-  businessDay,
-} from "../../../../helper/FOI/helper";
 import Loading from "../../../../containers/Loading";
 import { debounce, ClickableChip } from "../utils";
 import Grid from "@mui/material/Grid";
@@ -20,7 +15,12 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import { getAssigneeValue, updateSortModel, getFullName } from "../../utils";
+import {
+  getAssigneeValue,
+  updateSortModel,
+  getFullName,
+  getReceivedDate,
+} from "../../utils";
 
 const Queue = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -74,25 +74,6 @@ const Queue = ({ userDetail }) => {
       )
     );
   }, [rowsState, sortModel, filterModel, requestFilter]);
-
-  function getReceivedDate(params) {
-    let receivedDateString = params.row.receivedDateUF;
-    const dateString = receivedDateString
-      ? receivedDateString.substring(0, 10)
-      : "";
-    receivedDateString = receivedDateString ? new Date(receivedDateString) : "";
-
-    if (
-      receivedDateString !== "" &&
-      (receivedDateString.getHours() > 16 ||
-        (receivedDateString.getHours() === 16 &&
-          receivedDateString.getMinutes() > 30) ||
-        !businessDay(dateString))
-    ) {
-      receivedDateString = addBusinessDays(receivedDateString, 1);
-    }
-    return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
-  }
 
   const columns = React.useRef([
     {
