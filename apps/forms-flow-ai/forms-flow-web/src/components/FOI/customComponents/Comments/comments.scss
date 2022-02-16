@@ -426,8 +426,10 @@ border: 0px!important;
 }
 
 .foitabbedContainer{
-  height: 900px;
+  height: fit-content;
+  min-height: 900px;
   }
+
 
   .showMoreParentComments{
     position: static;

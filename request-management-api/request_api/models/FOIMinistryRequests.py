@@ -2,11 +2,11 @@ from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
-from sqlalchemy.orm import relationship,backref
+from sqlalchemy.orm import relationship, backref, aliased
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_, and_, text, func, literal, cast
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst
 from sqlalchemy.sql.sqltypes import String
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -16,6 +16,8 @@ from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .ProgramAreas import ProgramArea
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup
+from .FOIAssignees import FOIAssignee
+
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIMinistryRequests'
@@ -24,7 +26,6 @@ class FOIMinistryRequest(db.Model):
             ["foirequest_id", "foirequestversion_id"], ["FOIRequests.foirequestid", "FOIRequests.version"]
         ),
     )
-    
     
     # Defining the columns
     foiministryrequestid = db.Column(db.Integer, primary_key=True,autoincrement=True)
@@ -40,13 +41,13 @@ class FOIMinistryRequest(db.Model):
     duedate = db.Column(db.DateTime, nullable=False)
     cfrduedate = db.Column(db.DateTime, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
-    assignedto = db.Column(db.String(120), unique=False, nullable=True)
+    assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
                 
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    assignedministryperson = db.Column(db.String(120), unique=False, nullable=True)
+    assignedministryperson = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
     assignedministrygroup = db.Column(db.String(120), unique=False, nullable=True)
     closedate = db.Column(db.DateTime, nullable=True) 
     #ForeignKey References
@@ -67,12 +68,13 @@ class FOIMinistryRequest(db.Model):
 
     divisions = relationship('FOIMinistryRequestDivision', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDivision.foiministryrequest_id, "
                         "FOIMinistryRequest.version==FOIMinistryRequestDivision.foiministryrequestversion_id)") 
-    
     documents = relationship('FOIMinistryRequestDocument', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestDocument.foiministryrequest_id, "
                         "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
     extensions = relationship('FOIRequestExtension', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestExtension.foiministryrequest_id, "
                          "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
-     
+    assignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedto]")
+    ministryassignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedministryperson]")
+
     @classmethod
     def getrequest(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema(many=True)
@@ -203,7 +205,7 @@ class FOIMinistryRequest(db.Model):
         return requeststates
 
     @classmethod
-    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid):
+    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee):
         _session = db.session
 
         #ministry filter for group/team
@@ -228,7 +230,7 @@ class FOIMinistryRequest(db.Model):
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
             for field in filterfields:
-                filtercondition.append(FOIMinistryRequest.findfield(field).ilike('%'+keyword+'%'))
+                filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -250,7 +252,12 @@ class FOIMinistryRequest(db.Model):
             cast(FOIMinistryRequest.duedate, String).label('duedate'),
             ApplicantCategory.name.label('applicantcategory'),
             FOIRequest.created_at.label('created_at'),
-            func.lower(ProgramArea.bcgovcode).label('bcgovcode')
+            func.lower(ProgramArea.bcgovcode).label('bcgovcode'),
+            iaoassignee.firstname.label('assignedToFirstName'),
+            iaoassignee.lastname.label('assignedToLastName'),
+            ministryassignee.firstname.label('assignedministrypersonFirstName'),
+            ministryassignee.lastname.label('assignedministrypersonLastName'),
+            FOIMinistryRequest.description
         ]
 
         basequery = _session.query(
@@ -261,9 +268,6 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 FOIRequest,
                                 and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
-                            # ).join(
-                            #     subquery_foirequest_maxversion,
-                            #     and_(*joincondition_foirequest)
                             ).join(
                                 FOIRequestStatus,
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
@@ -282,6 +286,14 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
+                            ).join(
+                                iaoassignee,
+                                iaoassignee.username == FOIMinistryRequest.assignedto,
+                                isouter=True
+                            ).join(
+                                ministryassignee,
+                                ministryassignee.username == FOIMinistryRequest.assignedministryperson,
+                                isouter=True
                             )
 
         if(additionalfilter == 'watchingRequests'):
@@ -302,7 +314,10 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
-        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid)
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+
+        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee)
 
         #sorting
         sortingcondition = []
@@ -310,29 +325,38 @@ class FOIMinistryRequest(db.Model):
             for field in sortingitems:
                 order = sortingorders.pop()
                 if(order == 'desc'):
-                    sortingcondition.append(FOIMinistryRequest.findfield(field).desc())
+                    sortingcondition.append(nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc()))
                 else:
-                    sortingcondition.append(FOIMinistryRequest.findfield(field).asc())
+                    sortingcondition.append(nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc()))
 
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIMinistryRequest.findfield('currentState').asc())
-
+            sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
         return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
-    def findfield(cls, x):
+    def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
+
         return {
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
             'requestType': FOIRequest.requesttype,
             'idNumber': FOIMinistryRequest.filenumber,
+            'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
             'receivedDate': FOIRequest.receiveddate,
             'applicantcategory': ApplicantCategory.name,
-            'assignedministryperson': FOIMinistryRequest.assignedministryperson
+            'assignedministryperson': FOIMinistryRequest.assignedministryperson,
+            'assignedToFirstName': iaoassignee.firstname,
+            'assignedToLastName': iaoassignee.lastname,
+            'assignedministrypersonFirstName': ministryassignee.firstname,
+            'assignedministrypersonLastName': ministryassignee.lastname,
+            'description': FOIMinistryRequest.description,
+            'requestdescription': FOIMinistryRequest.description,
+            'duedate': FOIMinistryRequest.duedate,
+            'ministry': func.upper(ProgramArea.bcgovcode)
         }.get(x, FOIMinistryRequest.filenumber)
 
     @classmethod
@@ -430,10 +454,217 @@ class FOIMinistryRequest(db.Model):
         ministries = []
         for row in rs:
             ministries.append({"filenumber": row["filenumber"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
-        return ministries    
+        return ministries
 
+    @classmethod
+    def getbasequery(cls, iaoassignee, ministryassignee):
+        _session = db.session
+
+        #ministry filter for group/team
+        ministryfilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
+
+        #subquery for getting latest version & proper group/team for FOIMinistryRequest
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
+        joincondition_ministry = [
+            subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
+            subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
+        ]
+
+        #subquery for getting the first applicant mapping
+        subquery_applicantmapping_first = _session.query(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id, func.min(FOIRequestApplicantMapping.foirequestapplicantid).label('first_id')).group_by(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id).subquery()
+        joincondition_applicantmapping = [
+            subquery_applicantmapping_first.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
+            subquery_applicantmapping_first.c.foirequestversion_id == FOIRequestApplicantMapping.foirequestversion_id,
+            subquery_applicantmapping_first.c.first_id == FOIRequestApplicantMapping.foirequestapplicantid,
+        ]
+
+        selectedcolumns = [
+            FOIRequest.foirequestid.label('id'),
+            FOIMinistryRequest.version,
+            literal(None).label('sourceofsubmission'),
+            FOIRequestApplicant.firstname.label('firstName'),
+            FOIRequestApplicant.lastname.label('lastName'),
+            FOIRequest.requesttype.label('requestType'),
+            cast(FOIRequest.receiveddate, String).label('receivedDate'),
+            cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            FOIRequestStatus.name.label('currentState'),
+            FOIMinistryRequest.assignedgroup.label('assignedGroup'),
+            FOIMinistryRequest.assignedto.label('assignedTo'),
+            cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
+            FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
+            FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
+            cast(FOIMinistryRequest.cfrduedate, String).label('cfrduedate'),
+            cast(FOIMinistryRequest.duedate, String).label('duedate'),
+            ApplicantCategory.name.label('applicantcategory'),
+            FOIRequest.created_at.label('created_at'),
+            func.lower(ProgramArea.bcgovcode).label('bcgovcode'),
+            iaoassignee.firstname.label('assignedToFirstName'),
+            iaoassignee.lastname.label('assignedToLastName'),
+            ministryassignee.firstname.label('assignedministrypersonFirstName'),
+            ministryassignee.lastname.label('assignedministrypersonLastName'),
+            FOIMinistryRequest.description
+        ]
+
+        basequery = _session.query(
+                                *selectedcolumns
+                            ).join(
+                                subquery_ministry_maxversion,
+                                and_(*joincondition_ministry)
+                            ).join(
+                                FOIRequest,
+                                and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
+                            ).join(
+                                FOIRequestStatus,
+                                FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
+                            ).join(
+                                FOIRequestApplicantMapping,
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id)
+                            ).join(
+                                subquery_applicantmapping_first,
+                                and_(*joincondition_applicantmapping)
+                            ).join(
+                                FOIRequestApplicant,
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                            ).join(
+                                ApplicantCategory,
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                            ).join(
+                                ProgramArea,
+                                FOIMinistryRequest.programareaid == ProgramArea.programareaid
+                            ).join(
+                                iaoassignee,
+                                iaoassignee.username == FOIMinistryRequest.assignedto,
+                                isouter=True
+                            ).join(
+                                ministryassignee,
+                                ministryassignee.username == FOIMinistryRequest.assignedministryperson,
+                                isouter=True
+                            )
+
+        return basequery.filter(ministryfilter)
+
+    @classmethod
+    def advancedsearch(cls, params, iaoassignee, ministryassignee):
+        basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee)
+
+        #filter/search
+        filtercondition = FOIMinistryRequest.getfilterforadvancedsearch(params, iaoassignee, ministryassignee)
+        return basequery.filter(and_(*filtercondition))
+
+    @classmethod
+    def getfilterforadvancedsearch(cls, params, iaoassignee, ministryassignee):
+
+        #filter/search
+        filtercondition = []
+        includeclosed = False
+
+        #request state: unopened, call for records, etc.
+        if(len(params['requeststate']) > 0):
+            requeststatecondition = FOIMinistryRequest.getfilterforrequeststate(params, includeclosed)
+            filtercondition.append(requeststatecondition['condition'])
+            includeclosed = requeststatecondition['includeclosed']
+        
+        #request status: overdue || on time
+        if(len(params['requeststatus']) == 1):
+            requeststatuscondition = FOIMinistryRequest.getfilterforrequeststatus(params, iaoassignee, ministryassignee)
+            filtercondition.append(requeststatuscondition)
+
+            # return all except closed
+            if(includeclosed == False):
+                filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
+        elif(len(params['requeststatus']) > 1 and includeclosed == False):
+            # return all except closed
+            filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
+
+        #request type: personal, general
+        if(len(params['requesttype']) > 0):
+            requesttypecondition = FOIMinistryRequest.getfilterforrequesttype(params, iaoassignee, ministryassignee)
+            filtercondition.append(requesttypecondition)
+        
+        #public body: EDUC, etc.
+        if(len(params['publicbody']) > 0):
+            publicbodycondition = FOIMinistryRequest.getfilterforpublicbody(params, iaoassignee, ministryassignee)
+            filtercondition.append(publicbodycondition)
+
+        #axis request #, raw request #, applicant name, assignee name, request description, subject code
+        if(len(params['keywords']) > 0 and params['search'] is not None):
+            searchcondition = FOIMinistryRequest.getfilterforsearch(params, iaoassignee, ministryassignee)
+            filtercondition.append(searchcondition)
+
+        if(params['fromdate'] is not None):
+            filtercondition.append(FOIMinistryRequest.findfield('receivedDate', iaoassignee, ministryassignee) >= params['fromdate'])
+
+        if(params['todate'] is not None):
+            filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) <= params['todate'])
+        
+        return filtercondition
+
+    @classmethod
+    def getfilterforrequeststate(cls, params, includeclosed):
+        #request state: unopened, call for records, etc.
+        requeststatecondition = []
+        for stateid in params['requeststate']:
+            requeststatecondition.append(FOIMinistryRequest.requeststatusid == stateid)
+            if(stateid == 3):
+                includeclosed = True
+        return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
+
+    @classmethod
+    def getfilterforrequeststatus(cls, params, iaoassignee, ministryassignee):        
+        #request status: overdue || on time
+        if(params['requeststatus'][0] == 'overdue'):
+            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now()
+        else:
+            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now()
+
+    @classmethod
+    def getfilterforrequesttype(cls, params, iaoassignee, ministryassignee):  
+        #request type: personal, general
+        requesttypecondition = []
+        for type in params['requesttype']:
+            requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
+        return or_(*requesttypecondition)
+
+    @classmethod
+    def getfilterforpublicbody(cls, params, iaoassignee, ministryassignee):
+        #public body: EDUC, etc.
+        publicbodycondition = []
+        for ministry in params['publicbody']:
+            publicbodycondition.append(FOIMinistryRequest.findfield('ministry', iaoassignee, ministryassignee) == ministry)
+        return or_(*publicbodycondition)
+
+    @classmethod
+    def getfilterforsearch(cls, params, iaoassignee, ministryassignee):
+        #axis request #, raw request #, applicant name, assignee name, request description, subject code
+        if(len(params['keywords']) > 0 and params['search'] is not None):
+            if(params['search'] == 'applicantname'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIMinistryRequest.findfield('firstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('lastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'assigneename'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            else:
+                searchcondition = []
+                for keyword in params['keywords']:
+                    searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return and_(*searchcondition)
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
-        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate','startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid','foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid','foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode','programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson','assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name')
+        fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
+                'startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid',
+                'foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid',
+                'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
+                'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
+                'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname')
     

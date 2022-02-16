@@ -14,12 +14,12 @@ div .foi-dashboard {
 .foi-container {
     
     width: 100%!important;
-    height: 100%;
+    height: 100vh;
     background-color: #f1f1f1;
 }
 
 .foi-grid-container {
-    padding: 6em 1em 1em 1em !important;    
+    padding: 7% 1% 10% 1% !important;
     width: 75%!important;
     position: relative;
     margin-left: auto!important;
@@ -37,6 +37,7 @@ div .foi-dashboard {
 
 .foi-request-queue-text {
     font-family: "BCSans-Bold", sans-serif!important;
+    margin-bottom: 0;
 }
 .has-search .form-control {
     padding-left: 2.375rem;
