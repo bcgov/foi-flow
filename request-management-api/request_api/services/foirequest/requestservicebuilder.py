@@ -23,9 +23,6 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = requestschema.get("requeststatusid")
-        if ministryid is not None:
-            foiministryrequest.foiministryrequestid = ministryid
-            activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
         foiministryrequest.isactive = True
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
@@ -61,6 +58,8 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
 
         if ministryid is not None:
+            foiministryrequest.foiministryrequestid = ministryid
+            activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
             divisions = FOIMinistryRequestDivision().getdivisions(ministryid , activeversion-1)
             foiministryrequest.divisions = requestserviceministrybuilder().createfoirequestdivisionfromobject(divisions, ministryid, activeversion, userid)  
             foiministryrequest.documents = requestserviceministrybuilder().createfoirequestdocuments(requestschema,ministryid , activeversion , userid)
