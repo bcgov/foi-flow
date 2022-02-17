@@ -1,5 +1,12 @@
 import React, { useEffect, useState }  from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  gridPageCountSelector,
+  gridPageSelector,
+  useGridApiContext,
+  useGridSelector,
+} from '@mui/x-data-grid';
+import Pagination from '@mui/material/Pagination';
 import "./dashboard.scss";
 import useStyles from './CustomStyle';
 import { useDispatch, useSelector } from "react-redux";
@@ -20,9 +27,6 @@ const MinistryDashboard = ({userDetail}) => {
 
   const dispatch = useDispatch(); 
  
-  const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
-  const isAssignedToListLoading = useSelector(state=> state.foiRequests.isAssignedToListLoading);  
-
   const requestQueue = useSelector(state=> state.foiRequests.foiMinistryRequestsList);
   const isLoading = useSelector(state=> state.foiRequests.isLoading);
 
@@ -39,7 +43,7 @@ const MinistryDashboard = ({userDetail}) => {
   const [sortModel, setSortModel] = React.useState(defaultSortModel);
   let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
-    fields: ['applicantcategory', 'requestType', 'idNumber', 'currentState', 'assignedTo'],
+    fields: ['applicantcategory', 'requestType', 'idNumber', 'currentState', 'assignedministrypersonLastName', 'assignedministrypersonFirstName'],
     keyword: null 
   });
   const [requestFilter, setRequestFilter] = useState("All");
@@ -57,9 +61,14 @@ const MinistryDashboard = ({userDetail}) => {
       smodel.map( (row) => {
         if(row.field === 'CFRDueDateValue' || row.field === 'DueDateValue')
           row.field = 'cfrduedate';
-        if(row.field === 'assignedToName')
-          row.field = 'assignedministryperson';
       });
+
+      let field = smodel[0]?.field;
+      let order = smodel[0]?.sort;
+      if(field == 'assignedToName') {
+        smodel.shift();
+        smodel.unshift({field: 'assignedministrypersonLastName', sort: order},{field: 'assignedministrypersonFirstName', sort: order})
+      }
     }
 
     return smodel;
@@ -67,20 +76,7 @@ const MinistryDashboard = ({userDetail}) => {
 
   function getAssigneeValue(row) {
     const groupName = row.assignedministrygroup ? row.assignedministrygroup : "Unassigned";
-    const assignedTo = row.assignedministryperson ? row.assignedministryperson : groupName;    
-    if (ministryAssignedToList.length > 0) {
-      const assigneeDetails = ministryAssignedToList.find(assigneeGroup => assigneeGroup.name === groupName);
-      const assignee = assigneeDetails && assigneeDetails.members && assigneeDetails.members.find(_assignee => _assignee.username === assignedTo);      
-      if (groupName === assignedTo) {
-        return assignedTo;
-      }
-      else {
-        return  assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
-      }
-    }
-    else {
-      return assignedTo;
-    }
+    return row.assignedministryperson && row.assignedministrypersonFirstName && row.assignedministrypersonLastName ? `${row.assignedministrypersonLastName}, ${row.assignedministrypersonFirstName}` : groupName;    
   }
 
   function getRecordsDue(params) {
@@ -192,7 +188,7 @@ return (
         </Grid>
       </Grid>
       <>
-        {!isLoading && !isAssignedToListLoading ? (
+        {!isLoading ? (
           <>
             <Grid item container alignItems="center" xs={12}>
               <Grid item xs={12} lg={6} className="form-group has-search">
@@ -241,19 +237,23 @@ return (
                 columns={columns.current}
                 rowHeight={30}
                 headerHeight={50}
-                rowCount={requestQueue.meta.total}
+                rowCount={requestQueue?.meta?.total}
                 pageSize={rowsState.pageSize}
                 rowsPerPageOptions={[10]}
                 hideFooterSelectedRowCount={true}
                 disableColumnMenu={true}
                 pagination
                 paginationMode="server"
+                page = {rowsState.page}
                 onPageChange={(page) =>
                   setRowsState((prev) => ({ ...prev, page }))
                 }
                 onPageSizeChange={(pageSize) =>
                   setRowsState((prev) => ({ ...prev, pageSize }))
                 }
+                components={{
+                  Pagination: CustomPagination,
+                }}
                 sortingOrder={["desc", "asc"]}
                 sortModel={sortModel}
                 sortingMode={"server"}
@@ -279,6 +279,20 @@ return (
     </Grid>
   </div>
 );
-  };
+};
+
+const CustomPagination = () => {
+  const apiRef = useGridApiContext();
+  const page = useGridSelector(apiRef, gridPageSelector);
+  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+  return (
+    <Pagination
+      count={pageCount}
+      page={page + 1}
+      onChange={(event, value) => apiRef.current.setPage(value - 1)}
+    />
+  );
+}
 
 export default MinistryDashboard;

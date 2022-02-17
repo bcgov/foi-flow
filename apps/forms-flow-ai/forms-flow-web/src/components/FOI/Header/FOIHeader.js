@@ -36,28 +36,26 @@ const [messageData, setMessageData] = useState("");
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
 const [socket, setSocket] = useState(null);
 
-if (Object.entries(user)?.length !== 0) {
-  const userGroups = user?.groups?.map(group => group.slice(1));
-  isMinistry = isMinistryLogin(userGroups);
-  ministryCode = getMinistryCode(userGroups);
-}
+const userGroups = user?.groups?.map(group => group.slice(1));
+isMinistry = isMinistryLogin(userGroups);
+ministryCode = getMinistryCode(userGroups);
 
 useEffect(() => {     
   if(!unauthorized && isAuthenticated){
     dispatch(fetchFOINotifications());  
     const options = {
-      reconnectionDelay:SOCKETIO_RECONNECTION_DELAY,
-      reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX,
-      path: '/api/v1/socket.io',
+      reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
+      reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
+      path:'/api/v1/socket.io',
       transports: ['websocket'],
       auth: { "x-jwt-token": UserService.getToken() }
     };
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
-  }
-  setInterval(() => {
-    if(!unauthorized && isAuthenticated)
+  
+    setInterval(() => {
       dispatch(fetchFOINotifications());
-  }, 900000);
+    }, 900000);
+  }
 },[]);
 
 useEffect(() => {     

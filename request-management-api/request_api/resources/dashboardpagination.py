@@ -32,7 +32,17 @@ class DashboardPagination(Resource):
             DEFAULT_SIZE = 10
             DEFAULT_SORT_ITEMS = ['currentState']
             DEFAULT_SORT_ORDERS = ['desc']
-            DEFAULT_FILTER_FIELDS = ['idNumber', 'currentState', 'firstName', 'lastName', 'assignedTo', 'requestType']
+            DEFAULT_FILTER_FIELDS = [
+                                        'idNumber',
+                                        'currentState',
+                                        'firstName',
+                                        'lastName',
+                                        'assignedToFirstName',
+                                        'assignedToLastName',
+                                        'assignedministrypersonFirstName',
+                                        'assignedministrypersonLastName',
+                                        'requestType'
+                                    ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
             _size = flask.request.args.get('size', DEFAULT_SIZE, type=int)

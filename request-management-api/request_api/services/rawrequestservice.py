@@ -24,9 +24,24 @@ class rawrequestservice:
     def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
+        assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
+        assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
+        assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
-        result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,sourceofsubmission= sourceofsubmission,ispiiredacted=ispiiredacted,userid= userid,assigneegroup=assigneegroup,assignee=assignee,requirespayment=requirespayment,notes=notes)
+        result = FOIRawRequest.saverawrequest(
+                                                _requestrawdata=requestdatajson,
+                                                sourceofsubmission= sourceofsubmission,
+                                                ispiiredacted=ispiiredacted,
+                                                userid= userid,
+                                                assigneegroup=assigneegroup,
+                                                assignee=assignee,
+                                                requirespayment=requirespayment,
+                                                notes=notes,
+                                                assigneefirstname=assigneefirstname,
+                                                assigneemiddlename=assigneemiddlename,
+                                                assigneelastname=assigneelastname
+                                            )
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
@@ -56,10 +71,10 @@ class rawrequestservice:
             return requestdatajson['requiresPayment']            
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
-    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, username, isministryuser):
+    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, username, isministryuser, assigneefirstname, assigneemiddlename, assigneelastname):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
         #Get documents
-        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid)
+        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
         asyncio.create_task(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
         return result
