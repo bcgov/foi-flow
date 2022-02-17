@@ -46,7 +46,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   useEffect(() => {
     if (searchResults) {
-      console.log("called ");
       // page+1 here, because initial page value is 0 for mui-data-grid
       handleUpdateSearchFilter({
         page: rowsState.page + 1,
@@ -128,7 +127,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   };
 
-  if (searchLoading) {
+  if (searchResults === null && queryData) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />

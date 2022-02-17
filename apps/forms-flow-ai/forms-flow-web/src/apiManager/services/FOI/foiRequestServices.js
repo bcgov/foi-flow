@@ -59,6 +59,7 @@ export const fetchFOIRequestListByPage = (
   });
 
   return (dispatch) => {
+    dispatch(setFOILoader(true));
     httpGETRequest(
       API.FOI_GET_REQUESTS_PAGE_API,
       {
