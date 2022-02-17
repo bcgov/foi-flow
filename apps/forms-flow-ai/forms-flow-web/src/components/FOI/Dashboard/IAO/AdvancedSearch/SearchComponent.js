@@ -76,9 +76,6 @@ const AdvancedSearch = () => {
   );
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
-  const isAssignedToListLoading = useSelector(
-    (state) => state.foiRequests.isAssignedToListLoading
-  );
 
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
@@ -255,7 +252,7 @@ const AdvancedSearch = () => {
     );
   };
 
-  if (isLoading || isAssignedToListLoading) {
+  if (isLoading) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -617,9 +614,11 @@ const AdvancedSearch = () => {
                         shrink: true,
                       }}
                       variant="outlined"
-                      value={fromDate}
+                      value={fromDate || ""}
                       InputProps={{
-                        inputProps: { max: toDate || formatDate(new Date()) },
+                        inputProps: {
+                          max: formatDate(toDate) || formatDate(new Date()),
+                        },
                       }}
                       onChange={(e) => setFromDate(formatDate(e.target.value))}
                       fullWidth
@@ -646,11 +645,11 @@ const AdvancedSearch = () => {
                       }}
                       InputProps={{
                         inputProps: {
-                          min: fromDate,
+                          min: formatDate(fromDate),
                           max: formatDate(new Date()),
                         },
                       }}
-                      value={toDate}
+                      value={toDate || ""}
                       onChange={(e) => setToDate(formatDate(e.target.value))}
                       variant="outlined"
                       fullWidth

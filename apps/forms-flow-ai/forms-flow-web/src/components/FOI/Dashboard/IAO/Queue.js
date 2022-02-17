@@ -12,9 +12,8 @@ import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
-import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import Loading from "../../../../containers/Loading";
-import { 
+import {
   debounce,
   ClickableChip,
   getAssigneeValue,
@@ -147,7 +146,7 @@ const Queue = ({ userDetail }) => {
 
   const updateAssigneeName = (data) => {
     if (!data) {
-      return data;
+      return [];
     }
     return data.map((row) => ({
       ...row,
@@ -167,7 +166,7 @@ const Queue = ({ userDetail }) => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || requestQueue === null) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -259,7 +258,7 @@ const Queue = ({ userDetail }) => {
         <DataGrid
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(requestQueue?.data) || []}
+          rows={updateAssigneeName(requestQueue?.data)}
           columns={columns.current}
           rowHeight={30}
           headerHeight={50}
