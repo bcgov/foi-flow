@@ -16,6 +16,11 @@ export const ActionProvider = ({ children }) => {
     setQueryData({ ...(queryData || {}), ...filterData });
   };
 
+  const defaultSortModel = [
+    { field: "currentState", sort: "desc" },
+    { field: "receivedDateUF", sort: "desc" },
+  ];
+
   useEffect(() => {
     dispatch(fetchFOIProgramAreaList());
   }, [dispatch]);
@@ -45,6 +50,7 @@ export const ActionProvider = ({ children }) => {
         setSearchLoading,
         searchResults,
         queryData,
+        defaultSortModel,
       }}
     >
       {children}
