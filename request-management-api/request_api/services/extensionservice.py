@@ -103,7 +103,7 @@ class extensionservice:
         if 'documents' in updatedextension and updatedextension['documents'] and updatedextension['extensionstatusid'] != 1:
             self.saveextensiondocument(updatedextension['documents'], ministryrequestid, userid, extensionid)
         # Post event for system generated comments
-        asyncio.run(eventservice().posteventforextension(ministryrequestid, extensionid, userid, username, "modify"))
+        asyncio.create_task(eventservice().posteventforextension(ministryrequestid, extensionid, userid, username, "modify"))
         # updates the duedate to extendedduedate or updatedduedate
         # new ministry, extension, extensionmapping and document version gets created
         if extensionresult.success == True and (isstatuschangedfromapproved == True or updatedextension['extensionstatusid'] == 2):

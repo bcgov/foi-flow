@@ -2,6 +2,7 @@ from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
+from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime as datetime2, timedelta
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
@@ -18,7 +19,7 @@ class FOIRawRequestNotification(db.Model):
     requestid =db.Column(db.Integer,  db.ForeignKey('FOIRawRequests.requestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIRawRequests.version'))    
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
-    notification = db.Column(db.Text, unique=False, nullable=True)
+    notification = db.Column(JSON, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime2.now())
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
