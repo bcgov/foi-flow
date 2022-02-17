@@ -17,7 +17,10 @@ namespace MCS.FOI.AXISIntegration.DataModels
         public string RequestType { get; set; }
 
         public string ReceivedDate { get; set; }
+
         public string Category { get; set; }
+
+        public List<Extension> Extensions { get; set; }
 
     }
 }
