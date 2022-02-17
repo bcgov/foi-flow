@@ -167,6 +167,7 @@ const AdvancedSearch = () => {
     setSearchFilterSelected(SearchFilter.REQUEST_DESCRIPTION);
     setRequestState(intitialRequestState);
     setRequestTypes(initialRequestTypes);
+    setRequestStatus(intitialRequestStatus);
     setFromDate("");
     setToDate("");
     setSelectedPublicBodies([]);
