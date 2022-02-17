@@ -23,9 +23,6 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = requestschema.get("requeststatusid")
-        if ministryid is not None:
-            foiministryrequest.foiministryrequestid = ministryid
-            activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
         foiministryrequest.isactive = True
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
@@ -48,16 +45,21 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.assignedgroup = requestschema.get("assignedGroup")
         if self.isNotBlankorNone(requestschema,"assignedTo","main") == True:
             foiministryrequest.assignedto = requestschema.get("assignedTo")
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
+        else:
+            foiministryrequest.assignedto = None
         if self.isNotBlankorNone(requestschema,"assignedministrygroup","main") == True:
             foiministryrequest.assignedministrygroup = requestschema.get("assignedministrygroup")
         if self.isNotBlankorNone(requestschema,"assignedministryperson","main") == True:
             foiministryrequest.assignedministryperson = requestschema.get("assignedministryperson")
-
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedministryperson"), requestschema.get("assignedministrypersonFirstName"), requestschema.get("assignedministrypersonMiddleName"), requestschema.get("assignedministrypersonLastName"))
         if(ministryid is None and filenumber is None and status == "Open"):
-            foiministryrequest.assignedto =''
+            foiministryrequest.assignedto = None
             foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
 
         if ministryid is not None:
+            foiministryrequest.foiministryrequestid = ministryid
+            activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
             divisions = FOIMinistryRequestDivision().getdivisions(ministryid , activeversion-1)
             foiministryrequest.divisions = requestserviceministrybuilder().createfoirequestdivisionfromobject(divisions, ministryid, activeversion, userid)  
             foiministryrequest.documents = requestserviceministrybuilder().createfoirequestdocuments(requestschema,ministryid , activeversion , userid)
