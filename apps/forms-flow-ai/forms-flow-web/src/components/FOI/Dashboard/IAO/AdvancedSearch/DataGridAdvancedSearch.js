@@ -26,8 +26,14 @@ import { ConditionalComponent } from "../../../../../helper/FOI/helper";
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
 
-  const { handleUpdateSearchFilter, searchResults, searchLoading, queryData } =
-    useContext(ActionContext);
+  const {
+    handleUpdateSearchFilter,
+    searchResults,
+    searchLoading,
+    queryData,
+    setSearchLoading,
+    advancedSearchComponentLoading,
+  } = useContext(ActionContext);
 
   const assignedToList = useSelector(
     (state) => state.foiRequests.foiFullAssignedToList
@@ -46,6 +52,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   useEffect(() => {
     if (searchResults) {
+      setSearchLoading(true);
       // page+1 here, because initial page value is 0 for mui-data-grid
       handleUpdateSearchFilter({
         page: rowsState.page + 1,
@@ -127,7 +134,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   };
 
-  if (searchResults === null && queryData) {
+  if (advancedSearchComponentLoading && queryData) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
