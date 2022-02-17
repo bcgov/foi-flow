@@ -1,4 +1,5 @@
-﻿using MCS.FOI.AXISIntegration.DataModels;
+﻿using MCS.FOI.AXISIntegration.DAL.Interfaces;
+using MCS.FOI.AXISIntegration.DataModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,17 +14,20 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
     {
 
         private readonly ILogger<RequestSearchController> _logger;
+        private readonly IRequestDA _requestDA;
 
-       
 
-        public RequestSearchController(ILogger<RequestSearchController> logger)
+        public RequestSearchController(ILogger<RequestSearchController> logger, IRequestDA requestDA)
         {
             _logger = logger;
+            _requestDA = requestDA;
         }
 
         [HttpGet]
         public IEnumerable<AXISRequest> Get()
         {
+            _requestDA.GetAXISRequest("REQUEST#");
+
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new AXISRequest()
             {

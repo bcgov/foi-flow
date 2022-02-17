@@ -1,3 +1,6 @@
+using MCS.FOI.AXISIntegration.DAL;
+using MCS.FOI.AXISIntegration.DAL.Interfaces;
+using MCS.FOI.AXISIntegrationWebAPI.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,8 +29,16 @@ namespace MCS.FOI.AXISIntegrationWebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IRequestDA, RequestsDA>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            var logger = serviceProvider.GetService<ILogger<RequestsDA>>();
+            var requestlogger = serviceProvider.GetService<ILogger<RequestSearchController>>();
+            services.AddSingleton(typeof(ILogger), logger);
+            services.AddSingleton(typeof(ILogger), requestlogger);
 
             services.AddControllers();
+           
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MCS.FOI.AXISIntegrationWebAPI", Version = "v1" });
