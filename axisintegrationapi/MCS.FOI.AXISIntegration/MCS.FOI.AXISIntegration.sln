@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.Dat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.Utilities", "MCS.FOI.AXISIntegration.Utilities\MCS.FOI.AXISIntegration.Utilities.csproj", "{FC103B20-920C-4DBC-93B8-D14EAFF99ABF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.DAL.UnitTests", "MCS.FOI.AXISIntegration.DAL.UnitTests\MCS.FOI.AXISIntegration.DAL.UnitTests.csproj", "{A18765C7-34AE-4149-9AE4-258D5D12F2FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{FC103B20-920C-4DBC-93B8-D14EAFF99ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC103B20-920C-4DBC-93B8-D14EAFF99ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC103B20-920C-4DBC-93B8-D14EAFF99ABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A18765C7-34AE-4149-9AE4-258D5D12F2FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A18765C7-34AE-4149-9AE4-258D5D12F2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A18765C7-34AE-4149-9AE4-258D5D12F2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A18765C7-34AE-4149-9AE4-258D5D12F2FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
