@@ -31,7 +31,6 @@ export const fetchFOIRequestList = () => {
           dispatch(clearRequestDetails({}));
           dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(data));
-          dispatch(setFOILoader(false)); 
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
@@ -43,34 +42,42 @@ export const fetchFOIRequestList = () => {
   };
 };
 
-export const fetchFOIRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+export const fetchFOIRequestListByPage = (
+  page = 1,
+  size = 10,
+  sort = [{ field: "currentState", sort: "desc" }],
+  filters = null,
+  keyword = null,
+  additionalFilter = "All",
+  userID = null
+) => {
   let sortingItems = [];
   let sortingOrders = [];
-  sort.forEach((item)=>{
+  sort.forEach((item) => {
     sortingItems.push(item.field);
     sortingOrders.push(item.sort);
   });
 
   return (dispatch) => {
     httpGETRequest(
-          API.FOI_GET_REQUESTS_PAGE_API,
-          {
-            "page": page,
-            "size": size,
-            "sortingitems": sortingItems,
-            "sortingorders": sortingOrders,
-            "filters": filters,
-            "keyword": keyword,
-            "additionalfilter": additionalFilter,
-            "userid": userID
-          },
-          UserService.getToken())
+      API.FOI_GET_REQUESTS_PAGE_API,
+      {
+        page: page,
+        size: size,
+        sortingitems: sortingItems,
+        sortingorders: sortingOrders,
+        filters: filters,
+        keyword: keyword,
+        additionalfilter: additionalFilter,
+        userid: userID,
+      },
+      UserService.getToken()
+    )
       .then((res) => {
         if (res.data) {
           dispatch(clearRequestDetails({}));
           dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(res.data));
-          dispatch(setFOILoader(false)); 
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
