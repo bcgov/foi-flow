@@ -71,8 +71,10 @@ const AdvancedSearch = ({ userDetail }) => {
   const {
     handleUpdateSearchFilter,
     searchLoading,
-    setSearchLoading,
     defaultSortModel,
+    advancedSearchComponentLoading,
+    setAdvancedSearchComponentLoading,
+    setSearchLoading,
   } = useContext(ActionContext);
 
   const programAreaList = useSelector(
@@ -152,6 +154,9 @@ const AdvancedSearch = ({ userDetail }) => {
       .filter((value) => value);
   };
   const handleApplySearchFilters = () => {
+    if (!advancedSearchComponentLoading) {
+      setAdvancedSearchComponentLoading(true);
+    }
     setSearchLoading(true);
     handleUpdateSearchFilter({
       search: searchFilterSelected.replace("_", "").toLowerCase(),

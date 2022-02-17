@@ -10,6 +10,8 @@ export const ActionProvider = ({ children }) => {
 
   const [queryData, setQueryData] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [advancedSearchComponentLoading, setAdvancedSearchComponentLoading] =
+    useState(true);
   const [searchResults, setSearchResults] = useState(null);
 
   const handleUpdateSearchFilter = (filterData) => {
@@ -31,10 +33,12 @@ export const ActionProvider = ({ children }) => {
         ...queryData,
         callback: (data) => {
           setSearchLoading(false);
+          setAdvancedSearchComponentLoading(false);
           setSearchResults(data);
         },
         errorCallback: (error) => {
           setSearchLoading(false);
+          setAdvancedSearchComponentLoading(false);
           errorToast(error);
         },
         dispatch,
@@ -51,6 +55,8 @@ export const ActionProvider = ({ children }) => {
         searchResults,
         queryData,
         defaultSortModel,
+        advancedSearchComponentLoading,
+        setAdvancedSearchComponentLoading,
       }}
     >
       {children}
