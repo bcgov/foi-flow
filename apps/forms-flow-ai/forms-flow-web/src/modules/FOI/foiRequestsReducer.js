@@ -3,7 +3,7 @@ const initialState = {
   isLoading: true,
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
-  foiRequestsList: [],
+  foiRequestsList: null,
   foiMinistryRequestsList: [],
   foiRequestsCount: 0,
   foiRequestDetail: {},
@@ -25,13 +25,13 @@ const initialState = {
   foiRequestDescriptionHistoryList: [],
   foiMinistryDivisionalStages: [],
   foiWatcherList: [],
-  foiRequestComments:[],
-  foiRequestAttachments:[],
+  foiRequestComments: [],
+  foiRequestAttachments: [],
   foiRequestExtesions: [],
-  foiOpenedMinistries: []
+  foiOpenedMinistries: [],
 };
 
-const foiRequests = (state = initialState, action)=> {
+const foiRequests = (state = initialState, action) => {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return { ...state, isLoading: action.payload };
@@ -40,7 +40,7 @@ const foiRequests = (state = initialState, action)=> {
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
       return { ...state, isAttachmentListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
-      return { ...state, foiRequestsList: action.payload };
+      return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
       return { ...state, foiMinistryRequestsList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUESTS_COUNT:
@@ -90,5 +90,5 @@ const foiRequests = (state = initialState, action)=> {
     default:
       return state;
   }
-}
+};
 export default foiRequests ;
