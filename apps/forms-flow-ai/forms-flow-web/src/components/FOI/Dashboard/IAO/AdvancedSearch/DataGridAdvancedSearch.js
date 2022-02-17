@@ -202,7 +202,6 @@ const CustomPagination = () => {
 
   return (
     <Pagination
-      color="primary"
       count={pageCount}
       page={page + 1}
       onChange={(event, value) => apiRef.current.setPage(value - 1)}

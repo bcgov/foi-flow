@@ -395,13 +395,13 @@ const AdvancedSearch = ({ userDetail }) => {
               <Grid item xs={2}>
                 <ClickableChip
                   key={`filter-raw-request`}
-                  label={"RAW REQUEST #"}
+                  label={"ID NUMBER"}
                   color="primary"
                   onClick={() =>
-                    clickSearchFilter(SearchFilter.RAW_REQUEST_NUM)
+                    clickSearchFilter(SearchFilter.ID_NUM)
                   }
                   clicked={
-                    searchFilterSelected === SearchFilter.RAW_REQUEST_NUM
+                    searchFilterSelected === SearchFilter.ID_NUM
                   }
                 />
               </Grid>
