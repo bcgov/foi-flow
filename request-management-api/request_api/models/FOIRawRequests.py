@@ -482,6 +482,24 @@ class FOIRawRequest(db.Model):
                 searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
                 searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
             return or_(and_(*searchcondition1), and_(*searchcondition2))
+        elif(params['search'] == 'applicantname'):
+            searchcondition1 = []
+            searchcondition2 = []
+            searchcondition3 = []
+            searchcondition4 = []
+            for keyword in params['keywords']:
+                searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
+                searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
+                searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                searchcondition4.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
+        elif(params['search'] == 'assigneename'):
+            searchcondition1 = []
+            searchcondition2 = []
+            for keyword in params['keywords']:
+                searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
+                searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2))
         else:
             searchcondition = []
             for keyword in params['keywords']:

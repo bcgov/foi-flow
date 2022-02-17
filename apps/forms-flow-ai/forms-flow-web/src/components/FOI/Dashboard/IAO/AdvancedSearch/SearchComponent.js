@@ -65,11 +65,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AdvancedSearch = () => {
+const AdvancedSearch = ({ userDetail }) => {
   const classes = useStyles();
 
-  const { handleUpdateSearchFilter, searchLoading, setSearchLoading } =
-    useContext(ActionContext);
+  const {
+    handleUpdateSearchFilter,
+    searchLoading,
+    setSearchLoading,
+    defaultSortModel,
+  } = useContext(ActionContext);
 
   const programAreaList = useSelector(
     (state) => state.foiRequests.foiProgramAreaList
@@ -158,6 +162,10 @@ const AdvancedSearch = () => {
       fromDate: fromDate || null,
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
+      page: 1,
+      size: 10,
+      sort: defaultSortModel,
+      userId: userDetail.preferred_username,
     });
   };
 

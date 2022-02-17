@@ -166,7 +166,7 @@ const Queue = ({ userDetail }) => {
     }
   };
 
-  if (isLoading || requestQueue === null) {
+  if (requestQueue === null) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
