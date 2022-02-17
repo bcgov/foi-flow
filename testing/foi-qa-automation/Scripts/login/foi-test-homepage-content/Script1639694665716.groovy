@@ -17,8 +17,6 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.delay(5, FailureHandling.STOP_ON_FAILURE)
-
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/img'), 0)
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/img'))

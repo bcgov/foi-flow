@@ -20,13 +20,13 @@
    <testCaseLink>
       <guid>849fee5a-4ea5-40e1-a9bd-73d93b36c58d</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/login/foi-test-login-page</testCaseId>
    </testCaseLink>
    <testCaseLink>
       <guid>11e100b1-804b-4bbb-bcd1-597d43da7e2c</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/login/foi-test-valid-login-content</testCaseId>
       <testDataLink>
          <combinationType>ONE</combinationType>
@@ -65,7 +65,7 @@
    <testCaseLink>
       <guid>fa5a5d4e-7bbe-4075-9cdd-b8824000bdd9</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/login/foi-test-invalid-login-credentials</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
@@ -77,7 +77,7 @@
    <testCaseLink>
       <guid>c8054c8b-8556-4bb5-9c72-d9373c9c19a9</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/login/foi-test-sign-out</testCaseId>
    </testCaseLink>
 </TestSuiteEntity>
