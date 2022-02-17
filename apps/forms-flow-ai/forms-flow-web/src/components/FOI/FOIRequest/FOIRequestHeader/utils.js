@@ -82,7 +82,7 @@ export const getAssignedTo = (requestDetails) => {
 
   return requestDetails.assignedTo
     ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}|${requestDetails.assignedToFirstName}|${requestDetails.assignedToLastName}`
-    : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}|`;
+    : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
 };
 
 export const getStatus = ({ headerValue, requestDetails }) => {

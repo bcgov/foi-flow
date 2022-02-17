@@ -244,6 +244,7 @@ return (
                 disableColumnMenu={true}
                 pagination
                 paginationMode="server"
+                page = {rowsState.page}
                 onPageChange={(page) =>
                   setRowsState((prev) => ({ ...prev, page }))
                 }
@@ -287,7 +288,6 @@ const CustomPagination = () => {
 
   return (
     <Pagination
-      color="primary"
       count={pageCount}
       page={page + 1}
       onChange={(event, value) => apiRef.current.setPage(value - 1)}
