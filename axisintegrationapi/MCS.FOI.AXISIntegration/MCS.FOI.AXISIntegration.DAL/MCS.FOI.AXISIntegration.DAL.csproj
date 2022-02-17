@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MCS.FOI.AXISIntegration.DataModels\MCS.FOI.AXISIntegration.DataModels.csproj" />
+    <ProjectReference Include="..\MCS.FOI.AXISIntegration.Utilities\MCS.FOI.AXISIntegration.Utilities.csproj" />
   </ItemGroup>
 
 </Project>
