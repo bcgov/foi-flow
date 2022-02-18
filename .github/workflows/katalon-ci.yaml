@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Run bat script on CMD
       shell: cmd
-      run: foi-start.bat
+      run: dir
     - run: echo Y
     - name: Checkout
       uses: actions/checkout@v2
