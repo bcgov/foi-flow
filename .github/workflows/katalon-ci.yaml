@@ -9,6 +9,7 @@ jobs:
   katalon-win:
     runs-on: windows-latest
     steps:
+    - run: echo '${{ github.workspace }}'
     - name: Checkout
       uses: actions/checkout@v2
     - name: Katalon Studio Github Action
