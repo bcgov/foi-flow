@@ -1,12 +1,13 @@
 name: Katalon
-  defaults:
-    run:
-      working-directory: C:\
 on:
   push:
     branches: [ dev-NK-automationscripts ]
   pull_request:
     branches: [ dev ]
+
+defaults:
+  run:
+    working-directory: C:\
 
 jobs:
   katalon-win:
