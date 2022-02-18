@@ -21,7 +21,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: katalon-report
-        path: testing\foi-qa-automation\Reports\*\*\*.html
+        path: testing\foi-qa-automation\Reports\*\*\*\*.html
         # D:\a\foi-flow\foi-flow\testing\foi-qa-automation\Reports\20220217_191948\foi-test-homepage-and-login\20220217_191954
   # katalon-mac:
   #   runs-on: macos-latest
