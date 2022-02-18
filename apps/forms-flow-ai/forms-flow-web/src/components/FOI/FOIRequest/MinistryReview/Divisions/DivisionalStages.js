@@ -47,6 +47,7 @@ const DivisionalStages = React.memo(({
 
       setMinDivStages([...updatedIterator]);
       appendStageIterator([...updatedIterator]);
+      createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, "", "");
     };
     
     const [stageIterator, appendStageIterator] = React.useState(() =>
@@ -58,6 +59,7 @@ const DivisionalStages = React.memo(({
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
       });
+      createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION_STAGE, "", "");
     };
 
     const divisionList = divisionalstages.divisions
