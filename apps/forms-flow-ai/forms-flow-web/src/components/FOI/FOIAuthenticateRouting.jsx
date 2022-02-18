@@ -64,7 +64,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
             </>
           ) : (
             <Route path="/foi">
-              <FOIHeader /> 
+              <FOIHeader  unauthorized={true}/> 
               <UnAuthorized />
               <FOIFooter />
             </Route>

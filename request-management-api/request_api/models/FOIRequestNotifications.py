@@ -2,6 +2,7 @@ from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
+from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime as datetime2
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
@@ -20,7 +21,7 @@ class FOIRequestNotification(db.Model):
     requestid =db.Column(db.Integer,  db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))    
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
-    notification = db.Column(db.Text, unique=False, nullable=True)
+    notification = db.Column(JSON, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime2.now())
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -40,9 +41,9 @@ class FOIRequestNotification(db.Model):
     @classmethod 
     def getconsolidatednotifications(cls, userid, days):
         sql = """select idnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
-                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
+                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
                     union all
-                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
+                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
                   ) as notf order by created_at desc"""
         rs = db.session.execute(text(sql), {'userid': userid, 'days': days})
         notifications = []
@@ -50,6 +51,21 @@ class FOIRequestNotification(db.Model):
             dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
             _createddate = dt
             notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
+        return notifications
+    
+    @classmethod 
+    def getcommentnotifications(cls, commentid):
+        sql = """select idnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
+                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
+                    union all
+                    select frn.idnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
+                  ) as notf order by created_at desc"""
+        rs = db.session.execute(text(sql), {'commentid': commentid})
+        notifications = []
+        for row in rs:
+            dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
+            _createddate = dt
+            notifications.append({"userid": row["userid"],"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
         return notifications
 
     @classmethod
