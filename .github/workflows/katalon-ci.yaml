@@ -14,8 +14,7 @@ jobs:
     - run: dir
     - name: Run bat script on CMD
       shell: cmd
-      run: foi-start.bat
-    - run: echo Y
+      run: foi-start-copy.bat
     - name: Katalon Studio Github Action
       uses: katalon-studio/katalon-studio-github-action@v2
       with:
