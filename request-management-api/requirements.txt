@@ -58,7 +58,7 @@ threadloop==1.0.2
 thrift==0.13.0
 tornado==6.1
 flask-expects-json==1.5.0
-redis==3.5.3
+redis==4.1.4
 flask_jwt_oidc==0.3.0
 maya==0.6.1
 pyjwt==2.1.0

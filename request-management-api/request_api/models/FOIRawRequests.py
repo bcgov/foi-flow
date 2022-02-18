@@ -240,6 +240,11 @@ class FOIRawRequest(db.Model):
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['description'].astext).label('description')
+        duedate = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             literal(None)),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -258,7 +263,7 @@ class FOIRawRequest(db.Model):
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
             literal(None).label('cfrduedate'),
-            literal(None).label('duedate'),
+            duedate,
             FOIRawRequest.requestrawdata['category'].astext.label('applicantcategory'),
             FOIRawRequest.created_at.label('created_at'),
             literal(None).label('bcgovcode'),
@@ -290,19 +295,31 @@ class FOIRawRequest(db.Model):
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
-            filtercondition = []
-            for field in filterfields:
-                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
-                if(field == 'firstName'):
-                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
-                if(field == 'lastName'):
-                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-                if(field == 'requestType'):
-                    filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
-
-            return basequery.filter(or_(*filtercondition))
+            filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
+            return basequery.filter(filtercondition)
         else:
             return basequery
+
+    @classmethod
+    def getfilterforrequestssubquery(cls, filterfields, keyword):
+        keyword = keyword.lower()
+
+        #filter/search
+        filtercondition = []
+        for field in filterfields:
+            if(field == 'idNumber'):
+                keyword = keyword.replace('u-00', '')
+
+            filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+            if(field == 'firstName'):
+                filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+            if(field == 'lastName'):
+                filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+            if(field == 'requestType'):
+                filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+        
+        return or_(*filtercondition)
+
 
     @classmethod
     def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
@@ -340,7 +357,8 @@ class FOIRawRequest(db.Model):
             'description': FOIRawRequest.requestrawdata['description'].astext,
             'descriptionDescription': FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext,
             'ministry': FOIRawRequest.requestrawdata['selectedMinistries'].astext,
-            'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext
+            'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext,
+            'duedate': FOIRawRequest.requestrawdata['dueDate'].astext
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
@@ -431,7 +449,8 @@ class FOIRawRequest(db.Model):
         if(params['fromdate'] is not None):
             filtercondition.append(FOIRawRequest.findfield('receivedDate') >= params['fromdate'])
 
-        # no duedate for unopened & intake in progress
+        if(params['todate'] is not None):
+            filtercondition.append(FOIRawRequest.findfield('duedate') <= params['todate'])
         
         return filtercondition
 
@@ -482,6 +501,31 @@ class FOIRawRequest(db.Model):
                 searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
                 searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
             return or_(and_(*searchcondition1), and_(*searchcondition2))
+        elif(params['search'] == 'applicantname'):
+            searchcondition1 = []
+            searchcondition2 = []
+            searchcondition3 = []
+            searchcondition4 = []
+            for keyword in params['keywords']:
+                searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
+                searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
+                searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                searchcondition4.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
+        elif(params['search'] == 'assigneename'):
+            searchcondition1 = []
+            searchcondition2 = []
+            for keyword in params['keywords']:
+                searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
+                searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2))
+        elif(params['search'] == 'idnumber'):
+            searchcondition = []
+            for keyword in params['keywords']:
+                keyword = keyword.lower()
+                keyword = keyword.replace('u-00', '')
+                searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
+            return and_(*searchcondition)
         else:
             searchcondition = []
             for keyword in params['keywords']:
