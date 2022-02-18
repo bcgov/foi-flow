@@ -22,6 +22,7 @@ def response = WS.sendRequest(findTestObject('FoiRawRequest'))
 
 def jsonSlurper = new JsonSlurper()
 
+println(findTestData('Sample Applicant').getValue('requestType', 1))
 println(jsonSlurper.parseText(response.responseText))
 
 //WS.verifyResponseStatusCode(response, 200)
