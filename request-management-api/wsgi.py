@@ -2,7 +2,7 @@
 from threading import Thread
 import eventlet
 #Monkey patch to allow for async actions (aka multiple workers)
-eventlet.monkey_patch(socket=True)
+eventlet.monkey_patch()
 from distutils.log import debug
 
 
@@ -15,6 +15,7 @@ from flask import g, request
 from request_api.auth import AuthHelper
 from request_api.exceptions import BusinessException
 from flask import current_app
+from request_api.utils.redissubscriber import RedisSubscriberService
 
 @socketio.on('connect')
 def connect(message):
@@ -25,8 +26,7 @@ def connect(message):
         disconnect()
         raise ConnectionRefusedError('unauthorized!')
 
-
-  
+ 
 @socketio.on('disconnect')
 def disconnect():
     current_app.logger.info('socket disconnected for sid: '+request.sid)
@@ -42,18 +42,14 @@ def __getauthenticateduserid(message):
 
 @socketio.on_error()
 def error_handler(e):
-    print('Socket error ', e)  
+    current_app.logger.error("%s,%s" % ('Socket error', e.message))
 
 APP = create_app()
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5000))    
     if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
-        socketio.init_app(APP, async_mode='eventlet',
-                      message_queue=os.getenv("FOI_REQUESTQUEUE_REDISURL"),
-                      redis_options={'REDIS_OPTIONS'},  
-                      path='/api/v1/socket.io')
-    else:
-        socketio.init_app(APP, async_mode='eventlet', 
+        RedisSubscriberService().register_subscription()
+    socketio.init_app(APP, async_mode='eventlet', 
                       path='/api/v1/socket.io')
     socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
     

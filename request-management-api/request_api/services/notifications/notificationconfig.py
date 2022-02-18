@@ -33,10 +33,8 @@ class notificationconfig:
     def getnotificationusertypeid(self, notificationusertype):
         if notificationusertype.lower() == "watcher":
             return 1
-        elif notificationusertype.lower() == "assignee":
+        elif notificationusertype.lower() == "assignee" or "comment" in notificationusertype.lower():
             return 2
-        elif "comment" in notificationusertype.lower():
-            return 3
         return 0
     
     def getnotificationdays(self):
