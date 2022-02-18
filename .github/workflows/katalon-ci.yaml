@@ -9,12 +9,13 @@ jobs:
   katalon-win:
     runs-on: windows-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Run bat script on CMD
       shell: cmd
       run: dir
+      run: foi-start.bat
     - run: echo Y
-    - name: Checkout
-      uses: actions/checkout@v2
     - name: Katalon Studio Github Action
       uses: katalon-studio/katalon-studio-github-action@v2
       with:
