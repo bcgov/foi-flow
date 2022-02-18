@@ -13,6 +13,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - run: echo '${{ github.workspace }}'
+    - run: echo '${{ env.GITHUB_WORKSPACE }}'
     - name: Checkout
       uses: actions/checkout@v2
     - name: Katalon Studio Github Action
