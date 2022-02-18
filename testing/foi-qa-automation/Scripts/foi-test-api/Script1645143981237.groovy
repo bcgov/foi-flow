@@ -16,8 +16,13 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
+import groovy.json.JsonSlurper as JsonSlurper
 
 def response = WS.sendRequest(findTestObject('FoiRawRequest'))
 
-WS.verifyResponseStatusCode(response, 200)
+def jsonSlurper = new JsonSlurper()
+
+println(jsonSlurper.parseText(response.responseText))
+
+//WS.verifyResponseStatusCode(response, 200)
 
