@@ -1,11 +1,12 @@
 name: Katalon
-github:
-  workspace: C:\
 on:
   push:
     branches: [ dev-NK-automationscripts ]
   pull_request:
     branches: [ dev ]
+
+env:
+  GITHUB_WORKSPACE: C:\
 
 jobs:
   katalon-win:
