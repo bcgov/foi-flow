@@ -11,9 +11,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - run: dir
     - name: Run bat script on CMD
       shell: cmd
-      run: dir
       run: foi-start.bat
     - run: echo Y
     - name: Katalon Studio Github Action
