@@ -51,8 +51,8 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 //
 //WebUI.comment("switched to ${WebUI.getUrl()}")
 //
-//WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 8)
-//        , ('username') : findTestData('New Test Data').getValue('Username', 8)], 
+//WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 8)
+//        , ('username') : findTestData('Login Credentials').getValue('Username', 8)], 
 //    FailureHandling.STOP_ON_FAILURE)
 //
 //
@@ -64,8 +64,8 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 //WebUI.comment("switched to ${WebUI.getUrl()}")
 //
 //
-//WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 1)
-//        , ('username') : findTestData('New Test Data').getValue('Username', 1)], 
+//WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 1)
+//        , ('username') : findTestData('Login Credentials').getValue('Username', 1)], 
 //    FailureHandling.STOP_ON_FAILURE)
 //
 //
@@ -175,13 +175,13 @@ DriverFactory.changeWebDriver(driver2)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
-            8), ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
 
 DriverFactory.changeWebDriver(driver1)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
-            1), ('username') : findTestData('New Test Data').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 

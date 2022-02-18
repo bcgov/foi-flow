@@ -25,15 +25,6 @@
          </iterationEntity>
          <testDataId>Data Files/Sample Applicant</testDataId>
       </testDataLink>
-      <testDataLink>
-         <combinationType>ONE</combinationType>
-         <id>0699270e-050a-4c68-aaf0-413f6edc6574</id>
-         <iterationEntity>
-            <iterationType>ALL</iterationType>
-            <value></value>
-         </iterationEntity>
-         <testDataId>Data Files/Login Credentials</testDataId>
-      </testDataLink>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -166,34 +157,16 @@
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
       <testCaseId>Test Cases/form/foi-test-create-new-general-request</testCaseId>
-      <testDataLink>
-         <combinationType>ONE</combinationType>
-         <id>41e2481b-8d71-4a2c-9405-8437d345e60c</id>
-         <iterationEntity>
-            <iterationType>ALL</iterationType>
-            <value></value>
-         </iterationEntity>
-         <testDataId>Data Files/Login Credentials</testDataId>
-      </testDataLink>
-      <testDataLink>
-         <combinationType>ONE</combinationType>
-         <id>7aa68328-a845-4914-b285-fd02e6cae79f</id>
-         <iterationEntity>
-            <iterationType>ALL</iterationType>
-            <value></value>
-         </iterationEntity>
-         <testDataId>Data Files/New Test Data</testDataId>
-      </testDataLink>
       <variableLink>
-         <testDataLinkId>41e2481b-8d71-4a2c-9405-8437d345e60c</testDataLinkId>
-         <type>DATA_COLUMN</type>
-         <value>First Name</value>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
          <variableId>51df4c94-7a9c-408d-8d19-e94963af5958</variableId>
       </variableLink>
       <variableLink>
-         <testDataLinkId>41e2481b-8d71-4a2c-9405-8437d345e60c</testDataLinkId>
-         <type>DATA_COLUMN</type>
-         <value>Last Name</value>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
          <variableId>f3d615f8-7cbf-415f-87d6-fd3ee7795826</variableId>
       </variableLink>
    </testCaseLink>

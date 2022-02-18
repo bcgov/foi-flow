@@ -28,37 +28,28 @@
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
       <testCaseId>Test Cases/login/foi-test-valid-login-content</testCaseId>
-      <testDataLink>
-         <combinationType>ONE</combinationType>
-         <id>e425cd71-6d16-42bb-b4f6-3fb84e6d65d1</id>
-         <iterationEntity>
-            <iterationType>ALL</iterationType>
-            <value></value>
-         </iterationEntity>
-         <testDataId>Data Files/Login Credentials</testDataId>
-      </testDataLink>
       <variableLink>
-         <testDataLinkId>e425cd71-6d16-42bb-b4f6-3fb84e6d65d1</testDataLinkId>
-         <type>DATA_COLUMN</type>
-         <value>Username</value>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
          <variableId>94827f55-a251-4025-9719-11c192cf9bf1</variableId>
       </variableLink>
       <variableLink>
-         <testDataLinkId>e425cd71-6d16-42bb-b4f6-3fb84e6d65d1</testDataLinkId>
-         <type>DATA_COLUMN</type>
-         <value>Password</value>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
          <variableId>9f013253-ef8b-4088-ac4e-034a93f87198</variableId>
       </variableLink>
       <variableLink>
-         <testDataLinkId>e425cd71-6d16-42bb-b4f6-3fb84e6d65d1</testDataLinkId>
-         <type>DATA_COLUMN</type>
-         <value>First Name</value>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
          <variableId>c97fd75e-a2ad-42ab-9bbd-d9dc42260a7d</variableId>
       </variableLink>
       <variableLink>
-         <testDataLinkId>e425cd71-6d16-42bb-b4f6-3fb84e6d65d1</testDataLinkId>
-         <type>DATA_COLUMN</type>
-         <value>Last Name</value>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
          <variableId>ed9c7b40-9cee-4260-9823-ac9df645252f</variableId>
       </variableLink>
    </testCaseLink>

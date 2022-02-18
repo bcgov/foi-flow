@@ -17,9 +17,9 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('New Test Data').getValue(
-            'Password', 6), ('username') : findTestData('New Test Data').getValue('Username', 6), ('firstname') : findTestData(
-            'New Test Data').getValue('First Name', 6), ('lastname') : findTestData('New Test Data').getValue('Last Name', 
+WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('Login Credentials').getValue(
+            'Password', 6), ('username') : findTestData('Login Credentials').getValue('Username', 6), ('firstname') : findTestData(
+            'New Test Data').getValue('First Name', 6), ('lastname') : findTestData('Login Credentials').getValue('Last Name', 
             6), ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue(
             'email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
             'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
@@ -54,8 +54,8 @@ requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Tit
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
-            8), ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -83,8 +83,8 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/ministry view/fo
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), (findTestData('New Test Data').getValue(
-        'Last Name', 8) + ', ') + findTestData('New Test Data').getValue('First Name', 8))
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), (findTestData('Login Credentials').getValue(
+        'Last Name', 8) + ', ') + findTestData('Login Credentials').getValue('First Name', 8))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
@@ -100,8 +100,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), (findTestData('New Test Data').getValue(
-        'Last Name', 8) + ', ') + findTestData('New Test Data').getValue('First Name', 8 ))
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), (findTestData('Login Credentials').getValue(
+        'Last Name', 8) + ', ') + findTestData('Login Credentials').getValue('First Name', 8 ))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL, FailureHandling.STOP_ON_FAILURE)
 
@@ -113,8 +113,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue ro
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
-            7), ('username') : findTestData('New Test Data').getValue('Username', 7)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            7), ('username') : findTestData('Login Credentials').getValue('Username', 7)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
