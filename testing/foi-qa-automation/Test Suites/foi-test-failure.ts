@@ -14,7 +14,7 @@
    <testCaseLink>
       <guid>720d19fc-d3da-42b9-a1f0-b40ff5884557</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/foi-test-failure</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
