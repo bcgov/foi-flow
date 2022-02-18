@@ -5,15 +5,14 @@ on:
   pull_request:
     branches: [ dev ]
 
-env:
-  GITHUB_WORKSPACE: C:\
+github:
+  workspace: C:\
 
 jobs:
   katalon-win:
     runs-on: windows-latest
     steps:
     - run: echo '${{ github.workspace }}'
-    - run: echo '${{ env.GITHUB_WORKSPACE }}'
     - name: Checkout
       uses: actions/checkout@v2
     - name: Katalon Studio Github Action
