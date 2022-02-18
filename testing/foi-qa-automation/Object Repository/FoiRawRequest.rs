@@ -26,7 +26,7 @@
    <maxResponseSize>0</maxResponseSize>
    <migratedVersion>5.4.1</migratedVersion>
    <restRequestMethod>POST</restRequestMethod>
-   <restUrl>${URL}/api/foirawrequests</restUrl>
+   <restUrl>https://request-management-api-dev.apps.silver.devops.gov.bc.ca/api/foirawrequests</restUrl>
    <serviceType>RESTful</serviceType>
    <soapBody></soapBody>
    <soapHeader></soapHeader>
