@@ -14,7 +14,7 @@
    <testCaseLink>
       <guid>720d19fc-d3da-42b9-a1f0-b40ff5884557</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/foi-test-failure</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
@@ -148,5 +148,11 @@
          <value></value>
          <variableId>ee135a5d-2fed-4468-91c8-2680862c1929</variableId>
       </variableLink>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>a80b25b7-4656-4e6a-b8fb-4e0df755b1b0</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/foi-test-api</testCaseId>
    </testCaseLink>
 </TestSuiteEntity>
