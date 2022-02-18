@@ -1,4 +1,7 @@
 name: Katalon
+  defaults:
+    run:
+      working-directory: C:\
 on:
   push:
     branches: [ dev-NK-automationscripts ]
@@ -7,9 +10,6 @@ on:
 
 jobs:
   katalon-win:
-    defaults:
-      run:
-        working-directory: C:/
     runs-on: windows-latest
     steps:
     - run: echo '${{ github.workspace }}'
