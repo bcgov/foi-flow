@@ -6,7 +6,7 @@
    <UUID>03c51503-f9cf-4c96-a61c-3d441e2c75a0</UUID>
    <migratedVersion>5.9.0</migratedVersion>
    <pageLoadTimeout>0</pageLoadTimeout>
-   <projectFileLocation>C:\Users\Nicholas Kan\Katalon Studio\foi-qa-automation\foi-qa-automation.prj</projectFileLocation>
+   <projectFileLocation>C:\foi-flow\testing\foi-qa-automation\foi-qa-automation.prj</projectFileLocation>
    <sourceContent>
       <sourceFolderList>
          <sourceFolderConfiguration>

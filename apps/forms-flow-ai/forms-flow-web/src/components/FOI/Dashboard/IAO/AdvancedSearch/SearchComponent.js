@@ -311,6 +311,7 @@ const AdvancedSearch = ({ userDetail }) => {
             >
               <Grid item xs={keywordsMode ? 6 : 12}>
                 <InputBase
+                  id="advancedSearch"
                   placeholder="Search"
                   onChange={handleSearchChange}
                   value={searchText}

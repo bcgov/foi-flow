@@ -18,6 +18,19 @@ import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import groovy.json.JsonSlurper as JsonSlurper
 
+requestID = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : GlobalVariable.password
+        , ('username') : GlobalVariable.username, ('firstname') : GlobalVariable.firstname, ('lastname') : GlobalVariable.lastname
+        , ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue(
+            'email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
+            'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
+            1), ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue(
+            'country', 1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
+            'Sample Applicant').getValue('homePhone', 1), ('description') : findTestData('Sample Applicant').getValue('description', 
+            1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''
+        , ('sendRequest') : true, ('variable') : ''], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL, FailureHandling.STOP_ON_FAILURE)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
@@ -26,7 +39,7 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request qu
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
 
@@ -53,19 +66,4 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
-
-@com.kms.katalon.core.annotation.SetUp
-def setup() {
-    def response = WS.sendRequest(findTestObject('FoiRawRequest'))
-
-    WS.verifyResponseStatusCode(response, 200)
-
-    def jsonSlurper = new JsonSlurper()
-
-    requestID = jsonSlurper.parseText(response.responseText).id.toString()
-
-    WebUI.openBrowser(GlobalVariable.BASE_URL)
-
-    WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
-}
 

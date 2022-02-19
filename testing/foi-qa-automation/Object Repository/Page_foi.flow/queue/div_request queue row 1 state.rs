@@ -4,17 +4,23 @@
    <name>div_request queue row 1 state</name>
    <tag></tag>
    <elementGuidId>d25bae71-2acf-4b30-bb58-d7a34b4af578</elementGuidId>
+   <imagePath></imagePath>
    <selectorCollection>
-      <entry>
-         <key>XPATH</key>
-         <value>//div[@data-rowindex=0]/div[@data-field='currentState']</value>
-      </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[@data-field = 'currentState']</value>
       </entry>
       <entry>
+         <key>IMAGE</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@data-rowindex=0]/div[@data-field='currentState']</value>
+      </entry>
+      <entry>
          <key>CSS</key>
+         <value></value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

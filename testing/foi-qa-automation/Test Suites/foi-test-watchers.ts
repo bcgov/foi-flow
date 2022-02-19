@@ -39,7 +39,7 @@
       <guid>4e5488b7-b116-4dd7-9645-5f13bf8f2098</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/form/foi-test-watch-request-ministry-view</testCaseId>
+      <testCaseId>Test Cases/ministry view/foi-test-watch-request-ministry-view</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>

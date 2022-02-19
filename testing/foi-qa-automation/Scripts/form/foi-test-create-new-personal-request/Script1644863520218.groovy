@@ -17,25 +17,29 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
+WebUI.openBrowser(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
     'Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name Parent'), 'class').contains(
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name Parent'), 
+    'class').contains('Mui-error') == true
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name Parent'), 
+    'class').contains('Mui-error') == true
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email Parent'), 'class').contains(
     'Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name Parent'), 'class').contains(
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Category Parent'), 'class').contains(
     'Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email Parent'), 'class').contains('Mui-error') == 
-true
-
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Category Parent'), 'class').contains('Mui-error') == 
-true
-
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address parent'), 'class').contains('Mui-error') == 
-true
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address parent'), 'class').contains(
+    'Mui-error') == true
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_City parent'), 'class').contains('Mui-error') == 
 true
@@ -46,11 +50,11 @@ true
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Country parent'), 'class').contains('Mui-error') == 
 true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Postal Code parent'), 'class').contains('Mui-error') == 
-true
-
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description parent'), 'class').contains(
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Postal Code parent'), 'class').contains(
     'Mui-error') == true
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description parent'), 
+    'class').contains('Mui-error') == true
 
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
         'color'), 'rgba(255, 0, 0, 1)', false)
@@ -58,30 +62,31 @@ WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/re
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/h4_Select Ministry Client'), 'color'), 'rgba(255, 0, 0, 1)', 
     false)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type parent'), 'class').contains('Mui-error') == 
-true
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type parent'), 'class').contains(
+    'Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode parent'), 'class').contains('Mui-error') == 
-true
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode parent'), 'class').contains(
+    'Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode parent'), 'class').contains('Mui-error') == 
-true
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode parent'), 'class').contains(
+    'Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date parent'), 'class').contains('Mui-error') == 
-true
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date parent'), 'class').contains(
+    'Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date parent'), 'class').contains('Mui-error') == 
-true
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date parent'), 'class').contains(
+    'Mui-error') == true
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + firstname]))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
+            firstname]))
 
-WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 'required', 
-    0)
+WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 
+    'required', 0)
 
-WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name_MuiInputBase'), 'required', 
-    0)
+WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name_MuiInputBase'), 
+    'required', 0)
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), applicantFirstname)
 
@@ -131,33 +136,37 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/request det
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/request details/received mode options/li_Fax'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/request details/received mode options/li_Online Form'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/request details/received mode options/li_Online Form'), 
+    0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/received mode options/li_Online Form'), 'aria-disabled', 'true', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/received mode options/li_Online Form'), 
+    'aria-disabled', 'true', 0)
 
-WebUI.click(findTestObject(WebUI.concatenate(((['Object Repository/Page_foi.flow/form/inputs/request details/received mode options/li_', receivedMode]) as String[]))))
+WebUI.click(findTestObject(WebUI.concatenate(((['Object Repository/Page_foi.flow/form/inputs/request details/received mode options/li_'
+                    , receivedMode]) as String[]))))
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode'))
 
-WebUI.click(findTestObject(WebUI.concatenate(((['Object Repository/Page_foi.flow/form/inputs/request details/delivery mode options/li_', deliveryMode]) as String[]))))
+WebUI.click(findTestObject(WebUI.concatenate(((['Object Repository/Page_foi.flow/form/inputs/request details/delivery mode options/li_'
+                    , deliveryMode]) as String[]))))
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
     'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name Parent'), 'class').contains(
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name Parent'), 
+    'class').contains('Mui-error') == false
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name Parent'), 
+    'class').contains('Mui-error') == false
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email Parent'), 'class').contains(
     'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name Parent'), 'class').contains(
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Category Parent'), 'class').contains(
     'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email Parent'), 'class').contains('Mui-error') == 
-false
-
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Category Parent'), 'class').contains('Mui-error') == 
-false
-
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address parent'), 'class').contains('Mui-error') == 
-false
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address parent'), 'class').contains(
+    'Mui-error') == false
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_City parent'), 'class').contains('Mui-error') == 
 false
@@ -168,11 +177,11 @@ false
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Country parent'), 'class').contains('Mui-error') == 
 false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Postal Code parent'), 'class').contains('Mui-error') == 
-false
-
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description parent'), 'class').equals(
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/input_Postal Code parent'), 'class').contains(
     'Mui-error') == false
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description parent'), 
+    'class').equals('Mui-error') == false
 
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
         'color'), 'rgba(0, 0, 0, 0.87)', false)
@@ -180,20 +189,20 @@ WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/re
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/h4_Select Ministry Client'), 'color'), 'rgba(0, 0, 0, 0.87)', 
     false)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type parent'), 'class').contains('Mui-error') == 
-false
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type parent'), 'class').contains(
+    'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode parent'), 'class').contains('Mui-error') == 
-false
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode parent'), 'class').contains(
+    'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode parent'), 'class').contains('Mui-error') == 
-false
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode parent'), 'class').contains(
+    'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date parent'), 'class').contains('Mui-error') == 
-false
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date parent'), 'class').contains(
+    'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date parent'), 'class').contains('Mui-error') == 
-false
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date parent'), 'class').contains(
+    'Mui-error') == false
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
@@ -226,11 +235,4 @@ WebUI.callTestCase(findTestCase('form/foi-test-request-fields-populated'), [('fi
         , ('country') : country, ('postalCode') : postalCode, ('homePhone') : homePhone, ('description') : description, ('startDate') : startDate
         , ('receivedDate') : receivedDate, ('requestType') : requestType, ('receivedMode') : receivedMode, ('deliveryMode') : deliveryMode], 
     FailureHandling.STOP_ON_FAILURE)
-
-@com.kms.katalon.core.annotation.SetUp
-def setup() {
-    WebUI.openBrowser(GlobalVariable.BASE_URL)
-
-    WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
-}
 

@@ -20,7 +20,7 @@
       <name>lastname</name>
    </variable>
    <variable>
-      <defaultValue>findTestData('New Test Data').getValue('Last Name', 1) + ', ' + findTestData('New Test Data').getValue('First Name', 1)</defaultValue>
+      <defaultValue>findTestData('Login Credentials').getValue('Last Name', 1) + ', ' + findTestData('Login Credentials').getValue('First Name', 1)</defaultValue>
       <description></description>
       <id>b1d2d061-b89d-403d-ab65-67eec74af1b3</id>
       <masked>false</masked>

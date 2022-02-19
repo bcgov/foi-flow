@@ -26,11 +26,7 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.S
 
 WebUI.maximizeWindow()
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
@@ -38,7 +34,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Return to Queue'), Failure
 
 WebUI.verifyMatch(WebUI.getUrl(), GlobalVariable.BASE_URL + '/foi/dashboard', false)
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
+WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address_outlined-streetAddress'), streetAddress)
 

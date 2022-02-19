@@ -34,6 +34,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open')
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
@@ -137,8 +139,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/span_mi
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Request Type'), 'Request Type')
 
-assert WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/span_ministry form request type')).toLowerCase() == findTestData('Sample Applicant').getValue(
-    'requestType', 1)
+assert WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/span_ministry form request type')).toLowerCase() == 
+findTestData('Sample Applicant').getValue('requestType', 1)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Authorization'), 'Authorization')
 

@@ -6,14 +6,14 @@
    <comment></comment>
    <testCaseGuid>9c01bf8a-7ded-470e-893b-ce997b864f89</testCaseGuid>
    <variable>
-      <defaultValue>findTestData('New Test Data').getValue('Last Name', 6) + ', ' + findTestData('New Test Data').getValue('First Name', 6)</defaultValue>
+      <defaultValue>findTestData('Login Credentials').getValue('Last Name', 6) + ', ' + findTestData('Login Credentials').getValue('First Name', 6)</defaultValue>
       <description></description>
       <id>b1d2d061-b89d-403d-ab65-67eec74af1b3</id>
       <masked>false</masked>
       <name>teammate2</name>
    </variable>
    <variable>
-      <defaultValue>findTestData('New Test Data').getValue('Last Name', 1) + ', ' + findTestData('New Test Data').getValue('First Name', 1)</defaultValue>
+      <defaultValue>findTestData('Login Credentials').getValue('Last Name', 1) + ', ' + findTestData('Login Credentials').getValue('First Name', 1)</defaultValue>
       <description></description>
       <id>5f2e1f58-4118-4e25-8e29-d526e6433acb</id>
       <masked>false</masked>

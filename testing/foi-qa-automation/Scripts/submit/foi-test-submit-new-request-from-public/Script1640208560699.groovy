@@ -20,18 +20,17 @@ import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.maximizeWindow()
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID, ('clickOnRequest') : false], 
+    FailureHandling.STOP_ON_FAILURE)
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row by id state',  [('requestID') : 'U-00' + requestID]), 'Unopened')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 state'), 'Unopened')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row by id assignee',  [('requestID') : 'U-00' + requestID]), 'Unassigned')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Unassigned')
-
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row by id',  [('requestID') : 'U-00' + requestID]), 'background-color'), 
     'rgba(207, 215, 227, 1)', false)
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row by id', [('requestID') : 'U-00' + requestID]))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'), 'Unopened')
 
@@ -41,7 +40,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dro
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Intake In Progress'), 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Intake In Progress'), 'aria-disabled', 'true', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Intake In Progress'), 'aria-disabled', 
+    'true', 0)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'), 0)
 
