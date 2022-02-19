@@ -166,7 +166,7 @@ const Queue = ({ userDetail }) => {
     }
   };
 
-  if (isLoading || requestQueue === null) {
+  if (requestQueue === null) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -269,6 +269,7 @@ const Queue = ({ userDetail }) => {
           disableColumnMenu={true}
           pagination
           paginationMode="server"
+          page = {rowsState.page}
           onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
           onPageSizeChange={(pageSize) =>
             setRowsState((prev) => ({ ...prev, pageSize }))
@@ -300,7 +301,6 @@ const CustomPagination = () => {
 
   return (
     <Pagination
-      color="primary"
       count={pageCount}
       page={page + 1}
       onChange={(event, value) => apiRef.current.setPage(value - 1)}

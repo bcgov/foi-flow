@@ -127,6 +127,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    if(window.location.href.indexOf("comments") > -1){
+      tabclick('Comments');
+    }
+  },[])
+  
   useEffect(() => {
     if (ministryId) {
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));

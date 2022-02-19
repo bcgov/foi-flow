@@ -77,11 +77,11 @@ class FOIRawRequest(Resource):
                 assigneelastname = requestdata['assigneelastname']
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneefirstname,assigneemiddlename,assigneelastname)
                 if result.success == True:
-                    asyncio.run(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
+                    asyncio.create_task(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")               
-                asyncio.run(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
@@ -114,7 +114,7 @@ class FOIRawRequestLoadTest(Resource):
             username = 'Super Tester'
             if int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.run(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
+                asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
@@ -136,7 +136,6 @@ class FOIRawRequestBPMProcess(Resource):
             try:
 
                 _wfinstanceid = request_json['wfinstanceid']
-                status = request_json['status'] if request_json.get('status') is not None else 'Unopened'
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
                 result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getuserid())

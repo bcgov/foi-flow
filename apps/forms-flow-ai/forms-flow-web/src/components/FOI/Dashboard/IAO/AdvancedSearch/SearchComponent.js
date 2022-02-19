@@ -65,11 +65,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AdvancedSearch = () => {
+const AdvancedSearch = ({ userDetail }) => {
   const classes = useStyles();
 
-  const { handleUpdateSearchFilter, searchLoading, setSearchLoading } =
-    useContext(ActionContext);
+  const {
+    handleUpdateSearchFilter,
+    searchLoading,
+    defaultSortModel,
+    advancedSearchComponentLoading,
+    setAdvancedSearchComponentLoading,
+    setSearchLoading,
+  } = useContext(ActionContext);
 
   const programAreaList = useSelector(
     (state) => state.foiRequests.foiProgramAreaList
@@ -148,6 +154,9 @@ const AdvancedSearch = () => {
       .filter((value) => value);
   };
   const handleApplySearchFilters = () => {
+    if (!advancedSearchComponentLoading) {
+      setAdvancedSearchComponentLoading(true);
+    }
     setSearchLoading(true);
     handleUpdateSearchFilter({
       search: searchFilterSelected.replace("_", "").toLowerCase(),
@@ -158,6 +167,10 @@ const AdvancedSearch = () => {
       fromDate: fromDate || null,
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
+      page: 1,
+      size: 10,
+      sort: defaultSortModel,
+      userId: userDetail.preferred_username,
     });
   };
 
@@ -167,6 +180,7 @@ const AdvancedSearch = () => {
     setSearchFilterSelected(SearchFilter.REQUEST_DESCRIPTION);
     setRequestState(intitialRequestState);
     setRequestTypes(initialRequestTypes);
+    setRequestStatus(intitialRequestStatus);
     setFromDate("");
     setToDate("");
     setSelectedPublicBodies([]);
@@ -381,13 +395,13 @@ const AdvancedSearch = () => {
               <Grid item xs={2}>
                 <ClickableChip
                   key={`filter-raw-request`}
-                  label={"RAW REQUEST #"}
+                  label={"ID NUMBER"}
                   color="primary"
                   onClick={() =>
-                    clickSearchFilter(SearchFilter.RAW_REQUEST_NUM)
+                    clickSearchFilter(SearchFilter.ID_NUM)
                   }
                   clicked={
-                    searchFilterSelected === SearchFilter.RAW_REQUEST_NUM
+                    searchFilterSelected === SearchFilter.ID_NUM
                   }
                 />
               </Grid>

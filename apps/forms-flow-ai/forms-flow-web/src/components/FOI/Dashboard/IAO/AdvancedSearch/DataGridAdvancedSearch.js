@@ -1,5 +1,12 @@
 import React, { useEffect, useContext } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  gridPageCountSelector,
+  gridPageSelector,
+  useGridApiContext,
+  useGridSelector,
+} from '@mui/x-data-grid';
+import Pagination from '@mui/material/Pagination';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,8 +26,14 @@ import { ConditionalComponent } from "../../../../../helper/FOI/helper";
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
 
-  const { handleUpdateSearchFilter, searchResults, searchLoading, queryData } =
-    useContext(ActionContext);
+  const {
+    handleUpdateSearchFilter,
+    searchResults,
+    searchLoading,
+    queryData,
+    setSearchLoading,
+    advancedSearchComponentLoading,
+  } = useContext(ActionContext);
 
   const assignedToList = useSelector(
     (state) => state.foiRequests.foiFullAssignedToList
@@ -39,7 +52,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   useEffect(() => {
     if (searchResults) {
-      console.log("called ");
+      setSearchLoading(true);
       // page+1 here, because initial page value is 0 for mui-data-grid
       handleUpdateSearchFilter({
         page: rowsState.page + 1,
@@ -121,7 +134,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   };
 
-  if (searchLoading) {
+  if (advancedSearchComponentLoading && queryData) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -161,6 +174,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             onPageSizeChange={(pageSize) =>
               setRowsState((prev) => ({ ...prev, pageSize }))
             }
+            components={{
+              Pagination: CustomPagination,
+            }}
             sortingOrder={["desc", "asc"]}
             sortModel={sortModel}
             sortingMode={"server"}
@@ -178,5 +194,19 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     </ConditionalComponent>
   );
 };
+
+const CustomPagination = () => {
+  const apiRef = useGridApiContext();
+  const page = useGridSelector(apiRef, gridPageSelector);
+  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+  return (
+    <Pagination
+      count={pageCount}
+      page={page + 1}
+      onChange={(event, value) => apiRef.current.setPage(value - 1)}
+    />
+  );
+}
 
 export default DataGridAdvancedSearch;

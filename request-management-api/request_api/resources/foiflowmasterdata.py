@@ -50,7 +50,7 @@ class FOIFlowApplicantCategories(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())      
     @auth.require
-    @request_api.cache.cached(key_prefix="applicantcategories")
+    #@request_api.cache.cached(key_prefix="applicantcategories")
     def get():
         try:
             data = applicantcategoryservice().getapplicantcategories()
@@ -69,7 +69,7 @@ class FOIFlowProgramAreas(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())      
     @auth.require
-    @request_api.cache.cached(key_prefix="programareas")
+    #@request_api.cache.cached(key_prefix="programareas")
     def get():
         try:
             data = programareaservice().getprogramareas()
@@ -87,7 +87,7 @@ class FOIFlowDeliveryModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    @request_api.cache.cached(key_prefix="deliverymodes")
+    #@request_api.cache.cached(key_prefix="deliverymodes")
     def get():
         try:
             data = deliverymodeservice().getdeliverymodes()
@@ -105,7 +105,7 @@ class FOIFlowReceivedModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    @request_api.cache.cached(key_prefix="receivedmodes")
+    #@request_api.cache.cached(key_prefix="receivedmodes")
     def get():
         try:
             data = receivedmodeservice().getreceivedmodes()
@@ -140,7 +140,7 @@ class FOIFlowCloseReasons(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    @request_api.cache.cached(key_prefix="closereasons")
+    #@request_api.cache.cached(key_prefix="closereasons")
     def get():
         try:
             data = closereasonservice().getclosereasons()
@@ -214,7 +214,7 @@ class FOIFlowExtensionReasons(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    @request_api.cache.cached(key_prefix="extensionreasons")
+    #@request_api.cache.cached(key_prefix="extensionreasons")
     def get():
         try:
             data = extensionreasonservice().getextensionreasons()

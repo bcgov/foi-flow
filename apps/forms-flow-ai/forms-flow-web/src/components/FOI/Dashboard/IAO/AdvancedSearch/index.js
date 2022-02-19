@@ -6,7 +6,7 @@ import DataGridAdvancedSearch from "./DataGridAdvancedSearch";
 const AdvancedSearch = React.memo(({ userDetail }) => {
   return (
     <ActionProvider>
-      <SearchComponent />
+      <SearchComponent userDetail={userDetail} />
       <DataGridAdvancedSearch userDetail={userDetail} />
     </ActionProvider>
   );
