@@ -23,7 +23,7 @@ class rawrequestservice:
 
     def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
-        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
+        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") not in (None,'') else None
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
         assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None

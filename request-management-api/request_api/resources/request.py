@@ -136,7 +136,6 @@ class FOIRawRequestBPMProcess(Resource):
             try:
 
                 _wfinstanceid = request_json['wfinstanceid']
-                status = request_json['status'] if request_json.get('status') is not None else 'Unopened'
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
                 result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getuserid())
