@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useSelector, useDispatch } from "react-redux";
 import { Col, Row, ListGroup } from 'react-bootstrap';
 import './notificationlist.scss';
@@ -6,6 +6,7 @@ import {addToFullnameList, getFullnameList} from '../../../../../helper/FOI/help
 import {
   deleteFOINotifications
 } from "../../../../../apiManager/services/FOI/foiNotificationServices";
+import { fetchFOIFullAssignedToList } from "../../../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchOpenedMinistriesForNotification
 } from "../../../../../apiManager/services/FOI/foiRequestServices";
@@ -19,6 +20,10 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   const [openModal, setModal] = useState(false);
   const [selectedMinistries,setSelectedMinistries]=useState([]);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+
+  useEffect(()=>{
+    dispatch(fetchFOIFullAssignedToList());
+  },[dispatch]);
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
