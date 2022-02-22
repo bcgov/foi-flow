@@ -3,6 +3,9 @@ import {
   addBusinessDays,
   businessDay,
   calculateDaysRemaining,
+  isProcessingTeam,
+  isIntakeTeam,
+  isFlexTeam,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import Chip from "@mui/material/Chip";
@@ -23,7 +26,9 @@ export const debounce = (func, wait) => {
 
 export const getAssigneeValue = (row) => {
   const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";
-  return row.assignedTo && row.assignedToFirstName && row.assignedToLastName ? `${row.assignedToLastName}, ${row.assignedToFirstName}` : groupName;
+  return row.assignedTo && row.assignedToFirstName && row.assignedToLastName
+    ? `${row.assignedToLastName}, ${row.assignedToFirstName}`
+    : groupName;
 };
 
 export const getReceivedDate = (params) => {
@@ -48,18 +53,24 @@ export const getReceivedDate = (params) => {
 // update sortModel for applicantName & assignedTo
 export const updateSortModel = (sortModel) => {
   let smodel = JSON.parse(JSON.stringify(sortModel));
-  if(smodel) {
+  if (smodel) {
     let field = smodel[0]?.field;
     let order = smodel[0]?.sort;
 
-    if(field == 'applicantName') {
+    if (field == "applicantName") {
       smodel.shift();
-      smodel.unshift({field: 'lastName', sort: order},{field: 'firstName', sort: order})
+      smodel.unshift(
+        { field: "lastName", sort: order },
+        { field: "firstName", sort: order }
+      );
     }
 
-    if(field == 'assignedToName') {
+    if (field == "assignedToName") {
       smodel.shift();
-      smodel.unshift({field: 'assignedToLastName', sort: order},{field: 'assignedToFirstName', sort: order})
+      smodel.unshift(
+        { field: "assignedToLastName", sort: order },
+        { field: "assignedToFirstName", sort: order }
+      );
     }
   }
 
@@ -115,4 +126,21 @@ export const ClickableChip = ({ clicked, ...rest }) => {
       {...rest}
     />
   );
+};
+
+export const getGroup = (userGroups) => {
+  if (!userGroups) {
+    return "";
+  }
+  if (isProcessingTeam(userGroups)) {
+    return "processingTeam";
+  }
+
+  if (isFlexTeam(userGroups)) {
+    return "flexTeam";
+  }
+
+  if (isIntakeTeam(userGroups)) {
+    return "intakeTeam";
+  }
 };
