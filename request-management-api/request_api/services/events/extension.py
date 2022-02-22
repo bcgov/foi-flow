@@ -120,18 +120,22 @@ class extensionevent:
         prevapproveddays = self.__valueexists('approvednoofdays', prevextension)
         if (event == EventType.add.value and curextensionstatusid == 1) or (event == EventType.modify.value and curextensionstatusid ==  prevextensionstatusid and curapproveddays == prevapproveddays):
             return True
+        return False
     
     def __onlycleanuprequired(self, curextension, prevextension, event):
         curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
         prevextensionstatusid = self.__valueexists('extensionstatusid', prevextension)
         if event == EventType.delete.value or (event == EventType.modify.value and str(prevextensionstatusid)  in [str(ExtensionStatus.denied.value), str(ExtensionStatus.approved.value)] and curextensionstatusid == 1):
             return True
+        return False
+
     def __onlynotificationrequired(self, curextension, prevextension, event):
         isdenied = self.__finddenied(curextension, prevextension, event)
         ispublicbody = self.__findpublicbody(curextension)
         isapproved = self.__findapproved(curextension, prevextension, event)
         if isdenied == True or isapproved == True or ispublicbody == True:
             return True
+        return False
 
     def __bothnotificationandcleanup(self, curextension, prevextension, event):
         curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
@@ -140,8 +144,7 @@ class extensionevent:
         prevapproveddays = self.__valueexists('approvednoofdays', prevextension)
         if (event == EventType.modify.value and curextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value] and prevextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value]) or (event == EventType.modify.value and curextensionstatusid == ExtensionStatus.approved.value and curextensionstatusid == prevextensionstatusid and prevapproveddays != curapproveddays):
             return True
-        else:
-            return False
+        return False
 
     def __maintained(self, curextension, prevextension, event):        
         return self.__createextensionsummary(curextension, prevextension, event)
@@ -223,8 +226,3 @@ class ExtensionStatus(Enum):
 class ExtensionType(Enum):
     publicbody = "Public Body"
     oipc = "OIPC"
-
-class ExtensionSummaryFor(Enum):
-    comments = "comments"
-    notification = "notification"
-
