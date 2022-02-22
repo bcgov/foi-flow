@@ -46,7 +46,7 @@ class FOIRawRequest(db.Model):
     def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:
         createdat = datetime.now()        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
 
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
@@ -116,7 +116,7 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(False,'Requestid not exists',-1)              
 
     @classmethod
-    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,status,notes,userid)-> DefaultMethodResult:
+    def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,notes,userid)-> DefaultMethodResult:
         updatedat = datetime.now()
         dbquery = db.session.query(FOIRawRequest)
         _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
@@ -124,8 +124,7 @@ class FOIRawRequest(db.Model):
         if(requestraqw.count() > 0) :            
             request_schema = FOIRawRequestSchema()
             request = request_schema.dump(_requestraqw)            
-            if(request is not None and (request["status"] == "Redirect" or request["status"] == "Closed")):
-                status = request["status"]
+            status = request["status"]
                                 
             requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userid}, synchronize_session = False)
             db.session.commit()
