@@ -20,6 +20,7 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   const [selectedMinistries,setSelectedMinistries]=useState([]);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
+
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
     return user && user.fullname ? user.fullname : userId;
