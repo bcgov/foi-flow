@@ -46,9 +46,9 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
        
-    async def postcommentevent(self, commentid, requesttype, userid):
+    async def postcommentevent(self, commentid, requesttype, userid, isdelete=False):
         try:
-            commentresponse = commentevent().createcommentevent(commentid, requesttype, userid) 
+            commentresponse = commentevent().createcommentevent(commentid, requesttype, userid, isdelete) 
             if commentresponse.success == False :
                 current_app.logger.error("FOI Notification failed for comment event=%s" % (commentresponse.message))     
                 return DefaultMethodResult(False,'Comment notifications failed',commentresponse.identifier)

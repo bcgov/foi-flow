@@ -20,23 +20,33 @@ from request_api.utils.redispublisher import RedisPublisherService
 class commentevent:
     """ FOI Event management service
     """
-    def createcommentevent(self, commentid, requesttype, userid):
+    def createcommentevent(self, commentid, requesttype, userid, isdelete=False):
         try: 
-            _comment = self.__getcomment(commentid,requesttype)
-            notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, self.__getcommenttype(_comment), requesttype, userid)
-            if _comment["taggedusers"] != '[]':                
-                notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, "Tagged User Comments", requesttype, userid)    
-            _pushnotifications = notificationservice().getcommentnotifications(commentid)
-            self.__publishnotification(commentid, _pushnotifications)    
-            return DefaultMethodResult(True,'Comment notifications created',commentid)
+            if isdelete == True:
+               return self.__deletecommentnotification(commentid, userid)
+            else:
+                return self.__createcommentnotification(commentid, requesttype, userid)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Comment Notification Error', exception.message))
             return DefaultMethodResult(False,'Comment notifications failed',commentid)     
-        
-    def getcommentmessage(self, commentid, comment):
-        return {"commentid":commentid, "message" :self.__formatmessage(comment)}
+
+    def __createcommentnotification(self, commentid, requesttype, userid):
+        _comment = self.__getcomment(commentid,requesttype)
+        notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, self.__getcommenttype(_comment), requesttype, userid)
+        if _comment["taggedusers"] != '[]':                
+            notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, "Tagged User Comments", requesttype, userid)    
+        self.__pushcommentnotification(commentid)
+        return DefaultMethodResult(True,'Comment notifications created',commentid)
+
+    def __deletecommentnotification(self, commentid, userid):
+        _pushnotifications = notificationservice().getcommentnotifications(commentid)
+        for _pushnotification in _pushnotifications:  
+            notificationservice().dismissnotification(userid, None, _pushnotification["idnumber"], _pushnotification["notificationid"])
+            _pushnotification["action"] = "delete"
+            asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))   
+        return DefaultMethodResult(True,'Comment notifications deleted',commentid)      
     
-    def __publishnotification(self,commentid, _pushnotifications):
+    def __pushcommentnotification(self,commentid, _pushnotifications):
         try: 
             if os.getenv("SOCKETIO_MESSAGE_QTYPE") != "NONE":
                 for _pushnotification in _pushnotifications:
@@ -48,6 +58,14 @@ class commentevent:
             current_app.logger.error("%s,%s" % ('Comment Notification publish Error', exception.message))
             return DefaultMethodResult(False,'Comment notifications publish failed',commentid)  
 
+    def __pushcommentnotification(self, commentid):
+        _pushnotifications = notificationservice().getcommentnotifications(commentid)
+        for _pushnotification in _pushnotifications:
+            asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))
+
+    def getcommentmessage(self, commentid, comment):
+        return {"commentid":commentid, "message" :self.__formatmessage(comment)}
+    
     def __formatmessage(self, comment):
         _comment = json.loads(comment["comment"])
         msg = _comment["blocks"][0]["text"]
