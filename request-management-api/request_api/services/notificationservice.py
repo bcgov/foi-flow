@@ -214,23 +214,7 @@ class notificationservice:
             return FOIMinistryRequest.getrequestbyministryrequestid(requestid)
         else:
             return FOIRawRequest.get_request(requestid)
-    
-    def __getextensionidfrommesage(self, message):
-        return self.__valueexists('extensionid', message)
 
-    def __valueexists(self, key, jsonobj):
-        return jsonobj[key] if key in jsonobj else None
-
-class NotificationType(Enum):
-    state = "State"
-    extension = "Extension"
-    iaoassignment = "IAO Assignment"
-    ministryassignment = "Ministry Assignment"
-    cfrduereminder = "CFR Due Reminder"
-    legislativeduereminder = "Legislative Due Reminder"   
-    newusercomments = "New User Comments"
-    replyusercomments = "Reply User Comments"
-    taggedusercomments = "Tagged User Comments"
        
     
     
