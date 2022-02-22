@@ -27,7 +27,7 @@ class notificationservice:
     """ FOI notification management service
     """
     
-    def createnotification(self, message, requestid, requesttype, notificationtype, userid, cleanup):
+    def createnotification(self, message, requestid, requesttype, notificationtype, userid, cleanup=True):
         extensionid = None
         foirequest = self.__getrequest(requestid, requesttype)
         if notificationtype == NotificationType.extension.value:

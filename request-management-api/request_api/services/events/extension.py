@@ -70,7 +70,7 @@ class extensionevent:
         extendedduedays = self.__valueexists('extendedduedays', extension) 
         newduedate = self.__formatdate(self.__valueexists('extendedduedate', extension), self.__genericdateformat())
 
-        approveddayschanged = True if prevapprovedays and prevapprovedays != approveddays else False
+        approveddayschanged = True if prevapprovedays != approveddays else False
         extendeddayschanged = True if prevextendeddays and prevextendeddays != extendedduedays else False
 
       
@@ -140,6 +140,8 @@ class extensionevent:
         prevapproveddays = self.__valueexists('approvednoofdays', prevextension)
         if (event == EventType.modify.value and curextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value] and prevextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value]) or (event == EventType.modify.value and curextensionstatusid == ExtensionStatus.approved.value and curextensionstatusid == prevextensionstatusid and prevapproveddays != curapproveddays):
             return True
+        else:
+            return False
 
     def __maintained(self, curextension, prevextension, event):        
         return self.__createextensionsummary(curextension, prevextension, event)
