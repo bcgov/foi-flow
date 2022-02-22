@@ -27,16 +27,12 @@ class notificationservice:
     """ FOI notification management service
     """
     
-    def createnotification(self, message, requestid, requesttype, notificationtype, userid, cleanup=True):
-        extensionid = None
+    def createnotification(self, message, requestid, requesttype, notificationtype, userid):
         foirequest = self.__getrequest(requestid, requesttype)
-        if notificationtype == NotificationType.extension.value:
-            extensionid = self.__getextensionidfrommesage(message)
-        if cleanup == True:
-            self.__cleanupnotifications(requesttype, notificationtype, foirequest, extensionid)
+        self.__cleanupnotifications(requesttype, notificationtype, foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
     
-    def createremindernotification(self, message, requestid, requesttype, notificationtype, userid):
+    def createnotificationwithoutcleanup(self, message, requestid, requesttype, notificationtype, userid):
         foirequest = self.__getrequest(requestid, requesttype)
         return  self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
 
@@ -44,16 +40,15 @@ class notificationservice:
         requestid = comment["ministryrequestid"] if requesttype == "ministryrequest" else comment["requestid"]
         foirequest = self.__getrequest(requestid, requesttype)        
         return  self.__createnotification(message, requestid, requesttype, commenttype, userid, foirequest, comment)
-    
-    def cleanupnotifications(self, requestid, requesttype, notificationtype, extensionid=None):
-        foirequest = self.__getrequest(requestid, requesttype)
-        self.__cleanupnotifications(requesttype, notificationtype, foirequest, extensionid)
 
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid, notificationconfig().getnotificationdays())
 
     def getcommentnotifications(self, commentid):
         return FOIRequestNotification.getcommentnotifications(commentid)
+    
+    def getextensionnotifications(self, extensionid):
+        return FOIRequestNotification.getextensionnotifications(extensionid)
 
     def dismissnotification(self, userid, type, idnumber, notificationid):    
         if type is not None:
@@ -95,11 +90,9 @@ class notificationservice:
                 return FOIRawRequestNotification.savenotification(notification)
         return  DefaultMethodResult(True,'No change',requestid) 
     
-    def __cleanupnotifications(self, requesttype, notificationtype, foirequest, extensionid=None):
-        notificationid = notificationconfig().getnotificationtypeid(notificationtype) 
-        if requesttype == "ministryrequest" and notificationid == 4:
-            _ids = FOIRequestNotification.getnotificationidsbynumberandtypeandextensionid(foirequest["filenumber"], notificationid, extensionid)       
-        elif requesttype == "ministryrequest":
+    def __cleanupnotifications(self, requesttype, notificationtype, foirequest):
+        notificationid = notificationconfig().getnotificationtypeid(notificationtype)        
+        if requesttype == "ministryrequest":
             _ids = FOIRequestNotification.getnotificationidsbynumberandtype(foirequest["filenumber"], notificationid)
         else:
             _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationid)

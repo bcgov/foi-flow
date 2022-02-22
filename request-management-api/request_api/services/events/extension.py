@@ -50,12 +50,20 @@ class extensionevent:
         if nootificationrequired == True:
             return DefaultMethodResult(True, "No Notification", ministryrequestid)
         elif onlycleanuprequired == True:
-            notificationservice().cleanupnotifications(ministryrequestid, "ministryrequest", "Extension", extensionid)
+            self.__deleteextensionnotification(extensionid, userid)
             return DefaultMethodResult(True, "Delete Extension", ministryrequestid)
         elif onlynotificationrequired == True or notificationandcleanup == True:
             extensionsummary = self.__createnotificationsummary(curextension, prevextension, event)
             notification = self.__preparenotification(extensionsummary)
-            return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, notificationandcleanup)
+            if notificationandcleanup == True:
+                self.__deleteextensionnotification(extensionid, userid)
+            return notificationservice().createnotificationwithoutcleanup({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid)
+
+    def __deleteextensionnotification(self, extensionid, userid):
+        _extensionnotifications = notificationservice().getextensionnotifications(extensionid)
+        for _extensionnotification in _extensionnotifications:
+            notificationservice().dismissnotification(userid, None, _extensionnotification["idnumber"], _extensionnotification["notificationid"])             
+        return DefaultMethodResult(True,'Extension notifications deleted', extensionid)   
 
     def __preparenotification(self, extensionsummary):
         ispublicbody = self.__valueexists('ispublicbody', extensionsummary)
