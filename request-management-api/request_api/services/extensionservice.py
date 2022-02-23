@@ -286,5 +286,9 @@ class extensionservice:
 
     def __formatdate(self, datevalue, format):        
         return datevalue.strftime(format) if datevalue is not None else None
+
+    def getrequestextensionscount(self, requestid):
+        extensionrecordscount = FOIRequestExtension.getextensionscount(requestid)
+        return extensionrecordscount
         
   

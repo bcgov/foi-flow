@@ -28,7 +28,6 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 
 const Queue = ({ userDetail, tableInfo }) => {
-  console.log("userDetail!!!!!!!!!!!!!!!!!!!!!", userDetail);
   const dispatch = useDispatch();
 
   const requestQueue = useSelector(
@@ -80,7 +79,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }, [rowsState, sortModel, filterModel, requestFilter]);
 
-  const columnsRef = React.useRef(tableInfo.columns);
+  const columnsRef = React.useRef(tableInfo?.columns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {

@@ -127,20 +127,3 @@ export const ClickableChip = ({ clicked, ...rest }) => {
     />
   );
 };
-
-export const getGroup = (userGroups) => {
-  if (!userGroups) {
-    return "";
-  }
-  if (isProcessingTeam(userGroups)) {
-    return "processingTeam";
-  }
-
-  if (isFlexTeam(userGroups)) {
-    return "flexTeam";
-  }
-
-  if (isIntakeTeam(userGroups)) {
-    return "intakeTeam";
-  }
-};
