@@ -271,7 +271,9 @@ class FOIRawRequest(db.Model):
             FOIAssignee.lastname.label('assignedToLastName'),
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
-            description
+            description,
+            FOIRawRequest.requestrawdata['anotherFirstName'].astext.label('onBehalfFirstName'),
+            FOIRawRequest.requestrawdata['anotherLastName'].astext.label('onBehalfLastName'),
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)

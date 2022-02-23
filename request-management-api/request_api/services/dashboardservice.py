@@ -43,8 +43,8 @@ class dashboardservice:
         baserequestinfo.update({'duedate': request.duedate})
         baserequestinfo.update({'applicantcategory': request.applicantcategory})
         baserequestinfo.update({'assignedToLastName': request.assignedToLastName})
-        # baserequestinfo.update({'anotherFirstName': request.anotherFirstName})
-        # baserequestinfo.update({'anotherLastName': request.anotherLastName})
+        baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
+        baserequestinfo.update({'onBehalfLastName': request.onBehalfFirstName})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version):

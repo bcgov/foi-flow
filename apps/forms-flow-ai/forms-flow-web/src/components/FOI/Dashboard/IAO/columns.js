@@ -1,4 +1,9 @@
-import { getFullName, getDaysLeft, getReceivedDate } from "../utils";
+import {
+  getFullName,
+  getDaysLeft,
+  getReceivedDate,
+  onBehalfFullName,
+} from "../utils";
 import {
   isProcessingTeam,
   isIntakeTeam,
@@ -16,14 +21,16 @@ const ProcessingTeamColumns = [
     field: "applicantName",
     headerName: "APPLICANT NAME",
     headerAlign: "left",
-    valueGetter: getFullName,
-    flex: 1,
+    valueGetter: (params) =>
+      getFullName(params.row.firstName, params.row.lastName),
+    flex: 1.5,
   },
   {
     field: "onBehalf",
     headerName: "ON BEHALF",
     headerAlign: "left",
-    flex: 1,
+    valueGetter: onBehalfFullName,
+    flex: 1.5,
   },
   {
     field: "requestType",
@@ -46,27 +53,33 @@ const ProcessingTeamColumns = [
   {
     field: "DaysLeftValue",
     headerName: "DAYS LEFT",
-    headerAlign: "left",
+    headerAlign: "center",
+    align: "center",
     valueGetter: getDaysLeft,
-    flex: 1,
+    flex: 0.5,
   },
   {
     field: "extensions",
     headerName: "EXT.",
-    headerAlign: "left",
-    flex: 1,
+    headerAlign: "center",
+    align: "center",
+    flex: 0.5,
+    valueGetter: (params) =>
+      params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
   {
     field: "pages",
     headerName: "PAGES",
-    headerAlign: "left",
-    flex: 1,
+    headerAlign: "center",
+    align: "center",
+    flex: 0.5,
+    renderCell: (params) => <span></span>,
   },
   {
     field: "xgov",
     headerName: "XGOV",
     headerAlign: "left",
-    flex: 1,
+    flex: 0.5,
   },
 ];
 
@@ -74,22 +87,20 @@ const IntakeTeamColumns = [
   {
     field: "applicantName",
     headerName: "APPLICANT NAME",
-    width: 170,
     headerAlign: "left",
-    valueGetter: getFullName,
-    flex: 1,
+    valueGetter: (params) =>
+      getFullName(params.row.firstName, params.row.lastName),
+    flex: 1.5,
   },
   {
     field: "requestType",
     headerName: "REQUEST TYPE",
-    width: 150,
     headerAlign: "left",
     flex: 1,
   },
   {
     field: "idNumber",
     headerName: "ID NUMBER",
-    width: 150,
     headerAlign: "left",
     flex: 1,
   },
@@ -103,14 +114,12 @@ const IntakeTeamColumns = [
   {
     field: "assignedToName",
     headerName: "ASSIGNED TO",
-    width: 180,
     headerAlign: "left",
     flex: 1,
   },
   {
     field: "receivedDate",
     headerName: "RECEIVED DATE",
-    width: 180,
     headerAlign: "left",
     valueGetter: getReceivedDate,
     flex: 1,
@@ -118,7 +127,6 @@ const IntakeTeamColumns = [
   {
     field: "xgov",
     headerName: "XGOV",
-    width: 100,
     headerAlign: "left",
     flex: 0.5,
   },
@@ -128,7 +136,6 @@ const IntakeTeamColumns = [
     width: 0,
     hide: true,
     renderCell: (params) => <span></span>,
-    flex: 1,
   },
 ];
 
@@ -140,6 +147,13 @@ const defaultTableInfo = {
   ],
 };
 const getTableInfo = (userGroups) => {
+  return {
+    columns: ProcessingTeamColumns,
+    sort: [
+      { field: "currentState", sort: "desc" },
+      { field: "receivedDateUF", sort: "desc" },
+    ],
+  };
   if (!userGroups) {
     return defaultTableInfo;
   }

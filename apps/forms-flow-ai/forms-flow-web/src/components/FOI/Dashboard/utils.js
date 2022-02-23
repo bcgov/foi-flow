@@ -77,8 +77,20 @@ export const updateSortModel = (sortModel) => {
   return smodel;
 };
 
-export const getFullName = (params) => {
-  return `${params.row.lastName || ""}, ${params.row.firstName || ""}`;
+export const getFullName = (firstName, lastName) => {
+  if (!firstName && !lastName) {
+    return "";
+  }
+  return `${lastName || ""}, ${firstName || ""}`;
+};
+
+export const onBehalfFullName = (params) => {
+  if (!params.row.onBehalfFirstName && !params.row.onBehalfLastName) {
+    return "N/A";
+  }
+  return `${params.row.onBehalfFirstName || ""} ${
+    params.row.onBehalfLastName || ""
+  }`;
 };
 
 export const getLDD = (params) => {
