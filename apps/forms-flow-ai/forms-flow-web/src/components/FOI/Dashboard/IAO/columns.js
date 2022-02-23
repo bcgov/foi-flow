@@ -4,11 +4,7 @@ import {
   getReceivedDate,
   onBehalfFullName,
 } from "../utils";
-import {
-  isProcessingTeam,
-  isIntakeTeam,
-  isFlexTeam,
-} from "../../../../helper/FOI/helper";
+import { isProcessingTeam } from "../../../../helper/FOI/helper";
 
 const ProcessingTeamColumns = [
   {
@@ -147,13 +143,6 @@ const defaultTableInfo = {
   ],
 };
 const getTableInfo = (userGroups) => {
-  return {
-    columns: ProcessingTeamColumns,
-    sort: [
-      { field: "currentState", sort: "desc" },
-      { field: "receivedDateUF", sort: "desc" },
-    ],
-  };
   if (!userGroups) {
     return defaultTableInfo;
   }

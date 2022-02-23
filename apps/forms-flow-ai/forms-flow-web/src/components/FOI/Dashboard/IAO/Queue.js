@@ -43,11 +43,13 @@ const Queue = ({ userDetail, tableInfo }) => {
   const defaultRowsState = { page: 0, pageSize: 10 };
   const [rowsState, setRowsState] = React.useState(defaultRowsState);
 
-  // const defaultSortModel = [
-  //   { field: "currentState", sort: "desc" },
-  //   { field: "receivedDateUF", sort: "desc" },
-  // ];
-  const [sortModel, setSortModel] = React.useState(tableInfo?.sort || []);
+  const defaultSortModel = [
+    { field: "currentState", sort: "desc" },
+    { field: "receivedDateUF", sort: "desc" },
+  ];
+  const [sortModel, setSortModel] = React.useState(
+    tableInfo?.sort || defaultSortModel
+  );
   let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
     fields: [
