@@ -67,6 +67,15 @@ class FOIRequestNotification(db.Model):
             _createddate = dt
             notifications.append({"userid": row["userid"],"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
         return notifications
+    
+    @classmethod 
+    def getextensionnotifications(cls, extensionid):
+        sql = sql = """select idnumber, notificationid, notification , notificationtypeid from "FOIRequestNotifications" where notification->>'extensionid' = :extensionid """
+        rs = db.session.execute(text(sql), {'extensionid': extensionid})
+        notifications = []
+        for row in rs:
+            notifications.append({"idnumber": row["idnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtypeid": row["notificationtypeid"]})
+        return notifications
 
     @classmethod
     def dismissnotification(cls, notificationids):

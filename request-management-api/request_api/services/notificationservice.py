@@ -21,6 +21,7 @@ import json
 from datetime import datetime
 from dateutil.parser import parse
 from pytz import timezone
+from enum import Enum
 
 class notificationservice:
     """ FOI notification management service
@@ -31,7 +32,7 @@ class notificationservice:
         self.__cleanupnotifications(requesttype, notificationtype, foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
     
-    def createremindernotification(self, message, requestid, requesttype, notificationtype, userid):
+    def createnotificationwithoutcleanup(self, message, requestid, requesttype, notificationtype, userid):
         foirequest = self.__getrequest(requestid, requesttype)
         return  self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
 
@@ -45,6 +46,9 @@ class notificationservice:
 
     def getcommentnotifications(self, commentid):
         return FOIRequestNotification.getcommentnotifications(commentid)
+    
+    def getextensionnotifications(self, extensionid):
+        return FOIRequestNotification.getextensionnotifications(extensionid)
 
     def dismissnotification(self, userid, type, idnumber, notificationid):    
         if type is not None:
@@ -211,7 +215,6 @@ class notificationservice:
         else:
             return FOIRawRequest.get_request(requestid)
 
-  
        
     
     

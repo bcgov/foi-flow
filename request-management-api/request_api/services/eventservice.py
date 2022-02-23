@@ -27,7 +27,7 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-    async def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
+    def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
         try:
             extensioneventresponse = extensionevent().createextensionevent(ministryrequestid, extensionid, userid, username, event)
             if extensioneventresponse.success == False: 
