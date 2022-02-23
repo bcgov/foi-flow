@@ -32,7 +32,7 @@ const openModal = (coordinates) => {
   setScreenPosition(screenX);
   setOpen(!open);
 }
-const [messageData, setMessageData] = useState("");
+const [messageData, setMessageData] = useState([]);
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
 const [socket, setSocket] = useState(null);
 
@@ -59,7 +59,14 @@ useEffect(() => {
 },[]);
 
 useEffect(() => {     
-    socket?.on(user.preferred_username, data => setMessageData(oldMessageData => [data, ...oldMessageData]));
+    socket?.on(user.preferred_username, data => {
+     if(data.action === 'delete'){
+      setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
+     }
+     else{
+      setMessageData(oldMessageData => [data, ...oldMessageData])
+     }
+    });
   },[socket]);
 
 useEffect(() => {     
@@ -67,6 +74,7 @@ useEffect(() => {
     setMessageData(foiNotifications);
   }
 },[foiNotifications]);
+
 
  const signout = () => {
     socket?.disconnect();
