@@ -52,18 +52,18 @@ class notificationservice:
 
     def dismissnotification(self, userid, type, idnumber, notificationid):    
         if type is not None:
-            print("type ==== not expected ===", type)
             return self.__dismissnotificationbytype(userid, type)
         else:
-            print("idnumber === ", idnumber)
-            print("notificationid === ", notificationid)
             if idnumber is not None and notificationid is not None:
                 requesttype = self.__getnotificationtypefromid(idnumber)
-                print("requesttype === ", requesttype)
                 return self.__dimissusernotificationbyid(requesttype, notificationid)
             else:
-                print("else ==== not expected ===")
-                return self.__dismissnotificationbyuser(userid) 
+                return self.__dismissnotificationbyuser(userid)
+    
+    def dismissnotificationbyid(self, requesttype, notificationids):
+        print("idnumber === ", requesttype)
+        print("notificationid === ", notificationids)
+        return self.__deletenotificationids(requesttype, notificationids)
             
     def dismissremindernotification(self, requesttype, notificationtype):
         notificationid = notificationconfig().getnotificationtypeid(notificationtype)
@@ -104,32 +104,29 @@ class notificationservice:
         self.__deletenotificationids(requesttype, _ids) 
         
     def __deletenotificationids(self, requesttype, notificationids):
+        print("requesttype ==== ", requesttype)
+        print("notificationids === ", notificationids)
         if notificationids:
             if requesttype == "ministryrequest":
-                FOIRequestNotificationUser.dismissbynotificationid(notificationids)
-                FOIRequestNotification.dismissnotification(notificationids)
+                userresponse = FOIRequestNotificationUser.dismissbynotificationid(notificationids)
+                notificationresponse = FOIRequestNotification.dismissnotification(notificationids)
+                print("userresponse.success === ", userresponse.success)
+                print("notificationresponse.success === ", notificationresponse.success)
             else:
                 FOIRawRequestNotificationUser.dismissbynotificationid(notificationids)
                 FOIRawRequestNotification.dismissnotification(notificationids)            
 
     def __dimissusernotificationbyid(self, requesttype, notificationuserid):
-        notficationids = self.__getdismissparentids(requesttype, notificationuserid)
-        print("notficationids === ", notficationids)
-        print("requesttype ==== ", requesttype)
-        print("notificationuserid === ", notificationuserid)
-        if requesttype == "ministryrequest":         
-            cresponse = FOIRequestNotificationUser.dismissnotification(notificationuserid)
-            print("cresponse === ", cresponse)
-            presponse = FOIRequestNotification.dismissnotification(notficationids)            
-            print("presponse === ", presponse)
+        notficationids = self.__getdismissparentids(requesttype, notificationuserid)        
+        if requesttype == "ministryrequest":
+            cresponse = FOIRequestNotificationUser.dismissnotification(notificationuserid)          
+            presponse = FOIRequestNotification.dismissnotification(notficationids)
         else:
             cresponse = FOIRawRequestNotificationUser.dismissnotification(notificationuserid)
             presponse = FOIRawRequestNotification.dismissnotification(notficationids)
         if cresponse.success == True and presponse.success == True:
-            print("Notifications deleted for id ===== ", notificationuserid)
             return DefaultMethodResult(True,'Notifications deleted for id',notificationuserid) 
         else:
-            print("Unable to delete the notifications for id ===== ", notificationuserid)
             return DefaultMethodResult(False,'Unable to delete the notifications for id',notificationuserid)    
         
     def __dismissnotificationbyuser(self, userid):

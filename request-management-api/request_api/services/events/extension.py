@@ -55,20 +55,22 @@ class extensionevent:
         if nootificationrequired == True:
             return DefaultMethodResult(True, "No Notification", ministryrequestid)
         elif onlycleanuprequired == True:
-            self.__deleteextensionnotification(extensionid, userid)
+            self.__deleteextensionnotification(extensionid)
             return DefaultMethodResult(True, "Delete Extension", ministryrequestid)
         elif onlynotificationrequired == True or notificationandcleanup == True:
             extensionsummary = self.__createnotificationsummary(curextension, prevextension, event)
             notification = self.__preparenotification(extensionsummary)
             if notificationandcleanup == True:
-                self.__deleteextensionnotification(extensionid, userid)
+                self.__deleteextensionnotification(extensionid)
             return notificationservice().createnotificationwithoutcleanup({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid)
 
-    def __deleteextensionnotification(self, extensionid, userid):
-        _extensionnotifications = notificationservice().getextensionnotifications(extensionid)        
+    def __deleteextensionnotification(self, extensionid):
+        _extensionnotifications = notificationservice().getextensionnotifications(extensionid)
+        noticiationids = []
         for _extensionnotification in _extensionnotifications:
             print("_extensionnotification == ", _extensionnotification)
-            notificationservice().dismissnotification(userid, None, _extensionnotification["idnumber"], _extensionnotification["notificationid"])             
+            noticiationids.append(_extensionnotification["notificationid"])
+            notificationservice().dismissnotificationbyid("ministryrequest", noticiationids)             
         return DefaultMethodResult(True,'Extension notifications deleted', extensionid)   
 
     def __preparenotification(self, extensionsummary):
