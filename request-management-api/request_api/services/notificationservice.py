@@ -52,12 +52,17 @@ class notificationservice:
 
     def dismissnotification(self, userid, type, idnumber, notificationid):    
         if type is not None:
+            print("type ==== not expected ===", type)
             return self.__dismissnotificationbytype(userid, type)
-        else:    
+        else:
+            print("idnumber === ", idnumber)
+            print("notificationid === ", notificationid)
             if idnumber is not None and notificationid is not None:
                 requesttype = self.__getnotificationtypefromid(idnumber)
+                print("requesttype === ", requesttype)
                 return self.__dimissusernotificationbyid(requesttype, notificationid)
             else:
+                print("else ==== not expected ===")
                 return self.__dismissnotificationbyuser(userid) 
             
     def dismissremindernotification(self, requesttype, notificationtype):
@@ -109,15 +114,22 @@ class notificationservice:
 
     def __dimissusernotificationbyid(self, requesttype, notificationuserid):
         notficationids = self.__getdismissparentids(requesttype, notificationuserid)
+        print("notficationids === ", notficationids)
+        print("requesttype ==== ", requesttype)
+        print("notificationuserid === ", notificationuserid)
         if requesttype == "ministryrequest":         
             cresponse = FOIRequestNotificationUser.dismissnotification(notificationuserid)
+            print("cresponse === ", cresponse)
             presponse = FOIRequestNotification.dismissnotification(notficationids)            
+            print("presponse === ", presponse)
         else:
             cresponse = FOIRawRequestNotificationUser.dismissnotification(notificationuserid)
             presponse = FOIRawRequestNotification.dismissnotification(notficationids)
         if cresponse.success == True and presponse.success == True:
+            print("Notifications deleted for id ===== ", notificationuserid)
             return DefaultMethodResult(True,'Notifications deleted for id',notificationuserid) 
         else:
+            print("Unable to delete the notifications for id ===== ", notificationuserid)
             return DefaultMethodResult(False,'Unable to delete the notifications for id',notificationuserid)    
         
     def __dismissnotificationbyuser(self, userid):
