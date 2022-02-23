@@ -104,8 +104,8 @@ class notificationservice:
         self.__deletenotificationids(requesttype, _ids) 
         
     def __deletenotificationids(self, requesttype, notificationids):
-        print("requesttype ==== ", requesttype)
-        print("notificationids === ", notificationids)
+        print("requesttype ====== ", requesttype)
+        print("notificationids ===== ", notificationids)
         if notificationids:
             if requesttype == "ministryrequest":
                 userresponse = FOIRequestNotificationUser.dismissbynotificationid(notificationids)
