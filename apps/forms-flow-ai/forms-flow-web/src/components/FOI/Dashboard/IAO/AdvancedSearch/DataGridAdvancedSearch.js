@@ -69,7 +69,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "APPLICANT NAME",
       flex: 1,
       headerAlign: "left",
-      valueGetter: getFullName,
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
     },
     {
       field: "requestType",

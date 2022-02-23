@@ -137,7 +137,7 @@ class dashboardservice:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
             if(request.ministryrequestid == None):
-                unopenrequest = self.__preparefoirequestinfo(request.id, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+                unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
                 requestqueue.append(unopenrequest)
             else:
