@@ -46,16 +46,32 @@ class extensionevent:
         onlycleanuprequired = self.__onlycleanuprequired(curextension, prevextension, event)
         onlynotificationrequired = self.__onlynotificationrequired(curextension, prevextension, event)
         notificationandcleanup = self.__bothnotificationandcleanup(curextension, prevextension, event)
+
+        print("nootificationrequired == ", nootificationrequired)
+        print("onlycleanuprequired == ", onlycleanuprequired)
+        print("onlynotificationrequired == ", onlynotificationrequired)
+        print("notificationandcleanup == ", notificationandcleanup)
        
         if nootificationrequired == True:
             return DefaultMethodResult(True, "No Notification", ministryrequestid)
         elif onlycleanuprequired == True:
-            notificationservice().cleanupnotifications(ministryrequestid, "ministryrequest", "Extension", extensionid)
+            self.__deleteextensionnotification(extensionid)
             return DefaultMethodResult(True, "Delete Extension", ministryrequestid)
         elif onlynotificationrequired == True or notificationandcleanup == True:
             extensionsummary = self.__createnotificationsummary(curextension, prevextension, event)
             notification = self.__preparenotification(extensionsummary)
-            return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, notificationandcleanup)
+            if notificationandcleanup == True:
+                self.__deleteextensionnotification(extensionid)
+            return notificationservice().createnotificationwithoutcleanup({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid)
+
+    def __deleteextensionnotification(self, extensionid):
+        _extensionnotifications = notificationservice().getextensionnotifications(extensionid)
+        noticiationids = []
+        for _extensionnotification in _extensionnotifications:
+            print("_extensionnotification == ", _extensionnotification)
+            noticiationids.append(_extensionnotification["notificationid"])
+            notificationservice().dismissnotificationbyid("ministryrequest", noticiationids)             
+        return DefaultMethodResult(True,'Extension notifications deleted', extensionid)   
 
     def __preparenotification(self, extensionsummary):
         ispublicbody = self.__valueexists('ispublicbody', extensionsummary)
@@ -70,7 +86,7 @@ class extensionevent:
         extendedduedays = self.__valueexists('extendedduedays', extension) 
         newduedate = self.__formatdate(self.__valueexists('extendedduedate', extension), self.__genericdateformat())
 
-        approveddayschanged = True if prevapprovedays and prevapprovedays != approveddays else False
+        approveddayschanged = True if prevapprovedays != approveddays else False
         extendeddayschanged = True if prevextendeddays and prevextendeddays != extendedduedays else False
 
       
@@ -120,18 +136,22 @@ class extensionevent:
         prevapproveddays = self.__valueexists('approvednoofdays', prevextension)
         if (event == EventType.add.value and curextensionstatusid == 1) or (event == EventType.modify.value and curextensionstatusid ==  prevextensionstatusid and curapproveddays == prevapproveddays):
             return True
+        return False
     
     def __onlycleanuprequired(self, curextension, prevextension, event):
         curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
         prevextensionstatusid = self.__valueexists('extensionstatusid', prevextension)
         if event == EventType.delete.value or (event == EventType.modify.value and str(prevextensionstatusid)  in [str(ExtensionStatus.denied.value), str(ExtensionStatus.approved.value)] and curextensionstatusid == 1):
             return True
+        return False
+
     def __onlynotificationrequired(self, curextension, prevextension, event):
         isdenied = self.__finddenied(curextension, prevextension, event)
         ispublicbody = self.__findpublicbody(curextension)
         isapproved = self.__findapproved(curextension, prevextension, event)
         if isdenied == True or isapproved == True or ispublicbody == True:
             return True
+        return False
 
     def __bothnotificationandcleanup(self, curextension, prevextension, event):
         curextensionstatusid = self.__valueexists('extensionstatusid', curextension)
@@ -140,6 +160,7 @@ class extensionevent:
         prevapproveddays = self.__valueexists('approvednoofdays', prevextension)
         if (event == EventType.modify.value and curextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value] and prevextensionstatusid in [ExtensionStatus.approved.value, ExtensionStatus.denied.value]) or (event == EventType.modify.value and curextensionstatusid == ExtensionStatus.approved.value and curextensionstatusid == prevextensionstatusid and prevapproveddays != curapproveddays):
             return True
+        return False
 
     def __maintained(self, curextension, prevextension, event):        
         return self.__createextensionsummary(curextension, prevextension, event)
@@ -221,8 +242,3 @@ class ExtensionStatus(Enum):
 class ExtensionType(Enum):
     publicbody = "Public Body"
     oipc = "OIPC"
-
-class ExtensionSummaryFor(Enum):
-    comments = "comments"
-    notification = "notification"
-

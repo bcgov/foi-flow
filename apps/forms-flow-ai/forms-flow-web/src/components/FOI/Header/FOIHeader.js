@@ -15,6 +15,7 @@ import {
 import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
 import io from "socket.io-client";
 import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX} from "../../../constants/constants";
+import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 
 
 const FOIHeader = React.memo(({unauthorized=false}) => { 
@@ -42,6 +43,7 @@ ministryCode = getMinistryCode(userGroups);
 
 useEffect(() => {     
   if(!unauthorized && isAuthenticated){
+    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  
     const options = {
       reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,

@@ -14,7 +14,7 @@ import maya
 import os
 from flask import current_app
 from dateutil.parser import parse
-
+from request_api import socketio
 import asyncio
 from request_api.utils.redispublisher import RedisPublisherService
 class commentevent:
@@ -27,8 +27,7 @@ class commentevent:
             if _comment["taggedusers"] != '[]':                
                 notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, "Tagged User Comments", requesttype, userid)    
             _pushnotifications = notificationservice().getcommentnotifications(commentid)
-            for _pushnotification in _pushnotifications:
-                asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))
+            self.__publishnotification(commentid, _pushnotifications)    
             return DefaultMethodResult(True,'Comment notifications created',commentid)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Comment Notification Error', exception.message))
@@ -37,8 +36,18 @@ class commentevent:
     def getcommentmessage(self, commentid, comment):
         return {"commentid":commentid, "message" :self.__formatmessage(comment)}
     
-    
-  
+    def __publishnotification(self,commentid, _pushnotifications):
+        try: 
+            if os.getenv("SOCKETIO_MESSAGE_QTYPE") != "NONE":
+                for _pushnotification in _pushnotifications:
+                    if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
+                        asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))
+                    if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "IN-MEMORY":
+                        socketio.emit(_pushnotification["userid"], _pushnotification)
+        except BusinessException as exception:            
+            current_app.logger.error("%s,%s" % ('Comment Notification publish Error', exception.message))
+            return DefaultMethodResult(False,'Comment notifications publish failed',commentid)  
+
     def __formatmessage(self, comment):
         _comment = json.loads(comment["comment"])
         msg = _comment["blocks"][0]["text"]
