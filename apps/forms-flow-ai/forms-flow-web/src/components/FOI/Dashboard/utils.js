@@ -3,9 +3,6 @@ import {
   addBusinessDays,
   businessDay,
   calculateDaysRemaining,
-  isProcessingTeam,
-  isIntakeTeam,
-  isFlexTeam,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import Chip from "@mui/material/Chip";

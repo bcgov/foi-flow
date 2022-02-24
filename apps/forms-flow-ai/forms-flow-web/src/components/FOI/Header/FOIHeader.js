@@ -25,7 +25,6 @@ const FOIHeader = React.memo(() => {
 }
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
-const userInfo = useSelector((state) => state.user);
 let isMinistry = false;
 let ministryCode ="";
 const [screenPosition, setScreenPosition] = useState(0);
