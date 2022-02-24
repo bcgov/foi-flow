@@ -36,7 +36,11 @@ export const getTabBottomText = ({
   ];
 
   if (cfrStates.includes(_status)) {
-    bottomTextArray.splice(1, 0, _cfrDaysRemainingText);
+    if (bottomTextArray.length === 0) {
+      bottomTextArray.push(_cfrDaysRemainingText);
+    } else {
+      bottomTextArray.splice(1, 0, _cfrDaysRemainingText);
+    }
   }
 
   return bottomTextArray.join('|');
