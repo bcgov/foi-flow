@@ -21,6 +21,7 @@ import json
 from datetime import datetime
 from dateutil.parser import parse
 from pytz import timezone
+from enum import Enum
 
 class notificationservice:
     """ FOI notification management service
@@ -31,7 +32,7 @@ class notificationservice:
         self.__cleanupnotifications(requesttype, notificationtype, foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
     
-    def createremindernotification(self, message, requestid, requesttype, notificationtype, userid):
+    def createnotificationwithoutcleanup(self, message, requestid, requesttype, notificationtype, userid):
         foirequest = self.__getrequest(requestid, requesttype)
         return  self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
 
@@ -45,16 +46,24 @@ class notificationservice:
 
     def getcommentnotifications(self, commentid):
         return FOIRequestNotification.getcommentnotifications(commentid)
+    
+    def getextensionnotifications(self, extensionid):
+        return FOIRequestNotification.getextensionnotifications(extensionid)
 
     def dismissnotification(self, userid, type, idnumber, notificationid):    
         if type is not None:
             return self.__dismissnotificationbytype(userid, type)
-        else:    
+        else:
             if idnumber is not None and notificationid is not None:
                 requesttype = self.__getnotificationtypefromid(idnumber)
                 return self.__dimissusernotificationbyid(requesttype, notificationid)
             else:
-                return self.__dismissnotificationbyuser(userid) 
+                return self.__dismissnotificationbyuser(userid)
+    
+    def dismissnotificationbyid(self, requesttype, notificationids):
+        print("idnumber === ", requesttype)
+        print("notificationid === ", notificationids)
+        return self.__deletenotificationids(requesttype, notificationids)
             
     def dismissremindernotification(self, requesttype, notificationtype):
         notificationid = notificationconfig().getnotificationtypeid(notificationtype)
@@ -95,19 +104,23 @@ class notificationservice:
         self.__deletenotificationids(requesttype, _ids) 
         
     def __deletenotificationids(self, requesttype, notificationids):
+        print("requesttype ====== ", requesttype)
+        print("notificationids ===== ", notificationids)
         if notificationids:
             if requesttype == "ministryrequest":
-                FOIRequestNotificationUser.dismissbynotificationid(notificationids)
-                FOIRequestNotification.dismissnotification(notificationids)
+                userresponse = FOIRequestNotificationUser.dismissbynotificationid(notificationids)
+                notificationresponse = FOIRequestNotification.dismissnotification(notificationids)
+                print("userresponse.success === ", userresponse.success)
+                print("notificationresponse.success === ", notificationresponse.success)
             else:
                 FOIRawRequestNotificationUser.dismissbynotificationid(notificationids)
                 FOIRawRequestNotification.dismissnotification(notificationids)            
 
     def __dimissusernotificationbyid(self, requesttype, notificationuserid):
-        notficationids = self.__getdismissparentids(requesttype, notificationuserid)
-        if requesttype == "ministryrequest":         
-            cresponse = FOIRequestNotificationUser.dismissnotification(notificationuserid)
-            presponse = FOIRequestNotification.dismissnotification(notficationids)            
+        notficationids = self.__getdismissparentids(requesttype, notificationuserid)        
+        if requesttype == "ministryrequest":
+            cresponse = FOIRequestNotificationUser.dismissnotification(notificationuserid)          
+            presponse = FOIRequestNotification.dismissnotification(notficationids)
         else:
             cresponse = FOIRawRequestNotificationUser.dismissnotification(notificationuserid)
             presponse = FOIRawRequestNotification.dismissnotification(notficationids)
@@ -211,7 +224,6 @@ class notificationservice:
         else:
             return FOIRawRequest.get_request(requestid)
 
-  
        
     
     
