@@ -25,78 +25,87 @@ import {
   fetchFOIRequestNotesList
 } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 
-import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import {
+  ConditionalComponent,
+  calculateDaysRemaining,
+} from "../../../../helper/FOI/helper";
 
-import ApplicantDetails from './ApplicantDetails';
-import RequestDetails from './RequestDetails';
-import RequestDescription from './RequestDescription';
-import RequestHeader from './RequestHeader';
-import RequestTracking from './RequestTracking';
-import BottomButtonGroup from './BottomButtonGroup';
-import {CommentSection} from '../../customComponents/Comments';
-import {AttachmentSection} from '../../customComponents/Attachments';
-import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
+import ApplicantDetails from "./ApplicantDetails";
+import RequestDetails from "./RequestDetails";
+import RequestDescription from "./RequestDescription";
+import RequestHeader from "./RequestHeader";
+import RequestTracking from "./RequestTracking";
+import BottomButtonGroup from "./BottomButtonGroup";
+import { CommentSection } from "../../customComponents/Comments";
+import { AttachmentSection } from "../../customComponents/Attachments";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Loading from "../../../../containers/Loading";
-import ExtensionDetails from './ExtensionDetails';
+import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
+import { getMinistryBottomTextMap } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    '& .MuiTextField-root': {
+    "& .MuiTextField-root": {
       margin: theme.spacing(1),
     },
   },
   validationErrorMessage: {
-    marginTop: '30px',
+    marginTop: "30px",
     color: "#fd0404",
   },
   validationMessage: {
-    marginTop: '30px',
+    marginTop: "30px",
     color: "#000000",
   },
   btndisabled: {
-    border: 'none',
-    backgroundColor: '#eceaea',
-    color: '#FFFFFF'
+    border: "none",
+    backgroundColor: "#eceaea",
+    color: "#FFFFFF",
   },
   btnenabled: {
-    border: 'none',
-    backgroundColor: '#38598A',
-    color: '#FFFFFF'
+    border: "none",
+    backgroundColor: "#38598A",
+    color: "#FFFFFF",
   },
   btnsecondaryenabled: {
-    border: '1px solid #38598A',
-    backgroundColor: '#FFFFFF',
-    color: '#38598A'
+    border: "1px solid #38598A",
+    backgroundColor: "#FFFFFF",
+    color: "#38598A",
   },
   displayed: {
-    display: "block"
+    display: "block",
   },
   hidden: {
-    display: "none"
-  }
-
+    display: "none",
+  },
 }));
 
-
 const MinistryReview = React.memo(({ userDetail }) => {
-
-  const { requestId, ministryId} = useParams();
+  const { requestId, ministryId } = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
   //gets the request detail from the store
 
-
-  let requestDetails = useSelector(state => state.foiRequests.foiMinistryViewRequestDetail);
-  let requestNotes = useSelector(state => state.foiRequests.foiRequestComments);
-  let requestAttachments = useSelector(state=> state.foiRequests.foiRequestAttachments);
-  let bcgovcode = ministryId && requestDetails && requestDetails["selectedMinistries"] ?JSON.stringify(requestDetails["selectedMinistries"][0]["code"]):""
+  let requestDetails = useSelector(
+    (state) => state.foiRequests.foiMinistryViewRequestDetail
+  );
+  let requestNotes = useSelector(
+    (state) => state.foiRequests.foiRequestComments
+  );
+  let requestAttachments = useSelector(
+    (state) => state.foiRequests.foiRequestAttachments
+  );
+  let bcgovcode =
+    ministryId && requestDetails && requestDetails["selectedMinistries"]
+      ? JSON.stringify(requestDetails["selectedMinistries"][0]["code"])
+      : "";
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState();
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
-  
+
   const initialStatuses = {
     Request: {
       display: false,
@@ -132,31 +141,32 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
-      dispatch(fetchFOIRequestAttachmentsList(requestId,ministryId));
+      dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       dispatch(fetchFOIFullAssignedToList());
-      if (bcgovcode)
-        dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
+      if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId]);
 
   const [headerValue, setHeader] = useState("");
-  const [ministryAssignedToValue, setMinistryAssignedToValue] = React.useState("Unassigned");
+  const [ministryAssignedToValue, setMinistryAssignedToValue] =
+    React.useState("Unassigned");
   //gets the request detail from the store
 
+  const [saveMinistryRequestObject, setSaveMinistryRequestObject] =
+    React.useState(requestDetails);
 
-
-  const [saveMinistryRequestObject, setSaveMinistryRequestObject] = React.useState(requestDetails);
-
-
-  const [divstages, setdivStages] = React.useState([])
+  const [divstages, setdivStages] = React.useState([]);
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
-    ministryassignedtousername = requestDetailsValue && requestDetailsValue.assignedministryperson ? requestDetailsValue.assignedministryperson : "Unassigned";
+    ministryassignedtousername =
+      requestDetailsValue && requestDetailsValue.assignedministryperson
+        ? requestDetailsValue.assignedministryperson
+        : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
-    if(requestDetails && Object.keys(requestDetails).length !== 0){
+    if (requestDetails && Object.keys(requestDetails).length !== 0) {
       setRequestState(requestDetails.currentState);
       settabStatus(requestDetails.currentState);
     }
@@ -164,47 +174,73 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
 
-  let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
-  const _cfrDaysRemaining = requestDetails.cfrDueDate ? calculateDaysRemaining(requestDetails.cfrDueDate) : '';
-  const _daysRemainingText = _daysRemaining > 0 ? `${_daysRemaining} Days Remaining` : `${Math.abs(_daysRemaining)} Days Overdue`;
-  const _cfrDaysRemainingText = _cfrDaysRemaining > 0 ? `CFR Due in ${_cfrDaysRemaining} Days` : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
-  const bottomText = `${_cfrDaysRemainingText}|${_daysRemainingText}`;
-  const bottomTextArray = bottomText.split('|');
+  const hideBottomText = [
+    StateEnum.onhold.name.toLowerCase(),
+    StateEnum.closed.name.toLowerCase(),
+  ];
+
+  const _cfrDaysRemaining = requestDetails.cfrDueDate
+    ? calculateDaysRemaining(requestDetails.cfrDueDate)
+    : "";
+
+  const bottomTextMap = getMinistryBottomTextMap(
+    requestDetails,
+    _requestStatus,
+    _cfrDaysRemaining
+  );
 
   //gets the latest ministry assigned to value
   const handleMinistryAssignedToValue = (value) => {
     setMinistryAssignedToValue(value);
-  }
+  };
 
   let hasincompleteDivstage = false;
   divstages.forEach((item) => {
-    if (item.divisionid === -1 || item.stageid === -1 || item.stageid === "" || item.divisionid === "") {
-      hasincompleteDivstage = true
+    if (
+      item.divisionid === -1 ||
+      item.stageid === -1 ||
+      item.stageid === "" ||
+      item.divisionid === ""
+    ) {
+      hasincompleteDivstage = true;
     }
-  })
+  });
 
   //Variable to find if all required fields are filled or not
-  const isValidationError = ministryAssignedToValue.toLowerCase().includes("unassigned") || (divstages.length === 0 || hasincompleteDivstage);
+  const isValidationError =
+    ministryAssignedToValue.toLowerCase().includes("unassigned") ||
+    divstages.length === 0 ||
+    hasincompleteDivstage;
 
-  const createMinistryRequestDetailsObject = (requestObject, propName, value) => {
+  const createMinistryRequestDetailsObject = (
+    requestObject,
+    propName,
+    value
+  ) => {
     // requestDetails.
     if (propName === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
       const assignedToValue = value.split("|");
-      if (assignedToValue.length > 1 && assignedToValue[0] && assignedToValue[1] && assignedToValue[2] && assignedToValue[3]) {
+      if (
+        assignedToValue.length > 1 &&
+        assignedToValue[0] &&
+        assignedToValue[1] &&
+        assignedToValue[2] &&
+        assignedToValue[3]
+      ) {
         requestObject.assignedministrygroup = assignedToValue[0];
         requestObject.assignedministryperson = assignedToValue[1];
         requestObject.assignedministrypersonFirstName = assignedToValue[2];
         requestObject.assignedministrypersonLastName = assignedToValue[3];
       }
     }
-  }
+  };
 
   const createMinistrySaveRequestObject = (propName, value, value2) => {
     const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
     createMinistryRequestDetailsObject(requestObject, propName, value);
     setSaveMinistryRequestObject(requestObject);
-  }
+  };
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
   const handleSaveRequest = (_state, _unSaved, id) => {
@@ -214,72 +250,68 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`
-      }
-        , 1000);
-    }
-    else {
+        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`;
+      }, 1000);
+    } else {
       setUpdateStateDropdown(!updateStateDropDown);
       setcurrentrequestStatus(_state);
       setStateChanged(false);
     }
-  }
+  };
 
   const handleStateChange = (currentStatus) => {
     setcurrentrequestStatus(currentStatus);
     setStateChanged(true);
-  }
+  };
 
   const hasStatusRequestSaved = (state) => {
     settabStatus(state);
     setcurrentrequestStatus("");
-  }
-
+  };
 
   var foitabheaderBG;
   const classes = useStyles();
 
   switch (_tabStatus) {
     case StateEnum.open.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderOpenBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderOpenBG";
       break;
     case StateEnum.closed.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderClosedBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderClosedBG";
       break;
     case StateEnum.callforrecords.name:
       if (_cfrDaysRemaining < 0) {
-        foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG"
-      }
-      else {
-        foitabheaderBG = "foitabheadercollection foitabheaderCFRG"
+        foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG";
+      } else {
+        foitabheaderBG = "foitabheadercollection foitabheaderCFRG";
       }
       break;
     case StateEnum.redirect.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG";
       break;
     case StateEnum.review.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderReviewBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderReviewBG";
       break;
     case StateEnum.feeassessed.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderFeeBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderFeeBG";
       break;
     case StateEnum.consult.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderConsultBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderConsultBG";
       break;
     case StateEnum.signoff.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderSignoffBG";
       break;
     case StateEnum.deduplication.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderDeduplicationBG";
       break;
     case StateEnum.harms.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderHarmsBG";
       break;
     case StateEnum.onhold.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldBG";
       break;
     case StateEnum.response.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderResponseBG"
+      foitabheaderBG = "foitabheadercollection foitabheaderResponseBG";
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
@@ -290,27 +322,27 @@ const MinistryReview = React.memo(({ userDetail }) => {
    * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
    */
   //Below function will handle beforeunload event
-  const alertUser = e => {
-    if (editorChange) {     
-      e.returnValue = '';
+  const alertUser = (e) => {
+    if (editorChange) {
+      e.returnValue = "";
       e.preventDefault();
     }
-  }
-
-  //Below function will handle popstate event
-  const handleOnHashChange = (e) => {   
-    e.preventDefault();
-    window.removeEventListener('beforeunload', alertUser);
   };
 
-  React.useEffect(() => {    
+  //Below function will handle popstate event
+  const handleOnHashChange = (e) => {
+    e.preventDefault();
+    window.removeEventListener("beforeunload", alertUser);
+  };
+
+  React.useEffect(() => {
     window.history.pushState(null, null, window.location.pathname);
-    window.addEventListener('popstate', handleOnHashChange);
-    window.addEventListener('beforeunload', alertUser);
+    window.addEventListener("popstate", handleOnHashChange);
+    window.addEventListener("beforeunload", alertUser);
     return () => {
-      window.removeEventListener('popstate', handleOnHashChange);
-      window.removeEventListener('beforeunload', alertUser);
-    }
+      window.removeEventListener("popstate", handleOnHashChange);
+      window.removeEventListener("beforeunload", alertUser);
+    };
   });
 
   const tabclick = (param) => {
@@ -335,8 +367,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     } else {
       changeTabLinkStatuses(param);
     }
-
-  }
+  };
 
   const changeTabLinkStatuses = (param) => {
     setTabLinksStatuses({
@@ -362,164 +393,251 @@ const MinistryReview = React.memo(({ userDetail }) => {
   };
 
   const pubmindivstagestomain = (_divstages) => {
+    saveMinistryRequestObject.divisions = _divstages;
+    setdivStages(_divstages);
+  };
 
-    saveMinistryRequestObject.divisions = _divstages
-    setdivStages(_divstages)
-  }
+  const userId = userDetail && userDetail.preferred_username;
+  const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random";
+  const name = `${userDetail && userDetail.family_name}, ${
+    userDetail && userDetail.given_name
+  }`;
+  const signinUrl = "/signin";
+  const signupUrl = "/signup";
 
+  let iaoassignedToList = useSelector(
+    (state) => state.foiRequests.foiFullAssignedToList
+  );
+  let ministryAssignedToList = useSelector(
+    (state) => state.foiRequests.foiMinistryAssignedToList
+  );
+  const isLoading = useSelector((state) => state.foiRequests.isLoading);
+  const isAttachmentListLoading = useSelector(
+    (state) => state.foiRequests.isAttachmentListLoading
+  );
 
+  const requestNumber = requestDetails && requestDetails.idNumber;
 
-  const userId = userDetail && userDetail.preferred_username
-  const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random"
-  const name = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name}`
-  const signinUrl = "/signin"
-  const signupUrl = "/signup"
-
-  let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
-  let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
-  const isLoading = useSelector(state=> state.foiRequests.isLoading);
-  const isAttachmentListLoading = useSelector(state=> state.foiRequests.isAttachmentListLoading);
-
-  const requestNumber = requestDetails && requestDetails.idNumber; 
-  
-  return (
-    !isLoading && requestDetails && Object.keys(requestDetails).length !== 0  && requestState != undefined?
+  return !isLoading &&
+    requestDetails &&
+    Object.keys(requestDetails).length !== 0 &&
+    requestState != undefined ? (
     <div className="foiformcontent">
       <div className="foitabbedContainer">
-
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1><a href="/foi/dashboard">FOI</a></h1>
+            <h1>
+              <a href="/foi/dashboard">FOI</a>
+            </h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestState={requestState} updateStateDropDown={updateStateDropDown} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={true} isValidationError={isValidationError} />
+            <StateDropDown
+              requestState={requestState}
+              updateStateDropDown={updateStateDropDown}
+              requestStatus={_requestStatus}
+              handleStateChange={handleStateChange}
+              isMinistryCoordinator={true}
+              isValidationError={isValidationError}
+            />
           </div>
-          
-        <div className="tab">
-          <div
-            className={clsx("tablinks", {
-              "active": tabLinksStatuses.Request.active
-            })}
-            name="Request" 
-            onClick={() => tabclick('Request')}>
-              Request
-          </div>
-          <div
-            className={clsx("tablinks", {
-              "active": tabLinksStatuses.Attachments.active
-            })}
-            name="Attachments" 
-            onClick={() => tabclick('Attachments')}
-          >
-            Attachments{
-              requestAttachments && requestAttachments.length > 0 
-              ? ` (${requestAttachments.length})`
-              : ''
-            }
-          </div> 
-          <div 
-            className={clsx("tablinks", {
-              "active": tabLinksStatuses.Comments.active
-            })}
-            name="Comments" 
-            onClick={() => tabclick('Comments')}
+
+          <div className="tab">
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.Request.active,
+              })}
+              name="Request"
+              onClick={() => tabclick("Request")}
             >
-            Comments {requestNotes && requestNotes.length > 0  ? `(${requestNotes.length})`:""}
+              Request
+            </div>
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.Attachments.active,
+              })}
+              name="Attachments"
+              onClick={() => tabclick("Attachments")}
+            >
+              Attachments
+              {requestAttachments && requestAttachments.length > 0
+                ? ` (${requestAttachments.length})`
+                : ""}
+            </div>
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.Comments.active,
+              })}
+              name="Comments"
+              onClick={() => tabclick("Comments")}
+            >
+              Comments{" "}
+              {requestNotes && requestNotes.length > 0
+                ? `(${requestNotes.length})`
+                : ""}
+            </div>
+            <div
+              className="tablinks"
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.Option4.active,
+              })}
+              name="Option4"
+              onClick={() => tabclick("Option4")}
+            >
+              Option 4
+            </div>
           </div>
-          <div 
-            className="tablinks" 
-            className={clsx("tablinks", {
-              "active": tabLinksStatuses.Option4.active
-            })}
-            name="Option4" 
-            onClick={() => tabclick('Option4')}
-          >
-            Option 4
+
+          <div className="foileftpanelstatus">
+            \
+            <ConditionalComponent
+              condition={
+                !hideBottomText.includes(_requestStatus?.toLowerCase())
+              }
+            >
+              {bottomTextMap.values((value) => (
+                <h4>{value}</h4>
+              ))}
+            </ConditionalComponent>
           </div>
-        </div>
-        
-        <div className="foileftpanelstatus">
-        {_requestStatus?.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.closed.name.toLowerCase() &&  
-          <>
-          {(_requestStatus?.toLowerCase() !== StateEnum.review.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.consult.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.signoff.name.toLowerCase() && _requestStatus?.toLowerCase() !== StateEnum.response.name.toLowerCase()) &&
-          <h4>{bottomTextArray[0]}</h4>
-          }
-          <h4>{bottomTextArray[1]}</h4>
-          </>
-        }
-        </div>  
-     
         </div>
         <div className="foitabpanelcollection">
-          <div 
-            id="Request" 
+          <div
+            id="Request"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Request.active,
+              active: tabLinksStatuses.Request.active,
               [classes.displayed]: tabLinksStatuses.Request.display,
               [classes.hidden]: !tabLinksStatuses.Request.display,
             })}
           >
             <div className="container foi-review-request-container">
-
               <div className="foi-review-container">
-                <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  { (Object.entries(requestDetails).length >0  && requestDetails !== undefined) && 
-                  <>
-                    <RequestHeader requestDetails={requestDetails} userDetail={userDetail} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createMinistrySaveRequestObject={createMinistrySaveRequestObject} />
-                    <ApplicantDetails requestDetails={requestDetails} /> 
-                    <RequestDescription requestDetails={requestDetails} />
-                    <RequestDetails requestDetails={requestDetails}/>
-                    <ExtensionDetails requestDetails={requestDetails} requestState={requestState}/>
-                    <RequestTracking pubmindivstagestomain={pubmindivstagestomain} existingDivStages={requestDetails.divisions} ministrycode={requestDetails.selectedMinistries[0].code}/>                                                
-                    {/* <RequestNotes /> */}
-                    <BottomButtonGroup requestState={requestState} stateChanged={stateChanged} attachmentsArray={requestAttachments} isValidationError={isValidationError} saveMinistryRequestObject={saveMinistryRequestObject} unSavedRequest={unSavedRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={_currentrequestStatus} hasStatusRequestSaved={hasStatusRequestSaved} />
-                  </>
-                  }
+                <form
+                  className={`${classes.root} foi-request-form`}
+                  autoComplete="off"
+                >
+                  {Object.entries(requestDetails).length > 0 &&
+                    requestDetails !== undefined && (
+                      <>
+                        <RequestHeader
+                          requestDetails={requestDetails}
+                          userDetail={userDetail}
+                          handleMinistryAssignedToValue={
+                            handleMinistryAssignedToValue
+                          }
+                          createMinistrySaveRequestObject={
+                            createMinistrySaveRequestObject
+                          }
+                        />
+                        <ApplicantDetails requestDetails={requestDetails} />
+                        <RequestDescription requestDetails={requestDetails} />
+                        <RequestDetails requestDetails={requestDetails} />
+                        <ExtensionDetails
+                          requestDetails={requestDetails}
+                          requestState={requestState}
+                        />
+                        <RequestTracking
+                          pubmindivstagestomain={pubmindivstagestomain}
+                          existingDivStages={requestDetails.divisions}
+                          ministrycode={
+                            requestDetails.selectedMinistries[0].code
+                          }
+                        />
+                        {/* <RequestNotes /> */}
+                        <BottomButtonGroup
+                          requestState={requestState}
+                          stateChanged={stateChanged}
+                          attachmentsArray={requestAttachments}
+                          isValidationError={isValidationError}
+                          saveMinistryRequestObject={saveMinistryRequestObject}
+                          unSavedRequest={unSavedRequest}
+                          handleSaveRequest={handleSaveRequest}
+                          currentSelectedStatus={_currentrequestStatus}
+                          hasStatusRequestSaved={hasStatusRequestSaved}
+                        />
+                      </>
+                    )}
                 </form>
               </div>
             </div>
-          </div>  
-          <div 
-            id="Attachments" 
+          </div>
+          <div
+            id="Attachments"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Attachments.active,
+              active: tabLinksStatuses.Attachments.active,
               [classes.displayed]: tabLinksStatuses.Attachments.display,
               [classes.hidden]: !tabLinksStatuses.Attachments.display,
             })}
           >
-            {
-             !isAttachmentListLoading && iaoassignedToList && iaoassignedToList.length > 0 && ministryAssignedToList && ministryAssignedToList.length > 0 ?
-                <>
-                <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
-                  setAttachments={setAttachments} requestId={requestId} ministryId={ministryId} 
-                  requestNumber={requestNumber} requestState={requestState}
-                  iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} isMinistryCoordinator={true} />
-                </> : <Loading />
-            }
-          </div> 
-          <div 
-            id="Comments" 
+            {!isAttachmentListLoading &&
+            iaoassignedToList &&
+            iaoassignedToList.length > 0 &&
+            ministryAssignedToList &&
+            ministryAssignedToList.length > 0 ? (
+              <>
+                <AttachmentSection
+                  currentUser={userId}
+                  attachmentsArray={requestAttachments}
+                  setAttachments={setAttachments}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  requestNumber={requestNumber}
+                  requestState={requestState}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  isMinistryCoordinator={true}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
+          <div
+            id="Comments"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Comments.active,
+              active: tabLinksStatuses.Comments.active,
               [classes.displayed]: tabLinksStatuses.Comments.display,
               [classes.hidden]: !tabLinksStatuses.Comments.display,
             })}
           >
-            {
-             !isLoading && requestNotes && iaoassignedToList.length > 0 && ministryAssignedToList.length > 0 ?
-                <>
-                  <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: name }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} bcgovcode={bcgovcode} requestid={requestId} 
-                    ministryId={ministryId} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
-                    requestNumber={requestNumber}
-                    //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
-                </> : <Loading />}
+            {!isLoading &&
+            requestNotes &&
+            iaoassignedToList.length > 0 &&
+            ministryAssignedToList.length > 0 ? (
+              <>
+                <CommentSection
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: name,
+                    }
+                  }
+                  commentsArray={requestNotes.sort(function (a, b) {
+                    return b.commentId - a.commentId;
+                  })}
+                  setComment={setComment}
+                  signinUrl={signinUrl}
+                  signupUrl={signupUrl}
+                  bcgovcode={bcgovcode}
+                  requestid={requestId}
+                  ministryId={ministryId}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs
+                  setEditorChange={setEditorChange}
+                  removeComment={removeComment}
+                  setRemoveComment={setRemoveComment}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
           </div>
-          <div 
-            id="Option4" 
+          <div
+            id="Option4"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Option4.active,
+              active: tabLinksStatuses.Option4.active,
               [classes.displayed]: tabLinksStatuses.Option4.display,
               [classes.hidden]: !tabLinksStatuses.Option4.display,
             })}
@@ -529,9 +647,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
         </div>
       </div>
     </div>
-  : <Loading/>
+  ) : (
+    <Loading />
   );
-
-})
+});
 
 export default MinistryReview
