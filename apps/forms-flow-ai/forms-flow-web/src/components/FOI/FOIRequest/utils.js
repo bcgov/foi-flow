@@ -13,30 +13,7 @@ export const getTabBottomText = ({
   const _cfrDaysRemainingText = getcfrDaysRemainingText(_cfrDaysRemaining);
   const _extensionsCountText = getExtensionsCountText(requestExtensions);
 
-  let bottomTextArray = [];
-  const generalStates = [
-    StateEnum.open.name,
-    StateEnum.review.name,
-    StateEnum.redirect.name,
-    StateEnum.consult.name,
-    StateEnum.signoff.name,
-    StateEnum.response.name,
-  ];
-
-  if (generalStates.includes(_status)) {
-    bottomTextArray.push(_daysRemainingText);
-  }
-
-  const cfrStates = [
-    StateEnum.callforrecords.name,
-    StateEnum.feeassessed.name,
-    StateEnum.deduplication.name,
-    StateEnum.harms.name,
-  ];
-
-  if (cfrStates.includes(_status)) {
-    bottomTextArray.push(_cfrDaysRemainingText);
-  }
+  let bottomTextArray = []
 
   const statusesToNotAppearIn = [
     StateEnum.unopened.name,
@@ -47,10 +24,22 @@ export const getTabBottomText = ({
   ];
 
   if (!statusesToNotAppearIn.includes(_status)) {
+    bottomTextArray.push(_daysRemainingText);
     bottomTextArray.push(_extensionsCountText);
   }
 
-  return bottomTextArray.join("|");
+  const cfrStates = [
+    StateEnum.callforrecords.name,
+    StateEnum.feeassessed.name,
+    StateEnum.deduplication.name,
+    StateEnum.harms.name,
+  ];
+
+  if (cfrStates.includes(_status)) {
+    bottomTextArray.splice(1, 0, _cfrDaysRemainingText);
+  }
+
+  return bottomTextArray.join('|');
 };
 
 const getDaysRemainingText = (_daysRemaining) => {
