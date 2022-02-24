@@ -4,7 +4,7 @@ import {
   getReceivedDate,
   onBehalfFullName,
 } from "../utils";
-import { isProcessingTeam } from "../../../../helper/FOI/helper";
+import { isProcessingTeam, isIntakeTeam } from "../../../../helper/FOI/helper";
 
 const ProcessingTeamColumns = [
   {
@@ -143,7 +143,7 @@ const defaultTableInfo = {
   ],
 };
 const getTableInfo = (userGroups) => {
-  if (!userGroups) {
+  if (!userGroups || isIntakeTeam(userGroups)) {
     return defaultTableInfo;
   }
   if (isProcessingTeam(userGroups)) {
