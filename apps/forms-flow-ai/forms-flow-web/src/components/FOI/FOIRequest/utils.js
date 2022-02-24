@@ -65,7 +65,7 @@ const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
     : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
 };
 
-const getExtensionsCountText = (extensions) => {
+export const getExtensionsCountText = (extensions) => {
   if (!extensions || extensions.length < 1) {
     return `Extensions 0`;
   }

@@ -97,6 +97,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments
   );
+
+  const requestExtensions = useSelector(state => state.foiRequests.foiRequestExtesions);
+
   let bcgovcode =
     ministryId && requestDetails && requestDetails["selectedMinistries"]
       ? JSON.stringify(requestDetails["selectedMinistries"][0]["code"])
@@ -185,8 +188,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const bottomTextMap = getMinistryBottomTextMap(
     requestDetails,
-    _requestStatus,
-    _cfrDaysRemaining
+    requestState,
+    _cfrDaysRemaining,
+    requestExtensions
   );
 
   //gets the latest ministry assigned to value
@@ -488,13 +492,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div>
 
           <div className="foileftpanelstatus">
-            \
             <ConditionalComponent
-              condition={
-                !hideBottomText.includes(_requestStatus?.toLowerCase())
-              }
+              condition={!hideBottomText.includes(requestState?.toLowerCase())}
             >
-              {bottomTextMap.values((value) => (
+              {Array.from(bottomTextMap.values()).map((value) => (
                 <h4>{value}</h4>
               ))}
             </ConditionalComponent>

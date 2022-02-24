@@ -1,11 +1,14 @@
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import { getExtensionsCountText } from "../utils";
 
 export const getMinistryBottomTextMap = (
   requestDetails,
-  requestStatus,
-  _cfrDaysRemaining
+  requestState,
+  _cfrDaysRemaining,
+  requestExtensions
 ) => {
+  console.log(requestDetails);
   const _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
 
   const _daysRemainingText =
@@ -25,12 +28,13 @@ export const getMinistryBottomTextMap = (
     StateEnum.response.name.toLowerCase(),
   ];
 
-  const bottomTextMap = new Map();
+  const bottomTexts = [];
 
-  if (!hideCFRDaysRemaining.includes(requestStatus?.toLowerCase())) {
-    bottomTextMap.set("cfrDaysRemainingText", _cfrDaysRemainingText);
+  if (!hideCFRDaysRemaining.includes(requestState?.toLowerCase())) {
+    bottomTexts.push(_cfrDaysRemainingText);
   }
-  bottomTextMap.set("daysRemainingText", _daysRemainingText);
+  bottomTexts.push(_daysRemainingText);
+  bottomTexts.push(getExtensionsCountText(requestExtensions));
 
-  return bottomTextMap;
+  return bottomTexts;
 };
