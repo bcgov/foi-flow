@@ -196,7 +196,7 @@ const Queue = ({ userDetail }) => {
             container
             alignItems="center"
             direction="row"
-            xs={7}
+            xs={7.5}
             sx={{
               borderRight: "2px solid #38598A",
               backgroundColor: "rgba(56,89,138,0.1)",
@@ -222,10 +222,10 @@ const Queue = ({ userDetail }) => {
             item
             container
             alignItems="flex-start"
-            justifyContent="space-around"
-            xs={5}
+            justifyContent="center"
+            xs={4.5}
           >
-            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={2}>
+            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
               <ClickableChip
                 key={`my-requests`}
                 label={"MY REQUESTS"}
@@ -269,7 +269,7 @@ const Queue = ({ userDetail }) => {
           disableColumnMenu={true}
           pagination
           paginationMode="server"
-          page = {rowsState.page}
+          page={rowsState.page}
           onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
           onPageSizeChange={(pageSize) =>
             setRowsState((prev) => ({ ...prev, pageSize }))

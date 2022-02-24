@@ -58,7 +58,10 @@ const Dashboard = ({ userDetail }) => {
             justifyContent="flex-start"
             alignItems="center"
           >
-            <ButtonBase onClick={() => setAdvancedSearchEnabled(false)}>
+            <ButtonBase
+              onClick={() => setAdvancedSearchEnabled(false)}
+              disableRipple
+            >
               <h3
                 className={clsx("foi-request-queue-text", {
                   [classes.disabledTitle]: advnacedSearchEnabled,
@@ -69,7 +72,8 @@ const Dashboard = ({ userDetail }) => {
             </ButtonBase>
             <Divider
               sx={{
-                m: 1,
+                mr: 2,
+                ml: 2,
                 borderRightWidth: 3,
                 height: 28,
                 borderColor: "black",
@@ -77,7 +81,10 @@ const Dashboard = ({ userDetail }) => {
               flexItem
               orientation="vertical"
             />
-            <ButtonBase onClick={() => setAdvancedSearchEnabled(true)}>
+            <ButtonBase
+              onClick={() => setAdvancedSearchEnabled(true)}
+              disableRipple
+            >
               <h3
                 className={clsx("foi-request-queue-text", {
                   [classes.disabledTitle]: !advnacedSearchEnabled,
