@@ -62,7 +62,6 @@ const Queue = ({ userDetail, tableInfo }) => {
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
-    console.log(serverSortModel);
     dispatch(
       fetchFOIRequestListByPage(
         rowsState.page + 1,
