@@ -18,8 +18,6 @@ import {
   ClickableChip,
   getAssigneeValue,
   updateSortModel,
-  getFullName,
-  getReceivedDate,
 } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
@@ -29,7 +27,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 
-const Queue = ({ userDetail }) => {
+const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
 
   const requestQueue = useSelector(
@@ -45,11 +43,7 @@ const Queue = ({ userDetail }) => {
   const defaultRowsState = { page: 0, pageSize: 10 };
   const [rowsState, setRowsState] = React.useState(defaultRowsState);
 
-  const defaultSortModel = [
-    { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
-  ];
-  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  const [sortModel, setSortModel] = React.useState(tableInfo.sort);
   let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
     fields: [
@@ -81,54 +75,7 @@ const Queue = ({ userDetail }) => {
     );
   }, [rowsState, sortModel, filterModel, requestFilter]);
 
-  const columns = React.useRef([
-    {
-      field: "applicantName",
-      headerName: "APPLICANT NAME",
-      width: 170,
-      headerAlign: "left",
-      valueGetter: getFullName,
-    },
-    {
-      field: "requestType",
-      headerName: "REQUEST TYPE",
-      width: 150,
-      headerAlign: "left",
-    },
-    {
-      field: "idNumber",
-      headerName: "ID NUMBER",
-      width: 150,
-      headerAlign: "left",
-    },
-    {
-      field: "currentState",
-      headerName: "CURRENT STATE",
-      headerAlign: "left",
-      width: 180,
-    },
-    {
-      field: "assignedToName",
-      headerName: "ASSIGNED TO",
-      width: 180,
-      headerAlign: "left",
-    },
-    {
-      field: "receivedDate",
-      headerName: "RECEIVED DATE",
-      width: 180,
-      headerAlign: "left",
-      valueGetter: getReceivedDate,
-    },
-    { field: "xgov", headerName: "XGOV", width: 100, headerAlign: "left" },
-    {
-      field: "receivedDateUF",
-      headerName: "",
-      width: 0,
-      hide: true,
-      renderCell: (params) => <span></span>,
-    },
-  ]);
+  const columnsRef = React.useRef(tableInfo?.columns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
@@ -173,6 +120,14 @@ const Queue = ({ userDetail }) => {
       </Grid>
     );
   }
+
+  const handleSortChange = (model) => {
+    if (model.length === 0) {
+      return;
+    }
+
+    setSortModel(model);
+  };
 
   return (
     <>
@@ -259,7 +214,7 @@ const Queue = ({ userDetail }) => {
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
           rows={updateAssigneeName(requestQueue?.data)}
-          columns={columns.current}
+          columns={columnsRef.current}
           rowHeight={30}
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
@@ -269,7 +224,7 @@ const Queue = ({ userDetail }) => {
           disableColumnMenu={true}
           pagination
           paginationMode="server"
-          page = {rowsState.page}
+          page={rowsState.page}
           onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
           onPageSizeChange={(pageSize) =>
             setRowsState((prev) => ({ ...prev, pageSize }))
@@ -280,7 +235,7 @@ const Queue = ({ userDetail }) => {
           sortingOrder={["desc", "asc"]}
           sortModel={sortModel}
           sortingMode={"server"}
-          onSortModelChange={(model) => setSortModel(model)}
+          onSortModelChange={(model) => handleSortChange(model)}
           getRowClassName={(params) =>
             `super-app-theme--${params.row.currentState
               .toLowerCase()

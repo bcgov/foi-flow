@@ -219,11 +219,36 @@ class FOIMinistryRequest(db.Model):
         ]
 
         #subquery for getting the first applicant mapping
-        subquery_applicantmapping_first = _session.query(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id, func.min(FOIRequestApplicantMapping.foirequestapplicantid).label('first_id')).group_by(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id).subquery()
+        subquery_applicantmapping_first = _session.query(
+            FOIRequestApplicantMapping.foirequest_id, 
+            FOIRequestApplicantMapping.foirequestversion_id, 
+            func.min(FOIRequestApplicantMapping.foirequestapplicantid
+        )
+            .label('first_id')).group_by(
+                FOIRequestApplicantMapping.foirequest_id, 
+                FOIRequestApplicantMapping.foirequestversion_id).subquery()
+        
         joincondition_applicantmapping = [
             subquery_applicantmapping_first.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
             subquery_applicantmapping_first.c.foirequestversion_id == FOIRequestApplicantMapping.foirequestversion_id,
             subquery_applicantmapping_first.c.first_id == FOIRequestApplicantMapping.foirequestapplicantid,
+        ]
+        
+        onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
+        onbehalf_applicant = aliased(FOIRequestApplicant)
+        #subquery for getting the second applicant mapping
+        subquery_applicantmapping_second = _session.query(
+            onbehalf_applicantmapping.foirequest_id, 
+            onbehalf_applicantmapping.foirequestversion_id, 
+            func.max(onbehalf_applicantmapping.foirequestapplicantid)
+            .label('second_id')).group_by(
+                onbehalf_applicantmapping.foirequest_id, 
+                onbehalf_applicantmapping.foirequestversion_id).subquery()
+        
+        joincondition_applicantmapping_onbehalf = [
+            subquery_applicantmapping_second.c.foirequest_id == onbehalf_applicantmapping.foirequest_id,
+            subquery_applicantmapping_second.c.foirequestversion_id == onbehalf_applicantmapping.foirequestversion_id,
+            subquery_applicantmapping_second.c.second_id == onbehalf_applicantmapping.foirequestapplicantid,
         ]
 
         #filter/search
@@ -257,7 +282,9 @@ class FOIMinistryRequest(db.Model):
             iaoassignee.lastname.label('assignedToLastName'),
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
-            FOIMinistryRequest.description
+            FOIMinistryRequest.description,
+            onbehalf_applicant.firstname.label('onBehalfFirstName'),
+            onbehalf_applicant.lastname.label('onBehalfLastName'),
         ]
 
         basequery = _session.query(
@@ -279,7 +306,23 @@ class FOIMinistryRequest(db.Model):
                                 and_(*joincondition_applicantmapping)
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid                                
+                            ).join(
+                                onbehalf_applicantmapping,
+                                and_(
+                                    onbehalf_applicantmapping.foirequest_id == FOIMinistryRequest.foirequest_id, 
+                                    onbehalf_applicantmapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, 
+                                    onbehalf_applicantmapping.foirequestapplicantid != FOIRequestApplicantMapping.foirequestapplicantid),
+                                isouter=True
+                            ).join(
+                                subquery_applicantmapping_second,
+                                and_(*joincondition_applicantmapping_onbehalf),
+                                isouter=True
+                                
+                            ).join(
+                                onbehalf_applicant,
+                                onbehalf_applicant.foirequestapplicantid == onbehalf_applicantmapping.foirequestapplicantid,  
+                                isouter=True               
                             ).join(
                                 ApplicantCategory,
                                 and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
@@ -478,6 +521,23 @@ class FOIMinistryRequest(db.Model):
             subquery_applicantmapping_first.c.foirequestversion_id == FOIRequestApplicantMapping.foirequestversion_id,
             subquery_applicantmapping_first.c.first_id == FOIRequestApplicantMapping.foirequestapplicantid,
         ]
+        
+        onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
+        onbehalf_applicant = aliased(FOIRequestApplicant)
+        #subquery for getting the second applicant mapping
+        subquery_applicantmapping_second = _session.query(
+            onbehalf_applicantmapping.foirequest_id, 
+            onbehalf_applicantmapping.foirequestversion_id, 
+            func.max(onbehalf_applicantmapping.foirequestapplicantid)
+            .label('second_id')).group_by(
+                onbehalf_applicantmapping.foirequest_id, 
+                onbehalf_applicantmapping.foirequestversion_id).subquery()
+        
+        joincondition_applicantmapping_onbehalf = [
+            subquery_applicantmapping_second.c.foirequest_id == onbehalf_applicantmapping.foirequest_id,
+            subquery_applicantmapping_second.c.foirequestversion_id == onbehalf_applicantmapping.foirequestversion_id,
+            subquery_applicantmapping_second.c.second_id == onbehalf_applicantmapping.foirequestapplicantid,
+        ]
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -504,7 +564,9 @@ class FOIMinistryRequest(db.Model):
             iaoassignee.lastname.label('assignedToLastName'),
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
-            FOIMinistryRequest.description
+            FOIMinistryRequest.description,            
+            onbehalf_applicant.firstname.label('onBehalfFirstName'),
+            onbehalf_applicant.lastname.label('onBehalfLastName'),
         ]
 
         basequery = _session.query(
@@ -527,6 +589,22 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 FOIRequestApplicant,
                                 FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                            ).join(
+                                onbehalf_applicantmapping,
+                                and_(
+                                    onbehalf_applicantmapping.foirequest_id == FOIMinistryRequest.foirequest_id, 
+                                    onbehalf_applicantmapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, 
+                                    onbehalf_applicantmapping.foirequestapplicantid != FOIRequestApplicantMapping.foirequestapplicantid),
+                                isouter=True
+                            ).join(
+                                subquery_applicantmapping_second,
+                                and_(*joincondition_applicantmapping_onbehalf),
+                                isouter=True
+                                
+                            ).join(
+                                onbehalf_applicant,
+                                onbehalf_applicant.foirequestapplicantid == onbehalf_applicantmapping.foirequestapplicantid,  
+                                isouter=True               
                             ).join(
                                 ApplicantCategory,
                                 and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)

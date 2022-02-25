@@ -5,6 +5,7 @@ import { format, utcToZonedTime } from 'date-fns-tz';
 import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
 import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constants";
 import { toast } from "react-toastify";
+import { KCProcessingTeams } from "../../constants/FOI/enum";
 
 var isBetween = require("dayjs/plugin/isBetween");
 var utc = require("dayjs/plugin/utc");
@@ -84,7 +85,7 @@ const reconcilePublicHoliDays = (startDate, endDate) => {
   let publicHoliDays = getPublicHoliDays(startDate, endDate);
   endDate = endDate.businessDaysAdd(publicHoliDays);
   startDate = endDate;
-  if (publicHoliDays != 0) {
+  if (publicHoliDays !== 0) {
     reconcilePublicHoliDays(startDate, endDate);
   }
   return endDate;
@@ -102,7 +103,7 @@ const revertReconciledPublicHolidays = (startDate, endDate) => {
   let publicHoliDays = getPublicHoliDays(startDate, endDate);
   endDate = endDate.businessDaysSubtract(publicHoliDays);
   startDate = endDate;
-  if (publicHoliDays != 0) {
+  if (publicHoliDays !== 0) {
     reconcilePublicHoliDays(startDate, endDate);
   }
   return endDate;
@@ -164,12 +165,12 @@ const isMinistryCoordinator = (userdetail, ministryteam) => {
   }
 
   if (
-    userdetail.groups.indexOf("/Intake Team") != -1 ||
-    userdetail.groups.indexOf("/Flex Team") != -1 ||
-    userdetail.groups.indexOf("/Processing Team") != -1
+    userdetail.groups.indexOf("/Intake Team") !== -1 ||
+    userdetail.groups.indexOf("/Flex Team") !== -1 ||
+    userdetail.groups.indexOf("/Processing Team") !== -1
   ) {
     return false;
-  } else if (userdetail.groups.indexOf("/" + ministryteam) != -1) {
+  } else if (userdetail.groups.indexOf("/" + ministryteam) !== -1) {
     return true;
   } else {
     return false;
@@ -180,6 +181,19 @@ const isMinistryLogin = (userGroups) => {
   return Object.values(MINISTRYGROUPS).some((group) =>
     userGroups?.includes(group)
   );
+};
+const isProcessingTeam = (userGroups) => {
+  return userGroups.some((usergroup) =>
+    KCProcessingTeams.includes(usergroup.replace("/", ""))
+  );
+};
+
+const isFlexTeam = (userGroups) => {
+  return userGroups.indexOf("/Flex Team") !== -1;
+};
+
+const isIntakeTeam = (userGroups) => {
+  return userGroups.indexOf("/Intake Team") !== -1;
 };
 
 const getMinistryByValue = (userGroups) => {
@@ -340,4 +354,7 @@ export {
   removeBusinessDays,
   getMinistryCode,
   errorToast,
+  isProcessingTeam,
+  isFlexTeam,
+  isIntakeTeam,
 };
