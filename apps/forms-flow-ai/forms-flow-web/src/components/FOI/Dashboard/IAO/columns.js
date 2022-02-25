@@ -3,6 +3,7 @@ import {
   getDaysLeft,
   getReceivedDate,
   onBehalfFullName,
+  getLDD,
 } from "../utils";
 import { isProcessingTeam, isIntakeTeam } from "../../../../helper/FOI/helper";
 
@@ -27,6 +28,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: onBehalfFullName,
     flex: 1.5,
+    sortable: false,
   },
   {
     field: "requestType",
@@ -53,6 +55,7 @@ const ProcessingTeamColumns = [
     align: "center",
     valueGetter: getDaysLeft,
     flex: 0.5,
+    sortable: false,
   },
   {
     field: "extensions",
@@ -60,6 +63,7 @@ const ProcessingTeamColumns = [
     headerAlign: "center",
     align: "center",
     flex: 0.5,
+    sortable: false,
     valueGetter: (params) =>
       params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
@@ -69,6 +73,7 @@ const ProcessingTeamColumns = [
     headerAlign: "center",
     align: "center",
     flex: 0.5,
+    sortable: false,
     renderCell: (params) => <span></span>,
   },
   {
@@ -149,10 +154,7 @@ const getTableInfo = (userGroups) => {
   if (isProcessingTeam(userGroups)) {
     return {
       columns: ProcessingTeamColumns,
-      sort: [
-        { field: "currentState", sort: "desc" },
-        { field: "receivedDateUF", sort: "desc" },
-      ],
+      sort: [{ field: "duedate", sort: "asc" }],
     };
   }
 

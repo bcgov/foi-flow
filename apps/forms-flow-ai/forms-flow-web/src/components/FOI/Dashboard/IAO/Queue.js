@@ -43,13 +43,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   const defaultRowsState = { page: 0, pageSize: 10 };
   const [rowsState, setRowsState] = React.useState(defaultRowsState);
 
-  const defaultSortModel = [
-    { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
-  ];
-  const [sortModel, setSortModel] = React.useState(
-    tableInfo?.sort || defaultSortModel
-  );
+  const [sortModel, setSortModel] = React.useState(tableInfo.sort);
   let serverSortModel;
   const [filterModel, setFilterModel] = React.useState({
     fields: [
@@ -68,6 +62,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
+    console.log(serverSortModel);
     dispatch(
       fetchFOIRequestListByPage(
         rowsState.page + 1,
@@ -126,6 +121,14 @@ const Queue = ({ userDetail, tableInfo }) => {
       </Grid>
     );
   }
+
+  const handleSortChange = (model) => {
+    if (model.length === 0) {
+      return;
+    }
+
+    setSortModel(model);
+  };
 
   return (
     <>
@@ -233,7 +236,7 @@ const Queue = ({ userDetail, tableInfo }) => {
           sortingOrder={["desc", "asc"]}
           sortModel={sortModel}
           sortingMode={"server"}
-          onSortModelChange={(model) => setSortModel(model)}
+          onSortModelChange={(model) => handleSortChange(model)}
           getRowClassName={(params) =>
             `super-app-theme--${params.row.currentState
               .toLowerCase()
