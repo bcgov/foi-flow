@@ -244,11 +244,13 @@ const AdvancedSearch = ({ userDetail }) => {
     if (!clicked) {
       return (
         <Chip
-          sx={{
-            color: "#38598A",
-            border: "1px solid #38598A",
-            width: "100%",
-          }}
+          sx={[
+            {
+              color: "#38598A",
+              border: "1px solid #38598A",
+              width: "100%",
+            },
+          ]}
           variant="outlined"
           {...rest}
         />
@@ -257,10 +259,17 @@ const AdvancedSearch = ({ userDetail }) => {
 
     return (
       <Chip
-        sx={{
-          backgroundColor: "#38598A",
-          width: "100%",
-        }}
+        sx={[
+          {
+            backgroundColor: "#38598A",
+            width: "100%",
+          },
+          {
+            "&:hover": {
+              backgroundColor: "#38598A",
+            },
+          },
+        ]}
         {...rest}
       />
     );
