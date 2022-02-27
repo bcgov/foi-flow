@@ -63,6 +63,9 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     backgroundColor: "#F9FBFD",
   },
+  checkboxLabel: {
+    marginBottom: 0,
+  },
 }));
 
 const AdvancedSearch = ({ userDetail }) => {
@@ -470,6 +473,7 @@ const AdvancedSearch = ({ userDetail }) => {
                 <Grid item xs={12}>
                   <FormGroup>
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -481,6 +485,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Unopened"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -492,6 +497,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Call for Records"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -503,6 +509,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Records Review"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -514,6 +521,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Ministry Sign Off"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -542,6 +550,7 @@ const AdvancedSearch = ({ userDetail }) => {
                 <Grid item xs={12}>
                   <FormGroup>
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -553,6 +562,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Overdue"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -582,6 +592,7 @@ const AdvancedSearch = ({ userDetail }) => {
                 <Grid item xs={12}>
                   <FormGroup>
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -593,6 +604,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Personal"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
