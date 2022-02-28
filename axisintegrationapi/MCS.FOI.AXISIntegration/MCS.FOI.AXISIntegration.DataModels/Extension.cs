@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MCS.FOI.AXISIntegration.DataModels
+﻿namespace MCS.FOI.AXISIntegration.DataModels
 {
     public class Extension
     {
@@ -12,5 +6,12 @@ namespace MCS.FOI.AXISIntegration.DataModels
         /// THIS EXTENSION POCO Class will have more prop.
         /// </summary>
         public string Type { get; set; }
+        public string Reason { get; set; }
+        public int ExtendedDueDays { get; set; }
+        public int ApprovedDueDays { get; set; }
+        public string ExtendedDueDate { get; set; }
+        public string ApprovedDate { get; set; }
+        public string DeniedDate { get; set; }
+        public string Status { get; set; }
     }
 }

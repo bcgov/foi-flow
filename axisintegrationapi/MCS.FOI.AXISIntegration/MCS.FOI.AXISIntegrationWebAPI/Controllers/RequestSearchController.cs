@@ -26,7 +26,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         [HttpGet]
         public IEnumerable<AXISRequest> Get()
         {
-            _requestDA.GetAXISRequest("REQUEST#");
+            _requestDA.GetAXISRequest("EDU-2015-50012");
 
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new AXISRequest()
