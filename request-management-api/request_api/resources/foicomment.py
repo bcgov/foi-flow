@@ -17,8 +17,8 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
+from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
@@ -27,7 +27,7 @@ from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinis
 from request_api.schemas.foicomment import  EditFOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 import json
 from flask_cors import cross_origin
-
+import asyncio
 
 API = Namespace('FOIComment', description='Endpoints for FOI Comment management')
 TRACER = Tracer.get_instance()
@@ -50,6 +50,8 @@ class CreateFOIRequestComment(Resource):
             requestjson = request.get_json() 
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
             result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid())
+            if result.success == True:
+                asyncio.create_task(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -71,7 +73,9 @@ class CreateFOIRawRequestComment(Resource):
             requestjson = request.get_json() 
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
             result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+            if result.success == True:
+                asyncio.create_task(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -121,6 +125,8 @@ class FOIDisableComment(Resource):
                 result = commentservice().disableministryrequestcomment(commentid, AuthHelper.getuserid())
             else:
                 result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getuserid())
+            if result.success == True:
+                asyncio.create_task(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

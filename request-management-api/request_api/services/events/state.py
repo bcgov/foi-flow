@@ -46,8 +46,8 @@ class stateevent:
     def __createnotification(self, requestid, state, requesttype, userid):
         notification = self.__preparenotification(state)
         if state == 'Closed' or state == 'Archived' :
-            notificationservice().dismissnotificationsbyid(requestid, requesttype)
-        return notificationservice().createnotification(notification, requestid, requesttype, "State", userid)
+            notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
 
     def __preparenotification(self, state):
         return self.__notificationmessage(state)

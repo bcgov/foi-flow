@@ -83,15 +83,8 @@ export const filterExtensionReason = (
       .map((ex) => ex.extensionreasonid)
   );
 
-  if (selectedExtension?.extensiontype === "Public Body") {
-    return extensionReasonsToFilter.filter(
-      (ex) =>
-        !publicBodyExtensions.has(ex.extensionreasonid) ||
-        selectedExtension.extensionreasonid === ex.extensionreasonid
-    );
-  }
-
-  if (publicBodyExtensions.size > 0) {
+  const totalPublicBodyExtendedDays = getPublicBodyTotalExtendedDays(extensions);
+  if (publicBodyExtensions.size > 0 && totalPublicBodyExtendedDays >= 30) {
     return extensionReasonsToFilter.filter((ex) => {
       return ex.extensiontype !== "Public Body";
     });
@@ -99,6 +92,19 @@ export const filterExtensionReason = (
 
   return extensionReasonsToFilter;
 };
+
+export const getPublicBodyTotalExtendedDays = (extensions) => {
+  return extensions.filter(ex => ex.extensiontype === "Public Body").map(ex => ex.extendedduedays).reduce((prev, curr) => prev + curr, 0);
+}
+
+export const getMaxExtendDays = (totalPublicBodyDays, defaultDays, publicBodySelected, selectedExtendedduedays) => {
+  if (publicBodySelected && totalPublicBodyDays && selectedExtendedduedays)
+    return defaultDays - totalPublicBodyDays + selectedExtendedduedays
+  else if (publicBodySelected && totalPublicBodyDays)
+    return defaultDays - totalPublicBodyDays
+  else
+    return defaultDays
+}
 
 export const errorToast = (errorMessage) => {
   return toast.error(errorMessage, {

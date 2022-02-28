@@ -35,7 +35,9 @@ import {
   uploadFiles,
   checkPublicBodyError,
   filterExtensionReason,
-  errorToast
+  errorToast,
+  getPublicBodyTotalExtendedDays,
+  getMaxExtendDays
 } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -106,8 +108,7 @@ const AddExtensionModal = () => {
   const publicBodySelected = reason?.extensiontype === "Public Body";
 
   const [numberDays, setNumberDays] = useState("");
-  const maxExtendDays = reason?.defaultextendedduedays || 999;
-
+  const maxExtendDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), reason?.defaultextendedduedays, publicBodySelected, selectedExtension?.extendedduedays) || 999;
   const [extendedDate, setExtendedDate] = useState("");
   const [preExtendedDate, setPreExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
@@ -166,10 +167,15 @@ const AddExtensionModal = () => {
       (er) => er.extensionreasonid === e.target.value
     );
 
+    const isPublicBody = extensionReason?.extensiontype === "Public Body";
+    let days = extensionReason.defaultextendedduedays;
+    const selectedDays = reason?.extensiontype === "Public Body" ? selectedExtension?.extendedduedays : 0;
+    const maxDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), extensionReason.defaultextendedduedays, isPublicBody, selectedDays) || days;
     setReason(extensionReason);
-
-    if (extensionReason.defaultextendedduedays) {
-      updateExtendedDate(extensionReason.defaultextendedduedays);
+    if (isPublicBody)
+      days = maxDays
+    if (days) {
+      updateExtendedDate(days);
     }
   };
 

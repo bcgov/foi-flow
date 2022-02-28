@@ -93,7 +93,7 @@ class CreateFOIRequestExtension(Resource):
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
                 if result.success == True:
-                    asyncio.run(eventservice().posteventforextension(ministryrequestid, result.identifier, AuthHelper.getuserid(), AuthHelper.getusername(), "add"))
+                    eventservice().posteventforextension(ministryrequestid, result.identifier, AuthHelper.getuserid(), AuthHelper.getusername(), "add")
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -137,7 +137,7 @@ class DeleteFOIRequestExtension(Resource):
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().deleterequestextension(requestid, ministryrequestid, extensionid, AuthHelper.getuserid())
                 if result.success == True:
-                    asyncio.run(eventservice().posteventforextension(ministryrequestid, extensionid, AuthHelper.getuserid(), AuthHelper.getusername(), "delete"))
+                    eventservice().posteventforextension(ministryrequestid, extensionid, AuthHelper.getuserid(), AuthHelper.getusername(), "delete")
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

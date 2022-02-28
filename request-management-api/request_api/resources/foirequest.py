@@ -117,9 +117,9 @@ class FOIRequestsById(Resource):
             foirequestschema = FOIRequestWrapperSchema().load(request_json)                                    
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
-                asyncio.run(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                asyncio.create_task(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
-                asyncio.run(requestservice().posteventtoworkflow(foiministryrequestid,  result.args[1], foirequestschema, json.loads(metadata),"iao"))
+                asyncio.create_task(requestservice().posteventtoworkflow(foiministryrequestid,  result.args[1], foirequestschema, json.loads(metadata),"iao"))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -149,8 +149,8 @@ class FOIRequestsByIdAndType(Resource):
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                asyncio.run(requestservice().posteventtoworkflow(foiministryrequestid, result.args[1], ministryrequestschema, json.loads(metadata),"ministry"))
-                asyncio.run(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                asyncio.create_task(requestservice().posteventtoworkflow(foiministryrequestid, result.args[1], ministryrequestschema, json.loads(metadata),"ministry"))
+                asyncio.create_task(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404

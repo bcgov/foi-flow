@@ -23,7 +23,7 @@ class rawrequestservice:
 
     def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
-        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
+        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") not in (None,'') else None
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
         assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
@@ -49,7 +49,7 @@ class rawrequestservice:
             data['assignedGroup'] = assigneegroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
-            asyncio.run(redispubservice.publishtoredischannel(json_data))
+            asyncio.create_task(redispubservice.publishrequest(json_data))
         return result
 
     @staticmethod
@@ -76,15 +76,15 @@ class rawrequestservice:
         #Get documents
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
-        asyncio.run(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
+        asyncio.create_task(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
         return result
 
    
     def updateworkflowinstance(self, wfinstanceid, requestid, userid):
         return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userid)
 
-    def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,status,notes, userid):
-        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userid)    
+    def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,notes, userid):
+        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,notes, userid)    
     
     async def posteventtoworkflow(self, id, wfinstanceid, requestsschema, status):
         return workflowservice().postunopenedevent(id, wfinstanceid, requestsschema, status)
