@@ -83,13 +83,6 @@ export const filterExtensionReason = (
       .map((ex) => ex.extensionreasonid)
   );
 
-  if (selectedExtension?.extensiontype === "Public Body") {
-    return extensionReasonsToFilter.filter(
-      (ex) =>
-        !publicBodyExtensions.has(ex.extensionreasonid) ||
-        selectedExtension.extensionreasonid === ex.extensionreasonid
-    );
-  }
   const totalPublicBodyExtendedDays = getPublicBodyTotalExtendedDays(extensions);
   if (publicBodyExtensions.size > 0 && totalPublicBodyExtendedDays >= 30) {
     return extensionReasonsToFilter.filter((ex) => {
