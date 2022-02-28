@@ -19,14 +19,14 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    flex: 1.5,
+    flex: 1,
   },
   {
     field: "onBehalf",
     headerName: "ON BEHALF",
     headerAlign: "left",
     valueGetter: onBehalfFullName,
-    flex: 1.5,
+    flex: 1,
     sortable: false,
   },
   {
@@ -90,7 +90,7 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    flex: 1.5,
+    flex: 1,
   },
   {
     field: "requestType",
