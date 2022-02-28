@@ -270,7 +270,9 @@ class FOIRawRequest(db.Model):
             FOIAssignee.lastname.label('assignedToLastName'),
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
-            description
+            description,
+            FOIRawRequest.requestrawdata['anotherFirstName'].astext.label('onBehalfFirstName'),
+            FOIRawRequest.requestrawdata['anotherLastName'].astext.label('onBehalfLastName'),
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -362,7 +364,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate']
         if x in validfields:
             return True
         else:
