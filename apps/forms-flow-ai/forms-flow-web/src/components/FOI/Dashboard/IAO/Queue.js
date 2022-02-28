@@ -151,7 +151,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="center"
             direction="row"
-            xs={7}
+            xs={7.5}
             sx={{
               borderRight: "2px solid #38598A",
               backgroundColor: "rgba(56,89,138,0.1)",
@@ -177,10 +177,10 @@ const Queue = ({ userDetail, tableInfo }) => {
             item
             container
             alignItems="flex-start"
-            justifyContent="space-around"
-            xs={5}
+            justifyContent="center"
+            xs={4.5}
           >
-            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={2}>
+            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
               <ClickableChip
                 key={`my-requests`}
                 label={"MY REQUESTS"}
