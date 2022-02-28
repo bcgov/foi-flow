@@ -170,7 +170,7 @@ const AddExtensionModal = () => {
 
     const isPublicBody = extensionReason?.extensiontype === "Public Body";
     let days = extensionReason.defaultextendedduedays;
-    const maxDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), extensionReason.defaultextendedduedays, isPublicBody, getSelectedDays(reason?.extensiontype, selectedExtension?.extendedduedays)) || days;
+    const maxDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), extensionReason.defaultextendedduedays, isPublicBody, getSelectedDays(selectedExtension?.extensiontype, selectedExtension?.extendedduedays)) || days;
     maxExtendDays = isPublicBody ? maxDays : maxExtendDays;
     setReason(extensionReason);
     if (isPublicBody)
