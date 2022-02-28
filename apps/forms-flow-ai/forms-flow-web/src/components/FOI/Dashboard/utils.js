@@ -23,7 +23,9 @@ export const debounce = (func, wait) => {
 
 export const getAssigneeValue = (row) => {
   const groupName = row.assignedGroup ? row.assignedGroup : "Unassigned";
-  return row.assignedTo && row.assignedToFirstName && row.assignedToLastName ? `${row.assignedToLastName}, ${row.assignedToFirstName}` : groupName;
+  return row.assignedTo && row.assignedToFirstName && row.assignedToLastName
+    ? `${row.assignedToLastName}, ${row.assignedToFirstName}`
+    : groupName;
 };
 
 export const getReceivedDate = (params) => {
@@ -48,26 +50,44 @@ export const getReceivedDate = (params) => {
 // update sortModel for applicantName & assignedTo
 export const updateSortModel = (sortModel) => {
   let smodel = JSON.parse(JSON.stringify(sortModel));
-  if(smodel) {
+  if (smodel) {
     let field = smodel[0]?.field;
     let order = smodel[0]?.sort;
 
-    if(field == 'applicantName') {
+    if (field == "applicantName") {
       smodel.shift();
-      smodel.unshift({field: 'lastName', sort: order},{field: 'firstName', sort: order})
+      smodel.unshift(
+        { field: "lastName", sort: order },
+        { field: "firstName", sort: order }
+      );
     }
 
-    if(field == 'assignedToName') {
+    if (field == "assignedToName") {
       smodel.shift();
-      smodel.unshift({field: 'assignedToLastName', sort: order},{field: 'assignedToFirstName', sort: order})
+      smodel.unshift(
+        { field: "assignedToLastName", sort: order },
+        { field: "assignedToFirstName", sort: order }
+      );
     }
   }
 
   return smodel;
 };
 
-export const getFullName = (params) => {
-  return `${params.row.lastName || ""}, ${params.row.firstName || ""}`;
+export const getFullName = (firstName, lastName) => {
+  if (!firstName && !lastName) {
+    return "";
+  }
+  return `${lastName || ""}, ${firstName || ""}`;
+};
+
+export const onBehalfFullName = (params) => {
+  if (!params.row.onBehalfFirstName && !params.row.onBehalfLastName) {
+    return "N/A";
+  }
+  return `${params.row.onBehalfFirstName || ""} ${
+    params.row.onBehalfLastName || ""
+  }`;
 };
 
 export const getLDD = (params) => {
