@@ -3,7 +3,6 @@ import {
   getDaysLeft,
   getReceivedDate,
   onBehalfFullName,
-  getLDD,
 } from "../utils";
 import { isProcessingTeam, isIntakeTeam } from "../../../../helper/FOI/helper";
 
