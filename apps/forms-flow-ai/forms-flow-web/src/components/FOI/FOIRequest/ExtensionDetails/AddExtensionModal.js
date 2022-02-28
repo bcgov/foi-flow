@@ -37,7 +37,8 @@ import {
   filterExtensionReason,
   errorToast,
   getPublicBodyTotalExtendedDays,
-  getMaxExtendDays
+  getMaxExtendDays,
+  getSelectedDays
 } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -108,7 +109,7 @@ const AddExtensionModal = () => {
   const publicBodySelected = reason?.extensiontype === "Public Body";
 
   const [numberDays, setNumberDays] = useState("");
-  const maxExtendDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), reason?.defaultextendedduedays, publicBodySelected, selectedExtension?.extendedduedays) || 999;
+  let maxExtendDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), reason?.defaultextendedduedays, publicBodySelected, getSelectedDays(selectedExtension?.extensiontype, selectedExtension?.extendedduedays)) || 999;
   const [extendedDate, setExtendedDate] = useState("");
   const [preExtendedDate, setPreExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
@@ -169,8 +170,8 @@ const AddExtensionModal = () => {
 
     const isPublicBody = extensionReason?.extensiontype === "Public Body";
     let days = extensionReason.defaultextendedduedays;
-    const selectedDays = reason?.extensiontype === "Public Body" ? selectedExtension?.extendedduedays : 0;
-    const maxDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), extensionReason.defaultextendedduedays, isPublicBody, selectedDays) || days;
+    const maxDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), extensionReason.defaultextendedduedays, isPublicBody, getSelectedDays(reason?.extensiontype, selectedExtension?.extendedduedays)) || days;
+    maxExtendDays = isPublicBody ? maxDays : maxExtendDays;
     setReason(extensionReason);
     if (isPublicBody)
       days = maxDays
@@ -352,7 +353,7 @@ const AddExtensionModal = () => {
             setDeniedDate(formatDate(new Date()));
             setApprovedNumberDays("");
             setPreExtendedDate("");
-            setStatus(extensionStatusId.approved);
+            setStatus(extensionStatusId.pending);
           },
         }}
       >
