@@ -11,7 +11,7 @@ const ProcessingTeamColumns = [
     field: "idNumber",
     headerName: "ID NUMBER",
     headerAlign: "left",
-    flex: 1,
+    width: 150,
   },
   {
     field: "applicantName",
@@ -19,7 +19,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    flex: 1,
+    width: 170,
   },
   {
     field: "onBehalf",
