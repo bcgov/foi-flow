@@ -68,8 +68,9 @@ class FOIRawRequest(db.Model):
     def saverawrequestversion(cls,_requestrawdata,requestid,assigneegroup,assignee,status,ispiiredacted,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
-            if assignee is not None:
-                FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
+            _assginee = assignee if assignee not in (None,'') else None
+            if _assginee not in (None,''):
+                FOIAssignee.saveassignee(_assginee, assigneefirstname, assigneemiddlename, assigneelastname)
 
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
             closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None                
@@ -84,7 +85,7 @@ class FOIRawRequest(db.Model):
                     updated_at=datetime.now(),
                     status=status,
                     assignedgroup=assigneegroup,
-                    assignedto=assignee,
+                    assignedto=_assginee,
                     wfinstanceid=request.wfinstanceid,
                     sourceofsubmission=request.sourceofsubmission,
                     ispiiredacted=ispiiredacted,
@@ -297,9 +298,9 @@ class FOIRawRequest(db.Model):
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
-            return basequery.filter(filtercondition)
+            return basequery.filter(FOIRawRequest.status != 'Unopened').filter(filtercondition)
         else:
-            return basequery
+            return basequery.filter(FOIRawRequest.status != 'Unopened')
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):
@@ -423,6 +424,8 @@ class FOIRawRequest(db.Model):
             requeststatecondition = FOIRawRequest.getfilterforrequeststate(params, includeclosed)
             filtercondition.append(requeststatecondition['condition'])
             includeclosed = requeststatecondition['includeclosed']
+        else:
+            filtercondition.append(FOIRawRequest.status != 'Unopened')  #not return Unopened by default
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):
