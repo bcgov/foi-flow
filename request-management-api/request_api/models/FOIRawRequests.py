@@ -297,9 +297,9 @@ class FOIRawRequest(db.Model):
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
-            return basequery.filter(filtercondition)
+            return basequery.filter(FOIRawRequest.status != 'Unopened').filter(filtercondition)
         else:
-            return basequery
+            return basequery.filter(FOIRawRequest.status != 'Unopened')
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):
@@ -423,6 +423,8 @@ class FOIRawRequest(db.Model):
             requeststatecondition = FOIRawRequest.getfilterforrequeststate(params, includeclosed)
             filtercondition.append(requeststatecondition['condition'])
             includeclosed = requeststatecondition['includeclosed']
+        else:
+            filtercondition.append(FOIRawRequest.status != 'Unopened')  #not return Unopened by default
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):
