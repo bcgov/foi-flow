@@ -168,7 +168,6 @@ const BottomButtonGroup = React.memo(
           saveRequestModal();
         }
         else {
-          fillAssignmentFields(saveRequestObject);
           openRequest();          
         }
       }
