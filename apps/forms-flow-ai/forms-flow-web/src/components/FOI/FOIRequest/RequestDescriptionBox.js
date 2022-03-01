@@ -143,14 +143,15 @@ const RequestDescription = React.memo(({
         setOpenModal(false);
     }
     
-    const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
+    const sortedList = requestDescriptionHistoryList.sort((a, b) => {       
+      return new Date(a.createdAt) - new Date(b.createdAt);
+  });
+
+    const filteredList = sortedList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
             copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
         ))
     )
-    const sortedList = filteredList.sort((a, b) => {       
-        return new Date(a.createdAt) - new Date(b.createdAt);
-    });
 
      return (
         
@@ -158,13 +159,13 @@ const RequestDescription = React.memo(({
             <label className="foi-details-label">REQUEST DESCRIPTION</label>
             <CardContent>
                 <RequestDescriptionHistory 
-                  requestDescriptionHistoryList={sortedList} 
+                  requestDescriptionHistoryList={filteredList} 
                   openModal={openModal} 
                   handleModalClose={handleModalClose}
                 />
                 <div className="row foi-details-row">
                 <div className="foi-request-description-history">
-                    <button type="button" className={`btn btn-link btn-description-history ${sortedList.length <= 1 ? classes.btndisabled : ""}`} disabled={sortedList.length <= 1}  onClick={handleDescriptionHistoryClick}>
+                    <button type="button" className={`btn btn-link btn-description-history ${filteredList.length <= 1 ? classes.btndisabled : ""}`} disabled={filteredList.length <= 1}  onClick={handleDescriptionHistoryClick}>
                        Description History
                     </button>
                 </div>
