@@ -1,7 +1,7 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { formatDate } from "../../../helper/FOI/helper";
-import { extensionStatusId } from "../../../constants/FOI/enum";
+import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 
 export const getTabBottomText = ({
   _daysRemaining,
@@ -200,7 +200,8 @@ export const createRequestDetailsObjectFunc = (
         FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(
           (groupName) =>
             groupName === assignedTo[0] && groupName === assignedTo[1]
-        )
+        ) || KCProcessingTeams.find((groupName) =>
+        groupName === assignedTo[0] && groupName === assignedTo[1])
       ) {
         requestObject.assignedGroup = assignedTo[0];
         requestObject.assignedTo = "";
