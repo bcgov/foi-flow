@@ -205,7 +205,7 @@ class FOIMinistryRequest(db.Model):
         return requeststates
 
     @classmethod
-    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee):
+    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO'):
         _session = db.session
 
         #ministry filter for group/team
@@ -345,7 +345,10 @@ class FOIMinistryRequest(db.Model):
             dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(ministryfilter)
         elif(additionalfilter == 'myRequests'):
             #myrequest
-            dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
+            if(requestby == 'IAO'):
+                dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
+            else:
+                dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
         else:
             dbquery = basequery.filter(ministryfilter)
 
@@ -359,8 +362,9 @@ class FOIMinistryRequest(db.Model):
     def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
+        requestby = 'Ministry'
 
-        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee)
+        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby)
 
         #sorting
         sortingcondition = []
