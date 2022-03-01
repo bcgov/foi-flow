@@ -50,7 +50,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.startdate = requestdict['startdate']
         foiministryrequest.duedate = requestdict['duedate']
         foiministryrequest.assignedministrygroup = requestdict['assignedministrygroup']
-        if 'assignedministryperson' in requestschema:
+        if 'assignedministryperson' in requestschema and requestschema['assignedministryperson'] not in (None,''):
             foiministryrequest.assignedministryperson = requestschema['assignedministryperson']
             firstname = requestschema['assignedministrypersonFirstName'] if requestschema['assignedministryperson'] != None else None
             middlename = None
@@ -60,7 +60,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
 
         foiministryrequest.assignedgroup = requestdict['assignedgroup']
-        if 'assignedto' in requestschema:
+        if 'assignedto' in requestschema and requestschema['assignedto'] not in (None,''):
             foiministryrequest.assignedto = requestschema['assignedto']
             fn = requestschema['assignedtoFirstName'] if requestschema['assignedto'] != None else None
             mn = None
