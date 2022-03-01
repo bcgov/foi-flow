@@ -68,6 +68,7 @@ class FOIRawRequest(db.Model):
     def saverawrequestversion(cls,_requestrawdata,requestid,assigneegroup,assignee,status,ispiiredacted,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
+            print('assignee change')
             if assignee is not None:
                 FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
 
