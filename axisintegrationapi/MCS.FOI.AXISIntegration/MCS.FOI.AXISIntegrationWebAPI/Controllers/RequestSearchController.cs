@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{requestNumber}/{status}")]
     [ApiController]
     public class RequestSearchController : ControllerBase
     {
@@ -24,16 +24,10 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<AXISRequest> Get()
+        public string Get(string requestNumber, string status)
         {
-            _requestDA.GetAXISRequest("EDU-2015-50012");
-
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new AXISRequest()
-            {
-                AXISRequestID = "EDUC-2021-4524"
-            })
-            .ToArray();
+            return _requestDA.GetAXISRequestString(requestNumber, status);
+            
         }
     }
 }

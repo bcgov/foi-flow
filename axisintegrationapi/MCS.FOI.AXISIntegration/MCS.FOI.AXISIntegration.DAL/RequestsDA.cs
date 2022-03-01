@@ -2,6 +2,7 @@
 using MCS.FOI.AXISIntegration.DataModels;
 using MCS.FOI.AXISIntegration.Utilities;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -22,9 +23,15 @@ namespace MCS.FOI.AXISIntegration.DAL
             SettingsManager.Initializer();
         }
 
-        public AXISRequest GetAXISRequest(string request)
+        public string GetAXISRequestString(string requestNumber, string status = "")
         {
-            AXISRequest axisRequest = new AXISRequest();
+            AXISRequest axisRequest = GetAXISRequest(requestNumber);            
+            return ConvertRequestToJSON(axisRequest);
+        }
+
+        private AXISRequest GetAXISRequest(string request)
+        {
+            AXISRequest axisRequest = new();
             DataTable axisDataTable = GetAxisRequestData(request);
             if (axisDataTable.Rows.Count > 0)
             {
@@ -41,8 +48,7 @@ namespace MCS.FOI.AXISIntegration.DAL
 
                 axisRequest.ApplicantFirstName = Convert.ToString(row["firstName"]);
                 axisRequest.ApplicantMiddleName = Convert.ToString(row["middleName"]);
-                axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);
-                axisRequest.ApplicantDOB = row["birthDate"] == DBNull.Value ? null : ConvertDateTimeToString(Convert.ToDateTime(row["birthDate"]), "yyyy-MM-dd");
+                axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);                
                 axisRequest.BusinessName = Convert.ToString(row["businessName"]);
 
                 axisRequest.Address = Convert.ToString(row["address"]);
@@ -56,18 +62,21 @@ namespace MCS.FOI.AXISIntegration.DAL
                 axisRequest.PhoneSecondary = Convert.ToString(row["phoneSecondary"]);
                 axisRequest.WorkPhonePrimary = Convert.ToString(row["workPhonePrimary"]);
                 axisRequest.WorkPhoneSecondary = Convert.ToString(row["workPhoneSecondary"]);
-
-                axisRequest.OnBehalfFirstName = Convert.ToString(row["onbehalfFirstName"]);
-                axisRequest.OnBehalfMiddleName = Convert.ToString(row["onbehalfMiddleName"]);
-                axisRequest.OnBehalfLastName = Convert.ToString(row["onbehalfLastName"]);
+                string applicantDOB = row["birthDate"] == DBNull.Value ? null : ConvertDateTimeToString(Convert.ToDateTime(row["birthDate"]), "yyyy-MM-dd");
+                axisRequest.AdditionalPersonalInfo = new AdditionalPersonalInformation(applicantDOB, Convert.ToString(row["onbehalfFirstName"]), Convert.ToString(row["onbehalfMiddleName"]), Convert.ToString(row["onbehalfLastName"]));
 
                 axisRequest.RequestDescription = Convert.ToString(row["description"]);
-                axisRequest.RequestDescriptionFromDate = Convert.ToString(row["reqDescriptionFromDate"]);
-                axisRequest.RequestDescriptionToDate = Convert.ToString(row["reqDescriptionToDate"]);
+                axisRequest.RequestDescriptionFromDate = ConvertDateTimeToString(Convert.ToDateTime(row["reqDescriptionFromDate"]), "yyyy-MM-dd");
+                axisRequest.RequestDescriptionToDate = ConvertDateTimeToString(Convert.ToDateTime(row["reqDescriptionToDate"]), "yyyy-MM-dd");
                 axisRequest.Ispiiredacted = true;
-                axisRequest.SelectedMinistry = new Ministry(getMinistryCode(Convert.ToString(row["selectedMinistry"])));
+                axisRequest.SelectedMinistries = new Ministry(GetMinistryCode(Convert.ToString(row["selectedMinistry"])));
             }
             return axisRequest;
+        }
+
+        private static string ConvertRequestToJSON(AXISRequest request)
+        {
+            return JsonConvert.SerializeObject(request);
         }
         private DataTable GetAxisRequestData(string request)
         {
@@ -124,11 +133,11 @@ namespace MCS.FOI.AXISIntegration.DAL
             return dataTable;
         }
 
-        private string ConvertDateTimeToString(DateTime? date, string pattern)
+        private static string ConvertDateTimeToString(DateTime? date, string pattern)
         {
             return date?.ToString(pattern);
         }
-        private string GetRequestType(string requestType)
+        private static string GetRequestType(string requestType)
         {
             if (requestType.ToLower().Contains(RequestTypes.General.ToString().ToLower()))
                 return RequestTypes.General.ToString();
@@ -137,7 +146,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             return "";
         }
 
-        private string getMinistryCode(string code)
+        private static string GetMinistryCode(string code)
         {
             switch(code)
             {
