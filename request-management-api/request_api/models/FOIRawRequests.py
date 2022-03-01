@@ -270,7 +270,9 @@ class FOIRawRequest(db.Model):
             FOIAssignee.lastname.label('assignedToLastName'),
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
-            description
+            description,
+            FOIRawRequest.requestrawdata['anotherFirstName'].astext.label('onBehalfFirstName'),
+            FOIRawRequest.requestrawdata['anotherLastName'].astext.label('onBehalfLastName'),
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -295,9 +297,9 @@ class FOIRawRequest(db.Model):
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
-            return basequery.filter(filtercondition)
+            return basequery.filter(FOIRawRequest.status != 'Unopened').filter(filtercondition)
         else:
-            return basequery
+            return basequery.filter(FOIRawRequest.status != 'Unopened')
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):
@@ -362,7 +364,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate']
         if x in validfields:
             return True
         else:
@@ -421,6 +423,8 @@ class FOIRawRequest(db.Model):
             requeststatecondition = FOIRawRequest.getfilterforrequeststate(params, includeclosed)
             filtercondition.append(requeststatecondition['condition'])
             includeclosed = requeststatecondition['includeclosed']
+        else:
+            filtercondition.append(FOIRawRequest.status != 'Unopened')  #not return Unopened by default
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):

@@ -74,12 +74,12 @@ class notificationuser:
         if comment["parentcommentid"]:
             _commentusers = self.__getrelatedusers(comment, requesttype)
             for _commentuser in _commentusers:
-                commentusers.append({"userid":_commentuser["createdby"], "usertype":self.__getcommentusertype(comment, comment["createdby"],_requestusers)})
+                commentusers.append({"userid":_commentuser["createdby"], "usertype":self.__getcommentusertype(comment, _commentuser["createdby"],_requestusers)})
                 _skiptaguserforreplies = True
                 if _skiptaguserforreplies == False:
                     taggedusers = self.__gettaggedusers(_commentuser)
                     if taggedusers is not None:
-                        commentusers.extend(taggedusers)            
+                        commentusers.extend(taggedusers)   
         return commentusers  
     
     def __getcommentusertype(self, comment, userid, requestusers):
