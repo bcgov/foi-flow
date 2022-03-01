@@ -26,6 +26,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import clsx from "clsx";
 
 const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
@@ -237,9 +238,14 @@ const Queue = ({ userDetail, tableInfo }) => {
           sortingMode={"server"}
           onSortModelChange={(model) => handleSortChange(model)}
           getRowClassName={(params) =>
-            `super-app-theme--${params.row.currentState
-              .toLowerCase()
-              .replace(/ +/g, "")}`
+            clsx(
+              `super-app-theme--${params.row.currentState
+                .toLowerCase()
+                .replace(/ +/g, "")}`,
+              tableInfo?.stateClassName?.[
+                params.row.currentState.toLowerCase().replace(/ +/g, "")
+              ]
+            )
           }
           onRowClick={renderReviewRequest}
           loading={isLoading}
