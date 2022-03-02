@@ -10,14 +10,18 @@
          <value>//div[@id='app']/div/div[3]/div/div/div[4]/h4</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>//h4[(text() = 'CFR Due in 10 Days' or . = 'CFR Due in 10 Days')]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>h4</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>

@@ -44,9 +44,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Redirect', 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/h4_30 Days Remaining'), 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Redirect', 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
@@ -54,5 +53,6 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar C
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + ' changed the state of the request to Redirect')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
+    ' changed the state of the request to Redirect')
 
