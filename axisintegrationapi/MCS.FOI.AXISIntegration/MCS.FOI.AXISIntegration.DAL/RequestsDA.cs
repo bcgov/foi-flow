@@ -2,7 +2,6 @@
 using MCS.FOI.AXISIntegration.DataModels;
 using MCS.FOI.AXISIntegration.Utilities;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -26,7 +25,7 @@ namespace MCS.FOI.AXISIntegration.DAL
         public string GetAXISRequestString(string requestNumber, string status = "")
         {
             AXISRequest axisRequest = GetAXISRequest(requestNumber);            
-            return ConvertRequestToJSON(axisRequest);
+            return RequestsHelper.ConvertRequestToJSON(axisRequest);
         }
 
         private AXISRequest GetAXISRequest(string request)
@@ -38,11 +37,13 @@ namespace MCS.FOI.AXISIntegration.DAL
                 DataRow row = axisDataTable.Rows[0];
                 axisRequest.AXISRequestID = request;
                 axisRequest.Category = Convert.ToString(row["category"]);
-                axisRequest.RequestType = GetRequestType(Convert.ToString(row["requestType"]));
-                axisRequest.ReceivedDate = ConvertDateTimeToString(Convert.ToDateTime(row["receivedDate"]), "yyyy-MM-dd");
-                axisRequest.ReceivedDateUF = ConvertDateTimeToString(Convert.ToDateTime(row["receivedDate"]), "yyyy-MM-ddTHH:mm:ss.fffffffK");
-                axisRequest.StartDate = ConvertDateTimeToString(Convert.ToDateTime(row["requestProcessStart"]), "yyyy-MM-dd");
-                axisRequest.DueDate = ConvertDateTimeToString(Convert.ToDateTime(row["dueDate"]), "yyyy-MM-dd");
+                axisRequest.RequestType = RequestsHelper.GetRequestType(Convert.ToString(row["requestType"]));
+
+                axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");
+                axisRequest.ReceivedDateUF = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-ddTHH:mm:ssZ");                
+                axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
+                axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
+
                 axisRequest.DeliveryMode = Convert.ToString(row["deliveryMode"]);
                 axisRequest.ReceivedMode = Convert.ToString(row["receivedMode"]);
 
@@ -62,22 +63,18 @@ namespace MCS.FOI.AXISIntegration.DAL
                 axisRequest.PhoneSecondary = Convert.ToString(row["phoneSecondary"]);
                 axisRequest.WorkPhonePrimary = Convert.ToString(row["workPhonePrimary"]);
                 axisRequest.WorkPhoneSecondary = Convert.ToString(row["workPhoneSecondary"]);
-                string applicantDOB = row["birthDate"] == DBNull.Value ? null : ConvertDateTimeToString(Convert.ToDateTime(row["birthDate"]), "yyyy-MM-dd");
+                string applicantDOB = RequestsHelper.ConvertDateToString(row, "birthDate", "yyyy-MM-dd"); 
                 axisRequest.AdditionalPersonalInfo = new AdditionalPersonalInformation(applicantDOB, Convert.ToString(row["onbehalfFirstName"]), Convert.ToString(row["onbehalfMiddleName"]), Convert.ToString(row["onbehalfLastName"]));
 
                 axisRequest.RequestDescription = Convert.ToString(row["description"]);
-                axisRequest.RequestDescriptionFromDate = ConvertDateTimeToString(Convert.ToDateTime(row["reqDescriptionFromDate"]), "yyyy-MM-dd");
-                axisRequest.RequestDescriptionToDate = ConvertDateTimeToString(Convert.ToDateTime(row["reqDescriptionToDate"]), "yyyy-MM-dd");
+                axisRequest.RequestDescriptionFromDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionFromDate", "yyyy-MM-dd");
+                axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
                 axisRequest.Ispiiredacted = true;
-                axisRequest.SelectedMinistries = new Ministry(GetMinistryCode(Convert.ToString(row["selectedMinistry"])));
+                axisRequest.SelectedMinistries = new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])));
             }
             return axisRequest;
         }
 
-        private static string ConvertRequestToJSON(AXISRequest request)
-        {
-            return JsonConvert.SerializeObject(request);
-        }
         private DataTable GetAxisRequestData(string request)
         {
             ConnectionString = SettingsManager.ConnectionString;
@@ -117,76 +114,16 @@ namespace MCS.FOI.AXISIntegration.DAL
                 LEFT OUTER JOIN tblRequestTypes requestTypes ON requests.tiRequestTypeID = requestTypes.tiRequestTypeID
                 WHERE
                 vcVisibleRequestID = @vcVisibleRequestID";
-            DataTable dataTable = new DataTable();
+            DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {
-                using (SqlCommand sqlCommand = new SqlCommand(query, sqlConnection))
-                {
-                    sqlConnection.Open();
-                    sqlCommand.CommandType = CommandType.Text;
-                    sqlCommand.Parameters.Add("@vcVisibleRequestID", SqlDbType.VarChar);
-                    sqlCommand.Parameters["@vcVisibleRequestID"].Value = request;
-                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
-                    sqlDataAdapter.Fill(dataTable);
-                }
+                using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
+                sqlSelectCommand.SelectCommand.Parameters.Add("@vcVisibleRequestID", SqlDbType.VarChar, 50).Value = request;
+                sqlConnection.Open();
+                sqlSelectCommand.Fill(dataTable);
             }
             return dataTable;
         }
-
-        private static string ConvertDateTimeToString(DateTime? date, string pattern)
-        {
-            return date?.ToString(pattern);
-        }
-        private static string GetRequestType(string requestType)
-        {
-            if (requestType.ToLower().Contains(RequestTypes.General.ToString().ToLower()))
-                return RequestTypes.General.ToString();
-            else if (requestType.ToLower().Contains(RequestTypes.Personal.ToString().ToLower()))
-                return RequestTypes.Personal.ToString();
-            return "";
-        }
-
-        private static string GetMinistryCode(string code)
-        {
-            switch(code)
-            {
-                case "AED": 
-                    return "AEST";
-                case "AGR": 
-                    return "AFF";
-                case "MAG":
-                    return "AG";
-                case "CFD":
-                    return "MCF";
-                case "CTZ":
-                    return "CITZ";
-                case "EDU":
-                    return "EDUC";
-                case "EML":
-                    return "EMLI";
-                case "MOE":
-                    return "ENV";
-                case "FIN":
-                    return "FIN";
-                case "FNR":
-                    return "FLNR";
-                case "HLTH":
-                    return "HLTH";
-                case "IRR":
-                    return "IRR";
-                case "JER":
-                    return "JERI";
-                case "LBR":
-                    return "LBR";
-                case "MHA":
-                    return "MMHA";
-                case "MMA":
-                    return "MUNI";
-                case "PSS":
-                    return "PSSG";
-                default:
-                    return code;
-            }
-        }
+        
     }    
 }
