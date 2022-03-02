@@ -232,7 +232,7 @@ const getTableInfo = (userGroups) => {
   if (isFlexTeam(userGroups)) {
     return {
       columns: FlexTeamColumns,
-      sort: [{ field: "currentState", sort: "desc" }],
+      sort: [{ field: "stateForSorting", sort: "asc" }],
       stateClassName: {
         open: "flex-open",
       },

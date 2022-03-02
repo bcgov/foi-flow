@@ -244,6 +244,21 @@ class FOIRawRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
+        anotherfirstname = case([
+                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['firstName'] is not None,
+                             FOIRawRequest.requestrawdata['anotherInformation']['firstName'].astext),
+                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['firstName'] is None,
+                             FOIRawRequest.requestrawdata['childInformation']['firstName'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['anotherFirstName'].astext).label('onBehalfFirstName')
+        anotherlastname = case([
+                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['lastName'] is not None,
+                             FOIRawRequest.requestrawdata['anotherInformation']['lastName'].astext),
+                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['lastName'] is None,
+                             FOIRawRequest.requestrawdata['childInformation']['lastName'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['anotherLastName'].astext).label('onBehalfLastName')
+
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -271,8 +286,9 @@ class FOIRawRequest(db.Model):
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
             description,
-            FOIRawRequest.requestrawdata['anotherFirstName'].astext.label('onBehalfFirstName'),
-            FOIRawRequest.requestrawdata['anotherLastName'].astext.label('onBehalfLastName'),
+            anotherfirstname,
+            anotherlastname,
+            FOIRawRequest.status.label('stateForSorting')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -364,7 +380,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting']
         if x in validfields:
             return True
         else:
