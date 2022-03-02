@@ -74,6 +74,9 @@ const FOIRequestHeader = React.memo(
       setMenuItems(
         getMenuItems({ classes, assignedToList, selectedAssignedTo })
       );
+    }, [selectedAssignedTo, assignedToList]);
+
+    useEffect(() => {
       // handle case where assigned user was removed from group
       if (assignedToList && assignedToList.length > 0) {
         var team = assignedToList.find(team => team.name === requestDetails.assignedGroup);
@@ -82,7 +85,7 @@ const FOIRequestHeader = React.memo(
           handleAssignedToValue("|Unassigned");
         }
       }
-    }, [selectedAssignedTo, assignedToList]);
+    }, [assignedToList]);
 
     //handle onChange event for assigned To
     const handleAssignedToOnChange = (event) => {
