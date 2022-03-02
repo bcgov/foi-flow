@@ -246,6 +246,7 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
 
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -272,8 +273,9 @@ class FOIRawRequest(db.Model):
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
             description,
-            FOIRawRequest.requestrawdata['anotherFirstName'].astext.label('onBehalfFirstName'),
-            FOIRawRequest.requestrawdata['anotherLastName'].astext.label('onBehalfLastName'),
+            literal(None).label('onBehalfFirstName'),
+            literal(None).label('onBehalfLastName'),
+            FOIRawRequest.status.label('stateForSorting')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -365,7 +367,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting']
         if x in validfields:
             return True
         else:

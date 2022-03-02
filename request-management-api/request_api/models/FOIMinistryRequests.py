@@ -257,6 +257,12 @@ class FOIMinistryRequest(db.Model):
             for field in filterfields:
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
+        stateforsorting = case([
+                            (FOIRequestStatus.name == 'Open',
+                             literal(None)),
+                           ],
+                           else_ = FOIRequestStatus.name).label('stateForSorting')
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -285,6 +291,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
+            stateforsorting
         ]
 
         basequery = _session.query(
@@ -535,6 +542,12 @@ class FOIMinistryRequest(db.Model):
             subquery_applicantmapping_second.c.second_id == onbehalf_applicantmapping.foirequestapplicantid,
         ]
 
+        stateforsorting = case([
+                            (FOIRequestStatus.name == 'Open',
+                             literal(None)),
+                           ],
+                           else_ = FOIRequestStatus.name).label('stateForSorting')
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -563,6 +576,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,            
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
+            stateforsorting
         ]
 
         basequery = _session.query(

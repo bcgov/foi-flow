@@ -4,7 +4,12 @@ import {
   getReceivedDate,
   onBehalfFullName,
 } from "../utils";
-import { isProcessingTeam, isIntakeTeam } from "../../../../helper/FOI/helper";
+import {
+  isProcessingTeam,
+  isFlexTeam,
+  isIntakeTeam,
+  formatDate,
+} from "../../../../helper/FOI/helper";
 
 const ProcessingTeamColumns = [
   {
@@ -138,21 +143,99 @@ const IntakeTeamColumns = [
   },
 ];
 
+const FlexTeamColumns = [
+  {
+    field: "idNumber",
+    headerName: "ID NUMBER",
+    headerAlign: "left",
+    width: 150,
+  },
+  {
+    field: "applicantName",
+    headerName: "APPLICANT NAME",
+    headerAlign: "left",
+    valueGetter: (params) =>
+      getFullName(params.row.firstName, params.row.lastName),
+    width: 170,
+  },
+  {
+    field: "applicantcategory",
+    headerName: "APPLICANT TYPE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "requestType",
+    headerName: "REQUEST TYPE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "currentState",
+    headerName: "CURRENT STATE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "assignedToName",
+    headerName: "ASSIGNED TO",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "cfrduedate",
+    headerName: "CFR DUE",
+    flex: 1,
+    headerAlign: "left",
+    valueGetter: (params) => formatDate(params.row.cfrduedate),
+  },
+  {
+    field: "DaysLeftValue",
+    headerName: "DAYS LEFT",
+    headerAlign: "center",
+    align: "center",
+    valueGetter: getDaysLeft,
+    flex: 0.5,
+    sortable: false,
+  },
+  {
+    field: "xgov",
+    headerName: "XGOV",
+    headerAlign: "left",
+    flex: 0.5,
+  },
+];
+
 const defaultTableInfo = {
   columns: IntakeTeamColumns,
   sort: [
     { field: "currentState", sort: "desc" },
     { field: "receivedDateUF", sort: "desc" },
   ],
+  stateClassName: {
+    open: "flex-open",
+  },
 };
+
 const getTableInfo = (userGroups) => {
   if (!userGroups || isIntakeTeam(userGroups)) {
     return defaultTableInfo;
   }
+
   if (isProcessingTeam(userGroups)) {
     return {
       columns: ProcessingTeamColumns,
       sort: [{ field: "duedate", sort: "asc" }],
+    };
+  }
+
+  if (isFlexTeam(userGroups)) {
+    return {
+      columns: FlexTeamColumns,
+      sort: [{ field: "stateForSorting", sort: "asc" }],
+      stateClassName: {
+        open: "flex-open",
+      },
     };
   }
 
