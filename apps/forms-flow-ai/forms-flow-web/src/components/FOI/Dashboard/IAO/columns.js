@@ -234,7 +234,7 @@ const getTableInfo = (userGroups) => {
       columns: FlexTeamColumns,
       sort: [{ field: "stateForSorting", sort: "asc" }],
       stateClassName: {
-        open: "flex-open",
+        open: "flex--open",
       },
     };
   }
