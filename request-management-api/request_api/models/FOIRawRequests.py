@@ -245,20 +245,6 @@ class FOIRawRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
-        anotherfirstname = case([
-                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['firstName'] is not None,
-                             FOIRawRequest.requestrawdata['anotherInformation']['firstName'].astext),
-                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['firstName'] is None,
-                             FOIRawRequest.requestrawdata['childInformation']['firstName'].astext),
-                           ],
-                           else_ = FOIRawRequest.requestrawdata['anotherFirstName'].astext).label('onBehalfFirstName')
-        anotherlastname = case([
-                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['lastName'] is not None,
-                             FOIRawRequest.requestrawdata['anotherInformation']['lastName'].astext),
-                            (FOIRawRequest.status == 'Unopened' and FOIRawRequest.requestrawdata['anotherInformation']['lastName'] is None,
-                             FOIRawRequest.requestrawdata['childInformation']['lastName'].astext),
-                           ],
-                           else_ = FOIRawRequest.requestrawdata['anotherLastName'].astext).label('onBehalfLastName')
 
 
         selectedcolumns = [
@@ -287,8 +273,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
             description,
-            anotherfirstname,
-            anotherlastname,
+            literal(None).label('onBehalfFirstName'),
+            literal(None).label('onBehalfLastName'),
             FOIRawRequest.status.label('stateForSorting')
         ]
 
