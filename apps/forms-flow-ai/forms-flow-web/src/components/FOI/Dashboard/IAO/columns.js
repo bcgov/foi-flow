@@ -160,13 +160,13 @@ const FlexTeamColumns = [
   },
   {
     field: "applicantcategory",
-    headerName: "APPLICANT TYPE",
+    headerName: "CATEGORY",
     headerAlign: "left",
     flex: 1,
   },
   {
     field: "requestType",
-    headerName: "REQUEST TYPE",
+    headerName: "TYPE",
     headerAlign: "left",
     flex: 1,
   },
@@ -178,7 +178,7 @@ const FlexTeamColumns = [
   },
   {
     field: "assignedToName",
-    headerName: "ASSIGNED TO",
+    headerName: "ANALYST",
     headerAlign: "left",
     flex: 1,
   },
@@ -187,7 +187,7 @@ const FlexTeamColumns = [
     headerName: "CFR DUE",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => formatDate(params.row.cfrduedate),
+    valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
   },
   {
     field: "DaysLeftValue",
