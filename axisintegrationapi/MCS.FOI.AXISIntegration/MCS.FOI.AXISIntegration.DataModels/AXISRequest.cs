@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace MCS.FOI.AXISIntegration.DataModels
@@ -9,7 +10,11 @@ namespace MCS.FOI.AXISIntegration.DataModels
 
         //MORE PROPERTIES TO ADD HERE. TODO
 
+        [DataMember(Name = "axisRequestId")]
         public string AXISRequestID { get; set; }
+
+        [DataMember(Name = "axisSyncDate")]
+        public string AxisSyncDate { get; set; }
 
         [DataMember(Name = "description")]
         public string RequestDescription { get; set; }
@@ -34,6 +39,9 @@ namespace MCS.FOI.AXISIntegration.DataModels
 
         [DataMember(Name = "dueDate")]
         public string DueDate { get; set; }
+
+        [DataMember(Name = "originalDueDate")]
+        public string OriginalDueDate { get; set; }
 
         [DataMember(Name = "category")]
         public string Category { get; set; }
@@ -101,11 +109,12 @@ namespace MCS.FOI.AXISIntegration.DataModels
         public string PublicServiceEmployeeNumber { get; set; }
 
         [DataMember(Name = "selectedMinistries")]
-        public Ministry SelectedMinistries { get; set; }
+        public List<Ministry> SelectedMinistries { get; set; }
         
         [DataMember(Name = "additionalPersonalInfo")]
         public AdditionalPersonalInformation AdditionalPersonalInfo { get; set; }
 
+        [DataMember(Name = "Extensions")]
         public List<Extension> Extensions { get; set; }
 
     }

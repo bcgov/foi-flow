@@ -51,5 +51,45 @@ namespace MCS.FOI.AXISIntegration.DAL
                 _ => code,
             };
         }
+        public static string GetExtensionReasonID(string reason)
+        {           
+            return reason switch
+            {
+                //"OIPC - Applicant Consent" => "OIPC - Applicant Consent",
+                //"OIPC - Consultation" => "OIPC - Consultation",
+                //"OIPC - Fair and Reasonable to do so" => "OIPC - Fair and Reasonable",
+                //"OIPC - Further Detail from Applicant Needed" => "OIPC - Further Detail from Applicant Required",
+                //"OIPC - Large Volume and/or Volume of Search" => "OIPC - Large Volume and/or Volume of Search",
+                //"OIPC - Large Volume and/or Volume of Search and Consultation" => "OIPC - Large Volume and/or Volume of Search and Consultation",
+                //"PB - Applicant Consent" => "Public Body - Applicant Consent",
+                //"PB - Consultation" => "Public Body - Consultation",
+                //"PB - Further Detail from Applicant Needed" => "Public Body - Further Detail from Applicant Required",
+                //"PB - Large Volume and/or Volume of Search" => "Public Body - Large Volume and/or Volume of Search",
+                //"PB - Large Volume and/or Volume of Search and Consultation" => "Public Body - Large Volume and/or Volume of Search and Consultation",
+                "OIPC - Applicant Consent" => "6",
+                "OIPC - Consultation" => "7",
+                "OIPC - Fair and Reasonable to do so" => "11",
+                "OIPC - Further Detail from Applicant Needed" => "8",
+                "OIPC - Large Volume and/or Volume of Search" => "9",
+                "OIPC - Large Volume and/or Volume of Search and Consultation" => "10",
+                "PB - Applicant Consent" => "1",
+                "PB - Consultation" => "2",
+                "PB - Further Detail from Applicant Needed" => "3",
+                "PB - Large Volume and/or Volume of Search" => "4",
+                "PB - Large Volume and/or Volume of Search and Consultation" => "5",
+                _ => "0",
+            };
+        }
+
+        public static string GetExtensionStatusId(string code)
+        {
+            return code switch
+            {
+                "N" => "1", //Pending
+                "A" => "2", // Approved
+                "D" => "3", // Denied
+                _ => "0",
+            };
+        }
     }
 }

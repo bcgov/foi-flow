@@ -3,8 +3,10 @@ using MCS.FOI.AXISIntegration.DataModels;
 using MCS.FOI.AXISIntegration.Utilities;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace MCS.FOI.AXISIntegration.DAL
 {
@@ -49,7 +51,7 @@ namespace MCS.FOI.AXISIntegration.DAL
 
                 axisRequest.ApplicantFirstName = Convert.ToString(row["firstName"]);
                 axisRequest.ApplicantMiddleName = Convert.ToString(row["middleName"]);
-                axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);                
+                axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);
                 axisRequest.BusinessName = Convert.ToString(row["businessName"]);
 
                 axisRequest.Address = Convert.ToString(row["address"]);
@@ -70,16 +72,40 @@ namespace MCS.FOI.AXISIntegration.DAL
                 axisRequest.RequestDescriptionFromDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionFromDate", "yyyy-MM-dd");
                 axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
                 axisRequest.Ispiiredacted = true;
-                axisRequest.SelectedMinistries = new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])));
+                List<Ministry> ministryList = new()
+                {
+                    new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])))
+                };
+                axisRequest.SelectedMinistries = ministryList;
+                axisRequest.AxisSyncDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                var extensions = GetAxisExtensionData(request);
+                axisRequest.Extensions = GetAXISExtensions(extensions);
             }
             return axisRequest;
+        }
+
+        private static List<Extension> GetAXISExtensions(DataTable extensions)
+        {
+                var extensionList = (from rw in extensions.AsEnumerable()
+                                     select new Extension()
+                                     {
+                                         ReasonId = Convert.ToInt32(RequestsHelper.GetExtensionReasonID(Convert.ToString(rw["reason"]))),
+                                         ExtendedDueDays = Convert.ToInt32(rw["extensiondays"]),
+                                         ExtendedDueDate = RequestsHelper.ConvertDateToString(rw, "extendedduedate", "yyyy-MM-dd"),
+                                         StatusId = Convert.ToInt32(RequestsHelper.GetExtensionStatusId(Convert.ToString(rw["status"]))),
+                                         ApprovedDueDays = Convert.ToInt32(rw["extensiondays"]),
+                                         ApprovedDate = RequestsHelper.ConvertDateToString(rw, "decisiondate", "yyyy-MM-dd"),
+                                         DeniedDate = RequestsHelper.ConvertDateToString(rw, "decisiondate", "yyyy-MM-dd"),
+                                     }).ToList();
+
+                return extensionList;
         }
 
         private DataTable GetAxisRequestData(string request)
         {
             ConnectionString = SettingsManager.ConnectionString;
 
-            string query = @"SELECT requests.sdtReceivedDate as requestProcessStart, requests.sdtTargetDate as dueDate, 
+            string query = @"SELECT requests.sdtReceivedDate as requestProcessStart, requests.sdtTargetDate as dueDate, requests.sdtOriginalTargetDate as originalDueDate,
                 requests.vcDescription as [description], requests.sdtRqtDescFromdate as reqDescriptionFromDate, requests.sdtRqtDescTodate as reqDescriptionToDate, 
                 requests.sdtRequestedDate as receivedDate, requests.sdtRequestedDate as receivedDateUF, office.OFFICE_CODE as selectedMinistry, 
                 requesterTypes.vcDescription as category,
@@ -124,6 +150,28 @@ namespace MCS.FOI.AXISIntegration.DAL
             }
             return dataTable;
         }
-        
+
+        private DataTable GetAxisExtensionData(string request)
+        {
+            ConnectionString = SettingsManager.ConnectionString;
+
+            string query = @"SELECT loc.vcTerminology AS reason, reqextn.cApprovedStatus AS [status], reqextn.sdtExtendedDate AS extendedduedate, 
+                reqextn.siExtensionDays AS extensiondays, reqextn.dtApprovedDate AS decisiondate 
+                FROM tblRequests req INNER JOIN tblRequestExtensions reqextn ON req.iRequestID = reqextn.iRequestID 
+                AND req.tiExtension = reqextn.tiExtension 
+                AND req.vcVisibleRequestID = @vcVisibleRequestID
+                INNER JOIN tblExtensions extn ON req.tiExtension = extn.tiExtension 
+                LEFT OUTER JOIN tblTerminologyLookup loc ON loc.iLabelID = extn.iLabelID AND loc.tiLocaleID = 1";
+            DataTable dataTable = new();
+            using (sqlConnection = new SqlConnection(ConnectionString))
+            {
+                using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
+                sqlSelectCommand.SelectCommand.Parameters.Add("@vcVisibleRequestID", SqlDbType.VarChar, 50).Value = request;
+                sqlConnection.Open();
+                sqlSelectCommand.Fill(dataTable);
+            }
+            return dataTable;
+        }
+
     }    
 }
