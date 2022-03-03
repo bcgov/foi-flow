@@ -24,7 +24,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             SettingsManager.Initializer();
         }
 
-        public string GetAXISRequestString(string requestNumber, string status = "")
+        public string GetAXISRequestString(string requestNumber)
         {
             AXISRequest axisRequest = GetAXISRequest(requestNumber);            
             return RequestsHelper.ConvertRequestToJSON(axisRequest);

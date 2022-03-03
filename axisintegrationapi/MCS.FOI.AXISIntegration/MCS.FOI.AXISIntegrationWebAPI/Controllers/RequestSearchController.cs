@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
-    [Route("api/[controller]/{requestNumber}/{status}")]
+    [Route("api/[controller]/{requestNumber}")]
     [ApiController]
     public class RequestSearchController : ControllerBase
     {
@@ -24,9 +24,9 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         }
 
         [HttpGet]
-        public string Get(string requestNumber, string status)
+        public string Get(string requestNumber)
         {
-            return _requestDA.GetAXISRequestString(requestNumber, status);
+            return _requestDA.GetAXISRequestString(requestNumber);
             
         }
     }

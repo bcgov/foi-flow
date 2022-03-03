@@ -9,7 +9,7 @@ namespace MCS.FOI.AXISIntegration.DAL.Interfaces
 {
     public interface IRequestDA
     {
-        public string GetAXISRequestString(string requestNumber, string status);
+        public string GetAXISRequestString(string requestNumber);
 
     }
 }
