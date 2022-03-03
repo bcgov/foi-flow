@@ -78,6 +78,8 @@ class rawrequestservicegetter:
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
+            request['requestrawdata']['axisRequestId'] = request['axisrequestid']
+            request['requestrawdata']['axissyncdate'] = request['axissyncdate']
             return request['requestrawdata']
         else:
             return None

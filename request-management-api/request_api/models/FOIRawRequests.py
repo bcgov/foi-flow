@@ -37,16 +37,19 @@ class FOIRawRequest(db.Model):
     closedate = db.Column(db.DateTime, nullable=True)    
     requirespayment = db.Column(db.Boolean, unique=False, nullable=True, default=False)
     
+    axissyncdate = db.Column(db.DateTime, nullable=True)    
+    axisrequestid = db.Column(db.String(120), nullable=True)
+
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
 
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
-    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:
+    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:
         createdat = datetime.now()        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', created_at=createdat, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate)
 
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
@@ -73,7 +76,9 @@ class FOIRawRequest(db.Model):
                 FOIAssignee.saveassignee(_assginee, assigneefirstname, assigneemiddlename, assigneelastname)
 
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
-            closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None                
+            closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None
+            axisrequestid = _requestrawdata["axisRequestId"] if 'axisRequestId' in _requestrawdata  else None
+            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None           
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
@@ -92,6 +97,8 @@ class FOIRawRequest(db.Model):
                     createdby=userid,
                     closedate=closedate,
                     closereasonid=closereasonid,
+                    axisrequestid= axisrequestid,
+                    axissyncdate=axissyncdate,
                 )
             )
             db.session.execute(insertstmt)               
@@ -246,6 +253,7 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
 
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -272,8 +280,9 @@ class FOIRawRequest(db.Model):
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
             description,
-            FOIRawRequest.requestrawdata['anotherFirstName'].astext.label('onBehalfFirstName'),
-            FOIRawRequest.requestrawdata['anotherLastName'].astext.label('onBehalfLastName'),
+            literal(None).label('onBehalfFirstName'),
+            literal(None).label('onBehalfLastName'),
+            FOIRawRequest.status.label('stateForSorting')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -365,7 +374,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting']
         if x in validfields:
             return True
         else:
@@ -538,4 +547,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate')

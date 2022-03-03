@@ -28,6 +28,10 @@ class rawrequestservice:
         assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
+
+        axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
+        axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
+
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
         result = FOIRawRequest.saverawrequest(
                                                 _requestrawdata=requestdatajson,
@@ -40,7 +44,9 @@ class rawrequestservice:
                                                 notes=notes,
                                                 assigneefirstname=assigneefirstname,
                                                 assigneemiddlename=assigneemiddlename,
-                                                assigneelastname=assigneelastname
+                                                assigneelastname=assigneelastname,
+                                                axisrequestid=axisrequestid,
+                                                axissyncdate=axissyncdate
                                             )
         if result.success:
             redispubservice = RedisPublisherService()
