@@ -25,7 +25,7 @@ const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterPr
       setError(
         !programAreaList.some((programArea) => programArea.isChecked)
       );
-    },[programAreaList])
+    },[masterProgramAreaList, programAreaList])
 
     //handle onChange event of checkbox
     const handleOnChangeProgramArea = (e) => { 

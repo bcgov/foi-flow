@@ -57,6 +57,12 @@ import {
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
+import AxisDetails from './AxisDetails';
+import {
+  setFOIRequestDetail,
+
+} from "../../../actions/FOI/foiRequestActions";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -167,9 +173,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
+  const syncAxisData = (syncedData) =>{
+    dispatch(setFOIRequestDetail(syncedData));
+  }
 
   useEffect(() => {
-    const requestDetailsValue = isAddRequest ? {} : requestDetails;
+    //const requestDetailsValue = isAddRequest ? {} : requestDetails;
+    const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
@@ -542,10 +552,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  <ConditionalComponent condition={(!isAddRequest && Object.entries(requestDetails).length !== 0) || isAddRequest}>
+                  <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-
+                      <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} syncAxisData={syncAxisData} />
                       <ApplicantDetails
                         requestDetails={requestDetails}
                         requestStatus={_requestStatus}
