@@ -37,9 +37,6 @@ const Queue = ({ userDetail, tableInfo }) => {
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
   const classes = useStyles();
-  useEffect(() => {
-    dispatch(fetchFOIRequestListByPage());
-  }, [dispatch]);
 
   const defaultRowsState = { page: 0, pageSize: 10 };
   const [rowsState, setRowsState] = React.useState(defaultRowsState);

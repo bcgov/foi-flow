@@ -29,7 +29,6 @@ export const fetchFOIRequestList = () => {
             return { ...foiRequest };
           });
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(data));
         } else {
           dispatch(serviceActionError(res));
@@ -77,7 +76,6 @@ export const fetchFOIRequestListByPage = (
       .then((res) => {
         if (res.data) {
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(res.data));
         } else {
           dispatch(serviceActionError(res));
