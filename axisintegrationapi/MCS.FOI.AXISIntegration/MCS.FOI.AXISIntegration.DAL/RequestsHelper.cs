@@ -21,9 +21,9 @@ namespace MCS.FOI.AXISIntegration.DAL
         public static string GetRequestType(string requestType)
         {
             if (requestType.ToLower().Contains(RequestTypes.General.ToString().ToLower()))
-                return RequestTypes.General.ToString();
+                return RequestTypes.General.ToString().ToLower();
             else if (requestType.ToLower().Contains(RequestTypes.Personal.ToString().ToLower()))
-                return RequestTypes.Personal.ToString();
+                return RequestTypes.Personal.ToString().ToLower();
             return "";
         }
 
@@ -89,6 +89,28 @@ namespace MCS.FOI.AXISIntegration.DAL
                 "A" => "2", // Approved
                 "D" => "3", // Denied
                 _ => "0",
+            };
+        }
+
+        public static string GetReceivedMode(string receivedMode)
+        {
+            return receivedMode switch
+            {
+                "E-mail" => "Email",
+                "National FOIA Portal" => "Online Form",
+                _ => receivedMode,
+            };
+        }
+
+        public static string GetDeliveryMode(string deliveryMode)
+        {
+            return deliveryMode switch
+            {
+                "E-mail" => "Secure File Transfer",
+                "System to System" => "Secure File Transfer",
+                "Paper - post" => "Secure File Transfer",
+                "CD - post" => "Secure File Transfer",
+                _ => deliveryMode,
             };
         }
     }

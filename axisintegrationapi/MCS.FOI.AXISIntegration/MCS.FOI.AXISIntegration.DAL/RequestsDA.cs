@@ -46,8 +46,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                 axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
                 axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
 
-                axisRequest.DeliveryMode = Convert.ToString(row["deliveryMode"]);
-                axisRequest.ReceivedMode = Convert.ToString(row["receivedMode"]);
+                axisRequest.DeliveryMode = RequestsHelper.GetDeliveryMode(Convert.ToString(row["deliveryMode"]));
+                axisRequest.ReceivedMode = RequestsHelper.GetReceivedMode(Convert.ToString(row["receivedMode"]));
 
                 axisRequest.ApplicantFirstName = Convert.ToString(row["firstName"]);
                 axisRequest.ApplicantMiddleName = Convert.ToString(row["middleName"]);
