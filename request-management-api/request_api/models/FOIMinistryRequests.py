@@ -49,7 +49,11 @@ class FOIMinistryRequest(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     assignedministryperson = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
     assignedministrygroup = db.Column(db.String(120), unique=False, nullable=True)
-    closedate = db.Column(db.DateTime, nullable=True) 
+    closedate = db.Column(db.DateTime, nullable=True)
+
+    axissyncdate = db.Column(db.DateTime, nullable=True)    
+    axisrequestid = db.Column(db.String(120), nullable=True)
+
     #ForeignKey References
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
@@ -755,5 +759,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate')
     
