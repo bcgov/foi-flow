@@ -24,6 +24,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = requestschema.get("requeststatusid")
         foiministryrequest.isactive = True
+        foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
+        foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
