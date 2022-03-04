@@ -78,8 +78,6 @@ class rawrequestservicegetter:
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
-            request['requestrawdata']['axisRequestId'] = request['axisrequestid']
-            request['requestrawdata']['axissyncdate'] = request['axissyncdate']
             return request['requestrawdata']
         else:
             return None
@@ -121,6 +119,8 @@ class rawrequestservicegetter:
                                'assignedTo': "Unassigned",
                                'xgov': 'No',
                                'idNumber': 'U-00' + str(request['requestid']),
+                               'axisRequestId': request['axisrequestid'],
+                               'axisSyncDate': request['axissyncdate'],
                                'email': contactinfooptions['email'],
                                'phonePrimary': contactinfooptions['phonePrimary'],
                                'phoneSecondary': contactinfooptions['phoneSecondary'],
