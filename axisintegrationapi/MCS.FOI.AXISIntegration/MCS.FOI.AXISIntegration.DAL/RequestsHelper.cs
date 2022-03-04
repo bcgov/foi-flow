@@ -92,24 +92,33 @@ namespace MCS.FOI.AXISIntegration.DAL
             };
         }
 
+        //check with business
         public static string GetReceivedMode(string receivedMode)
         {
             return receivedMode switch
             {
+
+                "Courier" => "Mail",
                 "E-mail" => "Email",
                 "National FOIA Portal" => "Online Form",
+                "Forward from Public Body" => "Email",
+                "Hand Delivered" => "Mail",
+                "Internal" => "Email",
+                "Post" => "Mail",
                 _ => receivedMode,
             };
         }
 
+        //check with business
         public static string GetDeliveryMode(string deliveryMode)
         {
             return deliveryMode switch
             {
                 "E-mail" => "Secure File Transfer",
                 "System to System" => "Secure File Transfer",
-                "Paper - post" => "Secure File Transfer",
-                "CD - post" => "Secure File Transfer",
+                "Paper - Post" => "In Person Pick up",
+                "CD - Post" => "In Person Pick up",
+                "Post" => "In Person Pick up",
                 _ => deliveryMode,
             };
         }
