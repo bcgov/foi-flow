@@ -1,5 +1,6 @@
 ﻿using MCS.FOI.AXISIntegration.DAL.Interfaces;
 using MCS.FOI.AXISIntegration.DataModels;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,6 +11,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
     [Route("api/[controller]/{requestNumber}")]
     [ApiController]
+    [EnableCors]
     public class RequestSearchController : ControllerBase
     {
 
@@ -26,7 +28,14 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         [HttpGet]
         public string Get(string requestNumber)
         {
-            return _requestDA.GetAXISRequestString(requestNumber);
+            try
+            {
+                return _requestDA.GetAXISRequestString(requestNumber);
+            }
+            catch(Exception ex)
+            {
+                return ex.Message;
+            }
             
         }
     }

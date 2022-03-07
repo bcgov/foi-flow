@@ -38,7 +38,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI
             services.AddSingleton(typeof(ILogger), requestlogger);
 
             services.AddControllers();
-           
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MCS.FOI.AXISIntegrationWebAPI", Version = "v1" });
@@ -48,16 +48,27 @@ namespace MCS.FOI.AXISIntegrationWebAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MCS.FOI.AXISIntegrationWebAPI v1"));
+            if (env.IsDevelopment()) 
+            { 
+                app.UseDeveloperExceptionPage(); 
+              
             }
+            app.UseStaticFiles();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MCS.FOI.AXISIntegrationWebAPI v1"));
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection(); //TODO: need this before going to production
 
             app.UseRouting();
+
+            // Shows UseCors with CorsPolicyBuilder.
+            app.UseCors(builder =>
+            {
+                builder
+                .AllowAnyOrigin() //TODO : this need to pick origins from settings/config.
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
 
             app.UseAuthorization();
 
