@@ -17,7 +17,11 @@ class eventservice:
     """ FOI event management service
 
     """
+    
     async def postevent(self, requestid, requesttype, userid, username, isministryuser):
+        self.posteventsync(requestid, requesttype, userid, username, isministryuser)
+
+    def posteventsync(self, requestid, requesttype, userid, username, isministryuser):
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
