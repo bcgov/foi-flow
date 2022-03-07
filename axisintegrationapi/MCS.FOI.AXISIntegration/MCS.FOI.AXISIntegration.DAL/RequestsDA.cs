@@ -37,49 +37,56 @@ namespace MCS.FOI.AXISIntegration.DAL
             if (axisDataTable.Rows.Count > 0)
             {
                 DataRow row = axisDataTable.Rows[0];
-                axisRequest.AXISRequestID = request;
-                axisRequest.Category = Convert.ToString(row["category"]);
-                axisRequest.RequestType = RequestsHelper.GetRequestType(Convert.ToString(row["requestType"]));
-
-                axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");
-                axisRequest.ReceivedDateUF = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-ddTHH:mm:ssZ");                
-                axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
-                axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
-
-                axisRequest.DeliveryMode = RequestsHelper.GetDeliveryMode(Convert.ToString(row["deliveryMode"]));
-                axisRequest.ReceivedMode = RequestsHelper.GetReceivedMode(Convert.ToString(row["receivedMode"]));
-
-                axisRequest.ApplicantFirstName = Convert.ToString(row["firstName"]);
-                axisRequest.ApplicantMiddleName = Convert.ToString(row["middleName"]);
-                axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);
-                axisRequest.BusinessName = Convert.ToString(row["businessName"]);
-
-                axisRequest.Address = Convert.ToString(row["address"]);
-                axisRequest.AddressSecondary = Convert.ToString(row["addressSecondary"]);                
-                axisRequest.City = Convert.ToString(row["city"]);
-                axisRequest.PostalCode = Convert.ToString(row["postal"]);
-                axisRequest.Province = Convert.ToString(row["province"]);
-                axisRequest.Country = Convert.ToString(row["country"]);                
-                axisRequest.Email = Convert.ToString(row["email"]);
-                axisRequest.PhonePrimary = Convert.ToString(row["phonePrimary"]);
-                axisRequest.PhoneSecondary = Convert.ToString(row["phoneSecondary"]);
-                axisRequest.WorkPhonePrimary = Convert.ToString(row["workPhonePrimary"]);
-                axisRequest.WorkPhoneSecondary = Convert.ToString(row["workPhoneSecondary"]);
-                string applicantDOB = RequestsHelper.ConvertDateToString(row, "birthDate", "yyyy-MM-dd"); 
-                axisRequest.AdditionalPersonalInfo = new AdditionalPersonalInformation(applicantDOB, Convert.ToString(row["onbehalfFirstName"]), Convert.ToString(row["onbehalfMiddleName"]), Convert.ToString(row["onbehalfLastName"]));
-
-                axisRequest.RequestDescription = Convert.ToString(row["description"]);
-                axisRequest.RequestDescriptionFromDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionFromDate", "yyyy-MM-dd");
-                axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
-                axisRequest.Ispiiredacted = true;
-                List<Ministry> ministryList = new()
+                try
                 {
-                    new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])))
-                };
-                axisRequest.SelectedMinistries = ministryList;
-                axisRequest.AxisSyncDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                var extensions = GetAxisExtensionData(request);
-                axisRequest.Extensions = GetAXISExtensions(extensions);
+                    axisRequest.AXISRequestID = request;
+                    axisRequest.Category = Convert.ToString(row["category"]);
+                    axisRequest.RequestType = RequestsHelper.GetRequestType(Convert.ToString(row["requestType"]));
+
+                    axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");
+                    axisRequest.ReceivedDateUF = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-ddTHH:mm:ssZ");
+                    axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
+                    axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
+
+                    axisRequest.DeliveryMode = RequestsHelper.GetDeliveryMode(Convert.ToString(row["deliveryMode"]));
+                    axisRequest.ReceivedMode = RequestsHelper.GetReceivedMode(Convert.ToString(row["receivedMode"]));
+
+                    axisRequest.ApplicantFirstName = Convert.ToString(row["firstName"]);
+                    axisRequest.ApplicantMiddleName = Convert.ToString(row["middleName"]);
+                    axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);
+                    axisRequest.BusinessName = Convert.ToString(row["businessName"]);
+
+                    axisRequest.Address = Convert.ToString(row["address"]);
+                    axisRequest.AddressSecondary = Convert.ToString(row["addressSecondary"]);
+                    axisRequest.City = Convert.ToString(row["city"]);
+                    axisRequest.PostalCode = Convert.ToString(row["postal"]);
+                    axisRequest.Province = Convert.ToString(row["province"]);
+                    axisRequest.Country = Convert.ToString(row["country"]);
+                    axisRequest.Email = Convert.ToString(row["email"]);
+                    axisRequest.PhonePrimary = Convert.ToString(row["phonePrimary"]);
+                    axisRequest.PhoneSecondary = Convert.ToString(row["phoneSecondary"]);
+                    axisRequest.WorkPhonePrimary = Convert.ToString(row["workPhonePrimary"]);
+                    axisRequest.WorkPhoneSecondary = Convert.ToString(row["workPhoneSecondary"]);
+                    string applicantDOB = RequestsHelper.ConvertDateToString(row, "birthDate", "yyyy-MM-dd");
+                    axisRequest.AdditionalPersonalInfo = new AdditionalPersonalInformation(applicantDOB, Convert.ToString(row["onbehalfFirstName"]), Convert.ToString(row["onbehalfMiddleName"]), Convert.ToString(row["onbehalfLastName"]));
+
+                    axisRequest.RequestDescription = Convert.ToString(row["description"]);
+                    axisRequest.RequestDescriptionFromDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionFromDate", "yyyy-MM-dd");
+                    axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
+                    axisRequest.Ispiiredacted = true;
+                    List<Ministry> ministryList = new()
+                    {
+                        new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])))
+                    };
+                    axisRequest.SelectedMinistries = ministryList;
+                    axisRequest.AxisSyncDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    var extensions = GetAxisExtensionData(request);
+                    axisRequest.Extensions = GetAXISExtensions(extensions);
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                }
             }
             return axisRequest;
         }
@@ -145,8 +152,19 @@ namespace MCS.FOI.AXISIntegration.DAL
             {
                 using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
                 sqlSelectCommand.SelectCommand.Parameters.Add("@vcVisibleRequestID", SqlDbType.VarChar, 50).Value = request;
-                sqlConnection.Open();
-                sqlSelectCommand.Fill(dataTable);
+                try
+                {
+                    sqlConnection.Open();
+                    sqlSelectCommand.Fill(dataTable);
+                }
+                catch(SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                }
+                catch(Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                }
             }
             return dataTable;
         }
@@ -167,8 +185,19 @@ namespace MCS.FOI.AXISIntegration.DAL
             {
                 using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
                 sqlSelectCommand.SelectCommand.Parameters.Add("@vcVisibleRequestID", SqlDbType.VarChar, 50).Value = request;
-                sqlConnection.Open();
-                sqlSelectCommand.Fill(dataTable);
+                try
+                {
+                    sqlConnection.Open();
+                    sqlSelectCommand.Fill(dataTable);
+                }
+                catch (SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                }
             }
             return dataTable;
         }

@@ -15,7 +15,7 @@ namespace MCS.FOI.AXISIntegration.DAL.UnitTests
         public void GetRequestTest()
         {
             RequestsDA requestsDA = new RequestsDA(_mockLogger.Object);
-            requestsDA.GetAXISRequest("Sample");
+            requestsDA.GetAXISRequestString("EDU-2015-50012");
         }
 
     }
