@@ -84,6 +84,7 @@ const useStyles = makeStyles((theme) => ({
 const MinistryReview = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
+
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
   //gets the request detail from the store
@@ -98,7 +99,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.foiRequestAttachments
   );
 
-  const requestExtensions = useSelector(state => state.foiRequests.foiRequestExtesions);
+  const requestExtensions = useSelector(
+    (state) => state.foiRequests.foiRequestExtesions
+  );
 
   let bcgovcode =
     ministryId && requestDetails && requestDetails["selectedMinistries"]
@@ -347,14 +350,17 @@ const MinistryReview = React.memo(({ userDetail }) => {
   };
 
   React.useEffect(() => {
-    window.history.pushState(null, null, window.location.pathname);
-    window.addEventListener("popstate", handleOnHashChange);
-    window.addEventListener("beforeunload", alertUser);
-    return () => {
-      window.removeEventListener("popstate", handleOnHashChange);
-      window.removeEventListener("beforeunload", alertUser);
-    };
-  });
+    // This plus bottom button group
+    if (editorChange) {
+      window.history.pushState(null, null, window.location.pathname);
+      window.addEventListener("popstate", handleOnHashChange);
+      window.addEventListener("beforeunload", alertUser);
+      return () => {
+        window.removeEventListener("popstate", handleOnHashChange);
+        window.removeEventListener("beforeunload", alertUser);
+      };
+    }
+  }, [editorChange]);
 
   const tabclick = (param) => {
     if (param === "Comments") {
@@ -487,7 +493,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 : ""}
             </div>
             <div
-              className="tablinks"
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Option4.active,
               })}
