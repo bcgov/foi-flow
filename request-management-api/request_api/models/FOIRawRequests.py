@@ -267,6 +267,7 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
+            # cast(FOIRawRequest.axisrequestid, String).label('idNumber'),
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -360,6 +361,7 @@ class FOIRawRequest(db.Model):
             'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
             'requestTypeRequestType': FOIRawRequest.requestrawdata['requestType']['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
+            # 'idNumber': cast(FOIRawRequest.axisrequestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
             'assignedToFirstName': FOIAssignee.firstname,
@@ -544,6 +546,16 @@ class FOIRawRequest(db.Model):
             for keyword in params['keywords']:
                 searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
             return and_(*searchcondition)
+    
+    @classmethod
+    def getDistinctAXISRequestIds(cls):
+        
+        sql = """select distinct axisrequestid from "FOIRawRequests" where axisrequestid is not null;"""
+        axisids = db.session.execute(text(sql))
+        axisrequestids = []
+        for axisid in axisids:
+            axisrequestids.append(axisid[0])
+        return axisrequestids 
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
