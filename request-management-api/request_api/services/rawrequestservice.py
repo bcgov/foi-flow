@@ -114,4 +114,7 @@ class rawrequestservice:
                     return 'Closed'    
             except  KeyError:
                 print("Key Error on requeststatusid, ignore will be intake in Progress")
-        return 'Intake in Progress'     
+        return 'Intake in Progress'
+
+    def getaxisequestids(self):
+        return rawrequestservicegetter().getaxisequestids()     

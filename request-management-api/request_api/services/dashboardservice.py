@@ -25,6 +25,7 @@ class dashboardservice:
         self.extension_service = extensionservice()
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
+        idnumber = request.idNumber if request.idNumber is not None else ""
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
             request.requestType, 
@@ -33,7 +34,8 @@ class dashboardservice:
             receiveddateuf, 
             request.assignedGroup, 
             request.assignedTo, 
-            idnumberprefix + request.idNumber, 
+            idnumberprefix + idnumber, 
+            # idnumber,
             request.version
         )
         baserequestinfo.update({'firstName': request.firstName})
@@ -62,7 +64,7 @@ class dashboardservice:
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
-        
+        print("requests >>>>>> ", requests)
         requestqueue = []
         for request in requests.items:
             _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
