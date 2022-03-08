@@ -1,0 +1,63 @@
+.axis-sync{
+    .MuiCollapse-entered {
+        background-color: white !important;
+    }
+
+    .MuiAccordionDetails-root {
+        justify-content: center;
+        padding: 60px !important;
+    }
+
+    .MuiTypography-root {
+        color: #38598A;
+        font-size: 16px !important;
+        font-weight: bold !important;
+    }
+
+    .MuiAccordion-root {
+        border: #38598A 1px solid;
+    }
+}
+
+.axis-accordian-detail{
+
+    display: flex;
+    justify-content: center;
+
+    table{
+        min-width: 60%;
+    }
+    
+    td {
+        width: auto;
+    }
+    
+    td.row-width {
+        width: 0%;
+        white-space: nowrap;
+    }
+}
+
+.axis-updated-fields{
+    font-weight: bold;
+    width: 30% !important;
+}
+
+.axis-modal-actions{
+    padding: 8px 30px;
+}
+
+.axis-modal-action-cancel{
+    margin-right: 0px !important;
+    float: right !important;
+    width: 48% !important;
+    background-color: #FFFFFF;
+    border: 2px solid #38598A;
+    border-radius: 4px;
+    color: #38598A;
+    margin-top: 10px;
+    width: 30%;
+    height: 34px;
+    font-size: 16px;
+    font-weight: bold;
+}

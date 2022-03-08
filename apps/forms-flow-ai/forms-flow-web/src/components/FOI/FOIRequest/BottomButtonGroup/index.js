@@ -24,6 +24,7 @@ import {
   alertUser
 } from "./utils";
 import clsx from "clsx";
+import AxisSyncModal from "../AxisSyncModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,6 +82,8 @@ const BottomButtonGroup = React.memo(
 
     const [closingDate, setClosingDate] = useState(formatDate(new Date()));
     const [closingReasonId, setClosingReasonId] = useState();
+
+    const [axisSyncModalOpen, setAxisSyncModalOpen] = useState(false);
 
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
@@ -344,6 +347,13 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
+          {urlIndexCreateRequest < 0 &&
+            <button type="button" className="btn btn-bottom" 
+            onClick={(e) => {
+                setAxisSyncModalOpen(true);
+              }}>Sync with AXIS
+            </button>
+          }
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {
@@ -363,6 +373,10 @@ const BottomButtonGroup = React.memo(
             Return to Queue
           </button>
         </div>
+        {
+          axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} />
+        }
+        
       </div>
     );
   }
