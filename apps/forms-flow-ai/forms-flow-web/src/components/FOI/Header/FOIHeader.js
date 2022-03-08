@@ -9,16 +9,15 @@ import logo from "../../../assets/FOI/images/logo-banner.png";
 import {push} from "connected-react-router";
 import Popup from 'reactjs-popup';
 import NotificationPopup from "./NotificationPopup/NotificationPopup";
-import {
-  fetchFOINotifications
-} from "../../../apiManager/services/FOI/foiNotificationServices";
-import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
+import { fetchFOINotifications } from "../../../apiManager/services/FOI/foiNotificationServices";
+import { isMinistryLogin, getMinistryCode } from "../../../helper/FOI/helper";
 import io from "socket.io-client";
 import {
   SOCKETIO_CONNECT_URL,
   SOCKETIO_RECONNECTION_DELAY,
   SOCKETIO_RECONNECTION_DELAY_MAX,
 } from "../../../constants/constants";
+import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 
 const FOIHeader = React.memo(({ unauthorized = false }) => {
   const dispatch = useDispatch();
@@ -46,6 +45,7 @@ const FOIHeader = React.memo(({ unauthorized = false }) => {
 
   useEffect(() => {
     if (!unauthorized && isAuthenticated) {
+      dispatch(fetchFOIFullAssignedToList());
       dispatch(fetchFOINotifications());
       const options = {
         reconnectionDelay: SOCKETIO_RECONNECTION_DELAY
