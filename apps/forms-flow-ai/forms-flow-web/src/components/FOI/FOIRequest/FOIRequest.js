@@ -148,8 +148,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   useEffect(() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
-    }
-    else {
+    } else {
       dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));

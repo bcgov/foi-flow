@@ -487,7 +487,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 : ""}
             </div>
             <div
-              className="tablinks"
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Option4.active,
               })}
