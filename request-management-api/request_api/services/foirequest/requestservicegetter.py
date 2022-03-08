@@ -65,6 +65,7 @@ class requestservicegetter:
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
+        axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"])        
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -78,7 +79,7 @@ class requestservicegetter:
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
-            'axisSyncDate': requestministry["axissyncdate"],
+            'axisSyncDate': parse(requestministry["axissyncdate"]).strftime('%Y-%m-%d %H:%M:%S.%f') if axissyncdatenoneorempty == False else None,
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
@@ -186,4 +187,5 @@ class requestservicegetter:
         elif personalattribute['personalattributeid'] == 7:     
             return {'adoptiveFatherLastName': personalattribute['attributevalue']}, "main"         
           
-    
+    def __noneorempty(self, variable):
+	    return True if not variable else False
