@@ -350,7 +350,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
   };
 
   React.useEffect(() => {
-    // This plus bottom button group
     if (editorChange) {
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener("popstate", handleOnHashChange);
