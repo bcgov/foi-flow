@@ -176,7 +176,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const syncAxisData = (syncedData) =>{
     dispatch(setFOIRequestDetail(syncedData));
   }
-
+  
   useEffect(() => {
     //const requestDetailsValue = isAddRequest ? {} : requestDetails;
     const requestDetailsValue = requestDetails;
@@ -555,7 +555,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} syncAxisData={syncAxisData} />
+                      {isAddRequest && 
+                        <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} syncAxisData={syncAxisData} />
+                      }
                       <ApplicantDetails
                         requestDetails={requestDetails}
                         requestStatus={_requestStatus}

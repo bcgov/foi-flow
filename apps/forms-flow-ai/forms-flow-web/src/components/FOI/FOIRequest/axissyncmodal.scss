@@ -1,5 +1,6 @@
 .axis-sync{
-    .MuiCollapse-entered {
+
+    .MuiCollapse-root {
         background-color: white !important;
     }
 
@@ -8,39 +9,37 @@
         padding: 60px !important;
     }
 
-    .MuiTypography-root {
-        color: #38598A;
-        font-size: 16px !important;
-        font-weight: bold !important;
-    }
-
     .MuiAccordion-root {
         border: #38598A 1px solid;
+    }
+
+    .MuiPaper-rounded{
+        border-radius: 4px !important;
     }
 }
 
 .axis-accordian-detail{
 
-    display: flex;
+    display: contents;
     justify-content: center;
 
-    table{
-        min-width: 60%;
-    }
+    // table{
+    //     min-width: 60%;
+    // }
     
     td {
-        width: auto;
+        word-break: break-word;
     }
     
-    td.row-width {
-        width: 0%;
-        white-space: nowrap;
-    }
+    // td.row-width {
+    //     width: 0%;
+    //     white-space: nowrap;
+    // }
 }
 
 .axis-updated-fields{
     font-weight: bold;
-    width: 30% !important;
+    text-transform: capitalize;
 }
 
 .axis-modal-actions{
@@ -60,4 +59,14 @@
     height: 34px;
     font-size: 16px;
     font-weight: bold;
+}
+
+
+.confirmation-msg{
+    font-size: 23px;
+    text-align: center;
+}
+
+.updated-contents-table {
+    table-layout: fixed;
 }
