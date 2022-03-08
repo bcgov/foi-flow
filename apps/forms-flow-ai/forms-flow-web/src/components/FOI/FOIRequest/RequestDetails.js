@@ -97,6 +97,7 @@ const RequestDetails = React.memo(
      setSelectedDeliveryMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
      setReceivedDate(getReceivedDateForLocalState);
      setStartDate(getProcessStartDateForLocalState);
+     setDueDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
 
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
       receivedDate = calculateReceivedDate(receivedDate);
