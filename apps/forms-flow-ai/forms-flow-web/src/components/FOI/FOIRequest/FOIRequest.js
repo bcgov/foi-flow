@@ -148,23 +148,20 @@ const FOIRequest = React.memo(({ userDetail }) => {
   useEffect(() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
-    }
-    else {
+    } else {
       dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
     }
 
-    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
 
-    if (bcgovcode)
-      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
+    if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
 
