@@ -12,6 +12,12 @@ export const httpGETRequest = (url, data, token, isBearer = true) => {
   });
 };
 
+export const httpGETRequest1 = (url, data) => {
+  return axios.get(url, {
+    params: data
+  });
+};
+
 export const httpOpenGETRequest = (url) => {
   return axios.get(url);
 };
