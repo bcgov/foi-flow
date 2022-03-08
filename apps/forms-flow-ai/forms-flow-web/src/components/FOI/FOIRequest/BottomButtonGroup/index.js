@@ -366,8 +366,6 @@ const BottomButtonGroup = React.memo(
               }}>Sync with AXIS
             </button>
           }
-          {!axisSyncedRequest &&
-          <>
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {
@@ -386,8 +384,6 @@ const BottomButtonGroup = React.memo(
           >
             Return to Queue
           </button>
-          </>
-          }
         </div>
         {
           axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} 

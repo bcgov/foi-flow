@@ -13,6 +13,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
+import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
 
 const useStyles = makeStyles({
  
@@ -48,6 +49,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
     const compareFields = () => {
       let updatedObj = {};
         for(let key of Object.keys(saveRequestObject)){
+          if(isAxisSyncDisplayField(key)){
             if(saveRequestObject[key] !== sampleRequestDetails[key]){
               if(key === 'selectedMinistries'){
                 const ministryCodes = sampleRequestDetails[key].map(({code}) => code).join(', ');
@@ -63,8 +65,13 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
                 updatedObj[key] = sampleRequestDetails[key];
             }
           }
+          }
           console.log(updatedObj);
           setUpdatedFields(updatedObj);
+    };
+
+    const isAxisSyncDisplayField = (field) => {
+      return Object.values(AXIS_SYNC_DISPLAY_FIELDS).some((group) => group == field);
     };
 
     const handleClose = () => {
