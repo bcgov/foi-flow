@@ -96,7 +96,7 @@ const BottomButtonGroup = React.memo(
 
 
     useEffect(() => {
-        if(saveRequestObject.axisRequestId && requestState?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase()){
+        if(saveRequestObject.axisRequestId && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase()){
           setAxisSyncedRequest(true);
         }
         else
