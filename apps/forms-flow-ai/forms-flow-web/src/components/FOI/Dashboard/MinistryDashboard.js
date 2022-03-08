@@ -304,7 +304,11 @@ const MinistryDashboard = ({ userDetail }) => {
                   sortingOrder={["desc", "asc"]}
                   sortModel={sortModel}
                   sortingMode={"server"}
-                  onSortModelChange={(model) => setSortModel(model)}
+                  onSortModelChange={(model) => {
+                    if (model) {
+                      setSortModel(model);
+                    }
+                  }}
                   getRowClassName={(params) =>
                     `super-app-theme--${params.row.currentState
                       .toLowerCase()

@@ -233,7 +233,11 @@ const Queue = ({ userDetail, tableInfo }) => {
           sortingOrder={["desc", "asc"]}
           sortModel={sortModel}
           sortingMode={"server"}
-          onSortModelChange={(model) => handleSortChange(model)}
+          onSortModelChange={(model) => {
+            if (model) {
+              handleSortChange(model);
+            }
+          }}
           getRowClassName={(params) =>
             clsx(
               `super-app-theme--${params.row.currentState
