@@ -77,6 +77,8 @@ class requestservicegetter:
             'assignedGroup': requestministry["assignedgroup"],
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
+            'axisRequestId': requestministry["axisrequestid"],
+            'axisSyncDate': requestministry["axissyncdate"],
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
