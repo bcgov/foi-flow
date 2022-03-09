@@ -16,7 +16,6 @@ class RedisSubscriberService:
     def register_subscription(cls):        
         try: 
             print("subscribe to channel")
-            current_app.logger.info("subscribe to channel")
             cls.subscription.subscribe(**{os.getenv('SOCKETIO_REDIS_COMMENT_CHANNEL'): event_handler})
             cls.subscription.run_in_thread(sleep_time=float(os.getenv('SOCKETIO_REDIS_SLEEP_TIME')), daemon=True)
         except BusinessException as exception:            
