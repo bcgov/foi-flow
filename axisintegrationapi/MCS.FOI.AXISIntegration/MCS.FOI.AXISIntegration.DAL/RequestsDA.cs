@@ -21,7 +21,7 @@ namespace MCS.FOI.AXISIntegration.DAL
         public RequestsDA(ILogger _Ilogger)
         {
             Ilogger = _Ilogger;                     
-            SettingsManager.Initializer();
+            SettingsManager.DBConnectionInitializer();
         }
 
         public string GetAXISRequestString(string requestNumber)

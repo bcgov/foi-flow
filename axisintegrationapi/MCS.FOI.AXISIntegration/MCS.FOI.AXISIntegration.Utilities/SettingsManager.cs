@@ -12,11 +12,11 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// Configuration file name to read from.
         /// </summary>
         public static string ConfigurationFileName { get; set; } = "appsettings.json";
-        
+
         /// <summary>
         /// Must be first call to obtain properties
         /// </summary>
-        public static void Initializer()
+        public static void DBConnectionInitializer()
         {
 
             InitConfiguration();
@@ -30,7 +30,19 @@ namespace MCS.FOI.AXISIntegration.Utilities
             Environment = setting.Environment;
 
             ConnectionString = AssignConnectionString(Environment);
-            
+
+        }
+
+        public static void AuthConnectionInitializer()
+        {
+            InitConfiguration();
+            var setting = InitOptions<KCAuthentication>("KCAuthentication");
+
+            JWT_OIDC_ISSUER = setting.JWT_OIDC_ISSUER;
+            JWT_OIDC_AUDIENCE = setting.JWT_OIDC_AUDIENCE;
+            IAOGroups = setting.IAOGroups;
+            CORSORIGINS = setting.CORSORIGINS;
+
         }
         /// <summary>
         /// Assign connection string by Environment from appsettings.json
@@ -65,7 +77,21 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// Current environment
         /// </summary>
         public static Environments Environment { get; set; }
-        
+
+        public static string JWT_OIDC_WELL_KNOWN_CONFIG { get; set; }
+
+        public static string JWT_OIDC_AUDIENCE { get; set; }
+
+        public static string JWT_OIDC_ISSUER { get; set; }
+
+        public static string JWT_OIDC_ALGORITHMS { get; set; }
+
+        public static string JWT_OIDC_JWKS_URI { get; set; }
+
+        public static string IAOGroups { get; set; }
+
+        public static string CORSORIGINS { get; set; }
+
         /// <summary>
         /// Initialize ConfigurationBuilder for appsettings
         /// </summary>
