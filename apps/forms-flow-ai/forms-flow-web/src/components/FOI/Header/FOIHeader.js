@@ -45,6 +45,7 @@ useEffect(() => {
   if(!unauthorized && isAuthenticated){
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  
+    console.log("Token for Socket:", UserService.getToken());
     const options = {
       reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
       reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
@@ -53,7 +54,7 @@ useEffect(() => {
       auth: { "x-jwt-token": UserService.getToken() }
     };
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
-  
+    console.log("Socket Val after connect:", socket);
     setInterval(() => {
       dispatch(fetchFOINotifications());
     }, 900000);
@@ -80,6 +81,7 @@ useEffect(() => {
 
  const signout = () => {
     socket?.disconnect();
+    console.log("Socket Val after disconnect:", socket);
     localStorage.removeItem('authToken');
     dispatch(push(`/`));
     UserService.userLogout(); 
