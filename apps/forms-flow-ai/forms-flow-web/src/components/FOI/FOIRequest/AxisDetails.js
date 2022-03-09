@@ -3,11 +3,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-import { useDispatch, useSelector} from "react-redux";
-import {
-    httpGETRequest,
-  } from "../../../apiManager/httpRequestHandler";
-import UserService from "../../../services/UserService";
+import { useDispatch} from "react-redux";
 import { fetchRequestDataFromAxis } from '../../../apiManager/services/FOI/foiRequestServices';
 
 
@@ -20,7 +16,6 @@ const AxisDetails = React.memo(({
     const dispatch = useDispatch();
     const [axisRequestIdErrorText, setAxisRequestIdErrorText] = React.useState("");
     const [axisRequestId, setAxisRequestId] = React.useState(requestDetails?.axisRequestId);
-    var sampleRequestDetails = useSelector((state) => state.foiRequests.foiAxisRequestData);
     const handleAxisIdChange = (e) => {
         if(e.target.value) {
             const val =  foiAxisRequestIds.includes(e.target.value)
@@ -33,9 +28,13 @@ const AxisDetails = React.memo(({
 
     const syncWithAxis = () => {
         dispatch(fetchRequestDataFromAxis(axisRequestId, (err, data) => {
-            syncAxisData(data);
+            if(!err){
+                if(Object.entries(data).length !== 0)
+                    syncAxisData(data);
+                else
+                    setAxisRequestIdErrorText("Invalid AXIS ID Number.");
+            }
         }));
-        
     }
 
      return (
