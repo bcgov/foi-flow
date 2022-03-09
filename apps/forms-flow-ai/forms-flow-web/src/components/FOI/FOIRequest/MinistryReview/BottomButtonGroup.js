@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import '../BottomButtonGroup/bottombuttongroup.scss';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState } from "react";
+import "../BottomButtonGroup/bottombuttongroup.scss";
+import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import { getOSSHeaderDetails, saveFilesinS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveMinistryRequestDetails } from "../../../../apiManager/services/FOI/foiRequestServices";
@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 import { ConfirmationModal } from '../../customComponents';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { ConditionalComponent } from "../../../../helper/FOI/helper";
-import clsx from 'clsx';
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {

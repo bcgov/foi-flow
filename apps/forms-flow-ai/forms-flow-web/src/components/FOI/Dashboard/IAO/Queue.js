@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   DataGrid,
   gridPageCountSelector,
   gridPageSelector,
   useGridApiContext,
   useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+} from "@mui/x-data-grid";
+import Pagination from "@mui/material/Pagination";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,11 +39,19 @@ const Queue = ({ userDetail, tableInfo }) => {
   const classes = useStyles();
 
   const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  const [rowsState, setRowsState] = useState(defaultRowsState);
 
-  const [sortModel, setSortModel] = React.useState(tableInfo.sort);
+  console.log("tableInfo.sort", tableInfo.sort);
+
+  const [sortModel, setSortModelOriginal] = useState(tableInfo.sort);
+
+  const setSortModel = (model) => {
+    console.log("setting", model);
+    setSortModelOriginal(model);
+  };
+
   let serverSortModel;
-  const [filterModel, setFilterModel] = React.useState({
+  const [filterModel, setFilterModel] = useState({
     fields: [
       "firstName",
       "lastName",
@@ -58,6 +66,11 @@ const Queue = ({ userDetail, tableInfo }) => {
   const [requestFilter, setRequestFilter] = useState("All");
 
   useEffect(() => {
+    console.log("new");
+    console.log(rowsState);
+    console.log(sortModel);
+    console.log(filterModel);
+    console.log(requestFilter);
     serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
@@ -99,6 +112,10 @@ const Queue = ({ userDetail, tableInfo }) => {
     }));
   };
 
+  const rows = useMemo(
+    () => updateAssigneeName(requestQueue?.data),
+    [JSON.stringify(requestQueue?.data || [])]
+  );
   const renderReviewRequest = (e) => {
     if (e.row.ministryrequestid) {
       dispatch(
@@ -120,6 +137,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   }
 
   const handleSortChange = (model) => {
+    console.log("handleSortChange", model);
     if (model.length === 0) {
       return;
     }
@@ -211,7 +229,7 @@ const Queue = ({ userDetail, tableInfo }) => {
         <DataGrid
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(requestQueue?.data)}
+          rows={rows}
           columns={columnsRef.current}
           rowHeight={30}
           headerHeight={50}
@@ -268,6 +286,6 @@ const CustomPagination = () => {
       onChange={(event, value) => apiRef.current.setPage(value - 1)}
     />
   );
-}
+};
 
 export default Queue;
