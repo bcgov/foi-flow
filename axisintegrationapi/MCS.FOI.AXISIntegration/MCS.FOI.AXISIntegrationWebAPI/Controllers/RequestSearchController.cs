@@ -1,5 +1,6 @@
 ﻿using MCS.FOI.AXISIntegration.DAL.Interfaces;
 using MCS.FOI.AXISIntegration.DataModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,8 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
     [Route("api/[controller]/{requestNumber}")]
     [ApiController]
-    [EnableCors]
+   // [EnableCors]
+    [Authorize(Policy = "IAOTeam")]
     public class RequestSearchController : ControllerBase
     {
 
@@ -26,6 +28,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         }
 
         [HttpGet]
+        
         public string Get(string requestNumber)
         {
             try

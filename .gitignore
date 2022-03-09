@@ -73,3 +73,4 @@ axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/*.user
 axisintegrationapi/MCS.FOI.AXISIntegration/*/bin/*
 axisintegrationapi/MCS.FOI.AXISIntegration/*/obj/*
 axisintegrationapi/MCS.FOI.AXISIntegration/TestResults/*
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/.config/dotnet-tools.json
