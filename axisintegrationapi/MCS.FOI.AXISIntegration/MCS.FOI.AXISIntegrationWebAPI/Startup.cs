@@ -35,7 +35,9 @@ namespace MCS.FOI.AXISIntegrationWebAPI
                 services.AddCors(options =>
                                     options.AddPolicy("FOIOrigins", p => p.WithOrigins(_origins)
                                                    .WithMethods("GET")
-                                       ));
+                                                   .AllowAnyHeader()
+                                                   .AllowAnyMethod()
+                                       )) ;
             }
 
             services.AddScoped<IRequestDA, RequestsDA>();
