@@ -12,7 +12,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
     [Route("api/[controller]/{requestNumber}")]
     [ApiController]
-   // [EnableCors]
+    [EnableCors(PolicyName = "FOIOrigins")]
     [Authorize(Policy = "IAOTeam")]
     public class RequestSearchController : ControllerBase
     {
