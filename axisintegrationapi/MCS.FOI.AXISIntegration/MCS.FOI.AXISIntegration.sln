@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegrationWebAPI", "MCS.FOI.AXISIntegrationWebAPI\MCS.FOI.AXISIntegrationWebAPI.csproj", "{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCS.FOI.AXISIntegrationWebAPI", "MCS.FOI.AXISIntegrationWebAPI\MCS.FOI.AXISIntegrationWebAPI.csproj", "{BD6C6F3A-D988-4FBD-B7F6-D3F1D537B6E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.DAL", "MCS.FOI.AXISIntegration.DAL\MCS.FOI.AXISIntegration.DAL.csproj", "{3463E76B-BB61-4AC7-AB10-A49AA14903AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCS.FOI.AXISIntegration.DAL", "MCS.FOI.AXISIntegration.DAL\MCS.FOI.AXISIntegration.DAL.csproj", "{3463E76B-BB61-4AC7-AB10-A49AA14903AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.DataModels", "MCS.FOI.AXISIntegration.DataModels\MCS.FOI.AXISIntegration.DataModels.csproj", "{E44B48B1-9A31-441F-B58E-5CB3211D3E88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCS.FOI.AXISIntegration.DataModels", "MCS.FOI.AXISIntegration.DataModels\MCS.FOI.AXISIntegration.DataModels.csproj", "{E44B48B1-9A31-441F-B58E-5CB3211D3E88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.Utilities", "MCS.FOI.AXISIntegration.Utilities\MCS.FOI.AXISIntegration.Utilities.csproj", "{FC103B20-920C-4DBC-93B8-D14EAFF99ABF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCS.FOI.AXISIntegration.Utilities", "MCS.FOI.AXISIntegration.Utilities\MCS.FOI.AXISIntegration.Utilities.csproj", "{FC103B20-920C-4DBC-93B8-D14EAFF99ABF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegration.DAL.UnitTests", "MCS.FOI.AXISIntegration.DAL.UnitTests\MCS.FOI.AXISIntegration.DAL.UnitTests.csproj", "{A18765C7-34AE-4149-9AE4-258D5D12F2FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCS.FOI.AXISIntegration.DAL.UnitTests", "MCS.FOI.AXISIntegration.DAL.UnitTests\MCS.FOI.AXISIntegration.DAL.UnitTests.csproj", "{A18765C7-34AE-4149-9AE4-258D5D12F2FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.AXISIntegrationWebAPI.UnitTests", "MCS.FOI.AXISIntegrationWebAPI.UnitTests\MCS.FOI.AXISIntegrationWebAPI.UnitTests.csproj", "{A05D56B0-B9F6-4248-AB56-8C582F4973E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{A18765C7-34AE-4149-9AE4-258D5D12F2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A18765C7-34AE-4149-9AE4-258D5D12F2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A18765C7-34AE-4149-9AE4-258D5D12F2FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A05D56B0-B9F6-4248-AB56-8C582F4973E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A05D56B0-B9F6-4248-AB56-8C582F4973E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A05D56B0-B9F6-4248-AB56-8C582F4973E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A05D56B0-B9F6-4248-AB56-8C582F4973E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
