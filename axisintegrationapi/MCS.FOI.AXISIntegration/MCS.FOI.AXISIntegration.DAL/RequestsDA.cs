@@ -26,8 +26,10 @@ namespace MCS.FOI.AXISIntegration.DAL
 
         public string GetAXISRequestString(string requestNumber)
         {
-            AXISRequest axisRequest = GetAXISRequest(requestNumber);            
-            return RequestsHelper.ConvertRequestToJSON(axisRequest);
+            AXISRequest axisRequest = GetAXISRequest(requestNumber);
+            if(axisRequest.AXISRequestID != null)
+                return RequestsHelper.ConvertRequestToJSON(axisRequest);
+            return "{}";
         }
 
         private AXISRequest GetAXISRequest(string request)
