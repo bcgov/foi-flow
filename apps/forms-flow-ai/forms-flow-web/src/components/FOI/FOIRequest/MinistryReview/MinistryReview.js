@@ -12,10 +12,7 @@ import {
   fetchFOIRequestDescriptionList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-import {  
-  fetchFOIFullAssignedToList,
-  fetchFOIMinistryAssignedToList
-} from "../../../../apiManager/services/FOI/foiMasterDataServices";
+import { fetchFOIMinistryAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import {
   fetchFOIRequestAttachmentsList,

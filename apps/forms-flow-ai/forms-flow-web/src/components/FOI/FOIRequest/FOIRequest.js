@@ -20,8 +20,7 @@ import {
   fetchFOIDeliveryModeList,
   fetchFOIReceivedModeList,
   fetchClosingReasonList,
-  fetchFOIFullAssignedToList,
-  fetchFOIMinistryAssignedToList
+  fetchFOIMinistryAssignedToList,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,

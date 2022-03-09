@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "../BottomButtonGroup/bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
@@ -13,7 +13,6 @@ import { ConfirmationModal } from "../../customComponents";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { ConditionalComponent } from "../../../../helper/FOI/helper";
 import clsx from "clsx";
-import { createPortal } from "react-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
