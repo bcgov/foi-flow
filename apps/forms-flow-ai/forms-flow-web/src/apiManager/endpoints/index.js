@@ -67,5 +67,8 @@ const API = {
   FOI_GET_OPENED_MINISTRIES: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/fields?names=ministries`,
 
   FOI_GET_ADVANCED_SEARCH: `${FOI_BASE_API_URL}/api/advancedsearch`,
+
+  FOI_GET_AXIS_REQUEST_IDS: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestids`,
+  FOI_GET_AXIS_REQUEST_DATA: `http://flowaxisapidev.gov.bc.ca/api/RequestSearch/<axisrequestid>`
 };
 export default API;

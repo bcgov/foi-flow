@@ -25,7 +25,8 @@ import {
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
+  fetchExistingAxisRequestIds
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
   fetchFOIRequestAttachmentsList
@@ -105,6 +106,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
+  var foiAxisRequestIds = useSelector(state=> state.foiRequests.foiAxisRequestIds);
   
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
@@ -148,6 +150,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if(window.location.href.indexOf("comments") > -1){
       tabclick('Comments');
     }
+    dispatch(fetchExistingAxisRequestIds());
   },[])
   
   const dispatch = useDispatch();
@@ -555,7 +558,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} syncAxisData={syncAxisData} />
+                      <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
+                      syncAxisData={syncAxisData} foiAxisRequestIds={foiAxisRequestIds} />
                       <ApplicantDetails
                         requestDetails={requestDetails}
                         requestStatus={_requestStatus}

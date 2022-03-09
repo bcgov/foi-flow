@@ -87,6 +87,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:
       return { ...state, foiOpenedMinistries: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_AXIS_REQUEST_IDS:
+      return { ...state, foiAxisRequestIds: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_AXIS_REQUEST_DATA:
+        return { ...state, foiAxisRequestData: action.payload };
     default:
       return state;
   }
