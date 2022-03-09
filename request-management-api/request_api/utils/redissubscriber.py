@@ -22,7 +22,8 @@ class RedisSubscriberService:
 
     
 def event_handler(msg):
-    print("----debug------"+msg)
+    print("----debug------")
+    print(msg)
     if msg and msg.get('type') == 'message':
         data = msg.get('data')
         _pushnotification = json.loads(data)
