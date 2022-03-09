@@ -32,24 +32,10 @@ const AxisDetails = React.memo(({
     }
 
     const syncWithAxis = () => {
-        dispatch(fetchRequestDataFromAxis("IAO-2021-00005", (err, data) => {
+        dispatch(fetchRequestDataFromAxis(axisRequestId, (err, data) => {
             syncAxisData(data);
         }));
         
-        // httpGETRequest("http://flowaxisapidev.gov.bc.ca/api/RequestSearch/IAO-2021-00005" ,{}, UserService.getToken())
-        // .then((res) => {
-        //   if (res.data) {
-        //     sampleRequestDetails= res.data;
-        //     syncAxisData(sampleRequestDetails);
-        //     console.log(sampleRequestDetails);
-        //   } else {
-        //       console.log(res);
-        //   }
-        // })
-        // .catch((error) => {
-        //     console.log(error);
-        // });
-
     }
 
      return (
