@@ -54,12 +54,14 @@ useEffect(() => {
       auth: { "x-jwt-token": UserService.getToken() }
     };
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
-    console.log("Socket Val after connect:", socket);
+    //console.log("Socket Val after connect:", socket);
     setInterval(() => {
       dispatch(fetchFOINotifications());
     }, 900000);
   }
 },[]);
+
+console.log("Socket Value:", socket);
 
 useEffect(() => {     
     socket?.on(user.preferred_username, data => {
