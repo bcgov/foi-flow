@@ -40,7 +40,7 @@ const [socket, setSocket] = useState(null);
 const userGroups = user?.groups?.map(group => group.slice(1));
 isMinistry = isMinistryLogin(userGroups);
 ministryCode = getMinistryCode(userGroups);
-
+console.log("USER", user?.preferred_username);
 useEffect(() => {     
   if(!unauthorized && isAuthenticated){
     dispatch(fetchFOIFullAssignedToList());
@@ -63,25 +63,17 @@ useEffect(() => {
 
 console.log("Socket Value:", socket);
 
-socket?.on(user.preferred_username, data => {
-  if(data.action === 'delete'){
-   setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
-  }
-  else{
-   setMessageData(oldMessageData => [data, ...oldMessageData])
-  }
- });
-
-// useEffect(() => {     
-//     socket?.on(user.preferred_username, data => {
-//      if(data.action === 'delete'){
-//       setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
-//      }
-//      else{
-//       setMessageData(oldMessageData => [data, ...oldMessageData])
-//      }
-//     });
-//   },[socket]);
+useEffect(() => {    
+    console.log("USER inside useeffect of socket:", user?.preferred_username); 
+    socket?.on(user.preferred_username, data => {
+     if(data.action === 'delete'){
+      setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
+     }
+     else{
+      setMessageData(oldMessageData => [data, ...oldMessageData])
+     }
+    });
+  },[socket]);
 
 useEffect(() => {     
   if(foiNotifications){
