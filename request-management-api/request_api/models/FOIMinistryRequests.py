@@ -135,8 +135,8 @@ class FOIMinistryRequest(db.Model):
            _request["firstName"] = requestapplicants[0]['foirequestapplicant.firstname']
            _request["lastName"] = requestapplicants[0]['foirequestapplicant.lastname']
            _request["requestType"] = parentrequest.requesttype
-        #    _request["idNumber"] = ministryrequest['filenumber'] axisrequestid
-           _request["idNumber"] = ministryrequest['axisrequestid']
+           _request["idNumber"] = ministryrequest['filenumber']
+           _request["axisRequestId"] = ministryrequest['axisrequestid']
            _request["currentState"] = ministryrequest["requeststatus.name"]
            _request["dueDate"] = ministryrequest["duedate"]
            _request["cfrDueDate"] = ministryrequest["cfrduedate"]
@@ -280,8 +280,8 @@ class FOIMinistryRequest(db.Model):
             FOIRequestStatus.name.label('currentState'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
-            # cast(FOIMinistryRequest.filenumber, String).label('idNumber'), axisrequestid
-            cast(FOIMinistryRequest.axisrequestid, String).label('idNumber'),
+            cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -402,8 +402,9 @@ class FOIMinistryRequest(db.Model):
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
             'requestType': FOIRequest.requesttype,
-            # 'idNumber': FOIMinistryRequest.filenumber,
-            'idnumber': FOIMinistryRequest.axisrequestid,
+            'idNumber': FOIMinistryRequest.filenumber,
+            # 'axisRequestId': FOIMinistryRequest.axisrequestid,
+            'axisrequest_number': FOIMinistryRequest.axisrequestid,
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
@@ -418,7 +419,7 @@ class FOIMinistryRequest(db.Model):
             'requestdescription': FOIMinistryRequest.description,
             'duedate': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode)
-        }.get(x, FOIMinistryRequest.filenumber)
+        }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
     def getgroupfilters(cls, groups):
@@ -566,8 +567,8 @@ class FOIMinistryRequest(db.Model):
             FOIRequestStatus.name.label('currentState'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
-            # cast(FOIMinistryRequest.filenumber, String).label('idNumber'), axisrequestid
-            cast(FOIMinistryRequest.axisrequestid, String).label('idNumber'),
+            cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),

@@ -79,7 +79,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
     },
     {
-      field: "idNumber",
+      field: "axisRequestId",
       headerName: "ID NUMBER",
       flex: 1,
       headerAlign: "left",

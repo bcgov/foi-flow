@@ -25,7 +25,6 @@ class dashboardservice:
         self.extension_service = extensionservice()
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
-        idnumber = request.idNumber if request.idNumber is not None else ""
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
             request.requestType, 
@@ -34,8 +33,8 @@ class dashboardservice:
             receiveddateuf, 
             request.assignedGroup, 
             request.assignedTo, 
-            idnumberprefix + idnumber, 
-            # idnumber,
+            idnumberprefix + request.idNumber, 
+            request.axisRequestId,
             request.version
         )
         baserequestinfo.update({'firstName': request.firstName})
@@ -50,7 +49,7 @@ class dashboardservice:
         baserequestinfo.update({'onBehalfLastName': request.onBehalfFirstName})
         return baserequestinfo
         
-    def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version):
+    def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version):
         return {'id': id,
             'requestType': requesttype,
             'currentState': status,
@@ -59,12 +58,12 @@ class dashboardservice:
             'assignedGroup': assignedgroup,
             'assignedTo': assignedto,            
             'idNumber': idnumber,
+            'axisRequestId': axisrequestid,
             'version':version
         }
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
-        print("requests >>>>>> ", requests)
         requestqueue = []
         for request in requests.items:
             _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
@@ -102,7 +101,7 @@ class dashboardservice:
         for request in requests.items:
             _openrequest = self.__preparebaserequestinfo(request.id, request.requestType, request.currentState, 
                                                          request.receivedDate, request.receivedDateUF, request.assignedGroup, 
-                                                         request.assignedTo, request.idNumber, request.version)
+                                                         request.assignedTo, request.idNumber, request.axisRequestId, request.version)
             _openrequest.update({'assignedministrygroup': request.assignedministrygroup})
             _openrequest.update({'assignedministryperson': request.assignedministryperson})
             _openrequest.update({'cfrstatus':'Select Division'})

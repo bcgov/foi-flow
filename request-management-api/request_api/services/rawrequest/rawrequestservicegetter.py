@@ -39,6 +39,7 @@ class rawrequestservicegetter:
                              'assignedTo': assignedtovalue,
                              'xgov': 'No',
                              'idNumber': 'U-00' + str(request.requestid),
+                             'axisRequestId': request.axisrequestid,
                              'version':request.version
                              }
             unopenedrequests.append(unopenrequest)

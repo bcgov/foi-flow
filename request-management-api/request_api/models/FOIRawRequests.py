@@ -267,7 +267,7 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
-            # cast(FOIRawRequest.axisrequestid, String).label('idNumber'),
+            cast(FOIRawRequest.axisrequestid, String).label('axisRequestId'),
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -361,7 +361,8 @@ class FOIRawRequest(db.Model):
             'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
             'requestTypeRequestType': FOIRawRequest.requestrawdata['requestType']['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
-            # 'idNumber': cast(FOIRawRequest.axisrequestid, String),
+            # 'axisRequestId': cast(FOIRawRequest.axisrequestid, String),
+            'axisrequest_number': cast(FOIRawRequest.axisrequestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
             'assignedToFirstName': FOIAssignee.firstname,
@@ -372,7 +373,7 @@ class FOIRawRequest(db.Model):
             'ministry': FOIRawRequest.requestrawdata['selectedMinistries'].astext,
             'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext,
             'duedate': FOIRawRequest.requestrawdata['dueDate'].astext
-        }.get(x, cast(FOIRawRequest.requestid, String))
+        }.get(x, cast(FOIRawRequest.axisrequestid, String))
     
     @classmethod
     def validatefield(cls, x):
