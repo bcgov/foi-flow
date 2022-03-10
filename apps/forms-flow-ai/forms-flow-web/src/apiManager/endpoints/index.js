@@ -1,5 +1,5 @@
 
-import { FOI_BASE_API_URL } from "./config";
+import { FOI_BASE_API_URL, AXIS_API_URL } from "./config";
 
 const API = {
   FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard`,
@@ -69,6 +69,7 @@ const API = {
   FOI_GET_ADVANCED_SEARCH: `${FOI_BASE_API_URL}/api/advancedsearch`,
 
   FOI_GET_AXIS_REQUEST_IDS: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestids`,
-  FOI_GET_AXIS_REQUEST_DATA: `https://flowaxisapidev.gov.bc.ca/api/RequestSearch/<axisrequestid>`
+  
+  FOI_GET_AXIS_REQUEST_DATA: `${AXIS_API_URL}/api/RequestSearch/<axisrequestid>`
 };
 export default API;
