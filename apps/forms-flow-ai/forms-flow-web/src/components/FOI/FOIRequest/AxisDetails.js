@@ -15,10 +15,10 @@ const AxisDetails = React.memo(({
 }) => {
     const dispatch = useDispatch();
     const [axisRequestIdErrorText, setAxisRequestIdErrorText] = React.useState("");
-    const [axisRequestId, setAxisRequestId] = React.useState(requestDetails?.axisRequestId);
+    const [axisRequestId, setAxisRequestId] = React.useState("");
     const handleAxisIdChange = (e) => {
         if(e.target.value) {
-            const val =  foiAxisRequestIds.includes(e.target.value)
+            const val =  foiAxisRequestIds?.includes(e.target.value)
                 ? "AXIS Request already synced": "";
             setAxisRequestIdErrorText(val);
         }
