@@ -40,15 +40,7 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const defaultRowsState = { page: 0, pageSize: 10 };
   const [rowsState, setRowsState] = useState(defaultRowsState);
-
-  console.log("tableInfo.sort", tableInfo.sort);
-
-  const [sortModel, setSortModelOriginal] = useState(tableInfo.sort);
-
-  const setSortModel = (model) => {
-    console.log("setting", model);
-    setSortModelOriginal(model);
-  };
+  const [sortModel, setSortModel] = useState(tableInfo.sort);
 
   let serverSortModel;
   const [filterModel, setFilterModel] = useState({
@@ -66,11 +58,6 @@ const Queue = ({ userDetail, tableInfo }) => {
   const [requestFilter, setRequestFilter] = useState("All");
 
   useEffect(() => {
-    console.log("new");
-    console.log(rowsState);
-    console.log(sortModel);
-    console.log(filterModel);
-    console.log(requestFilter);
     serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
@@ -112,10 +99,10 @@ const Queue = ({ userDetail, tableInfo }) => {
     }));
   };
 
-  const rows = useMemo(
-    () => updateAssigneeName(requestQueue?.data),
-    [JSON.stringify(requestQueue?.data || [])]
-  );
+  const rows = useMemo(() => {
+    return updateAssigneeName(requestQueue?.data);
+  }, [JSON.stringify(requestQueue)]);
+
   const renderReviewRequest = (e) => {
     if (e.row.ministryrequestid) {
       dispatch(
@@ -137,7 +124,6 @@ const Queue = ({ userDetail, tableInfo }) => {
   }
 
   const handleSortChange = (model) => {
-    console.log("handleSortChange", model);
     if (model.length === 0) {
       return;
     }
@@ -249,7 +235,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             Pagination: CustomPagination,
           }}
           sortingOrder={["desc", "asc"]}
-          sortModel={sortModel}
+          sortModel={[sortModel[0]]}
           sortingMode={"server"}
           onSortModelChange={(model) => {
             if (model) {
