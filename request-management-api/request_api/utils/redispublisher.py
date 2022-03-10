@@ -19,6 +19,8 @@ class RedisPublisherService:
         self.publishtoredischannel(self.foirequestqueueredischannel, message)
             
     def publishcommment(self, message):  
+        print('publish message')
+        print(message)
         self.publishtoredischannel(self.foicommentqueueredischannel, message)
               
     def publishtoredischannel(self, channel , message):  

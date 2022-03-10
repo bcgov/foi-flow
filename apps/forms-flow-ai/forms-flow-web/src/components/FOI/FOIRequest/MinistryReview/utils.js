@@ -8,7 +8,6 @@ export const getMinistryBottomTextMap = (
   _cfrDaysRemaining,
   requestExtensions
 ) => {
-  console.log(requestDetails);
   const _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
 
   const _daysRemainingText =
