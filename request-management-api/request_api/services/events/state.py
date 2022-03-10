@@ -16,10 +16,7 @@ class stateevent:
     def createstatetransitionevent(self, requestid, requesttype, userid, username):
         state = self.__haschanged(requestid, requesttype)
         if state is not None:
-            if (state != 'Intake in Progress'):
-                _commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
-            else:
-                _commentresponse = DefaultMethodResult(True,'No comment for Intake stage',requestid)
+            _commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
             _notificationresponse = self.__createnotification(requestid, state, requesttype, userid)
             if _commentresponse.success == True and _notificationresponse.success == True :
                 return DefaultMethodResult(True,'Comment posted',requestid)
@@ -35,7 +32,7 @@ class stateevent:
         if len(states) == 2:
             newstate = states[0]
             oldstate = states[1]
-            if newstate != oldstate:
+            if newstate != oldstate and newstate != 'Intake in Progress':
                 return newstate
         return None 
     
