@@ -25,11 +25,9 @@ class RedisSubscriberService:
 def event_handler(msg):
     print("----debug------")
     print(msg)
-    current_app.logger.info(msg)
     if msg and msg.get('type') == 'message':
         data = msg.get('data')
         _pushnotification = json.loads(data)
         print(_pushnotification)
-        current_app.logger.info(_pushnotification)
         socketio.emit(_pushnotification["userid"], _pushnotification)
             
