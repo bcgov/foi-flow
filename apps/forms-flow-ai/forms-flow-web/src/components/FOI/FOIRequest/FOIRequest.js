@@ -558,7 +558,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      {isAddRequest &&
+                      {(isAddRequest || requestState === StateEnum.unopened.name) &&
                         <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
                         syncAxisData={syncAxisData} foiAxisRequestIds={foiAxisRequestIds} />
                       }
