@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   DataGrid,
   gridPageCountSelector,
   gridPageSelector,
   useGridApiContext,
   useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+} from "@mui/x-data-grid";
+import Pagination from "@mui/material/Pagination";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,16 +37,13 @@ const Queue = ({ userDetail, tableInfo }) => {
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
   const classes = useStyles();
-  useEffect(() => {
-    dispatch(fetchFOIRequestListByPage());
-  }, [dispatch]);
 
   const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  const [rowsState, setRowsState] = useState(defaultRowsState);
+  const [sortModel, setSortModel] = useState(tableInfo.sort);
 
-  const [sortModel, setSortModel] = React.useState(tableInfo.sort);
   let serverSortModel;
-  const [filterModel, setFilterModel] = React.useState({
+  const [filterModel, setFilterModel] = useState({
     fields: [
       "firstName",
       "lastName",
@@ -101,6 +98,10 @@ const Queue = ({ userDetail, tableInfo }) => {
       assignedToName: getAssigneeValue(row),
     }));
   };
+
+  const rows = useMemo(() => {
+    return updateAssigneeName(requestQueue?.data);
+  }, [JSON.stringify(requestQueue)]);
 
   const renderReviewRequest = (e) => {
     if (e.row.ministryrequestid) {
@@ -214,7 +215,7 @@ const Queue = ({ userDetail, tableInfo }) => {
         <DataGrid
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(requestQueue?.data)}
+          rows={rows}
           columns={columnsRef.current}
           rowHeight={30}
           headerHeight={50}
@@ -234,9 +235,13 @@ const Queue = ({ userDetail, tableInfo }) => {
             Pagination: CustomPagination,
           }}
           sortingOrder={["desc", "asc"]}
-          sortModel={sortModel}
+          sortModel={[sortModel[0]]}
           sortingMode={"server"}
-          onSortModelChange={(model) => handleSortChange(model)}
+          onSortModelChange={(model) => {
+            if (model) {
+              handleSortChange(model);
+            }
+          }}
           getRowClassName={(params) =>
             clsx(
               `super-app-theme--${params.row.currentState
@@ -267,6 +272,6 @@ const CustomPagination = () => {
       onChange={(event, value) => apiRef.current.setPage(value - 1)}
     />
   );
-}
+};
 
 export default Queue;
