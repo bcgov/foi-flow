@@ -66,17 +66,36 @@ const FOIHeader = React.memo(({ unauthorized = false }) => {
     }
   }, []);
 
-  useEffect(() => {
-    socket?.on(user.preferred_username, (data) => {
-      if (data.action === "delete") {
-        setMessageData((oldMessageData) =>
-          oldMessageData.filter(
-            (msg) => msg.notificationid !== data.notificationid
-          )
-        );
-      } else {
-        setMessageData((oldMessageData) => [data, ...oldMessageData]);
-      }
+useEffect(() => {     
+  if(!unauthorized && isAuthenticated){
+    dispatch(fetchFOIFullAssignedToList());
+    dispatch(fetchFOINotifications());  
+    console.log("Token for Socket:", UserService.getToken());
+    const options = {
+      reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
+      reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
+      path:'/api/v1/socket.io',
+      transports: ['websocket'],
+      auth: { "x-jwt-token": UserService.getToken() }
+    };
+    setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
+    //console.log("Socket Val after connect:", socket);
+    setInterval(() => {
+      dispatch(fetchFOINotifications());
+    }, 900000);
+  }
+},[]);
+
+console.log("Socket Value:", socket);
+
+useEffect(() => {     
+    socket?.on(user.preferred_username, data => {
+     if(data.action === 'delete'){
+      setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
+     }
+     else{
+      setMessageData(oldMessageData => [data, ...oldMessageData])
+     }
     });
   }, [socket]);
 
@@ -88,7 +107,8 @@ const FOIHeader = React.memo(({ unauthorized = false }) => {
 
   const signout = () => {
     socket?.disconnect();
-    localStorage.removeItem("authToken");
+    console.log("Socket Val after disconnect:", socket);
+    localStorage.removeItem('authToken');
     dispatch(push(`/`));
     UserService.userLogout();
   };
