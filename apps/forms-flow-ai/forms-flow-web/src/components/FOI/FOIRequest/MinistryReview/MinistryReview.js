@@ -12,10 +12,7 @@ import {
   fetchFOIRequestDescriptionList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-import {  
-  fetchFOIFullAssignedToList,
-  fetchFOIMinistryAssignedToList
-} from "../../../../apiManager/services/FOI/foiMasterDataServices";
+import { fetchFOIMinistryAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import {
   fetchFOIRequestAttachmentsList,
@@ -155,7 +152,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      dispatch(fetchFOIFullAssignedToList());
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId]);
