@@ -14,16 +14,18 @@
 
 .foi-request-description-history {
     width: 100%;
-    padding-bottom: 20px;
+    // padding-bottom: 20px;
 }
 
-.foi-date-range-h3 {
+.foi-date-range-h5 {
     font-family: "BCSans-Bold", sans-serif !important;
+    margin-left: 8px;
+    padding: 20px 0;
 }
 
 .foi-request-dates {
     display: flex;
-    margin-top: -15px;
+    // margin-top: -15px;
 }
 // #outlined-multiline-request-description {
 //     width: 100%;
@@ -66,6 +68,6 @@
 
 .no-personal-info{
     width: auto !important;
-     padding-left: 3% !important;
+     padding-left: 4% !important;
 
   }
