@@ -468,8 +468,12 @@ class FOIRawRequest(db.Model):
             if(state == 3):
                 requeststatecondition.append(FOIRawRequest.status == 'Closed')
                 includeclosed = True
+            elif(state == 4):
+                requeststatecondition.append(FOIRawRequest.status == 'Redirect')
             elif(state == 5):
                 requeststatecondition.append(FOIRawRequest.status == 'Unopened')
+            elif(state == 6):
+                requeststatecondition.append(FOIRawRequest.status == 'Intake in Progress')
         
         if(len(requeststatecondition) == 0):
             requeststatecondition.append(FOIRawRequest.status == 'Closed')
