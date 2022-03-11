@@ -507,7 +507,7 @@ class FOIMinistryRequest(db.Model):
         rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})
         ministries = []
         for row in rs:
-            ministries.append({"filenumber": row["filenumber"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+            ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
         return ministries
 
     @classmethod
