@@ -293,13 +293,11 @@ span.circle
 @media only screen and (max-width:1920px){
   .foitabpanelcollection{
       min-width: 1000px;
-      max-width: 1000px;
   }
 }
 
 @media screen and (max-width: 6000px) and (min-width: 1920px), (min-width: 1920px) {
   .foitabpanelcollection{
-    max-width: 1150px;
     min-width: 1150px;
   }
 }
