@@ -114,8 +114,8 @@ nav h2 {
 .foiContainer{
   margin: 0 13% !important;
   padding: 0 !important;
-  div {
-    div{
+  > div {
+    > div{
       padding: 0;
     }
   }

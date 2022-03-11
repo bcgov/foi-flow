@@ -26,8 +26,7 @@
 
   .inputBox{
     width:100%;
-    margin:25px;
-    margin-top:10px;
+    margin-top: 15px;
   }  
 
   .inputActions{
@@ -412,10 +411,6 @@ border: 0px!important;
   padding-left: 4%!important;
 }
 
-.inputBox .form ,.inputActions {
-  width: 95%;
-}
-
 .commentsection .inputActions {
   width: 100%;
 }
@@ -454,7 +449,7 @@ border: 0px!important;
   div.filterComments{
     display: inline-flex;
     margin-left: 15px;
-    margin-top: 5%;
+    margin-top: 15px;
     margin-bottom: 15px;
     width: 100%;
     label {
