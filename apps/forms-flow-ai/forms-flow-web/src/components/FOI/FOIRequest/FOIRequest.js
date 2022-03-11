@@ -181,13 +181,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   }
 
   useEffect(() => {
-    //const requestDetailsValue = isAddRequest ? {} : requestDetails;
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if(Object.entries(requestDetails)?.length !== 0){
-      var requestStateFromId = findRequestState(requestDetails.requeststatusid);
+      var requestStateFromId = findRequestState(requestDetails.requeststatusid) ? 
+      findRequestState(requestDetails.requeststatusid) : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
@@ -227,6 +227,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
     postalCode: "",
   }
 
+  const requiredAxisDetailsValue = {
+    axisRequestId: ""
+  }
+
   //below states are used to find if required fields are set or not
   const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
   const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);
@@ -236,7 +240,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [headerValue, setHeader] = useState("");
-
+  const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(requiredAxisDetailsValue);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
     setRequiredRequestDescriptionValues(requestDescriptionObject);
@@ -251,32 +255,32 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setrequiredContactDetails(value);
   }, [])
 
+
   const handleApplicantDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredApplicantDetails, value, name);
     setRequiredApplicantDetails(detailsData);
   }
-
   const handleContanctDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredContactDetails, value, name);
     setrequiredContactDetails(detailsData);
   }
-
+  const handleAxisDetailsValue = (value, name) => {
+    const detailsData = assignValue(requiredAxisDetailsValue, value, name);
+    setRequiredAxisDetails(detailsData);
+  }
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
     const descriptionData = assignValue(requiredRequestDescriptionValues, value, name);
     setRequiredRequestDescriptionValues(descriptionData);
   }
-
   //Update required fields of request details box with latest value
   const handleRequestDetailsValue = (value, name, value2) => {
     const detailsData = assignValue(requiredRequestDetailsValues, value, name);
-
     if (value2) {
       detailsData.dueDate = value2;
     }
     setRequiredRequestDetailsValues(detailsData);
   }
-
   //gets the latest assigned to value
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
@@ -285,6 +289,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {
+    setValidation(validationObj);
+  }
+  const handleAxisIdValidation = (validationObj) => {
     setValidation(validationObj);
   }
 
@@ -299,7 +306,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const contactDetailsNotGiven = checkContactGiven(requiredContactDetails, requiredApplicantDetails);
 
   //Variable to find if all required fields are filled or not
-  const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, assignedToValue, requiredRequestDetailsValues);
+  const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, 
+    assignedToValue, requiredRequestDetailsValues, requiredAxisDetails);
 
   const classes = useStyles();
 
@@ -558,9 +566,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      {(isAddRequest || requestState === StateEnum.unopened.name) &&
-                        <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
-                        syncAxisData={syncAxisData} foiAxisRequestIds={foiAxisRequestIds} />
+                      {isAddRequest || (requestState === StateEnum.unopened.name) &&
+                        <AxisDetails createSaveRequestObject={createSaveRequestObject} 
+                        syncAxisData={syncAxisData} foiAxisRequestIds={foiAxisRequestIds}
+                        handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
                       }
                       <ApplicantDetails
                         requestDetails={requestDetails}
