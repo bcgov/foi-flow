@@ -88,6 +88,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 catch (Exception e)
                 {
                     Ilogger.Log(LogLevel.Error, e.Message);
+                    throw;
                 }
             }
             return axisRequest;
@@ -162,10 +163,12 @@ namespace MCS.FOI.AXISIntegration.DAL
                 catch(SqlException ex)
                 {
                     Ilogger.Log(LogLevel.Error, ex.Message);
+                    throw;
                 }
                 catch(Exception e)
                 {
                     Ilogger.Log(LogLevel.Error, e.Message);
+                    throw;
                 }
             }
             return dataTable;

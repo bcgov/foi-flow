@@ -48,6 +48,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                 "MHA" => "MMHA",
                 "MMA" => "MUNI",
                 "PSS" => "PSSG",
+                "TAC" => "TACS",
+                "TRA" => "TRAN",
                 _ => code,
             };
         }
