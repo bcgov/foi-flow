@@ -44,20 +44,21 @@ export const fillAssignmentFields = (request) => {
   }
 };
 
-export const alertUser = (e) => {  
-    e.preventDefault();
-    e.returnValue = "";
+export const alertUser = (e) => {
+  e.preventDefault();
+  e.returnValue = "";
 };
 
-export const returnToQueue = (e, _unSavedRequest) => { 
+export const returnToQueue = (e, _unSavedRequest) => {
   if (
     !_unSavedRequest ||
-    (_unSavedRequest && window.confirm("Are you sure you want to leave? Your changes will be lost."))
+    (_unSavedRequest &&
+      window.confirm(
+        "Are you sure you want to leave? Your changes will be lost."
+      ))
   ) {
     e.preventDefault();
-    window.removeEventListener("beforeunload", (event) =>
-      alertUser(event)
-    );
+    window.removeEventListener("beforeunload", (event) => alertUser(event));
     window.location.href = "/foi/dashboard";
   }
 };
