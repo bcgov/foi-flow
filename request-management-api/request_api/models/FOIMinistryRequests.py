@@ -500,7 +500,7 @@ class FOIMinistryRequest(db.Model):
     
     @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
-        sql = """select distinct filenumber, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
+        sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
                     inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 
                     inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
                     where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;""" 

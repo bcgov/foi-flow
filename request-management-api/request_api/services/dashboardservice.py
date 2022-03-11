@@ -25,7 +25,7 @@ class dashboardservice:
         self.extension_service = extensionservice()
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
-        idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)        
+        idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
             request.requestType, 
@@ -162,7 +162,7 @@ class dashboardservice:
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def __getidnumber(self, idprefix, axisrequestid, filenumber):
-        if axisrequestid is not None and idprefix == '':
+        if axisrequestid is not None:
             return axisrequestid
         elif idprefix:
             return idprefix + filenumber
