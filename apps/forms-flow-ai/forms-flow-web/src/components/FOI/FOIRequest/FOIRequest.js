@@ -567,7 +567,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       {(isAddRequest || requestState === StateEnum.unopened.name) &&
-                        <AxisDetails createSaveRequestObject={createSaveRequestObject} 
+                        <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
                         syncAxisData={syncAxisData} foiAxisRequestIds={foiAxisRequestIds}
                         handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
                       }
