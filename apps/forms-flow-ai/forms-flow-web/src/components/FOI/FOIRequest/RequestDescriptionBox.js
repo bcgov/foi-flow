@@ -26,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
 
 const RequestDescription = React.memo(({     
     programAreaList, 
-    requestDetails,       
+    requestDetails,  
+    requiredRequestDetailsValues,     
     handleOnChangeRequiredRequestDescriptionValues,
     handleInitialRequiredRequestDescriptionValues,
     handleUpdatedProgramAreaList,
@@ -218,18 +219,21 @@ const RequestDescription = React.memo(({
                         error={requestDescriptionText===""}
                         fullWidth
                         disabled={disableInput}
-                    />
-                    <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
-                    <input
-                        type="checkbox"
-                        className="checkmark"
-                        checked={isPIIRedacted}
-                        onChange={handlePIIRedacted}
-                        disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
-                    />
-                    <span className="checkmark"></span>
-                        Description contains NO Personal Information
-                    </label>      
+                    />                    
+                    {requiredRequestDetailsValues.requestType.toLowerCase() ===
+                      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
+                      <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
+                      <input
+                          type="checkbox"
+                          className="checkmark"
+                          checked={isPIIRedacted}
+                          onChange={handlePIIRedacted}
+                          disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
+                      />
+                      <span className="checkmark"></span>
+                          Description contains NO Personal Information
+                      </label>  
+                    )}    
                     </div>
                     { Object.entries(localProgramAreaList).length !== 0 ?
                     <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
