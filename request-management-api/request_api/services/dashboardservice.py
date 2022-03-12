@@ -8,6 +8,7 @@ import datetime as dt
 from pytz import timezone
 import pytz
 import maya
+from request_api.auth import AuthHelper
 
 from flask import jsonify
 
@@ -128,7 +129,11 @@ class dashboardservice:
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def advancedsearch(self, params={'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
-        requests = FOIRawRequest.advancedsearch(params)
+        
+        if (AuthHelper.getusertype() == "iao"):                                                                                           
+            requests = FOIRawRequest.advancedsearch(params)
+        elif (AuthHelper.getusertype() == "ministry"):
+            requests = FOIMinistryRequest.advancedsearch(params)
         
         requestqueue = []
         for request in requests.items:

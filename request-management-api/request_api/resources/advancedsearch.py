@@ -69,7 +69,7 @@ class DashboardPagination(Resource):
                 params['keywords'] = []
 
             statuscode = 200
-            if (AuthHelper.getusertype() == "iao"):                                                                                           
+            if (AuthHelper.getusertype() == "iao" or AuthHelper.getusertype() == "ministry"):                                                                                           
                 requests = dashboardservice().advancedsearch(params)
             else:
                 statuscode = 401   

@@ -475,10 +475,13 @@ class FOIRawRequest(db.Model):
             elif(state == 6):
                 requeststatecondition.append(FOIRawRequest.status == 'Intake in Progress')
         
-        if(len(requeststatecondition) == 0):
+        if(len(requeststatecondition) == 0 and len(params['requeststate']) == 0):
             requeststatecondition.append(FOIRawRequest.status == 'Closed')
             requeststatecondition.append(FOIRawRequest.status == 'Unopened')
-        
+        elif(len(requeststatecondition) == 0 and len(params['requeststate']) > 0):
+            requeststatecondition.append(FOIRawRequest.status == 'Not Applicable')  #searched state does not apply to rawrequests
+
+
         return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
     
     @classmethod
