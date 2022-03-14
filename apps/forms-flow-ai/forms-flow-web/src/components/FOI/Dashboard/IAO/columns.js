@@ -4,14 +4,19 @@ import {
   getReceivedDate,
   onBehalfFullName,
 } from "../utils";
-import { isProcessingTeam, isIntakeTeam } from "../../../../helper/FOI/helper";
+import {
+  isProcessingTeam,
+  isFlexTeam,
+  isIntakeTeam,
+  formatDate,
+} from "../../../../helper/FOI/helper";
 
 const ProcessingTeamColumns = [
   {
     field: "idNumber",
     headerName: "ID NUMBER",
     headerAlign: "left",
-    width: 150,
+    width: 160,
   },
   {
     field: "applicantName",
@@ -19,7 +24,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    width: 170,
+    width: 180,
   },
   {
     field: "onBehalf",
@@ -32,7 +37,7 @@ const ProcessingTeamColumns = [
     field: "requestType",
     headerName: "TYPE",
     headerAlign: "left",
-    flex: 1,
+    flex: 0.75,
   },
   {
     field: "applicantcategory",
@@ -49,17 +54,15 @@ const ProcessingTeamColumns = [
   {
     field: "DaysLeftValue",
     headerName: "DAYS LEFT",
-    headerAlign: "center",
-    align: "center",
+    headerAlign: "left",
     valueGetter: getDaysLeft,
-    flex: 0.5,
+    flex: 0.75,
     sortable: false,
   },
   {
     field: "extensions",
     headerName: "EXT.",
-    headerAlign: "center",
-    align: "center",
+    headerAlign: "left",
     flex: 0.5,
     sortable: false,
     valueGetter: (params) =>
@@ -68,8 +71,7 @@ const ProcessingTeamColumns = [
   {
     field: "pages",
     headerName: "PAGES",
-    headerAlign: "center",
-    align: "center",
+    headerAlign: "left",
     flex: 0.5,
     sortable: false,
     renderCell: (params) => <span></span>,
@@ -89,7 +91,7 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    flex: 1,
+    width: 180,
   },
   {
     field: "requestType",
@@ -107,7 +109,6 @@ const IntakeTeamColumns = [
     field: "currentState",
     headerName: "CURRENT STATE",
     headerAlign: "left",
-    width: 180,
     flex: 1,
   },
   {
@@ -138,21 +139,98 @@ const IntakeTeamColumns = [
   },
 ];
 
+const FlexTeamColumns = [
+  {
+    field: "idNumber",
+    headerName: "ID NUMBER",
+    headerAlign: "left",
+    width: 160,
+  },
+  {
+    field: "applicantName",
+    headerName: "APPLICANT NAME",
+    headerAlign: "left",
+    valueGetter: (params) =>
+      getFullName(params.row.firstName, params.row.lastName),
+    width: 180,
+  },
+  {
+    field: "applicantcategory",
+    headerName: "CATEGORY",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "requestType",
+    headerName: "TYPE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "currentState",
+    headerName: "CURRENT STATE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "assignedToName",
+    headerName: "ANALYST",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "cfrduedate",
+    headerName: "CFR DUE",
+    flex: 1,
+    headerAlign: "left",
+    valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
+  },
+  {
+    field: "DaysLeftValue",
+    headerName: "DAYS LEFT",
+    headerAlign: "left",
+    valueGetter: getDaysLeft,
+    flex: 0.75,
+    sortable: false,
+  },
+  {
+    field: "xgov",
+    headerName: "XGOV",
+    headerAlign: "left",
+    flex: 0.5,
+  },
+];
+
 const defaultTableInfo = {
   columns: IntakeTeamColumns,
   sort: [
     { field: "currentState", sort: "desc" },
     { field: "receivedDateUF", sort: "desc" },
   ],
+  stateClassName: {
+    open: "flex-open",
+  },
 };
+
 const getTableInfo = (userGroups) => {
   if (!userGroups || isIntakeTeam(userGroups)) {
     return defaultTableInfo;
   }
+
   if (isProcessingTeam(userGroups)) {
     return {
       columns: ProcessingTeamColumns,
       sort: [{ field: "duedate", sort: "asc" }],
+    };
+  }
+
+  if (isFlexTeam(userGroups)) {
+    return {
+      columns: FlexTeamColumns,
+      sort: [{ field: "stateForSorting", sort: "asc" }],
+      stateClassName: {
+        open: "flex--open",
+      },
     };
   }
 

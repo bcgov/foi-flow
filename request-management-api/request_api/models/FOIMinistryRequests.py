@@ -257,6 +257,12 @@ class FOIMinistryRequest(db.Model):
             for field in filterfields:
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
+        stateforsorting = case([
+                            (FOIRequestStatus.name == 'Open',
+                             literal(None)),
+                           ],
+                           else_ = FOIRequestStatus.name).label('stateForSorting')
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -285,6 +291,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
+            stateforsorting
         ]
 
         basequery = _session.query(
@@ -415,18 +422,10 @@ class FOIMinistryRequest(db.Model):
         else:
             groupfilter = []
             for group in groups:
-                if (group == 'Flex Team'):
+                if (group == 'Flex Team' or group in ProcessingTeamWithKeycloackGroup.list()):
                     groupfilter.append(
                         and_(
-                            FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])
-                        )
-                    )
-                elif (group in ProcessingTeamWithKeycloackGroup.list()):
-                    groupfilter.append(
-                        and_(
-                            FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1,2,12,13,7,9,10,14,3])
+                            FOIMinistryRequest.assignedgroup == group
                         )
                     )
                 elif (group == 'Intake Team'):
@@ -543,6 +542,12 @@ class FOIMinistryRequest(db.Model):
             subquery_applicantmapping_second.c.second_id == onbehalf_applicantmapping.foirequestapplicantid,
         ]
 
+        stateforsorting = case([
+                            (FOIRequestStatus.name == 'Open',
+                             literal(None)),
+                           ],
+                           else_ = FOIRequestStatus.name).label('stateForSorting')
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -571,6 +576,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,            
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
+            stateforsorting
         ]
 
         basequery = _session.query(
