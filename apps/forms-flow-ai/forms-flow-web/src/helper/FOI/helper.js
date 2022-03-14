@@ -33,6 +33,14 @@ const formatDate = (d, formatString = "yyyy-MM-dd") => {
   }
 };
 
+const formatDateInPst = (d, formatString = "yyyy-MM-dd") => {
+  if (d) {
+    return formatInTimeZone(d, formatString, "America/Vancouver");
+  } else {
+    return "";
+  }
+};
+
 const businessDay = (date) => {
   return dayjs(date).isBusinessDay();
 };
@@ -362,6 +370,7 @@ export {
   removeBusinessDays,
   getMinistryCode,
   errorToast,
+  formatDateInPst,
   isProcessingTeam,
   isFlexTeam,
   isIntakeTeam,

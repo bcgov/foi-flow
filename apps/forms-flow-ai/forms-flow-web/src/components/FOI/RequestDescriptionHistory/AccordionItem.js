@@ -5,7 +5,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { formatDate } from '../../../helper/FOI/helper';
+import { formatDate, formatDateInPst} from '../../../helper/FOI/helper';
 
 const AccordionItem = React.memo(({details, index, expanded, handleChange}) => {
     
@@ -17,7 +17,7 @@ const AccordionItem = React.memo(({details, index, expanded, handleChange}) => {
             id="acc-header"            
             >
                 <Typography className="acc-request-description">{`${index === 0 ? "ORIGINAL ": ""}REQUEST DESCRIPTION`}</Typography>
-                <Typography className="acc-username-date">{details.createdBy} - {formatDate(details.createdAt, 'yyyy MMM dd')}</Typography>
+                <Typography className="acc-username-date">{details.createdBy} - {formatDateInPst(details.createdAt, 'yyyy MMM dd')}</Typography>
             </AccordionSummary>
             <AccordionDetails className="acc-details">
                 <div className="acc-details-1">
