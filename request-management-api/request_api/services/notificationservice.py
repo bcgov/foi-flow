@@ -205,8 +205,10 @@ class notificationservice:
             notification.foirequestid = foirequest["foirequest_id"]
         else:
             notification = FOIRawRequestNotification()
-            notification.requestid = foirequest["requestid"]     
-            notification.idnumber = 'U-00' + str(foirequest['requestid'])  
+            notification.requestid = foirequest["requestid"]
+            idnumber = self.__getidnumber(foirequest["axisrequestid"], 'U-00' + str(foirequest['requestid']))
+            notification.idnumber = idnumber #'U-00' + str(foirequest['requestid'])
+
         notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
         notification.version = foirequest["version"]        
         notification.createdby = userid
