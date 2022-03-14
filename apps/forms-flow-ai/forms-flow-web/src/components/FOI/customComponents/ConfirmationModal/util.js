@@ -93,6 +93,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper"
   export const getUpdatedAssignedTo = (_assignedTo, _processingTeamList, _state, _requestType) => {
     if (_requestType?.toLowerCase() === 'personal' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase()) 
       return _processingTeamList.join(", ");    
-    else 
+    else if (_requestType?.toLowerCase() === 'general' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase())
+      return "Flex Team";
+    else
       return _assignedTo;
   }

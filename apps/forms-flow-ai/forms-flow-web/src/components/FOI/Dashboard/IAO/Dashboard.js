@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Grid from "@mui/material/Grid";
@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
+import { getTableInfo } from "./columns";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -24,6 +25,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Dashboard = ({ userDetail }) => {
+  const user = useSelector((state) => state.user.userDetail);
+  const tableInfo = getTableInfo(user.groups);
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -58,7 +61,10 @@ const Dashboard = ({ userDetail }) => {
             justifyContent="flex-start"
             alignItems="center"
           >
-            <ButtonBase onClick={() => setAdvancedSearchEnabled(false)}>
+            <ButtonBase
+              onClick={() => setAdvancedSearchEnabled(false)}
+              disableRipple
+            >
               <h3
                 className={clsx("foi-request-queue-text", {
                   [classes.disabledTitle]: advnacedSearchEnabled,
@@ -69,7 +75,8 @@ const Dashboard = ({ userDetail }) => {
             </ButtonBase>
             <Divider
               sx={{
-                m: 1,
+                mr: 2,
+                ml: 2,
                 borderRightWidth: 3,
                 height: 28,
                 borderColor: "black",
@@ -77,7 +84,10 @@ const Dashboard = ({ userDetail }) => {
               flexItem
               orientation="vertical"
             />
-            <ButtonBase onClick={() => setAdvancedSearchEnabled(true)}>
+            <ButtonBase
+              onClick={() => setAdvancedSearchEnabled(true)}
+              disableRipple
+            >
               <h3
                 className={clsx("foi-request-queue-text", {
                   [classes.disabledTitle]: !advnacedSearchEnabled,
@@ -108,7 +118,7 @@ const Dashboard = ({ userDetail }) => {
             marginTop: "2em",
           }}
         >
-          <Queue userDetail={userDetail} />
+          <Queue userDetail={userDetail} tableInfo={tableInfo} />
         </Grid>
 
         <Grid

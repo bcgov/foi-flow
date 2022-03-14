@@ -46,12 +46,6 @@ class extensionevent:
         onlycleanuprequired = self.__onlycleanuprequired(curextension, prevextension, event)
         onlynotificationrequired = self.__onlynotificationrequired(curextension, prevextension, event)
         notificationandcleanup = self.__bothnotificationandcleanup(curextension, prevextension, event)
-
-        print("nootificationrequired == ", nootificationrequired)
-        print("onlycleanuprequired == ", onlycleanuprequired)
-        print("onlynotificationrequired == ", onlynotificationrequired)
-        print("notificationandcleanup == ", notificationandcleanup)
-       
         if nootificationrequired == True:
             return DefaultMethodResult(True, "No Notification", ministryrequestid)
         elif onlycleanuprequired == True:
@@ -68,7 +62,6 @@ class extensionevent:
         _extensionnotifications = notificationservice().getextensionnotifications(extensionid)
         noticiationids = []
         for _extensionnotification in _extensionnotifications:
-            print("_extensionnotification == ", _extensionnotification)
             noticiationids.append(_extensionnotification["notificationid"])
             notificationservice().dismissnotificationbyid("ministryrequest", noticiationids)             
         return DefaultMethodResult(True,'Extension notifications deleted', extensionid)   
@@ -227,7 +220,7 @@ class extensionevent:
         return dateutil.parser.parse(datevalue).strftime(format) if datevalue is not None else None
 
     def __genericdateformat(self):
-        return '%Y %b %d'       
+        return '%b %d %Y'       
 
 class EventType(Enum):
     add = "add"    

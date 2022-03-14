@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   DataGrid,
   gridPageCountSelector,
   gridPageSelector,
   useGridApiContext,
   useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+} from "@mui/x-data-grid";
+import Pagination from "@mui/material/Pagination";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,8 +18,6 @@ import {
   ClickableChip,
   getAssigneeValue,
   updateSortModel,
-  getFullName,
-  getReceivedDate,
 } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
@@ -28,8 +26,9 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import clsx from "clsx";
 
-const Queue = ({ userDetail }) => {
+const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
 
   const requestQueue = useSelector(
@@ -38,20 +37,13 @@ const Queue = ({ userDetail }) => {
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
   const classes = useStyles();
-  useEffect(() => {
-    dispatch(fetchFOIRequestListByPage());
-  }, [dispatch]);
 
   const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  const [rowsState, setRowsState] = useState(defaultRowsState);
+  const [sortModel, setSortModel] = useState(tableInfo.sort);
 
-  const defaultSortModel = [
-    { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
-  ];
-  const [sortModel, setSortModel] = React.useState(defaultSortModel);
   let serverSortModel;
-  const [filterModel, setFilterModel] = React.useState({
+  const [filterModel, setFilterModel] = useState({
     fields: [
       "firstName",
       "lastName",
@@ -81,54 +73,7 @@ const Queue = ({ userDetail }) => {
     );
   }, [rowsState, sortModel, filterModel, requestFilter]);
 
-  const columns = React.useRef([
-    {
-      field: "applicantName",
-      headerName: "APPLICANT NAME",
-      width: 170,
-      headerAlign: "left",
-      valueGetter: getFullName,
-    },
-    {
-      field: "requestType",
-      headerName: "REQUEST TYPE",
-      width: 150,
-      headerAlign: "left",
-    },
-    {
-      field: "idNumber",
-      headerName: "ID NUMBER",
-      width: 150,
-      headerAlign: "left",
-    },
-    {
-      field: "currentState",
-      headerName: "CURRENT STATE",
-      headerAlign: "left",
-      width: 180,
-    },
-    {
-      field: "assignedToName",
-      headerName: "ASSIGNED TO",
-      width: 180,
-      headerAlign: "left",
-    },
-    {
-      field: "receivedDate",
-      headerName: "RECEIVED DATE",
-      width: 180,
-      headerAlign: "left",
-      valueGetter: getReceivedDate,
-    },
-    { field: "xgov", headerName: "XGOV", width: 100, headerAlign: "left" },
-    {
-      field: "receivedDateUF",
-      headerName: "",
-      width: 0,
-      hide: true,
-      renderCell: (params) => <span></span>,
-    },
-  ]);
+  const columnsRef = React.useRef(tableInfo?.columns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
@@ -154,6 +99,10 @@ const Queue = ({ userDetail }) => {
     }));
   };
 
+  const rows = useMemo(() => {
+    return updateAssigneeName(requestQueue?.data);
+  }, [JSON.stringify(requestQueue)]);
+
   const renderReviewRequest = (e) => {
     if (e.row.ministryrequestid) {
       dispatch(
@@ -173,6 +122,14 @@ const Queue = ({ userDetail }) => {
       </Grid>
     );
   }
+
+  const handleSortChange = (model) => {
+    if (model.length === 0) {
+      return;
+    }
+
+    setSortModel(model);
+  };
 
   return (
     <>
@@ -196,7 +153,7 @@ const Queue = ({ userDetail }) => {
             container
             alignItems="center"
             direction="row"
-            xs={7}
+            xs={7.5}
             sx={{
               borderRight: "2px solid #38598A",
               backgroundColor: "rgba(56,89,138,0.1)",
@@ -222,10 +179,10 @@ const Queue = ({ userDetail }) => {
             item
             container
             alignItems="flex-start"
-            justifyContent="space-around"
-            xs={5}
+            justifyContent="center"
+            xs={4.5}
           >
-            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={2}>
+            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
               <ClickableChip
                 key={`my-requests`}
                 label={"MY REQUESTS"}
@@ -258,8 +215,8 @@ const Queue = ({ userDetail }) => {
         <DataGrid
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(requestQueue?.data)}
-          columns={columns.current}
+          rows={rows}
+          columns={columnsRef.current}
           rowHeight={30}
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
@@ -269,7 +226,7 @@ const Queue = ({ userDetail }) => {
           disableColumnMenu={true}
           pagination
           paginationMode="server"
-          page = {rowsState.page}
+          page={rowsState.page}
           onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
           onPageSizeChange={(pageSize) =>
             setRowsState((prev) => ({ ...prev, pageSize }))
@@ -278,13 +235,22 @@ const Queue = ({ userDetail }) => {
             Pagination: CustomPagination,
           }}
           sortingOrder={["desc", "asc"]}
-          sortModel={sortModel}
+          sortModel={[sortModel[0]]}
           sortingMode={"server"}
-          onSortModelChange={(model) => setSortModel(model)}
+          onSortModelChange={(model) => {
+            if (model) {
+              handleSortChange(model);
+            }
+          }}
           getRowClassName={(params) =>
-            `super-app-theme--${params.row.currentState
-              .toLowerCase()
-              .replace(/ +/g, "")}`
+            clsx(
+              `super-app-theme--${params.row.currentState
+                .toLowerCase()
+                .replace(/ +/g, "")}`,
+              tableInfo?.stateClassName?.[
+                params.row.currentState.toLowerCase().replace(/ +/g, "")
+              ]
+            )
           }
           onRowClick={renderReviewRequest}
           loading={isLoading}
@@ -306,6 +272,6 @@ const CustomPagination = () => {
       onChange={(event, value) => apiRef.current.setPage(value - 1)}
     />
   );
-}
+};
 
 export default Queue;

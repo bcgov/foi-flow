@@ -125,6 +125,8 @@ class FOIDisableComment(Resource):
                 result = commentservice().disableministryrequestcomment(commentid, AuthHelper.getuserid())
             else:
                 result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getuserid())
+            if result.success == True:
+                asyncio.create_task(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
