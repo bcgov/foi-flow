@@ -39,12 +39,12 @@ def cache_filter(*args, **kwargs):
         request_api.cache.get("")
     except Exception:
         return True
-    
     return False
 
 ## If True, cache response  
 def response_filter(resp):
-    if resp[-1] == 200 and resp[0] not in (None, ''):
+    print(resp)
+    if resp[-1] == 200 and resp[0] not in (None, '', '[]'):
         return True
     else:
         return False
