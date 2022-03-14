@@ -69,12 +69,23 @@ const FOIRequestHeader = React.memo(
 
     const preventDefault = (event) => event.preventDefault();
     const requestState = requestDetails?.currentState;
-    
+
+    useEffect(() => {
+      // handle case where assigned user was removed from group
+      if (assignedToList && assignedToList.length > 0) {
+        var team = assignedToList.find(team => team.name === requestDetails.assignedGroup);
+        if (team && requestDetails.assignedTo && !team.members.find(member => member.username === requestDetails.assignedTo)) {
+          setAssignedTo("|Unassigned");
+          handleAssignedToValue("|Unassigned");
+        }
+      }
+    }, [assignedToList]);
+
     useEffect(() => {
       setMenuItems(
         getMenuItems({ classes, assignedToList, selectedAssignedTo })
       );
-    }, [selectedAssignedTo, assignedToList]);
+    }, [selectedAssignedTo, assignedToList]);    
 
     //handle onChange event for assigned To
     const handleAssignedToOnChange = (event) => {
