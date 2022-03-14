@@ -13,12 +13,39 @@
 # limitations under the License.
 import os
 
+import request_api
+
 class Config(object):
-    CACHE_TYPE ='redis'
+    ## type 'redis' is deprecated
+    CACHE_TYPE ='RedisCache'
+    
     CACHE_REDIS_HOST = os.getenv('FOI_REQUESTQUEUE_REDISHOST')
     CACHE_REDIS_PORT = os.getenv('FOI_REQUESTQUEUE_REDISPORT')
     CACHE_REDIS_DB = 0
     CACHE_REDIS_URL = os.getenv('FOI_REQUESTQUEUE_REDISURL')
     CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_TIMEOUT')
     CACHE_KEY_PPREFIX = 'foi'
+        
+    ## include code of function in hash
+    CACHE_SOURCE_CHECK = True
+
+## If true, bypass cache
+def cache_filter(*args, **kwargs):
+    try:        
+        cache_disabled = os.getenv('CACHE_ENABLED') != 'Y'
+        if cache_disabled:
+            return True
+        
+        request_api.cache.get("")
+    except Exception:
+        return True
+    
+    return False
+
+## If True, cache response  
+def response_filter(resp):
+    if resp[-1] == 200 and resp[0] not in (None, ''):
+        return True
+    else:
+        return False
 
