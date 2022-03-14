@@ -100,7 +100,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header 
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header LDD'), 0)
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 

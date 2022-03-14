@@ -22,7 +22,7 @@ import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
             8), ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
@@ -58,7 +58,7 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 

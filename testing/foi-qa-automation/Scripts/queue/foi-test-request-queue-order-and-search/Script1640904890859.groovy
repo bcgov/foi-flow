@@ -27,7 +27,7 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 'aria-sort', 'descending', 
     0)
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), request1ID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), request1ID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
@@ -40,7 +40,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue ro
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 
     'rgba(207, 215, 227, 1)', false)
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), 'intake in progress')
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'intake in progress')
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
