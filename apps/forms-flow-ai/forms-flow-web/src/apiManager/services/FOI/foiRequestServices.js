@@ -422,7 +422,7 @@ export const fetchRequestDataFromAxis = (axisRequestId,...rest) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(setAxisRequest(res.data));
+          dispatch(setFOIRequestDetail(res.data));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));

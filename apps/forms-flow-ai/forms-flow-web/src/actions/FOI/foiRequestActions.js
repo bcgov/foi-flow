@@ -205,9 +205,3 @@ export const setExistingAxisRequestIds = (data) => (dispatch) => {
     });
   };
 
-  export const setAxisRequest = (data) => (dispatch) => {
-    dispatch({
-      type: FOI_ACTION_CONSTANTS.FOI_AXIS_REQUEST_DATA,
-      payload: data,
-    });
-  };

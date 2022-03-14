@@ -10,7 +10,6 @@ import { fetchRequestDataFromAxis } from '../../../apiManager/services/FOI/foiRe
 const AxisDetails = React.memo(({  
     requestDetails,
     createSaveRequestObject,
-    syncAxisData,
     foiAxisRequestIds,
     handleAxisDetailsValue,
     handleAxisIdValidation
@@ -54,15 +53,12 @@ const AxisDetails = React.memo(({
     const syncWithAxis = () => {
         dispatch(fetchRequestDataFromAxis(axisRequestId, (err, data) => {
             if(!err){
-                if(Object.entries(data).length !== 0)
-                    syncAxisData(data);
-                else{
+                if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}
                     setValidation(axisIdValidation);  
                 }
             }
         }));
-
     }
 
      return (

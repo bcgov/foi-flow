@@ -58,10 +58,6 @@ import {
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails';
-import {
-  setFOIRequestDetail,
-
-} from "../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -172,9 +168,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
-  const syncAxisData = (syncedData) =>{
-    dispatch(setFOIRequestDetail(syncedData));
-  }
 
   useEffect(() => {
     const requestDetailsValue = requestDetails;
@@ -573,7 +566,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       {(isAddRequest || requestState === StateEnum.unopened.name) &&
                         <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
-                        syncAxisData={syncAxisData} foiAxisRequestIds={foiAxisRequestIds}
+                        foiAxisRequestIds={foiAxisRequestIds}
                         handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
                       }
                       <ApplicantDetails
