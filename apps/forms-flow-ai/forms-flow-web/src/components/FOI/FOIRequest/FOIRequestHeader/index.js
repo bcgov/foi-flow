@@ -80,7 +80,7 @@ const FOIRequestHeader = React.memo(
       // handle case where assigned user was removed from group
       if (assignedToList && assignedToList.length > 0) {
         var team = assignedToList.find(team => team.name === requestDetails.assignedGroup);
-        if (!team || !team.members.find(member => member.username === requestDetails.assignedTo)) {
+        if (!team || (requestDetails.assignedTo && !team.members.find(member => member.username === requestDetails.assignedTo))) {
           setAssignedTo("|Unassigned");
           handleAssignedToValue("|Unassigned");
         }
