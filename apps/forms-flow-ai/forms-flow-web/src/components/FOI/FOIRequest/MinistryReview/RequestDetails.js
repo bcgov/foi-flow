@@ -11,7 +11,7 @@ const RequestDetails = React.memo((requestDetails) => {
     return Object.entries(_requestDetails).length > 0 &&
       _requestDetails != undefined ? (
       <>
-        <Card className="foi-details-card">
+        <Card id="requestDetailsMinistry" className="foi-details-card">
           <div className="row foi-details-row">
             <div className="col-lg-8 foi-details-col ">
               <label className="foi-details-label">REQUEST DETAILS</label>

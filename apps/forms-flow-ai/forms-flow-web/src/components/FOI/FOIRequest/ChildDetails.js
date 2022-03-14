@@ -63,7 +63,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     }  
      return (
         
-        <Card className="foi-details-card">            
+        <Card className="foi-details-card" id="childDetails">
             <label className="foi-details-label">CHILD DETAILS</label>
             <CardContent>
                 <div className="row foi-details-row">
