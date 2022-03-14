@@ -50,19 +50,20 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 t
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment 2')
+for (int i = 2; i < 10; i++) {	
+	WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment ' + i)
+	
+	WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
+}
 
-WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment 3')
+WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment 10')
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/div_Comment list 4'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/div_Comment list 10'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 
@@ -70,7 +71,7 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/button_Show more com
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/comment/div_Comment list 4'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/comment/div_Comment list 10'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 

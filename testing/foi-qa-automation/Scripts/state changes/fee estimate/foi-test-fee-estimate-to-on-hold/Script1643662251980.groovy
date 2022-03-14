@@ -113,7 +113,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hol
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
-    WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'))) + ' to on hold?\nThis will stop the clock and assign to Processing Team')
+    WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'))) + ' to on hold?\nThis will stop the clock.')
 
 WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [:], FailureHandling.STOP_ON_FAILURE)
 
