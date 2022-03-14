@@ -76,7 +76,6 @@ class rawrequestservice:
         #Get documents
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
-        asyncio.create_task(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
         return result
 
    
