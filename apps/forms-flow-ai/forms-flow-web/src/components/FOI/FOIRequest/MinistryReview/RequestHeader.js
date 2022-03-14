@@ -15,14 +15,18 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
     const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     const requestState = requestDetails?.currentState;
+    const assignedToList = useSelector(
+      (state) => state.foiRequests.foiFullAssignedToList
+    );
     const preventDefault = (event) => event.preventDefault();
 
     const dispatch = useDispatch();
     useEffect(() => {
-      dispatch(fetchFOIFullAssignedToList());
-    },[dispatch]); 
+      if (!assignedToList || assignedToList.length === 0) {
+        dispatch(fetchFOIFullAssignedToList());
+      }
+    }, [dispatch]); 
 
-    const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
     function getFullName(assignedToList, requestDetails) {
         const groupName = requestDetails.assignedGroup ? requestDetails.assignedGroup : "Unassigned";
         const assignedTo = requestDetails.assignedTo ? requestDetails.assignedTo : groupName;
