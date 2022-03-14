@@ -308,7 +308,7 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    requiredAxisDetails.axisRequestId === ""
+    !requiredAxisDetails.axisRequestId
   );
 };
 

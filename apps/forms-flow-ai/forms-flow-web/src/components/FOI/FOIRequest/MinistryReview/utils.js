@@ -1,6 +1,7 @@
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
 import { getExtensionsCountText } from "../utils";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 
 export const getMinistryBottomTextMap = (
   requestDetails,
@@ -36,4 +37,14 @@ export const getMinistryBottomTextMap = (
   bottomTexts.push(getExtensionsCountText(requestExtensions));
 
   return bottomTexts;
+};
+
+export const getHeaderText = (requestDetails) => {
+  console.log("Req", requestDetails);
+  if(requestDetails.axisRequestId)
+    return requestDetails.axisRequestId;
+
+  if (requestDetails.idNumber)
+    return `Request #${requestDetails.idNumber}`;   
+  return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
 };

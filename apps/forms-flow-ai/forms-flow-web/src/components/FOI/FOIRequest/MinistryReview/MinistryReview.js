@@ -428,7 +428,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.isAttachmentListLoading
   );
 
-  const requestNumber = requestDetails && requestDetails.idNumber;
+  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
 
   return !isLoading &&
     requestDetails &&
