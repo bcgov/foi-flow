@@ -466,7 +466,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  const requestNumber = requestDetails?.idNumber;
+  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
 
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
