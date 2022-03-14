@@ -5,6 +5,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 from datetime import datetime
+from request_api.utils.enums import RequestType
 import dateutil.parser
 class auditservice:
     """ FOI audit management service
@@ -68,7 +69,7 @@ class auditservice:
             if AuthHelper.getusertype() == "iao":
                 _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": entry['createdat'] , "createdby": entry['createdby'], "status": entry['status']})        
             else:
-                if entry['ispiiredacted'] == True:
+                if requestrecord['requesttype'] == 'personal' or entry['ispiiredacted'] == True:
                     _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": entry['createdat'] , "createdby": entry['createdby'], "status": entry['status']})            
         return _rawdescriptions
         
