@@ -1,24 +1,44 @@
-
 .active {
   display: block !important;
 }
 
 .foiformcontent {
-    display: inline-flex;  
-    padding-top: 65px;
-    position: relative;
- 
-    margin-left: 12%;
-    margin-right: 12%;
-    margin-bottom: 5%;
+  display: inline-flex;  
+  padding-top: 65px;
+  position: relative;
 
-    height: 90%;
+  margin-left: 12%;
+  margin-right: 12%;
+  margin-bottom: 5%;
+
+  height: 90%;
+}
+
+@media only screen and (min-width: 1800px) {
+  .foiformcontent {
+    margin-left: 19%;
+    margin-right: 19%;
   }
+}
 
 
-  .foitabbedContainer{
-    display: inline-flex;  
-    background-color: white;
+@media (min-width: 1000px) and (max-width: 1230px) {
+  .foiformcontent {
+    margin-left: calc(62vw - 615px);
+    margin-right: calc(62vw - 615px);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1000px) {
+  .foiformcontent {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}
+
+.foitabbedContainer{
+  display: inline-flex;  
+  background-color: white;
 }
 
   
@@ -51,7 +71,7 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: auto;
+    height: calc(100% - 96px - 67px);
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;
@@ -60,8 +80,7 @@
     z-index: 10;
   }
   .foitabpanelcollection{
-    margin-left:20%;
-    min-width: 1000px;
+    margin-left: 200px;
   }
 
   .foitabheaderdefaultBG {    
@@ -155,7 +174,9 @@
 
   .foileftpanelstatus
   {
-    padding-bottom: 1%;
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 20%;
     padding-top: 30%;
     padding-left: 10%;
     color: white;
@@ -288,16 +309,4 @@ span.circle
 .foitabpanelcollection .active {
   display: inline-block;
   width: 100%;
-}
-
-@media only screen and (max-width:1920px){
-  .foitabpanelcollection{
-      min-width: 1000px;
-  }
-}
-
-@media screen and (max-width: 6000px) and (min-width: 1920px), (min-width: 1920px) {
-  .foitabpanelcollection{
-    min-width: 1150px;
-  }
 }

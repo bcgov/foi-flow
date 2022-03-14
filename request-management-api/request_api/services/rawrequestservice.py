@@ -76,15 +76,14 @@ class rawrequestservice:
         #Get documents
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
-        asyncio.create_task(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
         return result
 
    
     def updateworkflowinstance(self, wfinstanceid, requestid, userid):
         return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userid)
 
-    def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,status,notes, userid):
-        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userid)    
+    def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,notes, userid):
+        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,notes, userid)    
     
     async def posteventtoworkflow(self, id, wfinstanceid, requestsschema, status):
         return workflowservice().postunopenedevent(id, wfinstanceid, requestsschema, status)

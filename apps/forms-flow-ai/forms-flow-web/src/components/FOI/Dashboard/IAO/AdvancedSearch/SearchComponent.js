@@ -63,6 +63,9 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     backgroundColor: "#F9FBFD",
   },
+  checkboxLabel: {
+    marginBottom: 0,
+  },
 }));
 
 const AdvancedSearch = ({ userDetail }) => {
@@ -244,11 +247,13 @@ const AdvancedSearch = ({ userDetail }) => {
     if (!clicked) {
       return (
         <Chip
-          sx={{
-            color: "#38598A",
-            border: "1px solid #38598A",
-            width: "100%",
-          }}
+          sx={[
+            {
+              color: "#38598A",
+              border: "1px solid #38598A",
+              width: "100%",
+            },
+          ]}
           variant="outlined"
           {...rest}
         />
@@ -257,10 +262,17 @@ const AdvancedSearch = ({ userDetail }) => {
 
     return (
       <Chip
-        sx={{
-          backgroundColor: "#38598A",
-          width: "100%",
-        }}
+        sx={[
+          {
+            backgroundColor: "#38598A",
+            width: "100%",
+          },
+          {
+            "&:hover": {
+              backgroundColor: "#38598A",
+            },
+          },
+        ]}
         {...rest}
       />
     );
@@ -373,6 +385,7 @@ const AdvancedSearch = ({ userDetail }) => {
                   sx={{
                     fontWeight: "bold",
                   }}
+                  variant="h6"
                 >
                   Advanced Search
                 </Typography>
@@ -397,12 +410,8 @@ const AdvancedSearch = ({ userDetail }) => {
                   key={`filter-raw-request`}
                   label={"ID NUMBER"}
                   color="primary"
-                  onClick={() =>
-                    clickSearchFilter(SearchFilter.ID_NUM)
-                  }
-                  clicked={
-                    searchFilterSelected === SearchFilter.ID_NUM
-                  }
+                  onClick={() => clickSearchFilter(SearchFilter.ID_NUM)}
+                  clicked={searchFilterSelected === SearchFilter.ID_NUM}
                 />
               </Grid>
 
@@ -455,8 +464,8 @@ const AdvancedSearch = ({ userDetail }) => {
                   <Typography
                     sx={{
                       fontWeight: "bold",
-                      marginBottom: "2em",
                     }}
+                    variant="h6"
                   >
                     Request State
                   </Typography>
@@ -464,6 +473,7 @@ const AdvancedSearch = ({ userDetail }) => {
                 <Grid item xs={12}>
                   <FormGroup>
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -475,6 +485,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Unopened"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -486,6 +497,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Call for Records"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -497,6 +509,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Records Review"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -508,6 +521,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Ministry Sign Off"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -527,8 +541,8 @@ const AdvancedSearch = ({ userDetail }) => {
                   <Typography
                     sx={{
                       fontWeight: "bold",
-                      marginBottom: "2em",
                     }}
+                    variant="h6"
                   >
                     Request Status
                   </Typography>
@@ -536,6 +550,7 @@ const AdvancedSearch = ({ userDetail }) => {
                 <Grid item xs={12}>
                   <FormGroup>
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -547,6 +562,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Overdue"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -567,6 +583,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     sx={{
                       fontWeight: "bold",
                     }}
+                    variant="h6"
                   >
                     Request Type
                   </Typography>
@@ -575,6 +592,7 @@ const AdvancedSearch = ({ userDetail }) => {
                 <Grid item xs={12}>
                   <FormGroup>
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -586,6 +604,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       label="Personal"
                     />
                     <FormControlLabel
+                      className={classes.checkboxLabel}
                       control={
                         <Checkbox
                           size="small"
@@ -606,6 +625,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     sx={{
                       fontWeight: "bold",
                     }}
+                    variant="h6"
                   >
                     Search by Date Range
                   </Typography>
@@ -618,6 +638,9 @@ const AdvancedSearch = ({ userDetail }) => {
                   justifyContent="flex-start"
                   alignItems="center"
                   xs={12}
+                  sx={{
+                    mb: "1em",
+                  }}
                 >
                   <Grid item xs={5}>
                     <TextField
@@ -644,6 +667,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       sx={{
                         fontWeight: "bold",
                       }}
+                      variant="h6"
                     >
                       to
                     </Typography>
@@ -676,6 +700,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     sx={{
                       fontWeight: "bold",
                     }}
+                    variant="h6"
                   >
                     Search by Public Body
                   </Typography>
@@ -729,34 +754,33 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
               </Grid>
 
-              <Grid item xs={12} container direction="row" columnSpacing={2}>
-                <Grid item xs={3}>
+              <Grid item xs={12} container direction="row" columnSpacing={1}>
+                <Grid item>
                   <Button
                     color="primary"
                     sx={{
                       backgroundColor: "#38598A",
-                      width: "100%",
                       color: "white",
                       fontWeight: "bold",
+                      textTransform: "none",
                     }}
-                    fullWidth
                     variant="contained"
                     onClick={handleApplySearchFilters}
                     disabled={searchLoading}
+                    disableElevation
                   >
                     Apply Search
                   </Button>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item>
                   <Button
                     variant="outlined"
                     sx={{
                       color: "#38598A",
                       border: "1px solid #38598A",
-                      width: "100%",
                       fontWeight: "bold",
+                      textTransform: "none",
                     }}
-                    fullWidth
                     onClick={handleResetSearchFilters}
                   >
                     Clear All Filters

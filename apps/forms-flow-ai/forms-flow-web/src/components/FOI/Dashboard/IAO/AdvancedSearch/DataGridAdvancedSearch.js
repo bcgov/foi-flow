@@ -67,49 +67,50 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     {
       field: "applicantName",
       headerName: "APPLICANT NAME",
-      width: 170,
+      flex: 1,
       headerAlign: "left",
-      valueGetter: getFullName,
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
     },
     {
       field: "requestType",
       headerName: "REQUEST TYPE",
-      width: 150,
+      flex: 1,
       headerAlign: "left",
     },
     {
       field: "idNumber",
       headerName: "ID NUMBER",
-      width: 150,
+      flex: 1,
       headerAlign: "left",
     },
     {
       field: "currentState",
       headerName: "CURRENT STATE",
       headerAlign: "left",
-      width: 180,
+      flex: 1,
     },
     {
       field: "assignedToName",
       headerName: "ASSIGNED TO",
-      width: 180,
+      flex: 1,
       headerAlign: "left",
     },
     {
       field: "DueDateValue",
       headerName: "LDD",
-      width: 100,
+      flex: 1,
       headerAlign: "left",
       valueGetter: getLDD,
     },
     {
       field: "DaysLeftValue",
       headerName: "DAYS LEFT",
-      width: 100,
+      flex: 0.5,
       headerAlign: "left",
       valueGetter: getDaysLeft,
     },
-    { field: "xgov", headerName: "XGOV", width: 100, headerAlign: "left" },
+    { field: "xgov", headerName: "XGOV", flex: 0.5, headerAlign: "left" },
   ]);
 
   const updateAssigneeName = (data) => {

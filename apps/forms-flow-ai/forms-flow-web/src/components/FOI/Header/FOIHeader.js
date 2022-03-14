@@ -15,6 +15,7 @@ import {
 import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
 import io from "socket.io-client";
 import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX} from "../../../constants/constants";
+import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 
 
 const FOIHeader = React.memo(({unauthorized=false}) => { 
@@ -32,17 +33,19 @@ const openModal = (coordinates) => {
   setScreenPosition(screenX);
   setOpen(!open);
 }
-const [messageData, setMessageData] = useState("");
+const [messageData, setMessageData] = useState([]);
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
 const [socket, setSocket] = useState(null);
 
 const userGroups = user?.groups?.map(group => group.slice(1));
 isMinistry = isMinistryLogin(userGroups);
 ministryCode = getMinistryCode(userGroups);
-
+console.log("USER", user?.preferred_username);
 useEffect(() => {     
   if(!unauthorized && isAuthenticated){
+    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  
+    console.log("Token for Socket:", UserService.getToken());
     const options = {
       reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
       reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
@@ -51,15 +54,25 @@ useEffect(() => {
       auth: { "x-jwt-token": UserService.getToken() }
     };
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
-  
+    //console.log("Socket Val after connect:", socket);
     setInterval(() => {
       dispatch(fetchFOINotifications());
     }, 900000);
   }
 },[]);
 
-useEffect(() => {     
-    socket?.on(user.preferred_username, data => setMessageData(oldMessageData => [data, ...oldMessageData]));
+console.log("Socket Value:", socket);
+
+useEffect(() => {    
+    console.log("USER inside useeffect of socket:", user?.preferred_username); 
+    socket?.on(user.preferred_username, data => {
+     if(data.action === 'delete'){
+      setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
+     }
+     else{
+      setMessageData(oldMessageData => [data, ...oldMessageData])
+     }
+    });
   },[socket]);
 
 useEffect(() => {     
@@ -68,8 +81,10 @@ useEffect(() => {
   }
 },[foiNotifications]);
 
+
  const signout = () => {
     socket?.disconnect();
+    console.log("Socket Val after disconnect:", socket);
     localStorage.removeItem('authToken');
     dispatch(push(`/`));
     UserService.userLogout(); 

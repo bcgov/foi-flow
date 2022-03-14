@@ -93,7 +93,28 @@ class FOIRequestExtension(db.Model):
         for row in rs:
             if row["isactive"] == True:
                 extensions.append(dict(row))
-        return extensions    
+        return extensions
+    
+    @classmethod   
+    def getextensionscount(cls,ministryrequestid):
+        sql = """SELECT 
+                    count(*) as extensions_count
+                    FROM 
+                    (
+                        SELECT 
+                            DISTINCT ON (foirequestextensionid) foirequestextensionid, 
+                            fre.extensionstatusid 
+                        FROM 
+                            "FOIRequestExtensions" fre 
+                            INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid 
+                        WHERE foiministryrequest_id = :ministryrequestid 
+                            AND es.extensionstatusid = 2
+                            AND fre.isactive is True
+                    ) AS list """
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        for row in rs:
+            return row["extensions_count"]
+        return None
 
     @classmethod
     def getlatestapprovedextension(cls, extensionid, ministryrequestid, ministryrequestversion):   
@@ -107,9 +128,10 @@ class FOIRequestExtension(db.Model):
     
     @classmethod
     def getextensionforversion(cls, foirequestextensionid, version):   
-        document_schema = FOIRequestExtensionSchema()            
-        request = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid, FOIRequestExtension.version == version).order_by(FOIRequestExtension.version.desc()).first()
-        return document_schema.dump(request)
+        extension_schema = FOIRequestExtensionSchema()            
+        extension = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid, FOIRequestExtension.version == version).order_by(FOIRequestExtension.version.desc()).first()
+        return extension_schema.dump(extension)
+
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:

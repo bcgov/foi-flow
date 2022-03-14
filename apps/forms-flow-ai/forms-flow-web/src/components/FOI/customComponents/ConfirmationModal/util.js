@@ -73,7 +73,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper"
       case StateEnum.harms.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};       
       case StateEnum.onhold.name.toLowerCase():
-          return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <span className="confirm-message-2">This will <b>stop</b> the clock and assign to Processing Team </span> </>};
+          return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <span className="confirm-message-2">This will <b>stop</b> the clock.</span> </>};
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
           return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
@@ -93,6 +93,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper"
   export const getUpdatedAssignedTo = (_assignedTo, _processingTeamList, _state, _requestType) => {
     if (_requestType?.toLowerCase() === 'personal' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase()) 
       return _processingTeamList.join(", ");    
-    else 
+    else if (_requestType?.toLowerCase() === 'general' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase())
+      return "Flex Team";
+    else
       return _assignedTo;
   }

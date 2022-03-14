@@ -12,12 +12,15 @@ from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 import json
 from flask import current_app
-
 class eventservice:
     """ FOI event management service
 
     """
+    
     async def postevent(self, requestid, requesttype, userid, username, isministryuser):
+        self.posteventsync(requestid, requesttype, userid, username, isministryuser)
+    
+    def posteventsync(self, requestid, requesttype, userid, username, isministryuser):
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
@@ -26,8 +29,8 @@ class eventservice:
                 current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
-
-    async def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
+ 
+    def posteventforextension(self, ministryrequestid, extensionid, userid, username, event):
         try:
             extensioneventresponse = extensionevent().createextensionevent(ministryrequestid, extensionid, userid, username, event)
             if extensioneventresponse.success == False: 
@@ -46,9 +49,9 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
        
-    async def postcommentevent(self, commentid, requesttype, userid):
+    async def postcommentevent(self, commentid, requesttype, userid, isdelete=False):
         try:
-            commentresponse = commentevent().createcommentevent(commentid, requesttype, userid) 
+            commentresponse = commentevent().createcommentevent(commentid, requesttype, userid, isdelete) 
             if commentresponse.success == False :
                 current_app.logger.error("FOI Notification failed for comment event=%s" % (commentresponse.message))     
                 return DefaultMethodResult(False,'Comment notifications failed',commentresponse.identifier)

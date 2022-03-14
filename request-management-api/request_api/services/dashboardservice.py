@@ -2,6 +2,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestWatchers import FOIRequestWatcher
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
+from request_api.services.extensionservice import extensionservice
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
@@ -20,13 +21,31 @@ class dashboardservice:
 
     """
 
-    def __preparefoirequestinfo(self, id, firstname, lastname, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version, assignedtofirstname, assignedtolastname):
-        baserequestinfo = self.__preparebaserequestinfo(id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version)
-        baserequestinfo.update({'firstName': firstname})
-        baserequestinfo.update({'lastName': lastname})
+    def __init__(self):
+        self.extension_service = extensionservice()
+
+    def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
+        baserequestinfo = self.__preparebaserequestinfo(
+            request.id, 
+            request.requestType, 
+            request.currentState, 
+            receiveddate, 
+            receiveddateuf, 
+            request.assignedGroup, 
+            request.assignedTo, 
+            idnumberprefix + request.idNumber, 
+            request.version
+        )
+        baserequestinfo.update({'firstName': request.firstName})
+        baserequestinfo.update({'lastName': request.lastName})
         baserequestinfo.update({'xgov': 'No'})
-        baserequestinfo.update({'assignedToFirstName': assignedtofirstname})
-        baserequestinfo.update({'assignedToLastName': assignedtolastname})
+        baserequestinfo.update({'assignedToFirstName': request.assignedToFirstName})
+        baserequestinfo.update({'duedate': request.duedate})
+        baserequestinfo.update({'cfrduedate': request.cfrduedate})
+        baserequestinfo.update({'applicantcategory': request.applicantcategory})
+        baserequestinfo.update({'assignedToLastName': request.assignedToLastName})
+        baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
+        baserequestinfo.update({'onBehalfLastName': request.onBehalfFirstName})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, version):
@@ -52,16 +71,14 @@ class dashboardservice:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
             if(request.ministryrequestid == None):
-                unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                            request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
-                                                            request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
 
                 requestqueue.append(unopenrequest)
             else:
-                _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                            request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
-                                                            request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                extensionscount = self.extension_service.getrequestextensionscount(requestid = request.ministryrequestid)
+                _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                _openrequest.update({'extensions': extensionscount})
                 requestqueue.append(_openrequest)    
 
         meta = {
@@ -121,19 +138,13 @@ class dashboardservice:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
             if(request.ministryrequestid == None):
-                unopenrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                             request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
-                                                             request.assignedTo, 'U-00' + request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
-                unopenrequest.update({'duedate':request.duedate})
                 requestqueue.append(unopenrequest)
             else:
-                _openrequest = self.__preparefoirequestinfo(request.id, request.firstName, request.lastName, request.requestType,
-                                                            request.currentState, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), request.assignedGroup,
-                                                            request.assignedGroup, request.idNumber, request.version, request.assignedToFirstName, request.assignedToLastName)
+                _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 _openrequest.update({'description':request.description})
-                _openrequest.update({'duedate':request.duedate})
                 requestqueue.append(_openrequest)    
 
         meta = {

@@ -76,6 +76,7 @@ class FOIRawRequest(Resource):
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneefirstname,assigneemiddlename,assigneelastname)
+                asyncio.create_task(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
                 if result.success == True:
                     asyncio.create_task(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
@@ -138,7 +139,7 @@ class FOIRawRequestBPMProcess(Resource):
                 _wfinstanceid = request_json['wfinstanceid']
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               
-                result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,status,notes,AuthHelper.getuserid())
+                result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,notes,AuthHelper.getuserid())
                 if result.identifier != -1 :                
                     return {'status': result.success, 'message':result.message}, 200
                 else:
