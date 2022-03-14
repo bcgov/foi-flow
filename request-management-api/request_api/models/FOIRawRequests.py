@@ -408,11 +408,8 @@ class FOIRawRequest(db.Model):
         sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])
 
         #rawrequests
-        if "Intake Team" in params['groups'] or params['groups'] is None:                
-            query_full_queue = searchquery.union(subquery_ministry_queue)
-            return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
-        else:
-            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+        query_full_queue = searchquery.union(subquery_ministry_queue)
+        return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod
     def getfilterforadvancedsearch(cls, params):
