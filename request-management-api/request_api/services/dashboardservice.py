@@ -41,6 +41,7 @@ class dashboardservice:
         baserequestinfo.update({'xgov': 'No'})
         baserequestinfo.update({'assignedToFirstName': request.assignedToFirstName})
         baserequestinfo.update({'duedate': request.duedate})
+        baserequestinfo.update({'cfrduedate': request.cfrduedate})
         baserequestinfo.update({'applicantcategory': request.applicantcategory})
         baserequestinfo.update({'assignedToLastName': request.assignedToLastName})
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
