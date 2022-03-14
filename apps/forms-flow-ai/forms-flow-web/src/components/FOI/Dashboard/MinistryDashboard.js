@@ -46,6 +46,7 @@ const MinistryDashboard = ({ userDetail }) => {
       "applicantcategory",
       "requestType",
       "idNumber",
+      "axisRequestId",
       "currentState",
       "assignedministrypersonLastName",
       "assignedministrypersonFirstName",
@@ -126,7 +127,7 @@ const MinistryDashboard = ({ userDetail }) => {
 
   const columns = React.useRef([
     {
-      field: "idNumber",
+      field: "axisRequestId",
       headerName: "ID NUMBER",
       width: 150,
       headerAlign: "left",
