@@ -31,7 +31,6 @@ export const fetchFOIRequestList = () => {
             return { ...foiRequest };
           });
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(data));
         } else {
           dispatch(serviceActionError(res));
@@ -79,7 +78,6 @@ export const fetchFOIRequestListByPage = (
       .then((res) => {
         if (res.data) {
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(res.data));
         } else {
           dispatch(serviceActionError(res));
@@ -159,10 +157,9 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
 };
 
 export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
-  if(ministryId) {
+  if (ministryId) {
     return fetchFOIRequestDetails(requestId, ministryId);
-  }
-  else {
+  } else {
     return fetchFOIRawRequestDetails(requestId);
   }
 };
