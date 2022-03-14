@@ -465,22 +465,18 @@ class FOIRawRequest(db.Model):
         #request state: unopened, call for records, etc.
         requeststatecondition = []
         for state in params['requeststate']:
-            if(state == 3):
+            if(state == '3'):
                 requeststatecondition.append(FOIRawRequest.status == 'Closed')
                 includeclosed = True
-            elif(state == 4):
+            elif(state == '4'):
                 requeststatecondition.append(FOIRawRequest.status == 'Redirect')
-            elif(state == 5):
+            elif(state == '5'):
                 requeststatecondition.append(FOIRawRequest.status == 'Unopened')
-            elif(state == 6):
+            elif(state == '6'):
                 requeststatecondition.append(FOIRawRequest.status == 'Intake in Progress')
         
-        if(len(requeststatecondition) == 0 and len(params['requeststate']) == 0):
-            requeststatecondition.append(FOIRawRequest.status == 'Closed')
-            requeststatecondition.append(FOIRawRequest.status == 'Unopened')
-        elif(len(requeststatecondition) == 0 and len(params['requeststate']) > 0):
+        if(len(requeststatecondition) == 0):
             requeststatecondition.append(FOIRawRequest.status == 'Not Applicable')  #searched state does not apply to rawrequests
-
 
         return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
     
