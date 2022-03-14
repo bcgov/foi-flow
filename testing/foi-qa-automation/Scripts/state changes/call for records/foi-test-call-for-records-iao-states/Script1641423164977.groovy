@@ -17,9 +17,7 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('New Test Data').getValue('Password', 
-            2), ('username') : findTestData('New Test Data').getValue('Username', 2), ('firstname') : GlobalVariable.firstname
-        , ('lastname') : GlobalVariable.lastname, ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : ''
+WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('applicantFirstname') : '', ('applicantLastname') : '', ('category') : ''
         , ('email') : findTestData('Sample Applicant').getValue('email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue(
             'streetAddress', 1), ('streetAddress2') : findTestData('Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData(
             'Sample Applicant').getValue('city', 1), ('province') : findTestData('Sample Applicant').getValue('province', 
@@ -30,45 +28,49 @@ WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('passwor
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Open'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
-
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
-
-WebUI.delay(1, FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Closed'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Open'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Open'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/td_Next Assignee'), 'Processing Team')
-
-WebUI.click(findTestObject('Page_foi.flow/button_Cancel'))
-
-WebUI.delay(1, FailureHandling.STOP_ON_FAILURE)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Call For Records', 0)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Open'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'), 0)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'), 0)
 
-WebUI.delay(1, FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Open', 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [:], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Call For Records', 
+    0)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Open', 
+    0)
+
+requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), 0)
 
@@ -77,16 +79,20 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('New Test Data').getValue(
-        'First Name', 2) + ' ') + findTestData('New Test Data').getValue('Last Name', 2)) + ' changed the state of the request to Open')
+        'First Name', 1) + ' ') + findTestData('New Test Data').getValue('Last Name', 1)) + ' changed the state of the request to Open')
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard', FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 8)
-        , ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
+            8), ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 

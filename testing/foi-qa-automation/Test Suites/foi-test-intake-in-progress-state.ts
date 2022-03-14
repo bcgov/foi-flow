@@ -15,7 +15,7 @@
       <guid>862f5b17-9fe8-4969-a254-8f19e3425a42</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/state changes/intake/foi-test-intake-in-progress-state-cancel</testCaseId>
+      <testCaseId>Test Cases/state changes/intake and open/foi-test-intake-in-progress-state-cancel</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -135,7 +135,7 @@
       <guid>a65b875f-0b21-4464-86be-1501b6c49e7b</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/state changes/intake/foi-test-intake-in-progress-to-open</testCaseId>
+      <testCaseId>Test Cases/state changes/intake and open/foi-test-intake-in-progress-to-open</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -255,7 +255,7 @@
       <guid>29acd769-e2af-4ddc-9c5b-b33ce51facea</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/state changes/intake/foi-test-intake-in-progress-to-redirect</testCaseId>
+      <testCaseId>Test Cases/state changes/intake and open/foi-test-intake-in-progress-to-redirect</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -375,7 +375,7 @@
       <guid>c2c0564d-caa5-4a1c-906c-bb9eac165fdc</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-assign-to-flex</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-assign-to-flex</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -495,7 +495,7 @@
       <guid>6748084b-6d09-4b43-bb2b-ff77f11225ce</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-assign-to-processing</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-assign-to-processing</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>

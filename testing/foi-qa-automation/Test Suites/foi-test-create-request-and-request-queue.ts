@@ -5,7 +5,7 @@
    <tag></tag>
    <isRerun>false</isRerun>
    <mailRecipient></mailRecipient>
-   <numberOfRerun>3</numberOfRerun>
+   <numberOfRerun>0</numberOfRerun>
    <pageLoadTimeout>30</pageLoadTimeout>
    <pageLoadTimeoutDefault>true</pageLoadTimeoutDefault>
    <rerunFailedTestCasesOnly>false</rerunFailedTestCasesOnly>
@@ -15,7 +15,7 @@
       <guid>ac0db7b0-f2b1-43b6-aab3-ea183e4ed0aa</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-create-new-personal-request</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-create-new-personal-request</testCaseId>
       <testDataLink>
          <combinationType>ONE</combinationType>
          <id>6d795318-2a72-4c07-94d2-ba46cb2603fc</id>
@@ -165,7 +165,7 @@
       <guid>daa8ce43-73f6-4b12-8170-3127f5c41890</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-create-new-general-request</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-create-new-general-request</testCaseId>
       <testDataLink>
          <combinationType>ONE</combinationType>
          <id>41e2481b-8d71-4a2c-9405-8437d345e60c</id>

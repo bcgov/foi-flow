@@ -17,12 +17,13 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
+import groovy.json.JsonSlurper as JsonSlurper
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('New Test Data').getValue('Password', 
-            6), ('username') : findTestData('New Test Data').getValue('Username', 6), ('firstname') : findTestData('New Test Data').getValue(
-            'First Name', 6), ('lastname') : findTestData('New Test Data').getValue('Last Name', 6), ('applicantFirstname') : ''
-        , ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue('email', 
-            1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
+WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('New Test Data').getValue(
+            'Password', 6), ('username') : findTestData('New Test Data').getValue('Username', 6), ('firstname') : findTestData(
+            'New Test Data').getValue('First Name', 6), ('lastname') : findTestData('New Test Data').getValue('Last Name', 
+            6), ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue(
+            'email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
             'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
             1), ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue(
             'country', 1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
@@ -32,50 +33,57 @@ WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('passwor
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Open'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.waitForElementClickable(findTestObject('Page_foi.flow/button_Sign Out'), 2)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 8)
-        , ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
+            8), ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/li_ministry assignee foiedu, foiedu'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/button_Save'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Education Programs'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/educ/li_Education Programs'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/dropdown options/li_Assigned to Division'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Fee Estimate'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'))
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/test.docx' //WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
-    //WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test.docx' //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+    //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
     )
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.delay(2, FailureHandling.STOP_ON_FAILURE)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'))
 
@@ -83,20 +91,21 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachments row 1 ac
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachment Replace'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/h2_Replace Attachment'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/h2_Replace Attachment'), 'Replace Attachment')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/span_replace attachment instructions'), ('This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from ' + 
-    WebUI.getText(findTestObject('Page_foi.flow/attachment/h1_Attachments Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' changing from Call For Records to Fee Estimate .')
+    WebUI.getText(findTestObject('Page_foi.flow/attachment/h1_Attachments Request Title'), FailureHandling.STOP_ON_FAILURE)) + 
+    ' changing from Call For Records to Fee Estimate .')
 
-WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/div_Attachment list 2'), 0)
 
@@ -108,7 +117,7 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachment Replace')
 
 WebUI.callTestCase(findTestCase('helper/foi-test-state-change-attachment-modal'), [('filename') : 'test2.docx'], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/div_Attachment list 2'), 0)
 

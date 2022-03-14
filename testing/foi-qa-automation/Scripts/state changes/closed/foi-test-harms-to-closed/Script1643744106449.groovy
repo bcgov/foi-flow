@@ -19,12 +19,13 @@ import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
+import groovy.json.JsonSlurper as JsonSlurper
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('New Test Data').getValue('Password', 
-            6), ('username') : findTestData('New Test Data').getValue('Username', 6), ('firstname') : findTestData('New Test Data').getValue(
-            'First Name', 6), ('lastname') : findTestData('New Test Data').getValue('Last Name', 6), ('applicantFirstname') : ''
-        , ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue('email', 
-            1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
+WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('New Test Data').getValue(
+            'Password', 6), ('username') : findTestData('New Test Data').getValue('Username', 6), ('firstname') : findTestData(
+            'New Test Data').getValue('First Name', 6), ('lastname') : findTestData('New Test Data').getValue('Last Name', 
+            6), ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue(
+            'email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
             'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
             1), ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue(
             'country', 1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
@@ -32,27 +33,23 @@ WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('passwor
             1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''], 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/input_Request Type'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/input_Request Type'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_general'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Open'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
-
-WebUI.delay(1.5, FailureHandling.STOP_ON_FAILURE)
-
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebDriver IAOuser = DriverFactory.getWebDriver()
 
@@ -62,105 +59,121 @@ DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 8)
-        , ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
+            8), ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/li_ministry assignee foiedu, foiedu'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/button_Save'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Education Programs'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/educ/li_Education Programs'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/dropdown options/li_Assigned to Division'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Deduplication'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Deduplication'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 DriverFactory.changeWebDriver(IAOuser)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 5)
-        , ('username') : findTestData('New Test Data').getValue('Username', 5)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
+            7), ('username') : findTestData('New Test Data').getValue('Username', 7)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Deduplication', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Deduplication', 
+    0)
 
-def ldd = WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_Due Date'), 'value')
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-WebUI.click(findTestObject('Page_foi.flow/li_Harms Assessment'))
-
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
-
-WebUI.delay(1.5, FailureHandling.STOP_ON_FAILURE)
+def ldd = WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value')
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Closed'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Harms Assessment'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/li_Abandoned'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Abandoned'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Cancel'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
-WebUI.delay(1, FailureHandling.STOP_ON_FAILURE)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Harms Assessment', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Harms Assessment', 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Closed'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/li_Abandoned'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Abandoned'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.delay(1, FailureHandling.STOP_ON_FAILURE)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Closed', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Closed', 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('New Test Data').getValue(
-        'First Name', 5) + ' ') + findTestData('New Test Data').getValue('Last Name', 5)) + ' changed the state of the request to Closed')
+        'First Name', 7) + ' ') + findTestData('New Test Data').getValue('Last Name', 7)) + ' changed the state of the request to Closed')
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/input_Due Date'), 'value', ldd, 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Call For Records'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Deduplication'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Deduplication'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Harms Assessment'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Harms Assessment'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/li_Harms Assessment'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Harms Assessment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Re-Open Request'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Re-Open Request'))
 
-WebUI.delay(1.5, FailureHandling.STOP_ON_FAILURE)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Harms Assessment', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Harms Assessment', 
+    0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/input_Due Date'), 'value', ldd, 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('New Test Data').getValue(
-        'First Name', 5) + ' ') + findTestData('New Test Data').getValue('Last Name', 5)) + ' changed the state of the request to Harms Assessment')
+        'First Name', 7) + ' ') + findTestData('New Test Data').getValue('Last Name', 7)) + ' changed the state of the request to Harms Assessment')
+
+ministryUser.close()
+
+IAOuser.close()
 

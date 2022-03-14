@@ -21,43 +21,43 @@ WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('username') : username, ('password') : password], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/span_Intake User'))
-
-WebUI.verifyElementText(findTestObject('Object Repository/Page_foi.flow/span_Intake User'), WebUI.concatenate((([firstname
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/span_username'), WebUI.concatenate((([firstname
                 , ' ', lastname]) as String[])))
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/span_Intake User'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/span_username'))
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/img'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/img'))
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/h3_Your FOI Request Queue'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/h3_Your FOI Request Queue'), 'Your FOI Request Queue')
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/div_My Requests Watching Requests My Team Requests'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/div_My Requests Watching Requests My Team Requests'))
 
-WebUI.verifyElementText(findTestObject('Object Repository/Page_foi.flow/div_My Requests Watching Requests My Team Requests'), 
-    'My Requests Watching Requests My Team Requests')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_My Requests Watching Requests My Team Requests'), 
+    'My Requests\nWatching Requests\nMy Team Requests')
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/input_Watching Requests'))
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/input_Watching Requests'), 0)
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/input_My Requests'))
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/input_My Requests'), 0)
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/input_My Team Requests'))
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/input_My Team Requests'), 0)
 
-WebUI.verifyElementClickable(findTestObject('Object Repository/Page_foi.flow/input_Add Request_form-control'))
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), 0)
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/div_Your FOI Request QueueAdd Request'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/notification bell'))
+WebUI.verifyElementClickable(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/notification/notification bell'))
 
-WebUI.verifyElementText(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'), 'Sign Out')
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/button_Sign Out'), 'Sign Out')
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/pagination counter'))
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/div_No_MuiTablePagination-actions'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/div_No_MuiTablePagination-actions'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header APPLICANT NAME'), 0)
 

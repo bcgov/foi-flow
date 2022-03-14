@@ -34,7 +34,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'), 'Attachments')
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_attachements list row 1'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/div_attachments list row 1'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
 
@@ -45,7 +45,7 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Files'), Failure
 //WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/test.docx')
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachments row 1 actions'), FailureHandling.STOP_ON_FAILURE) //WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), RunConfiguration.getProjectDir() + '/Test Attachments/500mb.pdf', 
 //    FailureHandling.STOP_ON_FAILURE)
@@ -66,7 +66,7 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachments row 1 ac
 //WebUI.click(findTestObject('Page_foi.flow/attachment/button_Attachments Download'), FailureHandling.STOP_ON_FAILURE)
 //
 //'Wait for Some time so that file gets downloaded and Stored in user defined path'
-//WebUI.delay(10)
+//WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT0)
 //
 //'Verifying the file is download in the User defined Path'
 //Assert.assertTrue(isFileDownloaded(downloadPath, 'test.docx'), 'Failed to download Expected document') // remove this line if you want to keep the file

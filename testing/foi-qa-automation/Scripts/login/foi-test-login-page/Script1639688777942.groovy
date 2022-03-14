@@ -19,7 +19,7 @@ import org.openqa.selenium.Keys as Keys
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Log In'))
+WebUI.click(findTestObject('Page_foi.flow/sign in/button_Log In'))
 
 WebUI.click(findTestObject('Object Repository/Page_Log in to FOI/a_IDIR'))
 

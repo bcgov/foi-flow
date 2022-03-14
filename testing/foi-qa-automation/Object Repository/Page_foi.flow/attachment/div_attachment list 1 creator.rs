@@ -6,32 +6,33 @@
    <elementGuidId>1a6fcb53-38d5-48f9-a32c-c10f430a91d7</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//div[@id='Attachments']/div/div/div[4]/div/div/div[3]/div</value>
+         <value>//div[@id='Attachments']/div/div/div[3]/div[1]/div[4]/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col attachment-owner&quot;]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
+         <value>//div[@class = 'attachment-owner ']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>col-sm-12 foi-details-col attachment-owner </value>
+      <value>attachment-owner </value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -41,46 +42,46 @@
       <value>User, Super</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col attachment-owner&quot;]</value>
+      <value>id(&quot;Attachments&quot;)/div[@class=&quot;jss40&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss42 MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12&quot;]/div[@class=&quot;attachment-owner&quot;]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='Attachments']/div/div/div[4]/div/div/div[3]/div</value>
+      <value>//div[@id='Attachments']/div/div/div[3]/div/div[4]/div</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[1]/following::div[6]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='GENERAL'])[1]/following::div[5]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.docx'])[1]/following::div[7]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test.docx'])[1]/following::div[6]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='test.docx'])[1]/preceding::div[3]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #U-002876'])[2]/preceding::div[3]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[2]/preceding::div[4]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='+ Add Comment'])[1]/preceding::div[4]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,6 +95,13 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[4]/div/div/div[3]/div</value>
+      <value>//div[3]/div/div[4]/div</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'User, Super' or . = 'User, Super')]</value>
    </webElementXpaths>
 </WebElementEntity>

@@ -16,15 +16,20 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
+import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.maximizeWindow()
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 state'), 'Unopened')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Unassigned')
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 'rgba(207, 215, 227, 1)', 
-    false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 
+    'rgba(207, 215, 227, 1)', false)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 
@@ -32,19 +37,25 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/status dropdo
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Unopened'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Unopened'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Intake In Progress'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Intake In Progress'), 0)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/li_Closed'), 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Intake In Progress'), 'aria-disabled', 'true', 0)
 
-WebUI.click(findTestObject('Page_foi.flow/li_Unopened'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Unopened'), FailureHandling.STOP_ON_FAILURE)
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
 
     WS.verifyResponseStatusCode(response, 200)
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WebUI.openBrowser(GlobalVariable.BASE_URL)
 

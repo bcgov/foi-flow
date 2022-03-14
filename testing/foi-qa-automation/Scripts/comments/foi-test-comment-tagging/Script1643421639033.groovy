@@ -21,13 +21,18 @@ import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
 import org.openqa.selenium.WebElement as WebElement
 import com.kms.katalon.core.webui.common.WebUiCommonHelper as WebUiCommonHelper
-import org.openqa.selenium.By
+import org.openqa.selenium.By as By
+import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.maximizeWindow()
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
@@ -59,26 +64,26 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Tagging 
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'm')
 
-def driver = DriverFactory.getWebDriver()
-
 def popup = WebUiCommonHelper.findWebElement(findTestObject('Page_foi.flow/comment/div_Comment tagging popup'), 1)
 
-List<WebElement> popupChildren = popup.findElements(By.xpath("*"))
+List<WebElement> popupChildren = popup.findElements(By.xpath('*'))
 
-println popupChildren.size()
+println(popupChildren.size())
 
 for (int i = 1; i <= popupChildren.size(); i++) {
-	assert WebUI.getText(findTestObject('Page_foi.flow/div_Tagging option ' + i), FailureHandling.STOP_ON_FAILURE).toLowerCase().contains('m') 
+    assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Tagging option ' + i), FailureHandling.STOP_ON_FAILURE).toLowerCase().contains(
+        'm')
 }
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'a')
 
-popupChildren = popup.findElements(By.xpath("*"))
+popupChildren = popup.findElements(By.xpath('*'))
 
-println popupChildren.size()
+println(popupChildren.size())
 
 for (int i = 1; i <= popupChildren.size(); i++) {
-	assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Tagging option ' + i), FailureHandling.STOP_ON_FAILURE).toLowerCase().contains('ma')
+    assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Tagging option ' + i), FailureHandling.STOP_ON_FAILURE).toLowerCase().contains(
+        'ma')
 }
 
 def name = WebUI.getText(findTestObject('Page_foi.flow/comment/div_Tagging option 1'), FailureHandling.STOP_ON_FAILURE)
@@ -87,19 +92,23 @@ WebUI.click(findTestObject('Page_foi.flow/comment/div_Tagging option 1'), Failur
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), name + ' ')
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/span_text box Mention'), 'background-color'), 'rgba(230, 243, 255, 1)', 
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/comment/span_text box Mention'), 'background-color'), 'rgba(230, 243, 255, 1)', 
     false)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), name + ' ')
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/comment/span_posted comment mention'), 'background-color'), 'rgba(230, 243, 255, 1)', 
-    false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/comment/span_posted comment mention'), 'background-color'), 
+    'rgba(230, 243, 255, 1)', false)
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WS.verifyResponseStatusCode(response, 200)
 }

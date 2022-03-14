@@ -6,15 +6,15 @@
    <elementGuidId>dbc96224-d363-451f-8fd2-549cdba9c4af</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//div[@id='Attachments']/div/div/div[4]/div[3]/div/div/div/div/div</value>
+         <value>//div[@id='Attachments']/div/div/div[3]/div[3]/div/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;][2]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col&quot;]/div[@class=&quot;col-sm-10&quot;]/div[@class=&quot;attachment-name&quot;]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

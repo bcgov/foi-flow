@@ -17,132 +17,153 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('New Test Data').getValue('Password', 
-            2), ('username') : findTestData('New Test Data').getValue('Username', 2), ('firstname') : findTestData('New Test Data').getValue(
-            'First Name', 2), ('lastname') : findTestData('New Test Data').getValue('Last Name', 2), ('applicantFirstname') : ''
-        , ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue('email', 
-            1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
-            'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
-            1), ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue(
-            'country', 1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
-            'Sample Applicant').getValue('homePhone', 1), ('description') : findTestData('Sample Applicant').getValue('description', 
-            1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''], 
-    FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('Object Repository/Page_foi.flow/span_Description contains NO Personal Infor_c58cd5'), 
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
     0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/span_MMA_checkmark'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_MMA_checkmark'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/span_JER_checkmark'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_JER_checkmark'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/span_TAC_checkmark'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_TAC_checkmark'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/span_LBR_checkmark'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_LBR_checkmark'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/request type options/li_general'))
+
+def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5]
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Open'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.delay(1, FailureHandling.STOP_ON_FAILURE)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 def year = new Date().format('yyyy')
 
-WebUI.verifyMatch('EDUC-' + year, WebUI.getText(findTestObject('Page_foi.flow/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE).substring(
-        0, 9), false)
+requestID = ((year + '-') + requestID)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.verifyMatch('EDUC-' + year, WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), FailureHandling.STOP_ON_FAILURE).substring(
-        0, 9), false)
+assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+    'EDUC-' + requestID)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 2'), 0)
 
-WebUI.verifyMatch('JERI-' + year, WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 2 request no'), FailureHandling.STOP_ON_FAILURE).substring(
-        0, 9), false)
+assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 2 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+    'JERI-' + requestID)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 3'), 0)
 
-WebUI.verifyMatch('LBR-' + year, WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 3 request no'), FailureHandling.STOP_ON_FAILURE).substring(
-        0, 8), false)
+assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 3 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+    'LBR-' + requestID)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 4'), 0)
 
-WebUI.verifyMatch('MUNI-' + year, WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 4 request no'), FailureHandling.STOP_ON_FAILURE).substring(
-        0, 9), false)
+assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 4 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+    'MUNI-' + requestID)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 5'), 0)
 
-WebUI.verifyMatch('TACS-' + year, WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 5 request no'), FailureHandling.STOP_ON_FAILURE).substring(
-        0, 9), false)
+assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 5 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+    'TACS-' + requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'))
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.delay(2)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-edu-options'), [:], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-edu-options'), [('requestID') : requestID], 
+    FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-jer-options'), [:], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-jer-options'), [('requestID') : requestID], 
+    FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-mma-options'), [:], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-mma-options'), [('requestID') : requestID], 
+    FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-tac-options'), [:], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-tac-options'), [('requestID') : requestID], 
+    FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-lbr-options'), [:], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-lbr-options'), [('requestID') : requestID], 
+    FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-comments'), [:], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-comments'), [('requestID') : requestID], 
+    FailureHandling.STOP_ON_FAILURE)
 

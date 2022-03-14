@@ -16,34 +16,41 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
+import groovy.json.JsonSlurper as JsonSlurper
 
-WebUI.click(findTestObject('Page_foi.flow/input_Watching Requests'))
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/input_Watching Requests'))
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/input_My Team Requests'))
+WebUI.click(findTestObject('Page_foi.flow/queue/input_My Team Requests'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Watch'))
+WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
-WebUI.click(findTestObject('Page_foi.flow/input_Watching Requests'))
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/input_Watching Requests'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Watch'))
+WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
 
-WebUI.scrollToElement(findTestObject('Object Repository/Page_foi.flow/button_Return to Queue'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Return to Queue'), 0)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Return to Queue'))
+WebUI.click(findTestObject('Page_foi.flow/form/button_Return to Queue'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
-WebUI.click(findTestObject('Page_foi.flow/input_Watching Requests'))
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/input_Watching Requests'))
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
@@ -52,6 +59,10 @@ def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
 
     WS.verifyResponseStatusCode(response, 200)
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WebUI.openBrowser(GlobalVariable.BASE_URL)
 

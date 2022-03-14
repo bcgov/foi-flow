@@ -19,12 +19,17 @@ import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
+import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.maximizeWindow()
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
@@ -36,9 +41,13 @@ WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'tes
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
 
+WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
+
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment 2')
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment 3')
 
@@ -84,8 +93,12 @@ DriverFactory.changeWebDriver(user2)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 6)
-        , ('username') : findTestData('New Test Data').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
+            6), ('username') : findTestData('New Test Data').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'), FailureHandling.STOP_ON_FAILURE)
 
@@ -111,9 +124,17 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment delete
 
 WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/comment/button_Delete comment modal confirm'), FailureHandling.STOP_ON_FAILURE)
 
+user1.close()
+
+user2.close()
+
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WS.verifyResponseStatusCode(response, 200)
 }

@@ -30,36 +30,41 @@ WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('passwor
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Open'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/td_Next Assignee'), 'Processing Team')
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
-    WebUI.getText(findTestObject('Page_foi.flow/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Call For Records?')
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/td_Minstry Next Assignee'), 'Ministry of Education Queue')
-
-WebUI.click(findTestObject('Page_foi.flow/button_Cancel'))
-
-WebUI.delay(1)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Open', 0)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_Call For Records'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save Change'))
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.delay(2)
+WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [:], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
+    WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Call For Records?')
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Minstry Next Assignee'), 'Ministry of Education Queue')
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Open', 
+    0)
+
+requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/h4_CFR Due in 10 Days'), 'CFR Due in 10 Days')
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
@@ -67,11 +72,13 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar C
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + ' changed the state of the request to Call For Records')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
+    ' changed the state of the request to Call For Records')
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Call For Records', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Call For Records', 
+    0)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
             8), ('username') : findTestData('New Test Data').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
@@ -93,39 +100,45 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header 
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header LDD'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 type'), 'Personal')
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 1 type')).toLowerCase() == findTestData('Sample Applicant').getValue(
+    'requestType', 1)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 category'), category)
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 'rgba(207, 215, 227, 1)', 
-    false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 
+    'rgba(207, 215, 227, 1)', false)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/h4_CFR Due in 10 Days'), 'CFR Due in 10 Days')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/h4_CFR Due in 10 Days'), 'CFR Due in 10 Days')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/div_request form ministry APPLICANT DETAILS'), 
     0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/label_APPLICANT DETAILS'), 'APPLICANT DETAILS')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/label_APPLICANT DETAILS'), 'APPLICANT DETAILS')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/div_request from ministry REQUEST DESCRIPTION'), 
     0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/label_REQUEST DESCRIPTION'), 'REQUEST DESCRIPTION')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/label_REQUEST DESCRIPTION'), 'REQUEST DESCRIPTION')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/div_request form ministry REQUEST DETAILS'), 
     0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/label_REQUEST DETAILS'), 'REQUEST DETAILS')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/label_REQUEST DETAILS'), 'REQUEST DETAILS')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Application Type'), 'Application Type')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/span_ministry form Category'), category)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/span_ministry form Category'), category)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Request Type'), 'Request Type')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/span_ministry form request type'), 'Personal')
+assert WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/span_ministry form request type')).toLowerCase() == findTestData('Sample Applicant').getValue(
+    'requestType', 1)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Authorization'), 'Authorization')
 
@@ -135,7 +148,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_minis
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Request Description'), 'Request Description')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/p_ministry form request description'), 'testing 123 description')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/p_ministry form request description'), 'testing 123 description')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Selected Ministry Ministry of Education'), 
     'Selected Ministry: Ministry of Education')

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>foi-test-watch-request</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>d3316af9-94bc-4e83-98f9-55c8a5c12b1f</testCaseGuid>
+   <variable>
+      <defaultValue>GlobalVariable.firstname</defaultValue>
+      <description></description>
+      <id>bb076765-80ea-4b2a-a3ff-384050d4ccaf</id>
+      <masked>false</masked>
+      <name>firstname</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.lastname</defaultValue>
+      <description></description>
+      <id>2e7b0f32-3d2c-4d7d-884c-8cb86dbbd3e8</id>
+      <masked>false</masked>
+      <name>lastname</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('New Test Data').getValue('Last Name', 6) + ', ' + findTestData('New Test Data').getValue('First Name', 6)</defaultValue>
+      <description></description>
+      <id>b1d2d061-b89d-403d-ab65-67eec74af1b3</id>
+      <masked>false</masked>
+      <name>teammate</name>
+   </variable>
+</TestCaseEntity>

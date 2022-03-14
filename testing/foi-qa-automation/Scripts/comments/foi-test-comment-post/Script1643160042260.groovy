@@ -21,12 +21,17 @@ import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
 import org.openqa.selenium.WebElement as WebElement
 import com.kms.katalon.core.webui.common.WebUiCommonHelper as WebUiCommonHelper
+import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.maximizeWindow()
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
@@ -74,6 +79,10 @@ WebUI.verifyAlertPresent(0)
 
 WebUI.acceptAlert(FailureHandling.STOP_ON_FAILURE)
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
@@ -106,8 +115,8 @@ WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), long
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/span_comment characters remaining'), '25 characters remaining')
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/comment/span_comment characters remaining'), 'color'), 'rgba(255, 0, 0, 1)', 
-    false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/comment/span_comment characters remaining'), 'color'), 
+    'rgba(255, 0, 0, 1)', false)
 
 def remainingString = '2EarUhvAMTvIv1O2Ox9IoOJgG'
 
@@ -115,13 +124,15 @@ WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), rema
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), longString + remainingString)
 
-assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), FailureHandling.STOP_ON_FAILURE).length() == 1000
+assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), FailureHandling.STOP_ON_FAILURE).length() == 
+1000
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'a')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), longString + remainingString)
 
-assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), FailureHandling.STOP_ON_FAILURE).length() == 1000
+assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), FailureHandling.STOP_ON_FAILURE).length() == 
+1000
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), Keys.chord(Keys.CONTROL, 'a'))
 
@@ -145,6 +156,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment lis
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 date'), today.format('yyyy MMM dd | hh:mm a'))
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 user'), (lastname + ', ') + firstname)
 
+WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
+
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment 2')
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment list 2'), 0)
@@ -166,6 +179,10 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment lis
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WS.verifyResponseStatusCode(response, 200)
 }

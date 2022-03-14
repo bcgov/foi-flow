@@ -10,6 +10,13 @@
       <description></description>
       <id>b1d2d061-b89d-403d-ab65-67eec74af1b3</id>
       <masked>false</masked>
-      <name>teammate</name>
+      <name>teammate2</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('New Test Data').getValue('Last Name', 1) + ', ' + findTestData('New Test Data').getValue('First Name', 1)</defaultValue>
+      <description></description>
+      <id>5f2e1f58-4118-4e25-8e29-d526e6433acb</id>
+      <masked>false</masked>
+      <name>teammate1</name>
    </variable>
 </TestCaseEntity>

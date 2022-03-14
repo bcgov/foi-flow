@@ -15,7 +15,7 @@
       <guid>fbf1a3de-7525-4382-8bd1-c0f4d3d53027</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-watch-request</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-watch-request</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -28,12 +28,18 @@
          <value></value>
          <variableId>2e7b0f32-3d2c-4d7d-884c-8cb86dbbd3e8</variableId>
       </variableLink>
+      <variableLink>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
+         <variableId>b1d2d061-b89d-403d-ab65-67eec74af1b3</variableId>
+      </variableLink>
    </testCaseLink>
    <testCaseLink>
       <guid>4e5488b7-b116-4dd7-9645-5f13bf8f2098</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-watch-request-ministry-view</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-watch-request-ministry-view</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>

@@ -16,6 +16,7 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
+import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
@@ -23,47 +24,57 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : passwo
 
 WebUI.maximizeWindow()
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.verifyElementNotClickable(findTestObject('Object Repository/Page_foi.flow/button_Save'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/li_assignee user option', [('user') : (lastname + ', ') + firstname]))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + firstname]))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/div_Category'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_' + findTestData('Sample Applicant').getValue('category', 
+WebUI.click(findTestObject('Object Repository/Page_foi.flow/form/inputs/applicant details/category dropdown/li_' + findTestData('Sample Applicant').getValue('category', 
             1)))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/textarea_request description'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/span_Description contains NO Personal Infor_c58cd5'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
 
-WebUI.scrollToElement(findTestObject('Object Repository/Page_foi.flow/span_EDU_checkmark'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/input_Delivery Mode'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/li_Secure File Transfer'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/delivery mode options/li_Secure File Transfer'))
 
-WebUI.scrollToElement(findTestObject('Object Repository/Page_foi.flow/button_Save'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
-WebUI.verifyElementClickable(findTestObject('Object Repository/Page_foi.flow/button_Save'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_The request has been saved successfully'), 0)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Save'))
+WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_The request has been saved successfully'), 0)
 
-WebUI.delay(1, FailureHandling.STOP_ON_FAILURE)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+return requestID
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
-	if (sendRequest) {
-		def response = WS.sendRequest(findTestObject('FoiRawRequest'))
-		
-		WS.verifyResponseStatusCode(response, 200)
-	}    
+    if (sendRequest) {
+        def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+        def jsonSlurper = new JsonSlurper()
+
+        requestID = jsonSlurper.parseText(response.responseText).id.toString()
+
+        WS.verifyResponseStatusCode(response, 200)
+    }
 }
 

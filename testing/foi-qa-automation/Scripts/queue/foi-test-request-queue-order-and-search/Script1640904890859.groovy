@@ -16,46 +16,54 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
+import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : GlobalVariable.password, ('username') : GlobalVariable.username
-        , ('firstname') : GlobalVariable.firstname, ('lastname') : GlobalVariable.lastname, ('applicantFirstname') : '', ('applicantLastname') : ''
-        , ('category') : '', ('email') : findTestData('Sample Applicant').getValue('email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1)
-        , ('streetAddress2') : findTestData('Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 1)
-        , ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue('country', 1)
-        , ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData('Sample Applicant').getValue('homePhone', 1)
-        , ('description') : findTestData('Sample Applicant').getValue('description', 1), ('startDate') : '', ('receivedDate') : ''
-        , ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''], FailureHandling.STOP_ON_FAILURE)
+        , ('firstname') : GlobalVariable.firstname, ('lastname') : GlobalVariable.lastname, ('sendRequest') : false, ('requestID') : request2ID], 
+    FailureHandling.STOP_ON_FAILURE)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 'aria-sort', 'descending', 
     0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), request1ID)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 2'), 0)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 state'), 'Unopened')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 2 state'), 'Intake In Progress')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), 'U-00' + request1ID)
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 'rgba(207, 215, 227, 1)', 
-    false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 
+    'rgba(207, 215, 227, 1)', false)
 
-WebUI.setText(findTestObject('Page_foi.flow/input_Dashboard Search'), 'intake')
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), 'intake in progress')
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 2'), 0)
-
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 state'), 'Intake In Progress')
 
-WebUI.verifyNotMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 'rgba(207, 215, 227, 1)', 
-    false)
+WebUI.verifyNotMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 
+    'rgba(207, 215, 227, 1)', false)
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    def jsonSlurper = new JsonSlurper()
+
+    request1ID = jsonSlurper.parseText(response.responseText).id.toString()
+
+    WS.verifyResponseStatusCode(response, 200)
+
+    response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    request2ID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WS.verifyResponseStatusCode(response, 200)
 }

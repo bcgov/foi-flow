@@ -6,67 +6,68 @@
    <elementGuidId>fbfa207b-2f4b-4bdc-91df-814fda88132b</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//div[@id='Attachments']/div/div/div[4]/div/div/div[2]/div</value>
+         <value>//div[@id='Attachments']/div/div/div[3]/div[1]/div[3]/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col attachment-time&quot;]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
+         <value>//div[@class = 'attachment-time ']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>col-sm-12 foi-details-col attachment-time </value>
+      <value>attachment-time </value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>2022 Jan 06 | 02:39 PM</value>
+      <value>2022 Feb 15 | 03:31 PM</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col attachment-time&quot;]</value>
+      <value>id(&quot;Attachments&quot;)/div[@class=&quot;jss40&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss42 MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12&quot;]/div[@class=&quot;attachment-time&quot;]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='Attachments']/div/div/div[4]/div/div/div[2]/div</value>
+      <value>//div[@id='Attachments']/div/div/div[3]/div/div[3]/div</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[1]/following::div[4]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='GENERAL'])[1]/following::div[3]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.docx'])[1]/following::div[5]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test.docx'])[1]/following::div[4]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -80,20 +81,27 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='test.docx'])[1]/preceding::div[5]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #U-002876'])[2]/preceding::div[5]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='2022 Jan 06 | 02:39 PM']/parent::*</value>
+      <value>//*/text()[normalize-space(.)='2022 Feb 15 | 03:31 PM']/parent::*</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div/div[4]/div/div/div[2]/div</value>
+      <value>//div[2]/div/div/div[3]/div/div[3]/div</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = '2022 Feb 15 | 03:31 PM' or . = '2022 Feb 15 | 03:31 PM')]</value>
    </webElementXpaths>
 </WebElementEntity>

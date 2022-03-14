@@ -21,7 +21,7 @@ WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/button_Sign Out'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.callTestCase(findTestCase('login/foi-test-homepage-content'), [:], FailureHandling.STOP_ON_FAILURE)
 

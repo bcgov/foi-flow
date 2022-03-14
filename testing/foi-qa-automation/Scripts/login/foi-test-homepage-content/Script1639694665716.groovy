@@ -17,17 +17,17 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.verifyElementPresent(findTestObject('Object Repository/Page_foi.flow/img'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/img'), 0)
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/img'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/img'))
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/h1_Welcome, Sign In'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/sign in/h1_Welcome, Sign In'))
 
-WebUI.verifyElementText(findTestObject('Object Repository/Page_foi.flow/h1_Welcome, Sign In'), 'Welcome, Sign In')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/sign in/h1_Welcome, Sign In'), 'Welcome, Sign In')
 
-WebUI.verifyElementVisible(findTestObject('Object Repository/Page_foi.flow/button_Log In'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/sign in/button_Log In'))
 
-WebUI.verifyElementText(findTestObject('Object Repository/Page_foi.flow/button_Log In'), 'Log In')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/sign in/button_Log In'), 'Log In')
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/bottom menu/a_Help'))
 

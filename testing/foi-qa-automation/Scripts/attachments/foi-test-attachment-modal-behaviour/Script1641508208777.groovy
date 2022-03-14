@@ -18,13 +18,21 @@ import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 
+import groovy.json.JsonSlurper as JsonSlurper
+
+import groovy.json.JsonSlurper as JsonSlurper
+
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.maximizeWindow()
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'), 'Unopened')
 
@@ -36,51 +44,54 @@ WebUI.verifyElementClickable(findTestObject('Page_foi.flow/attachment/button_Add
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), '+ Add Attachment')
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.verifyElementClickable(findTestObject('Page_foi.flow/attachment/button_Add Files'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/div_State Change Dialog'), 'Add Attachment')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 'Add Attachment')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/button_Continue'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/button_Cancel'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/p_File over 500 mb error'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File over 500 mb error'), 0)
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/500mb.pdf')
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/500mb.pdf')
 
-WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/button_Continue'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/p_File over 500 mb error'), 0)
-
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/p_File invalid type'), 0)
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/invalidfiletype.bin')
-
-WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/p_File invalid type'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File over 500 mb error'), 0)
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/download.png')
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type'), 0)
 
-WebUI.verifyElementClickable(findTestObject('Page_foi.flow/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/invalidfiletype.bin')
+
+WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type'), 0)
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/download.png')
+
+WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
@@ -88,12 +99,12 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded att
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachment 1'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
-WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), RunConfiguration.getProjectDir() + '/Test Attachments/test.docx', 
-    FailureHandling.STOP_ON_FAILURE)
+WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test.docx', FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
@@ -116,8 +127,8 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachmen
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachment 1'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), ((RunConfiguration.getProjectDir() + '/Test Attachments/test.docx\n') + 
-    RunConfiguration.getProjectDir()) + '/Test Attachments/test2.docx')
+WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), ((RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test.docx\n') + RunConfiguration.getProjectDir()) + '/Test Attachments/test2.docx')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
@@ -131,15 +142,17 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachmen
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachment 1'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/test.docx')
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test.docx')
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/p_upload file same name'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_upload file same name'), 0)
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/test.docx')
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test.docx')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/p_upload file same name'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_upload file same name'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyAlertPresent(0, FailureHandling.STOP_ON_FAILURE)
 
@@ -147,19 +160,23 @@ WebUI.verifyMatch(WebUI.getAlertText(), 'Are you sure you want to leave? Your ch
 
 WebUI.dismissAlert()
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyAlertPresent(0, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.acceptAlert()
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_State Change Dialog'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WS.verifyResponseStatusCode(response, 200)
 }

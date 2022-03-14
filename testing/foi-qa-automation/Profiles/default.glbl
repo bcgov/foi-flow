@@ -11,7 +11,7 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'foiintakeprocessing@idir'</initValue>
+      <initValue>'foiintakeflex@idir'</initValue>
       <name>username</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
@@ -26,7 +26,7 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'Processing'</initValue>
+      <initValue>'Flex'</initValue>
       <name>lastname</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
@@ -58,5 +58,10 @@
       <description>Fo!123 base 64 encoded</description>
       <initValue>'Rm8hMTIz'</initValue>
       <name>db_password</name>
+   </GlobalVariableEntity>
+   <GlobalVariableEntity>
+      <description></description>
+      <initValue>2</initValue>
+      <name>DEFAULT_TIMEOUT</name>
    </GlobalVariableEntity>
 </GlobalVariableEntities>

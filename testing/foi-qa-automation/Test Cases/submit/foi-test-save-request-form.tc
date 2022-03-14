@@ -159,4 +159,11 @@
       <masked>false</masked>
       <name>sendRequest</name>
    </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>aa4b62c9-ad53-4d50-9b96-326daf774ef5</id>
+      <masked>false</masked>
+      <name>variable</name>
+   </variable>
 </TestCaseEntity>

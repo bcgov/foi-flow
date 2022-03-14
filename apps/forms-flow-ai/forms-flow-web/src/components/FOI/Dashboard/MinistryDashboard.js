@@ -236,6 +236,7 @@ const MinistryDashboard = ({ userDetail }) => {
                 <Grid item xs={12} lg={6} className="form-group has-search">
                   <SearchIcon className="form-control-search" />
                   <input
+                    id="search"
                     type="text"
                     className="form-control"
                     placeholder="Search . . ."

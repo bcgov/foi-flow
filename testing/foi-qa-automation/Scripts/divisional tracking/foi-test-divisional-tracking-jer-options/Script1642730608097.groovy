@@ -17,54 +17,86 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 12)
-        , ('username') : findTestData('New Test Data').getValue('Username', 12)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('New Test Data').getValue('Password', 
+            12), ('username') : findTestData('New Test Data').getValue('Username', 12)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/button_Save'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Deputy Ministers Office'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Innovation, Technology  Investment Capital'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/jeri/li_Innovation, Technology  Investment Capital'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Investment  Innovation'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/jeri/li_Investment  Innovation'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Management Services'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Management Services'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Mass Timber Implementation'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/jeri/li_Mass Timber Implementation'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Ministers Office'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Small Business  Economic Development'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/jeri/li_Small Business  Economic Development'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Trade  Industry Development'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/jeri/li_Trade  Industry Development'), 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_close dropdown'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Clarification'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/dropdown options/li_Assigned to Division'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Awaiting Fees'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Awaiting Fees'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Fees Received'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fees Received'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Gathering Records'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Gathering Records'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Awaiting Harms'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Records Received'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Harms Received'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Awaiting Harms'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_Pending Sign Off'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Harms Received'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/li_No Records Response'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Pending Sign Off'), 
+    0)
 
-WebUI.click(findTestObject('Page_foi.flow/li_Clarification'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_No Records Response'), 
+    0)
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
+    FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
@@ -72,19 +104,12 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/button_Save'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), 
+    0)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.scrollToElement(findTestObject('Page_foi.flow/button_Save'), 0)
-
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), 0)
-
-WebUI.click(findTestObject('Page_foi.flow/button_Sign Out'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 

@@ -5,7 +5,7 @@
    <tag></tag>
    <isRerun>false</isRerun>
    <mailRecipient></mailRecipient>
-   <numberOfRerun>3</numberOfRerun>
+   <numberOfRerun>0</numberOfRerun>
    <pageLoadTimeout>30</pageLoadTimeout>
    <pageLoadTimeoutDefault>true</pageLoadTimeoutDefault>
    <rerunFailedTestCasesOnly>false</rerunFailedTestCasesOnly>
@@ -15,13 +15,13 @@
       <guid>8750bbf4-7c31-4f1a-a7b2-665c629254ae</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-change-request-type-form</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-change-request-type-form</testCaseId>
    </testCaseLink>
    <testCaseLink>
       <guid>be289834-210c-461a-b9fc-36b98dd045ca</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-request-form-behaviour</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-request-form-behaviour</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -274,6 +274,12 @@
          <value></value>
          <variableId>ecacaed9-2e6e-450e-a0be-8475cfbbaf44</variableId>
       </variableLink>
+      <variableLink>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
+         <variableId>aa4b62c9-ad53-4d50-9b96-326daf774ef5</variableId>
+      </variableLink>
    </testCaseLink>
    <testCaseLink>
       <guid>39285569-8f89-47f5-bd23-a32cc8c19912</guid>
@@ -399,7 +405,7 @@
       <guid>77e9a16e-d457-494d-a89b-81b1504e9681</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-request-description-history</testCaseId>
+      <testCaseId>Test Cases/form/foi-test-request-description-history</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>
@@ -518,8 +524,8 @@
    <testCaseLink>
       <guid>abcaba1e-646b-43b6-86d5-82ca697d21ec</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
-      <testCaseId>Test Cases/request form/foi-test-change-request-type-assignee</testCaseId>
+      <isRun>false</isRun>
+      <testCaseId>Test Cases/form/foi-test-change-request-type-assignee</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
          <type>DEFAULT</type>

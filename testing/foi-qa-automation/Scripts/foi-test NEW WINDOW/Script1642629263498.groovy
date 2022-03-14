@@ -56,7 +56,7 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 //    FailureHandling.STOP_ON_FAILURE)
 //
 //
-//WebUI.delay(1)
+//WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 //
 //// in the incoginto Chrome, do something
 //DriverFactory.changeWebDriver(incognitoChrome)
@@ -69,14 +69,14 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 //    FailureHandling.STOP_ON_FAILURE)
 //
 //
-//WebUI.delay(1)
+//WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 //
 //// close 2 browser windows
 ////DriverFactory.changeWebDriver(normalChrome)
 ////
 ////WebUI.closeBrowser()
 ////
-////WebUI.delay(1)
+////WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 ////
 ////DriverFactory.changeWebDriver(incognitoChrome)
 ////

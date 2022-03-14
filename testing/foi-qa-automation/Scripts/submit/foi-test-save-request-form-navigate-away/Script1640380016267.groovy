@@ -18,6 +18,7 @@ import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import org.openqa.selenium.remote.server.handler.GetAlertText as GetAlertText
 import org.openqa.selenium.remote.server.handler.GetAlertText as Keys
+import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
@@ -25,32 +26,35 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.S
 
 WebUI.maximizeWindow()
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
 
-WebUI.scrollToElement(findTestObject('Object Repository/Page_foi.flow/button_Save'), 0)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Return to Queue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/form/button_Return to Queue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyMatch(WebUI.getUrl(), GlobalVariable.BASE_URL + '/foi/dashboard', false)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_Street Address_outlined-streetAddress'), streetAddress)
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address_outlined-streetAddress'), streetAddress)
 
-WebUI.scrollToElement(findTestObject('Object Repository/Page_foi.flow/button_Save'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Return to Queue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/button_Return to Queue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyAlertPresent(0)
 
 //WebUI.verifyMatch(WebUI.getAlertText(), 'Are you sure you want to leave? Your changes will be lost.', false)
-
 WebUI.dismissAlert(FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/input_Street Address_outlined-streetAddress'), 
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address_outlined-streetAddress'), 
     'value', streetAddress, 0)
 
-WebUI.click(findTestObject('Page_foi.flow/button_Return to Queue'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/button_Return to Queue'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.acceptAlert(FailureHandling.STOP_ON_FAILURE)
 
@@ -59,6 +63,10 @@ WebUI.verifyMatch(WebUI.getUrl(), GlobalVariable.BASE_URL + '/foi/dashboard', fa
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WS.verifyResponseStatusCode(response, 200)
 }

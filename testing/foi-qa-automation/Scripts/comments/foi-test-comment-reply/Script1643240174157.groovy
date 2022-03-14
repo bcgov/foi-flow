@@ -18,11 +18,17 @@ import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 
+import groovy.json.JsonSlurper as JsonSlurper
+
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.maximizeWindow()
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Search'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
@@ -34,15 +40,15 @@ WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'tes
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_Reply_form'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_comment Reply_form'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_comment list 1 Reply button'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_Reply_form'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_comment Reply_form'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Reply_cancelBtn'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_Reply_form'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_comment Reply_form'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_comment list 1 Reply button'), FailureHandling.STOP_ON_FAILURE)
 
@@ -139,6 +145,10 @@ WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/div_comment 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
+    def jsonSlurper = new JsonSlurper()
+
+    requestID = jsonSlurper.parseText(response.responseText).id.toString()
 
     WS.verifyResponseStatusCode(response, 200)
 }

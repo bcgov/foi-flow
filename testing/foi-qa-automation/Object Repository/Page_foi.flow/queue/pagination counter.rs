@@ -10,12 +10,12 @@
          <value>//div[@id='app']/div/div[3]/div/div[3]/div/div[3]/div/div[2]/div/p</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//p[@class = 'MuiTypography-root MuiTablePagination-caption jss3 MuiTypography-body2 MuiTypography-colorInherit']</value>
+         <key>CSS</key>
+         <value>p.MuiTablePagination-displayedRows.css-1chpzqh</value>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value>p.MuiTypography-root.MuiTablePagination-caption.jss3.MuiTypography-body2.MuiTypography-colorInherit</value>
+         <key>BASIC</key>
+         <value>//p[@class = 'MuiTablePagination-displayedRows css-1chpzqh']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -32,21 +32,21 @@
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>MuiTypography-root MuiTablePagination-caption jss3 MuiTypography-body2 MuiTypography-colorInherit</value>
+      <value>MuiTablePagination-displayedRows css-1chpzqh</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>1-1 of 1</value>
+      <value>1–10 of 571</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;col-sm-12 col-md-12 foi-grid-container&quot;]/div[@class=&quot;jss1&quot;]/div[@class=&quot;MuiDataGrid-root MuiDataGrid-root foi-data-grid&quot;]/div[3]/div[@class=&quot;MuiDataGrid-footerContainer&quot;]/div[@class=&quot;MuiTablePagination-root&quot;]/div[@class=&quot;MuiToolbar-root MuiToolbar-regular MuiTablePagination-toolbar MuiToolbar-gutters&quot;]/p[@class=&quot;MuiTypography-root MuiTablePagination-caption jss3 MuiTypography-body2 MuiTypography-colorInherit&quot;]</value>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root foi-grid-container MuiGrid-container MuiGrid-spacing-xs-1&quot;]/div[@class=&quot;MuiGrid-root jss1 MuiGrid-item MuiGrid-grid-xs-12&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root css-fimgsr&quot;]/div[3]/div[@class=&quot;MuiDataGrid-footerContainer css-1ij7r4y&quot;]/div[@class=&quot;MuiTablePagination-root css-whi0l6&quot;]/div[@class=&quot;MuiToolbar-root MuiToolbar-gutters MuiToolbar-regular MuiTablePagination-toolbar css-1wif0xq&quot;]/p[@class=&quot;MuiTablePagination-displayedRows css-1chpzqh&quot;]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -60,21 +60,35 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='No'])[1]/following::p[1]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='No'])[10]/following::p[1]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Andrews, Arielle'])[1]/following::p[1]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='FEB 10 2022'])[3]/following::p[1]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='1-1 of 1']/parent::*</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Capture object:'])[1]/preceding::p[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Alt'])[1]/preceding::p[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='1–10 of 571']/parent::*</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,5 +96,12 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//p</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//p[(text() = '1–10 of 571' or . = '1–10 of 571')]</value>
    </webElementXpaths>
 </WebElementEntity>
