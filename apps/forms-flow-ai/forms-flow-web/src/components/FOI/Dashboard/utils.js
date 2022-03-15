@@ -116,6 +116,16 @@ export const getDaysLeft = (params) => {
   }
 };
 
+export const getRecordsDue = (params) => {
+  let receivedDateString = params.row.cfrduedate;
+  const currentStatus = params.row.currentState;
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+    return "N/A";
+  } else {
+    return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
+  }
+};
+
 export const ClickableChip = ({ clicked, ...rest }) => {
   return (
     <Chip

@@ -1,16 +1,16 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useEffect, useState } from "react";
 import {
   DataGrid,
   gridPageCountSelector,
   gridPageSelector,
   useGridApiContext,
   useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+} from "@mui/x-data-grid";
+import Pagination from "@mui/material/Pagination";
 import "./dashboard.scss";
-import useStyles from './CustomStyle';
+import useStyles from "./CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
-import {push} from "connected-react-router";
+import { push } from "connected-react-router";
 import { fetchFOIMinistryRequestListByPage } from "../../../apiManager/services/FOI/foiRequestServices";
 import { formatDate } from "../../../helper/FOI/helper";
 import Loading from "../../../containers/Loading";
@@ -191,12 +191,13 @@ const MinistryDashboard = ({ userDetail }) => {
   }, 500);
 
   const updateAssigneeName = (data) => {
-    if (data)
-      return data.map((row) => ({
-        ...row,
-        assignedToName: getAssigneeValue(row),
-      }));
-    else return data;
+    if (!data) {
+      return [];
+    }
+    return data.map((row) => ({
+      ...row,
+      assignedToName: getAssigneeValue(row),
+    }));
   };
 
   const renderReviewRequest = (e) => {
@@ -207,6 +208,14 @@ const MinistryDashboard = ({ userDetail }) => {
         )
       );
     }
+  };
+
+  const handleSortChange = (model) => {
+    if (model.length === 0) {
+      return;
+    }
+
+    setSortModel(model);
   };
 
   return (
@@ -346,6 +355,6 @@ const CustomPagination = () => {
       onChange={(event, value) => apiRef.current.setPage(value - 1)}
     />
   );
-}
+};
 
 export default MinistryDashboard;
