@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
+import { getHeaderText } from './utils';
 
 const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
 
@@ -15,14 +16,18 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
     const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     const requestState = requestDetails?.currentState;
+    const assignedToList = useSelector(
+      (state) => state.foiRequests.foiFullAssignedToList
+    );
     const preventDefault = (event) => event.preventDefault();
 
     const dispatch = useDispatch();
     useEffect(() => {
-      dispatch(fetchFOIFullAssignedToList());
-    },[dispatch]); 
+      if (!assignedToList || assignedToList.length === 0) {
+        dispatch(fetchFOIFullAssignedToList());
+      }
+    }, [dispatch]); 
 
-    const assignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
     function getFullName(assignedToList, requestDetails) {
         const groupName = requestDetails.assignedGroup ? requestDetails.assignedGroup : "Unassigned";
         const assignedTo = requestDetails.assignedTo ? requestDetails.assignedTo : groupName;
@@ -41,7 +46,8 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
         }
     }
 
-    const headerText = _requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    const headerText = getHeaderText(_requestDetails);
+    //_requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
     const assignedToValue = getFullName(assignedToList, _requestDetails);
 
     return (

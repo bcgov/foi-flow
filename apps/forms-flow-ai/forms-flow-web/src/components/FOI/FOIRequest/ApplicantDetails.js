@@ -35,7 +35,15 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
         if(options.dateFormat) {
           return data[name] ? formatDate(data[name]) : options.defaultValue;
         }
-  
+
+        if(name === 'category'){
+            if(category.length > 0){
+                let categoryValue = category.filter((item) =>item.name === data[name]);
+                if(categoryValue.length <= 0)
+                    return options.defaultValue;
+            }
+        }
+        
         return data[name] || options.defaultValue;
       }
 

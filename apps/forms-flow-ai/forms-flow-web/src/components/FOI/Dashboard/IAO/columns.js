@@ -13,10 +13,10 @@ import {
 
 const ProcessingTeamColumns = [
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
-    width: 150,
+    width: 160,
   },
   {
     field: "applicantName",
@@ -24,7 +24,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    width: 170,
+    width: 180,
   },
   {
     field: "onBehalf",
@@ -37,7 +37,7 @@ const ProcessingTeamColumns = [
     field: "requestType",
     headerName: "TYPE",
     headerAlign: "left",
-    flex: 1,
+    flex: 0.75,
   },
   {
     field: "applicantcategory",
@@ -54,17 +54,15 @@ const ProcessingTeamColumns = [
   {
     field: "DaysLeftValue",
     headerName: "DAYS LEFT",
-    headerAlign: "center",
-    align: "center",
+    headerAlign: "left",
     valueGetter: getDaysLeft,
-    flex: 0.5,
+    flex: 0.75,
     sortable: false,
   },
   {
     field: "extensions",
     headerName: "EXT.",
-    headerAlign: "center",
-    align: "center",
+    headerAlign: "left",
     flex: 0.5,
     sortable: false,
     valueGetter: (params) =>
@@ -73,8 +71,7 @@ const ProcessingTeamColumns = [
   {
     field: "pages",
     headerName: "PAGES",
-    headerAlign: "center",
-    align: "center",
+    headerAlign: "left",
     flex: 0.5,
     sortable: false,
     renderCell: (params) => <span></span>,
@@ -94,7 +91,7 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    flex: 1,
+    width: 180,
   },
   {
     field: "requestType",
@@ -103,7 +100,7 @@ const IntakeTeamColumns = [
     flex: 1,
   },
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     flex: 1,
@@ -112,7 +109,6 @@ const IntakeTeamColumns = [
     field: "currentState",
     headerName: "CURRENT STATE",
     headerAlign: "left",
-    width: 180,
     flex: 1,
   },
   {
@@ -145,10 +141,10 @@ const IntakeTeamColumns = [
 
 const FlexTeamColumns = [
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
-    width: 150,
+    width: 160,
   },
   {
     field: "applicantName",
@@ -156,7 +152,7 @@ const FlexTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    width: 170,
+    width: 180,
   },
   {
     field: "applicantcategory",
@@ -192,10 +188,9 @@ const FlexTeamColumns = [
   {
     field: "DaysLeftValue",
     headerName: "DAYS LEFT",
-    headerAlign: "center",
-    align: "center",
+    headerAlign: "left",
     valueGetter: getDaysLeft,
-    flex: 0.5,
+    flex: 0.75,
     sortable: false,
   },
   {

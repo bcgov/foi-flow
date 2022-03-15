@@ -32,7 +32,7 @@ class stateevent:
         if len(states) == 2:
             newstate = states[0]
             oldstate = states[1]
-            if newstate != oldstate:
+            if newstate != oldstate and newstate != 'Intake in Progress':
                 return newstate
         return None 
     

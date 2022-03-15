@@ -65,7 +65,7 @@ class requestservicegetter:
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
-        axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"])        
+        axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],

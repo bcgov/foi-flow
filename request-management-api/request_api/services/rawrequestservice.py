@@ -82,7 +82,6 @@ class rawrequestservice:
         #Get documents
         result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
-        asyncio.create_task(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
         return result
 
    
@@ -114,4 +113,7 @@ class rawrequestservice:
                     return 'Closed'    
             except  KeyError:
                 print("Key Error on requeststatusid, ignore will be intake in Progress")
-        return 'Intake in Progress'     
+        return 'Intake in Progress'
+
+    def getaxisequestids(self):
+        return rawrequestservicegetter().getaxisequestids()     

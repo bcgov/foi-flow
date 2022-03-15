@@ -20,12 +20,12 @@ import {
   fetchFOIDeliveryModeList,
   fetchFOIReceivedModeList,
   fetchClosingReasonList,
-  fetchFOIFullAssignedToList,
-  fetchFOIMinistryAssignedToList
+  fetchFOIMinistryAssignedToList,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
+  fetchExistingAxisRequestIds
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
   fetchFOIRequestAttachmentsList
@@ -58,10 +58,6 @@ import {
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails';
-import {
-  setFOIRequestDetail,
-
-} from "../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -105,6 +101,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
+  var foiAxisRequestIds = useSelector(state=> state.foiRequests.foiAxisRequestIds);
   
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
@@ -148,43 +145,37 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if(window.location.href.indexOf("comments") > -1){
       tabclick('Comments');
     }
+    dispatch(fetchExistingAxisRequestIds());
   },[])
   
   const dispatch = useDispatch();
   useEffect(() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
-    }
-    else {
+    } else {
       dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
     }
 
-    dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOICategoryList());
     dispatch(fetchFOIProgramAreaList());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
 
-    if (bcgovcode)
-      dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
+    if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
-  const syncAxisData = (syncedData) =>{
-    dispatch(setFOIRequestDetail(syncedData));
-  }
-  
   useEffect(() => {
-    //const requestDetailsValue = isAddRequest ? {} : requestDetails;
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if(Object.entries(requestDetails)?.length !== 0){
-      var requestStateFromId = findRequestState(requestDetails.requeststatusid);
+      var requestStateFromId = findRequestState(requestDetails.requeststatusid) ? 
+      findRequestState(requestDetails.requeststatusid) : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
@@ -224,6 +215,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
     postalCode: "",
   }
 
+  const requiredAxisDetailsValue = {
+    axisRequestId: ""
+  }
+
   //below states are used to find if required fields are set or not
   const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
   const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);
@@ -233,7 +228,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [headerValue, setHeader] = useState("");
-
+  const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(requiredAxisDetailsValue);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
     setRequiredRequestDescriptionValues(requestDescriptionObject);
@@ -248,32 +243,32 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setrequiredContactDetails(value);
   }, [])
 
+
   const handleApplicantDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredApplicantDetails, value, name);
     setRequiredApplicantDetails(detailsData);
   }
-
   const handleContanctDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredContactDetails, value, name);
     setrequiredContactDetails(detailsData);
   }
-
+  const handleAxisDetailsValue = (value, name) => {
+    const detailsData = assignValue(requiredAxisDetailsValue, value, name);
+    setRequiredAxisDetails(detailsData);
+  }
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
     const descriptionData = assignValue(requiredRequestDescriptionValues, value, name);
     setRequiredRequestDescriptionValues(descriptionData);
   }
-
   //Update required fields of request details box with latest value
   const handleRequestDetailsValue = (value, name, value2) => {
     const detailsData = assignValue(requiredRequestDetailsValues, value, name);
-
     if (value2) {
       detailsData.dueDate = value2;
     }
     setRequiredRequestDetailsValues(detailsData);
   }
-
   //gets the latest assigned to value
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
@@ -282,6 +277,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {
+    setValidation(validationObj);
+  }
+  const handleAxisIdValidation = (validationObj) => {
     setValidation(validationObj);
   }
 
@@ -296,7 +294,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const contactDetailsNotGiven = checkContactGiven(requiredContactDetails, requiredApplicantDetails);
 
   //Variable to find if all required fields are filled or not
-  const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, assignedToValue, requiredRequestDetailsValues);
+  const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, 
+    assignedToValue, requiredRequestDetailsValues, requiredAxisDetails);
 
   const classes = useStyles();
 
@@ -459,7 +458,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  const requestNumber = requestDetails?.idNumber;
+  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
 
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
@@ -468,167 +467,208 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const stateTransition = requestDetails?.stateTransition;
 
-  return (
-  (!isLoading && requestDetails && Object.keys(requestDetails).length !== 0) || isAddRequest ?
+  return (!isLoading &&
+    requestDetails &&
+    Object.keys(requestDetails).length !== 0) ||
+    isAddRequest ? (
     <div className="foiformcontent">
       <div className="foitabbedContainer">
-
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1><a href="/foi/dashboard">FOI</a></h1>
+            <h1>
+              <a href="/foi/dashboard">FOI</a>
+            </h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown requestState={requestState} updateStateDropDown={updateStateDropDown} stateTransition={stateTransition} requestStatus={_requestStatus} handleStateChange={handleStateChange} isMinistryCoordinator={false} isValidationError={isValidationError} />
+            <StateDropDown
+              requestState={requestState}
+              updateStateDropDown={updateStateDropDown}
+              stateTransition={stateTransition}
+              requestStatus={_requestStatus}
+              handleStateChange={handleStateChange}
+              isMinistryCoordinator={false}
+              isValidationError={isValidationError}
+            />
           </div>
 
           <div className="tab">
             <div
               className={clsx("tablinks", {
-                "active": tabLinksStatuses.Request.active
+                active: tabLinksStatuses.Request.active,
               })}
               name="Request"
-              onClick={() => tabclick('Request')}>
+              onClick={() => tabclick("Request")}
+            >
               Request
             </div>
-            {
-              !isAddRequest
-              &&
+            {!isAddRequest && (
               <>
                 <div
                   className={clsx("tablinks", {
-                    "active": tabLinksStatuses.Attachments.active
+                    active: tabLinksStatuses.Attachments.active,
                   })}
                   name="Attachments"
-                  onClick={() => tabclick('Attachments')}
+                  onClick={() => tabclick("Attachments")}
                 >
-                  Attachments {requestAttachments?.length > 0 ? `(${requestAttachments.length})` : ""}
+                  Attachments{" "}
+                  {requestAttachments?.length > 0
+                    ? `(${requestAttachments.length})`
+                    : ""}
                 </div>
                 <div
                   className={clsx("tablinks", {
-                    "active": tabLinksStatuses.Comments.active
+                    active: tabLinksStatuses.Comments.active,
                   })}
                   name="Comments"
-                  onClick={() => tabclick('Comments')}
+                  onClick={() => tabclick("Comments")}
                 >
-                  Comments {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
+                  Comments{" "}
+                  {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
               </>
-            }
+            )}
 
             <div
-              className="tablinks"
               className={clsx("tablinks", {
-                "active": tabLinksStatuses.Option4.active
+                active: tabLinksStatuses.Option4.active,
               })}
               name="Option4"
-              onClick={() => tabclick('Option4')}
+              onClick={() => tabclick("Option4")}
             >
               Option 4
             </div>
           </div>
 
           <div className="foileftpanelstatus">
-            {bottomTextArray.length > 0 && (_requestStatus && _requestStatus.toLowerCase().includes("days")) &&
-              bottomTextArray.map(text => {
-                return (
-                  <h4>{text}</h4>
-                )
-              })
-            }
+            {bottomTextArray.length > 0 &&
+              _requestStatus &&
+              _requestStatus.toLowerCase().includes("days") &&
+              bottomTextArray.map((text) => {
+                return <h4>{text}</h4>;
+              })}
           </div>
-
-
         </div>
         <div className="foitabpanelcollection">
           <div
             id="Request"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Request.active,
+              active: tabLinksStatuses.Request.active,
               [classes.displayed]: tabLinksStatuses.Request.display,
               [classes.hidden]: !tabLinksStatuses.Request.display,
             })}
           >
             <div className="container foi-review-request-container">
-
               <div className="foi-review-container">
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      {isAddRequest && 
-                        <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} syncAxisData={syncAxisData} />
+                      {(isAddRequest || requestState === StateEnum.unopened.name) &&
+                        <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
+                        foiAxisRequestIds={foiAxisRequestIds}
+                        handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
                       }
                       <ApplicantDetails
                         requestDetails={requestDetails}
                         requestStatus={_requestStatus}
                         contactDetailsNotGiven={contactDetailsNotGiven}
-                        handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue}
+                        handleApplicantDetailsInitialValue={
+                          handleApplicantDetailsInitialValue
+                        }
                         handleEmailValidation={handleEmailValidation}
-                        handleApplicantDetailsValue={handleApplicantDetailsValue}
+                        handleApplicantDetailsValue={
+                          handleApplicantDetailsValue
+                        }
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
                       />
-                      {
-                        requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+                      {requiredRequestDetailsValues.requestType.toLowerCase() ===
+                        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
                         <>
                           <ChildDetails
-                            additionalInfo={requestDetails.additionalPersonalInfo}
+                            additionalInfo={
+                              requestDetails.additionalPersonalInfo
+                            }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput}
                           />
                           <OnBehalfOfDetails
-                            additionalInfo={requestDetails.additionalPersonalInfo}
+                            additionalInfo={
+                              requestDetails.additionalPersonalInfo
+                            }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput}
                           />
                         </>
+                      )}
 
-                      }
-
-                      <AddressContactDetails requestDetails={requestDetails} contactDetailsNotGiven={contactDetailsNotGiven} createSaveRequestObject={createSaveRequestObject} handleContactDetailsInitialValue={handleContactDetailsInitialValue} handleContanctDetailsValue={handleContanctDetailsValue} disableInput={disableInput} />
-                      
-                      <RequestDescriptionBox 
-                        programAreaList={programAreaList} 
-                        urlIndexCreateRequest={urlIndexCreateRequest} 
-                        requestDetails={requestDetails} 
-                        handleUpdatedProgramAreaList={handleUpdatedProgramAreaList} 
-                        handleOnChangeRequiredRequestDescriptionValues={handleOnChangeRequiredRequestDescriptionValues} 
-                        handleInitialRequiredRequestDescriptionValues={handleInitialRequiredRequestDescriptionValues} 
-                        createSaveRequestObject={createSaveRequestObject} 
-                        disableInput={disableInput} 
+                      <AddressContactDetails
+                        requestDetails={requestDetails}
+                        contactDetailsNotGiven={contactDetailsNotGiven}
+                        createSaveRequestObject={createSaveRequestObject}
+                        handleContactDetailsInitialValue={
+                          handleContactDetailsInitialValue
+                        }
+                        handleContanctDetailsValue={handleContanctDetailsValue}
+                        disableInput={disableInput}
                       />
-                      <RequestDetails 
-                        requestDetails={requestDetails} 
+
+                      <RequestDescriptionBox
+                        programAreaList={programAreaList}
+                        urlIndexCreateRequest={urlIndexCreateRequest}
+                        requestDetails={requestDetails}
+                        handleUpdatedProgramAreaList={
+                          handleUpdatedProgramAreaList
+                        }
+                        handleOnChangeRequiredRequestDescriptionValues={
+                          handleOnChangeRequiredRequestDescriptionValues
+                        }
+                        handleInitialRequiredRequestDescriptionValues={
+                          handleInitialRequiredRequestDescriptionValues
+                        }
+                        createSaveRequestObject={createSaveRequestObject}
+                        disableInput={disableInput}
+                      />
+                      <RequestDetails
+                        requestDetails={requestDetails}
                         requestStatus={_requestStatus}
-                        handleRequestDetailsValue={handleRequestDetailsValue} 
-                        handleRequestDetailsInitialValue={handleRequestDetailsInitialValue} 
-                        createSaveRequestObject={createSaveRequestObject} 
-                        disableInput={disableInput} 
-                        
+                        handleRequestDetailsValue={handleRequestDetailsValue}
+                        handleRequestDetailsInitialValue={
+                          handleRequestDetailsInitialValue
+                        }
+                        createSaveRequestObject={createSaveRequestObject}
+                        disableInput={disableInput}
                       />
-                      
-                      <ExtensionDetails requestDetails={requestDetails} requestState={requestState}/>
-                      {
-                        requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL &&
+
+                      <ExtensionDetails
+                        requestDetails={requestDetails}
+                        requestState={requestState}
+                      />
+                      {requiredRequestDetailsValues.requestType.toLowerCase() ===
+                        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
                           disableInput={disableInput}
                         />
-                      }
-                      {showDivisionalTracking && <DivisionalTracking divisions={requestDetails.divisions} />}
+                      )}
+                      {showDivisionalTracking && (
+                        <DivisionalTracking
+                          divisions={requestDetails.divisions}
+                        />
+                      )}
                       <RequestNotes />
 
-                      <BottomButtonGroup 
-                        stateChanged={stateChanged} 
-                        isValidationError={isValidationError} 
-                        urlIndexCreateRequest={urlIndexCreateRequest} 
-                        saveRequestObject={saveRequestObject} 
-                        unSavedRequest={unSavedRequest} 
-                        handleSaveRequest={handleSaveRequest} 
-                        handleOpenRequest={handleOpenRequest} 
-                        currentSelectedStatus={_currentrequestStatus} 
-                        hasStatusRequestSaved={hasStatusRequestSaved} 
+                      <BottomButtonGroup
+                        stateChanged={stateChanged}
+                        isValidationError={isValidationError}
+                        urlIndexCreateRequest={urlIndexCreateRequest}
+                        saveRequestObject={saveRequestObject}
+                        unSavedRequest={unSavedRequest}
+                        handleSaveRequest={handleSaveRequest}
+                        handleOpenRequest={handleOpenRequest}
+                        currentSelectedStatus={_currentrequestStatus}
+                        hasStatusRequestSaved={hasStatusRequestSaved}
                         disableInput={disableInput}
                         requestState={requestState}
                       />
@@ -641,47 +681,79 @@ const FOIRequest = React.memo(({ userDetail }) => {
           <div
             id="Attachments"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Attachments.active,
+              active: tabLinksStatuses.Attachments.active,
               [classes.displayed]: tabLinksStatuses.Attachments.display,
               [classes.hidden]: !tabLinksStatuses.Attachments.display,
             })}
           >
-            {
-              !isAttachmentListLoading && (iaoassignedToList?.length > 0 || ministryAssignedToList?.length > 0) ?
-                <>
-                  <AttachmentSection currentUser={userId} attachmentsArray={requestAttachments}
-                    setAttachments={setAttachments} requestId={requestId} ministryId={ministryId}
-                    requestNumber={requestNumber} requestState={requestState}
-                    iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} isMinistryCoordinator={false} />
-                </> : <Loading />
-            }
+            {!isAttachmentListLoading &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <AttachmentSection
+                  currentUser={userId}
+                  attachmentsArray={requestAttachments}
+                  setAttachments={setAttachments}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  requestNumber={requestNumber}
+                  requestState={requestState}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  isMinistryCoordinator={false}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
           </div>
           <div
             id="Comments"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Comments.active,
+              active: tabLinksStatuses.Comments.active,
               [classes.displayed]: tabLinksStatuses.Comments.display,
               [classes.hidden]: !tabLinksStatuses.Comments.display,
             })}
           >
-            {
-              !isLoading && requestNotes && (iaoassignedToList?.length > 0 || ministryAssignedToList?.length > 0) ?
-                <>
-                  <CommentSection currentUser={userId && { userId: userId, avatarUrl: avatarUrl, name: fullName }} commentsArray={requestNotes.sort(function (a, b) { return b.commentId - a.commentId; })}
-                    setComment={setComment} signinUrl={signinUrl} signupUrl={signupUrl} requestid={requestId} ministryId={ministryId}
-                    bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} requestNumber={requestNumber}
-                    //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
-
-                </> : <Loading />
-            }
-
-
+            {!isLoading &&
+            requestNotes &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <CommentSection
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: fullName,
+                    }
+                  }
+                  commentsArray={requestNotes.sort(function (a, b) {
+                    return b.commentId - a.commentId;
+                  })}
+                  setComment={setComment}
+                  signinUrl={signinUrl}
+                  signupUrl={signupUrl}
+                  requestid={requestId}
+                  ministryId={ministryId}
+                  bcgovcode={bcgovcode}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs
+                  setEditorChange={setEditorChange}
+                  removeComment={removeComment}
+                  setRemoveComment={setRemoveComment}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
           </div>
           <div
             id="Option4"
             className={clsx("tabcontent", {
-              "active": tabLinksStatuses.Option4.active,
+              active: tabLinksStatuses.Option4.active,
               [classes.displayed]: tabLinksStatuses.Option4.display,
               [classes.hidden]: !tabLinksStatuses.Option4.display,
             })}
@@ -691,7 +763,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
         </div>
       </div>
     </div>
- : <Loading/>
+  ) : (
+    <Loading />
   );
 
 
