@@ -14,6 +14,8 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
+import { useDispatch} from "react-redux";
+import { fetchRequestDataFromAxis } from '../../../apiManager/services/FOI/foiRequestServices';
 
 const useStyles = makeStyles({
  
@@ -29,20 +31,20 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
 
     const classes = useStyles();
     const [updatedFields, setUpdatedFields] = React.useState({});
-    let sampleRequestDetails ={};
+    let requestDetailsValue ={};
+    const dispatch = useDispatch();
 
     useEffect(()=>{
-      sampleRequestDetails = {"axisRequestId":"EDU-2015-50012","axisSyncDate":"2022-03-03T13:59:18Z",
-      "description":"Copies of all my school records when taught by Miss Stacey at the Avonlea School.","fromDate":null,
-      "toDate":null,"requestType":"personal","receivedDate":"2015-02-19","receivedDateUF":"2015-02-19T00:00:00Z",
-      "requestProcessStart":"2015-02-19","dueDate":"2015-04-09","originalDueDate":null,"category":"Individual","receivedMode":"Email",
-      "deliveryMode":"Secure File Transfer","ispiiredacted":true,"firstName":"Anne","middleName":"","lastName":"Shirely",
-      "businessName":"Rollings Reliables","email":"redhairedanne@greengables.ca","address":"Green Gables","addressSecondary":"",
-      "city":"Avonlea","province":"Prince Edward Island","country":"Canada","postal":"K9K 9K9","phonePrimary":"250-998-8956",
-      "phoneSecondary":"250-153-1864","workPhonePrimary":"250-545-2454","workPhoneSecondary":"","correctionalServiceNumber":null,
-      "publicServiceEmployeeNumber":null,"selectedMinistries":[{"code":"EDUC"}],"additionalPersonalInfo":{"birthDate":null,
-      "anotherFirstName":"","anotherMiddleName":"","anotherLastName":"","personalHealthNumber":""}};
-      compareFields();
+      dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
+        if(!err){
+            if(Object.entries(data).length !== 0){
+              requestDetailsValue = data;
+              console.log("Sample Data:", requestDetailsValue);
+              compareFields();  
+            }
+        }
+    }));
+      
     },[])
 
 
@@ -50,9 +52,9 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
       let updatedObj = {};
         for(let key of Object.keys(saveRequestObject)){
           if(isAxisSyncDisplayField(key)){
-            if(saveRequestObject[key] !== sampleRequestDetails[key]){
+            if(saveRequestObject[key] !== requestDetailsValue[key]){
               if(key === 'selectedMinistries'){
-                const ministryCodes = sampleRequestDetails[key].map(({code}) => code).join(', ');
+                const ministryCodes = requestDetailsValue[key].map(({code}) => code).join(', ');
                 updatedObj[key] = ministryCodes;
               }
               else if(key ==='additionalPersonalInfo'){
@@ -62,7 +64,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
                 }
               }
               else
-                updatedObj[key] = sampleRequestDetails[key];
+                updatedObj[key] = requestDetailsValue[key];
             }
           }
           }
@@ -77,6 +79,11 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
     const handleClose = () => {
         setAxisSyncModalOpen(false);
     };
+
+    const saveAxisData = () => {
+      //setSaveRequestObject(requestDetailsValue);
+      saveRequest();
+    }
 
 
     return  Object.entries(updatedFields).length > 0 && (
@@ -119,7 +126,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
           </Accordion>
           <div className='axis-modal-actions'>
             <button type="button" style={{width: '48%'}}
-                className="btn btn-bottom" onClick={saveRequest}>
+                className="btn btn-bottom" onClick={saveAxisData}>
                 Save Changes
             </button>
             <button type="button" onClick={handleClose} className='axis-modal-action-cancel'>

@@ -411,7 +411,7 @@ export const fetchExistingAxisRequestIds = (...rest) => {
   }
 };
 
-export const fetchRequestDataFromAxis = (axisRequestId,...rest) => {
+export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
   const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_GET_AXIS_REQUEST_DATA,
@@ -423,7 +423,7 @@ export const fetchRequestDataFromAxis = (axisRequestId,...rest) => {
       .then((res) => {
         if (res.data) {
           console.log(res.data);
-          if(Object.entries(res.data).length !== 0){
+          if(!isModal && Object.entries(res.data).length !== 0){
             dispatch(setFOIRequestDetail(res.data));
           }
           done(null, res.data);

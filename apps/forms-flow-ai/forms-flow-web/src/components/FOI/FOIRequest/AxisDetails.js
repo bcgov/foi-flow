@@ -51,7 +51,7 @@ const AxisDetails = React.memo(({
     }
 
     const syncWithAxis = () => {
-        dispatch(fetchRequestDataFromAxis(axisRequestId, (err, data) => {
+        dispatch(fetchRequestDataFromAxis(axisRequestId, false, (err, data) => {
             if(!err){
                 if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}
