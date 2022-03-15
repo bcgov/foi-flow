@@ -179,7 +179,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
               Pagination: CustomPagination,
             }}
             sortingOrder={["desc", "asc"]}
-            sortModel={sortModel}
+            sortModel={[sortModel[0]]}
             sortingMode={"server"}
             onSortModelChange={(model) => setSortModel(model)}
             getRowClassName={(params) =>
