@@ -10,9 +10,8 @@ import {
     setRequestComments,
   } from "../../../actions/FOI/foiRequestActions";
   import UserService from "../../../services/UserService";
-  import { replaceUrl } from "../../../helper/FOI/helper";
+  import { replaceUrl, errorToast } from "../../../helper/FOI/helper";
   import { catchError } from './foiServicesUtil'
-  import { errorToast } from "../../../helper/FOI/helper";
 
   export const fetchFOIRequestNotesList = (requestId, ministryId) => {
     let apiUrl = "";
