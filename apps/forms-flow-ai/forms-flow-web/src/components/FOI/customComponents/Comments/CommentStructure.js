@@ -101,6 +101,96 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
           </div>
 
+            
+        </div>
+        <div className="userActions">
+          <div>
+            {i.commentTypeId === 1 && actions.userId === i.userId && actions.user && (
+              <Popup
+                ref={ref}
+                role='tooltip'
+                contentStyle={{width: "85px"}}
+                trigger={                
+                    <button className="actionsBtn">
+                      <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
+                    </button>
+                }
+                position='right center'
+                nested
+                closeOnDocumentClick
+              >
+                <div className="actionDiv">
+                  <div>
+                    <button
+                      className="editBtn"
+                      onClick={() => actions.handleAction(i.commentId, edit)}
+                    >
+                      {' '}
+                      Edit
+                    </button>
+                  </div>
+                  <div>
+                    <Popup
+                      trigger={
+                        <button className="deleteBtn" onClick={closeTooltip}> Delete</button>
+                      }
+                      modal
+                      nested
+                      closeOnDocumentClick
+                    >
+                      {(close) => (
+                        <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
+
+                          <div className='header' style={modalHeader} >
+                            {' '}
+                            Delete Comment{' '}
+                          </div>
+                          <div className='content' style={modalContent}>
+                            {hasAnotherUserComment ? <><FontAwesomeIcon icon={faInfoCircle} size='1x' color='darkblue' /><span className="deletevalidationInfo">Parent comments with a reply cannot be deleted. You may edit the comment.</span></> :
+                              ' Delete your comment permanently?'}
+                          </div>
+                          <div className='actions' style={modalActions}>
+                            {
+                              hasAnotherUserComment ?
+                                <button
+                                  className='button'
+                                  style={modalActionBtn}
+
+                                  disabled
+                                >
+                                  Delete
+                                </button>
+                                :
+                                <button
+                                  className='button btn-bottom'
+                                  style={modalActionBtn}
+
+                                  onClick={() => {
+                                    actions.onDelete(i.commentId, parentId)
+                                    close()
+                                  }}
+                                >
+                                  Delete
+                                </button>
+                            }
+                            <button
+                              className='button btn-bottom'
+                              style={modalDelBtn}
+                              onClick={() => {
+                                close(); closeTooltip()
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </Popup>
+                  </div>
+                </div>
+              </Popup>
+            )}
+          </div>
           <div>
             <button id={`btncomment${i.commentId}`}
               className={`replyBtn ${totalcommentCount === -100 || (isreplysection && totalcommentCount - 1 > currentIndex) ? " hide" : " show"}`}
@@ -111,96 +201,6 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               <FontAwesomeIcon icon={faReply} size='1x' color='#003366' /> Reply
             </button>
           </div>
-        </div>
-        <div className="userActions">
-          {actions.userId === i.userId && actions.user && (
-            <Popup
-              ref={ref}
-              role='tooltip'
-              trigger={
-                i.commentTypeId === 1 ?
-                  <button className="actionsBtn">
-                    <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
-                  </button> :
-                  <button className="actionsBtn" disabled>
-                    <FontAwesomeIcon icon={faEllipsisH} size='1x' color='grey' />
-                  </button>
-              }
-              position='right center'
-              nested
-              closeOnDocumentClick
-            >
-              <div className="actionDiv">
-                <div>
-                  <button
-                    className="editBtn"
-                    onClick={() => actions.handleAction(i.commentId, edit)}
-                  >
-                    {' '}
-                    edit
-                  </button>
-                </div>
-                <div>
-                  <Popup
-                    trigger={
-                      <button className="deleteBtn" onClick={closeTooltip}> delete</button>
-                    }
-                    modal
-                    nested
-                    closeOnDocumentClick
-                  >
-                    {(close) => (
-                      <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
-
-                        <div className='header' style={modalHeader} >
-                          {' '}
-                          Delete Comment{' '}
-                        </div>
-                        <div className='content' style={modalContent}>
-                          {hasAnotherUserComment ? <><FontAwesomeIcon icon={faInfoCircle} size='1x' color='darkblue' /><span className="deletevalidationInfo">Parent comments with a reply cannot be deleted. You may edit the comment.</span></> :
-                            ' Delete your comment permanently?'}
-                        </div>
-                        <div className='actions' style={modalActions}>
-                          {
-                            hasAnotherUserComment ?
-                              <button
-                                className='button'
-                                style={modalActionBtn}
-
-                                disabled
-                              >
-                                Delete
-                              </button>
-                              :
-                              <button
-                                className='button btn-bottom'
-                                style={modalActionBtn}
-
-                                onClick={() => {
-                                  actions.onDelete(i.commentId, parentId)
-                                  close()
-                                }}
-                              >
-                                Delete
-                              </button>
-                          }
-                          <button
-                            className='button btn-bottom'
-                            style={modalDelBtn}
-                            onClick={() => {
-                              close(); closeTooltip()
-                            }}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </Popup>
-                </div>
-              </div>
-            </Popup>
-          )}
         </div>
       </div>
       {

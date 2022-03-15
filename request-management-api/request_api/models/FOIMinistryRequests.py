@@ -344,7 +344,7 @@ class FOIMinistryRequest(db.Model):
                                 ministryassignee,
                                 ministryassignee.username == FOIMinistryRequest.assignedministryperson,
                                 isouter=True
-                            )
+                            ).filter(FOIMinistryRequest.requeststatusid != 3)
 
         if(additionalfilter == 'watchingRequests'):
             #watchby

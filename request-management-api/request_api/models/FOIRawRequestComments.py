@@ -44,6 +44,9 @@ class FOIRawRequestComment(db.Model):
         dbquery = db.session.query(FOIRawRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
         if(comment.count() > 0):
+            childcomments = dbquery.filter_by(parentcommentid=commentid, isactive=True)
+            if (childcomments.count() > 0) :
+                return DefaultMethodResult(False,'Cannot delete parent comment with replies',commentid)
             comment.update({FOIRawRequestComment.isactive: False, FOIRawRequestComment.updatedby: userid,
                             FOIRawRequestComment.updated_at: datetime.now()}, synchronize_session=False)
             db.session.commit()

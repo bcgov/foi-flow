@@ -515,15 +515,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
               </>
             )}
 
-            <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.Option4.active,
-              })}
-              name="Option4"
-              onClick={() => tabclick("Option4")}
-            >
-              Option 4
-            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -617,6 +608,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         programAreaList={programAreaList}
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
+                        requiredRequestDetailsValues = {requiredRequestDetailsValues}
                         handleUpdatedProgramAreaList={
                           handleUpdatedProgramAreaList
                         }
@@ -749,16 +741,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             ) : (
               <Loading />
             )}
-          </div>
-          <div
-            id="Option4"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.Option4.active,
-              [classes.displayed]: tabLinksStatuses.Option4.display,
-              [classes.hidden]: !tabLinksStatuses.Option4.display,
-            })}
-          >
-            <h3>Option 4</h3>
           </div>
         </div>
       </div>
