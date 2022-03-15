@@ -422,7 +422,10 @@ export const fetchRequestDataFromAxis = (axisRequestId,...rest) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(setFOIRequestDetail(res.data));
+          console.log(res.data);
+          if(Object.entries(res.data).length !== 0){
+            dispatch(setFOIRequestDetail(res.data));
+          }
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
