@@ -608,6 +608,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         programAreaList={programAreaList}
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
+                        requiredRequestDetailsValues = {requiredRequestDetailsValues}
                         handleUpdatedProgramAreaList={
                           handleUpdatedProgramAreaList
                         }

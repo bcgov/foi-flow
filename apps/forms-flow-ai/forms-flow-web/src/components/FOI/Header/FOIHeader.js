@@ -40,12 +40,11 @@ const [socket, setSocket] = useState(null);
 const userGroups = user?.groups?.map(group => group.slice(1));
 isMinistry = isMinistryLogin(userGroups);
 ministryCode = getMinistryCode(userGroups);
-console.log("USER", user?.preferred_username);
+
 useEffect(() => {     
   if(!unauthorized && isAuthenticated){
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  
-    console.log("Token for Socket:", UserService.getToken());
     const options = {
       reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
       reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
@@ -54,17 +53,14 @@ useEffect(() => {
       auth: { "x-jwt-token": UserService.getToken() }
     };
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
-    //console.log("Socket Val after connect:", socket);
     setInterval(() => {
       dispatch(fetchFOINotifications());
     }, 900000);
   }
 },[]);
 
-console.log("Socket Value:", socket);
 
 useEffect(() => {    
-    console.log("USER inside useeffect of socket:", user?.preferred_username); 
     socket?.on(user.preferred_username, data => {
      if(data.action === 'delete'){
       setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
@@ -84,7 +80,6 @@ useEffect(() => {
 
  const signout = () => {
     socket?.disconnect();
-    console.log("Socket Val after disconnect:", socket);
     localStorage.removeItem('authToken');
     dispatch(push(`/`));
     UserService.userLogout(); 

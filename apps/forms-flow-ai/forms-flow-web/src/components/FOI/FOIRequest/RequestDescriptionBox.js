@@ -26,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
 
 const RequestDescription = React.memo(({     
     programAreaList, 
-    requestDetails,       
+    requestDetails,  
+    requiredRequestDetailsValues,     
     handleOnChangeRequiredRequestDescriptionValues,
     handleInitialRequiredRequestDescriptionValues,
     handleUpdatedProgramAreaList,
@@ -232,21 +233,24 @@ const RequestDescription = React.memo(({
                     </div>
                   </div>
                 </div>
-                <div class="row foi-details-row">
-                  <div class="col-lg-12">
-                    <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
-                      <input
-                        type="checkbox"
-                        className="checkmark"
-                        checked={isPIIRedacted}
-                        onChange={handlePIIRedacted}
-                        disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
-                      />
-                      <span className="checkmark"></span>
-                        Description contains NO Personal Information
-                    </label>  
-                  </div>    
-                </div>
+                {requiredRequestDetailsValues.requestType.toLowerCase() ===
+                      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
+                  <div class="row foi-details-row">
+                    <div class="col-lg-12">
+                      <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
+                        <input
+                          type="checkbox"
+                          className="checkmark"
+                          checked={isPIIRedacted}
+                          onChange={handlePIIRedacted}
+                          disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
+                        />
+                        <span className="checkmark"></span>
+                          Description contains NO Personal Information
+                      </label>  
+                    </div>    
+                  </div>
+                )}
                 { Object.entries(localProgramAreaList).length !== 0 ?
                 <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
                 :null}
