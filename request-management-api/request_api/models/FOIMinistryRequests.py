@@ -581,7 +581,12 @@ class FOIMinistryRequest(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
+
+        groupfilter = []
+        for group in params['groups']:
+            groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
+
+        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee).filter(or_(*groupfilter))
 
         #sorting
         sortingcondition = FOIMinistryRequest.getsorting(params['sortingitems'], params['sortingorders'], iaoassignee, ministryassignee)
