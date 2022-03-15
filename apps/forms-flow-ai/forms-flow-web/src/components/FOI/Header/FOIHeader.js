@@ -53,14 +53,14 @@ useEffect(() => {
       auth: { "x-jwt-token": UserService.getToken() }
     };
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
-  
     setInterval(() => {
       dispatch(fetchFOINotifications());
     }, 900000);
   }
 },[]);
 
-useEffect(() => {     
+
+useEffect(() => {    
     socket?.on(user.preferred_username, data => {
      if(data.action === 'delete'){
       setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))

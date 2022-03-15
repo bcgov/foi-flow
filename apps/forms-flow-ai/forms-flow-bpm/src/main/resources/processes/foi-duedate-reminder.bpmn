@@ -96,7 +96,7 @@ connector.getVariable("statusCode");</camunda:script>
     <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="Activity_0gfn3o4">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &lt;= 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:intermediateThrowEvent id="Event_1tmmrt5" name="FOI API Failure Message">
+    <bpmn:intermediateThrowEvent id="Event_1tmmrt5" name="API Failure Message">
       <bpmn:incoming>Flow_017kmm6</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0950kk2" messageRef="Message_1yee5gs" />
     </bpmn:intermediateThrowEvent>
@@ -168,11 +168,14 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmndi:BPMNShape id="Event_1b3k3ug_di" bpmnElement="Event_1tmmrt5">
         <dc:Bounds x="712" y="272" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="692" y="315" width="77" height="27" />
+          <dc:Bounds x="704" y="315" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="Event_17odcea">
         <dc:Bounds x="542" y="139" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="548" y="182" width="25" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

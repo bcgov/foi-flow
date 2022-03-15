@@ -24,14 +24,14 @@ const RequestDescription = React.memo((requestDetails) => {
     const classes = useStyles();
     const _requestDetails = requestDetails.requestDetails;
     var requestDescriptionHistoryList = useSelector(state => state.foiRequests.foiRequestDescriptionHistoryList);
-    const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
+    const sortedList = requestDescriptionHistoryList.sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+    });
+    const filteredList = sortedList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
             copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
         ))
     )
-    const sortedList = filteredList.sort((a, b) => {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-    });
 
     const [openModal, setOpenModal] = React.useState(false);
     const handleDescriptionHistoryClick = () => {
@@ -43,7 +43,7 @@ const RequestDescription = React.memo((requestDetails) => {
     return (
       <Card className="foi-details-card">
         <RequestDescriptionHistory
-          requestDescriptionHistoryList={sortedList}
+          requestDescriptionHistoryList={filteredList}
           openModal={openModal}
           handleModalClose={handleModalClose}
         />
@@ -56,9 +56,9 @@ const RequestDescription = React.memo((requestDetails) => {
               <button
                 type="button"
                 className={`btn btn-link btn-description-history ${
-                  !(sortedList.length > 1) ? classes.btndisabled : ""
+                  !(filteredList.length > 1) ? classes.btndisabled : ""
                 }`}
-                disabled={!(sortedList.length > 1)}
+                disabled={!(filteredList.length > 1)}
                 onClick={handleDescriptionHistoryClick}
               >
                 Description History

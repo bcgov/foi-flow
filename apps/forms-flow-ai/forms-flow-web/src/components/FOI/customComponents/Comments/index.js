@@ -65,12 +65,13 @@ export const CommentSection = ({
       setRemoveComment={setRemoveComment}
     >
       <div className="section">
-        <div className="foi-request-number-header">
-          <h1 className="foi-review-request-text foi-ministry-requestheadertext">{getRequestNumber()}</h1>
-        </div>
-
-        <div className="addcommentBox">
-          <button type="button" style={{ display: !showaddbox ? 'block' : 'none' }} className="btn foi-btn-create addcomment" onClick={() => { !showaddbox ? setshowaddbox(true) : setshowaddbox(false); }}>+ Add Comment</button>
+        <div className="foi-request-review-header-row1">
+          <div className="col-9 foi-request-number-header">
+            <h1 className="foi-review-request-text foi-ministry-requestheadertext">{getRequestNumber()}</h1>
+          </div>
+          <div className="col-3 addcommentBox">
+            <button type="button" style={{ display: !showaddbox ? 'block' : 'none' }} className="btn foi-btn-create addcomment" onClick={() => { !showaddbox ? setshowaddbox(true) : setshowaddbox(false); }}>+ Add Comment</button>
+          </div>
         </div>
 { showaddbox ?
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>

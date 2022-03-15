@@ -144,7 +144,7 @@ const FlexTeamColumns = [
     field: "idNumber",
     headerName: "ID NUMBER",
     headerAlign: "left",
-    width: 150,
+    width: 160,
   },
   {
     field: "applicantName",
@@ -152,7 +152,7 @@ const FlexTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    width: 170,
+    width: 180,
   },
   {
     field: "applicantcategory",

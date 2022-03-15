@@ -296,13 +296,13 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid)
-
+        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
-            return basequery.filter(FOIRawRequest.status != 'Unopened').filter(filtercondition)
+            return basequery.filter(filtercondition)
         else:
-            return basequery.filter(FOIRawRequest.status != 'Unopened')
+            return basequery
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):
