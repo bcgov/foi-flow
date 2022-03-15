@@ -402,7 +402,7 @@ class FOIRawRequest(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.advancedsearch(params, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])

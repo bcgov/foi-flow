@@ -130,9 +130,10 @@ class dashboardservice:
 
     def advancedsearch(self, params={'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
         
-        if (AuthHelper.getusertype() == "iao"):                                                                                           
+        usertype = AuthHelper.getusertype()
+        if (usertype == "iao"):
             requests = FOIRawRequest.advancedsearch(params)
-        elif (AuthHelper.getusertype() == "ministry"):
+        elif (usertype == "ministry"):
             requests = FOIMinistryRequest.advancedsearch(params)
         
         requestqueue = []

@@ -338,6 +338,13 @@ class FOIMinistryRequest(db.Model):
         subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby)
 
         #sorting
+        sortingcondition = FOIMinistryRequest.getsorting(sortingitems, sortingorders, iaoassignee, ministryassignee)
+
+        return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
+    
+    @classmethod
+    def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee):
+        #sorting
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
@@ -350,7 +357,8 @@ class FOIMinistryRequest(db.Model):
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
-        return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
+        
+        return sortingcondition
 
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
@@ -569,7 +577,19 @@ class FOIMinistryRequest(db.Model):
         return basequery.filter(ministryfilter)
 
     @classmethod
-    def advancedsearch(cls, params, iaoassignee, ministryassignee):
+    def advancedsearch(cls, params):
+        #ministry requests
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
+
+        #sorting
+        sortingcondition = FOIMinistryRequest.getsorting(params['sortingitems'], params['sortingorders'], iaoassignee, ministryassignee)
+
+        return ministry_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+
+    @classmethod
+    def advancedsearchsubquery(cls, params, iaoassignee, ministryassignee):
         basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee)
 
         #filter/search
