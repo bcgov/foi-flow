@@ -72,7 +72,7 @@ class auditservice:
                 _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat , "createdby": entry['createdby'], "status": entry['status']})        
             else:
                 if requestrecord['requesttype'] == 'personal' or entry['ispiiredacted'] == True:
-                    _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": entry['createdat'] , "createdby": entry['createdby'], "status": entry['status']})            
+                    _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat , "createdby": entry['createdby'], "status": entry['status']})            
         return _rawdescriptions
         
             
