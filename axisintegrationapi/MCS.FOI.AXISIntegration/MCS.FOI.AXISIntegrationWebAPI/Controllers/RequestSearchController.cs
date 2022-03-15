@@ -32,11 +32,15 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         public string Get(string requestNumber)
         {
             try
-            {
-                return _requestDA.GetAXISRequestString(requestNumber);
+            {                
+                if (!string.IsNullOrEmpty(requestNumber) && requestNumber.Length > 10)
+                    return _requestDA.GetAXISRequestString(requestNumber);
+                else
+                    return "";
             }
             catch(Exception ex)
             {
+                _logger.Log(LogLevel.Error, string.Format($"Exception happened while GET operations of request - {requestNumber}, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}"));
                 return ex.Message;
             }
             
