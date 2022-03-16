@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import "../dashboard.scss";
-import { useDispatch } from "react-redux";
 import Grid from "@mui/material/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import Queue from "./Queue";
@@ -24,25 +23,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const MinistryDashboard = ({ userDetail }) => {
-  //   const user = useSelector((state) => state.user.userDetail);
-  //   const tableInfo = getTableInfo(user.groups);
-  const dispatch = useDispatch();
-
   const classes = useStyles();
-
-  const [filterModel, setFilterModel] = React.useState({
-    fields: [
-      "applicantcategory",
-      "requestType",
-      "idNumber",
-      "currentState",
-      "assignedministrypersonLastName",
-      "assignedministrypersonFirstName",
-    ],
-    keyword: null,
-  });
-  const [requestFilter, setRequestFilter] = useState("All");
-
   const [advnacedSearchEnabled, setAdvancedSearchEnabled] = useState(false);
 
   return (
