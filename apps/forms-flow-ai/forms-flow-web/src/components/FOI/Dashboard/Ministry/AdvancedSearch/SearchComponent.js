@@ -42,6 +42,9 @@ const MenuProps = {
       width: 250,
     },
   },
+  MenuListProps: {
+    autoFocusItem: false,
+  },
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -473,6 +476,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="callforrecords"
                           onChange={handleRequestStateChange}
                           checked={requestState.callforrecords.checked}
+                          color="success"
                         />
                       }
                       label="Call for Records"
@@ -485,6 +489,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="review"
                           onChange={handleRequestStateChange}
                           checked={requestState.review.checked}
+                          color="success"
                         />
                       }
                       label="Records Review"
@@ -497,6 +502,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="signoff"
                           onChange={handleRequestStateChange}
                           checked={requestState.signoff.checked}
+                          color="success"
                         />
                       }
                       label="Ministry Sign Off"
@@ -509,6 +515,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="closed"
                           onChange={handleRequestStateChange}
                           checked={requestState.closed.checked}
+                          color="success"
                         />
                       }
                       label="Closed"
@@ -538,6 +545,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="allActive"
                           onChange={handleRequestStatusChange}
                           checked={requestStatus.allActive}
+                          color="success"
                         />
                       }
                       label="All Active"
@@ -550,6 +558,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="overdue"
                           onChange={handleRequestStatusChange}
                           checked={requestStatus.overdue}
+                          color="success"
                         />
                       }
                       label="Overdue"
@@ -562,6 +571,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="onTime"
                           onChange={handleRequestStatusChange}
                           checked={requestStatus.onTime}
+                          color="success"
                         />
                       }
                       label="On Time"
@@ -592,6 +602,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="personal"
                           onChange={handleRequestTypeChange}
                           checked={requestTypes.personal}
+                          color="success"
                         />
                       }
                       label="Personal"
@@ -604,6 +615,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="general"
                           onChange={handleRequestTypeChange}
                           checked={requestTypes.general}
+                          color="success"
                         />
                       }
                       label="General"
@@ -701,12 +713,12 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="demo-multiple-checkbox-label" shrink>
+                    <InputLabel id="multiple-checkbox-label" shrink>
                       Public Body
                     </InputLabel>
                     <Select
-                      labelId="demo-multiple-checkbox-label"
-                      id="demo-multiple-checkbox"
+                      labelId="multiple-checkbox-label"
+                      id="multiple-checkbox"
                       multiple
                       displayEmpty
                       value={selectedPublicBodies}
@@ -739,6 +751,7 @@ const AdvancedSearch = ({ userDetail }) => {
                                 programArea.bcgovcode
                               ) > -1
                             }
+                            color="success"
                           />
                           <ListItemText
                             primary={programArea.name}
