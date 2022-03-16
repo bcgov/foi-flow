@@ -23,7 +23,7 @@ ARG CUSTOM_SRC_DIR=src/main/
 
 # Override these files they have custom changes in the sbc_divapps directory
 COPY ./${CUSTOM_SRC_DIR}/  /tmp/${CUSTOM_SRC_DIR}/
-RUN mvn -s /usr/share/maven/ref/settings-docker.xml package
+RUN mvn -s /usr/share/maven/ref/settings-docker.xml package -Dmaven.test.skip
 
 
 
@@ -39,8 +39,8 @@ EXPOSE 8080
 RUN test ! -d /app && mkdir /app || :
 # Add spring boot application
 RUN mkdir -p /app
-COPY --from=MAVEN_TOOL_CHAIN /tmp/target/camunda-bpm-identity-keycloak-examples-sso-kubernetes*.jar ./app
+COPY --from=MAVEN_TOOL_CHAIN /tmp/target/forms-flow-bpm.jar ./app
 RUN chmod a+rwx -R /app
 WORKDIR /app
 VOLUME /tmp
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/camunda-bpm-identity-keycloak-examples-sso-kubernetes.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/forms-flow-bpm.jar"]

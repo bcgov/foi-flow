@@ -1,0 +1,21 @@
+# Set variables
+
+foiwebsocket:
+  messageBroker:
+    host: ${WEBSOCKET_BROKER_HOST}
+    port: ${WEBSOCKET_BROKER_PORT}
+    passcode: ${WEBSOCKET_BROKER_PASSCODE}
+  plugin:
+    rawRequest-topic: ${WEBSOCKET_FOI_RAWREQUEST_TOPIC}
+
+camunda.bpm:
+  job-execution:
+    core-pool-size: ${CAMUNDA_JOB_CORE_POOL_SIZE:3}
+    lock-time-in-millis: ${CAMUNDA_JOB_LOCK_TIME_MILLIS:300000}
+    max-jobs-per-acquisition: ${CAMUNDA_JOB_MAXJOBS_PER_ACQUISITION:3}
+    max-pool-size: ${CAMUNDA_JOB_MAX_POOL_SIZE:10}
+    queue-capacity: ${CAMUNDA_JOB_QUEUE_SIZE:3}
+    wait-time-in-millis: ${CAMUNDA_JOB_WAIT_TIME_MILLIS:5000}
+    max-wait: ${CAMUNDA_JOB_MAX_WAIT:60000}
+  metrics:
+    enabled: ${CAMUNDA_METRICS_FLAG:false}
