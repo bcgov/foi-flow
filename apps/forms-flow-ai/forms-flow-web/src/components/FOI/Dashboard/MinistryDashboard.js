@@ -133,17 +133,16 @@ const MinistryDashboard = ({ userDetail }) => {
     },
     {
       field: "applicantcategory",
-      headerName: "APPLICANT TYPE",
+      headerName: "CATEGORY",
       width: 180,
       headerAlign: "left",
     },
     {
       field: "requestType",
-      headerName: "REQUEST TYPE",
+      headerName: "TYPE",
       width: 150,
       headerAlign: "left",
     },
-
     {
       field: "currentState",
       headerName: "REQUEST STATE",
@@ -152,7 +151,7 @@ const MinistryDashboard = ({ userDetail }) => {
     },
     {
       field: "assignedToName",
-      headerName: "ASSIGNEE",
+      headerName: "ASSIGNED TO",
       width: 180,
       headerAlign: "left",
     },
