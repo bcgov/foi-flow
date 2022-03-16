@@ -540,6 +540,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           ministrycode={
                             requestDetails.selectedMinistries[0].code
                           }
+                          createMinistrySaveRequestObject={createMinistrySaveRequestObject}
                         />
                         {/* <RequestNotes /> */}
                         <BottomButtonGroup
