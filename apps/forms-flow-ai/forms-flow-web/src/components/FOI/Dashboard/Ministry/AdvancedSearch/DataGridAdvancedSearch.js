@@ -127,11 +127,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     if (e.row.ministryrequestid) {
       dispatch(
         push(
-          `/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
+          `/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
         )
       );
-    } else {
-      dispatch(push(`/foi/reviewrequest/${e.row.id}`));
     }
   };
 

@@ -32,6 +32,7 @@ import {
 } from "../../../../../helper/FOI/helper";
 import { ActionContext } from "./ActionContext";
 import { StateEnum } from "../../../../../constants/FOI/statusEnum";
+import { getBottomNavigationActionUtilityClass } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -480,6 +481,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           name="unopened"
                           onChange={handleRequestStateChange}
                           checked={requestState.unopened.checked}
+                          disabled={true}
                         />
                       }
                       label="Unopened"
@@ -720,6 +722,9 @@ const AdvancedSearch = ({ userDetail }) => {
                       onChange={handleSelectedPublicBodiesChange}
                       input={<OutlinedInput label="Public Body" notched />}
                       renderValue={(selected) => {
+                        if (programAreaList?.length === 1) {
+                          return programAreaList[0].bcgovcode;
+                        }
                         if (selected.length === 0) {
                           return <em>All</em>;
                         }
@@ -727,6 +732,7 @@ const AdvancedSearch = ({ userDetail }) => {
                         return selected.join(", ");
                       }}
                       MenuProps={MenuProps}
+                      disabled={programAreaList.length === 1}
                     >
                       <MenuItem disabled value="" key="program-area-all">
                         <em>All</em>

@@ -228,14 +228,6 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }
 
-  const handleSortChange = (model) => {
-    if (model.length === 0) {
-      return;
-    }
-
-    setSortModel(model);
-  };
-
   return (
     <>
       <Grid item container alignItems="center" xs={12}>
@@ -320,7 +312,7 @@ const Queue = ({ userDetail, tableInfo }) => {
         <DataGrid
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={updateAssigneeName(requestQueue.data)}
+          rows={rows}
           columns={columns.current}
           rowHeight={30}
           headerHeight={50}
