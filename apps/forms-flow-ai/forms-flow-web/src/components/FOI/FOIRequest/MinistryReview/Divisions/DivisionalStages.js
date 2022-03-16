@@ -54,7 +54,8 @@ const DivisionalStages = React.memo(({
       calculateStageCounter(existingDivStages)
     );
     
-    const handleAddDivisionalStage = () => {
+    const handleAddDivisionalStage = (e) => {
+      e.preventDefault();
       addDivisionalStage(stageIterator, divisionList, (newStages) => {
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
@@ -201,9 +202,9 @@ const DivisionalStages = React.memo(({
                 className="fa fa-plus-circle fa-3 foi-add"
                 aria-hidden="true"
               ></i>
-              <a href="#" onClick={handleAddDivisionalStage}>
+              <button className="btn btn-link foi-add-division"  onClick={handleAddDivisionalStage}>
                 Add division to track
-              </a>
+              </button>
             </div>
           </div>
         ) : (
