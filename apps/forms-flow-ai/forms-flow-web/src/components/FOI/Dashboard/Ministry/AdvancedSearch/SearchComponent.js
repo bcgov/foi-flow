@@ -32,7 +32,6 @@ import {
 } from "../../../../../helper/FOI/helper";
 import { ActionContext } from "./ActionContext";
 import { StateEnum } from "../../../../../constants/FOI/statusEnum";
-import { getBottomNavigationActionUtilityClass } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
