@@ -45,6 +45,6 @@ public class RedisMessageListenerConfig extends RedisConfig implements ITaskEven
         return new MessageListenerAdapter(foiRequestMessageListener, getExecutorName());
     }
 
-    private String getTopicNameForFOIRequest() {return getMessageBrokerProperties().getProperty("plugin.foi.rawRequest-topic");}
+    private String getTopicNameForFOIRequest() {return getMessageBrokerProperties().getProperty("plugin.rawRequest-topic");}
 
 }
