@@ -131,45 +131,45 @@ const Queue = ({ userDetail, tableInfo }) => {
     {
       field: "idNumber",
       headerName: "ID NUMBER",
-      width: 150,
+      width: 170,
       headerAlign: "left",
     },
     {
       field: "applicantcategory",
       headerName: "APPLICANT TYPE",
-      width: 180,
+      flex: 1,
       headerAlign: "left",
     },
     {
       field: "requestType",
       headerName: "REQUEST TYPE",
-      width: 150,
+      flex: 1,
       headerAlign: "left",
     },
 
     {
       field: "currentState",
       headerName: "REQUEST STATE",
-      width: 180,
+      flex: 1,
       headerAlign: "left",
     },
     {
       field: "assignedToName",
       headerName: "ASSIGNEE",
-      width: 180,
+      flex: 1,
       headerAlign: "left",
     },
     {
       field: "CFRDueDateValue",
       headerName: "RECORDS DUE",
-      width: 150,
+      flex: 1,
       headerAlign: "left",
       valueGetter: getRecordsDue,
     },
     {
       field: "DueDateValue",
       headerName: "LDD",
-      width: 150,
+      flex: 1,
       headerAlign: "left",
       valueGetter: getLDD,
     },
@@ -316,7 +316,7 @@ const Queue = ({ userDetail, tableInfo }) => {
           columns={columns.current}
           rowHeight={30}
           headerHeight={50}
-          rowCount={requestQueue?.meta?.total}
+          rowCount={requestQueue?.meta?.total || 0}
           pageSize={rowsState.pageSize}
           rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}

@@ -96,14 +96,6 @@ const AdvancedSearch = ({ userDetail }) => {
     searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
 
   const intitialRequestState = {
-    unopened: {
-      checked: false,
-      id: StateEnum.unopened.id,
-    },
-    open: {
-      checked: false,
-      id: StateEnum.open.id,
-    },
     callforrecords: {
       checked: false,
       id: StateEnum.callforrecords.id,
@@ -128,6 +120,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const [requestState, setRequestState] = useState(intitialRequestState);
 
   const intitialRequestStatus = {
+    allActive: false,
     overdue: false,
     onTime: false,
   };
@@ -478,19 +471,6 @@ const AdvancedSearch = ({ userDetail }) => {
                       control={
                         <Checkbox
                           size="small"
-                          name="unopened"
-                          onChange={handleRequestStateChange}
-                          checked={requestState.unopened.checked}
-                          disabled={true}
-                        />
-                      }
-                      label="Unopened"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
                           name="callforrecords"
                           onChange={handleRequestStateChange}
                           checked={requestState.callforrecords.checked}
@@ -551,6 +531,18 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormGroup>
+                    <FormControlLabel
+                      className={classes.checkboxLabel}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="allActive"
+                          onChange={handleRequestStatusChange}
+                          checked={requestStatus.allActive}
+                        />
+                      }
+                      label="All Active"
+                    />
                     <FormControlLabel
                       className={classes.checkboxLabel}
                       control={
