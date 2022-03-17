@@ -19,3 +19,11 @@ camunda.bpm:
     max-wait: ${CAMUNDA_JOB_MAX_WAIT:60000}
   metrics:
     enabled: ${CAMUNDA_METRICS_FLAG:false}
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            accessTokenUri: ${keycloak.url}/auth/realms/${keycloak.url.realm}/protocol/openid-connect/token
