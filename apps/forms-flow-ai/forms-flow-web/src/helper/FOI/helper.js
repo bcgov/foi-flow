@@ -94,7 +94,7 @@ const reconcilePublicHoliDays = (startDate, endDate) => {
   endDate = endDate.businessDaysAdd(publicHoliDays);
   startDate = endDate;
   if (publicHoliDays !== 0) {
-    reconcilePublicHoliDays(startDate, endDate);
+    return reconcilePublicHoliDays(startDate, endDate);
   }
   return endDate;
 };
@@ -112,7 +112,7 @@ const revertReconciledPublicHolidays = (startDate, endDate) => {
   endDate = endDate.businessDaysSubtract(publicHoliDays);
   startDate = endDate;
   if (publicHoliDays !== 0) {
-    reconcilePublicHoliDays(startDate, endDate);
+    return reconcilePublicHoliDays(startDate, endDate);
   }
   return endDate;
 };

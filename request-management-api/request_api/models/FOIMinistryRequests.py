@@ -203,6 +203,17 @@ class FOIMinistryRequest(db.Model):
         for row in rs:
             requeststates.append(row["status"])
         return requeststates
+    
+    @classmethod
+    def getallstatenavigation(cls, ministryrequestid):                
+        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+        where foiministryrequestid=:ministryrequestid  order by version desc"""
+ 
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        requeststates = []
+        for row in rs:
+            requeststates.append(row["status"])
+        return requeststates
 
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO'):
