@@ -1,6 +1,6 @@
 from .db import  db, ma
 from .default_method_result import DefaultMethodResult
-
+from sqlalchemy import or_
 
 class ProgramArea(db.Model):
     __tablename__ = 'ProgramAreas' 
@@ -16,6 +16,16 @@ class ProgramArea(db.Model):
     def getprogramareas(cls):
         programarea_schema = ProgramAreaSchema(many=True)
         query = db.session.query(ProgramArea).filter_by(isactive=True).all()
+        return programarea_schema.dump(query)
+
+    @classmethod
+    def getprogramareasforministryuser(cls, groups):
+        bcgovcodefilter = []
+        for group in groups:
+            bcgovcodefilter.append(ProgramArea.bcgovcode == group.replace(' Ministry Team', ''))
+
+        programarea_schema = ProgramAreaSchema(many=True)
+        query = db.session.query(ProgramArea).filter_by(isactive=True).filter(or_(*bcgovcodefilter)).all()
         return programarea_schema.dump(query)
 
     @classmethod
