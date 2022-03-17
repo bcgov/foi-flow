@@ -1,5 +1,4 @@
 const AXIS_SYNC_DISPLAY_FIELDS = {
-    assignedTo: "IAO Assigned To",
     firstName: "Applicant First Name",
     lastName : "Applicant Last Name",
     middleName : "Applicant Middle Name",
@@ -7,17 +6,9 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     email:"Applicant Email",
     businessName:"Organization",
 
-    childFirstName:"Child First Name",
-    childLastName:"Child Last Name",
-    childMiddleName:"Child Middle Name",
-    childAlsoKnownAs:"Child Nickname",
-    childBirthDate:"Child DOB",
-
     anotherFirstName:"Another First Name",
     anotherLastName:"Another Last Name",
     anotherMiddleName:"Another Middle Name",
-    anotherAlsoKnownAs:"Another Nickname",
-    anotherBirthDate:"Another Dob",
 
     phonePrimary:"Home Phone",
     phoneSecondary:"Mobile Phone",
@@ -41,22 +32,14 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     requestStartDate:"Request Start Date",
     dueDate:"Legislated Due Date",
 
-    personalHealthNumber:"Personal Health Number",
-    correctionalServiceNumber:"Corrections Number",
+    additionalPersonalInfo:"Additional Personal Information",
     birthDate:"DOB",
-    publicServiceEmployeeNumber:"Employee Number",
-    identityVerified:"Identity Verified",
 
     general:"Request Type General",
     personal:"Request Type Personal",
-    xgov:"XGOVE",
-    //idNumber:"ID Number",    
     selectedMinistries:"Selected Ministries",
 
-    additionalPersonalInfo:"Additional Personal Information",
-    axisRequestId :"Axis Request Id",
-
-    extensions : "Extensions"
+    Extensions : "Extensions"
   };
   
   export default AXIS_SYNC_DISPLAY_FIELDS;

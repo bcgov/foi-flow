@@ -57,7 +57,7 @@ import {
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
-import AxisDetails from './AxisDetails';
+import AxisDetails from './AxisDetails/AxisDetails';
 
 const useStyles = makeStyles((theme) => ({
   root: {

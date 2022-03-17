@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useContext} from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -13,17 +13,18 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
-import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
+import AXIS_SYNC_DISPLAY_FIELDS from '../../../../constants/FOI/axisSyncDisplayFields';
 import { useDispatch, useSelector} from "react-redux";
 import { fetchRequestDataFromAxis,
   saveRequestDetails 
-} from '../../../apiManager/services/FOI/foiRequestServices';
-import {getRequestState} from "../FOIRequest/BottomButtonGroup/utils";
-import {StateEnum} from "../../../constants/FOI/statusEnum";
+} from '../../../../apiManager/services/FOI/foiRequestServices';
+import {getRequestState} from "../BottomButtonGroup/utils";
+import {StateEnum} from "../../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
-import { createRequestDetailsObjectFunc } from "../FOIRequest/utils";
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
-import { formatDate } from "../../../helper/FOI/helper";
+import { createRequestDetailsObjectFunc } from "../utils";
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
+import { formatDate } from "../../../../helper/FOI/helper";
+//import { ActionContext } from "./ActionContext";
 
 const useStyles = makeStyles({
  
@@ -35,9 +36,12 @@ const useStyles = makeStyles({
 });
 
 
-const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
+
+
+const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
   urlIndexCreateRequest, handleSaveRequest, currentSelectedStatus,
-  hasStatusRequestSaved, requestState, requestId, ministryId}) => {
+  hasStatusRequestSaved, requestState, requestId, ministryId,
+}) => {
 
     const classes = useStyles();
     const [updatedFields, setUpdatedFields] = React.useState({});
@@ -46,15 +50,18 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
 
+    // const {
+    //   axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
+    //   urlIndexCreateRequest, handleSaveRequest, currentSelectedStatus,
+    //   hasStatusRequestSaved, requestState, requestId, ministryId,
+    // } = useContext(ActionContext);
+
     useEffect(()=>{
       dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
         if(!err){
             if(Object.entries(data).length !== 0){
               requestDetailsValue = data;
-              // let requestObj = createRequestDetailsObjectFunc(requestDetailsValue, requestDetailsValue, requestId,
-              //   FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, requestDetailsValue.assignedTo, "");
-              // setUpdatedReqObj(requestObj);
-              setUpdatedReqObj(requestDetailsValue);
+              // setUpdatedReqObj(requestDetailsValue);
               console.log("Sample Data:", requestDetailsValue);
               compareFields();  
             }
@@ -66,25 +73,28 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
 
     const compareFields = () => {
       let updatedObj = {};
-      for(let key of Object.keys(saveRequestObject)){
+      let updatedOne = { ...saveRequestObject};
+      for(let key of Object.keys(requestDetailsValue)){
         var updatedField = isAxisSyncDisplayField(key);
         if(updatedField){
-          if((saveRequestObject[key] || requestDetailsValue[key]) && saveRequestObject[key] !== requestDetailsValue[key])
-            assignUpdatedFields(key, updatedObj, updatedField);
+          if((saveRequestObject[key] || requestDetailsValue[key]) && saveRequestObject[key] !== requestDetailsValue[key]){
+            assignUpdatedFields(key, updatedObj, updatedField,updatedOne);
+            if(key !== 'Extensions')
+              updatedOne= createRequestDetailsObjectFunc(updatedOne, requestDetailsValue, requestId, key, requestDetailsValue[key], "");
+          }
         }
-        //setUpdatedFields(updatedObj);
       }
-      if(Object.keys(requestDetailsValue).find((key) => key === "extensions")){
-        assignUpdatedFields("extensions", updatedObj, extensions);
-      }
+
       setUpdatedFields(updatedObj);
+      setUpdatedReqObj(updatedOne);
+
     };
 
     const isAxisSyncDisplayField = (field) => {
       return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
     };
 
-    const assignUpdatedFields = (key,updatedObj, updatedField) => {      
+    const assignUpdatedFields = (key,updatedObj, updatedField,updatedOne) => {      
       switch (key) {
         case 'selectedMinistries':
           const ministryCodes = requestDetailsValue[key].map(({code}) => code).join(', ');
@@ -111,7 +121,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
           updatedObj[updatedField] =formatDate(requestDetailsValue[key], "MMM dd yyyy")
           break;
         }
-        case 'extensions':
+        case 'Extensions':
           if(extensions !== requestDetailsValue[key]){
             let extensionsArr = [];
             requestDetailsValue[key].forEach(obj => {
@@ -125,6 +135,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
           updatedObj[updatedField] = requestDetailsValue[key];
           break;
       }
+      
     }
 
     const handleClose = () => {
