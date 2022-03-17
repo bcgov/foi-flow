@@ -206,7 +206,7 @@ const DivisionalStages = React.memo(
                     return "Select Devision Stage";
                   }
                   return (
-                    divisionList?.filter(
+                    divisionstageList?.filter(
                       (division) => division.stageid === value
                     )[0]?.name || "Select Devision Stage"
                   );

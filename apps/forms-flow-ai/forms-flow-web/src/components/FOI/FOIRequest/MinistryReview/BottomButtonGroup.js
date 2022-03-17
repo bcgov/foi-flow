@@ -84,7 +84,8 @@ const BottomButtonGroup = React.memo(
             ...saveMinistryRequestObject,
             divisions:
               saveMinistryRequestObject?.divisions?.filter(
-                (division) => division.id !== 0
+                (division) =>
+                  division.stageid !== -1 || division.divisionid !== -1
               ) || [],
           },
           requestId,
