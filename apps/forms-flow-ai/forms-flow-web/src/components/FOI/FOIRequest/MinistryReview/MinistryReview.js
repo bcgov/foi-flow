@@ -204,22 +204,19 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setMinistryAssignedToValue(value);
   };
 
-  let hasincompleteDivstage = false;
-  divstages.forEach((item) => {
-    if (
-      item.divisionid === -1 ||
-      item.stageid === -1 ||
-      item.stageid === "" ||
-      item.divisionid === ""
-    ) {
-      hasincompleteDivstage = true;
-    }
+  const isFalseDivStageInput = (divStageInput) =>
+    divStageInput === -1 || !Boolean(divStageInput);
+
+  const hasincompleteDivstage = divstages.some((item) => {
+    // XOR or Exlusive Or operation. Returns true if only one field is set and the other is not
+    return isFalseDivStageInput(item.divisionid)
+      ? !isFalseDivStageInput(item.stageid)
+      : isFalseDivStageInput(item.stageid);
   });
 
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    divstages.length === 0 ||
     hasincompleteDivstage;
 
   const createMinistryRequestDetailsObject = (
