@@ -52,6 +52,12 @@ const ProcessingTeamColumns = [
     flex: 1,
   },
   {
+    field: "assignedToName",
+    headerName: "ASSIGNED TO",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
     field: "DaysLeftValue",
     headerName: "DAYS LEFT",
     headerAlign: "left",
@@ -75,12 +81,6 @@ const ProcessingTeamColumns = [
     flex: 0.5,
     sortable: false,
     renderCell: (params) => <span></span>,
-  },
-  {
-    field: "xgov",
-    headerName: "XGOV",
-    headerAlign: "left",
-    flex: 0.5,
   },
 ];
 
@@ -123,12 +123,6 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: getReceivedDate,
     flex: 1,
-  },
-  {
-    field: "xgov",
-    headerName: "XGOV",
-    headerAlign: "left",
-    flex: 0.5,
   },
   {
     field: "receivedDateUF",
@@ -174,7 +168,7 @@ const FlexTeamColumns = [
   },
   {
     field: "assignedToName",
-    headerName: "ANALYST",
+    headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
   },
@@ -192,12 +186,6 @@ const FlexTeamColumns = [
     valueGetter: getDaysLeft,
     flex: 0.75,
     sortable: false,
-  },
-  {
-    field: "xgov",
-    headerName: "XGOV",
-    headerAlign: "left",
-    flex: 0.5,
   },
 ];
 
