@@ -65,7 +65,8 @@ const BottomButtonGroup = React.memo(
     hasStatusRequestSaved,
     disableInput,
     stateChanged,
-    requestState
+    requestState,
+    setSaveRequestObject
   }) => {
     
     /**
@@ -384,7 +385,8 @@ const BottomButtonGroup = React.memo(
         </div>
         {
           axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} 
-          saveRequest= {saveRequest} saveRequestObject= {saveRequestObject} />
+          saveRequest= {saveRequest} saveRequestObject= {saveRequestObject} urlIndexCreateRequest={urlIndexCreateRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={currentSelectedStatus}
+          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} />
         }
         
       </div>

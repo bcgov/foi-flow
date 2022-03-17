@@ -14,8 +14,16 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
-import { useDispatch} from "react-redux";
-import { fetchRequestDataFromAxis } from '../../../apiManager/services/FOI/foiRequestServices';
+import { useDispatch, useSelector} from "react-redux";
+import { fetchRequestDataFromAxis,
+  saveRequestDetails 
+} from '../../../apiManager/services/FOI/foiRequestServices';
+import {getRequestState} from "../FOIRequest/BottomButtonGroup/utils";
+import {StateEnum} from "../../../constants/FOI/statusEnum";
+import { toast } from "react-toastify";
+import { createRequestDetailsObjectFunc } from "../FOIRequest/utils";
+import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { formatDate } from "../../../helper/FOI/helper";
 
 const useStyles = makeStyles({
  
@@ -27,18 +35,26 @@ const useStyles = makeStyles({
 });
 
 
-const AxisSyncModal = ({requestId, ministryId, axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, saveRequestObject}) => {
+const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
+  urlIndexCreateRequest, handleSaveRequest, currentSelectedStatus,
+  hasStatusRequestSaved, requestState, requestId, ministryId}) => {
 
     const classes = useStyles();
     const [updatedFields, setUpdatedFields] = React.useState({});
+    const [updatedReqObj, setUpdatedReqObj] = React.useState({});
     let requestDetailsValue ={};
     const dispatch = useDispatch();
+    const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
 
     useEffect(()=>{
       dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
         if(!err){
             if(Object.entries(data).length !== 0){
               requestDetailsValue = data;
+              // let requestObj = createRequestDetailsObjectFunc(requestDetailsValue, requestDetailsValue, requestId,
+              //   FOI_COMPONENT_CONSTANTS.ASSIGNED_TO, requestDetailsValue.assignedTo, "");
+              // setUpdatedReqObj(requestObj);
+              setUpdatedReqObj(requestDetailsValue);
               console.log("Sample Data:", requestDetailsValue);
               saveExtensions(requestDetailsValue?.Extension);
               compareFields();  
@@ -54,40 +70,114 @@ const AxisSyncModal = ({requestId, ministryId, axisSyncModalOpen, setAxisSyncMod
 
     const compareFields = () => {
       let updatedObj = {};
-        for(let key of Object.keys(saveRequestObject)){
-          if(isAxisSyncDisplayField(key)){
-            if(saveRequestObject[key] !== requestDetailsValue[key]){
-              if(key === 'selectedMinistries'){
-                const ministryCodes = requestDetailsValue[key].map(({code}) => code).join(', ');
-                updatedObj[key] = ministryCodes;
-              }
-              else if(key ==='additionalPersonalInfo'){
-                let additionalPersonalInfo = saveRequestObject[key];
-                for(let key1 of Object.keys(additionalPersonalInfo)){
-                  updatedObj[key1] = additionalPersonalInfo[key];
-                }
-              }
-              else
-                updatedObj[key] = requestDetailsValue[key];
-            }
-          }
-          }
-          console.log(updatedObj);
-          setUpdatedFields(updatedObj);
+      for(let key of Object.keys(saveRequestObject)){
+        var updatedField = isAxisSyncDisplayField(key);
+        if(updatedField){
+          if((saveRequestObject[key] || requestDetailsValue[key]) && saveRequestObject[key] !== requestDetailsValue[key])
+            assignUpdatedFields(key, updatedObj, updatedField);
+        }
+        //setUpdatedFields(updatedObj);
+      }
+      if(Object.keys(requestDetailsValue).find((key) => key === "extensions")){
+        assignUpdatedFields("extensions", updatedObj, extensions);
+      }
+      setUpdatedFields(updatedObj);
     };
 
     const isAxisSyncDisplayField = (field) => {
-      return Object.values(AXIS_SYNC_DISPLAY_FIELDS).some((group) => group == field);
+      return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
     };
+
+    const assignUpdatedFields = (key,updatedObj, updatedField) => {      
+      switch (key) {
+        case 'selectedMinistries':
+          const ministryCodes = requestDetailsValue[key].map(({code}) => code).join(', ');
+          if(ministryCodes !== saveRequestObject[key].map(({code}) => code).join(', '))
+            updatedObj[updatedField] = ministryCodes;
+          break;
+        case 'additionalPersonalInfo':
+          let additionalPersonalInfo = saveRequestObject[key];
+          for(let key1 of Object.keys(additionalPersonalInfo)){
+            if(key1 === key){
+              if(key1 === 'birthDate')
+                updatedObj[key1] = formatDate(additionalPersonalInfo[key], "MMM dd yyyy")
+              else
+                updatedObj[key1] = additionalPersonalInfo[key];
+            }
+          }
+          break;
+        case 'dueDate':
+        case 'axisSyncDate':
+        case 'fromDate': 
+        case 'toDate':
+        case 'receivedDate':
+        case 'originalDueDate':{
+          updatedObj[updatedField] =formatDate(requestDetailsValue[key], "MMM dd yyyy")
+          break;
+        }
+        case 'extensions':
+          if(extensions !== requestDetailsValue[key]){
+            let extensionsArr = [];
+            requestDetailsValue[key].forEach(obj => {
+              const property = <>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+              extensionsArr.push(property);
+            });
+            updatedObj[key] = extensionsArr;
+          }
+          break;
+        default:
+          updatedObj[updatedField] = requestDetailsValue[key];
+          break;
+      }
+    }
 
     const handleClose = () => {
         setAxisSyncModalOpen(false);
     };
 
-    const saveAxisData = () => {
-      //setSaveRequestObject(requestDetailsValue);
-      saveRequest();
-    }
+
+    const saveAxisData = async () => {
+      if (urlIndexCreateRequest > -1)
+        updatedReqObj.requeststatusid = StateEnum.intakeinprogress.id;
+      dispatch(saveRequestDetails(updatedReqObj, urlIndexCreateRequest,requestId,ministryId,
+          (err, res) => {
+            if (!err) {
+              toast.success("The request has been saved successfully.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+              const _state = getRequestState({
+                currentSelectedStatus,
+                requestState,
+                urlIndexCreateRequest,
+                saveRequestObject,
+              });
+              handleSaveRequest(_state, false, res.id);
+              hasStatusRequestSaved(currentSelectedStatus);
+            } else {
+              toast.error(
+                "Temporarily unable to save your request. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+              handleSaveRequest(requestState, true, "");
+            }
+          }
+        )
+      );
+    };
 
 
     return  Object.entries(updatedFields).length > 0 && (
@@ -118,7 +208,7 @@ const AxisSyncModal = ({requestId, ministryId, axisSyncModalOpen, setAxisSyncMod
                 <Table bordered className='updated-contents-table'>
                 <tbody>
                 {Object.entries(updatedFields).map(([key, val]) => 
-                <tr>
+                <tr key= {key}>
                     <td className='axis-updated-fields'>{key}</td>
                     <td>{val}</td>
                   </tr>
