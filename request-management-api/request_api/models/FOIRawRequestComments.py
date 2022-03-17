@@ -44,6 +44,9 @@ class FOIRawRequestComment(db.Model):
         dbquery = db.session.query(FOIRawRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
         if(comment.count() > 0):
+            childcomments = dbquery.filter_by(parentcommentid=commentid, isactive=True)
+            if (childcomments.count() > 0) :
+                return DefaultMethodResult(False,'Cannot delete parent comment with replies',commentid)
             comment.update({FOIRawRequestComment.isactive: False, FOIRawRequestComment.updatedby: userid,
                             FOIRawRequestComment.updated_at: datetime.now()}, synchronize_session=False)
             db.session.commit()
@@ -69,7 +72,27 @@ class FOIRawRequestComment(db.Model):
         query = db.session.query(FOIRawRequestComment).filter_by(
             requestid=requestid, isactive=True).order_by(FOIRawRequestComment.commentid.asc()).all()
         return comment_schema.dump(query)
+    
+    @classmethod
+    def getcommentbyid(cls, commentid) -> DefaultMethodResult:
+        comment_schema = FOIRawRequestCommentSchema()
+        query = db.session.query(FOIRawRequestComment).filter_by(
+            commentid=commentid, isactive=True).first()
+        return comment_schema.dump(query)
 
+
+    @classmethod 
+    def getcommentusers(cls, commentid):
+        sql = """select commentid, createdby, taggedusers from (
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid)
+                    union all 
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid)
+                ) cmt where commenttypeid =1"""
+        rs = db.session.execute(text(sql), {'commentid': commentid})
+        users = []
+        for row in rs:
+            users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
+        return users
 
 class FOIRawRequestCommentSchema(ma.Schema):
     class Meta:

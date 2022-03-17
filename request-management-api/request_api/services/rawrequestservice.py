@@ -23,10 +23,25 @@ class rawrequestservice:
 
     def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
-        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") != None else None
+        assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") not in (None,'') else None
+        assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
+        assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
+        assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
-        result = FOIRawRequest.saverawrequest(_requestrawdata=requestdatajson,sourceofsubmission= sourceofsubmission,ispiiredacted=ispiiredacted,userid= userid,assigneegroup=assigneegroup,assignee=assignee,requirespayment=requirespayment,notes=notes)
+        result = FOIRawRequest.saverawrequest(
+                                                _requestrawdata=requestdatajson,
+                                                sourceofsubmission= sourceofsubmission,
+                                                ispiiredacted=ispiiredacted,
+                                                userid= userid,
+                                                assigneegroup=assigneegroup,
+                                                assignee=assignee,
+                                                requirespayment=requirespayment,
+                                                notes=notes,
+                                                assigneefirstname=assigneefirstname,
+                                                assigneemiddlename=assigneemiddlename,
+                                                assigneelastname=assigneelastname
+                                            )
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
@@ -34,7 +49,7 @@ class rawrequestservice:
             data['assignedGroup'] = assigneegroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
-            asyncio.run(redispubservice.publishtoredischannel(json_data))
+            asyncio.create_task(redispubservice.publishrequest(json_data))
         return result
 
     @staticmethod
@@ -56,20 +71,19 @@ class rawrequestservice:
             return requestdatajson['requiresPayment']            
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
-    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, username, isministryuser):
+    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, username, isministryuser, assigneefirstname, assigneemiddlename, assigneelastname):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
         #Get documents
-        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid)
+        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
-        asyncio.run(eventservice().postevent(_requestid,"rawrequest",userid, username, isministryuser))
         return result
 
    
     def updateworkflowinstance(self, wfinstanceid, requestid, userid):
         return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userid)
 
-    def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,status,notes, userid):
-        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,status,notes, userid)    
+    def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,notes, userid):
+        return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,notes, userid)    
     
     async def posteventtoworkflow(self, id, wfinstanceid, requestsschema, status):
         return workflowservice().postunopenedevent(id, wfinstanceid, requestsschema, status)

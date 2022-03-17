@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { formatDate } from "../../../../helper/FOI/helper";
+import { formatDate, errorToast } from "../../../../helper/FOI/helper";
 import { useParams } from "react-router-dom";
 import {
   fetchExtensionReasons,
@@ -9,7 +9,6 @@ import {
   updateExtensionRequest,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
 import { extensionStatusId } from "../../../../constants/FOI/enum";
-import { errorToast } from "./utils";
 
 export const ActionContext = createContext();
 ActionContext.displayName = "ExtensionContext"
@@ -20,26 +19,26 @@ export const ActionProvider = ({ children, requestDetails }) => {
 
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [extensionLoading, setExtensionLoading] = useState(true)
-  const [extensionReasons, setExtensionReasons] = useState()
+  const [extensionReasons, setExtensionReasons] = useState(null);
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const [extensionId, setExtensionId] = useState(null)
-  const [selectedExtension, setSelectedExtension] = useState(null)
+  const [extensionId, setExtensionId] = useState(null);
+  const [selectedExtension, setSelectedExtension] = useState(null);
 
-  const currentDueDate = formatDate(requestDetails.dueDate)
+  const currentDueDate = formatDate(requestDetails.dueDate);
   const startDate = formatDate(requestDetails.requestProcessStart);
   const originalDueDate = formatDate(requestDetails.originalDueDate);
   const extensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
   );
-  const idNumber = requestDetails?.idNumber
+  const idNumber = requestDetails?.idNumber;
   const pendingExtensionExists = extensions.some(
     (ex) => ex.extensionstatusid === extensionStatusId.pending
   );
 
   useEffect(() => {
-    if (requestId) {
+    if (requestId && !extensionReasons) {
       fetchExtensionReasons({
         callback: (data) => {
           setExtensionReasons(data);

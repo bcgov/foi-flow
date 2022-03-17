@@ -15,7 +15,7 @@ class requestservicegetter:
        
     def getrequest(self,foirequestid,foiministryrequestid):        
         request = FOIRequest.getrequest(foirequestid)
-        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)        
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
@@ -92,7 +92,11 @@ class requestservicegetter:
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            
-            'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid)
+            'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid),
+            'assignedToFirstName': requestministry["assignee.firstname"] if requestministry["assignedto"] != None else None,
+            'assignedToLastName': requestministry["assignee.lastname"] if requestministry["assignedto"] != None else None,
+            'assignedministrypersonFirstName': requestministry["ministryassignee.firstname"] if requestministry["assignedministryperson"] != None else None,
+            'assignedministrypersonLastName': requestministry["ministryassignee.lastname"] if requestministry["assignedministryperson"] != None else None,
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})

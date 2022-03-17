@@ -43,6 +43,9 @@ class FOIRequestComment(db.Model):
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
         if(comment.count() > 0) :             
+            childcomments = dbquery.filter_by(parentcommentid=commentid, isactive=True)
+            if (childcomments.count() > 0) :
+                return DefaultMethodResult(False,'Cannot delete parent comment with replies',commentid)
             comment.update({FOIRequestComment.isactive:False, FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Comment disabled',commentid)
@@ -66,7 +69,25 @@ class FOIRequestComment(db.Model):
         comment_schema = FOIRequestCommentSchema(many=True)
         query = db.session.query(FOIRequestComment).filter_by(ministryrequestid=ministryrequestid, isactive = True).order_by(FOIRequestComment.commentid.desc()).all()
         return comment_schema.dump(query)   
+
+    @classmethod
+    def getcommentbyid(cls, commentid) -> DefaultMethodResult:
+        comment_schema = FOIRequestCommentSchema()
+        query = db.session.query(FOIRequestComment).filter_by(commentid=commentid, isactive=True).first()
+        return comment_schema.dump(query)
     
+    @classmethod 
+    def getcommentusers(cls, commentid):
+        sql = """select commentid, createdby, taggedusers from (
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
+                    union all 
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
+                ) cmt where commenttypeid =1"""
+        rs = db.session.execute(text(sql), {'commentid': commentid})
+        users = []
+        for row in rs:
+            users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
+        return users    
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
         fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby','taggedusers') 

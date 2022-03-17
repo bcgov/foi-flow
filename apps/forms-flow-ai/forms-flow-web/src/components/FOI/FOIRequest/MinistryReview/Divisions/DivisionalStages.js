@@ -10,11 +10,13 @@ import {
   addDivisionalStage,
 } from "./utils";
 import clsx from 'clsx'
+import FOI_COMPONENT_CONSTANTS from '../../../../../constants/FOI/foiComponentConstants';
 
 const DivisionalStages = React.memo(({
     divisionalstages, 
     existingDivStages, 
-    popSelectedDivStages
+    popSelectedDivStages,
+    createMinistrySaveRequestObject
 }) => {
        
     const [minDivStages, setMinDivStages] = React.useState(() =>
@@ -26,12 +28,15 @@ const DivisionalStages = React.memo(({
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
       });
+      createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, e.target.value, e.target.name);
     };
 
     const handleDivisionStageChange = (e, id) => {
       updateDivisionsState(e, id, minDivStages, (newStages) => {
         setMinDivStages([...newStages]);
+        appendStageIterator([...newStages]);
       });
+      createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION_STAGE, e.target.value, e.target.name);
     };
    
     popSelectedDivStages(minDivStages)
@@ -42,17 +47,20 @@ const DivisionalStages = React.memo(({
 
       setMinDivStages([...updatedIterator]);
       appendStageIterator([...updatedIterator]);
+      createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, "", "");
     };
     
     const [stageIterator, appendStageIterator] = React.useState(() =>
       calculateStageCounter(existingDivStages)
     );
     
-    const handleAddDivisionalStage = () => {
+    const handleAddDivisionalStage = (e) => {
+      e.preventDefault();
       addDivisionalStage(stageIterator, divisionList, (newStages) => {
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
       });
+      createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION_STAGE, "", "");
     };
 
     const divisionList = divisionalstages.divisions
@@ -194,9 +202,9 @@ const DivisionalStages = React.memo(({
                 className="fa fa-plus-circle fa-3 foi-add"
                 aria-hidden="true"
               ></i>
-              <a href="#" onClick={handleAddDivisionalStage}>
+              <button className="btn btn-link foi-add-division"  onClick={handleAddDivisionalStage}>
                 Add division to track
-              </a>
+              </button>
             </div>
           </div>
         ) : (

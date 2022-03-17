@@ -97,7 +97,6 @@ const BottomButtonGroup = React.memo(
     }, [stateChanged]);
 
     const saveRequest = async () => {
-      
       if (urlIndexCreateRequest > -1)
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
       dispatch(
@@ -161,22 +160,19 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.currentState
       ) {
         saveRequestModal();
-      }
-      else {
+      } else {
         saveRequestObject.requeststatusid = StateEnum.open.id;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
         }
         else {
-          fillAssignmentFields(saveRequestObject);
           openRequest();          
         }
       }
     }, [currentSelectedStatus, stateChanged]);
 
     const handleBeforeUnload = (e) => {
-      if (unSavedRequest)
-        alertUser(e);
+      if (unSavedRequest) alertUser(e);
     };
     React.useEffect(() => {
       if (unSavedRequest) {
@@ -278,8 +274,13 @@ const BottomButtonGroup = React.memo(
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           } 
           if (![StateEnum.closed.name, StateEnum.onhold.name].includes(currentSelectedStatus) && saveRequestObject.onholdTransitionDate) {
+            const today = new Date();
+
+            // make it start of today
+            today.setHours(0, 0, 0, 0);
+
             const onHoldDays = calculateDaysRemaining(
-              new Date(),
+              today,
               saveRequestObject.onholdTransitionDate
             );
             const calculatedCFRDueDate = addBusinessDays(

@@ -70,7 +70,8 @@ class FOIRequest(db.Model):
         ministryarr = [] 
         for ministry in foirequest.ministryRequests:
             assignedministrygroup = ministry.assignedministrygroup if ministry.assignedministrygroup is not None else ""                                
-            ministryarr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "version":ministry.version})    
+            assignedgroup = ministry.assignedgroup if ministry.assignedgroup is not None else ""                                
+            ministryarr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "assignedgroup": assignedgroup, "version":ministry.version})    
         return DefaultMethodResult(True,'Request added',foirequest.foirequestid,ministryarr,foirequest.wfinstanceid)
                           
     @classmethod
@@ -98,5 +99,8 @@ class FOIRequest(db.Model):
     
 class FOIRequestsSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestid','version','foirawrequestid','requesttype','receiveddate','initialdescription','initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid','deliverymode.deliverymodeid','receivedmode.name','deliverymode.name','applicantcategory.applicantcategoryid','applicantcategory.name','wfinstanceid','ministryRequests')
+        fields = ('foirequestid','version','foirawrequestid','requesttype','receiveddate','initialdescription',
+                'initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid',
+                'deliverymode.deliverymodeid','receivedmode.name','deliverymode.name',
+                'applicantcategory.applicantcategoryid','applicantcategory.name','wfinstanceid','ministryRequests')
     
