@@ -27,3 +27,7 @@ spring:
         registration:
           keycloak:
             accessTokenUri: ${keycloak.url}/auth/realms/${keycloak.url.realm}/protocol/openid-connect/token
+
+formsflow.ai:
+  workflow:
+    url: ${FORMSFLOW_WF_URL}
