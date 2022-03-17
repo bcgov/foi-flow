@@ -27,7 +27,7 @@ const useStyles = makeStyles({
 });
 
 
-const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, saveRequestObject}) => {
+const AxisSyncModal = ({requestId, ministryId, axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, saveRequestObject}) => {
 
     const classes = useStyles();
     const [updatedFields, setUpdatedFields] = React.useState({});
@@ -40,6 +40,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
             if(Object.entries(data).length !== 0){
               requestDetailsValue = data;
               console.log("Sample Data:", requestDetailsValue);
+              saveExtensions(requestDetailsValue?.Extension);
               compareFields();  
             }
         }
@@ -47,6 +48,9 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequest, sa
       
     },[])
 
+    const saveExtensions = (extensions) => {
+      console.log(`extensions === ${extensions}`);
+    }
 
     const compareFields = () => {
       let updatedObj = {};
