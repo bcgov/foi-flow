@@ -17,7 +17,7 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "extendedduedays")]
         public int ExtendedDueDays { get; set; }
 
-        [DataMember(Name = "extededduedate")]
+        [DataMember(Name = "extendedduedate")]
         public string ExtendedDueDate { get; set; }
 
         public string Status { get; set; }
