@@ -29,7 +29,8 @@ public class RedisMessageListenerConfig extends RedisConfig implements ITaskEven
                                             @Qualifier("foiMessageListenerAdapter") MessageListenerAdapter foiMessageListenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(taskMessageListenerAdapter, new PatternTopic(getTopicNameForTask()));
+        //container.addMessageListener(taskMessageListenerAdapter, new PatternTopic(getTopicNameForTask()));
+        System.out.println("======>"+getTopicNameForFOIRequest());
         container.addMessageListener(foiMessageListenerAdapter, new PatternTopic(getTopicNameForFOIRequest()));
         return container;
     }

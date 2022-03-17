@@ -16,6 +16,9 @@ class RedisPublisherService:
     foiredis = Redis(host=foirequestqueueredishost, port=foirequestqueueredisport,password=foirequestqueueredispassword)
     
     async def publishrequest(self, message):  
+        print('publish request message')
+        print(self.foirequestqueueredischannel)
+        print(message)
         self.publishtoredischannel(self.foirequestqueueredischannel, message)
             
     def publishcommment(self, message):  
