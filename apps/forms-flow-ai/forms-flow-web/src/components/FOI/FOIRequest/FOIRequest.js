@@ -671,6 +671,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         hasStatusRequestSaved={hasStatusRequestSaved}
                         disableInput={disableInput}
                         requestState={requestState}
+                        setSaveRequestObject={setSaveRequestObject}
                       />
                     </>
                   </ConditionalComponent>
