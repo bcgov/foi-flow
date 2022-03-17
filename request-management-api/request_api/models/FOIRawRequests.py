@@ -137,12 +137,22 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
-        sql = """select CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
-                    CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
-                    CASE WHEN lower(status) <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
-                    to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted, 
-                    CASE WHEN lower(status) <> 'unopened' then createdby else 'Online Form' END  as createdby from "FOIRawRequests" fr 
-                    where requestid = :requestid order by version ;"""
+        sql = """select * ,
+                    CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
+                            then 'Online Form' 
+                            else savedby END  as createdby 
+                    from (select CASE WHEN lower(status) <> 'unopened' 
+                            then requestrawdata ->> 'description' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
+                        CASE WHEN lower(status) <> 'unopened' 
+                            then requestrawdata ->> 'fromDate' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
+                        CASE WHEN lower(status) <> 'unopened'
+                            then requestrawdata ->> 'toDate' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
+                        to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
+                        createdby as savedby from "FOIRawRequests" fr 
+                    where requestid = :requestid order by version ) as sq;"""
         rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []
         for row in rs:
