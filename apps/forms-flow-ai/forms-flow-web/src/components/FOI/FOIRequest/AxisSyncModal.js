@@ -18,6 +18,9 @@ import { useDispatch, useSelector} from "react-redux";
 import { fetchRequestDataFromAxis,
   saveRequestDetails 
 } from '../../../apiManager/services/FOI/foiRequestServices';
+import {
+  addAXISExtensions
+} from '../../../apiManager/services/FOI/foiExtensionServices';
 import {getRequestState} from "../FOIRequest/BottomButtonGroup/utils";
 import {StateEnum} from "../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
@@ -42,6 +45,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
     const classes = useStyles();
     const [updatedFields, setUpdatedFields] = React.useState({});
     const [updatedReqObj, setUpdatedReqObj] = React.useState({});
+    const [axisExtensions, setAxisExtension] = React.useState([]);
     let requestDetailsValue ={};
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
@@ -56,7 +60,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
               // setUpdatedReqObj(requestObj);
               setUpdatedReqObj(requestDetailsValue);
               console.log("Sample Data:", requestDetailsValue);
-              saveExtensions(requestDetailsValue?.Extension);
+              setAxisExtension(requestDetailsValue?.Extensions);          
               compareFields();  
             }
         }
@@ -64,8 +68,8 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
       
     },[])
 
-    const saveExtensions = (extensions) => {
-      console.log(`extensions === ${extensions}`);
+    const saveExtensions = () => {
+      dispatch(addAXISExtensions(axisExtensions, ministryId));
     }
 
     const compareFields = () => {
@@ -177,6 +181,7 @@ const AxisSyncModal = ({axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObje
           }
         )
       );
+      saveExtensions();
     };
 
 
