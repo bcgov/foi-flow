@@ -9,6 +9,7 @@ namespace MCS.FOI.AXISIntegration.DataModels
         /// THIS EXTENSION POCO Class will have more prop.
         /// </summary>
         public string Type { get; set; }
+        [DataMember(Name = "extensionreason")]
         public string Reason { get; set; }
 
         [DataMember(Name = "extensionreasonid")]
@@ -20,6 +21,7 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "extendedduedate")]
         public string ExtendedDueDate { get; set; }
 
+        [DataMember(Name = "extensionstatus")]
         public string Status { get; set; }
 
         [DataMember(Name = "extensionstatusid")]
