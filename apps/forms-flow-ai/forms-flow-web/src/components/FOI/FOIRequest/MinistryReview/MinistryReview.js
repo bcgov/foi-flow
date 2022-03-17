@@ -430,6 +430,23 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const requestNumber = requestDetails && requestDetails.idNumber;
 
+
+  const stateBox = (
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
+    (<span className="state-box">Closed</span>)
+    :
+    (
+      <StateDropDown
+        requestState={requestState}
+        updateStateDropDown={updateStateDropDown}
+        requestStatus={_requestStatus}
+        handleStateChange={handleStateChange}
+        isMinistryCoordinator={true}
+        isValidationError={isValidationError}
+      />
+    )
+  );
+
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -443,14 +460,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             </h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown
-              requestState={requestState}
-              updateStateDropDown={updateStateDropDown}
-              requestStatus={_requestStatus}
-              handleStateChange={handleStateChange}
-              isMinistryCoordinator={true}
-              isValidationError={isValidationError}
-            />
+            {stateBox}
           </div>
 
           <div className="tab">
