@@ -94,6 +94,17 @@ namespace MCS.FOI.AXISIntegration.DAL
             };
         }
 
+        public static string GetExtensionStatus(string code)
+        {
+            return code switch
+            {
+                "N" => "Pending", //Pending
+                "A" => "Approved", // Approved
+                "D" => "Denied", // Denied
+                _ => "",
+            };
+        }
+
         //check with business
         public static string GetReceivedMode(string receivedMode)
         {

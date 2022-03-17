@@ -104,7 +104,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                                          ExtendedDueDays = Convert.ToInt32(rw["extensiondays"]),
                                          ExtendedDueDate = RequestsHelper.ConvertDateToString(rw, "extendedduedate", "yyyy-MM-dd"),
                                          StatusId = Convert.ToInt32(RequestsHelper.GetExtensionStatusId(Convert.ToString(rw["status"]))),
-                                         Status = Convert.ToString(rw["status"]),
+                                         Status = RequestsHelper.GetExtensionStatus(Convert.ToString(rw["status"])),
                                          ApprovedDueDays = Convert.ToInt32(rw["extensiondays"]),
                                          ApprovedDate = RequestsHelper.ConvertDateToString(rw, "decisiondate", "yyyy-MM-dd"),
                                          DeniedDate = RequestsHelper.ConvertDateToString(rw, "decisiondate", "yyyy-MM-dd"),
