@@ -7,25 +7,18 @@
   padding-top: 65px;
   position: relative;
 
-  margin-left: 12%;
-  margin-right: 12%;
+  margin-left: 10%;
+  margin-right: 10%;
   margin-bottom: 5%;
 
   height: 90%;
 }
 
-@media only screen and (min-width: 1800px) {
-  .foiformcontent {
-    margin-left: 19%;
-    margin-right: 19%;
-  }
-}
-
 
 @media (min-width: 1000px) and (max-width: 1230px) {
   .foiformcontent {
-    margin-left: calc(62vw - 615px);
-    margin-right: calc(62vw - 615px);
+    margin-left: calc(51.68vw - 512px);
+    margin-right: calc(51.68vw - 512px);
   }
 }
 

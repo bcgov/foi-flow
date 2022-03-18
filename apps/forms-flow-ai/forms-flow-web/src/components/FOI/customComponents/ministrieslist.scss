@@ -14,7 +14,7 @@
     margin: 0.5%;
     padding: 2px;
     width: 10%;
-    padding-left: 3.5%;
+    padding-left: min(3.5%, 30px);
 
   }
   .checkmark{

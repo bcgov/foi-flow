@@ -20,7 +20,7 @@ div .foi-dashboard {
 
 .foi-grid-container {
     padding: 7% 1% 10% 1% !important;
-    width: 75%!important;
+    width: 80%!important;
     position: relative;
     margin-left: auto!important;
     margin-right: auto!important;
@@ -171,15 +171,6 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     border: none !important;
     background-color: #38598A !important;
     color: #FFFFFF !important;
-}
-
-
-@media only screen  and (min-width: 1800px) { 
-
-    .foi-grid-container {
-        width: 62%!important;
-    }
-
 }
 
 .form-control-label {
