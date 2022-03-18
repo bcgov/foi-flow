@@ -127,12 +127,8 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def advancedsearch(self, params={'usertype': 'iao', 'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
-        
-        if (params['usertype'] == "iao"):
-            requests = FOIRawRequest.advancedsearch(params)
-        else:
-            requests = FOIMinistryRequest.advancedsearch(params)
+    def advancedsearch(self, params={'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+        requests = FOIRawRequest.advancedsearch(params)
         
         requestqueue = []
         for request in requests.items:

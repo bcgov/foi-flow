@@ -37,7 +37,6 @@ import requests
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
-from request_api.auth import AuthHelper
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
 TRACER = Tracer.get_instance()
@@ -77,34 +76,7 @@ class FOIFlowProgramAreas(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except BusinessException:
-            return "Error happened while accessing program areas" , 500
-
-
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/programareasforuser')
-class FOIFlowProgramAreas(Resource):
-    """Retrieves all active program areas.
-    """
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
-    @auth.require
-    #@request_api.cache.cached(key_prefix="programareas")
-    def get():
-        try:
-            usertype = AuthHelper.getusertype()
-            if (usertype == "iao"):
-                data = programareaservice().getprogramareas()
-            elif (usertype == 'ministry'):
-                groups = AuthHelper.getministrygroups()
-                data = programareaservice().getprogramareasforministryuser(groups)
-            else:
-                data = None
-
-            jsondata = json.dumps(data)
-            return jsondata , 200
-        except BusinessException:
-            return "Error happened while accessing program areas for user" , 500
+            return "Error happened while accessing applicant categories" , 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/deliverymodes')

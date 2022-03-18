@@ -33,7 +33,6 @@ class DashboardPagination(Resource):
             DEFAULT_SORT_ORDERS = ['desc']
 
             params = {
-                'usertype': AuthHelper.getusertype(),
                 'groups': AuthHelper.getusergroups(),
                 'page': flask.request.args.get('page', DEFAULT_PAGE, type=int),
                 'size': flask.request.args.get('size', DEFAULT_SIZE, type=int),
@@ -70,7 +69,7 @@ class DashboardPagination(Resource):
                 params['keywords'] = []
 
             statuscode = 200
-            if (params['usertype'] == "iao" or params['usertype'] == "ministry"):                                                                                           
+            if (AuthHelper.getusertype() == "iao"):                                                                                           
                 requests = dashboardservice().advancedsearch(params)
             else:
                 statuscode = 401   
