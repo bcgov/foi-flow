@@ -39,6 +39,12 @@ class FOIRequestComment(db.Model):
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
 
     @classmethod
+    def deleteextensioncommentsbyministry(cls, ministryid):
+        db.session.query(FOIRequestComment).filter(FOIRequestComment.ministryrequestid.in_(ministryid), FOIRequestComment.commenttypeid == 2).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Extensions comments deleted for the ministry ', ministryid)
+
+    @classmethod
     def disablecomment(cls, commentid, userid):   
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
