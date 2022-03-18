@@ -362,7 +362,9 @@ class FOIRawRequest(db.Model):
             'descriptionDescription': FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext,
             'ministry': FOIRawRequest.requestrawdata['selectedMinistries'].astext,
             'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext,
-            'duedate': FOIRawRequest.requestrawdata['dueDate'].astext
+            'duedate': FOIRawRequest.requestrawdata['dueDate'].astext,
+            'DueDateValue': FOIRawRequest.requestrawdata['dueDate'].astext,
+            'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
