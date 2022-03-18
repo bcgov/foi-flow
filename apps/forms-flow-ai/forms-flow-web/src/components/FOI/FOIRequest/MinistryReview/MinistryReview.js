@@ -40,6 +40,7 @@ import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap } from "./utils";
+import DivisionalTracking from '../DivisionalTracking';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -447,6 +448,26 @@ const MinistryReview = React.memo(({ userDetail }) => {
     )
   );
 
+  const divisions = requestDetails?.divisions?.length > 0 ? requestDetails.divisions : [];
+  const ministrycode = requestDetails?.selectedMinistries?.length > 0 ? requestDetails.selectedMinistries[0].code : '';
+  const divisionsBox = (
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
+    (
+      <DivisionalTracking
+        divisions={divisions}
+      />
+    )
+    :
+    (
+      <RequestTracking
+        pubmindivstagestomain={pubmindivstagestomain}
+        existingDivStages={divisions}
+        ministrycode={ministrycode}
+        createMinistrySaveRequestObject={createMinistrySaveRequestObject}
+      />
+    )
+  );
+
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -544,14 +565,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           requestDetails={requestDetails}
                           requestState={requestState}
                         />
-                        <RequestTracking
-                          pubmindivstagestomain={pubmindivstagestomain}
-                          existingDivStages={requestDetails.divisions}
-                          ministrycode={
-                            requestDetails.selectedMinistries[0].code
-                          }
-                          createMinistrySaveRequestObject={createMinistrySaveRequestObject}
-                        />
+                        {divisionsBox}
                         {/* <RequestNotes /> */}
                         <BottomButtonGroup
                           requestState={requestState}
