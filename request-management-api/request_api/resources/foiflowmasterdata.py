@@ -77,7 +77,7 @@ class FOIFlowProgramAreas(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except BusinessException:
-            return "Error happened while accessing applicant categories" , 500
+            return "Error happened while accessing program areas" , 500
 
 
 @cors_preflight('GET,OPTIONS')
@@ -104,7 +104,7 @@ class FOIFlowProgramAreas(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except BusinessException:
-            return "Error happened while accessing applicant categories" , 500
+            return "Error happened while accessing program areas for user" , 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/deliverymodes')
