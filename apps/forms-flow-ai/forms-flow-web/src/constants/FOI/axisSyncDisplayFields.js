@@ -38,7 +38,7 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
 
     general:"Request Type General",
     personal:"Request Type Personal",
-    selectedMinistries:"Selected Ministries",
+    //selectedMinistries:"Selected Ministries",
 
     Extensions : "Extensions"
   };
