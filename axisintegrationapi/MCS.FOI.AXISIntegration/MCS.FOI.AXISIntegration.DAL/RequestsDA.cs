@@ -141,15 +141,15 @@ namespace MCS.FOI.AXISIntegration.DAL
                 onbehalf.vcMiddleName as onbehalfMiddleName,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = requestTypes.iLabelID and terminology.tiLocaleID = 1) as requestType
                 FROM
-                tblRequests requests LEFT OUTER JOIN EC_OFFICE office ON requests.tiOfficeID = office.OFFICE_ID
-                LEFT OUTER JOIN tblRequesterTypes requesterTypes ON requests.tiRequesterCategoryID = requesterTypes.tiRequesterTypeID
-                LEFT OUTER JOIN tblReceivedModes receivedModes ON requests.tiReceivedType = receivedModes.tiReceivedModeID 
-                LEFT OUTER JOIN tblDeliveryModes deliveryModes ON requests.tiDeliveryType = deliveryModes.tiDeliveryModeID
-                LEFT OUTER JOIN tblRequesters requesters ON requests.iRequesterID = requesters.iRequesterID
-                LEFT OUTER JOIN tblRequesters onbehalf ON requests.iOnBehalfOf = onbehalf.iRequesterID
-                LEFT OUTER JOIN tblCountries countries ON requesters.siCountryID = countries.siCountryID
-                LEFT OUTER JOIN tblStates states ON requesters.siStateID = states.siStateID
-                LEFT OUTER JOIN tblRequestTypes requestTypes ON requests.tiRequestTypeID = requestTypes.tiRequestTypeID
+                tblRequests requests WITH (NOLOCK) LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID
+                LEFT OUTER JOIN tblRequesterTypes  requesterTypes WITH (NOLOCK) ON requests.tiRequesterCategoryID = requesterTypes.tiRequesterTypeID
+                LEFT OUTER JOIN tblReceivedModes receivedModes WITH (NOLOCK) ON requests.tiReceivedType = receivedModes.tiReceivedModeID 
+                LEFT OUTER JOIN tblDeliveryModes deliveryModes WITH (NOLOCK) ON requests.tiDeliveryType = deliveryModes.tiDeliveryModeID
+                LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID
+                LEFT OUTER JOIN tblRequesters onbehalf WITH (NOLOCK) ON requests.iOnBehalfOf = onbehalf.iRequesterID
+                LEFT OUTER JOIN tblCountries countries WITH (NOLOCK) ON requesters.siCountryID = countries.siCountryID
+                LEFT OUTER JOIN tblStates states WITH (NOLOCK) ON requesters.siStateID = states.siStateID
+                LEFT OUTER JOIN tblRequestTypes requestTypes WITH (NOLOCK) ON requests.tiRequestTypeID = requestTypes.tiRequestTypeID
                 WHERE
                 vcVisibleRequestID = @vcVisibleRequestID";
             DataTable dataTable = new();
@@ -182,11 +182,11 @@ namespace MCS.FOI.AXISIntegration.DAL
 
             string query = @"SELECT loc.vcTerminology AS reason, reqextn.cApprovedStatus AS [status], reqextn.sdtExtendedDate AS extendedduedate, 
                 reqextn.siExtensionDays AS extensiondays, reqextn.dtApprovedDate AS decisiondate 
-                FROM tblRequests req INNER JOIN tblRequestExtensions reqextn ON req.iRequestID = reqextn.iRequestID 
+                FROM tblRequests req WITH (NOLOCK) INNER JOIN tblRequestExtensions reqextn WITH (NOLOCK) ON req.iRequestID = reqextn.iRequestID 
                 AND req.tiExtension = reqextn.tiExtension 
                 AND req.vcVisibleRequestID = @vcVisibleRequestID
-                INNER JOIN tblExtensions extn ON req.tiExtension = extn.tiExtension 
-                LEFT OUTER JOIN tblTerminologyLookup loc ON loc.iLabelID = extn.iLabelID AND loc.tiLocaleID = 1";
+                INNER JOIN tblExtensions extn WITH (NOLOCK) ON req.tiExtension = extn.tiExtension 
+                LEFT OUTER JOIN tblTerminologyLookup loc WITH (NOLOCK) ON loc.iLabelID = extn.iLabelID AND loc.tiLocaleID = 1";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {

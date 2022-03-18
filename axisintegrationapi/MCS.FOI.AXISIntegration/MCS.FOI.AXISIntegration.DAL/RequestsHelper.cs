@@ -101,7 +101,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 "N" => "Pending", //Pending
                 "A" => "Approved", // Approved
                 "D" => "Denied", // Denied
-                _ => "",
+                _ => "Pending",
             };
         }
 
@@ -113,12 +113,14 @@ namespace MCS.FOI.AXISIntegration.DAL
 
                 "Courier" => "Mail",
                 "E-mail" => "Email",
+                "Fax" => "Fax",
                 "National FOIA Portal" => "Online Form",
                 "Forward from Public Body" => "Email",
                 "Hand Delivered" => "Mail",
                 "Internal" => "Email",
+                "Online Form" => "Online Form",
                 "Post" => "Mail",
-                _ => receivedMode,
+                _ => "Email",
             };
         }
 
@@ -132,7 +134,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                 "Paper - Post" => "In Person Pick up",
                 "CD - Post" => "In Person Pick up",
                 "Post" => "In Person Pick up",
-                _ => deliveryMode,
+                "Secure File Transfer" => "Secure File Transfer",
+                _ => "Secure File Transfer",
             };
         }
     }
