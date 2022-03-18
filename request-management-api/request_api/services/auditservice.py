@@ -5,6 +5,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 from datetime import datetime
+from request_api.utils.enums import RequestType
 import dateutil.parser
 import maya
 class auditservice:
@@ -47,7 +48,7 @@ class auditservice:
         foirequestid = 0 
         for entry in ministryrecords:
             foirequestid = entry['foirequest_id']
-            createdat =  maya.parse(entry['created_at']).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y-%m-%d %H:%M:%S') 
+            createdat =  maya.parse(entry['created_at']).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y-%m-%d %H:%M:%S')
             fromdate = datetime.fromisoformat(entry['recordsearchfromdate']).strftime("%Y-%m-%d") if entry['recordsearchfromdate'] is not None else None 
             todate = datetime.fromisoformat(entry['recordsearchtodate']).strftime("%Y-%m-%d") if entry['recordsearchtodate'] is not None else None
             _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['createdby'], "status": entry['requeststatus.name']})
@@ -70,7 +71,7 @@ class auditservice:
             if AuthHelper.getusertype() == "iao":
                 _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat , "createdby": entry['createdby'], "status": entry['status']})        
             else:
-                if entry['ispiiredacted'] == True:
+                if requestrecord['requesttype'] == 'personal' or entry['ispiiredacted'] == True:
                     _rawdescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat , "createdby": entry['createdby'], "status": entry['status']})            
         return _rawdescriptions
         
