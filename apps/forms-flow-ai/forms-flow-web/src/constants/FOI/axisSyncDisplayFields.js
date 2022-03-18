@@ -28,12 +28,13 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     requestType:"Request Type",
     receivedMode:"Received Mode",
     deliveryMode:"Delivery Mode",
-    receivedDate:"Received Date",
+    receivedDateUF: "Received Date",
+    //receivedDate:"Received Date",
     requestStartDate:"Request Start Date",
     dueDate:"Legislated Due Date",
 
-    additionalPersonalInfo:"Additional Personal Information",
-    birthDate:"DOB",
+    // additionalPersonalInfo:"Additional Personal Information",
+    // birthDate:"DOB",
 
     general:"Request Type General",
     personal:"Request Type Personal",
