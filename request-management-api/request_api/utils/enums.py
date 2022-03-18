@@ -96,4 +96,8 @@ class UserGroup(Enum):
     flex = "Flex Team"
     processing = "@processing"
     ministry = "@bcgovcode Ministry Team" 
-    
+
+class RequestorType(Enum):
+    applicant = 1    
+    onbehalfof = 2
+    child = 3
