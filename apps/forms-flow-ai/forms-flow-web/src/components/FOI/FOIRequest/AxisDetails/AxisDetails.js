@@ -2,9 +2,9 @@ import React, {useEffect} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch} from "react-redux";
-import { fetchRequestDataFromAxis } from '../../../apiManager/services/FOI/foiRequestServices';
+import { fetchRequestDataFromAxis } from '../../../../apiManager/services/FOI/foiRequestServices';
 
 
 const AxisDetails = React.memo(({  

@@ -24,7 +24,7 @@ import {
   alertUser
 } from "./utils";
 import clsx from "clsx";
-import AxisSyncModal from "../AxisSyncModal";
+import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
