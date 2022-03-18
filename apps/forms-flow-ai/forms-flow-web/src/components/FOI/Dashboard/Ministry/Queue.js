@@ -58,8 +58,8 @@ const Queue = ({ userDetail, tableInfo }) => {
   const [requestFilter, setRequestFilter] = useState("All");
 
   // update sortModel for records due, ldd & assignedTo
-  const updateSortModel = (sortModel) => {
-    let smodel = JSON.parse(JSON.stringify(sortModel));
+  const updateSortModel = (_sortModel) => {
+    let smodel = JSON.parse(JSON.stringify(_sortModel));
     if (smodel) {
       smodel.map((row) => {
         if (row.field === "CFRDueDateValue" || row.field === "DueDateValue")
