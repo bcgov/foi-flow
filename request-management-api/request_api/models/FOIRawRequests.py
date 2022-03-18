@@ -82,6 +82,7 @@ class FOIRawRequest(db.Model):
                     requestrawdata=_requestrawdata,
                     version=_version,
                     updatedby=None,
+                    created_at=datetime.now(),
                     updated_at=datetime.now(),
                     status=status,
                     assignedgroup=assigneegroup,
