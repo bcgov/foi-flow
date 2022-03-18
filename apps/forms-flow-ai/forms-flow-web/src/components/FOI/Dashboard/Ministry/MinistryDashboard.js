@@ -24,7 +24,6 @@ const useStyles = makeStyles(() => ({
 
 const MinistryDashboard = ({ userDetail }) => {
   const classes = useStyles();
-
   const [advnacedSearchEnabled, setAdvancedSearchEnabled] = useState(false);
 
   return (

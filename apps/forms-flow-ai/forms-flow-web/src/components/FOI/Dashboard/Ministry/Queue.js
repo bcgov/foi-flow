@@ -58,8 +58,8 @@ const Queue = ({ userDetail, tableInfo }) => {
   const [requestFilter, setRequestFilter] = useState("All");
 
   // update sortModel for records due, ldd & assignedTo
-  const updateSortModel = (_sortModel) => {
-    let smodel = JSON.parse(JSON.stringify(_sortModel));
+  const updateSortModel = () => {
+    let smodel = JSON.parse(JSON.stringify(sortModel));
     if (smodel) {
       smodel.map((row) => {
         if (row.field === "CFRDueDateValue" || row.field === "DueDateValue")
@@ -81,7 +81,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   useEffect(() => {
-    serverSortModel = updateSortModel(sortModel);
+    serverSortModel = updateSortModel();
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
       fetchFOIMinistryRequestListByPage(

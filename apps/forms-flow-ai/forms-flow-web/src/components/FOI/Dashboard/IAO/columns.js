@@ -32,6 +32,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: onBehalfFullName,
     sortable: false,
+    width: 180,
   },
   {
     field: "requestType",
