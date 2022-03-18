@@ -46,7 +46,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.RequestType = RequestsHelper.GetRequestType(Convert.ToString(row["requestType"]));
 
                     axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");
-                    axisRequest.ReceivedDateUF = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-ddTHH:mm:ssZ");
+                    axisRequest.ReceivedDateUF = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd HH:mm:ss.ffffff");
                     axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
                     axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
 
