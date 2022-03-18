@@ -26,6 +26,7 @@ import {StateEnum} from "../../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
 import { createRequestDetailsObjectFunc } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
+import MANDATORY_FOI_REQUEST_FIELDS from "../../../../constants/FOI/mandatoryFOIRequestFields";
 //import { ActionContext } from "./ActionContext";
 
 const useStyles = makeStyles({
@@ -78,10 +79,12 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       for(let key of Object.keys(requestDetailsFromAxis)){
         var updatedField = isAxisSyncDisplayField(key);
         if(updatedField){
-          if(key === 'Extensions' && requestDetailsFromAxis[key] != extensions || ((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])){
+          var updateNeeded= checkValidation(key);
+          if(updateNeeded){
             assignDisplayedReqObj(key, updatedObj, updatedField);
             if(key !== 'Extensions')
-              saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, key, requestDetailsFromAxis[key], "");
+              saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
+                key, requestDetailsFromAxis[key], "");
           }
         }
       }
@@ -93,13 +96,25 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
     };
 
+    const isMandatoryField = (field) => {
+      return Object.entries(MANDATORY_FOI_REQUEST_FIELDS).find(([key]) => key === field)?.[1];
+    };
+
+    const checkValidation = (key) => {
+      var mandatoryField = isMandatoryField(key);
+      if(mandatoryField && requestDetailsFromAxis[key])
+        return true;
+      else if(!mandatoryField){
+        if((key === 'Extensions' && requestDetailsFromAxis[key] != extensions))
+          return true;
+        if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
+          return true;
+      }
+      return false;
+    }
+
     const assignDisplayedReqObj = (key,updatedObj, updatedField) => {      
       switch (key) {
-        case 'selectedMinistries':
-          const ministryCodes = requestDetailsFromAxis[key].map(({code}) => code).join(', ');
-          if(ministryCodes !== saveRequestObject[key].map(({code}) => code).join(', '))
-            updatedObj[updatedField] = ministryCodes;
-          break;
         case 'dueDate':
         case 'axisSyncDate':
         case 'fromDate': 
