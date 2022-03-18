@@ -136,13 +136,13 @@ const Queue = ({ userDetail, tableInfo }) => {
     },
     {
       field: "applicantcategory",
-      headerName: "APPLICANT TYPE",
+      headerName: "CATEGORY",
       flex: 1,
       headerAlign: "left",
     },
     {
       field: "requestType",
-      headerName: "REQUEST TYPE",
+      headerName: "TYPE",
       flex: 1,
       headerAlign: "left",
     },
@@ -153,9 +153,10 @@ const Queue = ({ userDetail, tableInfo }) => {
       flex: 1,
       headerAlign: "left",
     },
+
     {
       field: "assignedToName",
-      headerName: "ASSIGNEE",
+      headerName: "ASSIGNED TO",
       flex: 1,
       headerAlign: "left",
     },
