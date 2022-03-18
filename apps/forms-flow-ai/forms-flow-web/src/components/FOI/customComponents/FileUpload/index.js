@@ -203,18 +203,6 @@ const FileUpload = ({
             </button>  : null}
         </div>
         </div>
-        {/* {Object.entries(files).length === 0 ?
-        <input
-          className="file-upload-input"
-          type="file"
-          ref={fileInputField}
-          onChange={handleNewFileUpload}
-          title=""
-          value=""
-          multiple={multipleFiles}
-          accept={mimeTypes}
-        />
-        : null} */}
         
       </section>
       <ul className="error-message-ul">
