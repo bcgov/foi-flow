@@ -20,7 +20,7 @@ import { fetchRequestDataFromAxis,
 } from '../../../../apiManager/services/FOI/foiRequestServices';
 import {
   addAXISExtensions
-} from '../../../apiManager/services/FOI/foiExtensionServices';
+} from '../../../../apiManager/services/FOI/foiExtensionServices';
 import {getRequestState} from "../BottomButtonGroup/utils";
 import {StateEnum} from "../../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
@@ -61,7 +61,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         if(!err){
             if(Object.entries(data).length !== 0){
               requestDetailsFromAxis = data;
-              setAxisExtension(requestDetailsValue?.Extensions); 
+              setAxisExtension(requestDetailsFromAxis?.Extensions); 
               compareFields();  
             }
         }
