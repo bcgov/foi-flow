@@ -258,6 +258,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             }}
           >
             <InputBase
+              id="filter"
               placeholder="Search in Queue ..."
               onChange={setSearch}
               sx={{
