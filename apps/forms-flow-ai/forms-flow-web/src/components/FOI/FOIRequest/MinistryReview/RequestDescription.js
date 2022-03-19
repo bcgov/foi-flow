@@ -41,7 +41,7 @@ const RequestDescription = React.memo((requestDetails) => {
         setOpenModal(false);
     }
     return (
-      <Card className="foi-details-card">
+      <Card id="requestDescriptionMinistry" className="foi-details-card">
         <RequestDescriptionHistory
           requestDescriptionHistoryList={filteredList}
           openModal={openModal}

@@ -251,7 +251,8 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
     </div>
     <div className="row foi-details-row confirm-modal-row">
       <div className="col-lg-6 foi-details-col">
-        <TextField                
+        <TextField    
+            id="closingModalStartDate"            
             label="Start Date"
             type="date" 
             value={_requestDetails.requestProcessStart}                            
@@ -265,7 +266,8 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
         />
       </div>
       <div className="col-lg-6 foi-details-col">
-        <TextField                
+        <TextField    
+            id="closingModalCloseDate"              
             label="Closing Date"
             type="date" 
             value={closingDateText || ''} 
@@ -284,7 +286,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
     <div className="row foi-details-row confirm-modal-row">
       <div className="col-lg-12 foi-details-col">
         <TextField
-            id="requestType"
+            id="closingReason"
             label="Reason for Closing Request"
             InputLabelProps={{ shrink: true, }}          
             select

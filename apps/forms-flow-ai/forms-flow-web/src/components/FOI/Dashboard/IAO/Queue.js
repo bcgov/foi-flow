@@ -160,6 +160,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             }}
           >
             <InputBase
+              id="filter"
               placeholder="Search in Queue ..."
               onChange={setSearch}
               sx={{
@@ -185,6 +186,7 @@ const Queue = ({ userDetail, tableInfo }) => {
           >
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
               <ClickableChip
+                id="myRequests"
                 key={`my-requests`}
                 label={"MY REQUESTS"}
                 color="primary"
@@ -193,6 +195,7 @@ const Queue = ({ userDetail, tableInfo }) => {
                 clicked={requestFilter === "myRequests"}
               />
               <ClickableChip
+                id="teamRequests"
                 key={`team-requests`}
                 label={"MY TEAM'S REQUESTS"}
                 color="primary"
@@ -201,6 +204,7 @@ const Queue = ({ userDetail, tableInfo }) => {
                 clicked={requestFilter === "All"}
               />
               <ClickableChip
+                id="watchingRequests"
                 key={`watching-requests`}
                 label={"WATCHING REQUESTS"}
                 color="primary"

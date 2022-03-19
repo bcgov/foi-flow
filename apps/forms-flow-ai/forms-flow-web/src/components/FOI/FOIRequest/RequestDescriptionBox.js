@@ -239,6 +239,7 @@ const RequestDescription = React.memo(({
                     <div class="col-lg-12">
                       <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
                         <input
+                          id="noPICheckbox"
                           type="checkbox"
                           className="checkmark"
                           checked={isPIIRedacted}
