@@ -27,6 +27,8 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
 
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
+
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/request type options/li_general'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email_MuiInputBase'), 
@@ -36,11 +38,15 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_CHILD DETAI
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_ON BEHALF OF DETAILS section'), 0)
 
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
+
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/request type options/li_personal'))
+
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/div_CHILD DETAILS section'), 0)
 

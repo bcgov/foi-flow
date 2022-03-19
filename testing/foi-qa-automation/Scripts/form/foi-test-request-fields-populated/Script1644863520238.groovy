@@ -51,7 +51,7 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/addr
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 'value', description, 
     0)
 
-WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_noPICheckbox'), 'checked', 0)
+//WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_noPICheckbox'), 'checked', 0)
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 0)
 

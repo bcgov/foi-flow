@@ -25,7 +25,8 @@ WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + firstname]))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
+            firstname]))
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 'Firstname')
 
@@ -53,8 +54,6 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Home Phone
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 'testing 123 description')
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
-
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
@@ -66,6 +65,10 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Re
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/request type options/li_general'))
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode'))
 

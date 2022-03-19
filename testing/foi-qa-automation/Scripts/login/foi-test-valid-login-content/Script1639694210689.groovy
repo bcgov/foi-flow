@@ -71,5 +71,3 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header 
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header RECEIVED DATE'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header XGOV'), 0)
-

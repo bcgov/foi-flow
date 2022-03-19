@@ -114,8 +114,6 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Home Phone
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), description)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
-
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
