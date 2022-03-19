@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>foi-test-harms-to-review</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>0f22e58c-60f3-40cc-8260-8d5a9223f77a</testCaseGuid>
+   <variable>
+      <defaultValue>GlobalVariable.firstname</defaultValue>
+      <description></description>
+      <id>50e6238f-fe19-4c27-9c15-e63e5b0f92cf</id>
+      <masked>false</masked>
+      <name>firstname</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.lastname</defaultValue>
+      <description></description>
+      <id>939995e2-6a35-4276-8c04-110b4f4c5f3f</id>
+      <masked>false</masked>
+      <name>lastname</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>7f4172ba-30e3-414d-8bbf-70b15a7e3be0</id>
+      <masked>false</masked>
+      <name>applicantFirstname</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>c4e4cb76-3bb2-44a6-b0bb-e83457137c07</id>
+      <masked>false</masked>
+      <name>applicantLastname</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('category', 1)</defaultValue>
+      <description></description>
+      <id>ea6a0c8a-3002-4102-aeb0-ca5da361ec13</id>
+      <masked>false</masked>
+      <name>category</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>b3ae64b6-2370-46e6-89bb-36bc57ed3d28</id>
+      <masked>false</masked>
+      <name>email</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('streetAddress', 1)</defaultValue>
+      <description></description>
+      <id>eaf5d734-3c17-4689-a110-cf37b69b31d6</id>
+      <masked>false</masked>
+      <name>streetAddress</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('streetAddress2', 1)</defaultValue>
+      <description></description>
+      <id>cddc6680-23fe-4991-aba0-d5f227b093cb</id>
+      <masked>false</masked>
+      <name>streetAddress2</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('city', 1)</defaultValue>
+      <description></description>
+      <id>3996a954-65bb-4d93-8a3b-057da2e88b77</id>
+      <masked>false</masked>
+      <name>city</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('province', 1)</defaultValue>
+      <description></description>
+      <id>2678050a-f232-497b-b7bc-406aef4d78cf</id>
+      <masked>false</masked>
+      <name>province</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('country', 1)</defaultValue>
+      <description></description>
+      <id>263f5ac6-a5d2-4a0a-abb0-b2d8baaa48a7</id>
+      <masked>false</masked>
+      <name>country</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('postalCode', 1)</defaultValue>
+      <description></description>
+      <id>a30de359-00f0-45a6-8e7d-e87d7739ac45</id>
+      <masked>false</masked>
+      <name>postalCode</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('homePhone', 1)</defaultValue>
+      <description></description>
+      <id>255e1456-29d2-4dd2-bc13-9b90357a2261</id>
+      <masked>false</masked>
+      <name>homePhone</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('description', 1)</defaultValue>
+      <description></description>
+      <id>c64c442c-f042-4e54-a60e-03c6f6c93fed</id>
+      <masked>false</masked>
+      <name>description</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>1e02ada6-4c59-4875-bc44-d8f026263f07</id>
+      <masked>false</masked>
+      <name>startDate</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>d2889fda-7916-4714-a0c5-6b68fae96e37</id>
+      <masked>false</masked>
+      <name>receivedDate</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>f8818b58-528e-402b-8990-4aa0e7d33b3c</id>
+      <masked>false</masked>
+      <name>receivedMode</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Sample Applicant').getValue('requestType', 1)</defaultValue>
+      <description></description>
+      <id>ba44833e-5200-4b13-b044-23b02dceed93</id>
+      <masked>false</masked>
+      <name>requestType</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>37b66b50-2e38-49cf-8f6c-a563c467bedc</id>
+      <masked>false</masked>
+      <name>deliveryMode</name>
+   </variable>
+</TestCaseEntity>

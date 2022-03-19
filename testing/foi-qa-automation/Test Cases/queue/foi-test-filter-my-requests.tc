@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>foi-test-filter-my-requests</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>4b2180a7-b21a-4ad7-a1c9-4acf62267197</testCaseGuid>
+   <variable>
+      <defaultValue>GlobalVariable.firstname</defaultValue>
+      <description></description>
+      <id>51df4c94-7a9c-408d-8d19-e94963af5958</id>
+      <masked>false</masked>
+      <name>firstname</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.lastname</defaultValue>
+      <description></description>
+      <id>f3d615f8-7cbf-415f-87d6-fd3ee7795826</id>
+      <masked>false</masked>
+      <name>lastname</name>
+   </variable>
+   <variable>
+      <defaultValue>findTestData('Login Credentials').getValue('Last Name', 1) + ', ' + findTestData('Login Credentials').getValue('First Name', 1)</defaultValue>
+      <description></description>
+      <id>b1d2d061-b89d-403d-ab65-67eec74af1b3</id>
+      <masked>false</masked>
+      <name>teammate</name>
+   </variable>
+</TestCaseEntity>

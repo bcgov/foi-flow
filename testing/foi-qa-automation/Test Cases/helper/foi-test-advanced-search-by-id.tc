@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>foi-test-advanced-search-by-id</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>6c03bf51-007a-4b81-acac-2440ffea0c34</testCaseGuid>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>27a37c69-7a0b-422f-87f9-36d21b26e0d9</id>
+      <masked>false</masked>
+      <name>requestID</name>
+   </variable>
+   <variable>
+      <defaultValue>true</defaultValue>
+      <description></description>
+      <id>a30155e3-30ba-455e-adf2-9b452c1978a7</id>
+      <masked>false</masked>
+      <name>clickOnRequest</name>
+   </variable>
+</TestCaseEntity>
