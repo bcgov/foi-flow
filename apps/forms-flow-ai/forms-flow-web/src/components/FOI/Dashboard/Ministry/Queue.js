@@ -251,7 +251,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="center"
             direction="row"
-            xs={7.5}
+            xs={true}
             sx={{
               borderRight: "2px solid #38598A",
               backgroundColor: "rgba(56,89,138,0.1)",
@@ -278,7 +278,8 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="flex-start"
             justifyContent="center"
-            xs={4.5}
+            xs={3}
+            minWidth="390px"
           >
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
               <ClickableChip
