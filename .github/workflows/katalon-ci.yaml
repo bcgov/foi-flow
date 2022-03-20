@@ -21,8 +21,9 @@ jobs:
       run: echo '${{ github.workspace }}'
     - name: try copying files
       run: | 
-            FOR /d  %a in ("${{ github.workspace }}\testing\automation\foi-qa-automation\Reports\*") DO echo we found %a
-            echo we found %~nxa
+            dir
+            # FOR /d  %a in ("${{ github.workspace }}\testing\automation\foi-qa-automation\Reports\*") DO echo we found %a
+            # echo we found %~nxa
       shell: cmd
     # - name: Create collection report
     #   - uses: actions/checkout@v2
