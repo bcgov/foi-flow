@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>a_Add division to track</name>
+   <name>button_Add division to track</name>
    <tag></tag>
    <elementGuidId>8c2f87a8-614d-450f-8c0d-3e856eaf9438</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='divisionalTracking']/div/div/div/div[2]/div/a</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>div.col-lg-7.foi-details-col > a</value>
       </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='divisionalTracking']/div/div/div/div[2]/div/button</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[(text() = 'Add division to track' or . = 'Add division to track')]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
-      <value>a</value>
+      <value>button</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>href</name>
       <type>Main</type>

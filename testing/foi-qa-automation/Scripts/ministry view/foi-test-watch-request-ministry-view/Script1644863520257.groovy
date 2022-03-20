@@ -145,7 +145,7 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/input_Watching Requests'))
+WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 

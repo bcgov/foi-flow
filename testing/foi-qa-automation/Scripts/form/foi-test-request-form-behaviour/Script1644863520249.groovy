@@ -78,14 +78,14 @@ def laterDate = new Date().plus(10)
 //
 //WebUI.executeJavaScript("arguments[0].value='" + laterDate.format('yyyy-MM-dd') + "'", Arrays.asList(element))
 
-//WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), laterDate.format('yyyyyyMMdd'))
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), laterDate.format('yyyyyyMMdd'))
 
 //WebUI.sendKeys(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), Keys.chord('0','0','2','2','2','0','0','3','0','5'))
 
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), FailureHandling.STOP_ON_FAILURE)
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), FailureHandling.STOP_ON_FAILURE)
 
-System.exit(0)
+//System.exit(0)
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
         findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)

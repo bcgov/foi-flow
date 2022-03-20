@@ -6,16 +6,16 @@
    <elementGuidId>7ab4692e-5e28-47e0-847a-27a195b52a83</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>div.filterComments > label</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[3]/div/label</value>
+         <value>//div[@id='Comments']/div/div[@class='displayComments']/div/label</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'All Comments' or . = 'All Comments')]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>div.filterComments > label</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

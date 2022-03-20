@@ -6,16 +6,16 @@
    <elementGuidId>0cc68935-fec7-426d-a7d9-008c308fcdff</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>#btncomment615</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//button[@id='btncomment615']</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userInfo&quot;]/div[3]/button[count(. | //button[@class = 'replyBtn  show']) = count(//button[@class = 'replyBtn  show'])]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>#btncomment615</value>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userActions&quot;]/div[2]/button[count(. | //button[@class = 'replyBtn  show']) = count(//button[@class = 'replyBtn  show'])]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -53,7 +53,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userInfo&quot;]/div[3]/button</value>
+      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userActions&quot;]/div[2]/button</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>

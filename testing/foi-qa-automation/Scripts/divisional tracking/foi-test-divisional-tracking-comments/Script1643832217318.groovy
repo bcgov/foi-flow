@@ -141,7 +141,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Request'), Fa
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/a_Add division to track'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
 

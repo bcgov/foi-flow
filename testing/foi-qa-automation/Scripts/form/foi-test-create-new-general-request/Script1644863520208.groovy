@@ -23,6 +23,9 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.S
 
 WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
+        'color'), 'rgba(255, 0, 0, 1)', false)
+
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
@@ -69,6 +72,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/request ty
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
+
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'),
+	'color'), 'rgba(0, 0, 0, 0.87)', false)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode'))
 

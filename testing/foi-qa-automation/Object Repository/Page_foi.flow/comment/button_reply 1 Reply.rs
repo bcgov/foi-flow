@@ -6,16 +6,16 @@
    <elementGuidId>96c6a899-54a9-49ec-8962-1c86f486d215</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>#btncomment613</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//button[@id='btncomment613']</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[1]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userInfo&quot;]/div[3]/button</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>#btncomment613</value>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[1]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userActions&quot;]/div[2]/button</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -53,7 +53,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[1]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userInfo&quot;]/div[3]/button</value>
+      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[1]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userActions&quot;]/div[2]/button</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>

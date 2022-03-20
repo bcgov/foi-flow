@@ -20,9 +20,10 @@ import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.maximizeWindow()
 
-WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
-
+//WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 '\r\n'
+WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'), FailureHandling.STOP_ON_FAILURE)
+
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
@@ -40,6 +41,9 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_ON BEHALF O
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
 
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
+        'color'), 'rgba(255, 0, 0, 1)', false)
+
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
@@ -56,17 +60,18 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/labe
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/div_ON BEHALF OF DETAILS section'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/label_ON BEHALF OF DETAILS'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/label_ON BEHALF OF DETAILS'), 0) //    def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
-    def response = WS.sendRequest(findTestObject('FoiRawRequest'))
+	
 
-    def jsonSlurper = new JsonSlurper()
-
-    requestID = jsonSlurper.parseText(response.responseText).id.toString()
-
-    WS.verifyResponseStatusCode(response, 200)
+//    def jsonSlurper = new JsonSlurper()
+//
+//    requestID = jsonSlurper.parseText(response.responseText).id.toString()
+//
+//    WS.verifyResponseStatusCode(response, 200)
 
     WebUI.openBrowser(GlobalVariable.BASE_URL)
 

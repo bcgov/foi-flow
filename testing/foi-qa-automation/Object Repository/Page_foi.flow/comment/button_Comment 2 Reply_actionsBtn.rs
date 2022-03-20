@@ -6,16 +6,16 @@
    <elementGuidId>c7e8b2c0-fd78-41a6-beb4-174a68ebc85d</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>button.actionsBtn</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;][2]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/button[@class=&quot;actionsBtn&quot;]</value>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;][2]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/div/button[@class=&quot;actionsBtn&quot;]</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/button[@class=&quot;actionsBtn&quot;]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>button.actionsBtn</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

@@ -6,16 +6,16 @@
    <elementGuidId>287d3cb2-ff70-4486-beac-8fc3073e71c9</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>#btncomment604</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[@class='displayComments']/div[2]/div[1]/div/div/div[3]/button</value>
+         <value>//div[@id='Comments']/div/div[@class='displayComments']/div[2]/div[1]/div/div[@class='userActions']/div[2]/button</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//button[(text() = '  Reply' or . = '  Reply')]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>#btncomment604</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

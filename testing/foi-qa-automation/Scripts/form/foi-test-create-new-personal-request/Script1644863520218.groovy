@@ -56,9 +56,6 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/inpu
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description parent'), 
     'class').contains('Mui-error') == true
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
-        'color'), 'rgba(255, 0, 0, 1)', false)
-
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/h4_Select Ministry Client'), 'color'), 'rgba(255, 0, 0, 1)', 
     false)
 
@@ -180,9 +177,6 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/inpu
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description parent'), 
     'class').equals('Mui-error') == false
-
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
-        'color'), 'rgba(0, 0, 0, 0.87)', false)
 
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/h4_Select Ministry Client'), 'color'), 'rgba(0, 0, 0, 0.87)', 
     false)
