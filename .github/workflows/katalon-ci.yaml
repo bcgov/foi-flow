@@ -21,8 +21,10 @@ jobs:
       run: echo '${{ github.workspace }}'
     - name: try copying files
       run: | 
+            mkdir artifacts
             FOR /d  %%a in ("${{ github.workspace }}\testing\automation\foi-qa-automation\Reports\*") DO FOR /d %%b in ("%%a\*") DO FOR /d %%c in ("%%b\*") do (robocopy "%%c" "${{ github.workspace }}\artifacts" *.html
             robocopy "%%a\foi-test\%%~nxa" "${{ github.workspace }}\artifacts" JUnit_Report.xml)
+            cd artifacts
             dir
       shell: cmd
     # - name: Create collection report
