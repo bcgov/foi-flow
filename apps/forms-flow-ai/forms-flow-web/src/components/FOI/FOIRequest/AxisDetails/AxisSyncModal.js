@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from 'react';
+import React, {useEffect} from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -15,9 +15,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../../constants/FOI/axisSyncDisplayFields';
 import { useDispatch, useSelector} from "react-redux";
-import { fetchRequestDataFromAxis,
-  saveRequestDetails 
-} from '../../../../apiManager/services/FOI/foiRequestServices';
+import { saveRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
+import {
+  addAXISExtensions
+} from '../../../../apiManager/services/FOI/foiExtensionServices';
 import {getRequestState} from "../BottomButtonGroup/utils";
 import {StateEnum} from "../../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
@@ -43,29 +44,20 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const [displayedReqObj, setDisplayedReqObj] = React.useState({});
     const [updatedSaveReqObj, setUpdatedSaveReqObj] = React.useState({});
     let requestDetailsFromAxis ={...axisSyncedData};
+    const [axisExtensions, setAxisExtension] = React.useState([]);
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
 
-
-    // useEffect(()=>{
-    //   dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
-    //     if(!err){
-    //         if(Object.entries(data).length !== 0){
-    //           requestDetailsFromAxis = data;
-    //           compareFields();  
-    //         }
-    //     }
-    //   }));
-    // },[])
-
     useEffect(()=>{
-   
-            if(Object.entries(requestDetailsFromAxis).length !== 0){
-              compareFields();  
-            }
-     
+        if(Object.entries(requestDetailsFromAxis).length !== 0){
+          setAxisExtension(requestDetailsFromAxis?.Extensions); 
+          compareFields();  
+        }
     },[requestDetailsFromAxis])
 
+    const saveExtensions = () => {
+      dispatch(addAXISExtensions(axisExtensions, ministryId));
+    }
 
     const compareFields = () => {
       let updatedObj = {};
@@ -195,6 +187,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           }
         )
       );
+      saveExtensions();
     };
 
 
