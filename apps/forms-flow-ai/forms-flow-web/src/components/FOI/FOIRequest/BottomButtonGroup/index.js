@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import {
   saveRequestDetails,
   openRequestDetails,
+  fetchRequestDataFromAxis
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -94,17 +95,27 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
     const [axisSyncedRequest, setAxisSyncedRequest ]= useState(false);
-
+    const [axisSyncedData, setAxisSyncedData ]= useState(false);
 
     useEffect(() => {
+        
         if(saveRequestObject.axisRequestId && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase()){
           setAxisSyncedRequest(true);
+          dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
+            if(!err){
+                if(Object.entries(data).length !== 0){
+                  setAxisSyncedRequest(true);
+                  setAxisSyncedData(data);
+                }
+                else
+                  setAxisSyncedRequest(false);
+            }
+          }));
         }
         else
           setAxisSyncedRequest(false);
       
-    }, [saveRequestObject]);
-    
+    }, [saveRequestObject]);    
 
     useEffect(() => {
       if(stateChanged){
@@ -386,7 +397,7 @@ const BottomButtonGroup = React.memo(
         {
           axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} 
           saveRequest= {saveRequest} saveRequestObject= {saveRequestObject} urlIndexCreateRequest={urlIndexCreateRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={currentSelectedStatus}
-          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} />
+          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} axisSyncedData={axisSyncedData}/>
         }
         
       </div>

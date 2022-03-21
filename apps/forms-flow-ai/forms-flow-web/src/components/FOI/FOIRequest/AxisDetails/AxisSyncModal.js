@@ -24,7 +24,6 @@ import { toast } from "react-toastify";
 import { createRequestDetailsObjectFunc } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../../constants/FOI/mandatoryFOIRequestFields";
-//import { ActionContext } from "./ActionContext";
 
 const useStyles = makeStyles({
  
@@ -37,32 +36,35 @@ const useStyles = makeStyles({
 
 const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
   urlIndexCreateRequest, handleSaveRequest, currentSelectedStatus,
-  hasStatusRequestSaved, requestState, requestId, ministryId,
+  hasStatusRequestSaved, requestState, requestId, ministryId, axisSyncedData
 }) => {
 
     const classes = useStyles();
     const [displayedReqObj, setDisplayedReqObj] = React.useState({});
     const [updatedSaveReqObj, setUpdatedSaveReqObj] = React.useState({});
-    let requestDetailsFromAxis ={};
+    let requestDetailsFromAxis ={...axisSyncedData};
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
 
-    // const {
-    //   axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
-    //   urlIndexCreateRequest, handleSaveRequest, currentSelectedStatus,
-    //   hasStatusRequestSaved, requestState, requestId, ministryId,
-    // } = useContext(ActionContext);
+
+    // useEffect(()=>{
+    //   dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
+    //     if(!err){
+    //         if(Object.entries(data).length !== 0){
+    //           requestDetailsFromAxis = data;
+    //           compareFields();  
+    //         }
+    //     }
+    //   }));
+    // },[])
 
     useEffect(()=>{
-      dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
-        if(!err){
-            if(Object.entries(data).length !== 0){
-              requestDetailsFromAxis = data;
+   
+            if(Object.entries(requestDetailsFromAxis).length !== 0){
               compareFields();  
             }
-        }
-      }));
-    },[])
+     
+    },[requestDetailsFromAxis])
 
 
     const compareFields = () => {
