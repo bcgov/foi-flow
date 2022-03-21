@@ -11,6 +11,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: set screen resolution
+      run: |
+        system_profiler SPDisplaysDataType | grep Resolution
+        "/Library/Application Support/VMware Tools/vmware-resolutionSet" 1920 1080
+        system_profiler SPDisplaysDataType | grep Resolution
     - name: Katalon Studio Github Action
       uses: katalon-studio/katalon-studio-github-action@v2
       with:
