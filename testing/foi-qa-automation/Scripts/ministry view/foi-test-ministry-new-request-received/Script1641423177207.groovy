@@ -85,22 +85,22 @@ WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header APPLICANT TYPE'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header REQUEST TYPE'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 0)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 'aria-sort', 'ascending', 
-    0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ASSIGNED TO'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header RECORDS DUE'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header LDD'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'), 0)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header APPLICANT TYPE'), 0)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header REQUEST TYPE'), 0)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 0)
+//
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 'aria-sort', 'ascending', 
+//    0)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ASSIGNED TO'), 0)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header RECORDS DUE'), 0)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header LDD'), 0)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 

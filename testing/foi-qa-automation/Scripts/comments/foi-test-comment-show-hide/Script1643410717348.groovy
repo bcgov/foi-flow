@@ -17,10 +17,17 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
-
 import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
@@ -32,11 +39,13 @@ WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), Failure
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((firstname + ' ') + lastname) + ' changed the state of the request to Intake in Progress')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((firstname + ' ') + lastname) + 
+    ' changed the state of the request to Open')
 
 WebUI.click(findTestObject('Page_foi.flow/comment/input_comment filter Request History'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + ' changed the state of the request to Intake in Progress')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
+    ' changed the state of the request to Open')
 
 WebUI.click(findTestObject('Page_foi.flow/comment/input_comments filter User Comments'), FailureHandling.STOP_ON_FAILURE)
 
@@ -46,16 +55,17 @@ WebUI.click(findTestObject('Page_foi.flow/comment/input_comments filter All Comm
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((firstname + ' ') + lastname) + ' changed the state of the request to Intake in Progress')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((firstname + ' ') + lastname) + 
+    ' changed the state of the request to Open')
 
-WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
 
-for (int i = 2; i < 10; i++) {	
-	WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment ' + i)
+for (int i = 2; i < 10; i++) {
+	WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
 	
-	WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
-}
+    WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment ' + i)
 
+    WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
+}
 
 WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 

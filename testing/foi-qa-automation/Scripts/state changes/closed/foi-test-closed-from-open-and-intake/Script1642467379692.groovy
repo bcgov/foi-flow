@@ -97,7 +97,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 0)
 
-if (today.format('HHmm').toInteger() > 1630) {
+if (today.format('HHmm').toInteger() > 1630 && today.format('u') < 6) {
     // check if request was sent in after 4:30
     WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/h4_30 Days Remaining'), '31 Days Remaining')
 } else {

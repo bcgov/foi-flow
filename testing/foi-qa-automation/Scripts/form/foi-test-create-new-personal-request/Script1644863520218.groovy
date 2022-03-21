@@ -208,7 +208,7 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.maximizeWindow()
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'U-00' + requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 

@@ -6,24 +6,24 @@
    <elementGuidId>b3c9ea37-6688-4052-800c-91c2e0088b28</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li[8]</value>
+         <key>BASIC</key>
+         <value>//li[(text() = '${user}' or . = '${user}')]</value>
       </entry>
       <entry>
          <key>IMAGE</key>
       </entry>
       <entry>
-         <key>CSS</key>
+         <key>XPATH</key>
+         <value>//div[@id='menu-']/div[3]/ul/li[8]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = '${user}' or . = '${user}')]</value>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>

@@ -67,7 +67,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divi
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Gathering Records'), 
     0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Records Received'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Records Received'), 
+    0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Awaiting Harms'), 
     0)
@@ -100,4 +101,6 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/d
     0)
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.acceptAlert(FailureHandling.STOP_ON_FAILURE)
 

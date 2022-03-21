@@ -18,15 +18,16 @@ import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import groovy.json.JsonSlurper as JsonSlurper
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : GlobalVariable.password, ('username') : GlobalVariable.username
+def requestID = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : GlobalVariable.password, ('username') : GlobalVariable.username
         , ('firstname') : GlobalVariable.firstname, ('lastname') : GlobalVariable.lastname, ('applicantFirstname') : '', ('applicantLastname') : ''
-        , ('category') : '', ('email') : findTestData('Sample Applicant').getValue('email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1)
-        , ('streetAddress2') : findTestData('Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 1)
-        , ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue('country', 1)
-        , ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData('Sample Applicant').getValue('homePhone', 1)
-        , ('description') : findTestData('Sample Applicant').getValue('description', 1), ('startDate') : '', ('receivedDate') : ''
-        , ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : '', ('sendRequest') : true, ('variable') : ''], 
-    FailureHandling.STOP_ON_FAILURE)
+        , ('category') : '', ('email') : findTestData('Sample Applicant').getValue('email', 1), ('streetAddress') : findTestData(
+            'Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData('Sample Applicant').getValue(
+            'streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 1), ('province') : findTestData(
+            'Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue('country', 
+            1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
+            'Sample Applicant').getValue('homePhone', 1), ('description') : findTestData('Sample Applicant').getValue('description', 
+            1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''
+        , ('sendRequest') : true, ('variable') : ''], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/watch/button_Watch'), 0)
 
@@ -80,8 +81,9 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/
 //WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Processing Team'), 0)
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
 
+
 WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]), 
-    'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
+	'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]))
 
@@ -90,19 +92,22 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dr
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
-            ', ') + firstname]), 'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
-            firstname]), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname +
+			', ') + firstname]), 'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
-            ', ') + firstname]), 'aria-selected', 'true', 0)
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') +
+			firstname]), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '2')
 
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname +
+			', ') + firstname]), 'aria-selected', 'true', 0)
+
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
             firstname]), FailureHandling.STOP_ON_FAILURE)
+
+
 
 WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
             ', ') + firstname]), 'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
@@ -120,7 +125,13 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), 'U-00' + requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'), FailureHandling.STOP_ON_FAILURE)
 
