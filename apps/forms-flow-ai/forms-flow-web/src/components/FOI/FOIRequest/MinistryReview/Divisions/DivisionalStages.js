@@ -85,7 +85,7 @@ const DivisionalStages = React.memo(
       let _divisionItems = [];
       _divisionItems.push(
         <MenuItem key={0} name="selectmenuitem" value={-1}>
-          <em>None</em>
+          <em>Select Division</em>
         </MenuItem>
       );
 
@@ -121,7 +121,7 @@ const DivisionalStages = React.memo(
       var divisionstagesItems = [];
       divisionstagesItems.push(
         <MenuItem key={0} name="selectmenuitem" value={-1}>
-          <em>None</em>
+          <em>Select Division Stage</em>
         </MenuItem>
       );
 
@@ -160,24 +160,24 @@ const DivisionalStages = React.memo(
               error={row.divisionid === -1 && row.stageid !== -1}
             >
               <InputLabel id="foi-division-dropdown-label">
-                Select Divison*
+                Select Divison
               </InputLabel>
               <Select
                 labelId="foi-division-dropdown-label"
                 className="foi-division-dropdown"
                 id="foi-division-dropdown"
                 value={row.divisionid || -1}
-                input={<OutlinedInput label="Select Divison*" notched />}
+                input={<OutlinedInput label="Select Divison" notched />}
                 onChange={(e) => handleDivisionChange(e, _id)}
                 fullWidth
                 renderValue={(value) => {
                   if (value === -1) {
-                    return "Select Devision";
+                    return "Select Division";
                   }
                   return (
                     divisionList?.filter(
                       (division) => division.divisionid === value
-                    )[0]?.name || "Select Devision"
+                    )[0]?.name || "Select Division"
                   );
                 }}
               >
@@ -191,24 +191,24 @@ const DivisionalStages = React.memo(
               error={row.divisionid !== -1 && row.stageid === -1}
             >
               <InputLabel id="foi-divisionstage-dropdown-label">
-                Select Divison Stage*
+                Select Divison Stage
               </InputLabel>
               <Select
                 labelId="foi-divisionstage-dropdown-label"
                 className="foi-divisionstage-dropdown"
                 id="foi-divisionstage-dropdown"
                 value={row.stageid || -1}
-                input={<OutlinedInput label="Select Divison Stage*" notched />}
+                input={<OutlinedInput label="Select Divison Stage" notched />}
                 onChange={(e) => handleDivisionStageChange(e, _id)}
                 fullWidth
                 renderValue={(value) => {
                   if (value === -1) {
-                    return "Select Devision Stage";
+                    return "Select Division Stage";
                   }
                   return (
                     divisionstageList?.filter(
                       (division) => division.stageid === value
-                    )[0]?.name || "Select Devision Stage"
+                    )[0]?.name || "Select Division Stage"
                   );
                 }}
               >
@@ -231,7 +231,7 @@ const DivisionalStages = React.memo(
 
     return (
       <>
-        <div id="divstages">
+        <div id="divstages" className="divstages">
           {divisionList &&
             divisionstageList &&
             stageIterator.map((item, index) =>
