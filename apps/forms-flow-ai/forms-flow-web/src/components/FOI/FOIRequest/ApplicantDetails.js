@@ -136,6 +136,7 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                 <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">                       
                         <TextField                            
+                            id="firstName"
                             label="Applicant First Name" 
                             InputLabelProps={{ shrink: true, }} 
                             variant="outlined"                             
@@ -146,7 +147,8 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             disabled={disableInput}
                             error={applicantFirstNameText===""}
                         />
-                        <TextField                          
+                        <TextField
+                            id="middleName"
                             label="Applicant Middle Name" 
                             InputLabelProps={{ shrink: true, }} 
                             value={applicantMiddleNameText}
@@ -155,7 +157,8 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                             disabled={disableInput}
                             onChange={handleMiddleNameChange}
                         />
-                        <TextField                            
+                        <TextField
+                            id="lastName"
                             label="Applicant Last Name" 
                             InputLabelProps={{ shrink: true, }} 
                             value={applicantLastNameText}
@@ -194,7 +197,8 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
                         >            
                         {menuItems}
                         </TextField> 
-                        <TextField                           
+                        <TextField
+                            id="email"
                             label="Email" 
                             InputLabelProps={{ shrink: true, }} 
                             value={emailText}

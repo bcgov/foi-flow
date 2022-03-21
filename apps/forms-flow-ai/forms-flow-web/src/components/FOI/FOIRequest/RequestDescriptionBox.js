@@ -181,7 +181,8 @@ const RequestDescription = React.memo(({
                         <h5 className="foi-date-range-h5">Date Range for Record Search</h5>
                     </div>
                     <div className="col-lg-3 foi-details-col foi-request-dates">
-                      <TextField                
+                      <TextField  
+                          id="recordStartDate"              
                           label="Start Date"
                           type="date"
                           value={startDate}
@@ -197,7 +198,8 @@ const RequestDescription = React.memo(({
                       />  
                     </div>
                     <div className="col-lg-3 foi-details-col foi-request-dates">                     
-                      <TextField                
+                      <TextField          
+                          id="recordEndDate"          
                           label="End Date"
                           type="date" 
                           value={endDate}        
@@ -239,6 +241,7 @@ const RequestDescription = React.memo(({
                     <div class="col-lg-12">
                       <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
                         <input
+                          id="noPICheckbox"
                           type="checkbox"
                           className="checkmark"
                           checked={isPIIRedacted}
