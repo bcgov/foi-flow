@@ -1,7 +1,5 @@
-import React from 'react';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
-import Input from '@material-ui/core/Input';
+import React from "react";
+import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
@@ -117,6 +115,18 @@ const DivisionalStages = React.memo(
 
     const divisionstageList = divisionalstages.stages;
 
+    const renderMenuItem = (
+      value,
+      menuList,
+      emptyMenuItem = "Select Divison"
+    ) => {
+      if (value === -1) {
+        return emptyMenuItem;
+      }
+      return menuList?.filter((division) => division.stageid === value)[0]
+        ?.name;
+    };
+
     const getDivisionalStages = () => {
       var divisionstagesItems = [];
       divisionstagesItems.push(
@@ -171,14 +181,7 @@ const DivisionalStages = React.memo(
                 onChange={(e) => handleDivisionChange(e, _id)}
                 fullWidth
                 renderValue={(value) => {
-                  if (value === -1) {
-                    return "Select Division";
-                  }
-                  return (
-                    divisionList?.filter(
-                      (division) => division.divisionid === value
-                    )[0]?.name || "Select Division"
-                  );
+                  return renderMenuItem(value, divisionList, "Select Division");
                 }}
               >
                 {getdivisionMenuList()}
@@ -202,13 +205,10 @@ const DivisionalStages = React.memo(
                 onChange={(e) => handleDivisionStageChange(e, _id)}
                 fullWidth
                 renderValue={(value) => {
-                  if (value === -1) {
-                    return "Select Division Stage";
-                  }
-                  return (
-                    divisionstageList?.filter(
-                      (division) => division.stageid === value
-                    )[0]?.name || "Select Division Stage"
+                  return renderMenuItem(
+                    value,
+                    divisionstageList,
+                    "Select Division Stage"
                   );
                 }}
               >
@@ -261,4 +261,4 @@ const DivisionalStages = React.memo(
   }
 );
 
-export default DivisionalStages
+export default DivisionalStages;
