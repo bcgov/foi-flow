@@ -19,7 +19,7 @@ from request_api.utils.redissubscriber import RedisSubscriberService
 
 @socketio.on('connect')
 def connect(message):
-    current_app.logger.info('socket connection established for user: '+ userid + ' | sid: '+request.sid)
+    current_app.logger.info('socket connection established for user: ' + ' | sid: '+request.sid)
     # userid = __getauthenticateduserid(message)
     # if userid is not None:
     #     else:
