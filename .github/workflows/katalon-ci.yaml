@@ -26,8 +26,7 @@ jobs:
             mkdir artifacts
             FOR /d  %%a in ("${{ github.workspace }}\testing\foi-qa-automation\Reports\*") DO FOR /d %%b in ("%%a\*") DO FOR /d %%c in ("%%b\*") do (robocopy "%%c" "${{ github.workspace }}\artifacts" *.html
             robocopy "%%a\foi-test\%%~nxa" "${{ github.workspace }}\artifacts" JUnit_Report.xml
-            rename artifacts\%%a.html &&b.html)
-            rename artifacts\JUnit_Report.xml test.xml
+            rename artifacts\%%~nxa.html %%~nxb.html)
             cd artifacts
             dir
       shell: cmd
@@ -38,7 +37,7 @@ jobs:
     - name: Create collection report    
       run: |
             npm i -g xunit-viewer
-            xunit-viewer -r  artifacts\test.xml -o artifacts\summary.html
+            xunit-viewer -r  artifacts\JUnit_Report.xml -o artifacts\foi-test.html
     - name: Archive Katalon report
       uses: actions/upload-artifact@v2
       with:
