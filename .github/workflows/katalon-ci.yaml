@@ -26,7 +26,9 @@ jobs:
             mkdir artifacts
             FOR /d  %%a in ("${{ github.workspace }}\testing\foi-qa-automation\Reports\*") DO FOR /d %%b in ("%%a\*") DO FOR /d %%c in ("%%b\*") do (robocopy "%%c" "${{ github.workspace }}\artifacts" *.html
             robocopy "%%a\foi-test\%%~nxa" "${{ github.workspace }}\artifacts" JUnit_Report.xml
-            rename artifacts\%%~nxa.html %%~nxb.html)
+            echo "%%~nxa.html"
+            echo "%%~nxb.html"
+            rename "artifacts\%%~nxa.html" "%%~nxb.html")
             cd artifacts
             dir
       shell: cmd
