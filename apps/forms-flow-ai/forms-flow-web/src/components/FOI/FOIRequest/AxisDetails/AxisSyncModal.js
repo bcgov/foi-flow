@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from 'react';
+import React, {useEffect} from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -15,9 +15,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../../constants/FOI/axisSyncDisplayFields';
 import { useDispatch, useSelector} from "react-redux";
-import { fetchRequestDataFromAxis,
-  saveRequestDetails 
-} from '../../../../apiManager/services/FOI/foiRequestServices';
+import { saveRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
 import {
   addAXISExtensions
 } from '../../../../apiManager/services/FOI/foiExtensionServices';
@@ -27,7 +25,6 @@ import { toast } from "react-toastify";
 import { createRequestDetailsObjectFunc } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../../constants/FOI/mandatoryFOIRequestFields";
-//import { ActionContext } from "./ActionContext";
 
 const useStyles = makeStyles({
  
@@ -40,34 +37,23 @@ const useStyles = makeStyles({
 
 const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
   urlIndexCreateRequest, handleSaveRequest, currentSelectedStatus,
-  hasStatusRequestSaved, requestState, requestId, ministryId,
+  hasStatusRequestSaved, requestState, requestId, ministryId, axisSyncedData
 }) => {
 
     const classes = useStyles();
     const [displayedReqObj, setDisplayedReqObj] = React.useState({});
     const [updatedSaveReqObj, setUpdatedSaveReqObj] = React.useState({});
+    let requestDetailsFromAxis ={...axisSyncedData};
     const [axisExtensions, setAxisExtension] = React.useState([]);
-    let requestDetailsFromAxis ={};
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
 
-    // const {
-    //   axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObject, 
-    //   urlIndexCreateRequest, handleSaveRequest, currentSelectedStatus,
-    //   hasStatusRequestSaved, requestState, requestId, ministryId,
-    // } = useContext(ActionContext);
-
     useEffect(()=>{
-      dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
-        if(!err){
-            if(Object.entries(data).length !== 0){
-              requestDetailsFromAxis = data;
-              setAxisExtension(requestDetailsFromAxis?.Extensions); 
-              compareFields();  
-            }
+        if(Object.entries(requestDetailsFromAxis).length !== 0){
+          setAxisExtension(requestDetailsFromAxis?.Extensions); 
+          compareFields();  
         }
-      }));
-    },[])
+    },[requestDetailsFromAxis])
 
     const saveExtensions = () => {
       dispatch(addAXISExtensions(axisExtensions, ministryId));

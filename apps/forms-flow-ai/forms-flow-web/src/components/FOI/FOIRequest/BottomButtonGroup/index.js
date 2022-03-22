@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import {
   saveRequestDetails,
   openRequestDetails,
+  fetchRequestDataFromAxis
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -66,7 +67,8 @@ const BottomButtonGroup = React.memo(
     disableInput,
     stateChanged,
     requestState,
-    setSaveRequestObject
+    setSaveRequestObject,
+    axisSyncedData
   }) => {
     
     /**
@@ -93,18 +95,7 @@ const BottomButtonGroup = React.memo(
     const handleClosingReasonChange = (cReasonId) => {
       setClosingReasonId(cReasonId);
     };
-    const [axisSyncedRequest, setAxisSyncedRequest ]= useState(false);
-
-
-    useEffect(() => {
-        if(saveRequestObject.axisRequestId && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase()){
-          setAxisSyncedRequest(true);
-        }
-        else
-          setAxisSyncedRequest(false);
-      
-    }, [saveRequestObject]);
-    
+ 
 
     useEffect(() => {
       if(stateChanged){
@@ -357,7 +348,8 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
-          {urlIndexCreateRequest < 0 && axisSyncedRequest &&
+          {urlIndexCreateRequest < 0 && && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
+            Object.entries(axisSyncedData)?.length !== 0 &&
             <button type="button" className="btn btn-bottom" 
             onClick={(e) => {
                 setAxisSyncModalOpen(true);
@@ -386,7 +378,7 @@ const BottomButtonGroup = React.memo(
         {
           axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} 
           saveRequest= {saveRequest} saveRequestObject= {saveRequestObject} urlIndexCreateRequest={urlIndexCreateRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={currentSelectedStatus}
-          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} />
+          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} axisSyncedData={axisSyncedData}/>
         }
         
       </div>
