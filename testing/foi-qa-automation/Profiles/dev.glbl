@@ -6,7 +6,7 @@
    <defaultProfile>false</defaultProfile>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'https://dev-foirequest.apps.silver.devops.gov.bc.ca/'</initValue>
+      <initValue>'https://dev-foirequest.apps.silver.devops.gov.bc.ca'</initValue>
       <name>BASE_URL</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
