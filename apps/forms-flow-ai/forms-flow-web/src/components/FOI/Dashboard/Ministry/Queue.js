@@ -11,14 +11,9 @@ import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIMinistryRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
-import {
-  debounce,
-  ClickableChip,
-  getAssigneeValue,
-  updateSortModel,
-} from "../utils";
+import { debounce, ClickableChip } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
@@ -26,13 +21,14 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import clsx from "clsx";
+import { formatDate } from "../../../../helper/FOI/helper";
+import { StateEnum } from "../../../../constants/FOI/statusEnum";
 
 const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
 
   const requestQueue = useSelector(
-    (state) => state.foiRequests.foiRequestsList
+    (state) => state.foiRequests.foiMinistryRequestsList
   );
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
@@ -40,28 +36,55 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const defaultRowsState = { page: 0, pageSize: 10 };
   const [rowsState, setRowsState] = useState(defaultRowsState);
-  const [sortModel, setSortModel] = useState(tableInfo.sort);
+
+  const defaultSortModel = [
+    { field: "currentState", sort: "asc" },
+    { field: "cfrduedate", sort: "asc" },
+  ];
+  const [sortModel, setSortModel] = useState(defaultSortModel);
 
   let serverSortModel;
   const [filterModel, setFilterModel] = useState({
     fields: [
-      "firstName",
-      "lastName",
+      "applicantcategory",
       "requestType",
       "idNumber",
       "currentState",
-      "assignedToLastName",
-      "assignedToFirstName",
+      "assignedministrypersonLastName",
+      "assignedministrypersonFirstName",
     ],
     keyword: null,
   });
   const [requestFilter, setRequestFilter] = useState("All");
 
+  // update sortModel for records due, ldd & assignedTo
+  const updateSortModel = () => {
+    let smodel = JSON.parse(JSON.stringify(sortModel));
+    if (smodel) {
+      smodel.map((row) => {
+        if (row.field === "CFRDueDateValue" || row.field === "DueDateValue")
+          row.field = "cfrduedate";
+      });
+
+      let field = smodel[0]?.field;
+      let order = smodel[0]?.sort;
+      if (field == "assignedToName") {
+        smodel.shift();
+        smodel.unshift(
+          { field: "assignedministrypersonLastName", sort: order },
+          { field: "assignedministrypersonFirstName", sort: order }
+        );
+      }
+    }
+
+    return smodel;
+  };
+
   useEffect(() => {
-    serverSortModel = updateSortModel(sortModel);
+    serverSortModel = updateSortModel();
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
-      fetchFOIRequestListByPage(
+      fetchFOIMinistryRequestListByPage(
         rowsState.page + 1,
         rowsState.pageSize,
         serverSortModel,
@@ -73,7 +96,92 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }, [rowsState, sortModel, filterModel, requestFilter]);
 
-  const columnsRef = React.useRef(tableInfo?.columns || []);
+  function getAssigneeValue(row) {
+    const groupName = row.assignedministrygroup
+      ? row.assignedministrygroup
+      : "Unassigned";
+    return row.assignedministryperson &&
+      row.assignedministrypersonFirstName &&
+      row.assignedministrypersonLastName
+      ? `${row.assignedministrypersonLastName}, ${row.assignedministrypersonFirstName}`
+      : groupName;
+  }
+
+  function getRecordsDue(params) {
+    let receivedDateString = params.row.cfrduedate;
+    const currentStatus = params.row.currentState;
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+      return "N/A";
+    } else {
+      return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
+    }
+  }
+
+  function getLDD(params) {
+    let receivedDateString = params.row.duedate;
+    const currentStatus = params.row.currentState;
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+      return "N/A";
+    } else {
+      return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
+    }
+  }
+
+  const columns = React.useRef([
+    {
+      field: "idNumber",
+      headerName: "ID NUMBER",
+      width: 170,
+      headerAlign: "left",
+    },
+    {
+      field: "applicantcategory",
+      headerName: "CATEGORY",
+      flex: 1,
+      headerAlign: "left",
+    },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      flex: 1,
+      headerAlign: "left",
+    },
+
+    {
+      field: "currentState",
+      headerName: "REQUEST STATE",
+      flex: 1,
+      headerAlign: "left",
+    },
+
+    {
+      field: "assignedToName",
+      headerName: "ASSIGNED TO",
+      flex: 1,
+      headerAlign: "left",
+    },
+    {
+      field: "CFRDueDateValue",
+      headerName: "RECORDS DUE",
+      flex: 1,
+      headerAlign: "left",
+      valueGetter: getRecordsDue,
+    },
+    {
+      field: "DueDateValue",
+      headerName: "LDD",
+      flex: 1,
+      headerAlign: "left",
+      valueGetter: getLDD,
+    },
+    {
+      field: "cfrduedate",
+      headerName: "",
+      width: 0,
+      hide: true,
+      renderCell: (params) => <span></span>,
+    },
+  ]);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
@@ -107,11 +215,9 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (e.row.ministryrequestid) {
       dispatch(
         push(
-          `/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
+          `/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
         )
       );
-    } else {
-      dispatch(push(`/foi/reviewrequest/${e.row.id}`));
     }
   };
 
@@ -122,14 +228,6 @@ const Queue = ({ userDetail, tableInfo }) => {
       </Grid>
     );
   }
-
-  const handleSortChange = (model) => {
-    if (model.length === 0) {
-      return;
-    }
-
-    setSortModel(model);
-  };
 
   return (
     <>
@@ -221,7 +319,7 @@ const Queue = ({ userDetail, tableInfo }) => {
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
           rows={rows}
-          columns={columnsRef.current}
+          columns={columns.current}
           rowHeight={30}
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
@@ -244,18 +342,15 @@ const Queue = ({ userDetail, tableInfo }) => {
           sortingMode={"server"}
           onSortModelChange={(model) => {
             if (model) {
-              handleSortChange(model);
+              setSortModel(model);
             }
           }}
           getRowClassName={(params) =>
-            clsx(
-              `super-app-theme--${params.row.currentState
-                .toLowerCase()
-                .replace(/ +/g, "")}`,
-              tableInfo?.stateClassName?.[
-                params.row.currentState.toLowerCase().replace(/ +/g, "")
-              ]
-            )
+            `super-app-theme--${params.row.currentState
+              .toLowerCase()
+              .replace(/ +/g, "")}-${params.row.cfrstatus
+              .toLowerCase()
+              .replace(/ +/g, "")}`
           }
           onRowClick={renderReviewRequest}
           loading={isLoading}

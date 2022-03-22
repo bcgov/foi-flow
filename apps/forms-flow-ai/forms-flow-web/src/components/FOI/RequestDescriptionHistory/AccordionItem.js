@@ -10,11 +10,10 @@ import { formatDate, formatDateInPst} from '../../../helper/FOI/helper';
 const AccordionItem = React.memo(({details, index, expanded, handleChange}) => {
     
      return (
-        <Accordion id="acc-request-history" expanded={expanded === `panel${index+1}`} onChange={handleChange(`panel${index+1}`)}>
+        <Accordion expanded={expanded === `panel${index+1}`} onChange={handleChange(`panel${index+1}`)}>
             <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="acc-header"            
+            aria-controls="panel1a-content"         
             >
                 <Typography className="acc-request-description">{`${index === 0 ? "ORIGINAL ": ""}REQUEST DESCRIPTION`}</Typography>
                 <Typography className="acc-username-date">{details.createdBy} - {formatDateInPst(details.createdAt, 'yyyy MMM dd')}</Typography>
