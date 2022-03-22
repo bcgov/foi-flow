@@ -70,7 +70,6 @@ let refreshInterval;
 const refreshToken = (store) => {
   refreshInterval = setInterval(() => {
     KeycloakData &&
-      //updateToken(x), update token if expiry date is under x seconds
       KeycloakData.updateToken(5)
         .then((refreshed) => {
           if (refreshed) {
@@ -80,7 +79,7 @@ const refreshToken = (store) => {
         .catch((error) => {
           console.log(error);
           userLogout();
-        });        
+        });
   }, 6000);
 };
 
