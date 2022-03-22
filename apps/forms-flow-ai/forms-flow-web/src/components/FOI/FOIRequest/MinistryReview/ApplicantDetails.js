@@ -11,7 +11,7 @@ const ApplicantDetails = React.memo((requestDetails) => {
 
     return (
         
-        <Card className="foi-details-card">            
+        <Card id="applicantDetailsMinistry" className="foi-details-card">
             <label className="foi-details-label">APPLICANT DETAILS</label>
             <CardContent>          
                 <div className="row foi-details-row ">

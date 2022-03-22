@@ -42,7 +42,6 @@ public class FOIRequestMessageService {
 
     public void execute(FOIRequestMessage message) {
         try {
-            System.out.println(getUrl(message.getProcessDefinitionKey()));
             httpServiceInvoker.execute(getUrl(message.getProcessDefinitionKey()), HttpMethod.POST, prepareCreateProcessInstanceRequest(message.getAttributes()));
         } catch (JsonProcessingException e) {
             LOGGER.log(Level.SEVERE,"Exception occurred in created instance",e);
@@ -50,8 +49,6 @@ public class FOIRequestMessageService {
     }
 
     private String getUrl(String processDefinitionKey) {
-        System.out.println("**********************");
-        System.out.println(processDefinitionKey);
         return integrationCredentialProperties.getProperty("workflow.url")+"/process-definition/key/"+processDefinitionKey+"/start";
     }
 
