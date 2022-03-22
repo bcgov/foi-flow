@@ -3,21 +3,21 @@
 setlocal enableextensions enabledelayedexpansion
 
 set REPO_URL=https://github.com/AOT-Technologies/forms-flow-ai.git
-set REPO_BRANCH=RC4.0.2
+set REPO_BRANCH=v4.0.5-alpha
 SET START_REDIS=N
 set BPM_DIRECTORY=%cd%/apps/forms-flow-ai/forms-flow-bpm
-set FFA_DIRECTORY=%BPM_DIRECTORY%/../rc4.0.2
+set FFA_DIRECTORY=%BPM_DIRECTORY%/../v4.0.5-alpha
 
 
-if exist "%BPM_DIRECTORY%/../rc4.0.2" echo "Folder already exists" 
-if not exist "%BPM_DIRECTORY%/../rc4.0.2" echo "Folder does not exist", echo "Creating Directory for version 4.0.2"
-if not exist "%BPM_DIRECTORY%/../rc4.0.2" mkdir "%FFA_DIRECTORY%"
+if exist "%BPM_DIRECTORY%/../v4.0.5-alpha" echo "Folder already exists" 
+if not exist "%BPM_DIRECTORY%/../v4.0.5-alpha" echo "Folder does not exist", echo "Creating Directory for version 4.0.2"
+if not exist "%BPM_DIRECTORY%/../v4.0.5-alpha" mkdir "%FFA_DIRECTORY%"
 
-if not exist "%BPM_DIRECTORY%/../rc4.0.2/forms-flow-bpm" (
+if not exist "%BPM_DIRECTORY%/../v4.0.5-alpha/forms-flow-bpm" (
 echo "Clone formsflow.ai"
 git clone -b %REPO_BRANCH% %REPO_URL% "%FFA_DIRECTORY%"
 )
-if exist "%BPM_DIRECTORY%/../rc4.0.2/forms-flow-bpm" (
+if exist "%BPM_DIRECTORY%/../v4.0.5-alpha/forms-flow-bpm" (
 rem Remove formio specific processes
 rmdir "%FFA_DIRECTORY%/forms-flow-bpm/src/main/resources/processes" /q /s
 robocopy "%FFA_DIRECTORY%/forms-flow-bpm/src" "%BPM_DIRECTORY%/src" /E /XC /XN /XO /NP /NFL

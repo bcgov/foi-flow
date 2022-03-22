@@ -12,10 +12,7 @@ import {
   fetchFOIRequestDescriptionList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-import {  
-  fetchFOIFullAssignedToList,
-  fetchFOIMinistryAssignedToList
-} from "../../../../apiManager/services/FOI/foiMasterDataServices";
+import { fetchFOIMinistryAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import {
   fetchFOIRequestAttachmentsList,
@@ -43,6 +40,7 @@ import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap } from "./utils";
+import DivisionalTracking from '../DivisionalTracking';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -155,7 +153,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      dispatch(fetchFOIFullAssignedToList());
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId]);
@@ -208,22 +205,19 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setMinistryAssignedToValue(value);
   };
 
-  let hasincompleteDivstage = false;
-  divstages.forEach((item) => {
-    if (
-      item.divisionid === -1 ||
-      item.stageid === -1 ||
-      item.stageid === "" ||
-      item.divisionid === ""
-    ) {
-      hasincompleteDivstage = true;
-    }
+  const isFalseDivStageInput = (divStageInput) =>
+    divStageInput === -1 || !Boolean(divStageInput);
+
+  const hasincompleteDivstage = divstages.some((item) => {
+    // XOR or Exlusive Or operation. Returns true if only one field is set and the other is not
+    return isFalseDivStageInput(item.divisionid)
+      ? !isFalseDivStageInput(item.stageid)
+      : isFalseDivStageInput(item.stageid);
   });
 
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    divstages.length === 0 ||
     hasincompleteDivstage;
 
   const createMinistryRequestDetailsObject = (
@@ -434,6 +428,43 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const requestNumber = requestDetails && requestDetails.idNumber;
 
+
+  const stateBox = (
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
+    (<span className="state-box">Closed</span>)
+    :
+    (
+      <StateDropDown
+        requestState={requestState}
+        updateStateDropDown={updateStateDropDown}
+        requestStatus={_requestStatus}
+        handleStateChange={handleStateChange}
+        isMinistryCoordinator={true}
+        isValidationError={isValidationError}
+      />
+    )
+  );
+
+  const divisions = requestDetails?.divisions?.length > 0 ? requestDetails.divisions : [];
+  const ministrycode = requestDetails?.selectedMinistries?.length > 0 ? requestDetails.selectedMinistries[0].code : '';
+  const divisionsBox = (
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
+    (
+      <DivisionalTracking
+        divisions={divisions}
+      />
+    )
+    :
+    (
+      <RequestTracking
+        pubmindivstagestomain={pubmindivstagestomain}
+        existingDivStages={divisions}
+        ministrycode={ministrycode}
+        createMinistrySaveRequestObject={createMinistrySaveRequestObject}
+      />
+    )
+  );
+
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -447,14 +478,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             </h1>
           </div>
           <div className="foileftpaneldropdown">
-            <StateDropDown
-              requestState={requestState}
-              updateStateDropDown={updateStateDropDown}
-              requestStatus={_requestStatus}
-              handleStateChange={handleStateChange}
-              isMinistryCoordinator={true}
-              isValidationError={isValidationError}
-            />
+            {stateBox}
           </div>
 
           <div className="tab">
@@ -490,15 +514,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
               {requestNotes && requestNotes.length > 0
                 ? `(${requestNotes.length})`
                 : ""}
-            </div>
-            <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.Option4.active,
-              })}
-              name="Option4"
-              onClick={() => tabclick("Option4")}
-            >
-              Option 4
             </div>
           </div>
 
@@ -547,13 +562,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           requestDetails={requestDetails}
                           requestState={requestState}
                         />
-                        <RequestTracking
-                          pubmindivstagestomain={pubmindivstagestomain}
-                          existingDivStages={requestDetails.divisions}
-                          ministrycode={
-                            requestDetails.selectedMinistries[0].code
-                          }
-                        />
+                        {divisionsBox}
                         {/* <RequestNotes /> */}
                         <BottomButtonGroup
                           requestState={requestState}
@@ -645,16 +654,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
             ) : (
               <Loading />
             )}
-          </div>
-          <div
-            id="Option4"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.Option4.active,
-              [classes.displayed]: tabLinksStatuses.Option4.display,
-              [classes.hidden]: !tabLinksStatuses.Option4.display,
-            })}
-          >
-            <h3>Option 4</h3>
           </div>
         </div>
       </div>

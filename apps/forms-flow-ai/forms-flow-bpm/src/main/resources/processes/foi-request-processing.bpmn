@@ -229,17 +229,19 @@ execution.getProcessEngineServices().getTaskService().complete(execution.getVari
 task.execution.setVariable(fieldName, task.getId());</camunda:script>
           </camunda:taskListener>
           <camunda:taskListener event="create">
-            <camunda:script scriptFormat="javascript">var assignedGroup = task.execution.getVariable("deafultassignedGroup");
-var assignedTo = task.execution.getVariable("defaultassignedTo");
+            <camunda:script scriptFormat="javascript">var taskName = task.getName();
 var taskId = task.getId();
-if(assignedGroup &amp;&amp; assignedGroup != null &amp;&amp; assignedGroup != 'Unassigned') {
-assignGroup();
+var foiRequestMetaData = task.execution.getVariable("foiRequestMetaData");
+foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
+var obj = JSON.parse(foiRequestMetaData);
+var foiRequestId = obj.id;
+var dataArr = [];
+for (var i = 0; i &lt; obj.ministries.length; i++) {
+	if ( taskName == obj.ministries[i].filenumber) {
+		assignGroup(obj.ministries[i].assignedgroup);
+	}  
 }
-unclaimUser();
-if(assignedTo &amp;&amp; assignedTo != null &amp;&amp; assignedTo != 'Unassigned') {
-assignUser(assignedTo);
-}
-function assignGroup(){
+function assignGroup(assignedGroup){
 var currentCandidateGroups = task.execution.getProcessEngineServices().getTaskService().getIdentityLinksForTask(taskId);
 var currentGroups = []
 for (var n = 0; n &lt; currentCandidateGroups.length; n++) {
@@ -252,18 +254,7 @@ for (var m = 0; m &lt; currentGroups.length; m++) {
 }
 task.execution.getProcessEngineServices().getTaskService().addCandidateGroup(taskId,assignedGroup);
 }
-function unclaimUser(){
-var response = task.execution.getProcessEngineServices().getTaskService().createTaskQuery().taskId(taskId).singleResult();
-if (response != null) {
-var assignee = response.getAssignee();
-if(assignee != null) {
-task.execution.getProcessEngineServices().getTaskService().claim(taskId,null);
-}
-}
-}
-function assignUser() {
-task.execution.getProcessEngineServices().getTaskService().claim(taskId,assignedTo);
-}</camunda:script>
+</camunda:script>
           </camunda:taskListener>
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_0agk11f</bpmn:incoming>
@@ -493,21 +484,67 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
           <dc:Bounds x="195" y="345" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1ylofsn_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="152" y="349" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0yvpnso_di" bpmnElement="Gateway_04irril">
-        <dc:Bounds x="265" y="342" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1f00lwq_di" bpmnElement="Event_1i4lvgo">
-        <dc:Bounds x="272" y="422" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="267" y="465" width="48" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vkdaxq_di" bpmnElement="Activity_1vkdaxq" isExpanded="true">
         <dc:Bounds x="370" y="80" width="900" height="550" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1pvm9x9_di" bpmnElement="Flow_1pvm9x9">
+        <di:waypoint x="885" y="540" />
+        <di:waypoint x="670" y="540" />
+        <di:waypoint x="670" y="450" />
+        <di:waypoint x="730" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ywom1u_di" bpmnElement="Flow_0ywom1u">
+        <di:waypoint x="885" y="540" />
+        <di:waypoint x="670" y="540" />
+        <di:waypoint x="670" y="280" />
+        <di:waypoint x="730" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wui5fn_di" bpmnElement="Flow_1wui5fn">
+        <di:waypoint x="1040" y="225" />
+        <di:waypoint x="1040" y="302" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wby40k_di" bpmnElement="Flow_0wby40k">
+        <di:waypoint x="975" y="200" />
+        <di:waypoint x="1015" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1h6683w_di" bpmnElement="Flow_1h6683w">
+        <di:waypoint x="1200" y="175" />
+        <di:waypoint x="1200" y="140" />
+        <di:waypoint x="1040" y="140" />
+        <di:waypoint x="1040" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uh7g30_di" bpmnElement="Flow_0uh7g30">
+        <di:waypoint x="1138" y="200" />
+        <di:waypoint x="1175" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vgue8o_di" bpmnElement="Flow_0vgue8o">
+        <di:waypoint x="1200" y="225" />
+        <di:waypoint x="1200" y="302" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1108" y="246" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1irx3nv_di" bpmnElement="Flow_1irx3nv">
+        <di:waypoint x="1040" y="565" />
+        <di:waypoint x="1040" y="600" />
+        <di:waypoint x="440" y="600" />
+        <di:waypoint x="440" y="362" />
+        <di:waypoint x="460" y="362" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="960" y="582" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13k2s7n_di" bpmnElement="Flow_13k2s7n">
+        <di:waypoint x="1015" y="540" />
+        <di:waypoint x="935" y="540" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="975" y="522" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0474ttt_di" bpmnElement="Flow_0474ttt">
+        <di:waypoint x="1040" y="338" />
+        <di:waypoint x="1040" y="515" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0e4jw4y_di" bpmnElement="Flow_0e4jw4y">
         <di:waypoint x="1065" y="200" />
         <di:waypoint x="1102" y="200" />
@@ -550,64 +587,6 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
         <di:waypoint x="670" y="280" />
         <di:waypoint x="730" y="280" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0474ttt_di" bpmnElement="Flow_0474ttt">
-        <di:waypoint x="1040" y="338" />
-        <di:waypoint x="1040" y="515" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_13k2s7n_di" bpmnElement="Flow_13k2s7n">
-        <di:waypoint x="1015" y="540" />
-        <di:waypoint x="935" y="540" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="975" y="522" width="24" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1irx3nv_di" bpmnElement="Flow_1irx3nv">
-        <di:waypoint x="1040" y="565" />
-        <di:waypoint x="1040" y="600" />
-        <di:waypoint x="440" y="600" />
-        <di:waypoint x="440" y="362" />
-        <di:waypoint x="460" y="362" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="960" y="582" width="32" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0vgue8o_di" bpmnElement="Flow_0vgue8o">
-        <di:waypoint x="1200" y="225" />
-        <di:waypoint x="1200" y="302" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1108" y="246" width="84" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0uh7g30_di" bpmnElement="Flow_0uh7g30">
-        <di:waypoint x="1138" y="200" />
-        <di:waypoint x="1175" y="200" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1h6683w_di" bpmnElement="Flow_1h6683w">
-        <di:waypoint x="1200" y="175" />
-        <di:waypoint x="1200" y="140" />
-        <di:waypoint x="1040" y="140" />
-        <di:waypoint x="1040" y="175" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0wby40k_di" bpmnElement="Flow_0wby40k">
-        <di:waypoint x="975" y="200" />
-        <di:waypoint x="1015" y="200" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1wui5fn_di" bpmnElement="Flow_1wui5fn">
-        <di:waypoint x="1040" y="225" />
-        <di:waypoint x="1040" y="302" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ywom1u_di" bpmnElement="Flow_0ywom1u">
-        <di:waypoint x="885" y="540" />
-        <di:waypoint x="670" y="540" />
-        <di:waypoint x="670" y="280" />
-        <di:waypoint x="730" y="280" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1pvm9x9_di" bpmnElement="Flow_1pvm9x9">
-        <di:waypoint x="885" y="540" />
-        <di:waypoint x="670" y="540" />
-        <di:waypoint x="670" y="450" />
-        <di:waypoint x="730" y="450" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_103rgzd_di" bpmnElement="Activity_0jdrlcz">
         <dc:Bounds x="730" y="240" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -623,12 +602,6 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
       <bpmndi:BPMNShape id="Activity_0cj09ml_di" bpmnElement="Activity_0cj09ml">
         <dc:Bounds x="460" y="322" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_14uk8xb_di" bpmnElement="Event_14uk8xb">
-        <dc:Bounds x="1102" y="182" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1078" y="163" width="84" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0nhb3ga_di" bpmnElement="Gateway_0c9r9wb">
         <dc:Bounds x="1015" y="175" width="50" height="50" />
       </bpmndi:BPMNShape>
@@ -638,14 +611,20 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
           <dc:Bounds x="1049.5" y="348" width="39" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_14uk8xb_di" bpmnElement="Event_14uk8xb">
+        <dc:Bounds x="1102" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1078" y="163" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1tzto8x_di" bpmnElement="Gateway_1tzto8x" isMarkerVisible="true">
         <dc:Bounds x="1015" y="515" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_187ddq2_di" bpmnElement="Gateway_187ddq2" isMarkerVisible="true">
-        <dc:Bounds x="1175" y="175" width="50" height="50" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0pwci99_di" bpmnElement="Event_0pwci99">
         <dc:Bounds x="1182" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_187ddq2_di" bpmnElement="Gateway_187ddq2" isMarkerVisible="true">
+        <dc:Bounds x="1175" y="175" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0njl0mv_di" bpmnElement="Gateway_0m8um6n">
         <dc:Bounds x="925" y="175" width="50" height="50" />
@@ -687,6 +666,18 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
         <dc:Bounds x="732" y="302" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="736" y="345" width="29" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ylofsn_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="349" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0yvpnso_di" bpmnElement="Gateway_04irril">
+        <dc:Bounds x="265" y="342" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f00lwq_di" bpmnElement="Event_1i4lvgo">
+        <dc:Bounds x="272" y="422" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="267" y="465" width="48" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

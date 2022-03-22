@@ -26,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
 
 const RequestDescription = React.memo(({     
     programAreaList, 
-    requestDetails,       
+    requestDetails,  
+    requiredRequestDetailsValues,     
     handleOnChangeRequiredRequestDescriptionValues,
     handleInitialRequiredRequestDescriptionValues,
     handleUpdatedProgramAreaList,
@@ -143,67 +144,79 @@ const RequestDescription = React.memo(({
         setOpenModal(false);
     }
     
-    const filteredList = requestDescriptionHistoryList.filter((request, index, self) =>
+    const sortedList = requestDescriptionHistoryList.sort((a, b) => {       
+      return new Date(a.createdAt) - new Date(b.createdAt);
+  });
+
+    const filteredList = sortedList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
             copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
         ))
     )
-    const sortedList = filteredList.sort((a, b) => {       
-        return new Date(a.createdAt) - new Date(b.createdAt);
-    });
 
      return (
         
-        <Card className="foi-details-card">            
-            <label className="foi-details-label">REQUEST DESCRIPTION</label>
+        <Card className="foi-details-card">      
+        
+            <div className="row foi-details-row">              
+              <div className="col-lg-8 foi-details-col">
+                <label className="foi-details-label">REQUEST DESCRIPTION</label>
+              </div>            
+              <div className="col-lg-4 foi-details-col">  
+                <div className="foi-request-description-history">
+                    <button type="button" className={`btn btn-link btn-description-history ${filteredList.length <= 1 ? classes.btndisabled : ""}`} disabled={filteredList.length <= 1}  onClick={handleDescriptionHistoryClick}>
+                        Description History
+                    </button>
+                </div>
+              </div>
+            </div> 
             <CardContent>
                 <RequestDescriptionHistory 
-                  requestDescriptionHistoryList={sortedList} 
+                  requestDescriptionHistoryList={filteredList} 
                   openModal={openModal} 
                   handleModalClose={handleModalClose}
                 />
-                <div className="row foi-details-row">
-                <div className="foi-request-description-history">
-                    <button type="button" className={`btn btn-link btn-description-history ${sortedList.length <= 1 ? classes.btndisabled : ""}`} disabled={sortedList.length <= 1}  onClick={handleDescriptionHistoryClick}>
-                       Description History
-                    </button>
+                <div className="row foi-details-row foi-request-description-row">
+                    <div className="col-lg-6 foi-details-col">
+                        <h5 className="foi-date-range-h5">Date Range for Record Search</h5>
+                    </div>
+                    <div className="col-lg-3 foi-details-col foi-request-dates">
+                      <TextField  
+                          id="recordStartDate"              
+                          label="Start Date"
+                          type="date"
+                          value={startDate}
+                          className={classes.textField}
+                          onChange={handleStartDateChange}
+                          InputLabelProps={{
+                          shrink: true,
+                          }} 
+                          InputProps={{inputProps: { max: formatDate(new Date())} }}   
+                          variant="outlined"
+                          fullWidth
+                          disabled={disableInput}
+                      />  
+                    </div>
+                    <div className="col-lg-3 foi-details-col foi-request-dates">                     
+                      <TextField          
+                          id="recordEndDate"          
+                          label="End Date"
+                          type="date" 
+                          value={endDate}        
+                          className={classes.textField}
+                          onChange={handleEndDateChange}
+                          InputLabelProps={{
+                          shrink: true,
+                          }}
+                            InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
+                          variant="outlined" 
+                          fullWidth
+                          disabled={disableInput}
+                      />  
+                    </div>                                                              
                 </div>
-                    <div className="col-lg-12 foi-request-description-row">
-                        <div className="col-lg-6">
-                            <h3 className="foi-date-range-h3">Date Range for Record Search</h3>
-                        </div>
-                        <div className="col-lg-6 foi-request-dates">
-                        <TextField                
-                            label="Start Date"
-                            type="date"
-                            value={startDate}
-                            className={classes.textField}
-                            onChange={handleStartDateChange}
-                            InputLabelProps={{
-                            shrink: true,
-                            }} 
-                            InputProps={{inputProps: { max: formatDate(new Date())} }}   
-                            variant="outlined"
-                            fullWidth
-                            disabled={disableInput}
-                        />                       
-                        <TextField                
-                            label="End Date"
-                            type="date" 
-                            value={endDate}        
-                            className={classes.textField}
-                            onChange={handleEndDateChange}
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
-                             InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
-                            variant="outlined" 
-                            fullWidth
-                            disabled={disableInput}
-                        />  
-                        </div>                                                              
-                    </div>
-                    </div>
+                <div class="row foi-details-row">
+                  <div class="col-lg-12">
                     <div className="foi-request-description-textbox">
                     <TextField
                         id="outlined-multiline-request-description"
@@ -219,21 +232,31 @@ const RequestDescription = React.memo(({
                         fullWidth
                         disabled={disableInput}
                     />
-                    <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
-                    <input
-                        type="checkbox"
-                        className="checkmark"
-                        checked={isPIIRedacted}
-                        onChange={handlePIIRedacted}
-                        disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
-                    />
-                    <span className="checkmark"></span>
-                        Description contains NO Personal Information
-                    </label>      
                     </div>
-                    { Object.entries(localProgramAreaList).length !== 0 ?
-                    <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
-                    :null}
+                  </div>
+                </div>
+                {requiredRequestDetailsValues.requestType.toLowerCase() ===
+                      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
+                  <div class="row foi-details-row">
+                    <div class="col-lg-12">
+                      <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
+                        <input
+                          id="noPICheckbox"
+                          type="checkbox"
+                          className="checkmark"
+                          checked={isPIIRedacted}
+                          onChange={handlePIIRedacted}
+                          disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
+                        />
+                        <span className="checkmark"></span>
+                          Description contains NO Personal Information
+                      </label>  
+                    </div>    
+                  </div>
+                )}
+                { Object.entries(localProgramAreaList).length !== 0 ?
+                <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
+                :null}
             </CardContent>
         </Card>
        

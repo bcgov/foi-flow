@@ -25,6 +25,7 @@ from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredm
 from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
+from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
@@ -86,6 +87,7 @@ class FOIRequests(Resource):
             assignedtomiddlename = request_json["assignedToMiddleName"] if request_json.get("assignedToMiddleName") != None else None
             assignedtolastname = request_json["assignedToLastName"] if request_json.get("assignedToLastName") != None else None
             rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), AuthHelper.getusername(),AuthHelper.isministrymember(),assignedtofirstname,assignedtomiddlename,assignedtolastname)               
+            eventservice().posteventsync(request_json['id'],"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember())
             if rawresult.success == True:   
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:

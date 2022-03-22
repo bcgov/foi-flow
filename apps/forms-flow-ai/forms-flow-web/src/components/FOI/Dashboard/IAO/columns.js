@@ -32,6 +32,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: onBehalfFullName,
     sortable: false,
+    width: 180,
   },
   {
     field: "requestType",
@@ -48,6 +49,12 @@ const ProcessingTeamColumns = [
   {
     field: "currentState",
     headerName: "CURRENT STATE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "assignedToName",
+    headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
   },
@@ -75,12 +82,6 @@ const ProcessingTeamColumns = [
     flex: 0.5,
     sortable: false,
     renderCell: (params) => <span></span>,
-  },
-  {
-    field: "xgov",
-    headerName: "XGOV",
-    headerAlign: "left",
-    flex: 0.5,
   },
 ];
 
@@ -125,12 +126,6 @@ const IntakeTeamColumns = [
     flex: 1,
   },
   {
-    field: "xgov",
-    headerName: "XGOV",
-    headerAlign: "left",
-    flex: 0.5,
-  },
-  {
     field: "receivedDateUF",
     headerName: "",
     width: 0,
@@ -144,7 +139,7 @@ const FlexTeamColumns = [
     field: "idNumber",
     headerName: "ID NUMBER",
     headerAlign: "left",
-    width: 150,
+    width: 160,
   },
   {
     field: "applicantName",
@@ -152,7 +147,7 @@ const FlexTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    width: 170,
+    width: 180,
   },
   {
     field: "applicantcategory",
@@ -174,7 +169,7 @@ const FlexTeamColumns = [
   },
   {
     field: "assignedToName",
-    headerName: "ANALYST",
+    headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
   },
@@ -192,12 +187,6 @@ const FlexTeamColumns = [
     valueGetter: getDaysLeft,
     flex: 0.75,
     sortable: false,
-  },
-  {
-    field: "xgov",
-    headerName: "XGOV",
-    headerAlign: "left",
-    flex: 0.5,
   },
 ];
 

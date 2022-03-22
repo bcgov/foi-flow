@@ -43,7 +43,7 @@ class commentevent:
         for _pushnotification in _pushnotifications:  
             notificationservice().dismissnotification(userid, None, _pushnotification["idnumber"], _pushnotification["notificationid"])
             _pushnotification["action"] = "delete"
-            asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))   
+            RedisPublisherService().publishcommment(json.dumps(_pushnotification))
         return DefaultMethodResult(True,'Comment notifications deleted',commentid)      
     
     def __pushcommentnotification(self,commentid, _pushnotifications):
@@ -51,7 +51,7 @@ class commentevent:
             if os.getenv("SOCKETIO_MESSAGE_QTYPE") != "NONE":
                 for _pushnotification in _pushnotifications:
                     if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
-                        asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))
+                        RedisPublisherService().publishcommment(json.dumps(_pushnotification))
                     if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "IN-MEMORY":
                         socketio.emit(_pushnotification["userid"], _pushnotification)
         except BusinessException as exception:            
@@ -61,7 +61,7 @@ class commentevent:
     def __pushcommentnotification(self, commentid):
         _pushnotifications = notificationservice().getcommentnotifications(commentid)
         for _pushnotification in _pushnotifications:
-            asyncio.create_task(RedisPublisherService().publishcommment(json.dumps(_pushnotification)))
+            RedisPublisherService().publishcommment(json.dumps(_pushnotification))
 
     def getcommentmessage(self, commentid, comment):
         return {"commentid":commentid, "message" :self.__formatmessage(comment)}
