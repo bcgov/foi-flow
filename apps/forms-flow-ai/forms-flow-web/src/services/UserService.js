@@ -70,7 +70,7 @@ let refreshInterval;
 const refreshToken = (store) => {
   refreshInterval = setInterval(() => {
     KeycloakData &&
-      KeycloakData.updateToken(300)
+      KeycloakData.updateToken(3000)
         .then((refreshed) => {
           if (refreshed) {
             store.dispatch(setUserToken(KeycloakData.token));
