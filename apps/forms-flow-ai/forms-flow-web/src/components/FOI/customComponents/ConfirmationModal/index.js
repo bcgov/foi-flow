@@ -72,6 +72,13 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       setDisableSaveBtn(false);
     }
 
+    const isBtnDisabled = () => {
+      return files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || 
+      (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || 
+      (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id ) ||
+      (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id ))
+    }
+
     const handleClose = () => {
       handleModal(false);
     };
@@ -186,7 +193,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className={`btn-bottom btn-save ${ files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id )) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id )) } onClick={handleSave}>
+            <button className={`btn-bottom btn-save ${isBtnDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || isBtnDisabled()} onClick={handleSave}>
               {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
               "Save Change" : "Re-Open Request"}
             </button>
