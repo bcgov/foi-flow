@@ -115,16 +115,11 @@ const DivisionalStages = React.memo(
 
     const divisionstageList = divisionalstages.stages;
 
-    const renderMenuItem = (
-      value,
-      menuList,
-      emptyMenuItem = "Select Divison"
-    ) => {
+    const renderMenuItem = (value, menuList, key, emptyMenuItem) => {
       if (value === -1) {
         return emptyMenuItem;
       }
-      return menuList?.filter((division) => division.stageid === value)[0]
-        ?.name;
+      return menuList?.filter((division) => division[key] === value)[0]?.name;
     };
 
     const getDivisionalStages = () => {
@@ -181,7 +176,12 @@ const DivisionalStages = React.memo(
                 onChange={(e) => handleDivisionChange(e, _id)}
                 fullWidth
                 renderValue={(value) => {
-                  return renderMenuItem(value, divisionList, "Select Division");
+                  return renderMenuItem(
+                    value,
+                    divisionList,
+                    "divisionid",
+                    "Select Division"
+                  );
                 }}
               >
                 {getdivisionMenuList()}
@@ -208,6 +208,7 @@ const DivisionalStages = React.memo(
                   return renderMenuItem(
                     value,
                     divisionstageList,
+                    "stageid",
                     "Select Division Stage"
                   );
                 }}
