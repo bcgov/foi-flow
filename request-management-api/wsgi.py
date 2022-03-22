@@ -24,7 +24,7 @@ def connect(message):
         current_app.logger.info('socket connection established for user: ' + userid + ' | sid: ' + request.sid)
     else:
         disconnect()
-    raise ConnectionRefusedError('unauthorized!')
+        raise ConnectionRefusedError('unauthorized!')
 
  
 @socketio.on('disconnect')
