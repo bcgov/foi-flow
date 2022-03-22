@@ -175,6 +175,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
                 draggable: true,
                 progress: undefined,
               });
+              saveExtensions();
               const _state = getRequestState({
                 currentSelectedStatus,
                 requestState,
@@ -201,7 +202,6 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           }
         )
       );
-      saveExtensions();
     };
 
 
