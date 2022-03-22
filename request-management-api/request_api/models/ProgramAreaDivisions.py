@@ -11,7 +11,7 @@ class ProgramAreaDivision(db.Model):
     programareaid = db.Column(db.Integer, db.ForeignKey('ProgramAreas.programareaid'))
     name = db.Column(db.String(500), unique=False, nullable=False)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, default='System')
     
     @classmethod
