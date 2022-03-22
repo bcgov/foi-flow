@@ -6,12 +6,12 @@
    <elementGuidId>dbb9bec6-cee3-494d-ae15-25b080060060</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[3]/form/div[3]/div/div</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>#mention-option-fv8ok-0</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Comments']/div/div[2]/form/div[3]/div/div</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
