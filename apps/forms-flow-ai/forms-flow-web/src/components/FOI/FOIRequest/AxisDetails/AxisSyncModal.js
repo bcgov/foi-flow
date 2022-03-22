@@ -117,18 +117,18 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'Extensions':
             let extensionsArr = [];
             if(extensions.length > 0){
-             requestDetailsFromAxis[key].forEach(obj => {
-                extensions?.forEach(obj1 => {
-                  if(obj !== obj1){
-                    const property = <>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
-                    extensionsArr.push(property);
-                  }
-                })
-            });
+              requestDetailsFromAxis[key].forEach(obj => {
+                  extensions?.forEach(obj1 => {
+                    if(obj !== obj1){
+                      const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+                      extensionsArr.push(property);
+                    }
+                  })
+              });
           }
           else{
             requestDetailsFromAxis[key].forEach(obj => {
-              const property = <>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+              const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
               extensionsArr.push(property);
             });
           }
