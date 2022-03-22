@@ -67,7 +67,8 @@ const BottomButtonGroup = React.memo(
     disableInput,
     stateChanged,
     requestState,
-    setSaveRequestObject
+    setSaveRequestObject,
+    axisSyncedData
   }) => {
     
     /**
@@ -94,28 +95,7 @@ const BottomButtonGroup = React.memo(
     const handleClosingReasonChange = (cReasonId) => {
       setClosingReasonId(cReasonId);
     };
-    const [axisSyncedRequest, setAxisSyncedRequest ]= useState(false);
-    const [axisSyncedData, setAxisSyncedData ]= useState(false);
-
-    useEffect(() => {
-        
-        if(saveRequestObject.axisRequestId && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase()){
-          setAxisSyncedRequest(true);
-          dispatch(fetchRequestDataFromAxis(saveRequestObject.axisRequestId, true, (err, data) => {
-            if(!err){
-                if(Object.entries(data).length !== 0){
-                  setAxisSyncedRequest(true);
-                  setAxisSyncedData(data);
-                }
-                else
-                  setAxisSyncedRequest(false);
-            }
-          }));
-        }
-        else
-          setAxisSyncedRequest(false);
-      
-    }, [saveRequestObject]);    
+ 
 
     useEffect(() => {
       if(stateChanged){
@@ -368,7 +348,8 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
-          {urlIndexCreateRequest < 0 && axisSyncedRequest &&
+          {urlIndexCreateRequest < 0 && && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
+            Object.entries(axisSyncedData)?.length !== 0 &&
             <button type="button" className="btn btn-bottom" 
             onClick={(e) => {
                 setAxisSyncModalOpen(true);

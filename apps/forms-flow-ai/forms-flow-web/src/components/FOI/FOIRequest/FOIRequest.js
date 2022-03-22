@@ -25,7 +25,8 @@ import {
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
-  fetchExistingAxisRequestIds
+  fetchExistingAxisRequestIds,
+  fetchRequestDataFromAxis
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
   fetchFOIRequestAttachmentsList
@@ -136,6 +137,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const showDivisionalTracking = requestDetails && requestDetails.divisions?.length > 0 &&
     (requestState && requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
       requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase());
+  const [axisSyncedData, setAxisSyncedData ]= useState(false);
 
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   
@@ -178,6 +180,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
+      dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
+        if(!err){
+            if(Object.entries(data).length !== 0){
+              setAxisSyncedData(data);
+            }
+        }
+      }));
     }
   }, [requestDetails]);
 
@@ -671,6 +680,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         disableInput={disableInput}
                         requestState={requestState}
                         setSaveRequestObject={setSaveRequestObject}
+                        axisSyncedData={axisSyncedData}
                       />
                     </>
                   </ConditionalComponent>
