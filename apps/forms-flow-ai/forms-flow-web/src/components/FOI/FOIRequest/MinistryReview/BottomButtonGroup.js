@@ -80,7 +80,14 @@ const BottomButtonGroup = React.memo(
     const saveMinistryRequest = async () => {
       dispatch(
         saveMinistryRequestDetails(
-          saveMinistryRequestObject,
+          {
+            ...saveMinistryRequestObject,
+            divisions:
+              saveMinistryRequestObject?.divisions?.filter(
+                (division) =>
+                  division.stageid !== -1 || division.divisionid !== -1
+              ) || [],
+          },
           requestId,
           ministryId,
           (err, res) => {

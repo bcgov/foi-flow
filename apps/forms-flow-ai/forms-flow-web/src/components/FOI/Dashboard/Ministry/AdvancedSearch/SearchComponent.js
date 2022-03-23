@@ -98,14 +98,6 @@ const AdvancedSearch = ({ userDetail }) => {
     searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
 
   const intitialRequestState = {
-    unopened: {
-      checked: false,
-      id: StateEnum.unopened.id,
-    },
-    open: {
-      checked: false,
-      id: StateEnum.open.id,
-    },
     callforrecords: {
       checked: false,
       id: StateEnum.callforrecords.id,
@@ -314,7 +306,6 @@ const AdvancedSearch = ({ userDetail }) => {
             >
               <Grid item xs={keywordsMode ? 6 : 12}>
                 <InputBase
-                  id="advancedSearch"
                   placeholder="Search"
                   onChange={handleSearchChange}
                   value={searchText}
@@ -476,19 +467,6 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormGroup>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="unopened"
-                          onChange={handleRequestStateChange}
-                          checked={requestState.unopened.checked}
-                          color="success"
-                        />
-                      }
-                      label="Unopened"
-                    />
                     <FormControlLabel
                       className={classes.checkboxLabel}
                       control={
@@ -721,18 +699,21 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="demo-multiple-checkbox-label" shrink>
+                    <InputLabel id="multiple-checkbox-label" shrink>
                       Public Body
                     </InputLabel>
                     <Select
-                      labelId="demo-multiple-checkbox-label"
-                      id="demo-multiple-checkbox"
+                      labelId="multiple-checkbox-label"
+                      id="multiple-checkbox"
                       multiple
                       displayEmpty
                       value={selectedPublicBodies}
                       onChange={handleSelectedPublicBodiesChange}
                       input={<OutlinedInput label="Public Body" notched />}
                       renderValue={(selected) => {
+                        if (programAreaList?.length === 1) {
+                          return programAreaList[0].bcgovcode;
+                        }
                         if (selected.length === 0) {
                           return <em>All</em>;
                         }
@@ -740,6 +721,7 @@ const AdvancedSearch = ({ userDetail }) => {
                         return selected.join(", ");
                       }}
                       MenuProps={MenuProps}
+                      disabled={programAreaList.length === 1}
                     >
                       <MenuItem disabled value="" key="program-area-all">
                         <em>All</em>

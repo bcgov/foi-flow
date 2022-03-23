@@ -362,7 +362,9 @@ class FOIRawRequest(db.Model):
             'descriptionDescription': FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext,
             'ministry': FOIRawRequest.requestrawdata['selectedMinistries'].astext,
             'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext,
-            'duedate': FOIRawRequest.requestrawdata['dueDate'].astext
+            'duedate': FOIRawRequest.requestrawdata['dueDate'].astext,
+            'DueDateValue': FOIRawRequest.requestrawdata['dueDate'].astext,
+            'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
@@ -402,17 +404,14 @@ class FOIRawRequest(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.advancedsearch(params, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])
 
         #rawrequests
-        if "Intake Team" in params['groups'] or params['groups'] is None:                
-            query_full_queue = searchquery.union(subquery_ministry_queue)
-            return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
-        else:
-            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+        query_full_queue = searchquery.union(subquery_ministry_queue)
+        return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod
     def getfilterforadvancedsearch(cls, params):
@@ -465,16 +464,19 @@ class FOIRawRequest(db.Model):
         #request state: unopened, call for records, etc.
         requeststatecondition = []
         for state in params['requeststate']:
-            if(state == 3):
+            if(state == '3'):
                 requeststatecondition.append(FOIRawRequest.status == 'Closed')
                 includeclosed = True
-            elif(state == 5):
+            elif(state == '4'):
+                requeststatecondition.append(FOIRawRequest.status == 'Redirect')
+            elif(state == '5'):
                 requeststatecondition.append(FOIRawRequest.status == 'Unopened')
+            elif(state == '6'):
+                requeststatecondition.append(FOIRawRequest.status == 'Intake in Progress')
         
         if(len(requeststatecondition) == 0):
-            requeststatecondition.append(FOIRawRequest.status == 'Closed')
-            requeststatecondition.append(FOIRawRequest.status == 'Unopened')
-        
+            requeststatecondition.append(FOIRawRequest.status == 'Not Applicable')  #searched state does not apply to rawrequests
+
         return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
     
     @classmethod

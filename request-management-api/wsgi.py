@@ -21,7 +21,7 @@ from request_api.utils.redissubscriber import RedisSubscriberService
 def connect(message):
     userid = __getauthenticateduserid(message)
     if userid is not None:
-        current_app.logger.info('socket connection established for user: '+ userid + ' | sid: '+request.sid)
+        current_app.logger.info('socket connection established for user: ' + userid + ' | sid: ' + request.sid)
     else:
         disconnect()
         raise ConnectionRefusedError('unauthorized!')

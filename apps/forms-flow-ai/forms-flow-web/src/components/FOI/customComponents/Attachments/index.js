@@ -449,6 +449,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
           />
         </button>
       }
+      id="attachment-actions"
       className="attachment-popup"
       position={"bottom right"}
       closeOnDocumentClick
