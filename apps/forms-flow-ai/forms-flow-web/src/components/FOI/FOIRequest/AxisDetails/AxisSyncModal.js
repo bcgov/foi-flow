@@ -62,6 +62,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const compareFields = () => {
       let updatedObj = {};
       let saveReqCopy = { ...saveRequestObject};
+      saveReqCopy.axisSyncDate = requestDetailsFromAxis.axisSyncDate;
+      saveReqCopy.requestPageCount = requestDetailsFromAxis.requestPageCount;      
       for(let key of Object.keys(requestDetailsFromAxis)){
         var updatedField = isAxisSyncDisplayField(key);
         if(updatedField){
