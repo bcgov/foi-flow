@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#38598A",
   },
   container: {
-    marginTop: "3em",
+    marginTop: "60px",
     marginLeft: "1em",
     marginRight: "1em",
   },
@@ -449,6 +449,7 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
           />
         </button>
       }
+      id="attachment-actions"
       className="attachment-popup"
       position={"bottom right"}
       closeOnDocumentClick

@@ -73,9 +73,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
     commentlenghchecker.totalcharacterCount = comment.text.length
     commentlenghchecker.reachedLimit = false
-    commentlenghchecker.returnindex = 3
+    commentlenghchecker.returnindex = 10
     
-    if (commentlenghchecker.totalcharacterCount > 2000 && index > 3) {
+    if (commentlenghchecker.totalcharacterCount > 2000 && index > 10) {
       commentlenghchecker.returnindex = index
       commentlenghchecker.reachedLimit = true
       return commentlenghchecker
@@ -85,7 +85,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       comment.replies.forEach((reply) => {
         if (!commentlenghchecker.reachedLimit) {
           commentlenghchecker.totalcharacterCount += reply.text.length
-          if (commentlenghchecker.totalcharacterCount > 2000 && index > 3) {
+          if (commentlenghchecker.totalcharacterCount > 2000 && index > 10) {
             commentlenghchecker.returnindex = index
             commentlenghchecker.reachedLimit = true
             return commentlenghchecker
@@ -99,7 +99,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
   const dynamicIndexFinder = () => {
     var _commentscopy = [...comments]
-    var returnindex = 3
+    var returnindex = 10
     var totalcharacterCount = 0
     var reachedLimit = false;
 
@@ -217,7 +217,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
         comments.length === 0 ? <div className="nofiltermessage">No comments under this filter category</div> :
           rendercomments()          
           }
-      <div id="showMoreParentComments" className="showMoreParentComments" style={!showmorehidden && comments.length > 3 ? { display: 'block' } : { display: 'none' }}>
+      <div id="showMoreParentComments" className="showMoreParentComments" style={!showmorehidden && comments.length > 10 ? { display: 'block' } : { display: 'none' }}>
         <button className="btn foi-btn-create btnshowmore" onClick={(e) => showhiddencomments(e, 5)}>Show more comments</button>
       </div>
     </div>

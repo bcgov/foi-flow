@@ -33,6 +33,14 @@ const formatDate = (d, formatString = "yyyy-MM-dd") => {
   }
 };
 
+const formatDateInPst = (d, formatString = "yyyy-MM-dd") => {
+  if (d) {
+    return formatInTimeZone(d, formatString, "America/Vancouver");
+  } else {
+    return "";
+  }
+};
+
 const businessDay = (date) => {
   return dayjs(date).isBusinessDay();
 };
@@ -86,7 +94,7 @@ const reconcilePublicHoliDays = (startDate, endDate) => {
   endDate = endDate.businessDaysAdd(publicHoliDays);
   startDate = endDate;
   if (publicHoliDays !== 0) {
-    reconcilePublicHoliDays(startDate, endDate);
+    return reconcilePublicHoliDays(startDate, endDate);
   }
   return endDate;
 };
@@ -104,7 +112,7 @@ const revertReconciledPublicHolidays = (startDate, endDate) => {
   endDate = endDate.businessDaysSubtract(publicHoliDays);
   startDate = endDate;
   if (publicHoliDays !== 0) {
-    reconcilePublicHoliDays(startDate, endDate);
+    return reconcilePublicHoliDays(startDate, endDate);
   }
   return endDate;
 };
@@ -305,7 +313,7 @@ const addToFullnameList = (userArray, foiteam) => {
 };
 
 const getFullnameList = () => {
-  return getSessionData("fullnameList");
+  return getSessionData("fullnameList") || [];
 };
 
 const getAssignToList = (team) => {
@@ -362,6 +370,7 @@ export {
   removeBusinessDays,
   getMinistryCode,
   errorToast,
+  formatDateInPst,
   isProcessingTeam,
   isFlexTeam,
   isIntakeTeam,

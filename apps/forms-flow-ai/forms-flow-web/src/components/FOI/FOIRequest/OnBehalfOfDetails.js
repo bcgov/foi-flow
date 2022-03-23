@@ -62,7 +62,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
     }   
      return (
         
-        <Card className="foi-details-card">            
+        <Card className="foi-details-card" id="onBehalfOfDetails">            
             <label className="foi-details-label">ON BEHALF OF DETAILS</label>
             <CardContent>
                 <div className="row foi-details-row">
