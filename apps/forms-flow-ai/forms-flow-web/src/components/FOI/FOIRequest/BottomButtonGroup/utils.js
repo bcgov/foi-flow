@@ -49,16 +49,23 @@ export const alertUser = (e) => {
   e.returnValue = "";
 };
 
+export const handleBeforeUnload = (e) => {
+  alertUser(e);
+};
+
 export const returnToQueue = (e, _unSavedRequest) => {
-  if (
-    !_unSavedRequest ||
-    (_unSavedRequest &&
+  if (_unSavedRequest) {
+    if (
       window.confirm(
         "Are you sure you want to leave? Your changes will be lost."
-      ))
-  ) {
-    e.preventDefault();
-    window.removeEventListener("beforeunload", (event) => alertUser(event));
-    window.location.href = "/foi/dashboard";
+      )
+    ) {
+      e.preventDefault();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.location.href = "/foi/dashboard";
+    } else {
+      e.preventDefault();
+      window.history.pushState(null, null, window.location.pathname);
+    }
   }
 };
