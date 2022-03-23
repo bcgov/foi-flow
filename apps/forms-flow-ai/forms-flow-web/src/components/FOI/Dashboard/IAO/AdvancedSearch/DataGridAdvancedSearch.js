@@ -91,7 +91,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       flex: 1,
     },
     {
-      field: "assignedToName",
+      field: "assignedToFormatted",
       headerName: "ASSIGNED TO",
       flex: 1,
       headerAlign: "left",
@@ -112,16 +112,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     },
     { field: "xgov", headerName: "XGOV", flex: 0.5, headerAlign: "left" },
   ]);
-
-  const updateAssigneeName = (data) => {
-    if (!data) {
-      return [];
-    }
-    return data.map((row) => ({
-      ...row,
-      assignedToName: getAssigneeValue(row, assignedToList),
-    }));
-  };
 
   const renderReviewRequest = (e) => {
     if (e.row.ministryrequestid) {
@@ -160,7 +150,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
           <DataGrid
             className="foi-data-grid"
             getRowId={(row) => row.idNumber}
-            rows={updateAssigneeName(searchResults?.data)}
+            rows={searchResults?.data}
             columns={columns.current}
             rowHeight={30}
             headerHeight={50}

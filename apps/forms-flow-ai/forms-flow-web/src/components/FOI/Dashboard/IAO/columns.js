@@ -53,7 +53,7 @@ const ProcessingTeamColumns = [
     flex: 1,
   },
   {
-    field: "assignedToName",
+    field: "assignedToFormatted",
     headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
@@ -113,7 +113,7 @@ const IntakeTeamColumns = [
     flex: 1,
   },
   {
-    field: "assignedToName",
+    field: "assignedToFormatted",
     headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
@@ -168,7 +168,7 @@ const FlexTeamColumns = [
     flex: 1,
   },
   {
-    field: "assignedToName",
+    field: "assignedToFormatted",
     headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,

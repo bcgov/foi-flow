@@ -67,20 +67,22 @@ class dashboardservice:
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
         requestqueue = []
         for request in requests.items:
-            _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
-
-            if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
+            if(request.receivedDateUF is None): #request from online form has no received date in json
+                _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+            else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
-
+                unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 requestqueue.append(unopenrequest)
             else:
                 extensionscount = self.extension_service.getrequestextensionscount(requestid = request.ministryrequestid)
                 _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
-                _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                _openrequest.update({'ministryrequestid': request.ministryrequestid})
                 _openrequest.update({'extensions': extensionscount})
+                _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 requestqueue.append(_openrequest)    
 
         meta = {
@@ -115,6 +117,8 @@ class dashboardservice:
             _openrequest.update({'assignedToLastName': request.assignedToLastName})
             _openrequest.update({'assignedministrypersonFirstName': request.assignedministrypersonFirstName})
             _openrequest.update({'assignedministrypersonLastName': request.assignedministrypersonLastName})
+            _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+            _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
             requestqueue.append(_openrequest)
 
         meta = {
@@ -138,19 +142,22 @@ class dashboardservice:
         
         requestqueue = []
         for request in requests.items:
-            _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
-
-            if(request.version != 1 and  request.sourceofsubmission != "intake") or request.sourceofsubmission == "intake":
+            if(request.receivedDateUF is None): #request from online form has no received date in json
+                _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+            else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
+                unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 _openrequest.update({'description':request.description})
+                _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 requestqueue.append(_openrequest)    
 
         meta = {
