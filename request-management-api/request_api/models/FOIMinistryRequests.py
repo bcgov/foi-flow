@@ -755,12 +755,10 @@ class FOIMinistryRequest(db.Model):
             elif(params['search'] == 'assigneename'):
                 searchcondition1 = []
                 searchcondition2 = []
-                searchcondition3 = []
                 for keyword in params['keywords']:
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                    searchcondition3.append(FOIMinistryRequest.assignedgroup.ilike('%'+keyword+'%'))
-                return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
             else:
                 searchcondition = []
                 for keyword in params['keywords']:

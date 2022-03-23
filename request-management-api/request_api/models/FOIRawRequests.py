@@ -393,7 +393,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
         if x in validfields:
             return True
         else:
@@ -547,12 +547,10 @@ class FOIRawRequest(db.Model):
         elif(params['search'] == 'assigneename'):
             searchcondition1 = []
             searchcondition2 = []
-            searchcondition3 = []
             for keyword in params['keywords']:
                 searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
                 searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
-                searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
+            return or_(and_(*searchcondition1), and_(*searchcondition2))
         elif(params['search'] == 'idnumber'):
             searchcondition = []
             for keyword in params['keywords']:
