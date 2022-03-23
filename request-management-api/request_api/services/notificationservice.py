@@ -199,7 +199,6 @@ class notificationservice:
         notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
         notification.version = foirequest["version"]        
         notification.createdby = userid
-        notification.created_at = datetime2.now()
         notification.notification = message
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest, foicomment)
         users = []
@@ -216,7 +215,6 @@ class notificationservice:
         user.notificationusertypeid = notificationuser["usertype"]
         user.userid = notificationuser["userid"]
         user.createdby = userid
-        user.created_at = datetime2.now()
         return user
            
     def __getrequest(self, requestid, requesttype):
