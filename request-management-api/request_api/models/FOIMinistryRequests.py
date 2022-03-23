@@ -246,6 +246,26 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
 
+        assignedtoformatted = case([
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
+                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
+                             iaoassignee.lastname),
+                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
+                             iaoassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
+
+        ministryassignedtoformatted = case([
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
+                             func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
+                             ministryassignee.lastname),
+                            (and_(ministryassignee.lastname.is_(None), ministryassignee.firstname.isnot(None)),
+                             ministryassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -274,7 +294,9 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting
+            stateforsorting,
+            assignedtoformatted,
+            ministryassignedtoformatted
         ]
 
         basequery = _session.query(
@@ -512,6 +534,27 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
 
+        assignedtoformatted = case([
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
+                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
+                             iaoassignee.lastname),
+                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
+                             iaoassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
+
+        ministryassignedtoformatted = case([
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
+                             func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
+                             ministryassignee.lastname),
+                            (and_(ministryassignee.lastname.is_(None), ministryassignee.firstname.isnot(None)),
+                             ministryassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -540,7 +583,9 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,            
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting
+            stateforsorting,
+            assignedtoformatted,
+            ministryassignedtoformatted
         ]
 
         basequery = _session.query(
@@ -710,10 +755,12 @@ class FOIMinistryRequest(db.Model):
             elif(params['search'] == 'assigneename'):
                 searchcondition1 = []
                 searchcondition2 = []
+                searchcondition3 = []
                 for keyword in params['keywords']:
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                return or_(and_(*searchcondition1), and_(*searchcondition2))
+                    searchcondition3.append(FOIMinistryRequest.assignedgroup.ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
             else:
                 searchcondition = []
                 for keyword in params['keywords']:

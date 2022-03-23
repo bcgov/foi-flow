@@ -246,6 +246,16 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
 
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                           ],
+                           else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
+
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -275,7 +285,9 @@ class FOIRawRequest(db.Model):
             description,
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
-            FOIRawRequest.status.label('stateForSorting')
+            FOIRawRequest.status.label('stateForSorting'),
+            assignedtoformatted,
+            literal(None).label('ministryAssignedToFormatted')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -321,6 +333,10 @@ class FOIRawRequest(db.Model):
                 filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
             if(field == 'requestType'):
                 filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+            if(field == 'assignedToFormatted'):
+                filtercondition.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
+                filtercondition.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
+                filtercondition.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
         
         return or_(*filtercondition)
 
@@ -369,7 +385,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted']
         if x in validfields:
             return True
         else:
@@ -523,10 +539,12 @@ class FOIRawRequest(db.Model):
         elif(params['search'] == 'assigneename'):
             searchcondition1 = []
             searchcondition2 = []
+            searchcondition3 = []
             for keyword in params['keywords']:
                 searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
                 searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2))
+                searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
         elif(params['search'] == 'idnumber'):
             searchcondition = []
             for keyword in params['keywords']:
