@@ -53,7 +53,7 @@ class FOIMinistryRequest(db.Model):
 
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
-
+    requestpagecount = db.Column(db.String(20), nullable=True)
     #ForeignKey References
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
