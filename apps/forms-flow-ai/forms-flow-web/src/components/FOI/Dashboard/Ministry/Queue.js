@@ -177,7 +177,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   }, 500);
 
   const rows = useMemo(() => {
-    return requestQueue?.data;
+    return requestQueue?.data || [];
   }, [JSON.stringify(requestQueue)]);
 
   const renderReviewRequest = (e) => {
