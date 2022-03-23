@@ -19,8 +19,14 @@ import {
   isFlexTeam,
 } from "../helper/FOI/helper";
 
-const jwt = require("jsonwebtoken");
-
+const tokenRefreshInterval =
+  window._env_?.TOKEN_REFRESH_INTERVAL ||
+  process.env.TOKEN_REFRESH_INTERVAL ||
+  6000;
+const tokenUpdateThreshold =
+  window._env_?.TOKEN_UPDATE_THRESHOLD ||
+  process.env.TOKEN_UPDATE_THRESHOLD ||
+  300;
 /**
  * Initializes Keycloak instance and calls the provided callback function if successfully authenticated.
  *
@@ -70,7 +76,7 @@ let refreshInterval;
 const refreshToken = (store) => {
   refreshInterval = setInterval(() => {
     KeycloakData &&
-      KeycloakData.updateToken(5)
+      KeycloakData.updateToken(tokenUpdateThreshold)
         .then((refreshed) => {
           if (refreshed) {
             store.dispatch(setUserToken(KeycloakData.token));
@@ -80,7 +86,7 @@ const refreshToken = (store) => {
           console.log(error);
           userLogout();
         });
-  }, 6000);
+  }, tokenRefreshInterval);
 };
 
 /**

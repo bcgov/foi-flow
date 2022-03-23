@@ -49,3 +49,7 @@ WEBSOCKET_ENCRYPT_KEY={Secret phrase from camunda websocket implementation}
 
 #application name
 APPLICATION_NAME=formsflow.ai
+
+#keycloack token refresh
+TOKEN_REFRESH_INTERVAL=6000
+TOKEN_UPDATE_THRESHOLD=300

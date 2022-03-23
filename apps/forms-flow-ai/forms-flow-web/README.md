@@ -59,6 +59,8 @@ is mentioned on the [link](../forms-flow-idm/keycloak/README.md#create-forms-flo
  `KEYCLOAK_WEB_CLIENTID`|Your Keycloak Client ID within the realm| eg. forms-flow-web | `forms-flow-web`
  `WEBSOCKET_ENCRYPT_KEY`|Camunda task event streaming. AES encryption of token| | `giert989jkwrgb@DR55`
  `APPLICATION_NAME`|Application name is used to provide clients application name|
+ `TOKEN_REFRESH_INTERVAL`|The interval to specify for refreshing keycloak token|
+ `TOKEN_UPDATE_THRESHOLD`|The parameteer for keycloack.updateToken which specifies the threshold of the validity date after which token should update|
 
 * [STEP 1](): Getting **ROLE_ID** and **RESOURCE_ID** are mandatory for role based access. To generate ID go to ["Formsflow-forms user/role API"](../forms-flow-forms/README.md#formsflow-forms-api-requesting) and follow the steps.
 * [STEP 2](): Modify the environment variables using the values from step 1.

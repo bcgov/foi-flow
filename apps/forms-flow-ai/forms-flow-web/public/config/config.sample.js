@@ -27,9 +27,9 @@ window["_env_"] = {
   // Keycloak-client-name for web
   REACT_APP_KEYCLOAK_CLIENT: "forms-flow-web",
   // Keycloak-Realm-name
-  REACT_APP_KEYCLOAK_URL_REALM:"forms-flow-ai",
+  REACT_APP_KEYCLOAK_URL_REALM: "forms-flow-ai",
   // Keycloak URL
-  REACT_APP_KEYCLOAK_URL:"<Keycloak URL>",
+  REACT_APP_KEYCLOAK_URL: "<Keycloak URL>",
 
   ////Environment Variables for forms-flow-bpm////
 
@@ -39,9 +39,12 @@ window["_env_"] = {
   //web Api End point
   REACT_APP_WEB_BASE_URL: "Web Api base end-point",
   //bpm base api
-  REACT_APP_CAMUNDA_API_URI:"Camunda base API",
-  REACT_APP_WEBSOCKET_ENCRYPT_KEY:"Web Socket encrypt key for Socket IO",
+  REACT_APP_CAMUNDA_API_URI: "Camunda base API",
+  REACT_APP_WEBSOCKET_ENCRYPT_KEY: "Web Socket encrypt key for Socket IO",
   //application name
-  REACT_APP_APPLICATION_NAME:"formsflow.ai"
-  
+  REACT_APP_APPLICATION_NAME: "formsflow.ai",
+
+  //keycloack token refresh
+  TOKEN_REFRESH_INTERVAL: 6000,
+  TOKEN_UPDATE_THRESHOLD: 300,
 };
