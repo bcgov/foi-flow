@@ -122,7 +122,6 @@ const AdvancedSearch = ({ userDetail }) => {
   const [requestState, setRequestState] = useState(intitialRequestState);
 
   const intitialRequestStatus = {
-    allActive: false,
     overdue: false,
     onTime: false,
   };
@@ -537,19 +536,6 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormGroup>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="allActive"
-                          onChange={handleRequestStatusChange}
-                          checked={requestStatus.allActive}
-                          color="success"
-                        />
-                      }
-                      label="All Active"
-                    />
                     <FormControlLabel
                       className={classes.checkboxLabel}
                       control={

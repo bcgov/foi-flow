@@ -55,7 +55,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     ],
     keyword: null,
   });
-  const [requestFilter, setRequestFilter] = useState("All");
+  const [requestFilter, setRequestFilter] = useState("myRequests");
 
   // update sortModel for records due, ldd & assignedTo
   const updateSortModel = () => {
