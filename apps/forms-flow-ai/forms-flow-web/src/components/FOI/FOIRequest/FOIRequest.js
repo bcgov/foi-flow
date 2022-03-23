@@ -59,6 +59,7 @@ import {
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
+import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -104,6 +105,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
+  const [axisMessage, setAxisMessage] = React.useState("");
 
   const initialStatuses = {
     Request: {
@@ -184,12 +186,30 @@ const FOIRequest = React.memo(({ userDetail }) => {
         if(!err){
             if(Object.entries(data).length !== 0){
               setAxisSyncedData(data);
+              var axisDataUpdated = checkIfAxisDataUpdated(data);
+              if(axisDataUpdated)
+                setAxisMessage("WARNING");
             }
         }
+        else
+          setAxisMessage("ERROR");
+
       }));
     }
   }, [requestDetails]);
 
+  const checkIfAxisDataUpdated = (axisDataForComparison) => {
+    // for(let key of Object.keys(axisDataForComparison)){
+    //   var updatedField = isAxisSyncDisplayField(key);
+    //   if(updatedField){
+    //     var updateNeeded= checkValidation(key);
+    //     if(updateNeeded){
+          
+    //     }
+    //   }
+    // }
+    return true;
+  }
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -557,6 +577,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
+        <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
           <div
             id="Request"
             className={clsx("tabcontent", {
@@ -570,6 +591,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 <form className={`${classes.root} foi-request-form`} autoComplete="off">
                   <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
                     <>
+                    
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       {(isAddRequest || requestState === StateEnum.unopened.name) &&
                         <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
