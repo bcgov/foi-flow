@@ -65,16 +65,6 @@ const Queue = ({ userDetail, tableInfo }) => {
         if (row.field === "CFRDueDateValue" || row.field === "DueDateValue")
           row.field = "cfrduedate";
       });
-
-      // let field = smodel[0]?.field;
-      // let order = smodel[0]?.sort;
-      // if (field == "assignedToName") {
-      //   smodel.shift();
-      //   smodel.unshift(
-      //     { field: "assignedministrypersonLastName", sort: order },
-      //     { field: "assignedministrypersonFirstName", sort: order }
-      //   );
-      // }
     }
 
     return smodel;

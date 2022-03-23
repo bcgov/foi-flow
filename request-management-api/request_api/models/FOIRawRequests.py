@@ -341,10 +341,6 @@ class FOIRawRequest(db.Model):
                 filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
             if(field == 'requestType'):
                 filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
-            if(field == 'assignedToFormatted'):
-                filtercondition.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
-                filtercondition.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
-                filtercondition.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
         
         return or_(*filtercondition)
 
