@@ -65,16 +65,6 @@ const Queue = ({ userDetail, tableInfo }) => {
         if (row.field === "CFRDueDateValue" || row.field === "DueDateValue")
           row.field = "cfrduedate";
       });
-
-      let field = smodel[0]?.field;
-      let order = smodel[0]?.sort;
-      if (field == "assignedToName") {
-        smodel.shift();
-        smodel.unshift(
-          { field: "assignedministrypersonLastName", sort: order },
-          { field: "assignedministrypersonFirstName", sort: order }
-        );
-      }
     }
 
     return smodel;
@@ -95,17 +85,6 @@ const Queue = ({ userDetail, tableInfo }) => {
       )
     );
   }, [rowsState, sortModel, filterModel, requestFilter]);
-
-  function getAssigneeValue(row) {
-    const groupName = row.assignedministrygroup
-      ? row.assignedministrygroup
-      : "Unassigned";
-    return row.assignedministryperson &&
-      row.assignedministrypersonFirstName &&
-      row.assignedministrypersonLastName
-      ? `${row.assignedministrypersonLastName}, ${row.assignedministrypersonFirstName}`
-      : groupName;
-  }
 
   function getRecordsDue(params) {
     let receivedDateString = params.row.cfrduedate;
@@ -155,7 +134,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     },
 
     {
-      field: "assignedToName",
+      field: "ministryAssignedToFormatted",
       headerName: "ASSIGNED TO",
       flex: 1,
       headerAlign: "left",
@@ -197,18 +176,8 @@ const Queue = ({ userDetail, tableInfo }) => {
     setRowsState(defaultRowsState);
   }, 500);
 
-  const updateAssigneeName = (data) => {
-    if (!data) {
-      return [];
-    }
-    return data.map((row) => ({
-      ...row,
-      assignedToName: getAssigneeValue(row),
-    }));
-  };
-
   const rows = useMemo(() => {
-    return updateAssigneeName(requestQueue?.data);
+    return requestQueue?.data;
   }, [JSON.stringify(requestQueue)]);
 
   const renderReviewRequest = (e) => {

@@ -254,6 +254,16 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
 
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                           ],
+                           else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
+
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -283,7 +293,9 @@ class FOIRawRequest(db.Model):
             description,
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
-            FOIRawRequest.status.label('stateForSorting')
+            FOIRawRequest.status.label('stateForSorting'),
+            assignedtoformatted,
+            literal(None).label('ministryAssignedToFormatted')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -377,7 +389,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
         if x in validfields:
             return True
         else:
