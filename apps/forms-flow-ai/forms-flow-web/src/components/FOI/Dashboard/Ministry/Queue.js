@@ -49,6 +49,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       "applicantcategory",
       "requestType",
       "idNumber",
+      "axisRequestId",
       "currentState",
       "assignedministrypersonLastName",
       "assignedministrypersonFirstName",
@@ -108,7 +109,7 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const columns = React.useRef([
     {
-      field: "idNumber",
+      field: "axisRequestId",
       headerName: "ID NUMBER",
       width: 170,
       headerAlign: "left",

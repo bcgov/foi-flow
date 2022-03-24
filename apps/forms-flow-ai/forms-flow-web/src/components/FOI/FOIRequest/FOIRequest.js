@@ -260,6 +260,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setrequiredContactDetails(detailsData);
   }
   const handleAxisDetailsValue = (value, name) => {
+    if(value)
+      setUnSavedRequest(true);
     const detailsData = assignValue(requiredAxisDetailsValue, value, name);
     setRequiredAxisDetails(detailsData);
   }
