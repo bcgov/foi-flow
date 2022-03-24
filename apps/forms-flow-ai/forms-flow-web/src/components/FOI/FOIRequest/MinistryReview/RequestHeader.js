@@ -48,7 +48,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
     }
 
     const headerText = getHeaderText(_requestDetails);
-    //_requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    
     const assignedToValue = getFullName(assignedToList, _requestDetails);
 
     const watcherBox = (
