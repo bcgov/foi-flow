@@ -139,6 +139,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
               extensionsArr.push(property);
             });
           }
+          if(extensionsArr.length > 0)
             updatedObj[key] = extensionsArr;
           break;
         default:
