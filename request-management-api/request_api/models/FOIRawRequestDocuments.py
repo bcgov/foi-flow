@@ -24,7 +24,7 @@ class FOIRawRequestDocument(db.Model):
     version =db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
  
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)

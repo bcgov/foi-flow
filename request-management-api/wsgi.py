@@ -32,13 +32,26 @@ def disconnect():
     current_app.logger.info('socket disconnected for sid: '+request.sid)
     
 
-def __getauthenticateduserid(message):
+def __getauthenticateduserid(message):    
+    if message.get("userid") is not None and __isvalidnonce(message) == True: 
+        return message.get("userid")
+    else:
+        print('from token')
+        return __validatejwt(message)   
+      
+
+def __isvalidnonce(message):
+    if message.get("rkey") is not None and message.get("rkey") == os.getenv("SOCKETIO_CONNECT_NONCE"):
+        return True
+    return False
+
+def __validatejwt(message):
     if message.get("x-jwt-token") is not None:
         try:
             return AuthHelper.getwsuserid(message.get("x-jwt-token"))            
         except BusinessException as exception: 
             current_app.logger.error("%s,%s" % ('Unable to get user details', exception.message)) 
-    return None   
+    return None 
 
 @socketio.on_error()
 def error_handler(e):
