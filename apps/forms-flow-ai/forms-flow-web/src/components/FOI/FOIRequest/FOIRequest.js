@@ -279,7 +279,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setProgramAreaList(_programAreaList);
   }
 
-  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails, requiredApplicantDetails);
+  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails);
 
   //Variable to find if all required fields are filled or not
   const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, assignedToValue, requiredRequestDetailsValues);

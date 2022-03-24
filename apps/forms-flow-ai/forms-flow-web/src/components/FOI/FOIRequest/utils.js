@@ -260,10 +260,7 @@ export const createRequestDetailsObjectFunc = (
   return requestObject;
 };
 
-export const checkContactGiven = (
-  requiredContactDetails,
-  requiredApplicantDetails
-) => {
+export const checkContactGiven = (requiredContactDetails) => {
   return (
     (requiredContactDetails.primaryAddress === "" ||
       requiredContactDetails.city === "" ||
