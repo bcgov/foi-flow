@@ -514,7 +514,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 </div>
               </>
             )}
-
           </div>
 
           <div className="foileftpanelstatus">
@@ -602,13 +601,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
                         disableInput={disableInput}
+                        handleEmailValidation={handleEmailValidation}
                       />
 
                       <RequestDescriptionBox
                         programAreaList={programAreaList}
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
-                        requiredRequestDetailsValues = {requiredRequestDetailsValues}
+                        requiredRequestDetailsValues={
+                          requiredRequestDetailsValues
+                        }
                         handleUpdatedProgramAreaList={
                           handleUpdatedProgramAreaList
                         }

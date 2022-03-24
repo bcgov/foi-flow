@@ -270,7 +270,7 @@ export const checkContactGiven = (
       requiredContactDetails.province === "" ||
       requiredContactDetails.country === "" ||
       requiredContactDetails.postalCode === "") &&
-    requiredApplicantDetails.email === ""
+    requiredContactDetails.email === ""
   );
 };
 
