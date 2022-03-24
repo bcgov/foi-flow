@@ -14,7 +14,7 @@
    <testCaseLink>
       <guid>b0dd3630-bcda-498c-9653-0bd76ae975e7</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/attachments/foi-test-attachment-modal-behaviour</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
@@ -254,7 +254,7 @@
    <testCaseLink>
       <guid>211c4a68-ccd4-45e4-bf77-5280289894a8</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/attachments/foi-test-attachment-delete</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
@@ -374,7 +374,7 @@
    <testCaseLink>
       <guid>083ee2b0-a389-42c0-9376-67d8cf9d91c6</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/attachments/foi-test-attachment-rename</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
@@ -494,7 +494,7 @@
    <testCaseLink>
       <guid>026d6b41-79dc-4ab9-8318-9747c46ab615</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/attachments/foi-test-attachment-replace</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
@@ -614,7 +614,7 @@
    <testCaseLink>
       <guid>535ed029-3a67-4228-9cea-97f0a2c79dff</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/attachments/foi-test-attachment-from-public</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
