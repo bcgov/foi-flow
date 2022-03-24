@@ -101,7 +101,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [_tabStatus, settabStatus] = React.useState(requestState);
   var foitabheaderBG = getTabBG(_tabStatus, requestState);
   var foiAxisRequestIds = useSelector(state=> state.foiRequests.foiAxisRequestIds);
-
+    
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -536,15 +536,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
               </>
             )}
 
-            <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.Option4.active,
-              })}
-              name="Option4"
-              onClick={() => tabclick("Option4")}
-            >
-              Option 4
-            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -625,6 +616,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         programAreaList={programAreaList}
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
+                        requiredRequestDetailsValues = {requiredRequestDetailsValues}
                         handleUpdatedProgramAreaList={
                           handleUpdatedProgramAreaList
                         }
@@ -759,16 +751,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             ) : (
               <Loading />
             )}
-          </div>
-          <div
-            id="Option4"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.Option4.active,
-              [classes.displayed]: tabLinksStatuses.Option4.display,
-              [classes.hidden]: !tabLinksStatuses.Option4.display,
-            })}
-          >
-            <h3>Option 4</h3>
           </div>
         </div>
       </div>

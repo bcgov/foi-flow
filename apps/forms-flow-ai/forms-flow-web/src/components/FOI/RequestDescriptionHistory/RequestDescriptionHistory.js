@@ -10,8 +10,7 @@ import AccordionItem from './AccordionItem';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-      width: '100%',
-      marginTop:'20px'
+      width: '100%'
     },
     heading: {
       fontSize: theme.typography.pxToRem(15),

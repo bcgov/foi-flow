@@ -297,7 +297,8 @@ export const checkValidationError = (
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
     !requiredRequestDescriptionValues.isProgramAreaSelected ||
-    !requiredRequestDescriptionValues.ispiiredacted ||
+    (requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL 
+    && !requiredRequestDescriptionValues.ispiiredacted) ||
     !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||

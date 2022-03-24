@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     fetchFOIMinistryDivisionalStages
   } from "../../../../apiManager/services/FOI/foiMasterDataServices";
-const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,ministrycode}) => {
+const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,ministrycode,createMinistrySaveRequestObject}) => {
 
     const dispatch = useDispatch();
     useEffect(() => {    
@@ -28,7 +28,7 @@ const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,min
 
     return(
 
-        <Card className="foi-details-card">            
+        <Card className="foi-details-card" id="divisionalTracking">            
         <label className="foi-details-label">DIVISIONAL TRACKING</label>
         <CardContent>                       
                 <div className="row foi-details-row">
@@ -36,7 +36,7 @@ const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,min
                 <div className="col-lg-12 foi-details-col">
                     {
 
-                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 && divisionalstages.divisions.length >0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popSelectedDivStages={popselecteddivstages}   /> : <span className="nodivstages">Divisional stages does not exists for this ministry</span>
+                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 && divisionalstages.divisions.length >0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popSelectedDivStages={popselecteddivstages}  createMinistrySaveRequestObject={createMinistrySaveRequestObject} /> : <span className="nodivstages">Divisional stages does not exists for this ministry</span>
                     }                      
                   
                 </div>

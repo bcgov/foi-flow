@@ -19,14 +19,14 @@ class FOIRequestWatcher(db.Model):
     watchedbygroup = db.Column(db.String(250), unique=False, nullable=True) 
     watchedby = db.Column(db.String(120), unique=False, nullable=True)  
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     @classmethod
     def savewatcher(cls, foirequestwatcher, version, userid)->DefaultMethodResult:                
-        newwatcher = FOIRequestWatcher(ministryrequestid=foirequestwatcher["ministryrequestid"], version=version, watchedbygroup=foirequestwatcher["watchedbygroup"], watchedby=foirequestwatcher["watchedby"], isactive=foirequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
+        newwatcher = FOIRequestWatcher(ministryrequestid=foirequestwatcher["ministryrequestid"], version=version, watchedbygroup=foirequestwatcher["watchedbygroup"], watchedby=foirequestwatcher["watchedby"], isactive=foirequestwatcher["isactive"], createdby=userid)
         db.session.add(newwatcher)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added')   
@@ -35,7 +35,7 @@ class FOIRequestWatcher(db.Model):
     def savewatcherbygroups(cls, foirequestwatcher, version, userid, watchergroups)->DefaultMethodResult:             
         for group in watchergroups:
             foirequestwatcher["watchedbygroup"] = group
-            newwatcher = FOIRequestWatcher(ministryrequestid=foirequestwatcher["ministryrequestid"], version=version, watchedbygroup=foirequestwatcher["watchedbygroup"], watchedby=foirequestwatcher["watchedby"], isactive=foirequestwatcher["isactive"], created_at=datetime.now(), createdby=userid)
+            newwatcher = FOIRequestWatcher(ministryrequestid=foirequestwatcher["ministryrequestid"], version=version, watchedbygroup=foirequestwatcher["watchedbygroup"], watchedby=foirequestwatcher["watchedby"], isactive=foirequestwatcher["isactive"], createdby=userid)
             db.session.add(newwatcher)
             db.session.commit()               
         return DefaultMethodResult(True,'Request added')

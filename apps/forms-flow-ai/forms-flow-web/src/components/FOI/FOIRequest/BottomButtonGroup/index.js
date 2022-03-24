@@ -281,8 +281,13 @@ const BottomButtonGroup = React.memo(
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           } 
           if (![StateEnum.closed.name, StateEnum.onhold.name].includes(currentSelectedStatus) && saveRequestObject.onholdTransitionDate) {
+            const today = new Date();
+
+            // make it start of today
+            today.setHours(0, 0, 0, 0);
+
             const onHoldDays = calculateDaysRemaining(
-              new Date(),
+              today,
               saveRequestObject.onholdTransitionDate
             );
             const calculatedCFRDueDate = addBusinessDays(
