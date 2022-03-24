@@ -41,6 +41,13 @@ class FOIRequestApplicantMapping(db.Model):
         _applicantinfos = db.session.query(FOIRequestApplicantMapping).filter(FOIRequestApplicantMapping.foirequest_id == foirequest_id , FOIRequestApplicantMapping.foirequestversion_id == foirequestversion).order_by(FOIRequestApplicantMapping.foirequestapplicantmappingid.asc()).all()
         applicantinfos = requestapplicant_schema.dump(_applicantinfos)       
         return applicantinfos
+    
+    @classmethod
+    def getfirstapplicant(cls,foirequest_id,foirequestversion):
+        requestapplicant_schema = FOIRequestApplicantMappingSchema()
+        _applicantinfos = db.session.query(FOIRequestApplicantMapping).filter(FOIRequestApplicantMapping.foirequest_id == foirequest_id , FOIRequestApplicantMapping.foirequestversion_id == foirequestversion).order_by(FOIRequestApplicantMapping.foirequestapplicantmappingid.desc()).first()
+        applicantinfos = requestapplicant_schema.dump(_applicantinfos)       
+        return applicantinfos
             
 class FOIRequestApplicantMappingSchema(ma.Schema):
     class Meta:

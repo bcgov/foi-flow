@@ -61,6 +61,14 @@ class requestservicegetter:
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
+                    
+        if request['requesttype'] == 'personal':
+            requestapplicant = FOIRequestApplicantMapping.getfirstapplicant(foirequestid,request['version'])
+            baserequestinfo.update({
+                'firstName': requestapplicant['foirequestapplicant.firstname'],
+                'lastName': requestapplicant['foirequestapplicant.lastname'],
+                'middleName': requestapplicant['foirequestapplicant.middlename']                       
+            })            
         return baserequestinfo
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
