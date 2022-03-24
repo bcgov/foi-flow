@@ -241,7 +241,7 @@ class FOIMinistryRequest(db.Model):
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
         stateforsorting = case([
-                            (FOIRequestStatus.name == 'Open',
+                            (FOIRequestStatus.requeststatusid == 1, # Open
                              literal(None)),
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
@@ -265,6 +265,18 @@ class FOIMinistryRequest(db.Model):
                              ministryassignee.firstname),
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+        
+        duedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+        
+        cfrduedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -282,8 +294,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
-            cast(FOIMinistryRequest.cfrduedate, String).label('cfrduedate'),
-            cast(FOIMinistryRequest.duedate, String).label('duedate'),
+            cfrduedate,
+            duedate,
             ApplicantCategory.name.label('applicantcategory'),
             FOIRequest.created_at.label('created_at'),
             func.lower(ProgramArea.bcgovcode).label('bcgovcode'),
@@ -393,7 +405,7 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -565,6 +577,18 @@ class FOIMinistryRequest(db.Model):
                              ministryassignee.firstname),
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+        
+        duedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+        
+        cfrduedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
 
         selectedcolumns = [
@@ -583,8 +607,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
-            cast(FOIMinistryRequest.cfrduedate, String).label('cfrduedate'),
-            cast(FOIMinistryRequest.duedate, String).label('duedate'),
+            cfrduedate,
+            duedate,
             ApplicantCategory.name.label('applicantcategory'),
             FOIRequest.created_at.label('created_at'),
             func.lower(ProgramArea.bcgovcode).label('bcgovcode'),
