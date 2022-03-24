@@ -84,11 +84,6 @@ const useStyles = makeStyles((theme) => ({
 const FOIRequest = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const { requestId, ministryId} = useParams();
-  const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
-  const [_tabStatus, settabStatus] = React.useState(requestState);
-
-  var foitabheaderBG = getTabBG(_tabStatus, requestState);
-
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   const isAddRequest = urlIndexCreateRequest > -1;
@@ -102,6 +97,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
   var foiAxisRequestIds = useSelector(state=> state.foiRequests.foiAxisRequestIds);
+  
+  const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
+  const [_tabStatus, settabStatus] = React.useState(requestState);
+
+  var foitabheaderBG = getTabBG(_tabStatus, requestState);
   
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
