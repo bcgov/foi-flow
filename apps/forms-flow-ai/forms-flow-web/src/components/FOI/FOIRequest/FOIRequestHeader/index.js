@@ -62,7 +62,12 @@ const FOIRequestHeader = React.memo(
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
+     
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
+
+    useEffect(() => {
+        setAssignedTo(getAssignedTo(requestDetails));
+    }, [requestDetails]);
 
     const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(requestDetails));
     const [menuItems, setMenuItems] = useState([])

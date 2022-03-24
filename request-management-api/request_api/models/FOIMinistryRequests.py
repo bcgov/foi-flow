@@ -50,7 +50,11 @@ class FOIMinistryRequest(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     assignedministryperson = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
     assignedministrygroup = db.Column(db.String(120), unique=False, nullable=True)
-    closedate = db.Column(db.DateTime, nullable=True) 
+    closedate = db.Column(db.DateTime, nullable=True)
+
+    axissyncdate = db.Column(db.DateTime, nullable=True)    
+    axisrequestid = db.Column(db.String(120), nullable=True)
+
     #ForeignKey References
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
@@ -133,6 +137,7 @@ class FOIMinistryRequest(db.Model):
            _request["lastName"] = requestapplicants[0]['foirequestapplicant.lastname']
            _request["requestType"] = parentrequest.requesttype
            _request["idNumber"] = ministryrequest['filenumber']
+           _request["axisRequestId"] = ministryrequest['axisrequestid']
            _request["currentState"] = ministryrequest["requeststatus.name"]
            _request["dueDate"] = ministryrequest["duedate"]
            _request["cfrDueDate"] = ministryrequest["cfrduedate"]
@@ -279,6 +284,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -414,7 +420,8 @@ class FOIMinistryRequest(db.Model):
             'lastName': FOIRequestApplicant.lastname,
             'requestType': FOIRequest.requesttype,
             'idNumber': FOIMinistryRequest.filenumber,
-            'idnumber': FOIMinistryRequest.filenumber,
+            # 'axisRequestId': FOIMinistryRequest.axisrequestid,
+            'axisrequest_number': FOIMinistryRequest.axisrequestid,
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
@@ -431,7 +438,7 @@ class FOIMinistryRequest(db.Model):
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode)
-        }.get(x, FOIMinistryRequest.filenumber)
+        }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
     def getgroupfilters(cls, groups):
@@ -512,14 +519,14 @@ class FOIMinistryRequest(db.Model):
     
     @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
-        sql = """select distinct filenumber, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
+        sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
                     inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 
                     inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
                     where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;""" 
         rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})
         ministries = []
         for row in rs:
-            ministries.append({"filenumber": row["filenumber"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+            ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
         return ministries
 
     @classmethod
@@ -580,6 +587,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -785,5 +793,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate')
     

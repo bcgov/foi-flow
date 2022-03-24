@@ -98,6 +98,25 @@ def getparams(updaterequest):
         'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
     }
 
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirawrequest/axisrequestids')
+class FOIAXISRequest(Resource):
+    """Consolidates create and retrival of raw request"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())       
+    @auth.require
+    def get():
+        try : 
+            jsondata = {}
+            axisrequestids = rawrequestservice().getaxisequestids()                                    
+            jsondata = json.dumps(axisrequestids)
+            return jsondata , 200 
+        except ValueError:
+            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/loadtest/<requestid>')

@@ -35,7 +35,15 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
         if(options.dateFormat) {
           return data[name] ? formatDate(data[name]) : options.defaultValue;
         }
-  
+
+        if(name === 'category'){
+            if(category.length > 0){
+                let categoryValue = category.filter((item) =>item.name === data[name]);
+                if(categoryValue.length <= 0)
+                    return options.defaultValue;
+            }
+        }
+        
         return data[name] || options.defaultValue;
       }
 
@@ -56,6 +64,19 @@ const ApplicantDetails = React.memo(({requestDetails, contactDetailsNotGiven, ha
 
     //handle initial value for required field validation
     React.useEffect(() => {
+
+        setApplicantFirstName(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME));
+        setApplicantMiddleName(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME));
+        setApplicantLastName(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME));
+        setOrganization(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.ORGANIZATION));
+        setEmail(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL));
+        setCategoryValue(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY,
+        {
+            dateFormat: false,
+            defaultValue: "Select Category",
+        }
+        ));
+
         const applicantDetailsObject = {
             firstName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME),
             lastName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME),

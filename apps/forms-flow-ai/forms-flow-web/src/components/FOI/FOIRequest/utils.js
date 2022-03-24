@@ -286,7 +286,8 @@ export const checkValidationError = (
   requiredRequestDescriptionValues,
   validation,
   assignedToValue,
-  requiredRequestDetailsValues
+  requiredRequestDetailsValues,
+  requiredAxisDetails
 ) => {
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -307,7 +308,8 @@ export const checkValidationError = (
       .toLowerCase()
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
-    !requiredRequestDetailsValues.requestStartDate
+    !requiredRequestDetailsValues.requestStartDate ||
+    !requiredAxisDetails.axisRequestId
   );
 };
 

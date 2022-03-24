@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
@@ -59,6 +59,31 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
         }
       )
     );
+
+    useEffect(() => {
+
+      setPersonalHealthNumber(validateField(
+        requestDetails?.additionalPersonalInfo,
+        FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED
+      ));
+      setIdentityVerified(validateField(
+        requestDetails?.additionalPersonalInfo,
+        FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED
+      ));
+      setCorrectionsNumber(validateField(requestDetails, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER));
+      setEmployeeNumber(
+        validateField(requestDetails, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER)
+      );
+      setDOB(
+        validateField(
+          requestDetails?.additionalPersonalInfo,
+          FOI_COMPONENT_CONSTANTS.DOB,
+          {
+            dateFormat: true,
+            defaultValue: "",
+          }
+        ));
+    },[requestDetails]) 
 
   const handlePersonalHealthNumber = (e) => {
     setPersonalHealthNumber(e.target.value);

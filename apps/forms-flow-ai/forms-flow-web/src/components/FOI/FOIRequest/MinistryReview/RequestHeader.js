@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
+import { getHeaderText } from './utils';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
 const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
@@ -46,7 +47,8 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
         }
     }
 
-    const headerText = _requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    const headerText = getHeaderText(_requestDetails);
+    
     const assignedToValue = getFullName(assignedToList, _requestDetails);
 
     const watcherBox = (
