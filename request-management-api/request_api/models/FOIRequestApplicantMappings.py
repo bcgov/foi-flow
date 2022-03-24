@@ -17,7 +17,7 @@ class FOIRequestApplicantMapping(db.Model):
     # Defining the columns
     
     foirequestapplicantmappingid = db.Column(db.Integer, primary_key=True,autoincrement=True)            
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)

@@ -28,7 +28,7 @@ class FOIRawRequest(db.Model):
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
     assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)    
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -43,10 +43,9 @@ class FOIRawRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
-    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:
-        createdat = datetime.now()        
+    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:       
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', created_at=createdat,createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress',createdby=userid,version=version,sourceofsubmission=sourceofsubmission,assignedgroup=assigneegroup,assignedto=assignee,ispiiredacted=ispiiredacted,notes=notes, requirespayment=requirespayment)
 
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
@@ -56,10 +55,9 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequest_foipayment(cls,_requestrawdata,notes, requirespayment, ispiiredacted)->DefaultMethodResult:                
-        createdat = datetime.now()        
+    def saverawrequest_foipayment(cls,_requestrawdata,notes, requirespayment, ispiiredacted)->DefaultMethodResult: 
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',created_at=createdat,createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=ispiiredacted,notes=notes, requirespayment= requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=ispiiredacted,notes=notes, requirespayment= requirespayment)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -148,12 +146,22 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
-        sql = """select CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
-                    CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
-                    CASE WHEN lower(status) <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
-                    to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted, 
-                    CASE WHEN lower(status) <> 'unopened' then createdby else 'Online Form' END  as createdby from "FOIRawRequests" fr 
-                    where requestid = :requestid order by version ;"""
+        sql = """select * ,
+                    CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
+                            then 'Online Form' 
+                            else savedby END  as createdby 
+                    from (select CASE WHEN lower(status) <> 'unopened' 
+                            then requestrawdata ->> 'description' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
+                        CASE WHEN lower(status) <> 'unopened' 
+                            then requestrawdata ->> 'fromDate' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
+                        CASE WHEN lower(status) <> 'unopened'
+                            then requestrawdata ->> 'toDate' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
+                        to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
+                        createdby as savedby from "FOIRawRequests" fr 
+                    where requestid = :requestid order by version ) as sq;"""
         rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []
         for row in rs:
@@ -246,6 +254,16 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
 
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                           ],
+                           else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
+
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -275,7 +293,9 @@ class FOIRawRequest(db.Model):
             description,
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
-            FOIRawRequest.status.label('stateForSorting')
+            FOIRawRequest.status.label('stateForSorting'),
+            assignedtoformatted,
+            literal(None).label('ministryAssignedToFormatted')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -369,7 +389,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
         if x in validfields:
             return True
         else:

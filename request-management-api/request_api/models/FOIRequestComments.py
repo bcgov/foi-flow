@@ -20,7 +20,7 @@ class FOIRequestComment(db.Model):
     taggedusers = db.Column(JSON, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime2.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)

@@ -220,7 +220,6 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             extensiondocumentmapping.foirequestextensionid = extensiondocument["foirequestextensionid"]
             extensiondocumentmapping.extensionversion = activeversion
             extensiondocumentmapping.foiministrydocumentid = extensiondocument["foiministrydocumentid"]
-            extensiondocumentmapping.created_at = datetime2.now().isoformat()
             extensiondocumentmapping.createdby = userid
             extdocumentarr.append(extensiondocumentmapping)
         return extdocumentarr
