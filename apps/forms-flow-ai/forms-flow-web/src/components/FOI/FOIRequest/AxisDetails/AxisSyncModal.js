@@ -119,11 +119,16 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'Extensions':
             let extensionsArr = [];
             if(extensions.length > 0){
-              requestDetailsFromAxis[key].forEach(obj => {
-                  extensions?.forEach(obj1 => {
-                    if(obj !== obj1){
-                      const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
-                      extensionsArr.push(property);
+              requestDetailsFromAxis[key].forEach(axisObj => {
+                  extensions?.forEach(foiReqObj => {
+                    if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
+                      if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
+                        axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
+                        axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
+                        !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
+                        const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
+                        extensionsArr.push(property);
+                      }
                     }
                   })
               });
