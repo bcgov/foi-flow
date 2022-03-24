@@ -382,22 +382,28 @@ class FOIMinistryRequest(db.Model):
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
                 order = sortingorders.pop()
-                if(order == 'desc'):
-                    if(field == 'ministryAssignedToFormatted'):
-                        sortingcondition.append(nullslast(desc(field)))
-                    else:
-                        sortingcondition.append(nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc()))
-                else:
-                    if(field == 'ministryAssignedToFormatted'):
-                        sortingcondition.append(nullsfirst(asc(field)))
-                    else:
-                        sortingcondition.append(nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc()))
+                sortingcondition.append(FOIMinistryRequest.getfieldforsorting(field, order, iaoassignee, ministryassignee))
 
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
         
         return sortingcondition
+    
+    @classmethod
+    def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
+        #get one field
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted']
+        if(field in customizedfields):
+            if(order == 'desc'):
+                return nullslast(desc(field))
+            else:
+                return nullsfirst(asc(field))
+        else:
+            if(order == 'desc'):
+                return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
+            else:
+                return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc())
 
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
