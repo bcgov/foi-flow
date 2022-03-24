@@ -21,7 +21,6 @@ import {
   getRequestState,
   handleBeforeUnload,
   returnToQueue,
-  alertUser,
 } from "./utils";
 import clsx from "clsx";
 
