@@ -375,7 +375,6 @@
 				<version>3.0.0</version>
 				<configuration>
 					<mainClass>org.camunda.bpm.extension.CamundaApplication</mainClass>
-					<mainClass>org.camunda.bpm.extension.CamundaApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
