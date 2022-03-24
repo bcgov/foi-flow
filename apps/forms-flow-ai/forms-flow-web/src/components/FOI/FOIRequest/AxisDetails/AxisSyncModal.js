@@ -53,7 +53,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           setAxisExtension(requestDetailsFromAxis?.Extensions); 
           compareFields();  
         }
-    },[requestDetailsFromAxis])
+    },[axisSyncedData])
 
     const saveExtensions = () => {
       dispatch(addAXISExtensions(axisExtensions, ministryId));
