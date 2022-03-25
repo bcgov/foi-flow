@@ -111,11 +111,11 @@ const AddressContactDetails = memo(
         ),
         postalCode: validateFields(
           requestDetails,
-          FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
+          FOI_COMPONENT_CONSTANTS.POSTALCODE
         ),
         email: validateFields(
           requestDetails,
-          FOI_COMPONENT_CONSTANTS.POSTALCODE
+          FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
         ),
       };
       handleContactDetailsInitialValue(contanctDetailsObject);
@@ -161,6 +161,9 @@ const AddressContactDetails = memo(
       );
       setCountry(
         validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)
+      );
+      setEmail(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL)
       );
     };
 

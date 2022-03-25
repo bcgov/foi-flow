@@ -19,9 +19,8 @@ import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import {
   dueDateCalculation,
   getRequestState,
-  fillAssignmentFields,
   returnToQueue,
-  alertUser
+  alertUser,
 } from "./utils";
 import clsx from "clsx";
 
@@ -91,8 +90,8 @@ const BottomButtonGroup = React.memo(
     };
 
     useEffect(() => {
-      if(stateChanged){
-        requestState= saveRequestObject.currentState;
+      if (stateChanged) {
+        requestState = saveRequestObject.currentState;
       }
     }, [stateChanged]);
 
@@ -164,9 +163,8 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatusid = StateEnum.open.id;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
-        }
-        else {
-          openRequest();          
+        } else {
+          openRequest();
         }
       }
     }, [currentSelectedStatus, stateChanged]);
@@ -177,13 +175,13 @@ const BottomButtonGroup = React.memo(
     React.useEffect(() => {
       if (unSavedRequest) {
         window.history.pushState(null, null, window.location.pathname);
-        window.addEventListener("popstate", handleOnHashChange);     
-        window.addEventListener("beforeunload",handleBeforeUnload);
+        window.addEventListener("popstate", handleOnHashChange);
+        window.addEventListener("beforeunload", handleBeforeUnload);
         return () => {
-          window.removeEventListener("popstate", handleOnHashChange);        
-          window.removeEventListener("beforeunload",handleBeforeUnload);
+          window.removeEventListener("popstate", handleOnHashChange);
+          window.removeEventListener("beforeunload", handleBeforeUnload);
         };
-      }    
+      }
     }, [unSavedRequest]);
 
     const openRequest = () => {
@@ -199,8 +197,7 @@ const BottomButtonGroup = React.memo(
         setsaveModal(true);
     };
 
-    const handleModal = (value) => {  
-        
+    const handleModal = (value) => {
       setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);
@@ -242,7 +239,6 @@ const BottomButtonGroup = React.memo(
           }
         })
       );
-     
     };
 
     const handleSaveModal = (value, fileInfoList) => {
@@ -272,8 +268,13 @@ const BottomButtonGroup = React.memo(
           ) {
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-          } 
-          if (![StateEnum.closed.name, StateEnum.onhold.name].includes(currentSelectedStatus) && saveRequestObject.onholdTransitionDate) {
+          }
+          if (
+            ![StateEnum.closed.name, StateEnum.onhold.name].includes(
+              currentSelectedStatus
+            ) &&
+            saveRequestObject.onholdTransitionDate
+          ) {
             const today = new Date();
 
             // make it start of today
@@ -299,7 +300,7 @@ const BottomButtonGroup = React.memo(
 
         case StateEnum.redirect.name:
         case StateEnum.open.name:
-        case StateEnum.intakeinprogress.name:        
+        case StateEnum.intakeinprogress.name:
         case StateEnum.review.name:
         case StateEnum.onhold.name:
         case StateEnum.signoff.name:
@@ -318,7 +319,7 @@ const BottomButtonGroup = React.memo(
 
         default:
           return;
-      }    
+      }
     };
 
     return (
