@@ -288,7 +288,8 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails
+  requiredAxisDetails,
+  isAddRequest
 ) => {
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -310,7 +311,7 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    (isAddRequest && !requiredAxisDetails.axisRequestId)
   );
 };
 
