@@ -271,6 +271,11 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
 
+        axisrequestid = case([
+            (FOIRawRequest.axisrequestid.is_(None),
+            'U-00' + cast(FOIRawRequest.requestid, String)),
+            ],
+            else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -285,7 +290,7 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
-            cast(FOIRawRequest.axisrequestid, String).label('axisRequestId'),
+            axisrequestid,
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -399,7 +404,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'axisRequestId', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
         if x in validfields:
             return True
         else:
