@@ -45,44 +45,124 @@ const AddressContactDetails = memo(
       return data[name] || options.defaultValue;
     };
 
-    //local state management for homePhone, mobilePhone, workPhone1, workPhone2, streetAddress1, streetAddress2, city, postalcode, province and country
-    const [homePhoneText, setHomePhone] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.HOME_PHONE));
-    const [mobilePhoneText, setMobilePhone] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.MOBILE_PHONE));
-    const [workPhonePrimaryText, setWorkPhonePrimary] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY));
-    const [workPhoneSecondaryText, setWorkPhoneSecondary] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY));
-    const [streetAddressText, setStreetAddress] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY));
-    const [secondaryStreetAddressText, setSecondaryStreetAddress] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY));
-    const [CityText, setCity] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY));
-    const [PostalText, setPostal] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE));
-    const [ProvinceText, setProvince] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE));
-    const [CountryText, setCountry] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)); 
-    
+    //local state management for email, homePhone, mobilePhone, workPhone1, workPhone2, streetAddress1, streetAddress2, city, postalcode, province and country
+    const [homePhoneText, setHomePhone] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.HOME_PHONE)
+    );
+    const [mobilePhoneText, setMobilePhone] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.MOBILE_PHONE)
+    );
+    const [workPhonePrimaryText, setWorkPhonePrimary] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY)
+    );
+    const [workPhoneSecondaryText, setWorkPhoneSecondary] = React.useState(
+      validateFields(
+        requestDetails,
+        FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY
+      )
+    );
+    const [streetAddressText, setStreetAddress] = React.useState(
+      validateFields(
+        requestDetails,
+        FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY
+      )
+    );
+    const [secondaryStreetAddressText, setSecondaryStreetAddress] =
+      React.useState(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY
+        )
+      );
+    const [CityText, setCity] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY)
+    );
+    const [PostalText, setPostal] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE)
+    );
+    const [ProvinceText, setProvince] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE)
+    );
+    const [CountryText, setCountry] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)
+    );
+    const [emailText, setEmail] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL)
+    );
+
+    //state management for email validation
+    const [validation, setValidation] = React.useState({});
+
     React.useEffect(() => {
-    
       setFieldValues();
       const contanctDetailsObject = {
-          primaryAddress: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY),
-          city: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY),
-          province: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE),
-          country: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY),
-          postalCode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE),
-        }
-        handleContactDetailsInitialValue(contanctDetailsObject);
-    },[requestDetails, handleContactDetailsInitialValue])
-
+        primaryAddress: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY
+        ),
+        city: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY),
+        province: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.POSTALCODE
+        ),
+        country: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.COUNTRY
+        ),
+        postalCode: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
+        ),
+        email: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.POSTALCODE
+        ),
+      };
+      handleContactDetailsInitialValue(contanctDetailsObject);
+    }, [requestDetails, handleContactDetailsInitialValue]);
 
     const setFieldValues = () => {
-      setHomePhone(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.HOME_PHONE));
-      setMobilePhone(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.MOBILE_PHONE));
-      setWorkPhonePrimary(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY));
-      setWorkPhoneSecondary(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY));
-      setStreetAddress(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY));
-      setSecondaryStreetAddress(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY));
+      setHomePhone(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.HOME_PHONE)
+      );
+      setMobilePhone(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.MOBILE_PHONE)
+      );
+      setWorkPhonePrimary(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY
+        )
+      );
+      setWorkPhoneSecondary(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY
+        )
+      );
+      setStreetAddress(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY
+        )
+      );
+      setSecondaryStreetAddress(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY
+        )
+      );
       setCity(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY));
-      setPostal(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE));
-      setProvince(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE));
-      setCountry(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY));
-    }
+      setPostal(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE)
+      );
+      setProvince(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE)
+      );
+      setCountry(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)
+      );
+    };
 
     const handleHomePhoneChange = (e) => {
       setHomePhone(e.target.value);
@@ -164,6 +244,31 @@ const AddressContactDetails = memo(
         FOI_COMPONENT_CONSTANTS.COUNTRY
       );
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.COUNTRY, e.target.value);
+    };
+
+    //handle onchange of email and the validation
+    const handleEmailChange = (e) => {
+      var emailValidation = {};
+      if (e.target.value) {
+        const helperText = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e.target.value)
+          ? ""
+          : "Email is not valid.";
+        emailValidation = { field: "Email", helperTextValue: helperText };
+        setValidation(emailValidation);
+      } else {
+        emailValidation = { field: "Email", helperTextValue: "" };
+        setValidation(emailValidation);
+      }
+      handleEmailValidation(emailValidation);
+      setEmail(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
+      );
+      createSaveRequestObject(
+        FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL,
+        e.target.value
+      );
     };
 
     return (

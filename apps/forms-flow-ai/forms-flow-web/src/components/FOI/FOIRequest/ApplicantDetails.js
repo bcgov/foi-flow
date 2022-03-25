@@ -38,35 +38,29 @@ const ApplicantDetails = React.memo(
     ) => {
       options.defaultValue = options.defaultValue || "";
 
-        options.defaultValue = options.defaultValue || ""
-  
-        if(!data) {
-          return options.defaultValue;
-        }
-  
-        if(options.dateFormat) {
-          return data[name] ? formatDate(data[name]) : options.defaultValue;
-        }
+      options.defaultValue = options.defaultValue || "";
 
-        if(name === 'category'){
-            if(category.length > 0){
-                let categoryValue = category.filter((item) =>item.name === data[name]);
-                if(categoryValue.length <= 0)
-                    return options.defaultValue;
-            }
-        }
-        
-        return data[name] || options.defaultValue;
+      if (!data) {
+        return options.defaultValue;
       }
 
       if (options.dateFormat) {
         return data[name] ? formatDate(data[name]) : options.defaultValue;
       }
 
+      if (name === "category") {
+        if (category.length > 0) {
+          let categoryValue = category.filter(
+            (item) => item.name === data[name]
+          );
+          if (categoryValue.length <= 0) return options.defaultValue;
+        }
+      }
+
       return data[name] || options.defaultValue;
     };
 
-    //state management of Applicant FirstName, MiddleName, LastName, Organization, Email and Category
+    //state management of Applicant FirstName, MiddleName, LastName, Organization and Category
     const [applicantFirstNameText, setApplicantFirstName] = React.useState(
       validateFields(
         requestDetails,
@@ -97,28 +91,49 @@ const ApplicantDetails = React.memo(
 
     //handle initial value for required field validation
     React.useEffect(() => {
+      setApplicantFirstName(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME
+        )
+      );
+      setApplicantMiddleName(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME
+        )
+      );
+      setApplicantLastName(
+        validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME
+        )
+      );
+      setOrganization(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.ORGANIZATION)
+      );
+      setCategoryValue(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY, {
+          dateFormat: false,
+          defaultValue: "Select Category",
+        })
+      );
 
-        setApplicantFirstName(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME));
-        setApplicantMiddleName(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME));
-        setApplicantLastName(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME));
-        setOrganization(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.ORGANIZATION));
-        setEmail(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL));
-        setCategoryValue(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY,
-        {
+      const applicantDetailsObject = {
+        firstName: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME
+        ),
+        lastName: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME
+        ),
+        category: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.FOI_CATEGORY,
+          {
             dateFormat: false,
             defaultValue: "Select Category",
-        }
-        ));
-
-        const applicantDetailsObject = {
-            firstName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME),
-            lastName: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME),
-            email: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL),
-            category: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.FOI_CATEGORY,
-                {
-                    dateFormat: false,
-                    defaultValue: "Select Category",
-                }),            
           }
         ),
       };

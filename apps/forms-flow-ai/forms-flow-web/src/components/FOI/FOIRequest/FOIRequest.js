@@ -552,15 +552,36 @@ const FOIRequest = React.memo(({ userDetail }) => {
           >
             <div className="container foi-review-request-container">
               <div className="foi-review-container">
-                <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
+                <form
+                  className={`${classes.root} foi-request-form`}
+                  autoComplete="off"
+                >
+                  <ConditionalComponent
+                    condition={
+                      Object.entries(requestDetails).length !== 0 ||
+                      isAddRequest
+                    }
+                  >
                     <>
-                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
-                      {(isAddRequest || requestState === StateEnum.unopened.name) &&
-                        <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
-                        foiAxisRequestIds={foiAxisRequestIds}
-                        handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
-                      }
+                      <FOIRequestHeader
+                        headerValue={headerValue}
+                        requestDetails={requestDetails}
+                        handleAssignedToValue={handleAssignedToValue}
+                        createSaveRequestObject={createSaveRequestObject}
+                        handlestatusudpate={handlestatusudpate}
+                        userDetail={userDetail}
+                        disableInput={disableInput}
+                      />
+                      {(isAddRequest ||
+                        requestState === StateEnum.unopened.name) && (
+                        <AxisDetails
+                          requestDetails={requestDetails}
+                          createSaveRequestObject={createSaveRequestObject}
+                          foiAxisRequestIds={foiAxisRequestIds}
+                          handleAxisDetailsValue={handleAxisDetailsValue}
+                          handleAxisIdValidation={handleAxisIdValidation}
+                        />
+                      )}
                       <ApplicantDetails
                         requestDetails={requestDetails}
                         requestStatus={_requestStatus}
@@ -568,7 +589,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleApplicantDetailsInitialValue={
                           handleApplicantDetailsInitialValue
                         }
-                        handleEmailValidation={handleEmailValidation}
                         handleApplicantDetailsValue={
                           handleApplicantDetailsValue
                         }
