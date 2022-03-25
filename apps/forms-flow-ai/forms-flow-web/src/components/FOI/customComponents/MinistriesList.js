@@ -22,10 +22,11 @@ const MinistriesList = React.memo(({masterProgramAreaList, handleUpdatedMasterPr
     
     //sets the isError to true if no program area selected by default
     useEffect(() => {
+      setProgramAreaListItems(masterProgramAreaList);
       setError(
         !programAreaList.some((programArea) => programArea.isChecked)
       );
-    },[programAreaList])
+    },[masterProgramAreaList, programAreaList])
 
     //handle onChange event of checkbox
     const handleOnChangeProgramArea = (e) => { 
