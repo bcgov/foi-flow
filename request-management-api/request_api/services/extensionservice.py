@@ -8,6 +8,7 @@ from request_api.services.requestservice import requestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.eventservice import eventservice
+from request_api.services.events.extension import ExtensionType
 from datetime import datetime
 import asyncio
 import json
@@ -40,7 +41,7 @@ class extensionservice:
 
     def __ispublicbodyextension(self, reasonid):
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
-        return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'
+        return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value
 
     def getrequestextension(self, extensionid):
         requestextension = FOIRequestExtension().getextension(extensionid)
@@ -89,7 +90,7 @@ class extensionservice:
         decisiondate = approveddate if approveddate else denieddate
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
 
-        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body': 
+        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value: 
             extensionstatusid = 2
         elif 'extensionstatusid' in extension:
             extensionstatusid = extension['extensionstatusid']
@@ -229,7 +230,7 @@ class extensionservice:
     def getextendedduedate(self, extensionschema):
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
         # if status is Approved or reason is Public Body then directly take the extendedduedate
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == 'Public Body':
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == ExtensionType.publicbody.value:
             return extensionschema['extendedduedate']
 
     def getlatestapprovedrequest(self, extensionid, ministryrequestid, ministryversion):
