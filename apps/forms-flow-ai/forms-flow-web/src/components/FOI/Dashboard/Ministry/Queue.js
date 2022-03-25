@@ -63,8 +63,12 @@ const Queue = ({ userDetail, tableInfo }) => {
     let smodel = JSON.parse(JSON.stringify(sortModel));
     if (smodel) {
       smodel.map((row) => {
-        if (row.field === "CFRDueDateValue" || row.field === "DueDateValue")
+        if (row.field === "CFRDueDateValue") {
           row.field = "cfrduedate";
+        }
+        if (row.field === "DueDateValue"){
+          row.field = "duedate";
+        }
       });
     }
 
