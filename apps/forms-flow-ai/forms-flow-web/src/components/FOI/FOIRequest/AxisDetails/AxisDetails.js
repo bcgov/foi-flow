@@ -2,9 +2,9 @@ import React, {useEffect} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch} from "react-redux";
-import { fetchRequestDataFromAxis } from '../../../apiManager/services/FOI/foiRequestServices';
+import { fetchRequestDataFromAxis } from '../../../../apiManager/services/FOI/foiRequestServices';
 
 
 const AxisDetails = React.memo(({  
@@ -51,7 +51,7 @@ const AxisDetails = React.memo(({
     }
 
     const syncWithAxis = () => {
-        dispatch(fetchRequestDataFromAxis(axisRequestId, (err, data) => {
+        dispatch(fetchRequestDataFromAxis(axisRequestId, false, (err, data) => {
             if(!err){
                 if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}

@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
   saveRequestDetails,
-  openRequestDetails,
+  openRequestDetails
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -19,11 +19,11 @@ import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import {
   dueDateCalculation,
   getRequestState,
-  fillAssignmentFields,
   returnToQueue,
   alertUser
 } from "./utils";
 import clsx from "clsx";
+import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -64,7 +64,9 @@ const BottomButtonGroup = React.memo(
     hasStatusRequestSaved,
     disableInput,
     stateChanged,
-    requestState
+    requestState,
+    setSaveRequestObject,
+    axisSyncedData
   }) => {
     
     /**
@@ -82,6 +84,8 @@ const BottomButtonGroup = React.memo(
     const [closingDate, setClosingDate] = useState(formatDate(new Date()));
     const [closingReasonId, setClosingReasonId] = useState();
 
+    const [axisSyncModalOpen, setAxisSyncModalOpen] = useState(false);
+
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
     };
@@ -89,6 +93,7 @@ const BottomButtonGroup = React.memo(
     const handleClosingReasonChange = (cReasonId) => {
       setClosingReasonId(cReasonId);
     };
+ 
 
     useEffect(() => {
       if(stateChanged){
@@ -346,6 +351,14 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
+          {urlIndexCreateRequest < 0 && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
+            Object.entries(axisSyncedData)?.length !== 0 &&
+            <button type="button" className="btn btn-bottom" 
+            onClick={(e) => {
+                setAxisSyncModalOpen(true);
+              }}>Sync with AXIS
+            </button>
+          }
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {
@@ -365,6 +378,12 @@ const BottomButtonGroup = React.memo(
             Return to Queue
           </button>
         </div>
+        {
+          axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} 
+          saveRequest= {saveRequest} saveRequestObject= {saveRequestObject} urlIndexCreateRequest={urlIndexCreateRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={currentSelectedStatus}
+          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} axisSyncedData={axisSyncedData}/>
+        }
+        
       </div>
     );
   }

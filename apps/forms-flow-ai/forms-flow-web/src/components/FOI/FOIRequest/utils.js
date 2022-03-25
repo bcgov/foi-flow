@@ -178,7 +178,8 @@ export const createRequestDetailsObjectFunc = (
   value2
 ) => {
   requestObject.id = requestId;
-  requestObject.requestProcessStart =
+  if(requiredRequestDetailsValues.requestStartDate)
+    requestObject.requestProcessStart =
     requiredRequestDetailsValues.requestStartDate;
   requestObject.dueDate = requiredRequestDetailsValues.dueDate;
   requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
