@@ -178,7 +178,8 @@ export const createRequestDetailsObjectFunc = (
   value2
 ) => {
   requestObject.id = requestId;
-  requestObject.requestProcessStart =
+  if(requiredRequestDetailsValues.requestStartDate)
+    requestObject.requestProcessStart =
     requiredRequestDetailsValues.requestStartDate;
   requestObject.dueDate = requiredRequestDetailsValues.dueDate;
   requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
@@ -287,7 +288,8 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails
+  requiredAxisDetails,
+  isAddRequest
 ) => {
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -309,7 +311,7 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    (isAddRequest && !requiredAxisDetails.axisRequestId)
   );
 };
 

@@ -101,6 +101,29 @@ class CreateFOIRequestExtension(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
 @cors_preflight('POST,OPTIONS')
+@API.route('/foiextension/axisrequest/<ministryrequestid>')
+class SaveAXISRequestExtension(Resource):
+    """Creates extension for ministry(opened) request."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require   
+    def post(ministryrequestid):      
+        try:                     
+            rquesextensionschema = request.get_json()
+            if (AuthHelper.isministrymember() == False):           
+                result = extensionservice().saveaxisrequestextension(ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
+                if result.success == True:
+                    eventservice().posteventforaxisextension(ministryrequestid, result.args[0], AuthHelper.getuserid(), AuthHelper.getusername(), "add")
+                    return {'status': result.success, 'message':result.message} , 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
 @API.route('/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>/extension/<extensionid>/edit')
 class EditFOIRequestExtension(Resource):
     """Edits extension for ministry(opened) request."""

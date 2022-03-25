@@ -109,6 +109,15 @@ class FOIRequestNotification(db.Model):
         for row in rs:
             notificationids.append(row["notificationid"])
         return notificationids
+    
+    @classmethod
+    def getextensionnotificationidsbyministry(cls, ministryid):
+        sql = """select notificationid from "FOIRequestNotifications" where requestid = :requestid and notificationtypeid = 4 """
+        rs = db.session.execute(text(sql), {'requestid': ministryid})
+        notificationids = []
+        for row in rs:
+            notificationids.append(row["notificationid"])
+        return notificationids
 
 class FOIRequestNotificationSchema(ma.Schema):
     class Meta:
