@@ -17,11 +17,10 @@ const ApplicantDetails = React.memo((requestDetails) => {
   const requestType = _requestDetails.requestType
     ? _requestDetails.requestType.replace(/^./, (str) => str.toUpperCase())
     : "";
-  console.log(requestType);
 
   return (
     <Card id="applicantDetailsMinistry" className="foi-details-card">
-      <label className="foi-details-label">APPLICANT DETAILS</label>
+      <label className="foi-details-label">Applicant Details</label>
       <CardContent>
         <ConditionalComponent condition={requestType === "Personal"}>
           <div className={clsx("row", "foi-details-row", classes.rowMargin)}>

@@ -24,12 +24,12 @@ const ChildDetails = React.memo((requestDetails) => {
 
   return (
     <Card id="childDetailsMinistry" className="foi-details-card">
-      <label className="foi-details-label">CHILD DETAILS</label>
+      <label className="foi-details-label">Child Details</label>
       <CardContent>
         <div className="row foi-details-row">
           <div className="col-lg-3 foi-details-col">
             <div>
-              <b>FIRST NAME</b>
+              <b>First Name</b>
             </div>
             <div>
               <span>{childDetails.firstName}</span>
@@ -37,7 +37,7 @@ const ChildDetails = React.memo((requestDetails) => {
           </div>
           <div className="col-lg-3 foi-details-col">
             <div>
-              <b>MIDDLE NAME</b>
+              <b>Middle Name</b>
             </div>
             <div>
               <span>{childDetails.middleName}</span>
@@ -45,7 +45,7 @@ const ChildDetails = React.memo((requestDetails) => {
           </div>
           <div className="col-lg-3 foi-details-col">
             <div>
-              <b>LAST NAME</b>
+              <b>Last Name</b>
             </div>
             <div>
               <span>{childDetails.lastName}</span>

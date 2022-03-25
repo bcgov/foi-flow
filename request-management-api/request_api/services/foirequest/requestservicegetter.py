@@ -84,12 +84,11 @@ class requestservicegetter:
                 if requestortypeid == 1:
                     baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname))
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
-
-        baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
-        baserequestinfo.update(baserequestdetails)
-        additionalpersonalinfo.update(additionalpersonalinfodetails)
-                
-        baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
+            baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
+            baserequestinfo.update(baserequestdetails)
+            additionalpersonalinfo.update(additionalpersonalinfodetails)                
+            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
+            
         return baserequestinfo
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):

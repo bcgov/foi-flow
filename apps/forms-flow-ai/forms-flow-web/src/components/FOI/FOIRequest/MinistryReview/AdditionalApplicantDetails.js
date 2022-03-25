@@ -35,12 +35,12 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
 
   return (
     <Card id="additionalApplicantDetailsMinistry" className="foi-details-card">
-      <label className="foi-details-label">ADDITIONAL APPLICANT DETAILS</label>
+      <label className="foi-details-label">Additional Applicant Details</label>
       <CardContent>
         <div className={clsx("row", "foi-details-row", classes.rowMargin)}>
           <div className="col-lg-6 foi-details-col">
             <div>
-              <b>PERSONAL HEALTH NUMBER</b>
+              <b>Personal Health Number</b>
             </div>
             <div>
               <span>{additionalApplicantDetails.personalHealthNumber}</span>
@@ -48,7 +48,7 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
           </div>
           <div className="col-lg-6 foi-details-col">
             <div>
-              <b>EMPLOYEE NUMBER</b>
+              <b>Employee Number</b>
             </div>
             <div>
               <span>{additionalApplicantDetails.employeeNumber}</span>
@@ -59,7 +59,7 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
         <div className="row foi-details-row">
           <div className="col-lg-6 foi-details-col">
             <div>
-              <b>DATE OF BIRTH</b>
+              <b>Date of Birth</b>
             </div>
             <div>
               <span>
@@ -69,7 +69,7 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
           </div>
           <div className="col-lg-6 foi-details-col">
             <div>
-              <b>CORRECTIONS NUMBER</b>
+              <b>Corrections Number</b>
             </div>
             <div>
               <span>{additionalApplicantDetails.correctionsNumber}</span>
