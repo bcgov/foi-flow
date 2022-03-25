@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MinistryReview = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
+  const [requestState, setRequestState] = useState();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
@@ -106,7 +107,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       ? JSON.stringify(requestDetails["selectedMinistries"][0]["code"])
       : "";
   const [comment, setComment] = useState([]);
-  const [requestState, setRequestState] = useState();
+  
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -426,7 +427,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.isAttachmentListLoading
   );
 
-  const requestNumber = requestDetails && requestDetails.idNumber;
+  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
 
 
   const stateBox = (
