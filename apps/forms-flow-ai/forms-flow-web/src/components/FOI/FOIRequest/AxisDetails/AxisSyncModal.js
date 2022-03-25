@@ -90,7 +90,6 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     const checkValidation = (key) => {
       var mandatoryField = isMandatoryField(key);
-      console.log(mandatoryField);
       if(mandatoryField && !requestDetailsFromAxis[key])
         return false;
       else{
