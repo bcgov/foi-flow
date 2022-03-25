@@ -306,7 +306,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   //Variable to find if all required fields are filled or not
   const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, 
-    assignedToValue, requiredRequestDetailsValues, requiredAxisDetails);
+    assignedToValue, requiredRequestDetailsValues, requiredAxisDetails,isAddRequest);
 
   const classes = useStyles();
 
