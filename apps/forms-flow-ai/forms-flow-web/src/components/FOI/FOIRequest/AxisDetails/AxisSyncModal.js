@@ -116,31 +116,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           break;
         }
         case 'Extensions':
-            let extensionsArr = [];
-            if(extensions.length > 0){
-              requestDetailsFromAxis[key].forEach(axisObj => {
-                  extensions?.forEach(foiReqObj => {
-                    if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
-                      if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
-                        axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
-                        axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
-                        !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
-                        const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
-                        extensionsArr.push(property);
-                      }
-                    }
-                  })
-              });
-          }
-          else{
-            requestDetailsFromAxis[key].forEach(obj => {
-              const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
-              extensionsArr.push(property);
-            });
-          }
-          if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
-                requestDetailsFromAxis[key].length === 0 )
-            updatedObj[key] = extensionsArr;
+            let extensionsArr = compareExtensions(key);
+            if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
+              requestDetailsFromAxis[key].length === 0 )
+              updatedObj[key] = extensionsArr;
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -148,6 +127,32 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       }
       
     }
+
+    const compareExtensions = (key) => {
+      let extensionsArr = [];
+      if(extensions.length > 0){
+        requestDetailsFromAxis[key].forEach(axisObj => {
+            extensions?.forEach(foiReqObj => {
+              if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
+                if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
+                  axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
+                  axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
+                  !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
+                  const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
+                  extensionsArr.push(property);
+                }
+              }
+            })
+        });
+    }
+    else{
+      requestDetailsFromAxis[key].forEach(obj => {
+        const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+        extensionsArr.push(property);
+      });
+    }
+    return extensionsArr;
+    } 
 
     const handleClose = () => {
         setAxisSyncModalOpen(false);
