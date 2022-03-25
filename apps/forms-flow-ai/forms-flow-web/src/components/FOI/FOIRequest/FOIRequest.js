@@ -249,7 +249,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleContactDetailsInitialValue = React.useCallback((value) => {
     setrequiredContactDetails(value);
   }, [])
-
+  const handleAxisDetailsInitialValue = React.useCallback((value) => {
+    setRequiredAxisDetails(value);
+  }, [])
 
   const handleApplicantDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredApplicantDetails, value, name);
@@ -565,7 +567,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       {(isAddRequest || requestState === StateEnum.unopened.name) &&
                         <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
-                        foiAxisRequestIds={foiAxisRequestIds}
+                        foiAxisRequestIds={foiAxisRequestIds} handleAxisDetailsInitialValue={handleAxisDetailsInitialValue}
                         handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
                       }
                       <ApplicantDetails

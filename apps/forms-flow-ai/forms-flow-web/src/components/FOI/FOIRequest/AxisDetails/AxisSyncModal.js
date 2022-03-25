@@ -85,14 +85,15 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     };
 
     const isMandatoryField = (field) => {
-      return Object.entries(MANDATORY_FOI_REQUEST_FIELDS).find(([key]) => key === field)?.[1];
+      return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
     };
 
     const checkValidation = (key) => {
       var mandatoryField = isMandatoryField(key);
-      if(mandatoryField && requestDetailsFromAxis[key])
-        return true;
-      else if(!mandatoryField){
+      console.log(mandatoryField);
+      if(mandatoryField && !requestDetailsFromAxis[key])
+        return false;
+      else{
         if((key === 'Extensions'))
           return true;
         if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
@@ -118,7 +119,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'Extensions':
             let extensionsArr = compareExtensions(key);
             if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
-              requestDetailsFromAxis[key].length === 0 )
+              (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
               updatedObj[key] = extensionsArr;
           break;
         default:
