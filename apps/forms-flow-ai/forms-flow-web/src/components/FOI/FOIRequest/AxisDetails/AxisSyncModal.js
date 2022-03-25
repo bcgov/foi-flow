@@ -93,7 +93,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       if(mandatoryField && requestDetailsFromAxis[key])
         return true;
       else if(!mandatoryField){
-        if((key === 'Extensions' && requestDetailsFromAxis[key] != extensions))
+        if((key === 'Extensions'))
           return true;
         if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
           return true;
@@ -112,7 +112,6 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           break;
         }
         case 'receivedDateUF':{
-          console.log("Inside receivedDateUF : ", formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy"))
           updatedObj['receivedDate'] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
         }
@@ -139,7 +138,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
               extensionsArr.push(property);
             });
           }
-          if(extensionsArr.length > 0)
+          if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
+                requestDetailsFromAxis[key].length === 0 )
             updatedObj[key] = extensionsArr;
           break;
         default:
