@@ -13,7 +13,7 @@ import {
 
 const ProcessingTeamColumns = [
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
@@ -101,7 +101,7 @@ const IntakeTeamColumns = [
     flex: 1,
   },
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     flex: 1,
@@ -136,7 +136,7 @@ const IntakeTeamColumns = [
 
 const FlexTeamColumns = [
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,

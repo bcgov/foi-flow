@@ -68,6 +68,9 @@ export const getHeaderText = ({requestDetails, ministryId}) => {
     return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
   }
 
+  if(requestDetails.axisRequestId)
+    return requestDetails.axisRequestId;
+
   if (requestDetails.idNumber && ministryId) {
     return requestDetails.idNumber;
   }

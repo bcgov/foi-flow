@@ -26,3 +26,6 @@ FORMSFLOW_API_URL=http://IPADDRESS:5000
 #application name
 APPLICATION_NAME=foi-flow
 REACT_APP_FOI_BASE_API_URL=http://IPADDRESS:15000
+
+##AXIS base URL
+REACT_APP_AXIS_API_URL=http://flowaxisapidev.gov.bc.ca
