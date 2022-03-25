@@ -25,7 +25,7 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
-import { SearchFilter } from "./enum";
+import { SearchFilter, DateRangeTypes } from "./enum";
 import {
   ConditionalComponent,
   formatDate,
@@ -141,6 +141,7 @@ const AdvancedSearch = ({ userDetail }) => {
   };
   const [requestTypes, setRequestTypes] = useState(initialRequestTypes);
 
+  const [selectedDateRangeType, setSelectedDateRangeType] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
@@ -170,6 +171,7 @@ const AdvancedSearch = ({ userDetail }) => {
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
+      dateRangeType: selectedDateRangeType || null,
       fromDate: fromDate || null,
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
@@ -234,6 +236,10 @@ const AdvancedSearch = ({ userDetail }) => {
       ...requestTypes,
       [event.target.name]: event.target.checked,
     });
+  };
+
+  const handleSelectedDateRangeTypeChange = (event) => {
+    setSelectedDateRangeType(event.target.value);
   };
 
   const handleSelectedPublicBodiesChange = (event) => {
@@ -644,6 +650,34 @@ const AdvancedSearch = ({ userDetail }) => {
                   </Typography>
                 </Grid>
 
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label" shrink>
+                      Type of Date Range
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      displayEmpty
+                      value={selectedDateRangeType}
+                      onChange={handleSelectedDateRangeTypeChange}
+                      input={<OutlinedInput label="Type of Date Range" notched />}
+                    >
+                      <MenuItem disabled value="" key="date-range-type-default">
+                        <em>Select Type of Date Range</em>
+                      </MenuItem>
+                      {DateRangeTypes.map((dateRangeType) => (
+                        <MenuItem
+                          key={`date-range-type-${dateRangeType.name}`}
+                          value={dateRangeType.name}
+                        >
+                          {dateRangeType.value}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
                 <Grid
                   container
                   item
@@ -697,7 +731,6 @@ const AdvancedSearch = ({ userDetail }) => {
                       InputProps={{
                         inputProps: {
                           min: formatDate(fromDate),
-                          max: formatDate(new Date()),
                         },
                       }}
                       value={toDate || ""}

@@ -308,7 +308,8 @@ class FOIMinistryRequest(db.Model):
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             stateforsorting,
             assignedtoformatted,
-            ministryassignedtoformatted
+            ministryassignedtoformatted,
+            FOIMinistryRequest.closedate
         ]
 
         basequery = _session.query(
@@ -442,7 +443,8 @@ class FOIMinistryRequest(db.Model):
             'duedate': FOIMinistryRequest.duedate,
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
-            'ministry': func.upper(ProgramArea.bcgovcode)
+            'ministry': func.upper(ProgramArea.bcgovcode),
+            'closedate': FOIMinistryRequest.closedate
         }.get(x, FOIMinistryRequest.filenumber)
 
     @classmethod
@@ -621,7 +623,8 @@ class FOIMinistryRequest(db.Model):
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             stateforsorting,
             assignedtoformatted,
-            ministryassignedtoformatted
+            ministryassignedtoformatted,
+            FOIMinistryRequest.closedate
         ]
 
         basequery = _session.query(
@@ -735,11 +738,11 @@ class FOIMinistryRequest(db.Model):
             searchcondition = FOIMinistryRequest.getfilterforsearch(params, iaoassignee, ministryassignee)
             filtercondition.append(searchcondition)
 
-        if(params['fromdate'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield('receivedDate', iaoassignee, ministryassignee) >= params['fromdate'])
+        if(params['fromdate'] is not None and params['daterangetype'] is not None):
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) >= params['fromdate'])
 
-        if(params['todate'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) <= params['todate'])
+        if(params['todate'] is not None and params['daterangetype'] is not None):
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) <= params['todate'])
         
         return filtercondition
 

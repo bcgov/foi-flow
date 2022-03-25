@@ -295,7 +295,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('onBehalfLastName'),
             FOIRawRequest.status.label('stateForSorting'),
             assignedtoformatted,
-            literal(None).label('ministryAssignedToFormatted')
+            literal(None).label('ministryAssignedToFormatted'),
+            literal(None).label('closedate')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -471,13 +472,28 @@ class FOIRawRequest(db.Model):
             searchcondition = FOIRawRequest.getfilterforsearch(params)
             filtercondition.append(searchcondition)
 
-        if(params['fromdate'] is not None):
-            filtercondition.append(FOIRawRequest.findfield('receivedDate') >= params['fromdate'])
+        if(params['daterangetype'] == 'closedate'):
+            #no rawrequest returned for this case
+            filtercondition.append(FOIRawRequest.requestid < 0)
+        else:
+            filtercondition.append(FOIRawRequest.getfilterforfromdate(params))
+            filtercondition.append(FOIRawRequest.getfilterfortodate(params))
 
-        if(params['todate'] is not None):
-            filtercondition.append(FOIRawRequest.findfield('duedate') <= params['todate'])
-        
         return filtercondition
+
+    @classmethod
+    def getfilterforfromdate(cls, params):
+        if(params['daterangetype'] is not None and params['fromdate'] is not None):
+            return FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate']
+        else:
+            return None
+
+    @classmethod
+    def getfilterfortodate(cls, params):
+        if(params['daterangetype'] is not None and params['todate'] is not None):
+            return FOIRawRequest.findfield(params['daterangetype']) <= params['todate']
+        else:
+            return None
 
     @classmethod
     def getfilterforrequeststate(cls, params, includeclosed):
