@@ -47,6 +47,16 @@ socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_EN
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   
+
+    flask_logger = setup_logging(
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.conf")
+    )  # important to do this first
+    logging.config.fileConfig(
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.conf")
+    )
+    app.logger = flask_logger
+    app.logger = logging.getLogger("app")
+    setup_filelogging(app)
  
     app.config.from_object(config.CONFIGURATION[run_mode])
 
