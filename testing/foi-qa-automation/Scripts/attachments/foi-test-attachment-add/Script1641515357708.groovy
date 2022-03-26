@@ -38,6 +38,8 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/div_attac
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
 
+println RunConfiguration.getProjectDir() +  '/Test Attachments'
+
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx')
 
