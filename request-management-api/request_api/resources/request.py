@@ -14,7 +14,7 @@
 """API endpoints for managing a FOI Requests resource."""
 
 
-from flask import g, request
+from flask import Flask, g, request
 from flask_restx import Namespace, Resource
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
@@ -27,6 +27,7 @@ from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 import json
 import asyncio
+import logging
 from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
@@ -212,6 +213,26 @@ class FOIRawRequestFields(Resource):
             if request.args['names'] == "ministries":
                 baserequestinfo = rawrequestservice().getrawrequestfields(requestid,["ministries"])                                    
                 return json.dumps(baserequestinfo), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/loggingtest')
+class LoggingTest(Resource):
+    """Test Logging levels NOT TO BE PUSHED TO TEST"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())       
+    def get():
+        try : 
+            app = Flask(__name__)
+            print(app.logger)
+            print("here")
+            app.logger.info("test")            
+            return {'status': 200, 'message':"Test complete"}, 200    
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:            
