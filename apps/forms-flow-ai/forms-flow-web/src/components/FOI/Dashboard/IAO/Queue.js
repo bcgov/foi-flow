@@ -48,6 +48,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       "lastName",
       "requestType",
       "idNumber",
+      "axisRequestId",
       "currentState",
       "assignedToLastName",
       "assignedToFirstName",

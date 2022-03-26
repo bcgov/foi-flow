@@ -47,6 +47,14 @@ const RequestDescription = React.memo(({
     const [localProgramAreaList, setLocalProgramAreaList] = React.useState([])
     //updates the default values from the request description box    
     useEffect(() => {
+
+      setStartDate(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
+      setEndDate(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
+      setRequestDescription(!!requestDetails.description ? requestDetails.description : "");
+      setPIIRedacted(ministryId ? true : !!requestDetails.ispiiredacted);
+      if(Object.entries(requestDetails).length !== 0){
+        setSelectedMinistries();
+      }
         const descriptionObject = {
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
@@ -58,40 +66,41 @@ const RequestDescription = React.memo(({
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
     
     useEffect(() => {
-      //if updated program area list not exists then, update the master list with selected ministries
-      if (Object.entries(programAreaList).length === 0) {
-        const selectedMinistries = !!requestDetails.selectedMinistries
-          ? requestDetails.selectedMinistries
-          : "";
-        if (
-          selectedMinistries !== "" &&
-          Object.entries(masterProgramAreaList).length !== 0
-        ) {
-          const selectedList = selectedMinistries.map(
-            (element) => element.code
-          );
-          masterProgramAreaList = masterProgramAreaList.map((programArea) => {
-            programArea.isChecked = !!selectedList.find(
-              (selectedMinistry) => selectedMinistry === programArea.bcgovcode
-            );
-            return programArea;
-          });
-        } else {
-          //if it is add request then keep all check boxes unchecked
-          masterProgramAreaList = masterProgramAreaList.map((programArea) => {
-            programArea.isChecked = false;
-            return programArea;
-          });
-        }
-      }
-      //if updated program area list exists then use that list instead of master data
-      else {
-        masterProgramAreaList = programAreaList;
-      }
 
-      setLocalProgramAreaList(masterProgramAreaList);
+      setSelectedMinistries();
+      
 
     }, [programAreaList, masterProgramAreaList]);
+
+    const setSelectedMinistries = () => {
+            //if updated program area list not exists then, update the master list with selected ministries
+            if (Object.entries(programAreaList).length === 0) {
+              const selectedMinistries = !!requestDetails.selectedMinistries? requestDetails.selectedMinistries
+                : "";
+              if (selectedMinistries !== "" && Object.entries(masterProgramAreaList).length !== 0) {
+                const selectedList = selectedMinistries.map(
+                  (element) => element.code
+                );
+                masterProgramAreaList = masterProgramAreaList?.map((programArea) => {
+                  programArea.isChecked = !!selectedList.find(
+                    (selectedMinistry) => selectedMinistry === programArea.bcgovcode
+                  );
+                  return programArea;
+                });
+              } else {
+                //if it is add request then keep all check boxes unchecked
+                masterProgramAreaList = masterProgramAreaList?.map((programArea) => {
+                  programArea.isChecked = false;
+                  return programArea;
+                });
+              }
+            }
+            //if updated program area list exists then use that list instead of master data
+            else {
+              masterProgramAreaList = programAreaList;
+            }
+            setLocalProgramAreaList(masterProgramAreaList);
+    }
 
     //component state management for startDate, endDate and Description
     const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");

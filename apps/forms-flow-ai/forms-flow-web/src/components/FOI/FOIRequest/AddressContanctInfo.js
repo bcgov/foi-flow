@@ -68,7 +68,10 @@ const AddressContactDetails = React.memo(({
     const [PostalText, setPostal] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE));
     const [ProvinceText, setProvince] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE));
     const [CountryText, setCountry] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)); 
+    
     React.useEffect(() => {
+    
+      setFieldValues();
       const contanctDetailsObject = {
           primaryAddress: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY),
           city: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY),
@@ -78,6 +81,21 @@ const AddressContactDetails = React.memo(({
         }
         handleContactDetailsInitialValue(contanctDetailsObject);
     },[requestDetails, handleContactDetailsInitialValue])
+
+
+    const setFieldValues = () => {
+      setHomePhone(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.HOME_PHONE));
+      setMobilePhone(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.MOBILE_PHONE));
+      setWorkPhonePrimary(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY));
+      setWorkPhoneSecondary(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY));
+      setStreetAddress(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY));
+      setSecondaryStreetAddress(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY));
+      setCity(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY));
+      setPostal(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE));
+      setProvince(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE));
+      setCountry(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY));
+    }
+
     const handleHomePhoneChange = (e) => {
         setHomePhone(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.HOME_PHONE, e.target.value);

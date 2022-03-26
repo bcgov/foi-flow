@@ -50,13 +50,11 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   }
 
   const handleClick = (notificationVal) => {
-    let idNumber = notificationVal.idnumber;
-    idNumber+='';
-    let requestIdStart = idNumber.substring(0, idNumber.indexOf("-"));
+
     if(checkCommentType(notificationVal.notificationtype)){
       setCommentUrl();
     }
-    else if(requestIdStart === 'U' && notificationVal.requesttype === 'rawrequest' && 
+    else if(notificationVal.requesttype === 'rawrequest' && 
      notification.notification.toLowerCase() === "moved to open state"){
         dispatch(fetchOpenedMinistriesForNotification(notificationVal, (err, res) => {
             getStatusAndRedirect(err, res);
