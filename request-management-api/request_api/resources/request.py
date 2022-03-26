@@ -27,7 +27,6 @@ from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 import json
 import asyncio
-import logging
 from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
