@@ -41,7 +41,7 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), Fa
 println RunConfiguration.getProjectDir() +  '/Test Attachments'
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/test2.pdf')
+    '/Test Attachments/test2.docx')
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
