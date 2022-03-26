@@ -315,6 +315,10 @@ export const checkValidationError = (
   );
 };
 
+/*******
+ * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
+ */
+//Below function will handle beforeunload event
 export const alertUser = (e) => {
   e.preventDefault();
   e.returnValue = "";
@@ -340,4 +344,8 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
   ) {
     return true;
   }
+};
+
+export const handleBeforeUnload = (e) => {
+  alertUser(e);
 };

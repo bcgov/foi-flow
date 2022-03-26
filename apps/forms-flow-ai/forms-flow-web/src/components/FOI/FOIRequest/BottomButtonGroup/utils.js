@@ -2,6 +2,7 @@ import {
   addBusinessDays
 } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
+import { handleBeforeUnload } from "../utils";
 
 export const dueDateCalculation = (dateText, noOfBusinessDays) => {
   if (!dateText) {
@@ -34,7 +35,6 @@ export const getRequestState = ({
   return requestState;
 };
 
-
 export const fillAssignmentFields = (request) => {
   if (request.requestType === "general") {
     request.assignedTo = null;
@@ -44,28 +44,20 @@ export const fillAssignmentFields = (request) => {
   }
 };
 
-export const alertUser = (e) => {
-  e.preventDefault();
-  e.returnValue = "";
-};
-
-export const handleBeforeUnload = (e) => {
-  alertUser(e);
-};
-
 export const returnToQueue = (e, _unSavedRequest) => {
   if (_unSavedRequest) {
+    e.preventDefault();
     if (
       window.confirm(
         "Are you sure you want to leave? Your changes will be lost."
       )
     ) {
-      e.preventDefault();
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.location.href = "/foi/dashboard";
     } else {
-      e.preventDefault();
       window.history.pushState(null, null, window.location.pathname);
     }
+  } else {
+    window.location.href = "/foi/dashboard";
   }
 };

@@ -16,12 +16,8 @@ import {
   ConditionalComponent
 } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
-import {
-  dueDateCalculation,
-  getRequestState,
-  handleBeforeUnload,
-  returnToQueue,
-} from "./utils";
+import { dueDateCalculation, getRequestState, returnToQueue } from "./utils";
+import { handleBeforeUnload } from "../utils";
 import clsx from "clsx";
 import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
@@ -65,8 +61,7 @@ const BottomButtonGroup = React.memo(
     disableInput,
     stateChanged,
     requestState,
-    setSaveRequestObject,
-    axisSyncedData
+    axisSyncedData,
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -92,7 +87,6 @@ const BottomButtonGroup = React.memo(
     const handleClosingReasonChange = (cReasonId) => {
       setClosingReasonId(cReasonId);
     };
- 
 
     useEffect(() => {
       if (stateChanged) {
@@ -349,14 +343,20 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
-          {urlIndexCreateRequest < 0 && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
-            Object.entries(axisSyncedData)?.length !== 0 &&
-            <button type="button" className="btn btn-bottom" 
-            onClick={(e) => {
-                setAxisSyncModalOpen(true);
-              }}>Sync with AXIS
-            </button>
-          }
+          {urlIndexCreateRequest < 0 &&
+            requestState?.toLowerCase() !==
+              StateEnum.intakeinprogress.name.toLowerCase() &&
+            Object.entries(axisSyncedData)?.length !== 0 && (
+              <button
+                type="button"
+                className="btn btn-bottom"
+                onClick={(e) => {
+                  setAxisSyncModalOpen(true);
+                }}
+              >
+                Sync with AXIS
+              </button>
+            )}
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {
@@ -371,17 +371,27 @@ const BottomButtonGroup = React.memo(
           <button
             type="button"
             className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
-            onClick={returnToQueue}
+            onClick={(e) => returnToQueue(e, unSavedRequest)}
           >
             Return to Queue
           </button>
         </div>
-        {
-          axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} 
-          saveRequest= {saveRequest} saveRequestObject= {saveRequestObject} urlIndexCreateRequest={urlIndexCreateRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={currentSelectedStatus}
-          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} axisSyncedData={axisSyncedData}/>
-        }
-        
+        {axisSyncModalOpen && (
+          <AxisSyncModal
+            axisSyncModalOpen={axisSyncModalOpen}
+            setAxisSyncModalOpen={setAxisSyncModalOpen}
+            saveRequest={saveRequest}
+            saveRequestObject={saveRequestObject}
+            urlIndexCreateRequest={urlIndexCreateRequest}
+            handleSaveRequest={handleSaveRequest}
+            currentSelectedStatus={currentSelectedStatus}
+            hasStatusRequestSaved={hasStatusRequestSaved}
+            requestState={requestState}
+            requestId={requestId}
+            ministryId={ministryId}
+            axisSyncedData={axisSyncedData}
+          />
+        )}
       </div>
     );
   }
