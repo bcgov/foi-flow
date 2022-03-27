@@ -92,7 +92,6 @@ const AdvancedSearch = ({ userDetail }) => {
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
   const [searchFilterSelected, setSearchFilterSelected] = useState(
-    SearchFilter.REQUEST_DESCRIPTION
   );
   const keywordsMode =
     searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
@@ -166,7 +165,7 @@ const AdvancedSearch = ({ userDetail }) => {
     }
     setSearchLoading(true);
     handleUpdateSearchFilter({
-      search: searchFilterSelected.replace("_", "").toLowerCase(),
+      search: searchFilterSelected?.replace("_", "").toLowerCase(),
       keywords: keywordsMode ? keywords : [searchText],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
@@ -185,7 +184,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const handleResetSearchFilters = () => {
     setSearchText("");
     setKeywords([]);
-    setSearchFilterSelected(SearchFilter.REQUEST_DESCRIPTION);
+    setSearchFilterSelected();
     setRequestState(intitialRequestState);
     setRequestTypes(initialRequestTypes);
     setRequestStatus(intitialRequestStatus);

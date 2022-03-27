@@ -585,6 +585,15 @@ class FOIRawRequest(db.Model):
                 keyword = keyword.replace('u-00', '')
                 searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
             return and_(*searchcondition)
+        elif(params['search'] == 'axisrequest_number'):
+            searchcondition1 = []
+            searchcondition2 = []
+            for keyword in params['keywords']:
+                keyword = keyword.lower()
+                keyword = keyword.replace('u-00', '')
+                searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
+                searchcondition2.append(FOIRawRequest.findfield('axisrequest_number').ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2))
         else:
             searchcondition = []
             for keyword in params['keywords']:
