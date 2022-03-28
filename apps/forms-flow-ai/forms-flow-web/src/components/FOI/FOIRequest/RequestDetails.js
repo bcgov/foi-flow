@@ -256,7 +256,8 @@ const RequestDetails = React.memo(
                         </TextField> 
                     </div>
                     <div className="col-lg-6 foi-details-col"> 
-                    <TextField                
+                    <TextField
+                            id="receivedDate"
                             label="Received Date"
                             type="date" 
                             value={receivedDateText || ''} 
@@ -270,7 +271,8 @@ const RequestDetails = React.memo(
                             fullWidth
                             disabled={!!ministryId || disableInput}
                         />
-                        <TextField                
+                        <TextField
+                            id="startDate"
                             label="Start Date"
                             type="date" 
                             value={startDateText || ''} 
@@ -286,7 +288,8 @@ const RequestDetails = React.memo(
                             disabled={!!ministryId || disableInput}
                         />
                         {requestDetails.currentState === undefined || (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) ?
-                        <TextField                
+                        <TextField
+                            id="dueDate"
                             label="Due Date"
                             type="date" 
                             value={dueDateText || ''}                            
@@ -299,7 +302,8 @@ const RequestDetails = React.memo(
                             fullWidth
                         />
                         :
-                        <TextField                
+                        <TextField
+                            id="dueDate"
                             label="Due Date"                            
                             value="N/A"                            
                             InputLabelProps={{

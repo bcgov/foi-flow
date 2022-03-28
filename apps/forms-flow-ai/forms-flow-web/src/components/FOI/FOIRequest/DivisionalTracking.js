@@ -21,7 +21,7 @@ const DivisionalTracking = React.memo(({divisions}) => {
     );
 
     return (
-        <Card className="foi-details-card">            
+        <Card className="foi-details-card" id="divisionalTracking">
         <label className="foi-details-label">DIVISIONAL TRACKING</label>
         <CardContent className='align-division'> 
         {displayDivisions}

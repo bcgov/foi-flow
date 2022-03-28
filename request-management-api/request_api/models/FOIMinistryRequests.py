@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref, aliased
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
 from sqlalchemy.sql.sqltypes import String
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -17,6 +17,7 @@ from .FOIRequestWatchers import FOIRequestWatcher
 from .ProgramAreas import ProgramArea
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
+from request_api.utils.enums import RequestorType
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -37,13 +38,13 @@ class FOIMinistryRequest(db.Model):
     recordsearchfromdate = db.Column(db.DateTime, nullable=True)
     recordsearchtodate = db.Column(db.DateTime, nullable=True)
 
-    startdate = db.Column(db.DateTime, nullable=False,default=datetime.now())
+    startdate = db.Column(db.DateTime, nullable=False,default=datetime.now)
     duedate = db.Column(db.DateTime, nullable=False)
     cfrduedate = db.Column(db.DateTime, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
     assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
                 
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -208,6 +209,17 @@ class FOIMinistryRequest(db.Model):
         for row in rs:
             requeststates.append(row["status"])
         return requeststates
+    
+    @classmethod
+    def getallstatenavigation(cls, ministryrequestid):                
+        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+        where foiministryrequestid=:ministryrequestid  order by version desc"""
+ 
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        requeststates = []
+        for row in rs:
+            requeststates.append(row["status"])
+        return requeststates
 
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO'):
@@ -223,38 +235,9 @@ class FOIMinistryRequest(db.Model):
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
         ]
 
-        #subquery for getting the first applicant mapping
-        subquery_applicantmapping_first = _session.query(
-            FOIRequestApplicantMapping.foirequest_id, 
-            FOIRequestApplicantMapping.foirequestversion_id, 
-            func.min(FOIRequestApplicantMapping.foirequestapplicantid
-        )
-            .label('first_id')).group_by(
-                FOIRequestApplicantMapping.foirequest_id, 
-                FOIRequestApplicantMapping.foirequestversion_id).subquery()
-        
-        joincondition_applicantmapping = [
-            subquery_applicantmapping_first.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
-            subquery_applicantmapping_first.c.foirequestversion_id == FOIRequestApplicantMapping.foirequestversion_id,
-            subquery_applicantmapping_first.c.first_id == FOIRequestApplicantMapping.foirequestapplicantid,
-        ]
         
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
-        #subquery for getting the second applicant mapping
-        subquery_applicantmapping_second = _session.query(
-            onbehalf_applicantmapping.foirequest_id, 
-            onbehalf_applicantmapping.foirequestversion_id, 
-            func.max(onbehalf_applicantmapping.foirequestapplicantid)
-            .label('second_id')).group_by(
-                onbehalf_applicantmapping.foirequest_id, 
-                onbehalf_applicantmapping.foirequestversion_id).subquery()
-        
-        joincondition_applicantmapping_onbehalf = [
-            subquery_applicantmapping_second.c.foirequest_id == onbehalf_applicantmapping.foirequest_id,
-            subquery_applicantmapping_second.c.foirequestversion_id == onbehalf_applicantmapping.foirequestversion_id,
-            subquery_applicantmapping_second.c.second_id == onbehalf_applicantmapping.foirequestapplicantid,
-        ]
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -267,6 +250,26 @@ class FOIMinistryRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
+
+        assignedtoformatted = case([
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
+                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
+                             iaoassignee.lastname),
+                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
+                             iaoassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
+
+        ministryassignedtoformatted = case([
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
+                             func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
+                             ministryassignee.lastname),
+                            (and_(ministryassignee.lastname.is_(None), ministryassignee.firstname.isnot(None)),
+                             ministryassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -297,7 +300,9 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting
+            stateforsorting,
+            assignedtoformatted,
+            ministryassignedtoformatted
         ]
 
         basequery = _session.query(
@@ -313,29 +318,21 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).join(
                                 FOIRequestApplicantMapping,
-                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id)
-                            ).join(
-                                subquery_applicantmapping_first,
-                                and_(*joincondition_applicantmapping)
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid                                
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
                             ).join(
                                 onbehalf_applicantmapping,
                                 and_(
                                     onbehalf_applicantmapping.foirequest_id == FOIMinistryRequest.foirequest_id, 
                                     onbehalf_applicantmapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, 
-                                    onbehalf_applicantmapping.foirequestapplicantid != FOIRequestApplicantMapping.foirequestapplicantid),
+                                    onbehalf_applicantmapping.requestortypeid == RequestorType['onbehalfof'].value),
                                 isouter=True
-                            ).join(
-                                subquery_applicantmapping_second,
-                                and_(*joincondition_applicantmapping_onbehalf),
-                                isouter=True
-                                
                             ).join(
                                 onbehalf_applicant,
                                 onbehalf_applicant.foirequestapplicantid == onbehalf_applicantmapping.foirequestapplicantid,  
-                                isouter=True               
+                                isouter=True
                             ).join(
                                 ApplicantCategory,
                                 and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
@@ -350,7 +347,7 @@ class FOIMinistryRequest(db.Model):
                                 ministryassignee,
                                 ministryassignee.username == FOIMinistryRequest.assignedministryperson,
                                 isouter=True
-                            )
+                            ).filter(FOIMinistryRequest.requeststatusid != 3)
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -380,19 +377,39 @@ class FOIMinistryRequest(db.Model):
         subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby)
 
         #sorting
+        sortingcondition = FOIMinistryRequest.getsorting(sortingitems, sortingorders, iaoassignee, ministryassignee)
+
+        return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
+    
+    @classmethod
+    def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee):
+        #sorting
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
                 order = sortingorders.pop()
-                if(order == 'desc'):
-                    sortingcondition.append(nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc()))
-                else:
-                    sortingcondition.append(nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc()))
+                sortingcondition.append(FOIMinistryRequest.getfieldforsorting(field, order, iaoassignee, ministryassignee))
 
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
-        return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
+        
+        return sortingcondition
+    
+    @classmethod
+    def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
+        #get one field
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted']
+        if(field in customizedfields):
+            if(order == 'desc'):
+                return nullslast(desc(field))
+            else:
+                return nullsfirst(asc(field))
+        else:
+            if(order == 'desc'):
+                return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
+            else:
+                return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc())
 
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
@@ -418,6 +435,9 @@ class FOIMinistryRequest(db.Model):
             'description': FOIMinistryRequest.description,
             'requestdescription': FOIMinistryRequest.description,
             'duedate': FOIMinistryRequest.duedate,
+            'cfrduedate': FOIMinistryRequest.cfrduedate,
+            'DueDateValue': FOIMinistryRequest.duedate,
+            'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode)
         }.get(x, FOIMinistryRequest.axisrequestid)
 
@@ -524,36 +544,36 @@ class FOIMinistryRequest(db.Model):
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
         ]
 
-        #subquery for getting the first applicant mapping
-        subquery_applicantmapping_first = _session.query(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id, func.min(FOIRequestApplicantMapping.foirequestapplicantid).label('first_id')).group_by(FOIRequestApplicantMapping.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id).subquery()
-        joincondition_applicantmapping = [
-            subquery_applicantmapping_first.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
-            subquery_applicantmapping_first.c.foirequestversion_id == FOIRequestApplicantMapping.foirequestversion_id,
-            subquery_applicantmapping_first.c.first_id == FOIRequestApplicantMapping.foirequestapplicantid,
-        ]
         
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
-        #subquery for getting the second applicant mapping
-        subquery_applicantmapping_second = _session.query(
-            onbehalf_applicantmapping.foirequest_id, 
-            onbehalf_applicantmapping.foirequestversion_id, 
-            func.max(onbehalf_applicantmapping.foirequestapplicantid)
-            .label('second_id')).group_by(
-                onbehalf_applicantmapping.foirequest_id, 
-                onbehalf_applicantmapping.foirequestversion_id).subquery()
-        
-        joincondition_applicantmapping_onbehalf = [
-            subquery_applicantmapping_second.c.foirequest_id == onbehalf_applicantmapping.foirequest_id,
-            subquery_applicantmapping_second.c.foirequestversion_id == onbehalf_applicantmapping.foirequestversion_id,
-            subquery_applicantmapping_second.c.second_id == onbehalf_applicantmapping.foirequestapplicantid,
-        ]
 
         stateforsorting = case([
                             (FOIRequestStatus.name == 'Open',
                              literal(None)),
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
+
+        assignedtoformatted = case([
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
+                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
+                             iaoassignee.lastname),
+                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
+                             iaoassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
+
+        ministryassignedtoformatted = case([
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
+                             func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
+                             ministryassignee.lastname),
+                            (and_(ministryassignee.lastname.is_(None), ministryassignee.firstname.isnot(None)),
+                             ministryassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -584,7 +604,9 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,            
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting
+            stateforsorting,
+            assignedtoformatted,
+            ministryassignedtoformatted
         ]
 
         basequery = _session.query(
@@ -600,10 +622,7 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).join(
                                 FOIRequestApplicantMapping,
-                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id)
-                            ).join(
-                                subquery_applicantmapping_first,
-                                and_(*joincondition_applicantmapping)
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
                             ).join(
                                 FOIRequestApplicant,
                                 FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
@@ -612,17 +631,12 @@ class FOIMinistryRequest(db.Model):
                                 and_(
                                     onbehalf_applicantmapping.foirequest_id == FOIMinistryRequest.foirequest_id, 
                                     onbehalf_applicantmapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, 
-                                    onbehalf_applicantmapping.foirequestapplicantid != FOIRequestApplicantMapping.foirequestapplicantid),
+                                    onbehalf_applicantmapping.requestortypeid == RequestorType['onbehalfof'].value),
                                 isouter=True
-                            ).join(
-                                subquery_applicantmapping_second,
-                                and_(*joincondition_applicantmapping_onbehalf),
-                                isouter=True
-                                
                             ).join(
                                 onbehalf_applicant,
                                 onbehalf_applicant.foirequestapplicantid == onbehalf_applicantmapping.foirequestapplicantid,  
-                                isouter=True               
+                                isouter=True
                             ).join(
                                 ApplicantCategory,
                                 and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
@@ -642,7 +656,24 @@ class FOIMinistryRequest(db.Model):
         return basequery.filter(ministryfilter)
 
     @classmethod
-    def advancedsearch(cls, params, iaoassignee, ministryassignee):
+    def advancedsearch(cls, params):
+        #ministry requests
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+
+        groupfilter = []
+        for group in params['groups']:
+            groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
+
+        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee).filter(or_(*groupfilter))
+
+        #sorting
+        sortingcondition = FOIMinistryRequest.getsorting(params['sortingitems'], params['sortingorders'], iaoassignee, ministryassignee)
+
+        return ministry_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+
+    @classmethod
+    def advancedsearchsubquery(cls, params, iaoassignee, ministryassignee):
         basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee)
 
         #filter/search

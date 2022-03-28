@@ -101,7 +101,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [_tabStatus, settabStatus] = React.useState(requestState);
   var foitabheaderBG = getTabBG(_tabStatus, requestState);
   var foiAxisRequestIds = useSelector(state=> state.foiRequests.foiAxisRequestIds);
-
+    
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -168,7 +168,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
-  console.log(`requestDetails === ${JSON.stringify(requestDetails)}`)
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
@@ -250,7 +249,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleContactDetailsInitialValue = React.useCallback((value) => {
     setrequiredContactDetails(value);
   }, [])
-
+  const handleAxisDetailsInitialValue = React.useCallback((value) => {
+    setRequiredAxisDetails(value);
+  }, [])
 
   const handleApplicantDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredApplicantDetails, value, name);
@@ -261,6 +262,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setrequiredContactDetails(detailsData);
   }
   const handleAxisDetailsValue = (value, name) => {
+    if(value)
+      setUnSavedRequest(true);
     const detailsData = assignValue(requiredAxisDetailsValue, value, name);
     setRequiredAxisDetails(detailsData);
   }
@@ -303,7 +306,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   //Variable to find if all required fields are filled or not
   const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, 
-    assignedToValue, requiredRequestDetailsValues, requiredAxisDetails);
+    assignedToValue, requiredRequestDetailsValues, requiredAxisDetails,isAddRequest);
 
   const classes = useStyles();
 
@@ -536,15 +539,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
               </>
             )}
 
-            <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.Option4.active,
-              })}
-              name="Option4"
-              onClick={() => tabclick("Option4")}
-            >
-              Option 4
-            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -573,7 +567,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       {(isAddRequest || requestState === StateEnum.unopened.name) &&
                         <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
-                        foiAxisRequestIds={foiAxisRequestIds}
+                        foiAxisRequestIds={foiAxisRequestIds} handleAxisDetailsInitialValue={handleAxisDetailsInitialValue}
                         handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
                       }
                       <ApplicantDetails
@@ -625,6 +619,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         programAreaList={programAreaList}
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
+                        requiredRequestDetailsValues = {requiredRequestDetailsValues}
                         handleUpdatedProgramAreaList={
                           handleUpdatedProgramAreaList
                         }
@@ -759,16 +754,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             ) : (
               <Loading />
             )}
-          </div>
-          <div
-            id="Option4"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.Option4.active,
-              [classes.displayed]: tabLinksStatuses.Option4.display,
-              [classes.hidden]: !tabLinksStatuses.Option4.display,
-            })}
-          >
-            <h3>Option 4</h3>
           </div>
         </div>
       </div>

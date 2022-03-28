@@ -15,14 +15,14 @@ class FOIRequest(db.Model):
     foirequestid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     version = db.Column(db.Integer, primary_key=True,nullable=False)
     requesttype = db.Column(db.String(15), unique=False, nullable=False)
-    receiveddate = db.Column(db.DateTime, default=datetime.now())
+    receiveddate = db.Column(db.DateTime, default=datetime.now)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
 
     initialdescription = db.Column(db.String(500), unique=False, nullable=True)
     initialrecordsearchfromdate = db.Column(db.DateTime, nullable=True)
     initialrecordsearchtodate = db.Column(db.DateTime, nullable=True)
                 
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -70,7 +70,8 @@ class FOIRequest(db.Model):
         ministryarr = [] 
         for ministry in foirequest.ministryRequests:
             assignedministrygroup = ministry.assignedministrygroup if ministry.assignedministrygroup is not None else ""                                
-            ministryarr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "version":ministry.version})    
+            assignedgroup = ministry.assignedgroup if ministry.assignedgroup is not None else ""                                
+            ministryarr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "assignedgroup": assignedgroup, "version":ministry.version})    
         return DefaultMethodResult(True,'Request added',foirequest.foirequestid,ministryarr,foirequest.wfinstanceid)
                           
     @classmethod

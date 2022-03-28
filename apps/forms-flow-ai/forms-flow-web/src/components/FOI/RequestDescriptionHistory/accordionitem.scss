@@ -3,17 +3,17 @@
 
 .MuiAccordion-root {       
     border: #c9c7c7 1px solid;
+    margin-bottom: 30px !important;
 }
 
 .MuiAccordionSummary-root.Mui-expanded {
     min-height: 48px !important;
 }
-#acc-request-history {
-    margin-bottom: 30px !important;
+
+.MuiAccordionSummary-root {
+    background-color: #eceaea !important;  
 }
-#acc-header {
-    background-color: #eceaea !important;    
-}
+
 .acc-details {
     background-color: #ffffff !important;
     padding: 16px 16px 16px !important;

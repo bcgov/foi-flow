@@ -4,8 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
   saveRequestDetails,
-  openRequestDetails,
-  fetchRequestDataFromAxis
+  openRequestDetails
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -20,7 +19,6 @@ import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import {
   dueDateCalculation,
   getRequestState,
-  fillAssignmentFields,
   returnToQueue,
   alertUser
 } from "./utils";
@@ -281,8 +279,13 @@ const BottomButtonGroup = React.memo(
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
           } 
           if (![StateEnum.closed.name, StateEnum.onhold.name].includes(currentSelectedStatus) && saveRequestObject.onholdTransitionDate) {
+            const today = new Date();
+
+            // make it start of today
+            today.setHours(0, 0, 0, 0);
+
             const onHoldDays = calculateDaysRemaining(
-              new Date(),
+              today,
               saveRequestObject.onholdTransitionDate
             );
             const calculatedCFRDueDate = addBusinessDays(

@@ -28,7 +28,7 @@ class FOIMinistryRequestDivision(db.Model):
     stage =  relationship("ProgramAreaDivisionStage",backref=backref("ProgramAreaDivisionStages"),uselist=False)
     
        
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)

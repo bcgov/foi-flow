@@ -13,8 +13,7 @@ import {
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
-  setExistingAxisRequestIds,
-  setAxisRequest
+  setExistingAxisRequestIds
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -422,7 +421,6 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          console.log(res.data);
           if(!isModal && Object.entries(res.data).length !== 0){
             dispatch(setFOIRequestDetail(res.data));
           }

@@ -288,7 +288,8 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails
+  requiredAxisDetails,
+  isAddRequest
 ) => {
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -297,7 +298,8 @@ export const checkValidationError = (
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
     !requiredRequestDescriptionValues.isProgramAreaSelected ||
-    !requiredRequestDescriptionValues.ispiiredacted ||
+    (requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL 
+    && !requiredRequestDescriptionValues.ispiiredacted) ||
     !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
@@ -309,7 +311,7 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    (isAddRequest && !requiredAxisDetails.axisRequestId)
   );
 };
 

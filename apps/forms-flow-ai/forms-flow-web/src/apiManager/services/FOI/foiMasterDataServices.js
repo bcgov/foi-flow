@@ -50,7 +50,11 @@ import {
   
   export const fetchFOIProgramAreaList = () => {    
     return (dispatch) => {
-      httpGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
+      httpGETRequest(
+        API.FOI_GET_PROGRAMAREAS_FORUSER_API,
+        {},
+        UserService.getToken()
+      )
         .then((res) => {
           if (res.data) {
             const foiProgramAreaList = res.data;

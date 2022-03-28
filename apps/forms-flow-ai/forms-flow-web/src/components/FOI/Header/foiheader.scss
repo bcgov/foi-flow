@@ -3,8 +3,7 @@
 nav {
   background-color: #036 !important;
   
-  padding-top:10px !important;
-  padding-bottom: 10px !important;
+  padding: 10px 0 !important;
   color: #fff;
 }
 
@@ -66,6 +65,7 @@ nav h2 {
 .foiheaderAppNamesection{
   display: inline-block;
   width: auto!important;
+  top: 7px;
 }
 
 .foiheaderUserStatusSection {
@@ -111,6 +111,16 @@ nav h2 {
   cursor: pointer;
 }
 
+.foiContainer{
+  margin: 0 10.5% !important;
+  padding: 0 !important;
+  > div {
+    > div{
+      padding: 0;
+    }
+  }
+  max-width: none !important;
+}
 
 /*  Mobile screens (phones, 500px and down) */
 @media only screen  and (max-width: 500px) {
