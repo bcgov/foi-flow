@@ -41,7 +41,7 @@ import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConst
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
-import { getMinistryBottomTextMap } from "./utils";
+import { getMinistryBottomTextMap, alertUser } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
 
 const useStyles = makeStyles((theme) => ({
@@ -109,7 +109,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       ? JSON.stringify(requestDetails["selectedMinistries"][0]["code"])
       : "";
   const [comment, setComment] = useState([]);
-  
+
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -329,17 +329,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       break;
   }
 
-  /*******
-   * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
-   */
-  //Below function will handle beforeunload event
-  const alertUser = (e) => {
-    if (editorChange) {
-      e.returnValue = "";
-      e.preventDefault();
-    }
-  };
-
   //Below function will handle popstate event
   const handleOnHashChange = (e) => {
     e.preventDefault();
@@ -429,7 +418,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.isAttachmentListLoading
   );
 
-  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
+  const requestNumber = requestDetails?.axisRequestId
+    ? requestDetails.axisRequestId
+    : requestDetails?.idNumber;
 
   const stateBox =
     requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ? (
