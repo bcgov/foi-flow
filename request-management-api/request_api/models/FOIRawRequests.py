@@ -28,7 +28,7 @@ class FOIRawRequest(db.Model):
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
     assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)    
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -46,10 +46,9 @@ class FOIRawRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
-    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:
-        createdat = datetime.now()        
+    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', created_at=createdat, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate)
 
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
@@ -59,10 +58,9 @@ class FOIRawRequest(db.Model):
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequest_foipayment(cls,_requestrawdata,notes, requirespayment, ispiiredacted)->DefaultMethodResult:                
-        createdat = datetime.now()        
+    def saverawrequest_foipayment(cls,_requestrawdata,notes, requirespayment, ispiiredacted)->DefaultMethodResult: 
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',created_at=createdat,createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=ispiiredacted,notes=notes, requirespayment= requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=ispiiredacted,notes=notes, requirespayment= requirespayment)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
@@ -155,12 +153,22 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
-        sql = """select CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'description' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
-                    CASE WHEN lower(status) <> 'unopened' then requestrawdata ->> 'fromDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
-                    CASE WHEN lower(status) <> 'unopened'then requestrawdata ->> 'toDate' ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
-                    to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted, 
-                    CASE WHEN lower(status) <> 'unopened' then createdby else 'Online Form' END  as createdby from "FOIRawRequests" fr 
-                    where requestid = :requestid order by version ;"""
+        sql = """select * ,
+                    CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
+                            then 'Online Form' 
+                            else savedby END  as createdby 
+                    from (select CASE WHEN lower(status) <> 'unopened' 
+                            then requestrawdata ->> 'description' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
+                        CASE WHEN lower(status) <> 'unopened' 
+                            then requestrawdata ->> 'fromDate' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
+                        CASE WHEN lower(status) <> 'unopened'
+                            then requestrawdata ->> 'toDate' 
+                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
+                        to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
+                        createdby as savedby from "FOIRawRequests" fr 
+                    where requestid = :requestid order by version ) as sq;"""
         rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []
         for row in rs:
@@ -253,6 +261,21 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
 
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                           ],
+                           else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
+
+        axisrequestid = case([
+            (FOIRawRequest.axisrequestid.is_(None),
+            'U-00' + cast(FOIRawRequest.requestid, String)),
+            ],
+            else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -267,7 +290,7 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
-            cast(FOIRawRequest.axisrequestid, String).label('axisRequestId'),
+            axisrequestid,
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -283,7 +306,9 @@ class FOIRawRequest(db.Model):
             description,
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
-            FOIRawRequest.status.label('stateForSorting')
+            FOIRawRequest.status.label('stateForSorting'),
+            assignedtoformatted,
+            literal(None).label('ministryAssignedToFormatted')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -304,13 +329,13 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid)
-
+        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
-            return basequery.filter(FOIRawRequest.status != 'Unopened').filter(filtercondition)
+            return basequery.filter(filtercondition)
         else:
-            return basequery.filter(FOIRawRequest.status != 'Unopened')
+            return basequery
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):
@@ -372,12 +397,14 @@ class FOIRawRequest(db.Model):
             'descriptionDescription': FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext,
             'ministry': FOIRawRequest.requestrawdata['selectedMinistries'].astext,
             'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext,
-            'duedate': FOIRawRequest.requestrawdata['dueDate'].astext
-        }.get(x, cast(FOIRawRequest.axisrequestid, String))
+            'duedate': FOIRawRequest.requestrawdata['dueDate'].astext,
+            'DueDateValue': FOIRawRequest.requestrawdata['dueDate'].astext,
+            'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext
+        }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'axisRequestId', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
         if x in validfields:
             return True
         else:
@@ -412,17 +439,14 @@ class FOIRawRequest(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.advancedsearch(params, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])
 
         #rawrequests
-        if "Intake Team" in params['groups'] or params['groups'] is None:                
-            query_full_queue = searchquery.union(subquery_ministry_queue)
-            return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
-        else:
-            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+        query_full_queue = searchquery.union(subquery_ministry_queue)
+        return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod
     def getfilterforadvancedsearch(cls, params):
@@ -475,16 +499,19 @@ class FOIRawRequest(db.Model):
         #request state: unopened, call for records, etc.
         requeststatecondition = []
         for state in params['requeststate']:
-            if(state == 3):
+            if(state == '3'):
                 requeststatecondition.append(FOIRawRequest.status == 'Closed')
                 includeclosed = True
-            elif(state == 5):
+            elif(state == '4'):
+                requeststatecondition.append(FOIRawRequest.status == 'Redirect')
+            elif(state == '5'):
                 requeststatecondition.append(FOIRawRequest.status == 'Unopened')
+            elif(state == '6'):
+                requeststatecondition.append(FOIRawRequest.status == 'Intake in Progress')
         
         if(len(requeststatecondition) == 0):
-            requeststatecondition.append(FOIRawRequest.status == 'Closed')
-            requeststatecondition.append(FOIRawRequest.status == 'Unopened')
-        
+            requeststatecondition.append(FOIRawRequest.status == 'Not Applicable')  #searched state does not apply to rawrequests
+
         return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
     
     @classmethod

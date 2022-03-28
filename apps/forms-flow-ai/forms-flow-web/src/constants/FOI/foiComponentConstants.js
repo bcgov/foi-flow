@@ -69,6 +69,8 @@ const FOI_COMPONENT_CONSTANTS = {
     ADD_REQUEST: "Add Request",
     REVIEW_REQUEST: "Review Request",
     ISPIIREDACTED:"ispiiredacted",
+    DIVISION:"division",
+    DIVISION_STAGE:"divisionStage",
     AXIS_REQUEST_ID:"axisRequestId"
   };
   

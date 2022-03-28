@@ -4,8 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
   saveRequestDetails,
-  openRequestDetails,
-  fetchRequestDataFromAxis
+  openRequestDetails
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -17,13 +16,8 @@ import {
   ConditionalComponent
 } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
-import {
-  dueDateCalculation,
-  getRequestState,
-  fillAssignmentFields,
-  returnToQueue,
-  alertUser
-} from "./utils";
+import { dueDateCalculation, getRequestState, returnToQueue } from "./utils";
+import { handleBeforeUnload } from "../utils";
 import clsx from "clsx";
 import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
@@ -67,10 +61,8 @@ const BottomButtonGroup = React.memo(
     disableInput,
     stateChanged,
     requestState,
-    setSaveRequestObject,
-    axisSyncedData
+    axisSyncedData,
   }) => {
-    
     /**
      * Bottom Button Group of Review request Page
      * Button enable/disable is handled here based on the validation
@@ -95,11 +87,10 @@ const BottomButtonGroup = React.memo(
     const handleClosingReasonChange = (cReasonId) => {
       setClosingReasonId(cReasonId);
     };
- 
 
     useEffect(() => {
-      if(stateChanged){
-        requestState= saveRequestObject.currentState;
+      if (stateChanged) {
+        requestState = saveRequestObject.currentState;
       }
     }, [stateChanged]);
 
@@ -171,26 +162,22 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatusid = StateEnum.open.id;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
-        }
-        else {
-          openRequest();          
+        } else {
+          openRequest();
         }
       }
     }, [currentSelectedStatus, stateChanged]);
 
-    const handleBeforeUnload = (e) => {
-      if (unSavedRequest) alertUser(e);
-    };
     React.useEffect(() => {
       if (unSavedRequest) {
         window.history.pushState(null, null, window.location.pathname);
-        window.addEventListener("popstate", handleOnHashChange);     
-        window.addEventListener("beforeunload",handleBeforeUnload);
+        window.addEventListener("popstate", handleOnHashChange);
+        window.addEventListener("beforeunload", handleBeforeUnload);
         return () => {
-          window.removeEventListener("popstate", handleOnHashChange);        
-          window.removeEventListener("beforeunload",handleBeforeUnload);
+          window.removeEventListener("popstate", handleOnHashChange);
+          window.removeEventListener("beforeunload", handleBeforeUnload);
         };
-      }    
+      }
     }, [unSavedRequest]);
 
     const openRequest = () => {
@@ -206,8 +193,7 @@ const BottomButtonGroup = React.memo(
         setsaveModal(true);
     };
 
-    const handleModal = (value) => {  
-        
+    const handleModal = (value) => {
       setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);
@@ -249,7 +235,6 @@ const BottomButtonGroup = React.memo(
           }
         })
       );
-     
     };
 
     const handleSaveModal = (value, fileInfoList) => {
@@ -279,10 +264,20 @@ const BottomButtonGroup = React.memo(
           ) {
             const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
             saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-          } 
-          if (![StateEnum.closed.name, StateEnum.onhold.name].includes(currentSelectedStatus) && saveRequestObject.onholdTransitionDate) {
+          }
+          if (
+            ![StateEnum.closed.name, StateEnum.onhold.name].includes(
+              currentSelectedStatus
+            ) &&
+            saveRequestObject.onholdTransitionDate
+          ) {
+            const today = new Date();
+
+            // make it start of today
+            today.setHours(0, 0, 0, 0);
+
             const onHoldDays = calculateDaysRemaining(
-              new Date(),
+              today,
               saveRequestObject.onholdTransitionDate
             );
             const calculatedCFRDueDate = addBusinessDays(
@@ -301,7 +296,7 @@ const BottomButtonGroup = React.memo(
 
         case StateEnum.redirect.name:
         case StateEnum.open.name:
-        case StateEnum.intakeinprogress.name:        
+        case StateEnum.intakeinprogress.name:
         case StateEnum.review.name:
         case StateEnum.onhold.name:
         case StateEnum.signoff.name:
@@ -320,7 +315,7 @@ const BottomButtonGroup = React.memo(
 
         default:
           return;
-      }    
+      }
     };
 
     return (
@@ -348,14 +343,20 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
-          {urlIndexCreateRequest < 0 && requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
-            Object.entries(axisSyncedData)?.length !== 0 &&
-            <button type="button" className="btn btn-bottom" 
-            onClick={(e) => {
-                setAxisSyncModalOpen(true);
-              }}>Sync with AXIS
-            </button>
-          }
+          {urlIndexCreateRequest < 0 &&
+            requestState?.toLowerCase() !==
+              StateEnum.intakeinprogress.name.toLowerCase() &&
+            Object.entries(axisSyncedData)?.length !== 0 && (
+              <button
+                type="button"
+                className="btn btn-bottom"
+                onClick={(e) => {
+                  setAxisSyncModalOpen(true);
+                }}
+              >
+                Sync with AXIS
+              </button>
+            )}
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {
@@ -370,17 +371,27 @@ const BottomButtonGroup = React.memo(
           <button
             type="button"
             className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
-            onClick={returnToQueue}
+            onClick={(e) => returnToQueue(e, unSavedRequest)}
           >
             Return to Queue
           </button>
         </div>
-        {
-          axisSyncModalOpen && <AxisSyncModal axisSyncModalOpen={axisSyncModalOpen} setAxisSyncModalOpen={setAxisSyncModalOpen} 
-          saveRequest= {saveRequest} saveRequestObject= {saveRequestObject} urlIndexCreateRequest={urlIndexCreateRequest} handleSaveRequest={handleSaveRequest} currentSelectedStatus={currentSelectedStatus}
-          hasStatusRequestSaved ={hasStatusRequestSaved} requestState={requestState} requestId= {requestId} ministryId={ministryId} axisSyncedData={axisSyncedData}/>
-        }
-        
+        {axisSyncModalOpen && (
+          <AxisSyncModal
+            axisSyncModalOpen={axisSyncModalOpen}
+            setAxisSyncModalOpen={setAxisSyncModalOpen}
+            saveRequest={saveRequest}
+            saveRequestObject={saveRequestObject}
+            urlIndexCreateRequest={urlIndexCreateRequest}
+            handleSaveRequest={handleSaveRequest}
+            currentSelectedStatus={currentSelectedStatus}
+            hasStatusRequestSaved={hasStatusRequestSaved}
+            requestState={requestState}
+            requestId={requestId}
+            ministryId={ministryId}
+            axisSyncedData={axisSyncedData}
+          />
+        )}
       </div>
     );
   }

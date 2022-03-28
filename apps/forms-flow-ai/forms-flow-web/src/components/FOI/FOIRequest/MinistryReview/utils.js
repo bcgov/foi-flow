@@ -48,3 +48,8 @@ export const getHeaderText = (requestDetails) => {
     return `Request #${requestDetails.idNumber}`;   
   return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
 };
+
+export const alertUser = (e) => {
+  e.returnValue = "";
+  e.preventDefault();
+};

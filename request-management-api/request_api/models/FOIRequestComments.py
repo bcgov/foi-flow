@@ -20,7 +20,7 @@ class FOIRequestComment(db.Model):
     taggedusers = db.Column(JSON, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime2.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -49,6 +49,9 @@ class FOIRequestComment(db.Model):
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
         if(comment.count() > 0) :             
+            childcomments = dbquery.filter_by(parentcommentid=commentid, isactive=True)
+            if (childcomments.count() > 0) :
+                return DefaultMethodResult(False,'Cannot delete parent comment with replies',commentid)
             comment.update({FOIRequestComment.isactive:False, FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Comment disabled',commentid)

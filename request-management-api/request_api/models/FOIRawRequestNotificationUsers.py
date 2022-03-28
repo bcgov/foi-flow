@@ -16,7 +16,7 @@ class FOIRawRequestNotificationUser(db.Model):
     notificationuserid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     notificationid = db.Column(db.Integer,ForeignKey('FOIRawRequestNotifications.notificationid'))
     userid = db.Column(db.String(100), unique=False, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime2.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)

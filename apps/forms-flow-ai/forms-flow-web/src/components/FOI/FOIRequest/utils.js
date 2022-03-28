@@ -261,17 +261,14 @@ export const createRequestDetailsObjectFunc = (
   return requestObject;
 };
 
-export const checkContactGiven = (
-  requiredContactDetails,
-  requiredApplicantDetails
-) => {
+export const checkContactGiven = (requiredContactDetails) => {
   return (
     (requiredContactDetails.primaryAddress === "" ||
       requiredContactDetails.city === "" ||
       requiredContactDetails.province === "" ||
       requiredContactDetails.country === "" ||
       requiredContactDetails.postalCode === "") &&
-    requiredApplicantDetails.email === ""
+    requiredContactDetails.email === ""
   );
 };
 
@@ -288,7 +285,8 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails
+  requiredAxisDetails,
+  isAddRequest
 ) => {
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -297,7 +295,9 @@ export const checkValidationError = (
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
     !requiredRequestDescriptionValues.isProgramAreaSelected ||
-    !requiredRequestDescriptionValues.ispiiredacted ||
+    (requiredRequestDetailsValues.requestType.toLowerCase() ===
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
+      !requiredRequestDescriptionValues.ispiiredacted) ||
     !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
@@ -309,10 +309,14 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    (isAddRequest && !requiredAxisDetails.axisRequestId)
   );
 };
 
+/*******
+ * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
+ */
+//Below function will handle beforeunload event
 export const alertUser = (e) => {
   e.preventDefault();
   e.returnValue = "";
@@ -338,4 +342,8 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
   ) {
     return true;
   }
+};
+
+export const handleBeforeUnload = (e) => {
+  alertUser(e);
 };

@@ -8,10 +8,12 @@ from request_api.services.requestservice import requestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.eventservice import eventservice
+from request_api.services.events.extension import ExtensionType
 from datetime import datetime
 import asyncio
 import json
 import base64
+from request_api.exceptions import BusinessException, Error
 
 class extensionservice:
     """ FOI Extension management service
@@ -40,7 +42,7 @@ class extensionservice:
 
     def __ispublicbodyextension(self, reasonid):
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
-        return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'
+        return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value
 
     def getrequestextension(self, extensionid):
         requestextension = FOIRequestExtension().getextension(extensionid)
@@ -55,7 +57,8 @@ class extensionservice:
         reasonid = extensionschema['extensionreasonid']
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
         ispublicbodyextension = self.__ispublicbodyextension(reasonid)
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:            
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:
+            self.validatecreateextension(ministryrequestid, extensionschema, ispublicbodyextension)
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
@@ -69,6 +72,20 @@ class extensionservice:
         if 'documents' in extensionschema and extensionschema['extensionstatusid'] != 1:
             self.saveextensiondocument(extensionschema['documents'], ministryrequestid, userid, extnsionresult.identifier)
         return extnsionresult
+    
+
+    def validatecreateextension(self, ministryrequestid, extensionschema, ispublicbodyextension= None):
+        if ispublicbodyextension is None:
+            ispublicbodyextension = self.__ispublicbodyextension(extensionschema['extensionreasonid'])
+            
+        if not ispublicbodyextension:
+            return
+        
+        extensions = self.getrequestextensions(ministryrequestid)
+        publicbodyextensiondays = [extension['extendedduedays'] for extension in extensions if extension['extensiontype'] == ExtensionType.publicbody.value]
+        if sum(publicbodyextensiondays) + extensionschema['extendedduedays'] > 30:
+            raise BusinessException(Error.INVALID_INPUT)
+        
     
     def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
         version = self.__getversionforrequest(ministryrequestid)
@@ -89,7 +106,7 @@ class extensionservice:
         decisiondate = approveddate if approveddate else denieddate
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
 
-        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body': 
+        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value: 
             extensionstatusid = 2
         elif 'extensionstatusid' in extension:
             extensionstatusid = extension['extensionstatusid']
@@ -229,7 +246,7 @@ class extensionservice:
     def getextendedduedate(self, extensionschema):
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
         # if status is Approved or reason is Public Body then directly take the extendedduedate
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == 'Public Body':
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == ExtensionType.publicbody.value:
             return extensionschema['extendedduedate']
 
     def getlatestapprovedrequest(self, extensionid, ministryrequestid, ministryversion):

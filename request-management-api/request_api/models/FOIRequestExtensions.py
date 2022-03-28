@@ -20,7 +20,7 @@ class FOIRequestExtension(db.Model):
     version =db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
     
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -88,7 +88,7 @@ class FOIRequestExtension(db.Model):
     def createextensionversion(cls,ministryrequestid,ministryrequestversion, extension, userid):
         # if 'document' in extension:
         #     newextensiondocument = 
-        newextesion = FOIRequestExtension( foirequestextensionid=extension["foirequestextensionid"], extensionreasonid=extension['extensionreasonid'], extensionstatusid=extension['extensionstatusid'], extendedduedays=extension["extendedduedays"], extendedduedate=extension["extendedduedate"], decisiondate=extension["decisiondate"], approvednoofdays=extension["approvednoofdays"], version=extension["version"], isactive=extension["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
+        newextesion = FOIRequestExtension( foirequestextensionid=extension["foirequestextensionid"], extensionreasonid=extension['extensionreasonid'], extensionstatusid=extension['extensionstatusid'], extendedduedays=extension["extendedduedays"], extendedduedate=extension["extendedduedate"], decisiondate=extension["decisiondate"], approvednoofdays=extension["approvednoofdays"], version=extension["version"], isactive=extension["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, createdby=userid)
         db.session.add(newextesion)
         db.session.commit()               
         return DefaultMethodResult(True,'New Extension version created', newextesion.foirequestextensionid) 

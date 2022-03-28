@@ -26,8 +26,10 @@ import {
   ConditionalComponent,
   calculateDaysRemaining,
 } from "../../../../helper/FOI/helper";
-
 import ApplicantDetails from "./ApplicantDetails";
+import ChildDetails from "./ChildDetails";
+import OnBehalfDetails from "./OnBehalfDetails";
+import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 import RequestDetails from "./RequestDetails";
 import RequestDescription from "./RequestDescription";
 import RequestHeader from "./RequestHeader";
@@ -39,7 +41,8 @@ import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConst
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
-import { getMinistryBottomTextMap } from "./utils";
+import { getMinistryBottomTextMap, alertUser } from "./utils";
+import DivisionalTracking from "../DivisionalTracking";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -80,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MinistryReview = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
+  const [requestState, setRequestState] = useState();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
@@ -105,7 +109,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       ? JSON.stringify(requestDetails["selectedMinistries"][0]["code"])
       : "";
   const [comment, setComment] = useState([]);
-  const [requestState, setRequestState] = useState();
+
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -140,12 +144,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
 
-  useEffect(()=>{
-    if(window.location.href.indexOf("comments") > -1){
-      tabclick('Comments');
+  useEffect(() => {
+    if (window.location.href.indexOf("comments") > -1) {
+      tabclick("Comments");
     }
-  },[])
-  
+  }, []);
+
   useEffect(() => {
     if (ministryId) {
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
@@ -204,22 +208,19 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setMinistryAssignedToValue(value);
   };
 
-  let hasincompleteDivstage = false;
-  divstages.forEach((item) => {
-    if (
-      item.divisionid === -1 ||
-      item.stageid === -1 ||
-      item.stageid === "" ||
-      item.divisionid === ""
-    ) {
-      hasincompleteDivstage = true;
-    }
+  const isFalseDivStageInput = (divStageInput) =>
+    divStageInput === -1 || !Boolean(divStageInput);
+
+  const hasincompleteDivstage = divstages.some((item) => {
+    // XOR or Exlusive Or operation. Returns true if only one field is set and the other is not
+    return isFalseDivStageInput(item.divisionid)
+      ? !isFalseDivStageInput(item.stageid)
+      : isFalseDivStageInput(item.stageid);
   });
 
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    divstages.length === 0 ||
     hasincompleteDivstage;
 
   const createMinistryRequestDetailsObject = (
@@ -328,17 +329,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       break;
   }
 
-  /*******
-   * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
-   */
-  //Below function will handle beforeunload event
-  const alertUser = (e) => {
-    if (editorChange) {
-      e.returnValue = "";
-      e.preventDefault();
-    }
-  };
-
   //Below function will handle popstate event
   const handleOnHashChange = (e) => {
     e.preventDefault();
@@ -428,7 +418,41 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.isAttachmentListLoading
   );
 
-  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
+  const requestNumber = requestDetails?.axisRequestId
+    ? requestDetails.axisRequestId
+    : requestDetails?.idNumber;
+
+  const stateBox =
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ? (
+      <span className="state-box">Closed</span>
+    ) : (
+      <StateDropDown
+        requestState={requestState}
+        updateStateDropDown={updateStateDropDown}
+        requestStatus={_requestStatus}
+        handleStateChange={handleStateChange}
+        isMinistryCoordinator={true}
+        isValidationError={isValidationError}
+      />
+    );
+
+  const divisions =
+    requestDetails?.divisions?.length > 0 ? requestDetails.divisions : [];
+  const ministrycode =
+    requestDetails?.selectedMinistries?.length > 0
+      ? requestDetails.selectedMinistries[0].code
+      : "";
+  const divisionsBox =
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ? (
+      <DivisionalTracking divisions={divisions} />
+    ) : (
+      <RequestTracking
+        pubmindivstagestomain={pubmindivstagestomain}
+        existingDivStages={divisions}
+        ministrycode={ministrycode}
+        createMinistrySaveRequestObject={createMinistrySaveRequestObject}
+      />
+    );
 
   return !isLoading &&
     requestDetails &&
@@ -442,16 +466,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               <a href="/foi/dashboard">FOI</a>
             </h1>
           </div>
-          <div className="foileftpaneldropdown">
-            <StateDropDown
-              requestState={requestState}
-              updateStateDropDown={updateStateDropDown}
-              requestStatus={_requestStatus}
-              handleStateChange={handleStateChange}
-              isMinistryCoordinator={true}
-              isValidationError={isValidationError}
-            />
-          </div>
+          <div className="foileftpaneldropdown">{stateBox}</div>
 
           <div className="tab">
             <div
@@ -486,15 +501,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
               {requestNotes && requestNotes.length > 0
                 ? `(${requestNotes.length})`
                 : ""}
-            </div>
-            <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.Option4.active,
-              })}
-              name="Option4"
-              onClick={() => tabclick("Option4")}
-            >
-              Option 4
             </div>
           </div>
 
@@ -537,19 +543,18 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           }
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
+                        <ChildDetails requestDetails={requestDetails} />
+                        <OnBehalfDetails requestDetails={requestDetails} />
                         <RequestDescription requestDetails={requestDetails} />
                         <RequestDetails requestDetails={requestDetails} />
+                        <AdditionalApplicantDetails
+                          requestDetails={requestDetails}
+                        />
                         <ExtensionDetails
                           requestDetails={requestDetails}
                           requestState={requestState}
                         />
-                        <RequestTracking
-                          pubmindivstagestomain={pubmindivstagestomain}
-                          existingDivStages={requestDetails.divisions}
-                          ministrycode={
-                            requestDetails.selectedMinistries[0].code
-                          }
-                        />
+                        {divisionsBox}
                         {/* <RequestNotes /> */}
                         <BottomButtonGroup
                           requestState={requestState}
@@ -641,16 +646,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
             ) : (
               <Loading />
             )}
-          </div>
-          <div
-            id="Option4"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.Option4.active,
-              [classes.displayed]: tabLinksStatuses.Option4.display,
-              [classes.hidden]: !tabLinksStatuses.Option4.display,
-            })}
-          >
-            <h3>Option 4</h3>
           </div>
         </div>
       </div>

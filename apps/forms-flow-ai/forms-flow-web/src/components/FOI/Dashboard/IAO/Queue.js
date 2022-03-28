@@ -16,7 +16,6 @@ import Loading from "../../../../containers/Loading";
 import {
   debounce,
   ClickableChip,
-  getAssigneeValue,
   updateSortModel,
 } from "../utils";
 import Grid from "@mui/material/Grid";
@@ -56,7 +55,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     ],
     keyword: null,
   });
-  const [requestFilter, setRequestFilter] = useState("All");
+  const [requestFilter, setRequestFilter] = useState("myRequests");
 
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
@@ -90,18 +89,8 @@ const Queue = ({ userDetail, tableInfo }) => {
     setRowsState(defaultRowsState);
   }, 500);
 
-  const updateAssigneeName = (data) => {
-    if (!data) {
-      return [];
-    }
-    return data.map((row) => ({
-      ...row,
-      assignedToName: getAssigneeValue(row),
-    }));
-  };
-
   const rows = useMemo(() => {
-    return updateAssigneeName(requestQueue?.data);
+    return requestQueue?.data || [];
   }, [JSON.stringify(requestQueue)]);
 
   const renderReviewRequest = (e) => {
@@ -154,13 +143,14 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="center"
             direction="row"
-            xs={7.5}
+            xs={true}
             sx={{
               borderRight: "2px solid #38598A",
               backgroundColor: "rgba(56,89,138,0.1)",
             }}
           >
             <InputBase
+              id="filter"
               placeholder="Search in Queue ..."
               onChange={setSearch}
               sx={{
@@ -181,10 +171,12 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="flex-start"
             justifyContent="center"
-            xs={4.5}
+            xs={3}
+            minWidth="390px"
           >
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
               <ClickableChip
+                id="myRequests"
                 key={`my-requests`}
                 label={"MY REQUESTS"}
                 color="primary"
@@ -193,6 +185,7 @@ const Queue = ({ userDetail, tableInfo }) => {
                 clicked={requestFilter === "myRequests"}
               />
               <ClickableChip
+                id="teamRequests"
                 key={`team-requests`}
                 label={"MY TEAM'S REQUESTS"}
                 color="primary"
@@ -201,6 +194,7 @@ const Queue = ({ userDetail, tableInfo }) => {
                 clicked={requestFilter === "All"}
               />
               <ClickableChip
+                id="watchingRequests"
                 key={`watching-requests`}
                 label={"WATCHING REQUESTS"}
                 color="primary"
