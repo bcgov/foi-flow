@@ -4,6 +4,7 @@ import CardContent from "@material-ui/core/CardContent";
 import TextField from "@material-ui/core/TextField";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { makeStyles } from "@material-ui/core/styles";
+import * as EmailValidator from "email-validator";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -253,7 +254,7 @@ const AddressContactDetails = memo(
     const handleEmailChange = (e) => {
       var emailValidation = {};
       if (e.target.value) {
-        const helperText = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e.target.value)
+        const helperText = EmailValidator.validate(e.target.value)
           ? ""
           : "Email is not valid.";
         emailValidation = { field: "Email", helperTextValue: helperText };
