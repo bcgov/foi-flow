@@ -47,16 +47,48 @@ socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_EN
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   
-
-    flask_logger = setup_logging(
-        os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.conf")
-    )  # important to do this first
-    logging.config.fileConfig(
-        os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.conf")
-    )
+    # flask_logger = setup_logging(
+    #     os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.conf")
+    # )
+    flask_logger = setup_logging({
+        'version': 1,
+        'formatters': {'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s in %(module)s:%(filename)s:%(lineno)d - %(funcName)s: %(message)s',
+        }},
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
+                'formatter': 'simple',
+                'level': os.getenv('FLASK_CONSOLE_LOGGING_LEVEL')
+            },            
+            'file': {
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': 'request_api/logfile.log',
+                'formatter': 'simple',
+                'when':'d',
+                'interval':1,
+                'backupCount':5,
+                'level': os.getenv('FLASK_FILE_LOGGING_LEVEL')
+            }
+        },
+        'root': {
+            'level': os.getenv('FLASK_ROOT_LOGGING_LEVEL'),
+            'handlers': ['console', 'file']
+        },
+        'DATA-MANUFACTURING': {
+            'level': os.getenv('FLASK_DATA_LOGGING_LEVEL'),
+            'handlers': ['console', 'file'],
+            'propagate': False
+        },
+        'jaeger_tracing': {
+            'level': os.getenv('FLASK_TRACE_LOGGING_LEVEL'),
+            'handlers': ['console', 'file'],
+            'propagate': False
+        }
+    })
     app.logger = flask_logger
-    app.logger = logging.getLogger("app")
-    setup_filelogging(app)
+    # setup_filelogging(app)
  
     app.config.from_object(config.CONFIGURATION[run_mode])
 

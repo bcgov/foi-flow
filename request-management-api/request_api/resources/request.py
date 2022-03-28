@@ -27,6 +27,7 @@ from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 import json
 import asyncio
+import logging, warnings
 from jose import jwt as josejwt
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
@@ -230,7 +231,10 @@ class LoggingTest(Resource):
             app = Flask(__name__)
             print(app.logger)
             print("here")
-            app.logger.info("test")            
+            app.logger.info("test") 
+            logger = logging.getLogger('api')           
+            logger.warning('test logger warning')
+            warnings.warn('test warn')
             return {'status': 200, 'message':"Test complete"}, 200    
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 400    

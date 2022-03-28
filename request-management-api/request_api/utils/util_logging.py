@@ -22,16 +22,21 @@ def setup_logging(conf):
 
     TODO should be reworked to load in the proper loggers and remove others
     """
-    if conf and path.isfile(conf):
-        logfilepath = 'request_api/logs/logfile.log'
-        logdir = os.path.dirname(logfilepath)
+    
+    if type(conf) is dict:
+        logging.config.dictConfig(conf)
+        print('Configure logging, from conf:{}'.format(conf), file=sys.stdout)
+    elif conf and path.isfile(conf):
+        # logfilepath = 'request_api/logs/logfile.log'
+        # logdir = os.path.dirname(logfilepath)
 
-        if not os.path.exists(logdir):
-            os.mkdir(logdir)
+        # if not os.path.exists(logdir):
+        #     os.mkdir(logdir)
         logging.config.fileConfig(conf)
         print('Configure logging, from conf:{}'.format(conf), file=sys.stdout)
     else:
         print('Unable to configure logging, attempted conf:{}'.format(conf), file=sys.stderr)
+    return logging.getLogger(__name__)
 
 def setup_filelogging(app):
 
