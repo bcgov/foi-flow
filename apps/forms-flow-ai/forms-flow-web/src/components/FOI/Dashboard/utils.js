@@ -62,11 +62,17 @@ export const updateSortModel = (sortModel) => {
       );
     }
 
-    if (field == "assignedToName") {
+    if (field == "DueDateValue") {
       smodel.shift();
       smodel.unshift(
-        { field: "assignedToLastName", sort: order },
-        { field: "assignedToFirstName", sort: order }
+        { field: "duedate", sort: order },
+      );
+    }
+
+    if (field == "DaysLeftValue") {
+      smodel.shift();
+      smodel.unshift(
+        { field: "duedate", sort: order },
       );
     }
   }

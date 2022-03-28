@@ -26,8 +26,10 @@ import {
   ConditionalComponent,
   calculateDaysRemaining,
 } from "../../../../helper/FOI/helper";
-
 import ApplicantDetails from "./ApplicantDetails";
+import ChildDetails from "./ChildDetails";
+import OnBehalfDetails from "./OnBehalfDetails";
+import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 import RequestDetails from "./RequestDetails";
 import RequestDescription from "./RequestDescription";
 import RequestHeader from "./RequestHeader";
@@ -40,7 +42,7 @@ import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap } from "./utils";
-import DivisionalTracking from '../DivisionalTracking';
+import DivisionalTracking from "../DivisionalTracking";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MinistryReview = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
+  const [requestState, setRequestState] = useState();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
@@ -106,7 +109,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       ? JSON.stringify(requestDetails["selectedMinistries"][0]["code"])
       : "";
   const [comment, setComment] = useState([]);
-  const [requestState, setRequestState] = useState();
+  
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -141,12 +144,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
 
-  useEffect(()=>{
-    if(window.location.href.indexOf("comments") > -1){
-      tabclick('Comments');
+  useEffect(() => {
+    if (window.location.href.indexOf("comments") > -1) {
+      tabclick("Comments");
     }
-  },[])
-  
+  }, []);
+
   useEffect(() => {
     if (ministryId) {
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
@@ -426,14 +429,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.isAttachmentListLoading
   );
 
-  const requestNumber = requestDetails && requestDetails.idNumber;
+  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
 
-
-  const stateBox = (
-    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
-    (<span className="state-box">Closed</span>)
-    :
-    (
+  const stateBox =
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ? (
+      <span className="state-box">Closed</span>
+    ) : (
       <StateDropDown
         requestState={requestState}
         updateStateDropDown={updateStateDropDown}
@@ -442,28 +443,25 @@ const MinistryReview = React.memo(({ userDetail }) => {
         isMinistryCoordinator={true}
         isValidationError={isValidationError}
       />
-    )
-  );
+    );
 
-  const divisions = requestDetails?.divisions?.length > 0 ? requestDetails.divisions : [];
-  const ministrycode = requestDetails?.selectedMinistries?.length > 0 ? requestDetails.selectedMinistries[0].code : '';
-  const divisionsBox = (
-    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
-    (
-      <DivisionalTracking
-        divisions={divisions}
-      />
-    )
-    :
-    (
+  const divisions =
+    requestDetails?.divisions?.length > 0 ? requestDetails.divisions : [];
+  const ministrycode =
+    requestDetails?.selectedMinistries?.length > 0
+      ? requestDetails.selectedMinistries[0].code
+      : "";
+  const divisionsBox =
+    requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ? (
+      <DivisionalTracking divisions={divisions} />
+    ) : (
       <RequestTracking
         pubmindivstagestomain={pubmindivstagestomain}
         existingDivStages={divisions}
         ministrycode={ministrycode}
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
       />
-    )
-  );
+    );
 
   return !isLoading &&
     requestDetails &&
@@ -477,9 +475,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               <a href="/foi/dashboard">FOI</a>
             </h1>
           </div>
-          <div className="foileftpaneldropdown">
-            {stateBox}
-          </div>
+          <div className="foileftpaneldropdown">{stateBox}</div>
 
           <div className="tab">
             <div
@@ -556,8 +552,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           }
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
+                        <ChildDetails requestDetails={requestDetails} />
+                        <OnBehalfDetails requestDetails={requestDetails} />
                         <RequestDescription requestDetails={requestDetails} />
                         <RequestDetails requestDetails={requestDetails} />
+                        <AdditionalApplicantDetails
+                          requestDetails={requestDetails}
+                        />
                         <ExtensionDetails
                           requestDetails={requestDetails}
                           requestState={requestState}

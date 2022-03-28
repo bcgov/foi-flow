@@ -24,7 +24,9 @@ import {
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
+  fetchExistingAxisRequestIds,
+  fetchRequestDataFromAxis
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
   fetchFOIRequestAttachmentsList
@@ -56,6 +58,8 @@ import {
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
+import AxisDetails from './AxisDetails/AxisDetails';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -81,11 +85,6 @@ const useStyles = makeStyles((theme) => ({
 const FOIRequest = React.memo(({ userDetail }) => {
   const [_requestStatus, setRequestStatus] = React.useState(StateEnum.unopened.name);
   const { requestId, ministryId} = useParams();
-  const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
-  const [_tabStatus, settabStatus] = React.useState(requestState);
-
-  var foitabheaderBG = getTabBG(_tabStatus, requestState);
-
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   const isAddRequest = urlIndexCreateRequest > -1;
@@ -98,7 +97,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
-  
+  const disableInput = requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase(); 
+  const [_tabStatus, settabStatus] = React.useState(requestState);
+  var foitabheaderBG = getTabBG(_tabStatus, requestState);
+  var foiAxisRequestIds = useSelector(state=> state.foiRequests.foiAxisRequestIds);
+    
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
 
@@ -134,6 +137,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const showDivisionalTracking = requestDetails && requestDetails.divisions?.length > 0 &&
     (requestState && requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
       requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase());
+  const [axisSyncedData, setAxisSyncedData ]= useState(false);
 
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   
@@ -141,6 +145,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if(window.location.href.indexOf("comments") > -1){
       tabclick('Comments');
     }
+    dispatch(fetchExistingAxisRequestIds());
   },[])
   
   const dispatch = useDispatch();
@@ -163,17 +168,24 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
-
   useEffect(() => {
-    const requestDetailsValue = isAddRequest ? {} : requestDetails;
+    const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if(Object.entries(requestDetails)?.length !== 0){
-      var requestStateFromId = findRequestState(requestDetails.requeststatusid);
+      var requestStateFromId = findRequestState(requestDetails.requeststatusid) ? 
+      findRequestState(requestDetails.requeststatusid) : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
+      dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
+        if(!err){
+            if(Object.entries(data).length !== 0){
+              setAxisSyncedData(data);
+            }
+        }
+      }));
     }
   }, [requestDetails]);
 
@@ -210,6 +222,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
     postalCode: "",
   }
 
+  const requiredAxisDetailsValue = {
+    axisRequestId: ""
+  }
+
   //below states are used to find if required fields are set or not
   const [requiredRequestDescriptionValues, setRequiredRequestDescriptionValues] = React.useState(requiredRequestDescriptionDefaultData);
   const [requiredRequestDetailsValues, setRequiredRequestDetailsValues] = React.useState(requiredRequestDetailsInitialValues);
@@ -219,7 +235,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(requiredContactDetailsValue);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [headerValue, setHeader] = useState("");
-
+  const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(requiredAxisDetailsValue);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback((requestDescriptionObject) => {
     setRequiredRequestDescriptionValues(requestDescriptionObject);
@@ -233,33 +249,37 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleContactDetailsInitialValue = React.useCallback((value) => {
     setrequiredContactDetails(value);
   }, [])
+  const handleAxisDetailsInitialValue = React.useCallback((value) => {
+    setRequiredAxisDetails(value);
+  }, [])
 
   const handleApplicantDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredApplicantDetails, value, name);
     setRequiredApplicantDetails(detailsData);
   }
-
   const handleContanctDetailsValue = (value, name) => {
     const detailsData = assignValue(requiredContactDetails, value, name);
     setrequiredContactDetails(detailsData);
   }
-
+  const handleAxisDetailsValue = (value, name) => {
+    if(value)
+      setUnSavedRequest(true);
+    const detailsData = assignValue(requiredAxisDetailsValue, value, name);
+    setRequiredAxisDetails(detailsData);
+  }
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
     const descriptionData = assignValue(requiredRequestDescriptionValues, value, name);
     setRequiredRequestDescriptionValues(descriptionData);
   }
-
   //Update required fields of request details box with latest value
   const handleRequestDetailsValue = (value, name, value2) => {
     const detailsData = assignValue(requiredRequestDetailsValues, value, name);
-
     if (value2) {
       detailsData.dueDate = value2;
     }
     setRequiredRequestDetailsValues(detailsData);
   }
-
   //gets the latest assigned to value
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
@@ -268,6 +288,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {
+    setValidation(validationObj);
+  }
+  const handleAxisIdValidation = (validationObj) => {
     setValidation(validationObj);
   }
 
@@ -279,10 +302,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setProgramAreaList(_programAreaList);
   }
 
-  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails, requiredApplicantDetails);
+  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails);
 
   //Variable to find if all required fields are filled or not
-  const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, assignedToValue, requiredRequestDetailsValues);
+  const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, 
+    assignedToValue, requiredRequestDetailsValues, requiredAxisDetails,isAddRequest);
 
   const classes = useStyles();
 
@@ -445,7 +469,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const signinUrl = "/signin"
   const signupUrl = "/signup"
 
-  const requestNumber = requestDetails?.idNumber;
+  const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
 
   let iaoassignedToList = useSelector((state) => state.foiRequests.foiFullAssignedToList);
   let ministryAssignedToList = useSelector(state => state.foiRequests.foiMinistryAssignedToList);
@@ -514,7 +538,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 </div>
               </>
             )}
-
           </div>
 
           <div className="foileftpanelstatus">
@@ -543,22 +566,17 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 >
                   <ConditionalComponent
                     condition={
-                      (!isAddRequest &&
-                        Object.entries(requestDetails).length !== 0) ||
+                      Object.entries(requestDetails).length !== 0 ||
                       isAddRequest
                     }
                   >
                     <>
-                      <FOIRequestHeader
-                        headerValue={headerValue}
-                        requestDetails={requestDetails}
-                        handleAssignedToValue={handleAssignedToValue}
-                        createSaveRequestObject={createSaveRequestObject}
-                        handlestatusudpate={handlestatusudpate}
-                        userDetail={userDetail}
-                        disableInput={disableInput}
-                      />
-
+                      <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
+                      {(isAddRequest || requestState === StateEnum.unopened.name) &&
+                        <AxisDetails requestDetails={requestDetails} createSaveRequestObject={createSaveRequestObject} 
+                        foiAxisRequestIds={foiAxisRequestIds} handleAxisDetailsInitialValue={handleAxisDetailsInitialValue}
+                        handleAxisDetailsValue={handleAxisDetailsValue} handleAxisIdValidation={handleAxisIdValidation} />
+                      }
                       <ApplicantDetails
                         requestDetails={requestDetails}
                         requestStatus={_requestStatus}
@@ -566,7 +584,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleApplicantDetailsInitialValue={
                           handleApplicantDetailsInitialValue
                         }
-                        handleEmailValidation={handleEmailValidation}
                         handleApplicantDetailsValue={
                           handleApplicantDetailsValue
                         }
@@ -602,13 +619,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
                         disableInput={disableInput}
+                        handleEmailValidation={handleEmailValidation}
                       />
 
                       <RequestDescriptionBox
                         programAreaList={programAreaList}
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
-                        requiredRequestDetailsValues = {requiredRequestDetailsValues}
+                        requiredRequestDetailsValues={
+                          requiredRequestDetailsValues
+                        }
                         handleUpdatedProgramAreaList={
                           handleUpdatedProgramAreaList
                         }
@@ -663,6 +683,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         hasStatusRequestSaved={hasStatusRequestSaved}
                         disableInput={disableInput}
                         requestState={requestState}
+                        setSaveRequestObject={setSaveRequestObject}
+                        axisSyncedData={axisSyncedData}
                       />
                     </>
                   </ConditionalComponent>

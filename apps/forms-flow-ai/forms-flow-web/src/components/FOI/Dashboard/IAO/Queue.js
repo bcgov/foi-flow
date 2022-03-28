@@ -16,7 +16,6 @@ import Loading from "../../../../containers/Loading";
 import {
   debounce,
   ClickableChip,
-  getAssigneeValue,
   updateSortModel,
 } from "../utils";
 import Grid from "@mui/material/Grid";
@@ -49,6 +48,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       "lastName",
       "requestType",
       "idNumber",
+      "axisRequestId",
       "currentState",
       "assignedToLastName",
       "assignedToFirstName",
@@ -89,18 +89,8 @@ const Queue = ({ userDetail, tableInfo }) => {
     setRowsState(defaultRowsState);
   }, 500);
 
-  const updateAssigneeName = (data) => {
-    if (!data) {
-      return [];
-    }
-    return data.map((row) => ({
-      ...row,
-      assignedToName: getAssigneeValue(row),
-    }));
-  };
-
   const rows = useMemo(() => {
-    return updateAssigneeName(requestQueue?.data);
+    return requestQueue?.data || [];
   }, [JSON.stringify(requestQueue)]);
 
   const renderReviewRequest = (e) => {

@@ -36,7 +36,6 @@ class requestserviceministrybuilder(requestserviceconfigurator):
     
     def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):
         requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
-
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
         foiministryrequest.version = ministryschema["version"] + 1
@@ -46,6 +45,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.recordsearchfromdate = requestdict['recordsearchfromdate']
         foiministryrequest.recordsearchtodate = requestdict['recordsearchtodate']
         foiministryrequest.filenumber = ministryschema["filenumber"]
+        foiministryrequest.axissyncdate = ministryschema["axissyncdate"]
+        foiministryrequest.axisrequestid = ministryschema["axisrequestid"]
         foiministryrequest.cfrduedate = requestdict['cfrduedate']
         foiministryrequest.startdate = requestdict['startdate']
         foiministryrequest.duedate = requestdict['duedate']
@@ -220,7 +221,6 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             extensiondocumentmapping.foirequestextensionid = extensiondocument["foirequestextensionid"]
             extensiondocumentmapping.extensionversion = activeversion
             extensiondocumentmapping.foiministrydocumentid = extensiondocument["foiministrydocumentid"]
-            extensiondocumentmapping.created_at = datetime2.now().isoformat()
             extensiondocumentmapping.createdby = userid
             extdocumentarr.append(extensiondocumentmapping)
         return extdocumentarr

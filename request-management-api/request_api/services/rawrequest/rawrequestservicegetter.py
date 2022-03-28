@@ -39,6 +39,7 @@ class rawrequestservicegetter:
                              'assignedTo': assignedtovalue,
                              'xgov': 'No',
                              'idNumber': 'U-00' + str(request.requestid),
+                             'axisRequestId': request.axisrequestid,
                              'version':request.version
                              }
             unopenedrequests.append(unopenrequest)
@@ -89,7 +90,10 @@ class rawrequestservicegetter:
             if field == "ministries" and request['status'] == 'Archived':
                 fieldsresp['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(request["requestid"])
         return fieldsresp         
-     
+    
+    def getaxisequestids(self):
+        return FOIRawRequest.getDistinctAXISRequestIds()
+        
     def __attachministriesinfo(self,request):        
         if request != {} and request['status'] == 'Archived':
             request['requestrawdata']['openedMinistries']= FOIMinistryRequest.getministriesopenedbyuid(request["requestid"])
@@ -119,6 +123,8 @@ class rawrequestservicegetter:
                                'assignedTo': "Unassigned",
                                'xgov': 'No',
                                'idNumber': 'U-00' + str(request['requestid']),
+                               'axisRequestId': request['axisrequestid'],
+                               'axisSyncDate': request['axissyncdate'],
                                'email': contactinfooptions['email'],
                                'phonePrimary': contactinfooptions['phonePrimary'],
                                'phoneSecondary': contactinfooptions['phoneSecondary'],

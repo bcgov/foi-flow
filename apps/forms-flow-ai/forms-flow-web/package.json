@@ -64,6 +64,7 @@
     "dayjs-business-days": "1.0.4",
     "draft-js": "^0.11.7",
     "draftjs-to-html": "0.9.1",
+    "email-validator": "^2.0.4",
     "file-saver": "^2.0.2",
     "font-awesome": "^4.7.0",
     "html-to-draftjs": "1.5.0",
@@ -101,9 +102,9 @@
     "redux-thunk": "^2.3.0",
     "sass": "^1.32.13",
     "semantic-ui-css": "^2.4.1",
+    "socket.io-client": "^4.4.1",
     "sockjs-client": "^1.5.1",
-    "source-map-explorer": "^2.5.2",
-    "socket.io-client": "^4.4.1"
+    "source-map-explorer": "^2.5.2"
   },
   "resolutions": {
     "xmldom": "^0.6.0",

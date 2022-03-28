@@ -313,7 +313,7 @@ const addToFullnameList = (userArray, foiteam) => {
 };
 
 const getFullnameList = () => {
-  return getSessionData("fullnameList");
+  return getSessionData("fullnameList") || [];
 };
 
 const getAssignToList = (team) => {

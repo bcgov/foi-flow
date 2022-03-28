@@ -10,7 +10,7 @@ class CloseReason(db.Model):
     closereasonid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     name = db.Column(db.String(500), unique=False, nullable=False)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, default='System')
     
     @classmethod

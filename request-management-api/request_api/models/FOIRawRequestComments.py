@@ -23,7 +23,7 @@ class FOIRawRequestComment(db.Model):
     taggedusers = db.Column(JSON, unique=False, nullable=True)
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -34,7 +34,7 @@ class FOIRawRequestComment(db.Model):
     def savecomment(cls, commenttypeid, foirequestcomment, version, userid) -> DefaultMethodResult:
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment else None
         taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
-        newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=datetime.now(), createdby=userid,taggedusers=taggedusers)
+        newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, createdby=userid,taggedusers=taggedusers)
         db.session.add(newcomment)
         db.session.commit()
         return DefaultMethodResult(True, 'Comment added', newcomment.commentid)

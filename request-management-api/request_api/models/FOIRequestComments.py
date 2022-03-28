@@ -20,7 +20,7 @@ class FOIRequestComment(db.Model):
     taggedusers = db.Column(JSON, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime2.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -37,6 +37,12 @@ class FOIRequestComment(db.Model):
         db.session.add(newcomment)
         db.session.commit()               
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
+
+    @classmethod
+    def deleteextensioncommentsbyministry(cls, ministryid):
+        db.session.query(FOIRequestComment).filter(FOIRequestComment.ministryrequestid.in_(ministryid), FOIRequestComment.commenttypeid == 2).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Extensions comments deleted for the ministry ', ministryid)
 
     @classmethod
     def disablecomment(cls, commentid, userid):   

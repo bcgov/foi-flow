@@ -20,7 +20,7 @@ class FOIRawRequestNotification(db.Model):
     version =db.Column(db.Integer, db.ForeignKey('FOIRawRequests.version'))    
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
     notification = db.Column(JSON, unique=False, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime2.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
