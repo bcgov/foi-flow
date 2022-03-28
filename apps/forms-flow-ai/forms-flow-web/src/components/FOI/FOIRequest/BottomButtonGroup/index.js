@@ -343,20 +343,15 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
-          {urlIndexCreateRequest < 0 &&
-            requestState?.toLowerCase() !==
-              StateEnum.intakeinprogress.name.toLowerCase() &&
-            Object.entries(axisSyncedData)?.length !== 0 && (
-              <button
-                type="button"
-                className="btn btn-bottom"
-                onClick={(e) => {
-                  setAxisSyncModalOpen(true);
-                }}
-              >
-                Sync with AXIS
-              </button>
-            )}
+          {urlIndexCreateRequest < 0 && (requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
+          requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) &&
+            Object.entries(axisSyncedData)?.length !== 0 &&
+            <button type="button" className="btn btn-bottom" 
+            onClick={(e) => {
+                setAxisSyncModalOpen(true);
+              }}>Sync with AXIS
+            </button>
+          }
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {
