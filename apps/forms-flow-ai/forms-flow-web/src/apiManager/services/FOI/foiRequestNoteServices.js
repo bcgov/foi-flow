@@ -10,7 +10,7 @@ import {
     setRequestComments,
   } from "../../../actions/FOI/foiRequestActions";
   import UserService from "../../../services/UserService";
-  import { replaceUrl } from "../../../helper/FOI/helper";
+  import { replaceUrl, errorToast } from "../../../helper/FOI/helper";
   import { catchError } from './foiServicesUtil'
 
   export const fetchFOIRequestNotesList = (requestId, ministryId) => {
@@ -132,10 +132,11 @@ import {
       httpPUTRequest(apiUrl, data)
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(requestid, null))
-          if (res.data) {
+          if (res.data.status) {
             console.log("Deleted raw request note successfully!");
           } else {
             dispatch(serviceActionError(res));
+            errorToast(res.data.message)
             console.log("Error deleting Raw Request Note");
           }
         })
@@ -153,10 +154,11 @@ import {
       httpPUTRequest(apiUrl, data)
         .then((res) => {
           dispatch(fetchFOIRequestNotesList(null, ministryId))
-          if (res.data) {
+          if (res.data.status) {
             console.log("Deleted ministry request note successfully!");
           } else {
             dispatch(serviceActionError(res));
+            errorToast(res.data.message)
             console.log(`Error deleting ministry Request Note with id ${commentid}`);
           }
         })

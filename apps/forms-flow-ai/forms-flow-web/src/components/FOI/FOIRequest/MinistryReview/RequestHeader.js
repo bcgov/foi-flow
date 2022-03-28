@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
+import { getHeaderText } from './utils';
+import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
 const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
 
@@ -45,8 +47,18 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
         }
     }
 
-    const headerText = _requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    const headerText = getHeaderText(_requestDetails);
+    
     const assignedToValue = getFullName(assignedToList, _requestDetails);
+
+    const watcherBox = (
+        requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
+        (<></>)
+        :
+        (
+            <Watcher watcherFullList={ministryAssignedToList} ministryId={ministryId} userDetail={userDetail} />
+        )
+      );
 
     return (
 
@@ -59,7 +71,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
                   
-                    <Watcher watcherFullList={ministryAssignedToList} ministryId={ministryId} userDetail={userDetail} />
+                    {watcherBox}
                    
                 </div>
             </div>

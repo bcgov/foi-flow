@@ -22,7 +22,7 @@ class FOIRequestNotification(db.Model):
     version =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))    
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
     notification = db.Column(JSON, unique=False, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime2.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -105,6 +105,15 @@ class FOIRequestNotification(db.Model):
     def getnotificationidsbytype(cls, notificationtypeid):
         sql = """select notificationid from "FOIRequestNotifications" where notificationtypeid= :notificationtypeid """
         rs = db.session.execute(text(sql), {'notificationtypeid': notificationtypeid})
+        notificationids = []
+        for row in rs:
+            notificationids.append(row["notificationid"])
+        return notificationids
+    
+    @classmethod
+    def getextensionnotificationidsbyministry(cls, ministryid):
+        sql = """select notificationid from "FOIRequestNotifications" where requestid = :requestid and notificationtypeid = 4 """
+        rs = db.session.execute(text(sql), {'requestid': ministryid})
         notificationids = []
         for row in rs:
             notificationids.append(row["notificationid"])

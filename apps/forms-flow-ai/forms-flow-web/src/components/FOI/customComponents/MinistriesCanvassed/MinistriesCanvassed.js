@@ -33,7 +33,7 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
     return (
       <tr key ={index}>
         <td className='ministry-name'>{ministry.name}</td>
-       <td className='ministry-requestid' onClick={() => redirectUrl(ministry)} >{ministry.filenumber}</td>
+       <td className='ministry-requestid' onClick={() => redirectUrl(ministry)} >{(ministry.axisrequestid?ministry.axisrequestid:ministry.filenumber)}</td>
       </tr>
     )
    });

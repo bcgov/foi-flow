@@ -19,7 +19,7 @@ class workflowservice:
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None    
         if status == UnopenedEvent.intakeinprogress.value:
-            messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.iaoopenclaim.value
+            messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.intakeclaim.value
             return bpmservice().unopenedevent(wfinstanceid, assignedto, messagename)                 
         else:
             if status == UnopenedEvent.open.value:
@@ -39,7 +39,7 @@ class workflowservice:
                     oldstatus = self.__getministrystatus(filenumber, ministry["version"])
                     activity = self.__getministryactivity(oldstatus,newstatus)
                     metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"]})
-                    messagename = self.__messagename(oldstatus, activity, usertype)
+                    messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
         
     
@@ -62,8 +62,8 @@ class workflowservice:
             return None
         
              
-    def __messagename(self, status, activity, usertype):    
-        if status == UnopenedEvent.open.value:
+    def __messagename(self, status, activity, usertype, isprocessing=False):   
+        if status == UnopenedEvent.open.value and isprocessing == False:
             return MessageType.iaoopencomplete.value if activity == Activity.complete.value else MessageType.iaoopenclaim.value
         elif status == OpenedEvent.reopen.value:
             return MessageType.iaoreopen.value
@@ -86,6 +86,12 @@ class workflowservice:
                 return True
         return False 
 
+    def __isprocessing(self, requestid):
+        states =  FOIMinistryRequest.getallstatenavigation(requestid)
+        for state in states:
+            if state == OpenedEvent.callforrecords.value and states[0] != OpenedEvent.callforrecords.value :
+                return True
+        return False 
 
     def __getvaluefromschema(self,requestsschema, property):
         return requestsschema.get(property) if property in requestsschema  else None  

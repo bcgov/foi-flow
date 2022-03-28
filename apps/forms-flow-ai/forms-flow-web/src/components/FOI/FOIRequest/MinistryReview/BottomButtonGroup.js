@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { ConfirmationModal } from "../../customComponents";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { ConditionalComponent } from "../../../../helper/FOI/helper";
+import { alertUser } from "./utils";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -80,7 +81,14 @@ const BottomButtonGroup = React.memo(
     const saveMinistryRequest = async () => {
       dispatch(
         saveMinistryRequestDetails(
-          saveMinistryRequestObject,
+          {
+            ...saveMinistryRequestObject,
+            divisions:
+              saveMinistryRequestObject?.divisions?.filter(
+                (division) =>
+                  division.stageid !== -1 || division.divisionid !== -1
+              ) || [],
+          },
           requestId,
           ministryId,
           (err, res) => {
@@ -116,13 +124,6 @@ const BottomButtonGroup = React.memo(
           }
         )
       );
-    };
-
-    const alertUser = (e) => {
-      if (unSavedRequest) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
     };
 
     const handleOnHashChange = (e) => {

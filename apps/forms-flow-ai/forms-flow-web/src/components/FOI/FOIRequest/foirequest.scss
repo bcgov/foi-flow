@@ -9,8 +9,9 @@
 }
 
 .foi-request-number-header {
-    margin-top: 60px;
-    margin-left: 15px;
+    margin-top: 20px;
+    padding: 0 !important;
+
 }
 .foi-request-form {
     background-color: white;
@@ -92,4 +93,16 @@
 
 .foitabbedContainer{
 height: fit-content;
+}
+
+.btn-axis-sync {
+    background-color: #FFFFFF;
+    border: 2px solid #38598A;
+    border-radius: 4px;
+    color: #38598A;
+    margin-top: 10px;
+    height: 51px;
+    width: 179px;
+    font-size: 16px;
+    font-weight: bold;
 }

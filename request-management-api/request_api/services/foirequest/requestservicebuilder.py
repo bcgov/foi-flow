@@ -24,6 +24,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = requestschema.get("requeststatusid")
         foiministryrequest.isactive = True
+        foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
+        foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
@@ -31,7 +33,6 @@ class requestservicebuilder(requestserviceconfigurator):
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")        
         foiministryrequest.startdate = requestschema.get("startDate")
-        foiministryrequest.created_at = datetime2.now().isoformat()
         foiministryrequest.createdby = userid
         requeststatusid =  self.getpropertyvaluefromschema(requestschema, 'requeststatusid')
         if requeststatusid is not None:

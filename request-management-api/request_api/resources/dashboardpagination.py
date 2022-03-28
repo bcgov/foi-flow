@@ -34,6 +34,7 @@ class DashboardPagination(Resource):
             DEFAULT_SORT_ORDERS = ['desc']
             DEFAULT_FILTER_FIELDS = [
                                         'idNumber',
+                                        'axisRequestId',
                                         'currentState',
                                         'firstName',
                                         'lastName',
