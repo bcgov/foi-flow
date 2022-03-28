@@ -270,6 +270,11 @@ class FOIMinistryRequest(db.Model):
                              ministryassignee.firstname),
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+        requestpagecount = case([
+            (FOIMinistryRequest.requestpagecount.is_(None),
+            '0'),
+            ],
+            else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -285,6 +290,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            requestpagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -420,7 +426,6 @@ class FOIMinistryRequest(db.Model):
             'lastName': FOIRequestApplicant.lastname,
             'requestType': FOIRequest.requesttype,
             'idNumber': FOIMinistryRequest.filenumber,
-            # 'axisRequestId': FOIMinistryRequest.axisrequestid,
             'axisrequest_number': FOIMinistryRequest.axisrequestid,
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
@@ -438,6 +443,7 @@ class FOIMinistryRequest(db.Model):
             'cfrduedate': FOIMinistryRequest.cfrduedate,
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
+            'requestPageCount': FOIMinistryRequest.requestpagecount,
             'ministry': func.upper(ProgramArea.bcgovcode)
         }.get(x, FOIMinistryRequest.axisrequestid)
 
@@ -574,6 +580,11 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
 
+        requestpagecount = case([
+            (FOIMinistryRequest.requestpagecount.is_(None),
+            '0'),
+            ],
+            else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -589,6 +600,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            requestpagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
