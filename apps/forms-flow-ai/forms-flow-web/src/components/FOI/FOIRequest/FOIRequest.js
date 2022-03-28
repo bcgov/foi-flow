@@ -302,7 +302,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setProgramAreaList(_programAreaList);
   }
 
-  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails, requiredApplicantDetails);
+  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails);
 
   //Variable to find if all required fields are filled or not
   const isValidationError = checkValidationError(requiredApplicantDetails, contactDetailsNotGiven, requiredRequestDescriptionValues, validation, 
@@ -538,7 +538,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 </div>
               </>
             )}
-
           </div>
 
           <div className="foileftpanelstatus">
@@ -561,8 +560,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
           >
             <div className="container foi-review-request-container">
               <div className="foi-review-container">
-                <form className={`${classes.root} foi-request-form`} autoComplete="off">
-                  <ConditionalComponent condition={(Object.entries(requestDetails).length !== 0) || isAddRequest}>
+                <form
+                  className={`${classes.root} foi-request-form`}
+                  autoComplete="off"
+                >
+                  <ConditionalComponent
+                    condition={
+                      Object.entries(requestDetails).length !== 0 ||
+                      isAddRequest
+                    }
+                  >
                     <>
                       <FOIRequestHeader headerValue={headerValue} requestDetails={requestDetails} handleAssignedToValue={handleAssignedToValue} createSaveRequestObject={createSaveRequestObject} handlestatusudpate={handlestatusudpate} userDetail={userDetail} disableInput={disableInput} />
                       {(isAddRequest || requestState === StateEnum.unopened.name) &&
@@ -577,7 +584,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleApplicantDetailsInitialValue={
                           handleApplicantDetailsInitialValue
                         }
-                        handleEmailValidation={handleEmailValidation}
                         handleApplicantDetailsValue={
                           handleApplicantDetailsValue
                         }
@@ -613,13 +619,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
                         disableInput={disableInput}
+                        handleEmailValidation={handleEmailValidation}
                       />
 
                       <RequestDescriptionBox
                         programAreaList={programAreaList}
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
-                        requiredRequestDetailsValues = {requiredRequestDetailsValues}
+                        requiredRequestDetailsValues={
+                          requiredRequestDetailsValues
+                        }
                         handleUpdatedProgramAreaList={
                           handleUpdatedProgramAreaList
                         }
