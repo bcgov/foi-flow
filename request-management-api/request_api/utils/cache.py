@@ -32,8 +32,7 @@ class Config(object):
 ## If true, bypass cache
 def cache_filter(*args, **kwargs):
     try:        
-        cache_disabled = os.getenv('CACHE_ENABLED') != 'Y'
-        if cache_disabled:
+        if os.getenv('CACHE_ENABLED') != 'Y':
             return True
         
         request_api.cache.get("")
@@ -43,7 +42,6 @@ def cache_filter(*args, **kwargs):
 
 ## If True, cache response  
 def response_filter(resp):
-    print(resp)
     if resp[-1] == 200 and resp[0] not in (None, '', '[]'):
         return True
     else:

@@ -44,8 +44,6 @@ class KeycloakAdminService:
     
     
     def getallgroups(self):
-        if self.iscacheenabled() == True and request_api.cache.get("kcgroups") is not None:
-            return request_api.cache.get("kcgroups")
         url ='{0}/auth/admin/realms/{1}/groups'.format(self.keycloakhost,self.keycloakrealm)
         groupsresponse = requests.get(url, headers=self.getheaders())
         groups = []
@@ -53,8 +51,6 @@ class KeycloakAdminService:
             globalgroups =  groupsresponse.json()         
             for group in globalgroups:
                 groups.append({'id': group['id'],'name':group['name']})
-        if self.iscacheenabled() == True:
-            request_api.cache.set("kcgroups", groups, os.getenv('CACHE_TIMEOUT'))
         return groups      
     
  
@@ -66,9 +62,6 @@ class KeycloakAdminService:
     
 
     def getgroupmembersbyid(self, groupid, groupname):
-        cachename=self.getcachename(groupname)
-        if self.iscacheenabled() == True and request_api.cache.get(cachename) is not None:
-            return request_api.cache.get(cachename)
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
         users = []
@@ -76,8 +69,6 @@ class KeycloakAdminService:
             for user in groupresponse.json():           
                 _user =  self.__createuser(user)
                 users.append(_user)
-        if self.iscacheenabled() == True:
-            request_api.cache.set(cachename, users, os.getenv('CACHE_TIMEOUT'))
         return users 
     
     def __createuser(self, user):
@@ -98,10 +89,6 @@ class KeycloakAdminService:
     def formatgroupname(self,input):
         return input.lower().replace(' ', '')  
         
-    def getcachename(self,groupname):
-        return "kc_"+groupname.replace(' ','').lower()+"_cache"
 
-    def iscacheenabled(self):
-        return True if os.getenv('CACHE_ENABLED') == 'Y' else False
     
     

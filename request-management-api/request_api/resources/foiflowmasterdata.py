@@ -141,6 +141,10 @@ class FOIFlowDivisions(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get(bcgovcode):
         try:
             data = divisionstageservice().getdivisionandstages(bcgovcode)
