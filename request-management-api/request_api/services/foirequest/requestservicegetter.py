@@ -34,7 +34,8 @@ class requestservicegetter:
             middlename = applicant['foirequestapplicant.middlename']
             lastname = applicant['foirequestapplicant.lastname']
             businessname = applicant['foirequestapplicant.businessname']
-            dob = parse(applicant['foirequestapplicant.dob']).strftime(self.__genericdateformat()) if applicant['foirequestapplicant.dob'] is not None else ''
+            dobraw = applicant['foirequestapplicant.dob']
+            dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
             alsoknownas = applicant['foirequestapplicant.alsoknownas']
             requestortypeid = applicant['requestortype.requestortypeid']
             if requestortypeid == 1:
@@ -79,7 +80,8 @@ class requestservicegetter:
                 firstname = applicant['foirequestapplicant.firstname']
                 middlename = applicant['foirequestapplicant.middlename']
                 lastname = applicant['foirequestapplicant.lastname']
-                dob = parse(applicant['foirequestapplicant.dob']).strftime(self.__genericdateformat()) if applicant['foirequestapplicant.dob'] is not None else ''
+                dobraw = applicant['foirequestapplicant.dob']
+                dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
                 requestortypeid = applicant['requestortype.requestortypeid']
                 if requestortypeid == 1:
                     baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname))
