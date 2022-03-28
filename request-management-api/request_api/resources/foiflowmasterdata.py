@@ -81,10 +81,8 @@ class FOIFlowProgramAreas(Resource):
         )
     def get():
         try:
-            print("entering method")
             data = programareaservice().getprogramareas()
             jsondata = json.dumps(data)
-            print("resource returning")
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing program areas" , 500
