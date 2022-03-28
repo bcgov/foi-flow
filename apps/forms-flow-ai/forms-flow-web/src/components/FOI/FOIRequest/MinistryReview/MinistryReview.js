@@ -26,8 +26,10 @@ import {
   ConditionalComponent,
   calculateDaysRemaining,
 } from "../../../../helper/FOI/helper";
-
 import ApplicantDetails from "./ApplicantDetails";
+import ChildDetails from "./ChildDetails";
+import OnBehalfDetails from "./OnBehalfDetails";
+import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 import RequestDetails from "./RequestDetails";
 import RequestDescription from "./RequestDescription";
 import RequestHeader from "./RequestHeader";
@@ -541,8 +543,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           }
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
+                        <ChildDetails requestDetails={requestDetails} />
+                        <OnBehalfDetails requestDetails={requestDetails} />
                         <RequestDescription requestDetails={requestDetails} />
                         <RequestDetails requestDetails={requestDetails} />
+                        <AdditionalApplicantDetails
+                          requestDetails={requestDetails}
+                        />
                         <ExtensionDetails
                           requestDetails={requestDetails}
                           requestState={requestState}

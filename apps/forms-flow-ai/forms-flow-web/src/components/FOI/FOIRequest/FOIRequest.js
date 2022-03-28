@@ -341,10 +341,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setProgramAreaList(_programAreaList);
   };
 
-  const contactDetailsNotGiven = checkContactGiven(
-    requiredContactDetails,
-    requiredApplicantDetails
-  );
+  const contactDetailsNotGiven = checkContactGiven(requiredContactDetails);
 
   //Variable to find if all required fields are filled or not
   const isValidationError = checkValidationError(
@@ -657,7 +654,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleApplicantDetailsInitialValue={
                           handleApplicantDetailsInitialValue
                         }
-                        handleEmailValidation={handleEmailValidation}
                         handleApplicantDetailsValue={
                           handleApplicantDetailsValue
                         }
@@ -693,6 +689,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
                         disableInput={disableInput}
+                        handleEmailValidation={handleEmailValidation}
                       />
 
                       <RequestDescriptionBox
