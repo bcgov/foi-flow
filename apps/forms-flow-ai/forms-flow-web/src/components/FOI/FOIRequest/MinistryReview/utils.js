@@ -40,7 +40,6 @@ export const getMinistryBottomTextMap = (
 };
 
 export const getHeaderText = (requestDetails) => {
-  console.log("Req", requestDetails);
   if(requestDetails.axisRequestId)
     return requestDetails.axisRequestId;
 
