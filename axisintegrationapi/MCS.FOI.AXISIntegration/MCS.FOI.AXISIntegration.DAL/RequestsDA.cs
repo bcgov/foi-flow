@@ -76,7 +76,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.RequestDescriptionFromDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionFromDate", "yyyy-MM-dd");
                     axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
                     axisRequest.Ispiiredacted = true;
-                    axisRequest.RequestPageCount = Convert.ToString(row["requestPageCount"]) != "0" ? Convert.ToString(row["requestPageCount"]) : null;
+                    axisRequest.RequestPageCount = Convert.ToInt32(row["requestPageCount"]);
                     List<Ministry> ministryList = new()
                     {
                         new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])))

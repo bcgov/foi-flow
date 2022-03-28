@@ -109,7 +109,7 @@ namespace MCS.FOI.AXISIntegration.DataModels
         public string PublicServiceEmployeeNumber { get; set; }
 
         [DataMember(Name = "requestPageCount")]
-        public string RequestPageCount { get; set; }
+        public int RequestPageCount { get; set; }
 
         [DataMember(Name = "selectedMinistries")]
         public List<Ministry> SelectedMinistries { get; set; }
