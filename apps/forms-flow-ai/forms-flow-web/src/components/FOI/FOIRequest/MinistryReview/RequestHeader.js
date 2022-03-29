@@ -3,11 +3,11 @@ import { InputLabel } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
-import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
+import { getHeaderText } from './utils';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
 const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
@@ -46,7 +46,8 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
         }
     }
 
-    const headerText = _requestDetails.idNumber ? `Request #${_requestDetails.idNumber}` : FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+    const headerText = getHeaderText(_requestDetails);
+    
     const assignedToValue = getFullName(assignedToList, _requestDetails);
 
     const watcherBox = (

@@ -197,3 +197,11 @@ export const setOpenedMinistries = (data) => (dispatch) => {
       payload: data,
     });
   };
+
+export const setExistingAxisRequestIds = (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_AXIS_REQUEST_IDS,
+      payload: data,
+    });
+  };
+
