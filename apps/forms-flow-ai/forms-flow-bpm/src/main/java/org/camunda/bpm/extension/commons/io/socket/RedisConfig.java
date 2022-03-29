@@ -20,14 +20,15 @@ import java.util.Properties;
 @Configuration
 public class RedisConfig {
 
+
     @Autowired
     private Properties messageBrokerProperties;
 
     @Bean
     RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(messageBrokerProperties.getProperty("messageBroker.host"),
-                Integer.valueOf(messageBrokerProperties.getProperty("messageBroker.port")));
-        redisStandaloneConfiguration.setPassword(messageBrokerProperties.getProperty("messageBroker.passcode"));
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(getMessageBrokerProperties().getProperty("messageBroker.host"),
+                Integer.valueOf(getMessageBrokerProperties().getProperty("messageBroker.port")));
+        redisStandaloneConfiguration.setPassword(getMessageBrokerProperties().getProperty("messageBroker.passcode"));
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
@@ -39,6 +40,7 @@ public class RedisConfig {
     protected Properties getMessageBrokerProperties() {
         return messageBrokerProperties;
     }
+
 
 
 

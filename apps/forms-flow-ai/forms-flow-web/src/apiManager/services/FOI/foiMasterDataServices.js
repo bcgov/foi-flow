@@ -50,7 +50,11 @@ import {
   
   export const fetchFOIProgramAreaList = () => {    
     return (dispatch) => {
-      httpGETRequest(API.FOI_GET_PROGRAMAREAS_API, {}, UserService.getToken())
+      httpGETRequest(
+        API.FOI_GET_PROGRAMAREAS_FORUSER_API,
+        {},
+        UserService.getToken()
+      )
         .then((res) => {
           if (res.data) {
             const foiProgramAreaList = res.data;
@@ -111,12 +115,12 @@ import {
 
   export const fetchFOIProcessingTeamList = (requestType) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API;
-    if (requestType) {     
+    if (requestType) {
       apiUrlGETAssignedToList = replaceUrl(
         API.FOI_GET_PROCESSINGTEAMLIST_API,
         "<requesttype>",
         requestType
-      );      
+      );
     }
     return (dispatch) => {
       httpGETRequest(apiUrlGETAssignedToList, {}, UserService.getToken())
@@ -129,36 +133,45 @@ import {
             dispatch(setFOIProcessingTeamList(data));
             dispatch(setFOILoader(false));
           } else {
-            console.log(`Error while fetching assigned to master data based on requestType ${requestType} `, res);
+            console.log(
+              `Error while fetching assigned to master data based on requestType ${requestType} `,
+              res
+            );
             dispatch(serviceActionError(res));
             dispatch(setFOILoader(false));
           }
         })
         .catch((error) => {
-          console.log(`Error while fetching assigned to master data based on requestType ${requestType}`, error);
+          console.log(
+            `Error while fetching assigned to master data based on requestType ${requestType}`,
+            error
+          );
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });
     };
   };
-  
+
   export const fetchFOIFullAssignedToList = (...rest) => {
     let fullnameTeamArray = getFullnameTeamList();
-    if(!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
+    if (!fullnameTeamArray || !Array.isArray(fullnameTeamArray)) {
       fullnameTeamArray = [];
     }
-  
-      if(fullnameTeamArray.includes("iao")) {
+
+    if (fullnameTeamArray.includes("iao")) {
       return (dispatch) => {
         dispatch(setFOIFullAssignedToList(getAssignToList("iao")));
         dispatch(setFOIAssignedToListLoader(false));
       };
-  
-      } else {
-        const done = fnDone(rest);
-  
+    } else {
+      const done = fnDone(rest);
+
       return (dispatch) => {
-        httpGETRequest(API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API, {}, UserService.getToken())
+        httpGETRequest(
+          API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API,
+          {},
+          UserService.getToken()
+        )
           .then((res) => {
             if (res.data) {
               const foiFullAssignedToList = res.data;
@@ -170,19 +183,24 @@ import {
               dispatch(setFOIAssignedToListLoader(false));
               done(null, res.data);
             } else {
-              console.log("Error while fetching IAO assigned to master data", res);
+              console.log(
+                "Error while fetching IAO assigned to master data",
+                res
+              );
               dispatch(serviceActionError(res));
               dispatch(setFOIAssignedToListLoader(false));
             }
           })
           .catch((error) => {
-            console.log("Error while fetching IAO assigned to master data", error);
+            console.log(
+              "Error while fetching IAO assigned to master data",
+              error
+            );
             dispatch(serviceActionError(error));
             dispatch(setFOIAssignedToListLoader(false));
             done(error);
           });
       };
-  
     }
   };
   

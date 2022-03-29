@@ -12,17 +12,15 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
-import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper"
+import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
+import io from "socket.io-client";
+import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX, FOI_FLOW_REPORTING_URL, SOCKETIO_CONNECT_NONCE} from "../../../constants/constants";
+import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 
 
-const FOIHeader = React.memo(() => { 
+const FOIHeader = React.memo(({unauthorized=false}) => { 
 
-  const dispatch = useDispatch();
-  const signout = () => {
-    localStorage.removeItem('authToken');
-    dispatch(push(`/`));
-    UserService.userLogout();
-}
+const dispatch = useDispatch(); 
 const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
 let isMinistry = false;
@@ -35,28 +33,62 @@ const openModal = (coordinates) => {
   setScreenPosition(screenX);
   setOpen(!open);
 }
-
+const [messageData, setMessageData] = useState([]);
 let foiNotifications = useSelector(state=> state.notifications.foiNotifications);
+const [socket, setSocket] = useState(null);
 
-if (Object.entries(user).length !== 0) {
-  const userGroups = user && user.groups?.map(group => group.slice(1));
-  isMinistry = isMinistryLogin(userGroups);
-  ministryCode = getMinistryCode(userGroups);
-}
+const userGroups = user?.groups?.map(group => group.slice(1));
+isMinistry = isMinistryLogin(userGroups);
+ministryCode = getMinistryCode(userGroups);
 
 useEffect(() => {     
-  if(isAuthenticated)
-    dispatch(fetchFOINotifications());
-  setInterval(() => {
-    if(isAuthenticated)
+  if(!unauthorized && isAuthenticated){
+    dispatch(fetchFOIFullAssignedToList());
+    dispatch(fetchFOINotifications());  
+	const options = {
+      reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
+      reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
+      path:'/api/v1/socket.io',
+      transports: ['websocket'],
+      auth: { "userid": user.preferred_username , "rkey": SOCKETIO_CONNECT_NONCE, "x-jwt-token": UserService.getToken() }
+    };
+    setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
+    setInterval(() => {
       dispatch(fetchFOINotifications());
-  }, 900000);
-},[dispatch]);
+    }, 900000);
+  }
+},[]);
+
+
+useEffect(() => {    
+    socket?.on(user.preferred_username, data => {
+     if(data.action === 'delete'){
+      setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))
+     }
+     else{
+      setMessageData(oldMessageData => [data, ...oldMessageData])
+     }
+    });
+  },[socket]);
+
+useEffect(() => {     
+  if(foiNotifications){
+    setMessageData(foiNotifications);
+  }
+},[foiNotifications]);
+
+
+ const signout = () => {
+    socket?.disconnect();
+    localStorage.removeItem('authToken');
+    dispatch(push(`/`));
+    UserService.userLogout(); 
+}
 
 const triggerPopup = () => {
   return(
     <> 
-    <Badge badgeContent={foiNotifications?.length} color="secondary">
+    <Badge badgeContent={messageData?.length} color="secondary">
       <i style={{color: open? "#003366" : "white",cursor: "pointer"}} className="fa fa-bell-o foi-bell"></i>
     </Badge>
    </>
@@ -79,16 +111,22 @@ const triggerPopup = () => {
           <h2>FOI</h2>
           </div>
             <div className="col-md-6 col-sm-4 foiheaderUserStatusSection">
-          {isAuthenticated?
+          { isAuthenticated &&
+          <>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" className="foiNavBarToggle" />
-          :null}
-          { isAuthenticated?
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="ml-auto">
                 <div className="ml-auto banner-right foihamburgermenu">       
                   <ul className="navbar-nav foihamburgermenulist">
                       <li className="nav-item username foinavitem">
                           <span className="navbar-text">  {user.name || user.preferred_username || ""} </span>
+                      </li>
+                      <li className="report-icon foinavitem">
+                        <a href={FOI_FLOW_REPORTING_URL} target="_blank">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-line" viewBox="0 0 16 16">
+                              <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z"/>
+                          </svg>
+                        </a>
                       </li>
                       <li className="bell-icon foinavitem" >
                       <div onClick={(e) => openModal(e)} className={`drawer-div ${open && 'notification-popup-drawer'}`}>
@@ -104,8 +142,8 @@ const triggerPopup = () => {
                         contentStyle={{left: `${(screenPosition - 300)}px`}}
                         position={'bottom right'}
                         >
-                        <NotificationPopup notifications={foiNotifications} isMinistry ={isMinistry}
-                        ministryCode ={ministryCode}></NotificationPopup>
+                        <NotificationPopup notifications={messageData} isMinistry ={isMinistry}
+                        ministryCode ={ministryCode} ></NotificationPopup>
                         </Popup>
                       </div>
                       </li>
@@ -115,14 +153,14 @@ const triggerPopup = () => {
                   </ul>
                 </div>
               </Nav>
-            </Navbar.Collapse>       
-          :null}
+            </Navbar.Collapse>   
+            </>    
+          }
           </div>
           </div>
       </Nav>      
     </Container>    
          </Navbar>   
-      {/* {isAuthenticated ?  <HomeMenu /> : null} */}
          </div>
          </div>
   );

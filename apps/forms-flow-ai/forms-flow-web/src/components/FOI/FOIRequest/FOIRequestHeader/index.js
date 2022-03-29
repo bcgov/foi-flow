@@ -62,19 +62,35 @@ const FOIRequestHeader = React.memo(
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
+     
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
+
+    useEffect(() => {
+        setAssignedTo(getAssignedTo(requestDetails));
+    }, [requestDetails]);
 
     const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(requestDetails));
     const [menuItems, setMenuItems] = useState([])
 
     const preventDefault = (event) => event.preventDefault();
     const requestState = requestDetails?.currentState;
-    
+
+    useEffect(() => {
+      // handle case where assigned user was removed from group
+      if (assignedToList && assignedToList.length > 0) {
+        var assignedTeam = assignedToList.find(team => team.name === requestDetails.assignedGroup);
+        if (assignedTeam && requestDetails.assignedTo && !assignedTeam.members.find(member => member.username === requestDetails.assignedTo)) {
+          setAssignedTo("|Unassigned");
+          handleAssignedToValue("|Unassigned");
+        }
+      }
+    }, [assignedToList]);
+
     useEffect(() => {
       setMenuItems(
         getMenuItems({ classes, assignedToList, selectedAssignedTo })
       );
-    }, [selectedAssignedTo, assignedToList]);
+    }, [selectedAssignedTo, assignedToList]);    
 
     //handle onChange event for assigned To
     const handleAssignedToOnChange = (event) => {
@@ -92,8 +108,8 @@ const FOIRequestHeader = React.memo(
       //place holder - do nothing here
     };
 
-    const hearderText = getHeaderText({requestDetails, ministryId});
     const status = getStatus({ headerValue, requestDetails });
+    const hearderText = getHeaderText({requestDetails, ministryId, status});
     const showMinistryAssignedTo =
       status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.closed.name.toLowerCase() ||

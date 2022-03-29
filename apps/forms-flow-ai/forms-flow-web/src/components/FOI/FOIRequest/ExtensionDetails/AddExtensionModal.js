@@ -35,7 +35,10 @@ import {
   uploadFiles,
   checkPublicBodyError,
   filterExtensionReason,
-  errorToast
+  errorToast,
+  getPublicBodyTotalExtendedDays,
+  getMaxExtendDays,
+  getSelectedDays
 } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
@@ -106,8 +109,7 @@ const AddExtensionModal = () => {
   const publicBodySelected = reason?.extensiontype === "Public Body";
 
   const [numberDays, setNumberDays] = useState("");
-  const maxExtendDays = reason?.defaultextendedduedays || 999;
-
+  let maxExtendDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), reason?.defaultextendedduedays, publicBodySelected, getSelectedDays(selectedExtension?.extensiontype, selectedExtension?.extendedduedays)) || 999;
   const [extendedDate, setExtendedDate] = useState("");
   const [preExtendedDate, setPreExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
@@ -166,10 +168,15 @@ const AddExtensionModal = () => {
       (er) => er.extensionreasonid === e.target.value
     );
 
+    const isPublicBody = extensionReason?.extensiontype === "Public Body";
+    let days = extensionReason.defaultextendedduedays;
+    const maxDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), extensionReason.defaultextendedduedays, isPublicBody, getSelectedDays(selectedExtension?.extensiontype, selectedExtension?.extendedduedays)) || days;
+    maxExtendDays = isPublicBody ? maxDays : maxExtendDays;
     setReason(extensionReason);
-
-    if (extensionReason.defaultextendedduedays) {
-      updateExtendedDate(extensionReason.defaultextendedduedays);
+    if (isPublicBody)
+      days = maxDays
+    if (days) {
+      updateExtendedDate(days);
     }
   };
 
@@ -346,7 +353,7 @@ const AddExtensionModal = () => {
             setDeniedDate(formatDate(new Date()));
             setApprovedNumberDays("");
             setPreExtendedDate("");
-            setStatus(extensionStatusId.approved);
+            setStatus(extensionStatusId.pending);
           },
         }}
       >

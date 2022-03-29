@@ -91,6 +91,14 @@ const RequestDetails = React.memo(
       }
     //updates the default values from the request details    
     React.useEffect(() => {
+
+     setSelectedRequestType(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
+     setSelectedReceivedMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
+     setSelectedDeliveryMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
+     setReceivedDate(getReceivedDateForLocalState);
+     setStartDate(getProcessStartDateForLocalState);
+     setDueDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
+
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
       receivedDate = calculateReceivedDate(receivedDate);
       const startDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);     
@@ -248,7 +256,8 @@ const RequestDetails = React.memo(
                         </TextField> 
                     </div>
                     <div className="col-lg-6 foi-details-col"> 
-                    <TextField                
+                    <TextField
+                            id="receivedDate"
                             label="Received Date"
                             type="date" 
                             value={receivedDateText || ''} 
@@ -262,7 +271,8 @@ const RequestDetails = React.memo(
                             fullWidth
                             disabled={!!ministryId || disableInput}
                         />
-                        <TextField                
+                        <TextField
+                            id="startDate"
                             label="Start Date"
                             type="date" 
                             value={startDateText || ''} 
@@ -278,7 +288,8 @@ const RequestDetails = React.memo(
                             disabled={!!ministryId || disableInput}
                         />
                         {requestDetails.currentState === undefined || (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) ?
-                        <TextField                
+                        <TextField
+                            id="dueDate"
                             label="Due Date"
                             type="date" 
                             value={dueDateText || ''}                            
@@ -291,7 +302,8 @@ const RequestDetails = React.memo(
                             fullWidth
                         />
                         :
-                        <TextField                
+                        <TextField
+                            id="dueDate"
                             label="Due Date"                            
                             value="N/A"                            
                             InputLabelProps={{

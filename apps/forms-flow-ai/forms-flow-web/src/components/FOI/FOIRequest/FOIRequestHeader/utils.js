@@ -50,7 +50,7 @@ export const getMenuItems = ({
       <MenuItem
         key={`${assignee.id}`}
         className={classes.item}
-        value={`${group.name}|${assignee.username}`}
+        value={`${group.name}|${assignee.username}|${assignee.firstname}|${assignee.lastname}`}
       >
         {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
       </MenuItem>
@@ -63,10 +63,17 @@ export const getMenuItems = ({
   return menuItems;
 };
 
-export const getHeaderText = ({requestDetails, ministryId}) => {
+export const getHeaderText = ({requestDetails, ministryId, status}) => {
   if (window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDREQUEST)) {
     return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
   }
+  
+  if(status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()){
+    return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+  }
+
+  if(requestDetails.axisRequestId)
+    return requestDetails.axisRequestId;
 
   if (requestDetails.idNumber && ministryId) {
     return requestDetails.idNumber;
@@ -76,12 +83,12 @@ export const getHeaderText = ({requestDetails, ministryId}) => {
 };
 
 export const getAssignedTo = (requestDetails) => {
-  if (!requestDetails.assignedGroup || requestDetails === "Unassigned") {
+  if (!requestDetails.assignedGroup || requestDetails.assignedTo === "Unassigned") {
     return "|Unassigned";
   }
 
   return requestDetails.assignedTo
-    ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}`
+    ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}|${requestDetails.assignedToFirstName}|${requestDetails.assignedToLastName}`
     : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
 };
 

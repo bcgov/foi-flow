@@ -20,7 +20,7 @@ class FOIRequestExtension(db.Model):
     version =db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
     
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -75,12 +75,20 @@ class FOIRequestExtension(db.Model):
         db.session.commit()
         return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid)      
     
+    @classmethod
+    def saveextensions(cls, newextensions):
+        db.session.add_all(newextensions)
+        db.session.commit()
+        extensionids = []
+        for extension in newextensions:
+            extensionids.append(extension.foirequestextensionid)
+        return DefaultMethodResult(True,'Extensions created',-1,extensionids)
 
     @classmethod
     def createextensionversion(cls,ministryrequestid,ministryrequestversion, extension, userid):
         # if 'document' in extension:
         #     newextensiondocument = 
-        newextesion = FOIRequestExtension( foirequestextensionid=extension["foirequestextensionid"], extensionreasonid=extension['extensionreasonid'], extensionstatusid=extension['extensionstatusid'], extendedduedays=extension["extendedduedays"], extendedduedate=extension["extendedduedate"], decisiondate=extension["decisiondate"], approvednoofdays=extension["approvednoofdays"], version=extension["version"], isactive=extension["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
+        newextesion = FOIRequestExtension( foirequestextensionid=extension["foirequestextensionid"], extensionreasonid=extension['extensionreasonid'], extensionstatusid=extension['extensionstatusid'], extendedduedays=extension["extendedduedays"], extendedduedate=extension["extendedduedate"], decisiondate=extension["decisiondate"], approvednoofdays=extension["approvednoofdays"], version=extension["version"], isactive=extension["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, createdby=userid)
         db.session.add(newextesion)
         db.session.commit()               
         return DefaultMethodResult(True,'New Extension version created', newextesion.foirequestextensionid) 
@@ -93,7 +101,28 @@ class FOIRequestExtension(db.Model):
         for row in rs:
             if row["isactive"] == True:
                 extensions.append(dict(row))
-        return extensions    
+        return extensions
+    
+    @classmethod   
+    def getextensionscount(cls,ministryrequestid):
+        sql = """SELECT 
+                    count(*) as extensions_count
+                    FROM 
+                    (
+                        SELECT 
+                            DISTINCT ON (foirequestextensionid) foirequestextensionid, 
+                            fre.extensionstatusid 
+                        FROM 
+                            "FOIRequestExtensions" fre 
+                            INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid 
+                        WHERE foiministryrequest_id = :ministryrequestid 
+                            AND es.extensionstatusid = 2
+                            AND fre.isactive is True
+                    ) AS list """
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        for row in rs:
+            return row["extensions_count"]
+        return None
 
     @classmethod
     def getlatestapprovedextension(cls, extensionid, ministryrequestid, ministryrequestversion):   
@@ -107,9 +136,15 @@ class FOIRequestExtension(db.Model):
     
     @classmethod
     def getextensionforversion(cls, foirequestextensionid, version):   
-        document_schema = FOIRequestExtensionSchema()            
-        request = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid, FOIRequestExtension.version == version).order_by(FOIRequestExtension.version.desc()).first()
-        return document_schema.dump(request)
+        extension_schema = FOIRequestExtensionSchema()            
+        extension = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid, FOIRequestExtension.version == version).order_by(FOIRequestExtension.version.desc()).first()
+        return extension_schema.dump(extension)
+
+    @classmethod
+    def deleteextensionbyministry(cls, ministryid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id.in_(ministryid)).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Extensions deleted for the ministry ', ministryid)  
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:

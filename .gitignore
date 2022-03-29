@@ -65,6 +65,18 @@ request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
+axisintegrationapi/MCS.FOI.AXISIntegration/.vs/
+axisintegrationapi/MCS.FOI.AXISIntegration/.vs/*
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegration.DAL/bin/
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegration.DAL/bin/*
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegration.DAL/obj/
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegration.DAL/obj/*
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegration.DAL.UnitTests/bin/*
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegration.DAL.UnitTests/bin/
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI.UnitTests/obj/
+.gitignore
+
+
 
 axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/bin/*
 axisintegrationapi/MCS.FOI.AXISIntegration/.vs/*

@@ -20,7 +20,7 @@ class FOIRequestComment(db.Model):
     taggedusers = db.Column(JSON, unique=False, nullable=True)  
     parentcommentid = db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime2.now())
+    created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
@@ -39,10 +39,19 @@ class FOIRequestComment(db.Model):
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
 
     @classmethod
+    def deleteextensioncommentsbyministry(cls, ministryid):
+        db.session.query(FOIRequestComment).filter(FOIRequestComment.ministryrequestid.in_(ministryid), FOIRequestComment.commenttypeid == 2).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Extensions comments deleted for the ministry ', ministryid)
+
+    @classmethod
     def disablecomment(cls, commentid, userid):   
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid)
         if(comment.count() > 0) :             
+            childcomments = dbquery.filter_by(parentcommentid=commentid, isactive=True)
+            if (childcomments.count() > 0) :
+                return DefaultMethodResult(False,'Cannot delete parent comment with replies',commentid)
             comment.update({FOIRequestComment.isactive:False, FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Comment disabled',commentid)
@@ -66,7 +75,25 @@ class FOIRequestComment(db.Model):
         comment_schema = FOIRequestCommentSchema(many=True)
         query = db.session.query(FOIRequestComment).filter_by(ministryrequestid=ministryrequestid, isactive = True).order_by(FOIRequestComment.commentid.desc()).all()
         return comment_schema.dump(query)   
+
+    @classmethod
+    def getcommentbyid(cls, commentid) -> DefaultMethodResult:
+        comment_schema = FOIRequestCommentSchema()
+        query = db.session.query(FOIRequestComment).filter_by(commentid=commentid, isactive=True).first()
+        return comment_schema.dump(query)
     
+    @classmethod 
+    def getcommentusers(cls, commentid):
+        sql = """select commentid, createdby, taggedusers from (
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
+                    union all 
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
+                ) cmt where commenttypeid =1"""
+        rs = db.session.execute(text(sql), {'commentid': commentid})
+        users = []
+        for row in rs:
+            users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
+        return users    
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
         fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby','taggedusers') 
