@@ -9,8 +9,8 @@
 }
 
 .foi-request-number-header {
-    margin-top: 60px;
-    margin-left: 15px;
+    margin-top: 20px;
+    padding: 0 !important;
 }
 .foi-request-form {
     background-color: white;
@@ -131,4 +131,9 @@
 
 .nodivstages {
     color:red;
+}
+
+.state-box {
+    padding-left:12px;
+    color:white;
 }

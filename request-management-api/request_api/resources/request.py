@@ -76,6 +76,7 @@ class FOIRawRequest(Resource):
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneefirstname,assigneemiddlename,assigneelastname)
+                asyncio.create_task(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
                 if result.success == True:
                     asyncio.create_task(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
@@ -97,6 +98,25 @@ def getparams(updaterequest):
         'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
     }
 
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirawrequest/axisrequestids')
+class FOIAXISRequest(Resource):
+    """Consolidates create and retrival of raw request"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())       
+    @auth.require
+    def get():
+        try : 
+            jsondata = {}
+            axisrequestids = rawrequestservice().getaxisequestids()                                    
+            jsondata = json.dumps(axisrequestids)
+            return jsondata , 200 
+        except ValueError:
+            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/loadtest/<requestid>')

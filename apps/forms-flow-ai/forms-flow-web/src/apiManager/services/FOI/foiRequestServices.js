@@ -12,7 +12,8 @@ import {
   clearRequestDetails,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
-  setOpenedMinistries
+  setOpenedMinistries,
+  setExistingAxisRequestIds
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -29,7 +30,6 @@ export const fetchFOIRequestList = () => {
             return { ...foiRequest };
           });
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(data));
         } else {
           dispatch(serviceActionError(res));
@@ -77,7 +77,6 @@ export const fetchFOIRequestListByPage = (
       .then((res) => {
         if (res.data) {
           dispatch(clearRequestDetails({}));
-          dispatch(fetchFOIAssignedToList("", "", ""));
           dispatch(setFOIRequestList(res.data));
         } else {
           dispatch(serviceActionError(res));
@@ -157,10 +156,9 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
 };
 
 export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
-  if(ministryId) {
+  if (ministryId) {
     return fetchFOIRequestDetails(requestId, ministryId);
-  }
-  else {
+  } else {
     return fetchFOIRawRequestDetails(requestId);
   }
 };
@@ -376,7 +374,7 @@ export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
     "ministries"
   );
   return (dispatch) => {
-    httpGETRequest(apiUrlgetRequestDetails, UserService.getToken())
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           dispatch(setOpenedMinistries(res.data));
@@ -384,6 +382,52 @@ export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching raw request details for request# ${notification.requestId}`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+export const fetchExistingAxisRequestIds = (...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = replaceUrl(API.FOI_GET_AXIS_REQUEST_IDS);
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setExistingAxisRequestIds(res.data));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching axis request ids.`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = replaceUrl(
+    API.FOI_GET_AXIS_REQUEST_DATA,
+    "<axisrequestid>",
+    axisRequestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          if(!isModal && Object.entries(res.data).length !== 0){
+            dispatch(setFOIRequestDetail(res.data));
+          }
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching request from AXIS.`);
         }
       })
       .catch((error) => {

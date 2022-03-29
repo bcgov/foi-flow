@@ -72,6 +72,13 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       setDisableSaveBtn(false);
     }
 
+    const isBtnDisabled = () => {
+      return files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || 
+      (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || 
+      (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id ) ||
+      (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id ))
+    }
+
     const handleClose = () => {
       handleModal(false);
     };
@@ -186,7 +193,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             </DialogContentText>
           </DialogContent>
           <DialogActions>            
-            <button className={`btn-bottom btn-save ${ files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id )) ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id )) } onClick={handleSave}>
+            <button className={`btn-bottom btn-save ${isBtnDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || isBtnDisabled()} onClick={handleSave}>
               {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
               "Save Change" : "Re-Open Request"}
             </button>
@@ -251,7 +258,8 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
     </div>
     <div className="row foi-details-row confirm-modal-row">
       <div className="col-lg-6 foi-details-col">
-        <TextField                
+        <TextField    
+            id="closingModalStartDate"            
             label="Start Date"
             type="date" 
             value={_requestDetails.requestProcessStart}                            
@@ -265,7 +273,8 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
         />
       </div>
       <div className="col-lg-6 foi-details-col">
-        <TextField                
+        <TextField    
+            id="closingModalCloseDate"              
             label="Closing Date"
             type="date" 
             value={closingDateText || ''} 
@@ -284,7 +293,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
     <div className="row foi-details-row confirm-modal-row">
       <div className="col-lg-12 foi-details-col">
         <TextField
-            id="requestType"
+            id="closingReason"
             label="Reason for Closing Request"
             InputLabelProps={{ shrink: true, }}          
             select

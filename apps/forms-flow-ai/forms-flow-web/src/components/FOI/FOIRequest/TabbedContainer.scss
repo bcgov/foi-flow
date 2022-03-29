@@ -3,21 +3,52 @@
 }
 
 .foiformcontent {
-    display: inline-flex;  
-    padding-top: 65px;
-    position: relative;
- 
-    margin-left: 12%;
-    margin-right: 12%;
-    margin-bottom: 5%;
+  display: inline-flex;  
+  padding-top: 65px;
+  position: relative;
 
-    height: 90%;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-bottom: 5%;
+
+  height: 90%;
+  min-width: 80%;
+}
+
+@media (min-width: 1000px) and (max-width: 1230px) {
+  .foiformcontent {
+    margin-left: calc(51.68vw - 512px);
+    margin-right: calc(51.68vw - 512px);
+    .foitabbedContainer {
+      .foitabpanelcollection{
+        min-width: calc(824px - 3.36vw);
+        max-width: calc(824px - 3.36vw);
+      }
+    }
   }
+}
+
+@media (min-width: 768px) and (max-width: 1000px) {
+  .foiformcontent {
+    margin-left: 5px;
+    margin-right: 5px;
+    max-width: calc(100vw - 10px);
+    .foitabbedContainer {
+      .foitabpanelcollection{
+        min-width: calc(100vw - 210px);
+        max-width: calc(100vw - 210px);
+      }
+    }
+  }
+}
 
 
-  .foitabbedContainer{
-    display: inline-flex;  
-    background-color: white;
+
+
+.foitabbedContainer{
+  display: inline-flex;  
+  background-color: white;  
+  min-width: 100%;
 }
 
   
@@ -51,7 +82,7 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: auto;
+    height: calc(100% - 96px - 67px);
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;
@@ -60,7 +91,9 @@
     z-index: 10;
   }
   .foitabpanelcollection{
-    margin-left:18%;
+    margin-left: 200px;
+    min-width: calc(80vw - 200px);
+    max-width: calc(80vw - 200px);
   }
 
   .foitabheaderdefaultBG {
@@ -155,8 +188,9 @@
 
   .foileftpanelstatus
   {
-    padding-bottom: 1%;
-    padding-top: 30%;
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 20%;
     padding-left: 10%;
     color: white;
     font-size: 15px;

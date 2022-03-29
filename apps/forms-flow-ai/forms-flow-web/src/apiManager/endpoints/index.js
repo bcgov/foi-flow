@@ -1,5 +1,5 @@
 
-import { FOI_BASE_API_URL } from "./config";
+import { FOI_BASE_API_URL, AXIS_API_URL } from "./config";
 
 const API = {
   FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard`,
@@ -8,6 +8,7 @@ const API = {
   FOI_GET_MINISTRY_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination/ministry`,
   FOI_GET_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/applicantcategories`,
   FOI_GET_PROGRAMAREAS_API: `${FOI_BASE_API_URL}/api/foiflow/programareas`,
+  FOI_GET_PROGRAMAREAS_FORUSER_API: `${FOI_BASE_API_URL}/api/foiflow/programareasforuser`,
   FOI_RAW_REQUEST_API: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>`,
   FOI_POST_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>`,
   FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API: `${FOI_BASE_API_URL}/api/foiassignees`,
@@ -57,6 +58,7 @@ const API = {
   FOI_DELETE_ALL_NOTIFICATIONS: `${FOI_BASE_API_URL}/api/foinotifications/<type>`,
 
   FOI_GET_EXTENSION_REASONS: `${FOI_BASE_API_URL}/api/foiflow/extensionreasons`,
+  FOI_POST_AXIS_EXTENSIONS: `${FOI_BASE_API_URL}/api/foiextension/axisrequest/<ministryrequestid>`,
   FOI_POST_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_POST_UPDATE_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>/extension/<extensionid>/edit`,
   FOI_POST_DELETE_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/foirequest/<requestid>/ministryrequest/<ministryrequestid>/extension/<extensionid>/delete`,
@@ -67,5 +69,9 @@ const API = {
   FOI_GET_OPENED_MINISTRIES: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/fields?names=ministries`,
 
   FOI_GET_ADVANCED_SEARCH: `${FOI_BASE_API_URL}/api/advancedsearch`,
+
+  FOI_GET_AXIS_REQUEST_IDS: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestids`,
+  
+  FOI_GET_AXIS_REQUEST_DATA: `${AXIS_API_URL}/api/RequestSearch/<axisrequestid>`
 };
 export default API;

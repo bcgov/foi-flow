@@ -14,7 +14,7 @@ import {
 } from "../../../apiManager/services/FOI/foiNotificationServices";
 import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
 import io from "socket.io-client";
-import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX, FOI_FLOW_REPORTING_URL} from "../../../constants/constants";
+import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX, FOI_FLOW_REPORTING_URL, SOCKETIO_CONNECT_NONCE} from "../../../constants/constants";
 import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 
 
@@ -45,22 +45,22 @@ useEffect(() => {
   if(!unauthorized && isAuthenticated){
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  
-    const options = {
+	const options = {
       reconnectionDelay:SOCKETIO_RECONNECTION_DELAY?SOCKETIO_RECONNECTION_DELAY:20000,
       reconnectionDelayMax:SOCKETIO_RECONNECTION_DELAY_MAX?SOCKETIO_RECONNECTION_DELAY_MAX :30000,
       path:'/api/v1/socket.io',
       transports: ['websocket'],
-      auth: { "x-jwt-token": UserService.getToken() }
+      auth: { "userid": user.preferred_username , "rkey": SOCKETIO_CONNECT_NONCE, "x-jwt-token": UserService.getToken() }
     };
     setSocket(io.connect(SOCKETIO_CONNECT_URL, options));
-  
     setInterval(() => {
       dispatch(fetchFOINotifications());
     }, 900000);
   }
 },[]);
 
-useEffect(() => {     
+
+useEffect(() => {    
     socket?.on(user.preferred_username, data => {
      if(data.action === 'delete'){
       setMessageData((oldMessageData) => oldMessageData.filter((msg) => msg.notificationid !== data.notificationid))

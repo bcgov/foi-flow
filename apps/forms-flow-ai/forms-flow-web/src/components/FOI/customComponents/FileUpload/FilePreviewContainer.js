@@ -26,7 +26,7 @@ function FilePreviewContainer({files, removeFile}) {
         <div>
           <aside>  
             <span className="file-name">{file.filename ? file.filename : file.name}</span>                                       
-            <i className="fas fa-times-circle foi-file-close" onClick={() => removeFile(fileName)} />
+            <i className="fas fa-times-circle foi-file-close" onClick={(event) => {event.stopPropagation(); removeFile(fileName);}} />
           </aside>
         </div>
       </div>

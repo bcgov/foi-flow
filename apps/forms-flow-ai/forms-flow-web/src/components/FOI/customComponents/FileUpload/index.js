@@ -26,11 +26,13 @@ const FileUpload = ({
     const [files, setFiles] = useState({ ...existingDocuments });    
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]); 
-    const handleUploadBtnClick = () => {
-      if (fileInputField.current)
+    const handleUploadBtnClick = (e) => {
+      e.stopPropagation();
+      fileInputField.current.click();
+    };
+    const handleUploadAreaClick = () => {
+      if (Object.entries(files).length === 0)
         fileInputField.current.click();
-      else
-        fileInputFieldMultiple.current.click();
     };
 
     const handleDuplicateFiles = (file) => {
@@ -106,11 +108,11 @@ const FileUpload = ({
     };
 
     const validateFiles = (newFiles, totalFiles) => {
-
       if (multipleFiles && (newFiles.length > 10  || totalFiles > 10)) {
         setErrorMessage(["A maximum of 10 files can be uploaded at one time. Only 10 files have been added this upload window, please upload additional files separately"]);
-      }
-      else if (newFiles.length) {
+      } else if (!multipleFiles && totalFiles > 1) {
+        return
+      } else if (newFiles.length) {
         let updatedFilesDetails = addNewFiles(newFiles);
         if (multipleFiles && updatedFilesDetails[1] > totalFileSize) {
           setTotalFileSize(updatedFilesDetails[1] - parseFloat(updatedFilesDetails[2]))
@@ -130,8 +132,7 @@ const FileUpload = ({
       e.preventDefault();
       const newFiles = e.dataTransfer.files;
       const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
-      if (multipleFiles)
-        validateFiles(newFiles, totalNoOfFiles);
+      validateFiles(newFiles, totalNoOfFiles);
   }
     const removeFile = (fileName) => {
         const _file = files[fileName];
@@ -173,7 +174,7 @@ const FileUpload = ({
           onDragEnter={dragEnter}
           onDragLeave={dragLeave}
           onDrop={fileDrop}
-        >
+          onClick={handleUploadAreaClick}>
           <div className="file-upload-column">
             {Object.entries(files).length === 0 ? (
               <div className="file-upload-btn">
@@ -185,32 +186,7 @@ const FileUpload = ({
           </div>
           <div className="file-upload-column file-upload-column-2">
             <input
-              className="file-upload-input-multiple"
-              type="file"
-              ref={fileInputFieldMultiple}
-              onChange={handleNewFileUpload}
-              title=""
-              value=""
-              multiple={true}
-              accept={mimeTypes}
-            />
-          </div>
-          <div className="file-upload-column file-upload-column-3">
-            {(Object.entries(files).length === 0 && !multipleFiles) ||
-            multipleFiles ? (
-              <button
-                className="btn-add-files"
-                type="button"
-                onClick={handleUploadBtnClick}
-              >
-                Add Files
-              </button>
-            ) : null}
-          </div>
-        </div>
-        {Object.entries(files).length === 0 ? (
-          <input
-            className="file-upload-input"
+            className={multipleFiles ? "file-upload-input-multiple" : "file-upload-input"}
             type="file"
             ref={fileInputField}
             onChange={handleNewFileUpload}
@@ -218,8 +194,16 @@ const FileUpload = ({
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}
-          />
-        ) : null}
+            />
+          </div>
+          <div className="file-upload-column file-upload-column-3">
+            {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
+                  Add Files
+            </button>  : null}
+        </div>
+        </div>
+        
       </section>
       <ul className="error-message-ul">
         {errorMessage
