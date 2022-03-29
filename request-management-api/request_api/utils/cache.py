@@ -35,6 +35,8 @@ def cache_filter(*args, **kwargs):
         if os.getenv('CACHE_ENABLED') != 'Y':
             return True
         
+        # Do a random get to the cache just to ping it and test its health. 
+        # If redis is down exception will happen and will be caught in next line, otherwise it will just return None
         request_api.cache.get("")
     except Exception:
         return True
