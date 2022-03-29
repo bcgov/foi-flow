@@ -41,7 +41,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
             catch(Exception ex)
             {
                 _logger.Log(LogLevel.Error, string.Format($"Exception happened while GET operations of request - {requestNumber}, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}"));
-                return ex.Message;
+                return string.Format($"Exception happened while GET operations of request - {requestNumber}, Error Message : {ex.Message}");
             }
             
         }

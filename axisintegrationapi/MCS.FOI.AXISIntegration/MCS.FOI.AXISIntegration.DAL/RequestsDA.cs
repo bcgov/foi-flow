@@ -49,6 +49,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.ReceivedDateUF = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd HH:mm:ss.ffffff");
                     axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
                     axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
+                    axisRequest.CFRDueDate = RequestsHelper.ConvertDateToString(row, "cfrDueDate", "yyyy-MM-dd");
 
                     axisRequest.DeliveryMode = RequestsHelper.GetDeliveryMode(Convert.ToString(row["deliveryMode"]));
                     axisRequest.ReceivedMode = RequestsHelper.GetReceivedMode(Convert.ToString(row["receivedMode"]));
@@ -143,7 +144,14 @@ namespace MCS.FOI.AXISIntegration.DAL
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = requestTypes.iLabelID and terminology.tiLocaleID = 1) as requestType,
                 sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
-                else 0 end) as requestPageCount
+                else 0 end) as requestPageCount,
+                (SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK) 
+                INNER JOIN tblProgramOffices programoffice WITH (NOLOCK) ON programoffice.tiProgramOfficeID = cfr.tiProgramOfficeID 
+                WHERE requests.iRequestID = cfr.iRequestID 
+                AND requests.tiOfficeID = programoffice.tiOfficeID 
+                AND office.OFFICE_ID = programoffice.tiOfficeID
+                AND cfr.sdtDueDate IS NOT NULL
+                ORDER BY cfr.sdtDueDate DESC) as cfrDueDate
                 FROM
                 tblRequests requests WITH (NOLOCK) LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID
                 LEFT OUTER JOIN tblRequesterTypes  requesterTypes WITH (NOLOCK) ON requests.tiRequesterCategoryID = requesterTypes.tiRequesterTypeID
@@ -158,7 +166,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID
                 LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID
                 LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID
-                WHERE
+                WHERE 
                 vcVisibleRequestID = @vcVisibleRequestID
                 GROUP BY requests.sdtReceivedDate, requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription,
                 requests.sdtRqtDescFromdate, requests.sdtRqtDescTodate, requests.sdtRequestedDate, office.OFFICE_CODE, requesterTypes.vcDescription,
@@ -166,7 +174,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
-                requestTypes.iLabelID";
+                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {

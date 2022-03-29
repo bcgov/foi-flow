@@ -43,6 +43,9 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "originalDueDate")]
         public string OriginalDueDate { get; set; }
 
+        [DataMember(Name = "cfrDueDate")]
+        public string CFRDueDate { get; set; }
+
         [DataMember(Name = "category")]
         public string Category { get; set; }
         
