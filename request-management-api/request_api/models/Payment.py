@@ -16,7 +16,7 @@ class Payment(db.Model):
     total = db.Column(db.Float, nullable=False)
     status = db.Column(db.String, nullable=False)
     request_id = db.Column(db.Integer, nullable=False)
-    created_on = db.Column(db.DateTime, default=datetime.now(), nullable=False)
+    created_on = db.Column(db.DateTime, default=datetime.now, nullable=False)
     completed_on = db.Column(db.DateTime, default=None, nullable=True)
     paybc_url = db.Column(db.String, nullable=True)
     response_url = db.Column(db.String, nullable=True)

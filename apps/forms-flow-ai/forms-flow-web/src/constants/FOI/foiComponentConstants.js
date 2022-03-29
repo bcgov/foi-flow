@@ -70,7 +70,8 @@ const FOI_COMPONENT_CONSTANTS = {
     REVIEW_REQUEST: "Review Request",
     ISPIIREDACTED:"ispiiredacted",
     DIVISION:"division",
-    DIVISION_STAGE:"divisionStage"
+    DIVISION_STAGE:"divisionStage",
+    AXIS_REQUEST_ID:"axisRequestId"
   };
   
   export default FOI_COMPONENT_CONSTANTS;

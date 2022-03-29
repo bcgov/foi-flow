@@ -18,7 +18,6 @@ class requestservicegetter:
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
-        personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
@@ -35,36 +34,68 @@ class requestservicegetter:
             middlename = applicant['foirequestapplicant.middlename']
             lastname = applicant['foirequestapplicant.lastname']
             businessname = applicant['foirequestapplicant.businessname']
-            dob = parse(applicant['foirequestapplicant.dob']).strftime(self.__genericdateformat()) if applicant['foirequestapplicant.dob'] is not None else ''
+            dobraw = applicant['foirequestapplicant.dob']
+            dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
             alsoknownas = applicant['foirequestapplicant.alsoknownas']
             requestortypeid = applicant['requestortype.requestortypeid']
             if requestortypeid == 1:
                 baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname, businessname))
-            additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(firstname, middlename, lastname, dob, alsoknownas, requestortypeid))
-                       
-        for personalattribute in personalattributes:
-            attribute, location = self.__preparepersonalattribute(personalattribute)
-            if location == "main":
-                baserequestinfo.update(attribute)
-            elif location =="additionalPersonalInfo":
-                additionalpersonalinfo.update(attribute)
-                
+            additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
+
+        baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
+        baserequestinfo.update(baserequestdetails)
+        additionalpersonalinfo.update(additionalpersonalinfodetails)
+        
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
         originalduedate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
         baserequestinfo['originalDueDate'] = originalduedate.strftime(self.__genericdateformat())
         return baserequestinfo
+    
+    def preparepersonalattributes(self, foirequestid, version):
+        personalattributes = FOIRequestPersonalAttribute.getrequestpersonalattributes(foirequestid, version)
+        baserequestdetails = {}
+        additionalpersonalinfodetails = {}
+                       
+        for personalattribute in personalattributes:
+            attribute, location = self.__preparepersonalattribute(personalattribute)
+            if location == "main":
+                baserequestdetails.update(attribute)
+            elif location =="additionalPersonalInfo":
+                additionalpersonalinfodetails.update(attribute)
+        return baserequestdetails, additionalpersonalinfodetails
 
     def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authmembershipgroups):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
+        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])        
+        
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
+
+        if request['requesttype'] == 'personal':
+            requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+            additionalpersonalinfo ={}
+            for applicant in requestapplicants:
+                firstname = applicant['foirequestapplicant.firstname']
+                middlename = applicant['foirequestapplicant.middlename']
+                lastname = applicant['foirequestapplicant.lastname']
+                dobraw = applicant['foirequestapplicant.dob']
+                dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
+                requestortypeid = applicant['requestortype.requestortypeid']
+                if requestortypeid == 1:
+                    baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname))
+                additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
+            baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
+            baserequestinfo.update(baserequestdetails)
+            additionalpersonalinfo.update(additionalpersonalinfodetails)                
+            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
+            
         return baserequestinfo
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
+        axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -77,6 +108,8 @@ class requestservicegetter:
             'assignedGroup': requestministry["assignedgroup"],
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
+            'axisRequestId': requestministry["axisrequestid"],
+            'axisSyncDate': parse(requestministry["axissyncdate"]).strftime('%Y-%m-%d %H:%M:%S.%f') if axissyncdatenoneorempty == False else None,
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
@@ -131,7 +164,7 @@ class requestservicegetter:
     def __genericdateformat(self):
         return '%Y-%m-%d'
     
-    def __prepareapplicant(self,firstname, middlename, lastname, businessname):
+    def __prepareapplicant(self,firstname= None, middlename= None, lastname= None, businessname= None):
         return {
                     'firstName': firstname,
                     'middleName': middlename,
@@ -139,7 +172,7 @@ class requestservicegetter:
                     'businessName': businessname,                                                
                 }     
         
-    def __prepareadditionalpersonalinfo(self,firstname, middlename, lastname, dob, alsoknownas, requestortypeid):
+    def __prepareadditionalpersonalinfo(self, requestortypeid, firstname= None, middlename= None, lastname= None, dob= None, alsoknownas= None):
         if requestortypeid == 1:
             return {                            
                     'birthDate' : dob,
@@ -184,4 +217,5 @@ class requestservicegetter:
         elif personalattribute['personalattributeid'] == 7:     
             return {'adoptiveFatherLastName': personalattribute['attributevalue']}, "main"         
           
-    
+    def __noneorempty(self, variable):
+	    return True if not variable else False

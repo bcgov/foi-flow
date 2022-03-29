@@ -13,7 +13,7 @@ import {
 
 const ProcessingTeamColumns = [
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
@@ -53,7 +53,7 @@ const ProcessingTeamColumns = [
     flex: 1,
   },
   {
-    field: "assignedToName",
+    field: "assignedToFormatted",
     headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
@@ -101,7 +101,7 @@ const IntakeTeamColumns = [
     flex: 1,
   },
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     flex: 1,
@@ -113,7 +113,7 @@ const IntakeTeamColumns = [
     flex: 1,
   },
   {
-    field: "assignedToName",
+    field: "assignedToFormatted",
     headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
@@ -136,7 +136,7 @@ const IntakeTeamColumns = [
 
 const FlexTeamColumns = [
   {
-    field: "idNumber",
+    field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
@@ -168,7 +168,7 @@ const FlexTeamColumns = [
     flex: 1,
   },
   {
-    field: "assignedToName",
+    field: "assignedToFormatted",
     headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,

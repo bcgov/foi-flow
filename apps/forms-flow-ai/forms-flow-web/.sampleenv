@@ -30,3 +30,6 @@ REACT_APP_FOI_BASE_API_URL=http://IPADDRESS:15000
 #keycloack token refresh
 TOKEN_REFRESH_INTERVAL=6000
 TOKEN_UPDATE_THRESHOLD=300
+
+##AXIS base URL
+REACT_APP_AXIS_API_URL=http://flowaxisapidev.gov.bc.ca

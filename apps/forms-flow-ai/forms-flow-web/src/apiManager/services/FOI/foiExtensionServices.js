@@ -107,6 +107,32 @@ export const createExtensionRequest = ({
     });
 };
 
+export const addAXISExtensions = (data, ministryId, ...rest) => {
+  const done = fnDone(rest);  
+  let apiUrl = replaceUrl(
+    API.FOI_POST_AXIS_EXTENSIONS,
+    "<ministryrequestid>",
+    ministryId
+  );  
+
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          console.log("Extensions saved successfully!");
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in saving request extensions details for the ministry# ${ministryId}`);
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
+};
+
 export const updateExtensionRequest = ({
   data,
   extensionId,

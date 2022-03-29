@@ -62,7 +62,12 @@ const FOIRequestHeader = React.memo(
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
+     
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
+
+    useEffect(() => {
+        setAssignedTo(getAssignedTo(requestDetails));
+    }, [requestDetails]);
 
     const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(requestDetails));
     const [menuItems, setMenuItems] = useState([])
@@ -103,8 +108,8 @@ const FOIRequestHeader = React.memo(
       //place holder - do nothing here
     };
 
-    const hearderText = getHeaderText({requestDetails, ministryId});
     const status = getStatus({ headerValue, requestDetails });
+    const hearderText = getHeaderText({requestDetails, ministryId, status});
     const showMinistryAssignedTo =
       status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.closed.name.toLowerCase() ||
