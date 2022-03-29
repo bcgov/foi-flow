@@ -211,7 +211,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             if(Object.entries(data).length !== 0){
               setAxisSyncedData(data);
               var axisDataUpdated = checkIfAxisDataUpdated(data);
-              console.log("axisDataUpdated=>",axisDataUpdated);
               if(axisDataUpdated)
                 setAxisMessage("WARNING");
             }
@@ -236,7 +235,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const checkValidation = (key,axisData) => {
-    console.log("Req==>",requestDetails);
     var mandatoryField = isMandatoryField(key);
     if(mandatoryField && axisData[key])
       return true;
