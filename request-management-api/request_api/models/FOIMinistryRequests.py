@@ -435,6 +435,7 @@ class FOIMinistryRequest(db.Model):
             'description': FOIMinistryRequest.description,
             'requestdescription': FOIMinistryRequest.description,
             'duedate': FOIMinistryRequest.duedate,
+            'cfrduedate': FOIMinistryRequest.cfrduedate,
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode)

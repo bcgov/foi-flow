@@ -14,7 +14,7 @@
 """API endpoints for managing a FOI Requests resource."""
 
 
-from flask import Flask, g, request
+from flask import g, request
 from flask_restx import Namespace, Resource
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
