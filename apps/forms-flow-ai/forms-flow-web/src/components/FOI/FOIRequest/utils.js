@@ -355,5 +355,5 @@ export  const isAxisSyncDisplayField = (field) => {
 };
 
 export const isMandatoryField = (field) => {
-  return Object.entries(MANDATORY_FOI_REQUEST_FIELDS).find(([key]) => key === field)?.[1];
+  return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
 };
