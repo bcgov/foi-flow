@@ -33,6 +33,8 @@ def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5]
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -54,6 +56,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -84,6 +88,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call F
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 

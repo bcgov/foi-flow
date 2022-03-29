@@ -102,6 +102,8 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 //
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header LDD'), 0)
 
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)

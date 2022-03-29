@@ -62,6 +62,8 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
 
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -93,19 +95,7 @@ assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 5
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
-
-WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -121,6 +111,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -134,6 +126,24 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call F
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 

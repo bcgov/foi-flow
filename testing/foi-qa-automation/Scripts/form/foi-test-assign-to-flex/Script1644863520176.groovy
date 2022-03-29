@@ -61,6 +61,8 @@ requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Tit
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -73,6 +75,8 @@ WebUI.waitForElementClickable(findTestObject('Page_foi.flow/sign in/button_Log I
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             7), ('username') : findTestData('Login Credentials').getValue('Username', 7)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -96,6 +100,8 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -106,6 +112,8 @@ WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'), FailureHandl
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 

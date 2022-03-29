@@ -28,6 +28,10 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
             firstname]))
 
+Random random = new Random()
+
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + + random.nextInt(100000)) //generate random axis number for sake of test
+
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 'Firstname')
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name_MuiInputBase'), 'Lastname')
@@ -95,6 +99,8 @@ def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5]
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.maximizeWindow()
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 

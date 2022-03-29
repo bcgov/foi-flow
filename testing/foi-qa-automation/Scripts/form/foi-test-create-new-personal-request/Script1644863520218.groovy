@@ -23,6 +23,9 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.S
 
 WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'class').equals('Mui-error') == 
+true
+
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
     'Mui-error') == true
 
@@ -78,6 +81,11 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
             firstname]))
+
+Random random = new Random()
+
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + +(random.nextInt(100000)) //generate random axis number for sake of test
+    )
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 
     'required', 0)
@@ -146,6 +154,9 @@ WebUI.click(findTestObject(WebUI.concatenate(((['Object Repository/Page_foi.flow
                     , deliveryMode]) as String[]))))
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
+    'Mui-error') == false
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'class').contains(
     'Mui-error') == false
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name Parent'), 
