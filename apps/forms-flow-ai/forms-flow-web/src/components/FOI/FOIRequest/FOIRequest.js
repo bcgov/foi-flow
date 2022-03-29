@@ -55,6 +55,8 @@ import {
   checkValidationError,
   handleBeforeUnload,
   findRequestState,
+  isMandatoryField,
+  isAxisSyncDisplayField
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
@@ -84,6 +86,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FOIRequest = React.memo(({ userDetail }) => {
+
   const [_requestStatus, setRequestStatus] = React.useState(
     StateEnum.unopened.name
   );
@@ -205,6 +208,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             if(Object.entries(data).length !== 0){
               setAxisSyncedData(data);
               var axisDataUpdated = checkIfAxisDataUpdated(data);
+              console.log("axisDataUpdated=>",axisDataUpdated);
               if(axisDataUpdated)
                 setAxisMessage("WARNING");
             }
@@ -216,18 +220,46 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [requestDetails]);
 
-  const checkIfAxisDataUpdated = (axisDataForComparison) => {
-    // for(let key of Object.keys(axisDataForComparison)){
-    //   var updatedField = isAxisSyncDisplayField(key);
-    //   if(updatedField){
-    //     var updateNeeded= checkValidation(key);
-    //     if(updateNeeded){
-          
-    //     }
-    //   }
-    // }
-    return true;
+  const checkIfAxisDataUpdated = (axisData) => {
+    console.log("axisData=>",axisData);
+    for(let key of Object.keys(axisData)){
+      var updatedField = isAxisSyncDisplayField(key);
+      if(updatedField)
+        return checkValidation(key, axisData);
+    }
+    return false;
+  };
+
+  const checkValidation = (key,axisData) => {
+    console.log("Req==>",requestDetails);
+    var mandatoryField = isMandatoryField(key);
+    if(mandatoryField && axisData[key])
+      return true;
+    else if(!mandatoryField){
+      if(key === 'Extensions')
+        return extensionComparison(axisData, key);
+      if((requestDetails[key] || axisData[key]) && requestDetails[key] !== axisData[key])
+        return true;
+    }
+    return false;
   }
+
+  const extensionComparison = (axisData, key) => {
+    if(requestExtensions.length > 0){
+      axisData[key].forEach(obj => {
+         requestExtensions?.forEach(obj1 => {
+           if(obj !== obj1)
+             return true;
+         })
+     });
+   }
+   else{
+    if(axisData[key].length > 0)
+      return true;
+   }
+   return false;
+  }
+
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",

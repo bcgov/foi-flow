@@ -15,8 +15,9 @@ const AxisMessageBanner = ({axisMessage, requestDetails}) => {
   }
 
     return (
+      axisMessage &&
         <div style={{marginLeft: '-10%'}}>
-           <Alert style={{backgroundColor: axisMessage === "ERROR"? "#F97957 !important" : " #FFC709; !important"}}>
+           <Alert className={axisMessage === "WARNING" ? 'update-warning' : 'no-connection'}>
             <Alert.Heading>
              <div className='axis-banner-div'>
                <span className='axis-message'>WARNING!</span>

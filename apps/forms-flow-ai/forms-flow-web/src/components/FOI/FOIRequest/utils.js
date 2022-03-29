@@ -2,6 +2,8 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { formatDate } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
+import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
+import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
 
 export const getTabBottomText = ({
   _daysRemaining,
@@ -346,4 +348,12 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
 
 export const handleBeforeUnload = (e) => {
   alertUser(e);
+};
+
+export  const isAxisSyncDisplayField = (field) => {
+  return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
+};
+
+export const isMandatoryField = (field) => {
+  return Object.entries(MANDATORY_FOI_REQUEST_FIELDS).find(([key]) => key === field)?.[1];
 };
