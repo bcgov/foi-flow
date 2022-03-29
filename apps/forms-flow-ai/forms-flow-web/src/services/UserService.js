@@ -20,12 +20,12 @@ import {
 } from "../helper/FOI/helper";
 
 const tokenRefreshInterval =
-  window._env_?.TOKEN_REFRESH_INTERVAL ||
-  process.env.TOKEN_REFRESH_INTERVAL ||
+  (window._env_ && window._env_.REACT_APP_TOKEN_REFRESH_INTERVAL) ||
+  process.env.REACT_APP_TOKEN_REFRESH_INTERVAL ||
   6000;
 const tokenUpdateThreshold =
-  window._env_?.TOKEN_UPDATE_THRESHOLD ||
-  process.env.TOKEN_UPDATE_THRESHOLD ||
+  (window._env_ && window._env_.REACT_APP_TOKEN_UPDATE_THRESHOLD) ||
+  process.env.REACT_APP_TOKEN_UPDATE_THRESHOLD ||
   300;
 /**
  * Initializes Keycloak instance and calls the provided callback function if successfully authenticated.
