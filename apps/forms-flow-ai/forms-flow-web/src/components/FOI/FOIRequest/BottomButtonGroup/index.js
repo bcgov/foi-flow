@@ -62,6 +62,7 @@ const BottomButtonGroup = React.memo(
     stateChanged,
     requestState,
     axisSyncedData,
+    axisMessage
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -350,6 +351,7 @@ const BottomButtonGroup = React.memo(
               <button
                 type="button"
                 className="btn btn-bottom"
+                disabled={axisMessage !== "WARNING"}
                 onClick={(e) => {
                   setAxisSyncModalOpen(true);
                 }}
