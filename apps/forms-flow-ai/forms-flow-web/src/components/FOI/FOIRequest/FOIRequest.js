@@ -203,24 +203,20 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
-      // dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
-      //   if(!err){
-        var sampleRequestDetails = {"axisRequestId":"IAO-2021-00009","axisSyncDate":"2022-03-03T13:59:18Z","description":"Copies of all my school records when taught by Miss Stacey at the Avonlea School.","fromDate":null,"toDate":null,
-"requestType":"personal","receivedDate":"2015-02-19","receivedDateUF":"2015-02-19T00:00:00Z","requestProcessStart":"2015-02-19","dueDate":"2015-04-09","originalDueDate":null,"category":"Individual","receivedMode":"Email","deliveryMode":"Secure File Transfer","ispiiredacted":true,
-"firstName":"Levi","middleName":"","lastName":"Shirely","businessName":"Rollings Reliables","email":"redhairedanne@greengables.ca","address":"Green Gables","addressSecondary":"","city":"Avonlea","province":"Prince Edward Island","country":"Canada","postal":"K9K 9K9","phonePrimary":"250-998-8956","phoneSecondary":"250-153-1864","workPhonePrimary":"250-545-2454","workPhoneSecondary":"","correctionalServiceNumber":null,"publicServiceEmployeeNumber":null,"selectedMinistries":[{"code":"EDUC"}],"additionalPersonalInfo":{"birthDate":null,"anotherFirstName":"","anotherMiddleName":"","anotherLastName":"","personalHealthNumber":""},"Extensions":[{"extensionreasonid":8,"extendedduedays":1,"extededduedate":"2015-04-07","extensionstatusid":2,
-"approvednoofdays":1,"approveddate":"2015-02-24","denieddate":"2015-02-24"}]}
-            if(Object.entries(sampleRequestDetails).length !== 0){
-              setAxisSyncedData(sampleRequestDetails);
-              var axisDataUpdated = checkIfAxisDataUpdated(sampleRequestDetails);
+      dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
+        if(!err){
+            if(Object.entries(data).length !== 0){
+              setAxisSyncedData(data);
+              var axisDataUpdated = checkIfAxisDataUpdated(data);
               console.log("axisDataUpdated=>",axisDataUpdated);
               if(axisDataUpdated)
                 setAxisMessage("WARNING");
             }
-        // }
-        // else
-        //   setAxisMessage("ERROR");
+        }
+        else
+          setAxisMessage("ERROR");
 
-     // }));
+     }));
     }
   }, [requestDetails]);
 
