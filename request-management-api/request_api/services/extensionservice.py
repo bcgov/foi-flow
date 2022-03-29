@@ -13,6 +13,7 @@ from datetime import datetime
 import asyncio
 import json
 import base64
+from request_api.exceptions import BusinessException, Error
 
 class extensionservice:
     """ FOI Extension management service
@@ -56,7 +57,8 @@ class extensionservice:
         reasonid = extensionschema['extensionreasonid']
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
         ispublicbodyextension = self.__ispublicbodyextension(reasonid)
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:            
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:
+            self.validatecreateextension(ministryrequestid, extensionschema, ispublicbodyextension)
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
@@ -70,6 +72,20 @@ class extensionservice:
         if 'documents' in extensionschema and extensionschema['extensionstatusid'] != 1:
             self.saveextensiondocument(extensionschema['documents'], ministryrequestid, userid, extnsionresult.identifier)
         return extnsionresult
+    
+
+    def validatecreateextension(self, ministryrequestid, extensionschema, ispublicbodyextension= None):
+        if ispublicbodyextension is None:
+            ispublicbodyextension = self.__ispublicbodyextension(extensionschema['extensionreasonid'])
+            
+        if not ispublicbodyextension:
+            return
+        
+        extensions = self.getrequestextensions(ministryrequestid)
+        publicbodyextensiondays = [extension['extendedduedays'] for extension in extensions if extension['extensiontype'] == ExtensionType.publicbody.value]
+        if sum(publicbodyextensiondays) + extensionschema['extendedduedays'] > 30:
+            raise BusinessException(Error.INVALID_INPUT)
+        
     
     def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
         version = self.__getversionforrequest(ministryrequestid)
