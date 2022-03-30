@@ -78,6 +78,9 @@ const refreshToken = (store) => {
     KeycloakData &&
       KeycloakData.updateToken(tokenUpdateThreshold)
         .then((refreshed) => {
+          console.log(KeycloakData.isTokenExpired(tokenUpdateThreshold))
+          console.log(refreshed)
+          console.log(KeycloakData.token)
           if (refreshed) {
             store.dispatch(setUserToken(KeycloakData.token));
           }
