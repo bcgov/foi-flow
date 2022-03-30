@@ -128,7 +128,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MCS.FOI.AXISIntegrationWebAPI v1"));
 
-            //app.UseHttpsRedirection(); //TODO: need this before going to production
+            app.UseHttpsRedirection(); 
 
             app.UseRouting();
 
