@@ -108,8 +108,8 @@ const FOIRequestHeader = React.memo(
       //place holder - do nothing here
     };
 
-    const hearderText = getHeaderText({requestDetails, ministryId});
     const status = getStatus({ headerValue, requestDetails });
+    const hearderText = getHeaderText({requestDetails, ministryId, status});
     const showMinistryAssignedTo =
       status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.closed.name.toLowerCase() ||

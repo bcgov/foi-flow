@@ -3,7 +3,6 @@ import { InputLabel } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
-import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIFullAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import { Watcher } from '../../customComponents';

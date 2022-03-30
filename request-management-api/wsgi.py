@@ -36,7 +36,6 @@ def __getauthenticateduserid(message):
     if message.get("userid") is not None and __isvalidnonce(message) == True: 
         return message.get("userid")
     else:
-        print('from token')
         return __validatejwt(message)   
       
 

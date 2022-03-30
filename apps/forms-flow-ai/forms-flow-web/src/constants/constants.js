@@ -31,6 +31,8 @@ export const SOCKETIO_RECONNECTION_DELAY_MAX =
   (window._env_ && window._env_.REACT_APP_SOCKETIO_RECONNECTION_DELAY_MAX) ||
   process.env.REACT_APP_SOCKETIO_RECONNECTION_DELAY_MAX;
 
+export const FOI_FLOW_REPORTING_URL =  (window._env_ && window._env_.REACT_APP_FOI_FLOW_REPORTING_URL) ||
+process.env.REACT_APP_FOI_FLOW_REPORTING_URL;
 export const SOCKETIO_CONNECT_NONCE =
   (window._env_ && window._env_.REACT_APP_SOCKETIO_CONNECT_NONCE) ||
   process.env.REACT_APP_SOCKETIO_CONNECT_NONCE;
