@@ -18,11 +18,11 @@ from request_api.exceptions import BusinessException, Error
 class extensionservice:
     """ FOI Extension management service
     """
+    otherdateformat = '%Y-%m-%d'
 
     def getrequestextensions(self, requestid, version=None):
         extensions = []
         created_atdateformat = '%Y-%m-%d %H:%M:%S.%f'
-        otherdateformat = '%Y-%m-%d'
         requestversion =  self.__getversionforrequest(requestid) if version is None else version
         extensionrecords = FOIRequestExtension.getextensions(requestid, requestversion)        
         for entry in extensionrecords:               
@@ -33,8 +33,8 @@ class extensionservice:
                     "extensionstatusid": entry["extensionstatusid"], 
                     "extensionstatus": entry["name"],
                     "extendedduedays": entry["extendedduedays"], 
-                    "extendedduedate": self.__formatdate(entry["extendedduedate"], otherdateformat),  
-                    "decisiondate": self.__formatdate(entry["decisiondate"], otherdateformat), 
+                    "extendedduedate": self.__formatdate(entry["extendedduedate"], self.otherdateformat),  
+                    "decisiondate": self.__formatdate(entry["decisiondate"], self.otherdateformat), 
                     "approvednoofdays": entry["approvednoofdays"], 
                     "created_at": self.__formatdate(entry["created_at"], created_atdateformat),  
                     "createdby": entry["createdby"]})        
@@ -67,7 +67,7 @@ class extensionservice:
             newduedate = \
             ministryrequestschema['duedate'] \
             if isinstance(ministryrequestschema['duedate'], str) \
-            else self.__formatdate(ministryrequestschema['duedate'], '%Y-%m-%d')
+            else self.__formatdate(ministryrequestschema['duedate'], self.otherdateformat)
            
             if result.success == True:
                 version = self.__getversionforrequest(ministryrequestid)
@@ -179,7 +179,7 @@ class extensionservice:
             newduedate = \
             ministryrequestschema['duedate'] \
             if isinstance(ministryrequestschema['duedate'], str) \
-            else self.__formatdate(ministryrequestschema['duedate'], '%Y-%m-%d')
+            else self.__formatdate(ministryrequestschema['duedate'], self.otherdateformat)
             
             extensionresult.args = (*extensionresult.args, newduedate)
         return extensionresult
@@ -222,7 +222,7 @@ class extensionservice:
             newduedate = \
             ministryrequestschema['duedate'] \
             if isinstance(ministryrequestschema['duedate'], str) \
-            else self.__formatdate(ministryrequestschema['duedate'], '%Y-%m-%d')
+            else self.__formatdate(ministryrequestschema['duedate'], self.otherdateformat)
             
             extensionresult.args = (*extensionresult.args, newduedate)
         # soft delete the documents attached to the extension
