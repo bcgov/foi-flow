@@ -345,9 +345,8 @@ const BottomButtonGroup = React.memo(
 
         <div className="foi-bottom-button-group">
           {urlIndexCreateRequest < 0 &&
-            requestState?.toLowerCase() !==
-              StateEnum.intakeinprogress.name.toLowerCase() &&
-            (
+            (requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
+            requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) &&
               <button
                 type="button"
                 className="btn btn-bottom"
@@ -358,7 +357,7 @@ const BottomButtonGroup = React.memo(
               >
                 Sync with AXIS
               </button>
-            )}
+            }
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {

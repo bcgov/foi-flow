@@ -24,7 +24,8 @@ from request_api.exceptions import BusinessException, Error
 from request_api.services.assigneeservice import assigneeservice
 import json
 from flask_cors import cross_origin
-
+import request_api
+from request_api.utils.cache import cache_filter, response_filter
 
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
@@ -46,6 +47,10 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get(requestype=None, status=None, bcgovcode=None):
         if requestype is not None and (requestype != "personal" and requestype != "general"):
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
@@ -68,6 +73,10 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get(groupname):
         """ POST Method for capturing FOI requests before processing"""
         try:
@@ -90,6 +99,10 @@ class FOIAssigneesTeams(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get(requestype):
         """ POST Method for capturing FOI requests before processing"""
         try:
