@@ -22,7 +22,9 @@ const AxisMessageBanner = ({axisMessage, requestDetails}) => {
              <div className='axis-banner-div'>
                <span className='axis-message'>WARNING!</span>
                <span>{warningMessage()}</span>
-               <span className='axis-sync-date'>Last Updated {formatDate(requestDetails.axisSyncDate, "MMM dd yyyy | hh:mm aa")}</span>
+               {requestDetails?.axisSyncDate &&
+                <span className='axis-sync-date'>Last Updated {formatDate(requestDetails.axisSyncDate, "MMM dd yyyy | hh:mm aa")}</span>    
+                }
              </div>
              
             </Alert.Heading>

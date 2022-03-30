@@ -206,7 +206,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       if(requestDetails.axisRequestId){
         dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
           if(!err){
-            if(Object.entries(data).length !== 0){
+            if(typeof(data) !== "string" && Object.entries(data).length > 0){
               setAxisSyncedData(data);
               var axisDataUpdated = checkIfAxisDataUpdated(data);
               if(axisDataUpdated)

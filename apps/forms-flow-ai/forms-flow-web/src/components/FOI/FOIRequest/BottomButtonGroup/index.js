@@ -347,12 +347,12 @@ const BottomButtonGroup = React.memo(
           {urlIndexCreateRequest < 0 &&
             requestState?.toLowerCase() !==
               StateEnum.intakeinprogress.name.toLowerCase() &&
-            Object.entries(axisSyncedData)?.length !== 0 && (
+            (
               <button
                 type="button"
                 className="btn btn-bottom"
-                disabled={axisMessage !== "WARNING"}
-                onClick={(e) => {
+                disabled={Object.entries(axisSyncedData)?.length !== 0 || axisMessage !== "WARNING"}
+                onClick={() => {
                   setAxisSyncModalOpen(true);
                 }}
               >
