@@ -47,6 +47,14 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestsCount: action.payload.count };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_DETAIL:
       return { ...state, foiRequestDetail: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_DUE_DATE:
+      return {
+        ...state,
+        foiRequestDetail: {
+          ...state.foiRequestDetail,
+          dueDate: action.payload,
+        },
+      };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRYVIEW_REQUEST_DETAIL:
       return { ...state, foiMinistryViewRequestDetail: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED:

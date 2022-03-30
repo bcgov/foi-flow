@@ -44,35 +44,33 @@ export const fetchExtension = ({extensionId, callback, errorCallback, dispatch})
     });
 };
 
-export const fetchExtensions = (
+export const fetchExtensions = ({
   ministryId,
-  ...rest
-) => {
-  const done = fnDone(rest);
+  errorCallback = null,
+  dispatch,
+}) => {
   const apiUrl = replaceUrl(
     API.FOI_GET_EXTENSIONS,
     "<ministryrequestid>",
     ministryId
   );
-
-  return (dispatch) => {
-    httpGETRequest(apiUrl, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          dispatch(setRequestExtensions(res.data));
-          done(null, res.data);
-        } else {
-          console.log("Error in fetching attachment list", res);
-          dispatch(serviceActionError(res));
-        }
-      })
-      .catch((error) => {
-        console.log("Error in fetching attachment list", error);
-        dispatch(serviceActionError(error));
-        done(error);
-      });
-  }
-}
+  httpGETRequest(apiUrl, {}, UserService.getToken())
+    .then((res) => {
+      if (res.data) {
+        dispatch(setRequestExtensions(res.data));
+      } else {
+        console.log("Error in fetching attachment list", res);
+        dispatch(serviceActionError(res));
+      }
+    })
+    .catch((error) => {
+      console.log("Error in fetching attachment list", error);
+      dispatch(serviceActionError(error));
+      if (errorCallback) {
+        errorCallback();
+      }
+    });
+};
 
 export const createExtensionRequest = ({
   data,

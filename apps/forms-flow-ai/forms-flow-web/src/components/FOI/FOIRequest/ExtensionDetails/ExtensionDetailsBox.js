@@ -27,7 +27,10 @@ const ExtensionDetailsBox = React.memo(() => {
 
   useEffect(() => {
     if (ministryId) {
-      dispatch(fetchExtensions(ministryId));
+      fetchExtensions({
+        ministryId,
+        dispatch,
+      });
     }
   }, [ministryId]);
 
