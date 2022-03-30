@@ -657,7 +657,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
-        <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
+        { requestState !== StateEnum.intakeinprogress.name &&
+          <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
+        }
           <div
             id="Request"
             className={clsx("tabcontent", {
