@@ -40,6 +40,9 @@ import {
   getMaxExtendDays,
   getSelectedDays
 } from "./utils";
+import { fetchExtensions } from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { useParams } from "react-router-dom";
+import { setRequestDueDate } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles((theme) => ({
   btndisabled: {
@@ -75,6 +78,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AddExtensionModal = () => {
   const classes = useStyles();
+  const { ministryId } = useParams();
 
   const costumFormat = useMemo(() => {
     return {
@@ -109,7 +113,16 @@ const AddExtensionModal = () => {
   const publicBodySelected = reason?.extensiontype === "Public Body";
 
   const [numberDays, setNumberDays] = useState("");
-  let maxExtendDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), reason?.defaultextendedduedays, publicBodySelected, getSelectedDays(selectedExtension?.extensiontype, selectedExtension?.extendedduedays)) || 999;
+  let maxExtendDays =
+    getMaxExtendDays(
+      getPublicBodyTotalExtendedDays(extensions),
+      reason?.defaultextendedduedays,
+      publicBodySelected,
+      getSelectedDays(
+        selectedExtension?.extensiontype,
+        selectedExtension?.extendedduedays
+      )
+    ) || 999;
   const [extendedDate, setExtendedDate] = useState("");
   const [preExtendedDate, setPreExtendedDate] = useState("");
   const [status, setStatus] = useState(extensionStatusId.pending);
@@ -143,11 +156,11 @@ const AddExtensionModal = () => {
         formatDate(selectedExtension.approveddate) || formatDate(new Date())
       );
       setApprovedNumberDays(
-        selectedExtension.approvednoofdays ||
-          selectedExtension.extendedduedays
+        selectedExtension.approvednoofdays || selectedExtension.extendedduedays
       );
 
-      const daysToSubtract = selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
+      const daysToSubtract =
+        selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
       setPreExtendedDate(
         removeBusinessDays(
           formatDate(selectedExtension.extendedduedate),
@@ -158,7 +171,6 @@ const AddExtensionModal = () => {
       setDeniedDate(
         formatDate(selectedExtension.denieddate) || formatDate(new Date())
       );
-
     }
     setExtensionLoading(false);
   }, [selectedExtension, extensionReasons]);
@@ -170,11 +182,19 @@ const AddExtensionModal = () => {
 
     const isPublicBody = extensionReason?.extensiontype === "Public Body";
     let days = extensionReason.defaultextendedduedays;
-    const maxDays = getMaxExtendDays(getPublicBodyTotalExtendedDays(extensions), extensionReason.defaultextendedduedays, isPublicBody, getSelectedDays(selectedExtension?.extensiontype, selectedExtension?.extendedduedays)) || days;
+    const maxDays =
+      getMaxExtendDays(
+        getPublicBodyTotalExtendedDays(extensions),
+        extensionReason.defaultextendedduedays,
+        isPublicBody,
+        getSelectedDays(
+          selectedExtension?.extensiontype,
+          selectedExtension?.extendedduedays
+        )
+      ) || days;
     maxExtendDays = isPublicBody ? maxDays : maxExtendDays;
     setReason(extensionReason);
-    if (isPublicBody)
-      days = maxDays
+    if (isPublicBody) days = maxDays;
     if (days) {
       updateExtendedDate(days);
     }
@@ -286,10 +306,15 @@ const AddExtensionModal = () => {
 
       saveExtensionRequest({
         data: extensionRequest,
-        callback: () => {
+        callback: (data) => {
+          dispatch(fetchExtensions(ministryId));
           setSaveModalOpen(false);
           setSaveLoading(false);
-          window.history.go(0);
+          if (data.newduedate) {
+            dispatch(
+              setRequestDueDate(formatDate(data.newduedate, "yyyy-MM-dd"))
+            );
+          }
         },
         errorCallback: (errorMessage) => {
           setSaveLoading(false);
@@ -306,9 +331,16 @@ const AddExtensionModal = () => {
   const errorExists = Object.values({
     reason: !reason,
     numberDays: checkPublicBodyError(numberDays, publicBodySelected),
-    approvedDate: status === extensionStatusId.approved && !publicBodySelected && !approvedDate,
-    approvedNumberDays: status === extensionStatusId.approved && !publicBodySelected && !approvedNumberDays,
-    deniedDate: status === extensionStatusId.denied && !publicBodySelected && !deniedDate,
+    approvedDate:
+      status === extensionStatusId.approved &&
+      !publicBodySelected &&
+      !approvedDate,
+    approvedNumberDays:
+      status === extensionStatusId.approved &&
+      !publicBodySelected &&
+      !approvedNumberDays,
+    deniedDate:
+      status === extensionStatusId.denied && !publicBodySelected && !deniedDate,
   }).some((isErrorTrue) => isErrorTrue);
 
   const getExtensionReasonMenueItems = () => {
@@ -483,7 +515,7 @@ const AddExtensionModal = () => {
                 <ConditionalComponent
                   condition={status === extensionStatusId.approved}
                 >
-                  <Grid item xs={6}/>
+                  <Grid item xs={6} />
                   <Grid item xs={6}>
                     <TextField
                       label="Approved Date"

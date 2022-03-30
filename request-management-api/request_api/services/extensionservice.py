@@ -63,10 +63,15 @@ class extensionservice:
                 "duedate": extensionschema['extendedduedate']
             }
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+            
+            newduedate = \
+            ministryrequestschema['duedate'] \
+            if isinstance(ministryrequestschema['duedate'], str) \
+            else self.__formatdate(ministryrequestschema['duedate'], '%Y-%m-%d')
            
             if result.success == True:
                 version = self.__getversionforrequest(ministryrequestid)
-                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
+                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid, newduedate= newduedate)
         else:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         if 'documents' in extensionschema and extensionschema['extensionstatusid'] != 1:
@@ -170,6 +175,13 @@ class extensionservice:
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+                      
+            newduedate = \
+            ministryrequestschema['duedate'] \
+            if isinstance(ministryrequestschema['duedate'], str) \
+            else self.__formatdate(ministryrequestschema['duedate'], '%Y-%m-%d')
+            
+            extensionresult.args = (*extensionresult.args, newduedate)
         return extensionresult
         
     def deleterequestextension(self, requestid, ministryrequestid, extensionid, userid):
@@ -205,9 +217,18 @@ class extensionservice:
                 "duedate": updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, requestid, ministryrequestid, userid)
+            ## return due date
+            
+            newduedate = \
+            ministryrequestschema['duedate'] \
+            if isinstance(ministryrequestschema['duedate'], str) \
+            else self.__formatdate(ministryrequestschema['duedate'], '%Y-%m-%d')
+            
+            extensionresult.args = (*extensionresult.args, newduedate)
         # soft delete the documents attached to the extension
         if extensionresult.success == True and isdeletedocument == True:
             self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)
+            
         return extensionresult
 
     def __isstatuschangedfromapproved(self, prevstatus,  currentstatus):        
@@ -253,11 +274,11 @@ class extensionservice:
             return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)
 
     def getlatestapprovedduedate(self, prevstatus, ministryrequestid, approvedextension):       
-        if approvedextension and len(approvedextension) != 0:            
+        if approvedextension and len(approvedextension) != 0:  
             return approvedextension['extendedduedate']
         # if Prev extension status was Approved and no approved extension in FOIRequestExtension table then get the original DueDate from FOIMinisrtRequests table   
-        elif prevstatus == 2 and not approvedextension:           
-            duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)           
+        elif prevstatus == 2 and not approvedextension:
+            duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
             return duedate
         #if current and prev status is Pending or Denied
         else:
