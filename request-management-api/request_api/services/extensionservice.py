@@ -175,7 +175,7 @@ class extensionservice:
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
-                      
+        
             newduedate = \
             ministryrequestschema['duedate'] \
             if isinstance(ministryrequestschema['duedate'], str) \

@@ -307,7 +307,13 @@ const AddExtensionModal = () => {
       saveExtensionRequest({
         data: extensionRequest,
         callback: (data) => {
-          dispatch(fetchExtensions(ministryId));
+          fetchExtensions({
+            ministryId: ministryId,
+            errorCallback: () => {
+              errorToast("Error occurred while refreshing extensions.");
+            },
+            dispatch,
+          });
           setSaveModalOpen(false);
           setSaveLoading(false);
           if (data.newduedate) {

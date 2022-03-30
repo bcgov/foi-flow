@@ -68,7 +68,13 @@ const DeleteExtensionModal = () => {
       ministryId,
       requestId,
       callback: (data) => {
-        dispatch(fetchExtensions(ministryId));
+        fetchExtensions({
+          ministryId: ministryId,
+          errorCallback: () => {
+            errorToast("Error occurred while refreshing extensions.");
+          },
+          dispatch,
+        });
         setLoading(false);
         setDeleteModalOpen(false);
         if (data.newduedate) {
