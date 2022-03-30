@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Alert from 'react-bootstrap/Alert';
 import './axismessagebanner.scss';
 import { formatDate } from "../../../../helper/FOI/helper";
@@ -16,7 +16,7 @@ const AxisMessageBanner = ({axisMessage, requestDetails}) => {
 
     return (
       axisMessage &&
-        <div style={{marginLeft: '-10%'}}>
+        <div className='axis-banner'>
            <Alert className={axisMessage === "WARNING" ? 'update-warning' : 'no-connection'}>
             <Alert.Heading>
              <div className='axis-banner-div'>
