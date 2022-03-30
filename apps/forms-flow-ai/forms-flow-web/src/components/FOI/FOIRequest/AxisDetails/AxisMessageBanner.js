@@ -1,7 +1,7 @@
 import React from 'react';
 import Alert from 'react-bootstrap/Alert';
 import './axismessagebanner.scss';
-import { formatDate } from "../../../../helper/FOI/helper";
+import { formatDateInPst } from "../../../../helper/FOI/helper";
 
 
 const AxisMessageBanner = ({axisMessage, requestDetails}) => {
@@ -23,7 +23,7 @@ const AxisMessageBanner = ({axisMessage, requestDetails}) => {
                <span className='axis-message'>WARNING!</span>
                <span>{warningMessage()}</span>
                {requestDetails?.axisSyncDate &&
-                <span className='axis-sync-date'>Last Updated {formatDate(requestDetails.axisSyncDate, "MMM dd yyyy | hh:mm aa")}</span>    
+                <span className='axis-sync-date'>Last Updated {formatDateInPst(requestDetails.axisSyncDate, "MMM dd yyyy | hh:mm aa")}</span>    
                 }
              </div>
              
