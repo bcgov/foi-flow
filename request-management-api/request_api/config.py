@@ -99,8 +99,8 @@ class _Config():  # pylint: disable=too-few-public-methods
         SQLALCHEMY_ENGINE_OPTIONS['pool_timeout'] = pool_timeout
     
     if connect_timeout_string != "":
-        connect_timeout = int(connect_timeout_string)
-        SQLALCHEMY_ENGINE_OPTIONS['connect_args'] = {'connect_timeout': connect_timeout}
+        connect_timeout_int = int(connect_timeout_string)
+        SQLALCHEMY_ENGINE_OPTIONS['connect_args'] = {'connect_timeout': connect_timeout_int}
 
     print(SQLALCHEMY_ENGINE_OPTIONS)
     #Logging echo settings
