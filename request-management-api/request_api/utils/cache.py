@@ -22,8 +22,7 @@ class Config(object):
     
     CACHE_REDIS_HOST = os.getenv('FOI_REQUESTQUEUE_REDISHOST')
     CACHE_REDIS_PORT = os.getenv('FOI_REQUESTQUEUE_REDISPORT')
-    if os.getenv('CACHE_REDIS_DEFAULT_DB') == "Y":
-        CACHE_REDIS_DB =  0 
+    CACHE_REDIS_DB =  0 
     CACHE_REDIS_URL = os.getenv('FOI_REQUESTQUEUE_REDISURL')
     CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_TIMEOUT')
     CACHE_KEY_PPREFIX = 'foi'
@@ -33,17 +32,8 @@ class Config(object):
 
 ## If true, bypass cache
 def cache_filter(*args, **kwargs):
-    try:        
-        if os.getenv('CACHE_ENABLED') != 'Y':
-            return True
-        
-        # Do a random get to the cache just to ping it and test its health. 
-        # If redis is down exception will happen and will be caught in next line, otherwise the cache.get will just return None and will have no functional impact
-        request_api.cache.get("")
-    except (redis.exceptions.ConnectionError, redis.exceptions.BusyLoadingError):
+    if os.getenv('CACHE_ENABLED') != 'Y':
         return True
-    except redis.exceptions.ResponseError:
-        return False
     return False
 
 ## If True, cache response  
