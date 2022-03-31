@@ -11,7 +11,7 @@
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@data-id='${requestID}']/div[@data-field='assignedToName']</value>
+         <value>//div[@data-id='${requestID}']/div[@data-field='assignedToFormatted']</value>
       </entry>
       <entry>
          <key>CSS</key>

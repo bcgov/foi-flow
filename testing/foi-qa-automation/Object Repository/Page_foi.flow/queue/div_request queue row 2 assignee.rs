@@ -6,12 +6,12 @@
    <elementGuidId>64ab64c2-4eeb-4a8c-8077-6676a884213b</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@data-rowindex=1]/div[@data-field='assignedToName']</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'Flex, Intake' or . = 'Flex, Intake')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@data-rowindex=1]/div[@data-field='assignedToFormatted']</value>
       </entry>
       <entry>
          <key>CSS</key>

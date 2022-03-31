@@ -22,13 +22,16 @@ WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change 
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'), 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 'accept', 'application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword', 
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 'accept', 
+    'application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,.xls,.xlsx,.doc,.docx', 
     0)
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 'multiple', 0, FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 'multiple', 
+    0, FailureHandling.STOP_ON_FAILURE)
 
 //
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/50mb.pdf')
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/50mb.pdf')
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
@@ -36,7 +39,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File over 
 
 WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + '/Test Attachments/download.png')
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/download.png')
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 

@@ -30,13 +30,14 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee use
 
 Random random = new Random()
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + + random.nextInt(100000)) //generate random axis number for sake of test
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000)) //generate random axis number for sake of test
+    
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 'Firstname')
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name_MuiInputBase'), 'Lastname')
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email_MuiInputBase'), 'a@b.c')
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email_MuiInputBase'), 'a@b.ca')
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'))
 
@@ -94,7 +95,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5]
+def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5] // put back in after axis is phased out
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 

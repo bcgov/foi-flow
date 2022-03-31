@@ -23,7 +23,7 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.S
 
 WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'class').equals('Mui-error') == 
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number Parent'), 'class').contains('Mui-error') == 
 true
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
@@ -84,8 +84,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee use
 
 Random random = new Random()
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + +(random.nextInt(100000)) //generate random axis number for sake of test
-    )
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000)) //generate random axis number for sake of test
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 
     'required', 0)
@@ -156,7 +155,7 @@ WebUI.click(findTestObject(WebUI.concatenate(((['Object Repository/Page_foi.flow
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
     'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'class').contains(
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number Parent'), 'class').contains(
     'Mui-error') == false
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name Parent'), 
@@ -213,13 +212,13 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5]
+def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5] // put back in after axis is phased out
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.maximizeWindow()
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'U-00' + requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 

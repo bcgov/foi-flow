@@ -6,12 +6,12 @@
    <elementGuidId>0aff7d59-b68c-452b-bee3-511e297f96b0</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@data-rowindex=0]/div[@data-field='assignedToName']</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>xpath1643934009209</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@data-rowindex=0]/div[@data-field='assignedToFormatted']</value>
       </entry>
       <entry>
          <key>CSS</key>
