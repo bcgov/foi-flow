@@ -79,7 +79,32 @@ class _Config():  # pylint: disable=too-few-public-methods
         port=int(DB_PORT),
         name=DB_NAME,
     )
-    SQLALCHEMY_ECHO = False 
+    #Engine configurations
+    pool_size = int(os.getenv('SQLALCHEMY_POOL_SIZE', '9'))
+    max_overflow = int(os.getenv('SQLALCHEMY_MAX_OVERFLOW', '18'))
+
+    pool_timeout_string = os.getenv('SQLALCHEMY_POOL_TIMEOUT', '')
+    connect_timeout_string = os.getenv('SQLALCHEMY_CONNECT_TIMEOUT', '')
+    pool_pre_ping = (os.getenv('SQLALCHEMY_POOL_PRE_PING', 'False')).upper() == "TRUE"
+    db_sql_echo = (os.getenv('SQLALCHEMY_ECHO', 'False')).upper() == "TRUE"
+    #  Try to set some options to avoid long delays.
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': pool_size,
+        'max_overflow': max_overflow,
+        'pool_pre_ping': pool_pre_ping
+    }
+
+    if pool_timeout_string != "":
+        pool_timeout = int(pool_timeout_string)
+        SQLALCHEMY_ENGINE_OPTIONS['pool_timeout'] = pool_timeout
+    
+    if connect_timeout_string != "":
+        connect_timeout = int(connect_timeout_string)
+        SQLALCHEMY_ENGINE_OPTIONS['connect_args'] = {'connect_timeout': connect_timeout}
+
+    print(SQLALCHEMY_ENGINE_OPTIONS)
+    #Logging echo settings
+    SQLALCHEMY_ECHO = db_sql_echo 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     print('SQLAlchemy URL (base): {}'.format(SQLALCHEMY_DATABASE_URI))

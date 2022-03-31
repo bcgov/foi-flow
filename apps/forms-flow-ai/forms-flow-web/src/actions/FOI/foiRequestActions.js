@@ -205,3 +205,10 @@ export const setExistingAxisRequestIds = (data) => (dispatch) => {
     });
   };
 
+export const setRequestDueDate = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_DUE_DATE,
+    payload: data,
+  });
+};
+
