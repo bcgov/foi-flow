@@ -42,6 +42,8 @@ def cache_filter(*args, **kwargs):
         request_api.cache.get("")
     except (redis.exceptions.ConnectionError, redis.exceptions.BusyLoadingError):
         return True
+    except redis.exceptions.ResponseError:
+        return False
     return False
 
 ## If True, cache response  
