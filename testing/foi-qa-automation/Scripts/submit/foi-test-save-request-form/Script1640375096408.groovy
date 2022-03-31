@@ -31,7 +31,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
             firstname]))
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + + requestID)
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'))
 

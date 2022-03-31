@@ -13,10 +13,13 @@ jobs:
       uses: actions/checkout@v2
     - name: set screen resolution
       run: Set-DisplayResolution -Width 1920 -Height 1080 -Force  
-    - name: check files
+    - name: create Test Attachments
       run: |
             echo '${{ github.workspace }}'
             cd "testing\foi-qa-automation\Test Attachments"
+            fsutil file createnew 50mb.pdf 53428800
+            fsutil file createnew 500mb.pdf 534288000
+            fsutil file createnew invalidfiletype.bin 5242880
             dir
       shell: cmd
     - name: Katalon Studio Github Action
