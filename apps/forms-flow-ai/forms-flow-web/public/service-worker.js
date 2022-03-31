@@ -49,8 +49,9 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener('message', (event)=>{
-  console.log("event.origin", event.origin);
-  if (event.data.action === 'skipWaiting') {
-    self.skipWaiting();
+  if(event.origin === self.location.origin){
+    if (event.data.action === 'skipWaiting') {
+      self.skipWaiting();
+    }
   }
 });
