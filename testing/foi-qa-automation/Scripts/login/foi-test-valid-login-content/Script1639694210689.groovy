@@ -21,7 +21,7 @@ WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('username') : username, ('password') : password], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/span_username'), WebUI.concatenate((([firstname, ' ', lastname]) as String[])))
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/span_username'), firstname +  ' ' + lastname)
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/span_username'))
 
@@ -52,6 +52,8 @@ WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/button_Add Reques
 WebUI.verifyElementClickable(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/notification/notification bell'))
+
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/reporting link'))
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 

@@ -6,12 +6,12 @@
    <elementGuidId>dc4af0cd-3990-45fc-bf24-40e2bf6f9c1a</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@data-field='assignedToName']</value>
+         <key>BASIC</key>
+         <value>//*[@role = 'columnheader' and @data-field = 'assignedToFormatted']</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//*[@role = 'columnheader' and @data-field = 'assignedToName']</value>
+         <key>XPATH</key>
+         <value>//div[@data-field='assignedToName']</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -59,7 +59,7 @@
       <matchCondition>equals</matchCondition>
       <name>data-field</name>
       <type>Main</type>
-      <value>assignedToName</value>
+      <value>assignedToFormatted</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>

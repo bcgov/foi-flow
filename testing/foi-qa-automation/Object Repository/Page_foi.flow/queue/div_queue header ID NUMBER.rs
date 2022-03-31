@@ -6,12 +6,12 @@
    <elementGuidId>908b8f5c-81fe-4f87-b665-2e836c894285</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@data-field='idNumber']</value>
+         <key>BASIC</key>
+         <value>//*[(text() = 'ID NUMBER' or . = 'ID NUMBER') and @role = 'columnheader' and @data-field = 'axisRequestId']</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = 'ID NUMBER' or . = 'ID NUMBER') and @role = 'columnheader' and @data-field = 'idNumber']</value>
+         <key>XPATH</key>
+         <value>//div[@data-field='idNumber']</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -59,7 +59,7 @@
       <matchCondition>equals</matchCondition>
       <name>data-field</name>
       <type>Main</type>
-      <value>idNumber</value>
+      <value>axisRequestId</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
