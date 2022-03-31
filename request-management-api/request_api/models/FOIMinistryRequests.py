@@ -426,6 +426,7 @@ class FOIMinistryRequest(db.Model):
             'lastName': FOIRequestApplicant.lastname,
             'requestType': FOIRequest.requesttype,
             'idNumber': FOIMinistryRequest.filenumber,
+            'axisRequestId': FOIMinistryRequest.axisrequestid,
             'axisrequest_number': FOIMinistryRequest.axisrequestid,
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
