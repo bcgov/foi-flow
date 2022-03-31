@@ -22,9 +22,12 @@ import {
 import {getRequestState} from "../BottomButtonGroup/utils";
 import {StateEnum} from "../../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
-import { createRequestDetailsObjectFunc } from "../utils";
+import { createRequestDetailsObjectFunc,
+         isAxisSyncDisplayField,
+         isMandatoryField } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../../constants/FOI/mandatoryFOIRequestFields";
+
 
 const useStyles = makeStyles({
  
@@ -80,13 +83,6 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       setUpdatedSaveReqObj(saveReqCopy);
     };
 
-    const isAxisSyncDisplayField = (field) => {
-      return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
-    };
-
-    const isMandatoryField = (field) => {
-      return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
-    };
 
     const checkValidation = (key) => {
       var mandatoryField = isMandatoryField(key);

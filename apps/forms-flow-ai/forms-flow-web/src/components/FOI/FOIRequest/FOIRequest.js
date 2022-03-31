@@ -55,10 +55,13 @@ import {
   checkValidationError,
   handleBeforeUnload,
   findRequestState,
+  isMandatoryField,
+  isAxisSyncDisplayField
 } from "./utils";
-import { ConditionalComponent } from "../../../helper/FOI/helper";
-import DivisionalTracking from "./DivisionalTracking";
-import AxisDetails from "./AxisDetails/AxisDetails";
+import { ConditionalComponent } from '../../../helper/FOI/helper';
+import DivisionalTracking from './DivisionalTracking';
+import AxisDetails from './AxisDetails/AxisDetails';
+import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,6 +86,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FOIRequest = React.memo(({ userDetail }) => {
+
   const [_requestStatus, setRequestStatus] = React.useState(
     StateEnum.unopened.name
   );
@@ -117,6 +121,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
+  const [axisMessage, setAxisMessage] = React.useState("");
 
   const initialStatuses = {
     Request: {
@@ -198,21 +203,69 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
-      dispatch(
-        fetchRequestDataFromAxis(
-          requestDetails.axisRequestId,
-          true,
-          (err, data) => {
-            if (!err) {
-              if (Object.entries(data).length !== 0) {
-                setAxisSyncedData(data);
-              }
+      if(requestDetails.axisRequestId){
+        dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
+          if(!err){
+            if(typeof(data) !== "string" && Object.entries(data).length > 0){
+              setAxisSyncedData(data);
+              var axisDataUpdated = checkIfAxisDataUpdated(data);
+              if(axisDataUpdated)
+                setAxisMessage("WARNING");
             }
+            else if(data){
+              let responseMsg = data;
+              responseMsg+='';
+              if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+                setAxisMessage("ERROR");
+            }
+            
           }
-        )
-      );
+          else
+            setAxisMessage("ERROR");
+
+        }));
+      }
     }
   }, [requestDetails]);
+
+  const checkIfAxisDataUpdated = (axisData) => {
+    var updateNeeded= false;
+    for(let key of Object.keys(axisData)){
+      var updatedField = isAxisSyncDisplayField(key);
+      if(updatedField)
+        updateNeeded= checkValidation(key, axisData);
+      if(updateNeeded)
+        return true;
+    }
+    return false;
+  };
+
+  const checkValidation = (key,axisData) => {
+    var mandatoryField = isMandatoryField(key);
+    if(key === 'Extensions')
+        return extensionComparison(axisData, key);
+    if(mandatoryField && axisData[key] || !mandatoryField){
+      if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key])
+        return true;
+    }
+  }
+
+  const extensionComparison = (axisData, key) => {
+    if(requestExtensions.length > 0){
+      axisData[key].forEach(obj => {
+         requestExtensions?.forEach(obj1 => {
+           if(obj !== obj1)
+             return true;
+         })
+     });
+   }
+   else{
+    if(axisData[key].length > 0)
+      return true;
+   }
+   return false;
+  }
+
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -604,6 +657,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
+        { requestState !== StateEnum.intakeinprogress.name &&
+          <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
+        }
           <div
             id="Request"
             className={clsx("tabcontent", {
@@ -645,6 +701,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           }
                           handleAxisDetailsValue={handleAxisDetailsValue}
                           handleAxisIdValidation={handleAxisIdValidation}
+                          setAxisMessage={setAxisMessage}
                         />
                       )}
                       <ApplicantDetails
@@ -755,6 +812,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         requestState={requestState}
                         setSaveRequestObject={setSaveRequestObject}
                         axisSyncedData={axisSyncedData}
+                        axisMessage={axisMessage}
                       />
                     </>
                   </ConditionalComponent>
