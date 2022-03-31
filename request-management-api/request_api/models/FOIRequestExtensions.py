@@ -42,7 +42,7 @@ class FOIRequestExtension(db.Model):
         return document_schema.dump(request)
 
     @classmethod
-    def saveextension(cls,ministryrequestid,ministryrequestversion, extension, extensionreason, userid):
+    def saveextension(cls,ministryrequestid,ministryrequestversion, extension, extensionreason, userid, newduedate=None):
         
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
@@ -73,7 +73,7 @@ class FOIRequestExtension(db.Model):
         createdby=createuserid)        
         db.session.add(newextension)
         db.session.commit()
-        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid)      
+        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid, newduedate)      
     
     @classmethod
     def saveextensions(cls, newextensions):

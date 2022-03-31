@@ -13,16 +13,15 @@
 # limitations under the License.
 """API endpoints for managing a FOI Requests resource."""
 
-from flask import g, request
+from flask import request
 from flask_restx import Namespace, Resource
-from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth
 
 
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
-from request_api.exceptions import BusinessException, Error
+from request_api.exceptions import BusinessException
 from request_api.services.applicantcategoryservice import applicantcategoryservice
 from request_api.services.programareaservice import programareaservice
 from request_api.services.deliverymodeservice import deliverymodeservice
@@ -37,6 +36,7 @@ import requests
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
+from request_api.utils.cache import cache_filter, response_filter
 from request_api.auth import AuthHelper
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
@@ -51,7 +51,11 @@ class FOIFlowApplicantCategories(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())      
     @auth.require
-    #@request_api.cache.cached(key_prefix="applicantcategories")
+    @request_api.cache.cached(
+        key_prefix="applicantcategories",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get():
         try:
             data = applicantcategoryservice().getapplicantcategories()
@@ -70,7 +74,11 @@ class FOIFlowProgramAreas(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())      
     @auth.require
-    #@request_api.cache.cached(key_prefix="programareas")
+    @request_api.cache.cached(
+        key_prefix="programareas",
+        response_filter=response_filter,
+        unless=cache_filter
+        )
     def get():
         try:
             data = programareaservice().getprogramareas()
@@ -115,7 +123,11 @@ class FOIFlowDeliveryModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    #@request_api.cache.cached(key_prefix="deliverymodes")
+    @request_api.cache.cached(
+        key_prefix="deliverymodes",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get():
         try:
             data = deliverymodeservice().getdeliverymodes()
@@ -133,7 +145,11 @@ class FOIFlowReceivedModes(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    #@request_api.cache.cached(key_prefix="receivedmodes")
+    @request_api.cache.cached(
+        key_prefix="receivedmodes",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get():
         try:
             data = receivedmodeservice().getreceivedmodes()
@@ -151,6 +167,10 @@ class FOIFlowDivisions(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get(bcgovcode):
         try:
             data = divisionstageservice().getdivisionandstages(bcgovcode)
@@ -168,7 +188,11 @@ class FOIFlowCloseReasons(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    #@request_api.cache.cached(key_prefix="closereasons")
+    @request_api.cache.cached(
+        key_prefix="closereasons",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get():
         try:
             data = closereasonservice().getclosereasons()
@@ -242,7 +266,11 @@ class FOIFlowExtensionReasons(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    #@request_api.cache.cached(key_prefix="extensionreasons")
+    @request_api.cache.cached(
+        key_prefix="extensionreasons",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
     def get():
         try:
             data = extensionreasonservice().getextensionreasons()
