@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_request queue row 1 ministry assignee</name>
+   <tag></tag>
+   <elementGuidId>ddcfc06c-c24b-4b59-ac1a-02b0f4910289</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@data-rowindex=0]/div[@data-field='ministryAssignedToFormatted']</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>xpath1643934009209</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>DIV</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>xpath1643934009209</value>
+   </webElementProperties>
+</WebElementEntity>

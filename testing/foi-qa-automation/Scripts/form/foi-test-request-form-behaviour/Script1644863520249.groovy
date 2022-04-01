@@ -93,7 +93,7 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/requ
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'value', 
     laterDate.format('yyyy-MM-dd'), 0)
 
-if (today.format('HHmm').toInteger() > 1630) {
+if (today.format('HHmm', TimeZone.getTimeZone("Canada/Pacific")).toInteger() > 1630) {
     today = today.next() //    use(groovy.time.TimeCategory, { 
     //    })
 }

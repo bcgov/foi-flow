@@ -24,14 +24,8 @@ def today = new Date()
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-def tomorrow
-
-use(groovy.time.TimeCategory, { 
-        tomorrow = (new Date() + 1.day)
-    })
-
-if (today.format('HHmm').toInteger() > 1630) {
-    today = tomorrow
+if (today.format('HHmm', TimeZone.getTimeZone("Canada/Pacific")).toInteger() > 1630) {
+    today = today.next()
 }
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
