@@ -277,6 +277,12 @@ class FOIRawRequest(db.Model):
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
+        requestpagecount = case([
+            (FOIRawRequest.requestrawdata['requestPageCount'].is_(None),
+            '0'),
+            ],
+            else_ = cast(FOIRawRequest.requestrawdata['requestPageCount'], String)).label('requestPageCount')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -291,6 +297,7 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
             axisrequestid,
+            requestpagecount,
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -404,7 +411,7 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'axisRequestId', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
+        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'axisRequestId', 'requestPageCount', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
         if x in validfields:
             return True
         else:

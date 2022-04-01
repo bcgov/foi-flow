@@ -2,7 +2,6 @@ const MANDATORY_FOI_REQUEST_FIELDS = {
     ASSIGNED_TO: "assignedTo",
     APPLICANT_FIRST_NAME: "firstName",
     APPLICANT_LAST_NAME: "lastName",
-    APPLICANT_MIDDLE_NAME: "middleName",
     FOI_CATEGORY: "category",
     FOI_SELECTED_CATEGORY: "selectedCategory",
 

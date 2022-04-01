@@ -77,7 +77,7 @@ class notificationservice:
     def dismissnotificationsbyrequestid(self,requestid, requesttype):
         foirequest = self.__getrequest(requestid, requesttype)
         if requesttype == "ministryrequest":
-            idnumber = self.__getidnumber(foirequest["axisrequestid"], foirequest["filenumber"])
+            idnumber = foirequest["filenumber"]
             _ids = FOIRequestNotification.getnotificationidsbynumber(idnumber)
             if _ids:
                 FOIRequestNotificationUser.dismissbynotificationid(_ids)
@@ -88,11 +88,6 @@ class notificationservice:
                 FOIRawRequestNotificationUser.dismissbynotificationid(_ids)
                 FOIRawRequestNotification.dismissnotification(_ids)  
     
-    def __getidnumber(self, axisrequestid, filenumber):
-        if axisrequestid is not None:
-            return axisrequestid
-        return filenumber
-
     def __createnotification(self, message, requestid, requesttype, notificationtype, userid, foirequest, foicomment=None):
         notification = self.__preparenotification(message, requesttype, notificationtype, userid, foirequest, foicomment)
         if notification is not None:      
@@ -105,7 +100,7 @@ class notificationservice:
     def __cleanupnotifications(self, requesttype, notificationtype, foirequest):
         notificationid = notificationconfig().getnotificationtypeid(notificationtype)        
         if requesttype == "ministryrequest":
-            idnumber = self.__getidnumber(foirequest["axisrequestid"], foirequest["filenumber"])
+            idnumber = foirequest["filenumber"]
             _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationid)
         else:
             _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationid)
@@ -195,18 +190,17 @@ class notificationservice:
             
     def __preparenotification(self, message, requesttype, notificationtype, userid, foirequest, foicomment=None):            
         if requesttype == "ministryrequest":
-            idnumber = self.__getidnumber(foirequest["axisrequestid"], foirequest["filenumber"])
             notification = FOIRequestNotification()
             notification.requestid = foirequest["foiministryrequestid"]
-            notification.idnumber = idnumber
+            notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
         else:
             notification = FOIRawRequestNotification()
             notification.requestid = foirequest["requestid"]
-            idnumber = self.__getidnumber(foirequest["axisrequestid"], 'U-00' + str(foirequest['requestid']))
-            notification.idnumber = idnumber #'U-00' + str(foirequest['requestid'])
+            notification.idnumber ='U-00' + str(foirequest['requestid'])
 
         notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
+        notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
         notification.notification = message
