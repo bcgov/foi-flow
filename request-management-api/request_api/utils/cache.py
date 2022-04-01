@@ -37,13 +37,9 @@ def cache_filter(*args, **kwargs):
     if os.getenv('CACHE_ENABLED') != 'Y':
         return True    
     
-    try:
-        request_api.cache.get("")
-    except Exception:  
-        print("Exception in blank get")              
-        return True
     try:        
         cache_client.ping()
+        print('ping successful')
     except Exception:    
         print("Exception in redis ping")             
         return True
@@ -55,4 +51,3 @@ def response_filter(resp):
         return True
     else:
         return False
-
