@@ -541,7 +541,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
             <h1>
-              <a href="/foi/dashboard">FOI</a>
+              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
             </h1>
           </div>
           <div className="foileftpaneldropdown">
