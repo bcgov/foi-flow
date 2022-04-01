@@ -73,17 +73,20 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_min
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee EDU ministry team'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee Unassigned'), 0)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee Unassigned'), 'aria-disabled', 'true', 
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee EDU ministry team'), 
     0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee EDU ministry team'), 'aria-disabled', 
-    'true', 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'), 
+    0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee Unassigned'), 
+    0)
+
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee Unassigned'), 
+    'aria-disabled', 'true', 0)
+
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee EDU ministry team'), 
+    'aria-disabled', 'true', 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
@@ -105,7 +108,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), (findTestData('Login Credentials').getValue(
-        'Last Name', 8) + ', ') + findTestData('Login Credentials').getValue('First Name', 8 ))
+        'Last Name', 8) + ', ') + findTestData('Login Credentials').getValue('First Name', 8))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL, FailureHandling.STOP_ON_FAILURE)
 
@@ -115,7 +118,7 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Foiedu, Foiedu')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 ministry assignee'), 'Foiedu, Foiedu')
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 

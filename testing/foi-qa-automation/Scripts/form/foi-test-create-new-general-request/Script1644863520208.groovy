@@ -30,8 +30,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee use
 
 Random random = new Random()
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000)) //generate random axis number for sake of test
-    
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000 //generate random axis number for sake of test
+        ))
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 'Firstname')
 
@@ -95,7 +95,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5] // put back in after axis is phased out
+def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5]
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
@@ -107,13 +107,5 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'), 'Lastname, Firstname')
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 type'), 'General')
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 state'), 'Intake In Progress')
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Flex, Intake')
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 received date'), 'DEC 16 2021')
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row by id', [('requestID') : 'U-00' + requestID]), 0)
 

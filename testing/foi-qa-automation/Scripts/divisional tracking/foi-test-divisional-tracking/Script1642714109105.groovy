@@ -70,28 +70,30 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), FailureHandling.STOP_ON_FAILURE).contains(
-    'EDUC-' + requestID)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 2'), 0)
-
-assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 2 request no'), FailureHandling.STOP_ON_FAILURE).contains(
-    'JERI-' + requestID)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 3'), 0)
-
-assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 3 request no'), FailureHandling.STOP_ON_FAILURE).contains(
-    'LBR-' + requestID)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 4'), 0)
-
-assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 4 request no'), FailureHandling.STOP_ON_FAILURE).contains(
-    'MUNI-' + requestID)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 5'), 0)
-
-assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 5 request no'), FailureHandling.STOP_ON_FAILURE).contains(
-    'TACS-' + requestID)
+// put the following code back in once axis is phased out
+//assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+//    'EDUC-' + requestID)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 2'), 0)
+//
+//assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 2 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+//    'JERI-' + requestID)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 3'), 0)
+//
+//assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 3 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+//    'LBR-' + requestID)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 4'), 0)
+//
+//assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 4 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+//    'MUNI-' + requestID)
+//
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 5'), 0)
+//
+//assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 5 request no'), FailureHandling.STOP_ON_FAILURE).contains(
+//    'TACS-' + requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'))
 

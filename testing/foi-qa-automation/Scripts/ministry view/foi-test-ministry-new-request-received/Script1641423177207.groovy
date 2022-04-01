@@ -67,7 +67,6 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/h4_CFR Due in 10 Days'), 'CFR Due in 10 Days')
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (2)')
@@ -101,7 +100,6 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header RECORDS DUE'), 0)
 //
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header LDD'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
@@ -119,11 +117,10 @@ WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_requ
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/h4_CFR Due in 10 Days'), 'CFR Due in 10 Days')
-
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/div_request form ministry APPLICANT DETAILS'), 
     0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/label_APPLICANT DETAILS'), 'APPLICANT DETAILS')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/label_APPLICANT DETAILS'), 'Applicant Details')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/div_request from ministry REQUEST DESCRIPTION'), 
     0)
