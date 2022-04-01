@@ -3,7 +3,7 @@
    <description></description>
    <name>dev</name>
    <tag></tag>
-   <defaultProfile>false</defaultProfile>
+   <defaultProfile>true</defaultProfile>
    <GlobalVariableEntity>
       <description></description>
       <initValue>'https://dev-foirequest.apps.silver.devops.gov.bc.ca'</initValue>

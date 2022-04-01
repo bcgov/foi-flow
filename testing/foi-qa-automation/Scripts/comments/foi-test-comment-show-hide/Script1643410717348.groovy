@@ -75,7 +75,7 @@ WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'tes
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/div_Comment list 10'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/div_Comment list 11'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 
@@ -83,7 +83,7 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/button_Show more com
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/comment/div_Comment list 10'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/comment/div_Comment list 11'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 

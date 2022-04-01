@@ -100,15 +100,15 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 //WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 //
 //WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 //
 //WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
 //
 //WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 //
