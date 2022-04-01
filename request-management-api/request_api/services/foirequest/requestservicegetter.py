@@ -146,6 +146,8 @@ class requestservicegetter:
                     "divisionname": ministrydivision["division.name"],
                     "stageid": ministrydivision["stage.stageid"],
                     "stagename": ministrydivision["stage.name"],
+                    "divisionduedate": ministrydivision["divisionduedate"],
+                    "eapproval": ministrydivision["eapproval"]
                     } 
                 divisions.append(division)
         return divisions
