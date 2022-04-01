@@ -10,11 +10,15 @@
          <value>(//button[@type='button'])[5]</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>//*[@type = 'button' and (text() = 'Return to Queue' or . = 'Return to Queue')]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>button.btn.btn-bottom.jss31</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@data-rowindex=0]/div[@data-field='idNumber']</value>
+         <value>//div[@data-rowindex=0]/div[@data-field='axisRequestId']</value>
       </entry>
       <entry>
          <key>BASIC</key>

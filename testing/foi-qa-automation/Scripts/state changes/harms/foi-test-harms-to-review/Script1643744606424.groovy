@@ -137,7 +137,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Record
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change ' + 
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
     WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Records Review?')
 
 WebUI.callTestCase(findTestCase('helper/foi-test-state-change-attachment-modal'), [('filename') : 'test2.docx'], FailureHandling.STOP_ON_FAILURE)

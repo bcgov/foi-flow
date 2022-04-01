@@ -93,8 +93,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Dedupl
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change ' + 
-    WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Deduplication?')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
+    WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + 
+    ' to Deduplication?')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
 

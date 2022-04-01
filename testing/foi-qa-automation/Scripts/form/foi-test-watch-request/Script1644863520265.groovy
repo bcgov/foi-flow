@@ -133,7 +133,10 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), 'U-00' + requestID)
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), 'ABC-2099-' + requestID)
+
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), 'U-00' + requestID) // put this line back in and remove previous line after axis phase out
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'), FailureHandling.STOP_ON_FAILURE)
 
