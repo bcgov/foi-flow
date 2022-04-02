@@ -59,4 +59,9 @@
       <initValue>'Rm8hMTIz'</initValue>
       <name>db_password</name>
    </GlobalVariableEntity>
+   <GlobalVariableEntity>
+      <description></description>
+      <initValue>3</initValue>
+      <name>DEFAULT_TIMEOUT</name>
+   </GlobalVariableEntity>
 </GlobalVariableEntities>

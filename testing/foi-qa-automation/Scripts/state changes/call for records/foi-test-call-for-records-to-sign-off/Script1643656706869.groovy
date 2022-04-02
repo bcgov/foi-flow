@@ -104,7 +104,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Minist
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 2)
+WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Ministry Sign Off', 
     0)

@@ -84,7 +84,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee use
 
 Random random = new Random()
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000)) //generate random axis number for sake of test
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000) //generate random axis number for sake of test
+    )
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 
     'required', 0)
@@ -122,9 +123,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_E
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), startDateInput)
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '002021-12-16')
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), receivedDateInput)
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), '002021-12-16')
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
 
@@ -155,8 +156,8 @@ WebUI.click(findTestObject(WebUI.concatenate(((['Object Repository/Page_foi.flow
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
     'Mui-error') == false
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number Parent'), 'class').contains(
-    'Mui-error') == false
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number Parent'), 'class').contains('Mui-error') == 
+false
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name Parent'), 
     'class').contains('Mui-error') == false
@@ -212,7 +213,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5] // put back in after axis is phased out
+def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5 // put back in after axis is phased out
+]
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
