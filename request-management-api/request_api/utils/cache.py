@@ -39,9 +39,7 @@ def cache_filter(*args, **kwargs):
     
     try:        
         cache_client.ping()
-        print('ping successful')
     except Exception:    
-        print("Exception in redis ping")             
         return True
     return False
 
