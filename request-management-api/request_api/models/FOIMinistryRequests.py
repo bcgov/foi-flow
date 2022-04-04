@@ -54,7 +54,7 @@ class FOIMinistryRequest(db.Model):
 
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
-
+    requestpagecount = db.Column(db.String(20), nullable=True)
     #ForeignKey References
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
@@ -282,6 +282,11 @@ class FOIMinistryRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+        requestpagecount = case([
+            (FOIMinistryRequest.requestpagecount.is_(None),
+            '0'),
+            ],
+            else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -297,6 +302,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            requestpagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -433,7 +439,7 @@ class FOIMinistryRequest(db.Model):
             'lastName': FOIRequestApplicant.lastname,
             'requestType': FOIRequest.requesttype,
             'idNumber': FOIMinistryRequest.filenumber,
-            # 'axisRequestId': FOIMinistryRequest.axisrequestid,
+            'axisRequestId': FOIMinistryRequest.axisrequestid,
             'axisrequest_number': FOIMinistryRequest.axisrequestid,
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
@@ -452,8 +458,9 @@ class FOIMinistryRequest(db.Model):
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode),
+            'requestPageCount': FOIMinistryRequest.requestpagecount,
             'closedate': FOIMinistryRequest.closedate
-        }.get(x, FOIMinistryRequest.filenumber)
+        }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
     def getgroupfilters(cls, groups):
@@ -600,6 +607,11 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
+        requestpagecount = case([
+            (FOIMinistryRequest.requestpagecount.is_(None),
+            '0'),
+            ],
+            else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -615,6 +627,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            requestpagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -821,5 +834,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount')
     

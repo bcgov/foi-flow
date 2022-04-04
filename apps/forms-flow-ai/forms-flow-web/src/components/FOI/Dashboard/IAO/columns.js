@@ -76,12 +76,10 @@ const ProcessingTeamColumns = [
       params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
   {
-    field: "pages",
+    field: "requestPageCount",
     headerName: "PAGES",
     headerAlign: "left",
     flex: 0.5,
-    sortable: false,
-    renderCell: (params) => <span></span>,
   },
 ];
 

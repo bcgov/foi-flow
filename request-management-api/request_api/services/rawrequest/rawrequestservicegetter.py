@@ -56,13 +56,14 @@ class rawrequestservicegetter:
             if self.__ispersonalrequest(requesttype):
                 baserequestinfo['additionalPersonalInfo'] = self.__prepareadditionalpersonalinfo(requestrawdata)
             return baserequestinfo
-        elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":            
+        elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":       
             request['requestrawdata']['currentState'] = request['status']            
             requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             if request['status'] == 'Closed':
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
+            request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']

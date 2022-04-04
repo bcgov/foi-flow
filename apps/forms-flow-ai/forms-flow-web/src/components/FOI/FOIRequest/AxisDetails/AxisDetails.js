@@ -2,17 +2,19 @@ import React, {useEffect} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch} from "react-redux";
-import { fetchRequestDataFromAxis } from '../../../apiManager/services/FOI/foiRequestServices';
+import { fetchRequestDataFromAxis } from '../../../../apiManager/services/FOI/foiRequestServices';
 
 
 const AxisDetails = React.memo(({  
     requestDetails,
     createSaveRequestObject,
     foiAxisRequestIds,
+    handleAxisDetailsInitialValue,
     handleAxisDetailsValue,
-    handleAxisIdValidation
+    handleAxisIdValidation,
+    setAxisMessage
 }) => {
     const dispatch = useDispatch();
     const [axisRequestId, setAxisRequestId] = React.useState("");
@@ -23,8 +25,12 @@ const AxisDetails = React.memo(({
     useEffect(() => {
        if(Object.entries(requestDetails)?.length !== 0){
         handleAxisDetailsValue(requestDetails.axisRequestId, FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
+        const axisDetails = {
+            axisRequestId : requestDetails.axisRequestId
+        }
+        handleAxisDetailsInitialValue(axisDetails);
        }
-      }, [requestDetails]);
+      }, [requestDetails, handleAxisDetailsInitialValue]);
 
 
     const handleAxisIdChange = (e) => {
@@ -51,13 +57,21 @@ const AxisDetails = React.memo(({
     }
 
     const syncWithAxis = () => {
-        dispatch(fetchRequestDataFromAxis(axisRequestId, (err, data) => {
+        dispatch(fetchRequestDataFromAxis(axisRequestId, false, (err, data) => {
             if(!err){
                 if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}
                     setValidation(axisIdValidation);  
                 }
+                else if(data){
+                    let responseMsg = data;
+                    responseMsg+='';
+                    if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+                      setAxisMessage("ERROR");
+                }
             }
+            else
+                setAxisMessage("ERROR");
         }));
     }
 

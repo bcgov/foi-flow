@@ -2,6 +2,8 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { formatDate } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
+import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
+import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
 
 export const getTabBottomText = ({
   _daysRemaining,
@@ -178,7 +180,8 @@ export const createRequestDetailsObjectFunc = (
   value2
 ) => {
   requestObject.id = requestId;
-  requestObject.requestProcessStart =
+  if(requiredRequestDetailsValues.requestStartDate)
+    requestObject.requestProcessStart =
     requiredRequestDetailsValues.requestStartDate;
   requestObject.dueDate = requiredRequestDetailsValues.dueDate;
   requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
@@ -260,17 +263,14 @@ export const createRequestDetailsObjectFunc = (
   return requestObject;
 };
 
-export const checkContactGiven = (
-  requiredContactDetails,
-  requiredApplicantDetails
-) => {
+export const checkContactGiven = (requiredContactDetails) => {
   return (
     (requiredContactDetails.primaryAddress === "" ||
       requiredContactDetails.city === "" ||
       requiredContactDetails.province === "" ||
       requiredContactDetails.country === "" ||
       requiredContactDetails.postalCode === "") &&
-    requiredApplicantDetails.email === ""
+    requiredContactDetails.email === ""
   );
 };
 
@@ -287,7 +287,8 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails
+  requiredAxisDetails,
+  isAddRequest
 ) => {
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -296,8 +297,9 @@ export const checkValidationError = (
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
     !requiredRequestDescriptionValues.isProgramAreaSelected ||
-    (requiredRequestDetailsValues.requestType.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL 
-    && !requiredRequestDescriptionValues.ispiiredacted) ||
+    (requiredRequestDetailsValues.requestType.toLowerCase() ===
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
+      !requiredRequestDescriptionValues.ispiiredacted) ||
     !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
@@ -309,10 +311,14 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    (isAddRequest && !requiredAxisDetails.axisRequestId)
   );
 };
 
+/*******
+ * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs
+ */
+//Below function will handle beforeunload event
 export const alertUser = (e) => {
   e.preventDefault();
   e.returnValue = "";
@@ -338,4 +344,16 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
   ) {
     return true;
   }
+};
+
+export const handleBeforeUnload = (e) => {
+  alertUser(e);
+};
+
+export  const isAxisSyncDisplayField = (field) => {
+  return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
+};
+
+export const isMandatoryField = (field) => {
+  return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
 };

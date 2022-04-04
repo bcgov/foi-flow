@@ -47,7 +47,8 @@ class dashboardservice:
         baserequestinfo.update({'applicantcategory': request.applicantcategory})
         baserequestinfo.update({'assignedToLastName': request.assignedToLastName})
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
-        baserequestinfo.update({'onBehalfLastName': request.onBehalfFirstName})
+        baserequestinfo.update({'onBehalfLastName': request.onBehalfLastName})
+        baserequestinfo.update({'requestPageCount': request.requestPageCount})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version):

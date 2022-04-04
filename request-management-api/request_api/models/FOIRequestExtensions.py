@@ -42,7 +42,7 @@ class FOIRequestExtension(db.Model):
         return document_schema.dump(request)
 
     @classmethod
-    def saveextension(cls,ministryrequestid,ministryrequestversion, extension, extensionreason, userid):
+    def saveextension(cls,ministryrequestid,ministryrequestversion, extension, extensionreason, userid, newduedate=None):
         
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
@@ -73,8 +73,16 @@ class FOIRequestExtension(db.Model):
         createdby=createuserid)        
         db.session.add(newextension)
         db.session.commit()
-        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid)      
+        return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid, newduedate)      
     
+    @classmethod
+    def saveextensions(cls, newextensions):
+        db.session.add_all(newextensions)
+        db.session.commit()
+        extensionids = []
+        for extension in newextensions:
+            extensionids.append(extension.foirequestextensionid)
+        return DefaultMethodResult(True,'Extensions created',-1,extensionids)
 
     @classmethod
     def createextensionversion(cls,ministryrequestid,ministryrequestversion, extension, userid):
@@ -132,6 +140,11 @@ class FOIRequestExtension(db.Model):
         extension = db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid, FOIRequestExtension.version == version).order_by(FOIRequestExtension.version.desc()).first()
         return extension_schema.dump(extension)
 
+    @classmethod
+    def deleteextensionbyministry(cls, ministryid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id.in_(ministryid)).delete(synchronize_session=False)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Extensions deleted for the ministry ', ministryid)  
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:

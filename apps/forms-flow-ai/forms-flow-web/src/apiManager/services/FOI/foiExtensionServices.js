@@ -44,35 +44,33 @@ export const fetchExtension = ({extensionId, callback, errorCallback, dispatch})
     });
 };
 
-export const fetchExtensions = (
+export const fetchExtensions = ({
   ministryId,
-  ...rest
-) => {
-  const done = fnDone(rest);
+  errorCallback = null,
+  dispatch,
+}) => {
   const apiUrl = replaceUrl(
     API.FOI_GET_EXTENSIONS,
     "<ministryrequestid>",
     ministryId
   );
-
-  return (dispatch) => {
-    httpGETRequest(apiUrl, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          dispatch(setRequestExtensions(res.data));
-          done(null, res.data);
-        } else {
-          console.log("Error in fetching attachment list", res);
-          dispatch(serviceActionError(res));
-        }
-      })
-      .catch((error) => {
-        console.log("Error in fetching attachment list", error);
-        dispatch(serviceActionError(error));
-        done(error);
-      });
-  }
-}
+  httpGETRequest(apiUrl, {}, UserService.getToken())
+    .then((res) => {
+      if (res.data) {
+        dispatch(setRequestExtensions(res.data));
+      } else {
+        console.log("Error in fetching attachment list", res);
+        dispatch(serviceActionError(res));
+      }
+    })
+    .catch((error) => {
+      console.log("Error in fetching attachment list", error);
+      dispatch(serviceActionError(error));
+      if (errorCallback) {
+        errorCallback();
+      }
+    });
+};
 
 export const createExtensionRequest = ({
   data,
@@ -105,6 +103,32 @@ export const createExtensionRequest = ({
       catchError(error, dispatch);
       errorCallback("An error occured while trying to save this extension");
     });
+};
+
+export const addAXISExtensions = (data, ministryId, ...rest) => {
+  const done = fnDone(rest);  
+  let apiUrl = replaceUrl(
+    API.FOI_POST_AXIS_EXTENSIONS,
+    "<ministryrequestid>",
+    ministryId
+  );  
+
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          console.log("Extensions saved successfully!");
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in saving request extensions details for the ministry# ${ministryId}`);
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
 };
 
 export const updateExtensionRequest = ({

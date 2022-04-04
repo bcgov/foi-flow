@@ -12,9 +12,14 @@ import Grid from "@material-ui/core/Grid";
 import "./extensionscss.scss";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import clsx from "clsx";
-import { deleteExtensionRequest } from "../../../../apiManager/services/FOI/foiExtensionServices";
+import {
+  deleteExtensionRequest,
+  fetchExtensions,
+} from "../../../../apiManager/services/FOI/foiExtensionServices";
 import { useParams } from "react-router-dom";
 import { errorToast } from "./utils";
+import { setRequestDueDate } from "../../../../actions/FOI/foiRequestActions";
+import { formatDate } from "../../../../helper/FOI/helper";
 
 const useStyles = makeStyles((theme) => ({
   btndisabled: {
@@ -57,21 +62,34 @@ const DeleteExtensionModal = () => {
   const [loading, setLoading] = useState(false);
 
   const handleDelete = () => {
-    setLoading(true)
+    setLoading(true);
     deleteExtensionRequest({
       extensionId,
       ministryId,
       requestId,
-      callback: () => {
+      callback: (data) => {
+        fetchExtensions({
+          ministryId: ministryId,
+          errorCallback: () => {
+            errorToast("Error occurred while refreshing extensions.");
+          },
+          dispatch,
+        });
         setLoading(false);
         setDeleteModalOpen(false);
-        window.history.go(0);
+        if (data.newduedate) {
+          dispatch(
+            setRequestDueDate(
+              formatDate(new Date(data.newduedate), "yyyy-MM-dd")
+            )
+          );
+        }
       },
       errorCallback: (errorMessage) => {
         setLoading(false);
         errorToast(errorMessage);
       },
-      dispatch
+      dispatch,
     });
   };
 

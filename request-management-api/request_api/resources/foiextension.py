@@ -94,7 +94,31 @@ class CreateFOIRequestExtension(Resource):
                 result = extensionservice().createrequestextension(requestid, ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
                 if result.success == True:
                     eventservice().posteventforextension(ministryrequestid, result.identifier, AuthHelper.getuserid(), AuthHelper.getusername(), "add")
-                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                    newduedate, = result.args
+                    return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiextension/axisrequest/<ministryrequestid>')
+class SaveAXISRequestExtension(Resource):
+    """Creates extension for ministry(opened) request."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require   
+    def post(ministryrequestid):      
+        try:                     
+            rquesextensionschema = request.get_json()
+            if (AuthHelper.isministrymember() == False):           
+                result = extensionservice().saveaxisrequestextension(ministryrequestid, rquesextensionschema, AuthHelper.getuserid())
+                if result.success == True:
+                    eventservice().posteventforaxisextension(ministryrequestid, result.args[0], AuthHelper.getuserid(), AuthHelper.getusername(), "add")
+                    return {'status': result.success, 'message':result.message} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -117,7 +141,8 @@ class EditFOIRequestExtension(Resource):
                 result = extensionservice().createrequestextensionversion(requestid, ministryrequestid, extensionid, rquesextensionschema, AuthHelper.getuserid(), AuthHelper.getusername())
                 if result.success == True:
                     # posteventforextension moved to createrequestextensionversion to generate the comments before updating the ministry table with new due date
-                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                    newduedate = result.args[-1] if len(result.args) > 0 else None
+                    return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
@@ -138,7 +163,8 @@ class DeleteFOIRequestExtension(Resource):
                 result = extensionservice().deleterequestextension(requestid, ministryrequestid, extensionid, AuthHelper.getuserid())
                 if result.success == True:
                     eventservice().posteventforextension(ministryrequestid, extensionid, AuthHelper.getuserid(), AuthHelper.getusername(), "delete")
-                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                    newduedate = result.args[-1] if len(result.args) > 0 else None
+                    return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            

@@ -8,18 +8,21 @@ from request_api.services.requestservice import requestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.eventservice import eventservice
+from request_api.services.events.extension import ExtensionType
+from datetime import datetime
 import asyncio
 import json
 import base64
+from request_api.exceptions import BusinessException, Error
 
 class extensionservice:
     """ FOI Extension management service
     """
+    otherdateformat = '%Y-%m-%d'
 
     def getrequestextensions(self, requestid, version=None):
         extensions = []
         created_atdateformat = '%Y-%m-%d %H:%M:%S.%f'
-        otherdateformat = '%Y-%m-%d'
         requestversion =  self.__getversionforrequest(requestid) if version is None else version
         extensionrecords = FOIRequestExtension.getextensions(requestid, requestversion)        
         for entry in extensionrecords:               
@@ -30,8 +33,8 @@ class extensionservice:
                     "extensionstatusid": entry["extensionstatusid"], 
                     "extensionstatus": entry["name"],
                     "extendedduedays": entry["extendedduedays"], 
-                    "extendedduedate": self.__formatdate(entry["extendedduedate"], otherdateformat),  
-                    "decisiondate": self.__formatdate(entry["decisiondate"], otherdateformat), 
+                    "extendedduedate": self.__formatdate(entry["extendedduedate"], self.otherdateformat),  
+                    "decisiondate": self.__formatdate(entry["decisiondate"], self.otherdateformat), 
                     "approvednoofdays": entry["approvednoofdays"], 
                     "created_at": self.__formatdate(entry["created_at"], created_atdateformat),  
                     "createdby": entry["createdby"]})        
@@ -39,7 +42,7 @@ class extensionservice:
 
     def __ispublicbodyextension(self, reasonid):
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
-        return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body'
+        return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value
 
     def getrequestextension(self, extensionid):
         requestextension = FOIRequestExtension().getextension(extensionid)
@@ -54,21 +57,81 @@ class extensionservice:
         reasonid = extensionschema['extensionreasonid']
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
         ispublicbodyextension = self.__ispublicbodyextension(reasonid)
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:            
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:
+            self.validatecreateextension(ministryrequestid, extensionschema, ispublicbodyextension)
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+            
+            newduedate = \
+            ministryrequestschema['duedate'] \
+            if isinstance(ministryrequestschema['duedate'], str) \
+            else self.__formatdate(ministryrequestschema['duedate'], self.otherdateformat)
            
             if result.success == True:
                 version = self.__getversionforrequest(ministryrequestid)
-                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
+                extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid, newduedate= newduedate)
         else:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         if 'documents' in extensionschema and extensionschema['extensionstatusid'] != 1:
             self.saveextensiondocument(extensionschema['documents'], ministryrequestid, userid, extnsionresult.identifier)
         return extnsionresult
+    
 
+    def validatecreateextension(self, ministryrequestid, extensionschema, ispublicbodyextension= None):
+        if ispublicbodyextension is None:
+            ispublicbodyextension = self.__ispublicbodyextension(extensionschema['extensionreasonid'])
+            
+        if not ispublicbodyextension:
+            return
+        
+        extensions = self.getrequestextensions(ministryrequestid)
+        publicbodyextensiondays = [extension['extendedduedays'] for extension in extensions if extension['extensiontype'] == ExtensionType.publicbody.value]
+        if sum(publicbodyextensiondays) + extensionschema['extendedduedays'] > 30:
+            raise BusinessException(Error.INVALID_INPUT)
+        
+    
+    def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
+        version = self.__getversionforrequest(ministryrequestid)
+        # delete all exisitng extensions for this ministry
+        FOIRequestExtension.deleteextensionbyministry(ministryrequestid)
+        newextensions = []
+        for extension in extensions:
+            newextensions.append(self.__createextension(extension, ministryrequestid, version, userid))
+        extnsionresult = FOIRequestExtension.saveextensions(newextensions)
+        return extnsionresult
+
+    def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid):       
+        extensionreason = extensionreasonservice().getextensionreasonbyid(extension['extensionreasonid'])   
+        createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
+        createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
+        approveddate = extension['approveddate'] if 'approveddate' in extension else None
+        denieddate = extension['denieddate'] if 'denieddate' in extension else None
+        decisiondate = approveddate if approveddate else denieddate
+        approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
+
+        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value: 
+            extensionstatusid = 2
+        elif 'extensionstatusid' in extension:
+            extensionstatusid = extension['extensionstatusid']
+        else:
+            extensionstatusid = 1        
+      
+        return FOIRequestExtension(
+        extensionreasonid=extension['extensionreasonid'], 
+        extendedduedays=extension['extendedduedays'], 
+        extendedduedate=extension['extendedduedate'], 
+        decisiondate=decisiondate, 
+        approvednoofdays=approvednoofdays, 
+        extensionstatusid=extensionstatusid, 
+        version=1, 
+        isactive=True, 
+        foiministryrequest_id=ministryrequestid, 
+        foiministryrequestversion_id=ministryrequestversion, 
+        created_at=createdat, 
+        createdby=createuserid)
+     
     # This is used for edit/approve/deny extension
     # Edit can be normal edit like Pending -> Pending, Approved -> Approved, Denied -> Denied
     # or it can be complex edit like Pending -> Approved/Denied, Approved -> Pending/Denied, Denied -> Approved/Pending
@@ -112,6 +175,13 @@ class extensionservice:
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+        
+            newduedate = \
+            ministryrequestschema['duedate'] \
+            if isinstance(ministryrequestschema['duedate'], str) \
+            else self.__formatdate(ministryrequestschema['duedate'], self.otherdateformat)
+            
+            extensionresult.args = (*extensionresult.args, newduedate)
         return extensionresult
         
     def deleterequestextension(self, requestid, ministryrequestid, extensionid, userid):
@@ -147,9 +217,18 @@ class extensionservice:
                 "duedate": updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, requestid, ministryrequestid, userid)
+            ## return due date
+            
+            newduedate = \
+            ministryrequestschema['duedate'] \
+            if isinstance(ministryrequestschema['duedate'], str) \
+            else self.__formatdate(ministryrequestschema['duedate'], self.otherdateformat)
+            
+            extensionresult.args = (*extensionresult.args, newduedate)
         # soft delete the documents attached to the extension
         if extensionresult.success == True and isdeletedocument == True:
             self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)
+            
         return extensionresult
 
     def __isstatuschangedfromapproved(self, prevstatus,  currentstatus):        
@@ -188,18 +267,18 @@ class extensionservice:
     def getextendedduedate(self, extensionschema):
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
         # if status is Approved or reason is Public Body then directly take the extendedduedate
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == 'Public Body':
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == ExtensionType.publicbody.value:
             return extensionschema['extendedduedate']
 
     def getlatestapprovedrequest(self, extensionid, ministryrequestid, ministryversion):
             return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)
 
     def getlatestapprovedduedate(self, prevstatus, ministryrequestid, approvedextension):       
-        if approvedextension and len(approvedextension) != 0:            
+        if approvedextension and len(approvedextension) != 0:  
             return approvedextension['extendedduedate']
         # if Prev extension status was Approved and no approved extension in FOIRequestExtension table then get the original DueDate from FOIMinisrtRequests table   
-        elif prevstatus == 2 and not approvedextension:           
-            duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)           
+        elif prevstatus == 2 and not approvedextension:
+            duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
             return duedate
         #if current and prev status is Pending or Denied
         else:
