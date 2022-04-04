@@ -5,6 +5,8 @@ export const calculateStageCounter = (existingDivStages) => {
       id: 0,
       divisionid: -1,
       stageid: -1,
+      divisionDueDate: null,
+      eApproval: null
     }];
   }
 
@@ -13,6 +15,8 @@ export const calculateStageCounter = (existingDivStages) => {
       id: index,
       divisionid: item.divisionid,
       stageid: item.stageid,
+      divisionDueDate: item.divisionDueDate,
+      eApproval: item.eApproval
     };
   });
 };
