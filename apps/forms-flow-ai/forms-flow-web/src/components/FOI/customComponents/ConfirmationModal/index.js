@@ -54,6 +54,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const selectedMinistry = getSelectedMinistry(saveRequestObject, ministryGroup);
     const selectedMinistryAssignedTo = getSelectedMinistryAssignedTo(saveRequestObject, selectedMinistry);
     const requestNumber = saveRequestObject?.idNumber; 
+    const axisRequestId = saveRequestObject?.axisRequestId;
     const currentState = saveRequestObject?.currentState;
     const daysRemainingLDD = calculateDaysRemaining(saveRequestObject?.dueDate);
     const multipleFiles = false;
@@ -109,7 +110,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, requestNumber, currentState, requestId);
+    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
