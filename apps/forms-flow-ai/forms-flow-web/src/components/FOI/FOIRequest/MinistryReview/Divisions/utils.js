@@ -64,3 +64,39 @@ export const addDivisionalStage = (stageIterator, divisionList, setStates) => {
     setStates(existing);
   }
 };
+
+export const updateEApproval = (e, id, minDivStages, setStates) => {
+  console.log("Name", e.target.name);
+  let arr = minDivStages;
+
+  const exists = arr.some((st) => st.id === id);
+
+  if (!exists) {
+    return;
+  }
+
+  arr
+    .filter((st) => st.id === id)
+    .forEach((item) => {
+        item.eApproval = e.target.value;
+    });
+  setStates(arr);
+};
+
+export const updateDueDate = (e, id, minDivStages, setStates) => {
+  console.log("Name", e.target.name);
+  let arr = minDivStages;
+
+  const exists = arr.some((st) => st.id === id);
+
+  if (!exists) {
+    return;
+  }
+
+  arr
+    .filter((st) => st.id === id)
+    .forEach((item) => {
+        item.divisionDueDate = e.target.value;
+    });
+  setStates(arr);
+};
