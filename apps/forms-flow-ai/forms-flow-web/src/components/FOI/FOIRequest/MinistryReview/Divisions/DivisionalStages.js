@@ -28,7 +28,7 @@ const DivisionalStages = React.memo(
 
 
     const [eApproval, setEApproval] = React.useState("");
-    const [divisionDueDate, setDivisionDueDate] = React.useState(!!divisionDueDate ? formatDate(new Date(divisionDueDate)): "");
+    const [divisionDueDate, setDivisionDueDate] = React.useState("");
 
     const [minDivStages, setMinDivStages] = React.useState(() =>
       calculateStageCounter(existingDivStages)
