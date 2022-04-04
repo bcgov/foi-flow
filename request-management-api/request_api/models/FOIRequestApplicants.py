@@ -27,28 +27,32 @@ class FOIRequestApplicant(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     @classmethod
-    def getrequest(cls,foirequestapplicant):
-        request_schema = FOIRequestApplicantSchema()
+    def saveapplicant(cls,firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
         dbquery = db.session.query(FOIRequestApplicant)
-        dbquery = dbquery.filter_by(firstname=foirequestapplicant.firstname)
-        if foirequestapplicant.middlename is not None:
-            dbquery = dbquery.filter_by(middlename=foirequestapplicant.middlename)
-        if foirequestapplicant.lastname is not None:
-            dbquery = dbquery.filter_by(lastname=foirequestapplicant.lastname)
-        if foirequestapplicant.businessname is not None:
-            dbquery = dbquery.filter_by(businessname=foirequestapplicant.businessname)
-        if foirequestapplicant.alsoknownas is not None:
-            dbquery = dbquery.filter_by(alsoknownas=foirequestapplicant.alsoknownas)
-        if foirequestapplicant.dob is not None:
-            dbquery = dbquery.filter_by(dob=foirequestapplicant.dob)
-        result = dbquery.first()   
-        return request_schema.dump(result)
-
-    @classmethod
-    def saverequest(cls,foirequestapplicant)->DefaultMethodResult:
-        db.session.add(foirequestapplicant)
-        db.session.commit()               
-        return DefaultMethodResult(True,'Request added',foirequestapplicant.foirequestapplicantid)
+        dbquery = dbquery.filter_by(firstname=firstname)
+        applicant = dbquery.filter_by(lastname=lastname)
+        if (applicant.count() > 0):
+            applicant.update({
+                FOIRequestApplicant.updatedby: userid, 
+                FOIRequestApplicant.updated_at: datetime.now(),
+                FOIRequestApplicant.middlename: middlename,
+                FOIRequestApplicant.businessname: businessname,
+                FOIRequestApplicant.alsoknownas: alsoknownas,
+                FOIRequestApplicant.dob: dob
+            })
+            return DefaultMethodResult(True,'Applicant updated',applicant.first().foirequestapplicantid)
+        else:
+            applicant = FOIRequestApplicant()
+            applicant.createdby = userid
+            applicant.firstname = firstname
+            applicant.lastname = lastname
+            applicant.middlename = middlename
+            applicant.businessname = businessname
+            applicant.alsoknownas = alsoknownas
+            applicant.dob = dob
+            db.session.add(applicant)
+            db.session.commit()               
+            return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
                 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:
