@@ -26,9 +26,9 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'))
 
@@ -103,7 +103,6 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 // commented out because division stage is no longer required field. If this ever changes in the future add this code back in
 //WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'), 
@@ -116,7 +115,6 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisio
     'Clarification')
 
 //WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/i_Division stage row 1 delete'))
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_Division stage row 2'), 
@@ -128,7 +126,6 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divi
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
 //WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/i_Division stage row 1 delete'), 
     FailureHandling.STOP_ON_FAILURE)
 
@@ -151,7 +148,6 @@ WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/ministry view/form/d
     FailureHandling.STOP_ON_FAILURE)
 
 //WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'), 
@@ -175,11 +171,9 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
     FailureHandling.STOP_ON_FAILURE)
 
 //WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/i_Division stage row 2 delete'), FailureHandling.STOP_ON_FAILURE)
 
 //WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
