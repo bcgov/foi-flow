@@ -26,10 +26,6 @@ const DivisionalStages = React.memo(
     createMinistrySaveRequestObject,
   }) => {
 
-
-    const [eApproval, setEApproval] = React.useState("");
-    const [divisionDueDate, setDivisionDueDate] = React.useState("");
-
     const [minDivStages, setMinDivStages] = React.useState(() =>
       calculateStageCounter(existingDivStages)
     );
@@ -89,7 +85,6 @@ const DivisionalStages = React.memo(
     const divisionList = divisionalstages.divisions;
 
     const handleEApprovalChange = (e,id) => {
-      setEApproval(e.target.value);
       updateEApproval(e, id, minDivStages, (newStages) => {
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
@@ -102,7 +97,6 @@ const DivisionalStages = React.memo(
     };
 
     const handleDivisionDueDateChange = (e,id) => {
-      setDivisionDueDate(e.target.value);
       updateDueDate(e, id, minDivStages, (newStages) => {
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
@@ -256,7 +250,7 @@ const DivisionalStages = React.memo(
               <TextField
                 style={{marginTop: '0px'}}
                 label="E-Apps/Other"
-                value={eApproval}
+                value={row.eApproval}
                 onChange={(e) => handleEApprovalChange(e, _id)}
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
@@ -269,7 +263,7 @@ const DivisionalStages = React.memo(
                   style={{marginTop: '0px'}}
                   id="divisionDueDate"              
                   label="Division Due Date"
-                  value={divisionDueDate}
+                  value={row.divisionDueDate}
                   onChange={(e) => handleDivisionDueDateChange(e, _id)}
                   type="date"
                   InputLabelProps={{
