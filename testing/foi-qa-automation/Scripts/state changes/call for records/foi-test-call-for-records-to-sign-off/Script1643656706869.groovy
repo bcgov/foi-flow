@@ -85,7 +85,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/s
     WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'))) + ' to Ministry Sign Off?')
 
 ministryCode = (WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE).split(
-    '-')[0].substring(1))
+    '-')[0]).substring(1)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [('ministryCode') : ministryCode], FailureHandling.STOP_ON_FAILURE)
 
@@ -104,7 +104,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Minist
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), GlobalVariable.DEFAULT_TIMEOUT)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Ministry Sign Off', 
     0)

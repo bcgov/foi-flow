@@ -6,12 +6,12 @@
    <elementGuidId>9a4adb4d-1059-4a26-87c4-10dee5fd8799</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='app']/div/div[3]/div/div/div[4]/h4</value>
+         <key>BASIC</key>
+         <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderOpenBG&quot;]/div[@class=&quot;foileftpanelstatus&quot;]/h4[1]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//h4[(text() = '30 Days Remaining' or . = '30 Days Remaining')]</value>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div/div[4]/h4</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -28,14 +28,14 @@
       <value>h4</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
       <value>30 Days Remaining</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
