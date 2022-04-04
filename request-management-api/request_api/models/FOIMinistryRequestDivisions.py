@@ -27,6 +27,8 @@ class FOIMinistryRequestDivision(db.Model):
     stageid = db.Column(db.Integer,ForeignKey('ProgramAreaDivisionStages.stageid'))
     stage =  relationship("ProgramAreaDivisionStage",backref=backref("ProgramAreaDivisionStages"),uselist=False)
     
+    divisionduedate = db.Column(db.DateTime, nullable=True)
+    eapproval = db.Column(db.String(12), nullable=True)
        
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -49,5 +51,5 @@ class FOIMinistryRequestDivision(db.Model):
    
 class FOIMinistryRequestDivisionSchema(ma.Schema):
     class Meta:
-        fields = ('foiministrydivisionid','division.divisionid','division.name','stage.stageid','stage.name','foiministryrequest_id','foiministryrequestversion_id')
+        fields = ('foiministrydivisionid','division.divisionid','division.name','stage.stageid','stage.name','foiministryrequest_id','foiministryrequestversion_id', 'divisionduedate', 'eapproval')
     
