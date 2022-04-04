@@ -5,8 +5,8 @@ export const calculateStageCounter = (existingDivStages) => {
       id: 0,
       divisionid: -1,
       stageid: -1,
-      divisionDueDate: null,
-      eApproval: null
+      divisionDueDate: "",
+      eApproval: ""
     }];
   }
 
@@ -64,7 +64,7 @@ export const addDivisionalStage = (stageIterator, divisionList, setStates) => {
       ? stageIterator[stageIterator.length - 1].id + 1
       : 0;
   if (divisionList.length > stageIterator.length) {
-    existing.push({ id: val, divisionid: -1, stageid: -1 });
+    existing.push({ id: val, divisionid: -1, stageid: -1, divisionDueDate: "", eApproval: "" });
     setStates(existing);
   }
 };
