@@ -224,8 +224,8 @@ const RequestDescription = React.memo(({
                       />  
                     </div>                                                              
                 </div>
-                <div class="row foi-details-row">
-                  <div class="col-lg-12">
+                <div className="row foi-details-row">
+                  <div className="col-lg-12">
                     <div className="foi-request-description-textbox">
                     <TextField
                         id="outlined-multiline-request-description"
@@ -246,8 +246,8 @@ const RequestDescription = React.memo(({
                 </div>
                 {requiredRequestDetailsValues.requestType.toLowerCase() ===
                       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
-                  <div class="row foi-details-row">
-                    <div class="col-lg-12">
+                  <div className="row foi-details-row">
+                    <div className="col-lg-12">
                       <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
                         <input
                           id="noPICheckbox"
