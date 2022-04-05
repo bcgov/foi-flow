@@ -12,49 +12,62 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Centralized setup of logging for the service."""
-import sys, os, re, datetime, logging.config
-from os import path
-from pathlib import Path
-from logging.handlers import TimedRotatingFileHandler
+import os, logging, logging.config
 
-def setup_logging(conf):
-    """Create the services logger.
+LOG_ROOT = os.getenv('LOG_ROOT', "DEBUG").upper()
+LOG_BASIC = os.getenv('LOG_BASIC', "WARNING").upper()
+LOG_TRACING = os.getenv('LOG_TRACING', "ERROR").upper()
+LOGGING_FORMAT = '[%(asctime)s] %(levelname)-8s (%(name)s) <%(module)s.py:%(filename)s:%(lineno)d>.%(funcName)s: %(message)s'
 
-    TODO should be reworked to load in the proper loggers and remove others
-    """
-    if conf and path.isfile(conf):
-        logfilepath = 'request_api/logs/logfile.log'
-        logdir = os.path.dirname(logfilepath)
+def configure_logging(app):    
+    # Set up basic logging for the application.
+    logging.basicConfig(format=LOGGING_FORMAT, level=string_to_debug_level(LOG_ROOT))
+    temp_logger = logging.getLogger()
+    print("==> Root logger of '" + temp_logger.name + "' set to level: " + LOG_ROOT)
+    
+    #   Set up defaults.   
+    for name in logging.root.manager.loggerDict:        
+        module_logger = logging.getLogger(name)
+        module_prefix = name.split('.')[0] if name not in (None,'') else "NOTSET"
+        module_logger_level = os.getenv(make_env_name(module_prefix), LOG_BASIC).upper()
+        print("--> Logger " + name + " set to level LOG_BASIC level of " + module_logger_level)
+        module_logger.setLevel(string_to_debug_level(module_logger_level))
+    
+    # Tracing Log Config    
+    logging.getLogger("jaeger_tracing").setLevel(LOG_TRACING)
 
-        if not os.path.exists(logdir):
-            os.mkdir(logdir)
-        logging.config.fileConfig(conf)
-        print('Configure logging, from conf:{}'.format(conf), file=sys.stdout)
+def make_env_name(name):
+    return ("LOG_" + name.upper())
+
+def string_to_debug_level(debug_string):
+    input_string = debug_string.lower()
+    if input_string == 'critical':
+        result = logging.CRITICAL
+    elif input_string == 'error':
+        result = logging.ERROR
+    elif input_string == 'warning':
+        result = logging.WARNING
+    elif input_string == 'info':
+        result = logging.INFO
+    elif input_string == 'debug':
+        result = logging.DEBUG
+    elif input_string == 'notset':
+        result = logging.NOTSET
     else:
-        print('Unable to configure logging, attempted conf:{}'.format(conf), file=sys.stderr)
+        result = logging.WARNING
+    return result
 
-def setup_filelogging(app):
-
-    """ 
-    Log file setup 
-    """
-    logfilepath = 'request_api/logs/logfile.log'
-    for handler in app.logger.handlers:
-        app.logger.removeHandler(handler)
-
-    log_file = os.path.abspath(logfilepath)
-    log_format = '%(asctime)s - %(levelname)s - %(message)s'  ##TODO: formatter has to be taken from logging.config
-    log_level = 10
-    handler = TimedRotatingFileHandler(log_file, when='d', interval=1, backupCount=5)
-    handler.setLevel(log_level)
-    formatter = logging.Formatter(log_format)
-    handler.setFormatter(formatter)
-
-    # add a suffix which you want
-    handler.suffix = '%Y-%m-%d_%H-%M-%S'
-
-    #need to change the extMatch variable to match the suffix for it
-    # handler.extMatch = re.compile(r'^\d{8}$') 
-
-    # finally add handler to logger    
-    app.logger.addHandler(handler)  
+def debug_level_to_string(debug_level):
+    if debug_level == logging.CRITICAL:
+        result = "CRITICAL"
+    elif debug_level == logging.ERROR:
+        result = "ERROR"
+    elif debug_level == logging.WARNING:
+        result = "WARNING"
+    elif debug_level == logging.INFO:
+        result = "INFO"
+    elif debug_level == logging.DEBUG:
+        result = "DEBUG"
+    elif debug_level == logging.NOTSET:
+        result = "NOTSET"
+    return result
