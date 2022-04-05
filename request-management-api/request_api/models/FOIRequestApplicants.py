@@ -32,14 +32,16 @@ class FOIRequestApplicant(db.Model):
         dbquery = dbquery.filter_by(firstname=firstname)
         applicant = dbquery.filter_by(lastname=lastname)
         if (applicant.count() > 0):
-            applicant.update({
+            _applicant = {
                 FOIRequestApplicant.updatedby: userid, 
                 FOIRequestApplicant.updated_at: datetime.now(),
                 FOIRequestApplicant.middlename: middlename,
                 FOIRequestApplicant.businessname: businessname,
-                FOIRequestApplicant.alsoknownas: alsoknownas,
-                FOIRequestApplicant.dob: dob
-            })
+                FOIRequestApplicant.alsoknownas: alsoknownas
+            }
+            if dob is not None and dob != "":
+                _applicant[FOIRequestApplicant.dob] = dob
+            applicant.update(_applicant)
             return DefaultMethodResult(True,'Applicant updated',applicant.first().foirequestapplicantid)
         else:
             applicant = FOIRequestApplicant()
@@ -49,7 +51,8 @@ class FOIRequestApplicant(db.Model):
             applicant.middlename = middlename
             applicant.businessname = businessname
             applicant.alsoknownas = alsoknownas
-            applicant.dob = dob
+            if dob is not None and dob != "":
+                applicant.dob = dob
             db.session.add(applicant)
             db.session.commit()               
             return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
