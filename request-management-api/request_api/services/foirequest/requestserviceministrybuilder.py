@@ -251,7 +251,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydivision = FOIMinistryRequestDivision()
                 ministrydivision.divisionid = division["divisionid"]
                 ministrydivision.stageid = division["stageid"]
-                ministrydivision.divisionduedate = division["divisionDueDate"] if "divisionDueDate" in division else None
+                ministrydivision.divisionduedate = division["divisionDueDate"] if "divisionDueDate" in division and division["divisionDueDate"] != '' else None
                 ministrydivision.eapproval = division["eApproval"] if "eApproval" in division else None
                 ministrydivision.foiministryrequest_id = requestid
                 ministrydivision.foiministryrequestversion_id = version
