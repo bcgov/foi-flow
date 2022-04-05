@@ -41,6 +41,8 @@ class FOIRequestApplicant(db.Model):
             }
             if dob is not None and dob != "":
                 _applicant[FOIRequestApplicant.dob] = dob
+            else:
+                _applicant[FOIRequestApplicant.dob] = None
             applicant.update(_applicant)
             return DefaultMethodResult(True,'Applicant updated',applicant.first().foirequestapplicantid)
         else:
@@ -53,6 +55,8 @@ class FOIRequestApplicant(db.Model):
             applicant.alsoknownas = alsoknownas
             if dob is not None and dob != "":
                 applicant.dob = dob
+            else:
+                applicant.dob = None
             db.session.add(applicant)
             db.session.commit()               
             return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
