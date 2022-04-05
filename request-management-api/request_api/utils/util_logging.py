@@ -34,40 +34,16 @@ def configure_logging(app):
         module_logger.setLevel(string_to_debug_level(module_logger_level))
     
     # Tracing Log Config    
-    logging.getLogger("jaeger_tracing").setLevel(LOG_TRACING)
+    logging.getLogger("jaeger_tracing").setLevel(string_to_debug_level(LOG_TRACING))
 
 def make_env_name(name):
     return ("LOG_" + name.upper())
 
 def string_to_debug_level(debug_string):
-    input_string = debug_string.lower()
-    if input_string == 'critical':
-        result = logging.CRITICAL
-    elif input_string == 'error':
-        result = logging.ERROR
-    elif input_string == 'warning':
-        result = logging.WARNING
-    elif input_string == 'info':
-        result = logging.INFO
-    elif input_string == 'debug':
-        result = logging.DEBUG
-    elif input_string == 'notset':
-        result = logging.NOTSET
+    level = debug_string.upper()
+    if level in ('CRITICAL', 'ERROR', 'WARNING', 'INFO','DEBUG'):
+        result = logging.getLevelName(level)
     else:
         result = logging.WARNING
     return result
 
-def debug_level_to_string(debug_level):
-    if debug_level == logging.CRITICAL:
-        result = "CRITICAL"
-    elif debug_level == logging.ERROR:
-        result = "ERROR"
-    elif debug_level == logging.WARNING:
-        result = "WARNING"
-    elif debug_level == logging.INFO:
-        result = "INFO"
-    elif debug_level == logging.DEBUG:
-        result = "DEBUG"
-    elif debug_level == logging.NOTSET:
-        result = "NOTSET"
-    return result
