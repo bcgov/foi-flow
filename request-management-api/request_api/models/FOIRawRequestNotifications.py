@@ -33,16 +33,24 @@ class FOIRawRequestNotification(db.Model):
         
     @classmethod
     def savenotification(cls,foinotification)->DefaultMethodResult:
-        db.session.add(foinotification)
-        db.session.commit()
-        return DefaultMethodResult(True,'Notification added',foinotification.requestid)
+        try:
+            db.session.add(foinotification)
+            db.session.commit()
+            return DefaultMethodResult(True,'Notification added',foinotification.requestid)
+        except:
+            db.session.rollback()
+            raise
       
     @classmethod
     def dismissnotification(cls, notificationids):
-        db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
-        db.session.commit()  
-        return DefaultMethodResult(True,'Notifications deleted ', notificationids)
-
+        try:
+            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
+            db.session.commit()  
+            return DefaultMethodResult(True,'Notifications deleted ', notificationids)
+        except:
+            db.session.rollback()
+            raise
+        
     @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
         sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
