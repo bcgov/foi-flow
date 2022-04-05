@@ -10,6 +10,7 @@ import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
 from request_api.exceptions import BusinessException
+from dateutil.parser import parse
 
 class divisionevent:
     """ FOI Event management service
@@ -21,19 +22,19 @@ class divisionevent:
         version = FOIMinistryRequest.getversionforrequest(requestid)
         curdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version)
         prevdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version[0]-1)
-        divisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions) 
+        divisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions)
         if divisionsummary is None or (divisionsummary and len(divisionsummary) <1):
             return  DefaultMethodResult(True,'No change',requestid)
         try:
             for division in divisionsummary:  
-                self.createcomment(requestid, division['division'], division['stage'], division['event'], userid)
+                self.createcomment(requestid, division, userid)
             return DefaultMethodResult(True,'Comment posted',requestid)
         except BusinessException as exception:
             return DefaultMethodResult(False,'unable to post comment - '+exception.message,requestid)   
                 
         
-    def createcomment(self, requestid, division, stage, event, userid):
-        comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division, stage, event)}
+    def createcomment(self, requestid, division, userid):
+        comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division)}
         commentservice().createministryrequestcomment(comment, userid, 2)
 
     
@@ -43,8 +44,8 @@ class divisionevent:
             if self.__isdivisionpresent(self.__getdivisioname(cdivision), pdivisions) == False:
                divisions.append(self.__createdivisionsummary(cdivision, EventType.add.value)) 
             else:
-                if self.__isstagechanged(self.__getdivisioname(cdivision), self.__getstagename(cdivision), pdivisions) == True :
-                   divisions.append(self.__createdivisionsummary(cdivision, EventType.modify.value))                      
+                if self.__isstagechanged(self.__getdivisioname(cdivision), self.__getstagename(cdivision), pdivisions) == True or self.__isdivisionduedatechanged(self.__getdivisioname(cdivision), self.__getdivisionduedate(cdivision), pdivisions) or self.__iseapprovalchanged(self.__getdivisioname(cdivision), self.__geteaproval(cdivision), pdivisions) :
+                    divisions.append(self.__createdivisionsummary(cdivision, EventType.modify.value))                  
         return divisions            
     
     def __deleted(self,cdivisions, pdivisions):
@@ -65,28 +66,57 @@ class divisionevent:
             if self.__getdivisioname(division) == divisionid and self.__getstagename(division) != stageid:
                 return True
         return False
-                               
+
+    def __isdivisionduedatechanged(self, divisionid, cdivisionduedate, divisionlist):
+        for division in divisionlist:
+            if self.__getdivisioname(division) == divisionid and self.__getdivisionduedate(division) != cdivisionduedate:
+                return True
+        return False
+
+    def __iseapprovalchanged(self, divisionid, ceapproval, divisionlist):
+        for division in divisionlist:
+            if self.__getdivisioname(division) == divisionid and self.__geteaproval(division) != ceapproval:
+                return True
+        return False
+
     def __createdivisionsummary(self, division, event):
-        return {'division': self.__getdivisioname(division), 'stage': self.__getstagename(division), 'event': event}
+        return {'division': self.__getdivisioname(division), 
+        'stage': self.__getstagename(division), 
+        'divisionduedate':self.__getdivisionduedate(division), 
+        'eapproval': self.__geteaproval(division),
+        'event': event}
         
     def __getdivisioname(self, dataschema):
         return dataschema['division.name']
 
     def __getstagename(self, dataschema):
-        return dataschema['stage.name']    
+        return dataschema['stage.name']
+    
+    def __getdivisionduedate(self, dataschema):
+        return parse(dataschema['divisionduedate']).strftime(self.__genericdateformat()) if dataschema['divisionduedate'] is not None else None
+    
+    def __geteaproval(self, dataschema):
+        return dataschema['eapproval']
 
-    def __preparemessage(self, division, stage, event): 
-        if event == EventType.modify.value:
-            return self.__formatmessage(division)+' division has been updated to stage '+ self.__formatmessage(stage)
-        elif event == EventType.add.value:
-            return self.__formatmessage(division)+' division has been added with stage '+ self.__formatmessage(stage) 
+    def __preparemessage(self, division):
+        message = ""
+        if division['eapproval'] is not None:
+            message = ' E-App/Other reference Number: ' + division['eapproval']
+        if division['divisionduedate'] is not None:
+            message += ' Due on ' + division['divisionduedate']
+
+        if division['event'] == EventType.modify.value:
+            return self.__formatmessage(division['division'])+' division has been updated to stage '+ self.__formatmessage(division['stage']) + message 
+        elif division['event'] == EventType.add.value:
+            return self.__formatmessage(division['division'])+' division has been added with stage '+ self.__formatmessage(division['stage']) + message
         else:
-            return self.__formatmessage(division)+' division with stage '+ self.__formatmessage(stage) +' has been removed'  
+            return self.__formatmessage(division['division'])+' division with stage '+ self.__formatmessage(division['stage']) + message + ' has been removed'  
              
         
     def __formatmessage(self, data):
         return '<i>'+data+'</i>'    
-
+    def __genericdateformat(self):
+        return '%Y-%m-%d'
 class EventType(Enum):
     add = "add"    
     delete = "delete"
