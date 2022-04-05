@@ -131,6 +131,8 @@ class FOIMinistryRequestDivisionSchema(Schema):
         unknown = EXCLUDE
     divisionid = fields.Int(data_key="divisionid")
     stageid = fields.Int(data_key="stageid")
+    divisionDueDate = fields.Str(data_key="divisionDueDate",allow_none=True)
+    eApproval = fields.Str(data_key="eApproval",allow_none=True)
 
   
 class FOIRequestMinistrySchema(Schema):
