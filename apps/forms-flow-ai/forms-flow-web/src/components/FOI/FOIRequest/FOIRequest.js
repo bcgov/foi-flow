@@ -160,7 +160,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
     requestState.toLowerCase() !==
       StateEnum.intakeinprogress.name.toLowerCase();
-  const [axisSyncedData, setAxisSyncedData] = useState(false);
+  const [axisSyncedData, setAxisSyncedData] = useState({});
 
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
 
@@ -228,34 +228,49 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [requestDetails]);
 
+
+  useEffect(() => {
+    if(axisMessage !== "WARNING" && Object.entries(axisSyncedData).length !== 0){
+      var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
+      if(axisDataUpdated)
+        setAxisMessage("WARNING");
+    }
+  }, [axisSyncedData, requestExtensions]);
+
   const checkIfAxisDataUpdated = (axisData) => {
     var updateNeeded= false;
     for(let key of Object.keys(axisData)){
       var updatedField = isAxisSyncDisplayField(key);
-      if(updatedField)
+      if(key !== 'Extensions' && updatedField)
         updateNeeded= checkValidation(key, axisData);
-      if(updateNeeded)
+      if(updateNeeded){
         return true;
+      }
     }
     return false;
   };
 
   const checkValidation = (key,axisData) => {
     var mandatoryField = isMandatoryField(key);
-    if(key === 'Extensions')
-        return extensionComparison(axisData, key);
     if(mandatoryField && axisData[key] || !mandatoryField){
-      if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key])
+      if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key]){
         return true;
+      }
     }
   }
 
   const extensionComparison = (axisData, key) => {
     if(requestExtensions.length > 0){
-      axisData[key].forEach(obj => {
-         requestExtensions?.forEach(obj1 => {
-           if(obj !== obj1)
-             return true;
+      axisData[key].forEach(axisObj => {
+         requestExtensions?.forEach(foiReqObj => {
+          if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
+            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
+              axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
+              axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
+              !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
+              return true;
+            }
+          }
          })
      });
    }
