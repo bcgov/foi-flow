@@ -20,9 +20,6 @@ class Config(object):
     ## type 'redis' is deprecated
     CACHE_TYPE = 'RedisCache'
     
-    #CACHE_REDIS_HOST = os.getenv('FOI_REQUESTQUEUE_REDISHOST')
-    #CACHE_REDIS_PORT = os.getenv('FOI_REQUESTQUEUE_REDISPORT')
-    #CACHE_REDIS_DB =  0 
     CACHE_REDIS_URL = os.getenv('CACHE_REDISURL')
     CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_TIMEOUT')
     CACHE_KEY_PPREFIX = 'foi'

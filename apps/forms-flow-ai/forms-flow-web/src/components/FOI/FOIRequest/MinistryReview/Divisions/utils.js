@@ -5,6 +5,8 @@ export const calculateStageCounter = (existingDivStages) => {
       id: 0,
       divisionid: -1,
       stageid: -1,
+      divisionDueDate: null,
+      eApproval: null
     }];
   }
 
@@ -13,6 +15,8 @@ export const calculateStageCounter = (existingDivStages) => {
       id: index,
       divisionid: item.divisionid,
       stageid: item.stageid,
+      divisionDueDate: item.divisionDueDate,
+      eApproval: item.eApproval
     };
   });
 };
@@ -22,7 +26,6 @@ export const updateDivisions = (e, id, minDivStages, setStates) => {
   const idExists = arr.some((st) => st.id === id);
 
   if (!idExists) {
-    console.log("No Id found - handleDivisionChange ");
     return;
   }
 
@@ -37,11 +40,9 @@ export const updateDivisions = (e, id, minDivStages, setStates) => {
 
 export const updateDivisionsState = (e, id, minDivStages, setStates) => {
   let arr = minDivStages;
-
   const exists = arr.some((st) => st.id === id);
 
   if (!exists) {
-    console.log("No Id found - handleDivisionStageChange ");
     return;
   }
 
@@ -49,6 +50,11 @@ export const updateDivisionsState = (e, id, minDivStages, setStates) => {
     .filter((st) => st.id === id)
     .forEach((item) => {
       item.stageid = e.target.value;
+      if(!(item.stageid == 5 || item.stageid == 7 || item.stageid == 9)){
+        item.divisionDueDate = null;
+        item.eApproval = null;
+      }
+
     });
   setStates(arr);
 };
@@ -60,7 +66,41 @@ export const addDivisionalStage = (stageIterator, divisionList, setStates) => {
       ? stageIterator[stageIterator.length - 1].id + 1
       : 0;
   if (divisionList.length > stageIterator.length) {
-    existing.push({ id: val, divisionid: -1, stageid: -1 });
+    existing.push({ id: val, divisionid: -1, stageid: -1, divisionDueDate: null, eApproval: null });
     setStates(existing);
   }
+};
+
+export const updateEApproval = (e, id, minDivStages, setStates) => {
+  let arr = minDivStages;
+
+  const exists = arr.some((st) => st.id === id);
+
+  if (!exists) {
+    return;
+  }
+
+  arr
+    .filter((st) => st.id === id)
+    .forEach((item) => {
+        item.eApproval = e.target.value;
+    });
+  setStates(arr);
+};
+
+export const updateDueDate = (e, id, minDivStages, setStates) => {
+  let arr = minDivStages;
+
+  const exists = arr.some((st) => st.id === id);
+
+  if (!exists) {
+    return;
+  }
+
+  arr
+    .filter((st) => st.id === id)
+    .forEach((item) => {
+        item.divisionDueDate = e.target.value;
+    });
+  setStates(arr);
 };
