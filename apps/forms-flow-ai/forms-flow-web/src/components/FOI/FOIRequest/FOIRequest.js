@@ -230,12 +230,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
 
   useEffect(() => {
+    
     if(axisMessage !== "WARNING" && Object.entries(axisSyncedData).length !== 0){
       var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
       if(axisDataUpdated)
         setAxisMessage("WARNING");
     }
-  }, [axisSyncedData, requestExtensions]);
+  }, [requestExtensions]);
 
   const checkIfAxisDataUpdated = (axisData) => {
     var updateNeeded= false;
@@ -252,7 +253,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const checkValidation = (key,axisData) => {
     var mandatoryField = isMandatoryField(key);
-    if(mandatoryField && axisData[key] || !mandatoryField){
+    if(key === 'compareReceivedDate'){
+      if(requestDetails['receivedDate'] !== axisData[key])
+        return true;
+      return false;
+    }
+    else if(mandatoryField && axisData[key] || !mandatoryField){
       if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key]){
         return true;
       }
@@ -260,9 +266,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   }
 
   const extensionComparison = (axisData, key) => {
-    if(requestExtensions.length > 0){
+    if(requestExtensions.length !== axisData[key].length)
+        return true;
+    if(requestExtensions.length > 0 && axisData[key].length > 0){
       axisData[key].forEach(axisObj => {
-         requestExtensions?.forEach(foiReqObj => {
+        requestExtensions?.forEach(foiReqObj => {
           if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
             if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
               axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
@@ -271,13 +279,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
               return true;
             }
           }
-         })
-     });
-   }
-   else{
-    if(axisData[key].length > 0)
+        })
+    });
+  }
+  else{
+    if(axisData[key]?.length > 0)
       return true;
-   }
+  }
    return false;
   }
 
