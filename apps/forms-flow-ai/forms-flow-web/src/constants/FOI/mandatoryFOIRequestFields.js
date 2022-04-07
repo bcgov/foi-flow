@@ -12,8 +12,6 @@ const MANDATORY_FOI_REQUEST_FIELDS = {
     REQUEST_TYPE: "requestType",
     RECEIVED_MODE: "receivedMode",
     DELIVERY_MODE: "deliveryMode",
-    RECEIVED_DATE: "receivedDate",
-    RECEIVED_DATE_UF: "receivedDateUF",
     REQUEST_START_DATE: "requestStartDate",
     DUE_DATE: "dueDate",
  

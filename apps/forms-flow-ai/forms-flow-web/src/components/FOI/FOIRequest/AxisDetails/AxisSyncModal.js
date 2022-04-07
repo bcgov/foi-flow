@@ -89,13 +89,16 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       else{
         if((key === 'Extensions'))
           return true;
-        if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
+        else if(key === 'compareReceivedDate' && (saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key])){
+          return true;
+        }
+        else if(key !== 'compareReceivedDate' && (saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
           return true;
       }
       return false;
     }
 
-    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {      
+    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {     
       switch (key) {
         case 'dueDate':
         case 'axisSyncDate':
@@ -105,15 +108,14 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis[key], "MMM dd yyyy");
           break;
         }
-        case 'receivedDateUF':{
+        case 'compareReceivedDate':
           updatedObj['receivedDate'] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
-        }
         case 'Extensions':
-            let extensionsArr = compareExtensions(key);
-            if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
-              (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
-              updatedObj[key] = extensionsArr;
+          let extensionsArr = compareExtensions(key);
+          if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
+            (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
+            updatedObj[key] = extensionsArr;
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -124,7 +126,30 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     const compareExtensions = (key) => {
       let extensionsArr = [];
-      if(extensions.length > 0){
+      if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0 && 
+          extensions.length === requestDetailsFromAxis[key]?.length ){
+            extensionsArr = assignExtensionForDsiplay(key,extensionsArr);
+      }
+      else{
+        requestDetailsFromAxis[key].forEach(obj => {
+          const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+          extensionsArr.push(property);
+        });
+      }
+    return extensionsArr;
+    } 
+
+
+    const assignExtensionForDsiplay = (key,extensionsArr) => {
+      const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
+      const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
+      if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
+        requestDetailsFromAxis[key].forEach(obj => {
+          const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+          extensionsArr.push(property);
+        });
+      }
+      else{
         requestDetailsFromAxis[key].forEach(axisObj => {
             extensions?.forEach(foiReqObj => {
               if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
@@ -138,15 +163,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
               }
             })
         });
+      }
+      return extensionsArr;
     }
-    else{
-      requestDetailsFromAxis[key].forEach(obj => {
-        const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
-        extensionsArr.push(property);
-      });
-    }
-    return extensionsArr;
-    } 
 
     const handleClose = () => {
         setAxisSyncModalOpen(false);
