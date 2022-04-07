@@ -161,7 +161,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestState.toLowerCase() !==
       StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
-
+  const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
 
   useEffect(() => {
@@ -209,8 +209,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
             if(typeof(data) !== "string" && Object.entries(data).length > 0){
               setAxisSyncedData(data);
               var axisDataUpdated = checkIfAxisDataUpdated(data);
-              if(axisDataUpdated)
+              console.log("axisDataUpdated==>",axisDataUpdated);
+              if(axisDataUpdated){
+                setCheckExtension(false);
                 setAxisMessage("WARNING");
+              }
             }
             else if(data){
               let responseMsg = data;
@@ -230,13 +233,17 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
 
   useEffect(() => {
-    
-    if(axisMessage !== "WARNING" && Object.entries(axisSyncedData).length !== 0){
+    console.log("checkExtension==>",checkExtension);
+    console.log("axisMessage==>",axisMessage);
+    if(checkExtension && Object.entries(axisSyncedData).length !== 0){
       var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
+      console.log("extension-update needed??",axisDataUpdated);
       if(axisDataUpdated)
         setAxisMessage("WARNING");
+      else
+        setAxisMessage("");
     }
-  }, [requestExtensions]);
+  }, [axisSyncedData, requestExtensions, checkExtension]);
 
   const checkIfAxisDataUpdated = (axisData) => {
     var updateNeeded= false;
@@ -266,6 +273,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   }
 
   const extensionComparison = (axisData, key) => {
+    console.log("axis data length",axisData[key].length);
     if(requestExtensions.length !== axisData[key].length)
         return true;
     if(requestExtensions.length > 0 && axisData[key].length > 0){
@@ -280,12 +288,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
             }
           }
         })
-    });
-  }
-  else{
-    if(axisData[key]?.length > 0)
-      return true;
-  }
+      });
+    }
+    else{
+      if(axisData[key]?.length > 0)
+        return true;
+    }
    return false;
   }
 

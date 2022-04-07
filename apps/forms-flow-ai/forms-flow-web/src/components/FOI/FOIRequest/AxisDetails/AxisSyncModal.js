@@ -131,6 +131,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       let extensionsArr = [];
       if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0 && 
           extensions.length === requestDetailsFromAxis[key]?.length ){
+            console.log(extensions.length);
+            console.log(requestDetailsFromAxis[key]?.length);
         requestDetailsFromAxis[key].forEach(axisObj => {
             extensions?.forEach(foiReqObj => {
               if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){

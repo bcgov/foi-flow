@@ -32,13 +32,9 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     requestStartDate:"Request Start Date",
     dueDate:"Legislated Due Date",
 
-    // additionalPersonalInfo:"Additional Personal Information",
-    // birthDate:"DOB",
-
     general:"Request Type General",
     personal:"Request Type Personal",
-    //selectedMinistries:"Selected Ministries",
-
+ 
     Extensions : "Extensions"
   };
   
