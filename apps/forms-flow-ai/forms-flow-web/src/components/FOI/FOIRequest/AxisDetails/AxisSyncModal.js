@@ -131,8 +131,28 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       let extensionsArr = [];
       if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0 && 
           extensions.length === requestDetailsFromAxis[key]?.length ){
-            console.log(extensions.length);
-            console.log(requestDetailsFromAxis[key]?.length);
+            extensionsArr = assignExtensionForDsiplay(key,extensionsArr);
+      }
+      else{
+        requestDetailsFromAxis[key].forEach(obj => {
+          const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+          extensionsArr.push(property);
+        });
+      }
+    return extensionsArr;
+    } 
+
+
+    const assignExtensionForDsiplay = (key,extensionsArr) => {
+      const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
+      const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
+      if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
+        requestDetailsFromAxis[key].forEach(obj => {
+          const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+          extensionsArr.push(property);
+        });
+      }
+      else{
         requestDetailsFromAxis[key].forEach(axisObj => {
             extensions?.forEach(foiReqObj => {
               if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
@@ -146,15 +166,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
               }
             })
         });
+      }
+      return extensionsArr;
     }
-    else{
-      requestDetailsFromAxis[key].forEach(obj => {
-        const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
-        extensionsArr.push(property);
-      });
-    }
-    return extensionsArr;
-    } 
 
     const handleClose = () => {
         setAxisSyncModalOpen(false);

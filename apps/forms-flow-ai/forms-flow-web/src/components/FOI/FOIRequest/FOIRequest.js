@@ -276,6 +276,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
     console.log("axis data length",axisData[key].length);
     if(requestExtensions.length !== axisData[key].length)
         return true;
+    const axisReasonIds = axisData[key].map(x => x.extensionreasonid);
+    const foiReqReasonIds = requestExtensions.map(x => x.extensionreasonid);
+    console.log("-->",axisReasonIds.filter(x => !foiReqReasonIds.includes(x)));
+    if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
+      console.log(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length);
+      return true;
+    }
+      
     if(requestExtensions.length > 0 && axisData[key].length > 0){
       axisData[key].forEach(axisObj => {
         requestExtensions?.forEach(foiReqObj => {
