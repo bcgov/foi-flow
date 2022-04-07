@@ -25,13 +25,15 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
-import { SearchFilter } from "./enum";
+import { SearchFilter, DateRangeTypes } from "./enum";
 import {
   ConditionalComponent,
   formatDate,
 } from "../../../../../helper/FOI/helper";
 import { ActionContext } from "./ActionContext";
 import { StateEnum } from "../../../../../constants/FOI/statusEnum";
+
+import Tooltip from '../../../customComponents/Tooltip/Tooltip';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -89,10 +91,14 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
+  const tooltipContent = {
+    "title": "Advanced Search",
+    "content": "In order to search FOI requests you must select one of the advanced search or date filter below to better refine your search results."
+  };
+
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
   const [searchFilterSelected, setSearchFilterSelected] = useState(
-    SearchFilter.REQUEST_DESCRIPTION
   );
   const keywordsMode =
     searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
@@ -141,6 +147,7 @@ const AdvancedSearch = ({ userDetail }) => {
   };
   const [requestTypes, setRequestTypes] = useState(initialRequestTypes);
 
+  const [selectedDateRangeType, setSelectedDateRangeType] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
@@ -165,11 +172,12 @@ const AdvancedSearch = ({ userDetail }) => {
     }
     setSearchLoading(true);
     handleUpdateSearchFilter({
-      search: searchFilterSelected.replace("_", "").toLowerCase(),
+      search: searchFilterSelected?.replace("_", "").toLowerCase(),
       keywords: keywordsMode ? keywords : [searchText],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
+      dateRangeType: selectedDateRangeType || null,
       fromDate: fromDate || null,
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
@@ -180,10 +188,17 @@ const AdvancedSearch = ({ userDetail }) => {
     });
   };
 
+  const noSearchCriteria = () => {
+    let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
+    let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
+    let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
+    return !searchText && !fromDate && !toDate && selectedPublicBodies.length===0 && selectedRequestStates.length===0 && selectedRequestTypes.length===0 && selectedRequestStatus.length===0;
+  };
+
   const handleResetSearchFilters = () => {
     setSearchText("");
     setKeywords([]);
-    setSearchFilterSelected(SearchFilter.REQUEST_DESCRIPTION);
+    setSearchFilterSelected();
     setRequestState(intitialRequestState);
     setRequestTypes(initialRequestTypes);
     setRequestStatus(intitialRequestStatus);
@@ -234,6 +249,10 @@ const AdvancedSearch = ({ userDetail }) => {
       ...requestTypes,
       [event.target.name]: event.target.checked,
     });
+  };
+
+  const handleSelectedDateRangeTypeChange = (event) => {
+    setSelectedDateRangeType(event.target.value);
   };
 
   const handleSelectedPublicBodiesChange = (event) => {
@@ -644,6 +663,34 @@ const AdvancedSearch = ({ userDetail }) => {
                   </Typography>
                 </Grid>
 
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label" shrink>
+                      Type of Date Range
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      displayEmpty
+                      value={selectedDateRangeType}
+                      onChange={handleSelectedDateRangeTypeChange}
+                      input={<OutlinedInput label="Type of Date Range" notched />}
+                    >
+                      <MenuItem disabled value="" key="date-range-type-default">
+                        <em>Select Type of Date Range</em>
+                      </MenuItem>
+                      {DateRangeTypes.map((dateRangeType) => (
+                        <MenuItem
+                          key={`date-range-type-${dateRangeType.name}`}
+                          value={dateRangeType.name}
+                        >
+                          {dateRangeType.value}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
                 <Grid
                   container
                   item
@@ -671,6 +718,7 @@ const AdvancedSearch = ({ userDetail }) => {
                         },
                       }}
                       onChange={(e) => setFromDate(formatDate(e.target.value))}
+                      disabled={!selectedDateRangeType}
                       fullWidth
                     />
                   </Grid>
@@ -697,11 +745,11 @@ const AdvancedSearch = ({ userDetail }) => {
                       InputProps={{
                         inputProps: {
                           min: formatDate(fromDate),
-                          max: formatDate(new Date()),
                         },
                       }}
                       value={toDate || ""}
                       onChange={(e) => setToDate(formatDate(e.target.value))}
+                      disabled={!selectedDateRangeType}
                       variant="outlined"
                       fullWidth
                     />
@@ -780,7 +828,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     }}
                     variant="contained"
                     onClick={handleApplySearchFilters}
-                    disabled={searchLoading}
+                    disabled={searchLoading || noSearchCriteria() || ((searchText || keywords.length>0) && !searchFilterSelected ) }
                     disableElevation
                   >
                     Apply Search
@@ -804,6 +852,9 @@ const AdvancedSearch = ({ userDetail }) => {
             </Grid>
           </Paper>
         </Grid>
+      </Grid>
+      <Grid className="floatAboveEverything">
+        <Tooltip content={tooltipContent} />
       </Grid>
     </>
   );

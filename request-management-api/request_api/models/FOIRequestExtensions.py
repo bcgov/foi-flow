@@ -142,7 +142,8 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def deleteextensionbyministry(cls, ministryid):
-        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id.in_(ministryid)).delete(synchronize_session=False)
+        print("ministryid ===== ", ministryid)
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryid).delete()
         db.session.commit()  
         return DefaultMethodResult(True,'Extensions deleted for the ministry ', ministryid)  
 

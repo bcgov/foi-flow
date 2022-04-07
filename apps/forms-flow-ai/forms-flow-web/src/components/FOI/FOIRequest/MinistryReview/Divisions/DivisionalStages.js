@@ -10,9 +10,13 @@ import {
   updateDivisions,
   updateDivisionsState,
   addDivisionalStage,
+  updateEApproval,
+  updateDueDate
 } from "./utils";
 import clsx from "clsx";
 import FOI_COMPONENT_CONSTANTS from "../../../../../constants/FOI/foiComponentConstants";
+import TextField from '@material-ui/core/TextField';
+import { formatDate } from "../../../../../helper/FOI/helper";
 
 const DivisionalStages = React.memo(
   ({
@@ -21,6 +25,7 @@ const DivisionalStages = React.memo(
     popSelectedDivStages,
     createMinistrySaveRequestObject,
   }) => {
+
     const [minDivStages, setMinDivStages] = React.useState(() =>
       calculateStageCounter(existingDivStages)
     );
@@ -78,6 +83,30 @@ const DivisionalStages = React.memo(
     };
 
     const divisionList = divisionalstages.divisions;
+
+    const handleEApprovalChange = (e,id) => {
+      updateEApproval(e, id, minDivStages, (newStages) => {
+        setMinDivStages([...newStages]);
+        appendStageIterator([...newStages]);
+      });
+      createMinistrySaveRequestObject(
+        FOI_COMPONENT_CONSTANTS.EAPPROVAL,
+        e.target.value,
+        e.target.name
+      );
+    };
+
+    const handleDivisionDueDateChange = (e,id) => {
+      updateDueDate(e, id, minDivStages, (newStages) => {
+        setMinDivStages([...newStages]);
+        appendStageIterator([...newStages]);
+      });
+      createMinistrySaveRequestObject(
+        FOI_COMPONENT_CONSTANTS.DIVISION_DUE_DATE,
+        e.target.value,
+        e.target.name
+      );
+    };
 
     const getdivisionMenuList = () => {
       let _divisionItems = [];
@@ -159,11 +188,10 @@ const DivisionalStages = React.memo(
 
       return (
         <div className="row foi-details-row" id={`foi-division-row${_id}`}>
-          <div className="col-lg-5 foi-details-col">
+          <div className="col-lg-3 foi-details-col">
             <FormControl
               fullWidth
-              error={row.divisionid === -1 && row.stageid !== -1}
-            >
+              error={row.divisionid === -1 && row.stageid !== -1}>
               <InputLabel id="foi-division-dropdown-label">
                 Select Divison
               </InputLabel>
@@ -188,11 +216,10 @@ const DivisionalStages = React.memo(
               </Select>
             </FormControl>
           </div>
-          <div className="col-lg-5 foi-details-col">
+          <div className="col-lg-3 foi-details-col">
             <FormControl
               fullWidth
-              error={row.divisionid !== -1 && row.stageid === -1}
-            >
+              error={row.divisionid !== -1 && row.stageid === -1}>
               <InputLabel id="foi-divisionstage-dropdown-label">
                 Select Divison Stage
               </InputLabel>
@@ -217,7 +244,39 @@ const DivisionalStages = React.memo(
               </Select>
             </FormControl>
           </div>
-          <div className="col-lg-2 foi-details-col">
+          {(row.stageid == 5 || row.stageid == 7 || row.stageid == 9) && 
+            <>
+            <div className="col-lg-2 foi-details-col due-date-field">
+              <TextField
+                style={{marginTop: '0px'}}
+                label="E-Apps/Other"
+                value={row.eApproval}
+                onChange={(e) => handleEApprovalChange(e, _id)}
+                InputLabelProps={{ shrink: true }}
+                variant="outlined"
+                fullWidth
+                inputProps={{maxLength :12}}
+              />
+            </div>
+            <div className="col-lg-3 foi-details-col foi-request-dates due-date-field">
+              <TextField  
+                  style={{marginTop: '0px'}}
+                  id="divisionDueDate"              
+                  label="Division Due Date"
+                  value={row.divisionDueDate}
+                  onChange={(e) => handleDivisionDueDateChange(e, _id)}
+                  type="date"
+                  InputLabelProps={{
+                  shrink: true,
+                  }} 
+                  InputProps={{inputProps: { min: formatDate(new Date()) } }}   
+                  variant="outlined"
+                  fullWidth
+              />  
+            </div>
+            </>
+          }
+          <div className="col-lg-1 foi-details-col">
             <i
               className={clsx("fa fa-trash fa-3 foi-bin", {
                 hidebin: index === 0 && stageIterator.length === 1,

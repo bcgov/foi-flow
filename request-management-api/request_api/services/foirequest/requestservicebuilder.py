@@ -92,26 +92,8 @@ class requestservicebuilder(requestserviceconfigurator):
     
     def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None,businessname = None, alsoknownas = None, dob = None):
         requestapplicant = FOIRequestApplicantMapping()
-        applicant = FOIRequestApplicant()
-        applicant.createdby = userid
-        if firstname is not None and firstname != "":
-            applicant.firstname = firstname
-        if lastname is not None and lastname != "":
-            applicant.lastname = lastname
-        if middlename is not None and middlename != "":
-            applicant.middlename = middlename
-        if businessname is not None and businessname != "":
-           applicant.businessname = businessname
-        if alsoknownas is not None and alsoknownas != "":
-            applicant.alsoknownas = alsoknownas
-        if dob is not None and dob != "":
-            applicant.dob = dob
-        _applicant = FOIRequestApplicant().getrequest(applicant)
-        if _applicant == {} :
-            _applicant = FOIRequestApplicant().saverequest(applicant)
-            requestapplicant.foirequestapplicantid = _applicant.identifier
-        else:
-            requestapplicant.foirequestapplicantid = _applicant["foirequestapplicantid"]
+        _applicant = FOIRequestApplicant().saveapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, userid)
+        requestapplicant.foirequestapplicantid = _applicant.identifier
         if appltcategory is not None:           
             requestertype = RequestorType().getrequestortype(appltcategory)  
             requestapplicant.requestortypeid = requestertype["requestortypeid"]
