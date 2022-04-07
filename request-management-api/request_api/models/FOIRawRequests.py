@@ -512,10 +512,28 @@ class FOIRawRequest(db.Model):
             filterconditionfordate.append(FOIRawRequest.requestid < 0)
         else:
             if(params['fromdate'] is not None):
-                filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate'])
+                if(params['daterangetype'] == 'receivedDate'):
+                    #online form submission has no receivedDate in json - using created_at
+                    filterconditionfordate.append(
+                        or_(
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at >= parser.parse(params['fromdate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate']),
+                        )
+                    )
+                else:
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate'])
 
             if(params['todate'] is not None):
-                filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate']))
+                if(params['daterangetype'] == 'receivedDate'):
+                    #online form submission has no receivedDate in json - using created_at
+                    filterconditionfordate.append(
+                        or_(
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at <= parser.parse(params['todate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate'])),
+                        )
+                    )
+                else:
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate']))
 
         return filterconditionfordate
 
