@@ -374,4 +374,6 @@ export {
   isProcessingTeam,
   isFlexTeam,
   isIntakeTeam,
+  encrypt,
+  decrypt,
 };

@@ -32,6 +32,7 @@ from flask_cors import CORS
 import re
 from flask_caching import Cache
 from flask_socketio import SocketIO
+import secure
 
 app = Flask(__name__)
 #Cache Initialization
@@ -47,6 +48,35 @@ socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_EN
 
 #Setup log
 configure_logging(app)
+
+# Security Response headers
+csp = (
+    secure.ContentSecurityPolicy()
+    .default_src("'self'")
+    .script_src("'self'")
+    .object_src('self')
+    .connect_src('self')
+)
+hsts = secure.StrictTransportSecurity().include_subdomains().preload().max_age(31536000)
+referrer = secure.ReferrerPolicy().no_referrer()
+cache_value = secure.CacheControl().no_store().max_age(0)
+xfo_value = secure.XFrameOptions().deny()
+secure_headers = secure.Secure(
+    csp=csp,
+    hsts=hsts,
+    referrer=referrer,
+    cache=cache_value,
+    xfo=xfo_value
+)
+
+@app.after_request
+def set_secure_headers(response):
+    secure_headers.framework.flask(response)
+    response.headers.add('Cross-Origin-Resource-Policy','same-origin')
+    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+    response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
+    response.headers['Clear-Site-Data'] = '"cache","cookies","storage"'
+    return response
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   
