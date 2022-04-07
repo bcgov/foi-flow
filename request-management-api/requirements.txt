@@ -66,10 +66,11 @@ aws-requests-auth==0.4.3
 holidays==0.12
 Flask-SocketIO==5.1.0
 Flask-Login==0.5.0
-eventlet==0.30.2
+eventlet==0.31.0
 uritemplate.py==3.0.2
 urllib3
 ndg-httpsclient
 pyopenssl
 pyasn1
+secure==0.3.0
 -e git+https://github.com/bcgov/sbc-common-components.git#egg=sbc-common-components&subdirectory=python

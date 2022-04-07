@@ -1,4 +1,5 @@
 import ACTION_CONSTANTS from "../actions/actionConstants";
+import { encrypt } from "../helper/FOI/helper";
 
 const initialState = {
   bearerToken: '',
@@ -15,7 +16,7 @@ const user = (state = initialState, action)=> {
     case ACTION_CONSTANTS.SET_CURRENT_PAGE:
       return {...state, currentPage: action.payload};
     case ACTION_CONSTANTS.SET_USER_TOKEN:
-      localStorage.setItem('authToken', action.payload);
+      localStorage.setItem('authToken', encrypt(action.payload));
       return {...state, bearerToken: action.payload};
     case ACTION_CONSTANTS.SET_USER_ROLES:
       return {...state, roles: action.payload};
