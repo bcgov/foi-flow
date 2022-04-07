@@ -33,6 +33,8 @@ import {
 import { ActionContext } from "./ActionContext";
 import { StateEnum } from "../../../../../constants/FOI/statusEnum";
 
+import Tooltip from '../../../customComponents/Tooltip/Tooltip';
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -88,6 +90,11 @@ const AdvancedSearch = ({ userDetail }) => {
   );
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
+
+  const tooltipContent = {
+    "title": "Advanced Search",
+    "content": "In order to search FOI requests you must select one of the advanced search or date filter below to better refine your search results."
+  };
 
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
@@ -179,6 +186,13 @@ const AdvancedSearch = ({ userDetail }) => {
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
     });
+  };
+
+  const noSearchCriteria = () => {
+    let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
+    let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
+    let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
+    return !searchText && !fromDate && !toDate && selectedPublicBodies.length===0 && selectedRequestStates.length===0 && selectedRequestTypes.length===0 && selectedRequestStatus.length===0;
   };
 
   const handleResetSearchFilters = () => {
@@ -704,6 +718,7 @@ const AdvancedSearch = ({ userDetail }) => {
                         },
                       }}
                       onChange={(e) => setFromDate(formatDate(e.target.value))}
+                      disabled={!selectedDateRangeType}
                       fullWidth
                     />
                   </Grid>
@@ -734,6 +749,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       }}
                       value={toDate || ""}
                       onChange={(e) => setToDate(formatDate(e.target.value))}
+                      disabled={!selectedDateRangeType}
                       variant="outlined"
                       fullWidth
                     />
@@ -812,7 +828,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     }}
                     variant="contained"
                     onClick={handleApplySearchFilters}
-                    disabled={searchLoading}
+                    disabled={searchLoading || noSearchCriteria() || ((searchText || keywords.length>0) && !searchFilterSelected ) }
                     disableElevation
                   >
                     Apply Search
@@ -836,6 +852,9 @@ const AdvancedSearch = ({ userDetail }) => {
             </Grid>
           </Paper>
         </Grid>
+      </Grid>
+      <Grid className="floatAboveEverything">
+        <Tooltip content={tooltipContent} />
       </Grid>
     </>
   );

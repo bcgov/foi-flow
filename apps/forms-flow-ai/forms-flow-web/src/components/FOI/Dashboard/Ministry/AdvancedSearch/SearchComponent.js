@@ -33,6 +33,8 @@ import {
 import { ActionContext } from "./ActionContext";
 import { StateEnum } from "../../../../../constants/FOI/statusEnum";
 
+import Tooltip from '../../../customComponents/Tooltip/Tooltip';
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -89,10 +91,14 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
+  const tooltipContent = {
+    "title": "Advanced Search",
+    "content": "In order to search FOI requests you must select one of the advanced search or date filter below to better refine your search results."
+  };
+
   const [searchText, setSearchText] = useState("");
   const [keywords, setKeywords] = useState([]);
   const [searchFilterSelected, setSearchFilterSelected] = useState(
-    SearchFilter.REQUEST_DESCRIPTION
   );
   const keywordsMode =
     searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
@@ -158,7 +164,7 @@ const AdvancedSearch = ({ userDetail }) => {
     }
     setSearchLoading(true);
     handleUpdateSearchFilter({
-      search: searchFilterSelected.replace("_", "").toLowerCase(),
+      search: searchFilterSelected?.replace("_", "").toLowerCase(),
       keywords: keywordsMode ? keywords : [searchText],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
@@ -174,10 +180,17 @@ const AdvancedSearch = ({ userDetail }) => {
     });
   };
 
+  const noSearchCriteria = () => {
+    let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
+    let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
+    let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
+    return !searchText && !fromDate && !toDate && selectedPublicBodies.length===0 && selectedRequestStates.length===0 && selectedRequestTypes.length===0 && selectedRequestStatus.length===0;
+  };
+
   const handleResetSearchFilters = () => {
     setSearchText("");
     setKeywords([]);
-    setSearchFilterSelected(SearchFilter.REQUEST_DESCRIPTION);
+    setSearchFilterSelected();
     setRequestState(intitialRequestState);
     setRequestTypes(initialRequestTypes);
     setRequestStatus(intitialRequestStatus);
@@ -795,7 +808,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     }}
                     variant="contained"
                     onClick={handleApplySearchFilters}
-                    disabled={searchLoading}
+                    disabled={searchLoading || noSearchCriteria() || ((searchText || keywords.length>0) && !searchFilterSelected ) }
                     disableElevation
                   >
                     Apply Search
@@ -819,6 +832,9 @@ const AdvancedSearch = ({ userDetail }) => {
             </Grid>
           </Paper>
         </Grid>
+      </Grid>
+      <Grid className="floatAboveEverything">
+        <Tooltip content={tooltipContent} />
       </Grid>
     </>
   );
