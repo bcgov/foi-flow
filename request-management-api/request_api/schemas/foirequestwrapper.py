@@ -91,10 +91,10 @@ class FOIRequestWrapperSchema(Schema):
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True)
 
     
-    phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])    
-    workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])  
-    phoneSecondary = fields.Str(data_key="phoneSecondary",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])    
-    workPhoneSecondary = fields.Str(data_key="workPhoneSecondary",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])    
+    phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
+    workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])  
+    phoneSecondary = fields.Str(data_key="phoneSecondary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
+    workPhoneSecondary = fields.Str(data_key="workPhoneSecondary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
     address = fields.Str(data_key="address",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])    
     addressSecondary = fields.Str(data_key="addressSecondary",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])    
     city = fields.Str(data_key="city",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])    
