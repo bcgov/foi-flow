@@ -89,8 +89,7 @@ class requestservicegetter:
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
             additionalpersonalinfo.update(additionalpersonalinfodetails)                
-            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
-            
+            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
         return baserequestinfo
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
@@ -138,7 +137,7 @@ class requestservicegetter:
     
     def getdivisions(self, ministrydivisions):
         divisions = []
-        if ministrydivisions is not None:            
+        if ministrydivisions is not None:                      
             for ministrydivision in ministrydivisions:
                 division = {
                     "foiministrydivisionid": ministrydivision["foiministrydivisionid"],
@@ -146,8 +145,10 @@ class requestservicegetter:
                     "divisionname": ministrydivision["division.name"],
                     "stageid": ministrydivision["stage.stageid"],
                     "stagename": ministrydivision["stage.name"],
+                    "divisionDueDate": parse(ministrydivision['divisionduedate']).strftime(self.__genericdateformat()) if ministrydivision['divisionduedate'] is not None else None,
+                    "eApproval": ministrydivision["eapproval"]
                     } 
-                divisions.append(division)
+                divisions.append(division) 
         return divisions
 
     

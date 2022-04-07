@@ -26,7 +26,7 @@ import request_api.config as config
 from request_api.config import _Config
 
 from request_api.models import db, ma
-from request_api.utils.util_logging import setup_logging, setup_filelogging
+from request_api.utils.util_logging import configure_logging
 from request_api.auth import jwt
 from flask_cors import CORS
 import re
@@ -44,6 +44,9 @@ SOCKETIO_LOG_ENABLED = True if os.getenv('SOCKETIO_LOG_ENABLED').lower() == "tru
 SOCKETIO_CORS_ORIGIN= os.getenv('CORS_ORIGIN').split(",")
 
 socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_ENABLED,ping_timeout=SOCKETIO_PING_TIMEOUT,ping_interval=SOCKETIO_PING_INTERVAL,cors_allowed_origins=SOCKETIO_CORS_ORIGIN)
+
+#Setup log
+configure_logging(app)
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   

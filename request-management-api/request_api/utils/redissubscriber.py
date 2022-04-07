@@ -7,6 +7,7 @@ import time
 from request_api import socketio
 import json
 import redis
+import logging
 class RedisSubscriberService:
    
     foicommentredis = redis.from_url(os.getenv('SOCKETIO_REDISURL'), health_check_interval=int(os.getenv('SOCKETIO_REDIS_HEALTHCHECK_INTERVAL')), socket_connect_timeout=int(os.getenv('SOCKETIO_REDIS_CONNECT_TIMEOUT')), retry_on_timeout=True, socket_keepalive=True)
@@ -15,11 +16,11 @@ class RedisSubscriberService:
     @classmethod
     def register_subscription(cls):        
         try: 
-            print("subscribe to channel")
+            logging.warning("subscription to channel")
             cls.subscription.subscribe(**{os.getenv('SOCKETIO_REDIS_COMMENT_CHANNEL'): event_handler})
             cls.subscription.run_in_thread(sleep_time=float(os.getenv('SOCKETIO_REDIS_SLEEP_TIME')), daemon=True)
         except BusinessException as exception:            
-            current_app.logger.error("%s,%s" % ('FOI request Queue REDIS Error', exception.message))              
+            logging.error("%s,%s" % ('FOI request Queue REDIS Error', exception.message))              
 
     
 def event_handler(msg):

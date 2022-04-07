@@ -13,7 +13,6 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
-import AXIS_SYNC_DISPLAY_FIELDS from '../../../../constants/FOI/axisSyncDisplayFields';
 import { useDispatch, useSelector} from "react-redux";
 import { saveRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
 import {
@@ -26,7 +25,6 @@ import { createRequestDetailsObjectFunc,
          isAxisSyncDisplayField,
          isMandatoryField } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
-import MANDATORY_FOI_REQUEST_FIELDS from "../../../../constants/FOI/mandatoryFOIRequestFields";
 
 
 const useStyles = makeStyles({
