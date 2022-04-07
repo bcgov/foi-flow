@@ -1,6 +1,7 @@
 
 
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, validate
+from request_api.utils.constants import BLANK_EXCEPTION_MESSAGE, MAX_EXCEPTION_MESSAGE
 
 """
 This class  consolidates schemas of bpm operations.
@@ -13,14 +14,14 @@ class FOIMinistryRequestSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    filenumber = fields.Str(data_key="fileNumber")
+    filenumber = fields.Str(data_key="fileNumber", validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     description = fields.Str(data_key="description")
     recordSearchFromDate = fields.Date(data_key="recordSearchFromDate")
     recordSearchToDate = fields.Date(data_key="recordSearchToDate")
     startdate = fields.Date(data_key="startDate")
     duedate = fields.Date(data_key="dueDate")
     cfrduedate = fields.Date(data_key="cfrDueDate", required=False,allow_none=True)
-    assignedto = fields.Str(data_key="assignedTo")
+    assignedto = fields.Str(data_key="assignedTo", validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     programareaid = fields.Int(data_key="programAreaId")
 
 class FOIContactInformationSchema(Schema):
@@ -61,7 +62,7 @@ class FOIRequestApplicantSchema(Schema):
     requestortypeid = fields.Int(data_key="requestorTypeId")
     
 class FOIRequestTypeSchema(Schema):
-    requestType = fields.Str(data_key="requestType")
+    requestType = fields.Str(data_key="requestType", validate=[validate.Length(max=10, error=MAX_EXCEPTION_MESSAGE)])
  
 class FOIRequestSchema(Schema):
 
