@@ -696,6 +696,7 @@ const AdvancedSearch = ({ userDetail }) => {
                         },
                       }}
                       onChange={(e) => setFromDate(formatDate(e.target.value))}
+                      disabled={!selectedDateRangeType}
                       fullWidth
                     />
                   </Grid>
@@ -726,6 +727,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       }}
                       value={toDate || ""}
                       onChange={(e) => setToDate(formatDate(e.target.value))}
+                      disabled={!selectedDateRangeType}
                       variant="outlined"
                       fullWidth
                     />
