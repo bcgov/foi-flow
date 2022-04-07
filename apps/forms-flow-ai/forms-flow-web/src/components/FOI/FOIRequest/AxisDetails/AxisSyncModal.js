@@ -89,13 +89,19 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       else{
         if((key === 'Extensions'))
           return true;
-        if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
+        else if(key === 'compareReceivedDate'){
+          if(saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key])
+            return true;
+          return false;
+        }
+        else if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key]){
           return true;
+        }
       }
       return false;
     }
 
-    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {      
+    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {     
       switch (key) {
         case 'dueDate':
         case 'axisSyncDate':
@@ -105,15 +111,14 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis[key], "MMM dd yyyy");
           break;
         }
-        case 'receivedDateUF':{
+        case 'compareReceivedDate':
           updatedObj['receivedDate'] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
-        }
         case 'Extensions':
-            let extensionsArr = compareExtensions(key);
-            if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
-              (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
-              updatedObj[key] = extensionsArr;
+          let extensionsArr = compareExtensions(key);
+          if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
+            (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
+            updatedObj[key] = extensionsArr;
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -124,7 +129,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     const compareExtensions = (key) => {
       let extensionsArr = [];
-      if(extensions.length > 0){
+      if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0 && 
+          extensions.length === requestDetailsFromAxis[key]?.length ){
+            console.log(extensions.length);
+            console.log(requestDetailsFromAxis[key]?.length);
         requestDetailsFromAxis[key].forEach(axisObj => {
             extensions?.forEach(foiReqObj => {
               if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){

@@ -28,18 +28,13 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     requestType:"Request Type",
     receivedMode:"Received Mode",
     deliveryMode:"Delivery Mode",
-    receivedDateUF: "Received Date",
-    //receivedDate:"Received Date",
+    compareReceivedDate: "Received Date",
     requestStartDate:"Request Start Date",
     dueDate:"Legislated Due Date",
 
-    // additionalPersonalInfo:"Additional Personal Information",
-    // birthDate:"DOB",
-
     general:"Request Type General",
     personal:"Request Type Personal",
-    //selectedMinistries:"Selected Ministries",
-
+ 
     Extensions : "Extensions"
   };
   
