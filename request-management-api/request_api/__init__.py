@@ -75,7 +75,6 @@ def set_secure_headers(response):
     response.headers.add('Cross-Origin-Resource-Policy','same-origin')
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
-    response.headers['Clear-Site-Data'] = '"cache","cookies","storage"'
     return response
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):

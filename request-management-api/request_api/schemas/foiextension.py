@@ -1,6 +1,7 @@
 
 
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, validate
+from request_api.utils.constants import MAX_EXCEPTION_MESSAGE
 
 """
 This class  consolidates schemas of extension operations.
@@ -15,9 +16,9 @@ class FOIMinistryRequestDocumentSchema(Schema):
 
         unknown = EXCLUDE
     foiministrydocumentid = fields.Int(data_key="foiministrydocumentid",required=False, allow_none=True)
-    documentpath = fields.Str(data_key="documentpath",allow_none=False)
-    filename = fields.Str(data_key="filename",allow_none=False)
-    category = fields.Str(data_key="category",allow_none=False)
+    documentpath = fields.Str(data_key="documentpath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    category = fields.Str(data_key="category",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
 
 class FOIRequestExtensionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
