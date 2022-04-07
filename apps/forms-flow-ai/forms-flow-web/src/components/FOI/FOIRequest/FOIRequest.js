@@ -256,12 +256,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const checkValidation = (key,axisData) => {
     var mandatoryField = isMandatoryField(key);
-    if(key === 'compareReceivedDate'){
-      if(requestDetails['receivedDate'] !== axisData[key] && requestDetails['receivedDate'] !== axisData['receivedDate'])
+    if(key === 'compareReceivedDate' && 
+        (requestDetails['receivedDate'] !== axisData[key] && requestDetails['receivedDate'] !== axisData['receivedDate'])){
         return true;
-      return false;
     }
-    else if(mandatoryField && axisData[key] || !mandatoryField){
+    else if(key !== 'compareReceivedDate' && (mandatoryField && axisData[key] || !mandatoryField)){
       if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key])
         return true;
     }

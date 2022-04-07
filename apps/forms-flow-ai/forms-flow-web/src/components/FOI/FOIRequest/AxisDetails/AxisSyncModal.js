@@ -89,14 +89,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       else{
         if((key === 'Extensions'))
           return true;
-        else if(key === 'compareReceivedDate'){
-          if(saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key])
+        else if(key === 'compareReceivedDate' && (saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key])
             return true;
-          return false;
-        }
-        else if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key]){
+        else if(key !== 'compareReceivedDate' && (saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
           return true;
-        }
       }
       return false;
     }
