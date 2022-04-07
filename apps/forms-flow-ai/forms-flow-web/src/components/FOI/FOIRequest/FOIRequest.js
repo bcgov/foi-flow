@@ -209,7 +209,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             if(typeof(data) !== "string" && Object.entries(data).length > 0){
               setAxisSyncedData(data);
               var axisDataUpdated = checkIfAxisDataUpdated(data);
-              console.log("axisDataUpdated==>",axisDataUpdated);
               if(axisDataUpdated){
                 setCheckExtension(false);
                 setAxisMessage("WARNING");
@@ -233,11 +232,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
 
   useEffect(() => {
-    console.log("checkExtension==>",checkExtension);
-    console.log("axisMessage==>",axisMessage);
     if(checkExtension && Object.entries(axisSyncedData).length !== 0){
       var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
-      console.log("extension-update needed??",axisDataUpdated);
       if(axisDataUpdated)
         setAxisMessage("WARNING");
       else
@@ -261,26 +257,23 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const checkValidation = (key,axisData) => {
     var mandatoryField = isMandatoryField(key);
     if(key === 'compareReceivedDate'){
-      if(requestDetails['receivedDate'] !== axisData[key])
+      if(requestDetails['receivedDate'] !== axisData[key] && requestDetails['receivedDate'] !== axisData['receivedDate'])
         return true;
       return false;
     }
     else if(mandatoryField && axisData[key] || !mandatoryField){
-      if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key]){
+      if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key])
         return true;
-      }
     }
+    return false;
   }
 
   const extensionComparison = (axisData, key) => {
-    console.log("axis data length",axisData[key].length);
     if(requestExtensions.length !== axisData[key].length)
         return true;
     const axisReasonIds = axisData[key].map(x => x.extensionreasonid);
     const foiReqReasonIds = requestExtensions.map(x => x.extensionreasonid);
-    console.log("-->",axisReasonIds.filter(x => !foiReqReasonIds.includes(x)));
     if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
-      console.log(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length);
       return true;
     }
       
