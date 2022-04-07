@@ -188,7 +188,7 @@ export const createRequestDetailsObjectFunc = (
   requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
   switch (name) {
     case FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES:
-      requestObject.receivedDate = value.receivedDate;
+      requestObject.receivedDate = value.receivedDate?formatDate(value.receivedDate, "yyyy MMM, dd"): "";
       requestObject.receivedDateUF = value.receivedDate
         ? new Date(value.receivedDate).toISOString()
         : "";
