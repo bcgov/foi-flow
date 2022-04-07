@@ -101,6 +101,8 @@ export const getLDD = (params) => {
   const currentStatus = params.row.currentState;
   if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
     return "N/A";
+  } else if(!receivedDateString) {
+    return "";
   } else {
     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
   }
@@ -108,15 +110,14 @@ export const getLDD = (params) => {
 
 export const getDaysLeft = (params) => {
   const receivedDateString = params.row.duedate;
-  if (!receivedDateString) {
-    return "";
-  }
 
   if (
     params.row.currentState.toLowerCase() ===
     StateEnum.onhold.name.toLowerCase()
   ) {
     return "N/A";
+  } else if(!receivedDateString) {
+    return "";
   } else {
     return `${calculateDaysRemaining(receivedDateString)}`;
   }
