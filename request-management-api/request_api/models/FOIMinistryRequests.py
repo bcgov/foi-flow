@@ -246,7 +246,7 @@ class FOIMinistryRequest(db.Model):
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
         stateforsorting = case([
-                            (FOIRequestStatus.name == 'Open',
+                            (FOIRequestStatus.requeststatusid == 1, # Open
                              literal(None)),
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
@@ -270,6 +270,18 @@ class FOIMinistryRequest(db.Model):
                              ministryassignee.firstname),
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+        
+        duedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+        
+        cfrduedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
         requestpagecount = case([
             (FOIMinistryRequest.requestpagecount.is_(None),
             '0'),
@@ -294,8 +306,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
-            cast(FOIMinistryRequest.cfrduedate, String).label('cfrduedate'),
-            cast(FOIMinistryRequest.duedate, String).label('duedate'),
+            cfrduedate,
+            duedate,
             ApplicantCategory.name.label('applicantcategory'),
             FOIRequest.created_at.label('created_at'),
             func.lower(ProgramArea.bcgovcode).label('bcgovcode'),
@@ -308,7 +320,8 @@ class FOIMinistryRequest(db.Model):
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             stateforsorting,
             assignedtoformatted,
-            ministryassignedtoformatted
+            ministryassignedtoformatted,
+            FOIMinistryRequest.closedate
         ]
 
         basequery = _session.query(
@@ -405,7 +418,7 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -444,8 +457,9 @@ class FOIMinistryRequest(db.Model):
             'cfrduedate': FOIMinistryRequest.cfrduedate,
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
+            'ministry': func.upper(ProgramArea.bcgovcode),
             'requestPageCount': FOIMinistryRequest.requestpagecount,
-            'ministry': func.upper(ProgramArea.bcgovcode)
+            'closedate': FOIMinistryRequest.closedate
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -580,6 +594,18 @@ class FOIMinistryRequest(db.Model):
                              ministryassignee.firstname),
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+        
+        duedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+        
+        cfrduedate = case([
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
         requestpagecount = case([
             (FOIMinistryRequest.requestpagecount.is_(None),
@@ -605,8 +631,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
-            cast(FOIMinistryRequest.cfrduedate, String).label('cfrduedate'),
-            cast(FOIMinistryRequest.duedate, String).label('duedate'),
+            cfrduedate,
+            duedate,
             ApplicantCategory.name.label('applicantcategory'),
             FOIRequest.created_at.label('created_at'),
             func.lower(ProgramArea.bcgovcode).label('bcgovcode'),
@@ -619,7 +645,8 @@ class FOIMinistryRequest(db.Model):
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             stateforsorting,
             assignedtoformatted,
-            ministryassignedtoformatted
+            ministryassignedtoformatted,
+            FOIMinistryRequest.closedate
         ]
 
         basequery = _session.query(
@@ -733,11 +760,11 @@ class FOIMinistryRequest(db.Model):
             searchcondition = FOIMinistryRequest.getfilterforsearch(params, iaoassignee, ministryassignee)
             filtercondition.append(searchcondition)
 
-        if(params['fromdate'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield('receivedDate', iaoassignee, ministryassignee) >= params['fromdate'])
+        if(params['fromdate'] is not None and params['daterangetype'] is not None):
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) >= params['fromdate'])
 
-        if(params['todate'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) <= params['todate'])
+        if(params['todate'] is not None and params['daterangetype'] is not None):
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) <= params['todate'])
         
         return filtercondition
 
