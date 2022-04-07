@@ -1,4 +1,4 @@
-export const SearchFilter = Object.freeze({
+const SearchFilter = Object.freeze({
   REQUEST_DESCRIPTION: "REQUEST_DESCRIPTION",
   RAW_REQUEST_NUM: "RAW_REQUEST_NUMBER",
   ID_NUM: "ID_NUMBER",
@@ -7,3 +7,14 @@ export const SearchFilter = Object.freeze({
   ASSIGNEE_NAME: "ASSIGNEE_NAME",
   SUBJECT_CODE: "SUBJECT_CODE",
 });
+
+const DateRangeTypes = Object.freeze([
+  {name: "receivedDate", value: "Received Date"},
+  {name: "duedate", value: "Legislated Due Date"},
+  {name: "closedate", value: "Closed Date"},
+]);
+
+export {
+  SearchFilter,
+  DateRangeTypes
+};

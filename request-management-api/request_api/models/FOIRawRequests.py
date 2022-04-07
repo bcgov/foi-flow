@@ -16,6 +16,8 @@ from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIAssignees import FOIAssignee
 
+from dateutil import parser
+
 class FOIRawRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequests' 
@@ -268,6 +270,8 @@ class FOIRawRequest(db.Model):
                              FOIAssignee.lastname),
                             (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
                              FOIAssignee.firstname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.is_(None)),
+                             'Unassigned'),
                            ],
                            else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
 
@@ -315,7 +319,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('onBehalfLastName'),
             FOIRawRequest.status.label('stateForSorting'),
             assignedtoformatted,
-            literal(None).label('ministryAssignedToFormatted')
+            literal(None).label('ministryAssignedToFormatted'),
+            literal(None).label('closedate')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -472,7 +477,7 @@ class FOIRawRequest(db.Model):
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):
-            if(params['requeststatus'][0] == 'overdue'):
+            if(len(params['requeststatus']) == 1 and params['requeststatus'][0] == 'overdue'):
                 #no rawrequest returned for this case
                 filtercondition.append(FOIRawRequest.status == 'ReturnNothing')
             else:
@@ -493,13 +498,44 @@ class FOIRawRequest(db.Model):
             searchcondition = FOIRawRequest.getfilterforsearch(params)
             filtercondition.append(searchcondition)
 
-        if(params['fromdate'] is not None):
-            filtercondition.append(FOIRawRequest.findfield('receivedDate') >= params['fromdate'])
+        if(params['daterangetype'] is not None):
+            filterconditionfordate = FOIRawRequest.getfilterfordate(params)
+            filtercondition += filterconditionfordate
 
-        if(params['todate'] is not None):
-            filtercondition.append(FOIRawRequest.findfield('duedate') <= params['todate'])
-        
         return filtercondition
+
+    @classmethod
+    def getfilterfordate(cls, params):
+        filterconditionfordate = []
+        if(params['daterangetype'] == 'closedate'):
+            #no rawrequest returned for this case
+            filterconditionfordate.append(FOIRawRequest.requestid < 0)
+        else:
+            if(params['fromdate'] is not None):
+                if(params['daterangetype'] == 'receivedDate'):
+                    #online form submission has no receivedDate in json - using created_at
+                    filterconditionfordate.append(
+                        or_(
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at >= parser.parse(params['fromdate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate']),
+                        )
+                    )
+                else:
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate'])
+
+            if(params['todate'] is not None):
+                if(params['daterangetype'] == 'receivedDate'):
+                    #online form submission has no receivedDate in json - using created_at
+                    filterconditionfordate.append(
+                        or_(
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at <= parser.parse(params['todate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate'])),
+                        )
+                    )
+                else:
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate']))
+
+        return filterconditionfordate
 
     @classmethod
     def getfilterforrequeststate(cls, params, includeclosed):
@@ -576,6 +612,15 @@ class FOIRawRequest(db.Model):
                 keyword = keyword.replace('u-00', '')
                 searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
             return and_(*searchcondition)
+        elif(params['search'] == 'axisrequest_number'):
+            searchcondition1 = []
+            searchcondition2 = []
+            for keyword in params['keywords']:
+                keyword = keyword.lower()
+                keyword = keyword.replace('u-00', '')
+                searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
+                searchcondition2.append(FOIRawRequest.findfield('axisrequest_number').ilike('%'+keyword+'%'))
+            return or_(and_(*searchcondition1), and_(*searchcondition2))
         else:
             searchcondition = []
             for keyword in params['keywords']:
