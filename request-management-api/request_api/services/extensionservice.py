@@ -94,6 +94,7 @@ class extensionservice:
     
     def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
         version = self.__getversionforrequest(ministryrequestid)
+        print("---------------before delete-------------------")
         # delete all exisitng extensions for this ministry
         FOIRequestExtension.deleteextensionbyministry(ministryrequestid)
         newextensions = []
