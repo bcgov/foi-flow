@@ -16,6 +16,8 @@ from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIAssignees import FOIAssignee
 
+from dateutil import parser
+
 class FOIRawRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequests' 
@@ -268,6 +270,8 @@ class FOIRawRequest(db.Model):
                              FOIAssignee.lastname),
                             (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
                              FOIAssignee.firstname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.is_(None)),
+                             'Unassigned'),
                            ],
                            else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
 
@@ -473,7 +477,7 @@ class FOIRawRequest(db.Model):
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):
-            if(params['requeststatus'][0] == 'overdue'):
+            if(len(params['requeststatus']) == 1 and params['requeststatus'][0] == 'overdue'):
                 #no rawrequest returned for this case
                 filtercondition.append(FOIRawRequest.status == 'ReturnNothing')
             else:
@@ -494,28 +498,26 @@ class FOIRawRequest(db.Model):
             searchcondition = FOIRawRequest.getfilterforsearch(params)
             filtercondition.append(searchcondition)
 
-        if(params['daterangetype'] == 'closedate'):
-            #no rawrequest returned for this case
-            filtercondition.append(FOIRawRequest.requestid < 0)
-        else:
-            filtercondition.append(FOIRawRequest.getfilterforfromdate(params))
-            filtercondition.append(FOIRawRequest.getfilterfortodate(params))
+        if(params['daterangetype'] is not None):
+            filterconditionfordate = FOIRawRequest.getfilterfordate(params)
+            filtercondition += filterconditionfordate
 
         return filtercondition
 
     @classmethod
-    def getfilterforfromdate(cls, params):
-        if(params['daterangetype'] is not None and params['fromdate'] is not None):
-            return FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate']
+    def getfilterfordate(cls, params):
+        filterconditionfordate = []
+        if(params['daterangetype'] == 'closedate'):
+            #no rawrequest returned for this case
+            filterconditionfordate.append(FOIRawRequest.requestid < 0)
         else:
-            return None
+            if(params['fromdate'] is not None):
+                filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate'])
 
-    @classmethod
-    def getfilterfortodate(cls, params):
-        if(params['daterangetype'] is not None and params['todate'] is not None):
-            return FOIRawRequest.findfield(params['daterangetype']) <= params['todate']
-        else:
-            return None
+            if(params['todate'] is not None):
+                filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate']))
+
+        return filterconditionfordate
 
     @classmethod
     def getfilterforrequeststate(cls, params, includeclosed):
