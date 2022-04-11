@@ -1,0 +1,321 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: ${NAME}
+objects:
+  - apiVersion: v1
+    data:
+      mail-config.properties: |
+        # send mails via SMTP
+        mail.transport.protocol=smtp
+        mail.smtp.host=${SMTP_SERVER}
+        mail.smtp.port=25
+        mail.smtp.auth=false
+        mail.smtp.ssl.enable=false
+        #mail.smtp.socketFactory.port=465
+        #mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory
+        # poll mails via IMAPS
+        #mail.store.protocol=imaps
+        # mail.imaps.host=imap.gmail.com
+        #mail.imaps.port=993
+        #mail.imaps.timeout=10000
+        # additional config
+        #mail.poll.folder=INBOX
+        mail.sender=donotreply@gov.bc.ca
+        mail.sender.alias=DoNotReply
+        mail.attachment.download=true
+        mail.attachment.path=attachments
+        # credentials
+        mail.user=
+        mail.password=
+    kind: ConfigMap
+    metadata:
+      labels:
+        app: ${NAME}
+      name: ${NAME}-mail-config
+
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      labels:
+        app: ${NAME}
+      name: ${NAME}
+    spec:
+      host: ${CAMUNDA_URL}
+      path: /camunda
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
+      to:
+        kind: Service
+        name: ${NAME}
+      wildcardPolicy: None
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: ${NAME}
+      name: ${NAME}
+    spec:
+      ports:
+        - name: web
+          port: 8080
+          targetPort: 8080
+      selector:
+        app: ${NAME}
+
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      annotations:
+      labels:
+        app: ${NAME}
+      name: ${NAME}
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        app: ${NAME}
+      strategy:
+        activeDeadlineSeconds: 21600
+        resources: {}
+        rollingParams:
+          intervalSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
+          updatePeriodSeconds: 1
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: ${NAME}
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: name
+                        operator: In
+                        values:
+                          - ${NAME}
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - env:
+                - name: APP_SECURITY_ORIGIN
+                  value: ${APP_SECURITY_ORIGIN}
+                - name: CAMUNDA_JDBC_DRIVER
+                  value: 'org.postgresql.Driver'  
+                - name: DATABASE_SERVICE_NAME
+                  value: ${DATABASE_SERVICE_NAME}
+                - name: CAMUNDA_JDBC_URL
+                  value: jdbc:postgresql://${DATABASE_SERVICE_NAME}:${DATABASE_PORT}/${DATABASE_NAME}
+                - name: WAIT_FOR
+                  value: ${DATABASE_SERVICE_NAME}:${DATABASE_PORT}
+                - name: CAMUNDA_JDBC_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: app-db-username
+                      name: ${DATABASE_SECRET}
+                - name: CAMUNDA_JDBC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: app-db-password
+                      name: ${DATABASE_SECRET}                      
+                - name: KEYCLOAK_URL
+                  value: ${KEYCLOAK_URL}
+                - name: KEYCLOAK_URL_REALM
+                  value: ${KEYCLOAK_URL_REALM}
+                - name: KEYCLOAK_CLIENTID
+                  value: ${KEYCLOAK_CLIENTID}
+                - name: KEYCLOAK_CLIENTSECRET
+                  valueFrom:
+                    secretKeyRef:
+                      key: BPM_CLIENT_SECRET
+                      name: ${FOI_SECRET}
+                - name: DEBUG
+                  value: "False"
+                - name: MAIL_CONFIG
+                  value: /app/mail-config.properties
+                - name: TZ
+                  value: UTC
+                - name: CAMUNDA_JDBC_DB
+                  value: ${DATABASE_NAME}
+                - name: FORMSFLOW_API_URL
+                  value: ${FORMSFLOW_API_URL}
+                - name: CAMUNDA_APP_ROOT_LOG_FLAG
+                  value: ${CAMUNDA_APP_ROOT_LOG_FLAG}
+                - name: WEBSOCKET_ENCRYPT_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: WEBSOCKET_ENCRYPT_KEY
+                      name: ${FOI_SECRET}
+                - name: WEBSOCKET_MESSAGE_TYPE
+                  value: ${WEBSOCKET_MESSAGE_TYPE}
+                - name: WEBSOCKET_SECURITY_ORIGIN
+                  value: ${WEBSOCKET_SECURITY_ORIGIN}
+                - name: WEBSOCKET_BROKER_HOST
+                  value: ${WEBSOCKET_BROKER_HOST}
+                - name: WEBSOCKET_BROKER_PORT
+                  value: ${WEBSOCKET_BROKER_PORT}   
+                - name: WEBSOCKET_BROKER_PASSCODE
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: ${MSGBROKER_SECRET}                 
+                - name: WEBSOCKET_FOI_RAWREQUEST_TOPIC
+                  value: ${WEBSOCKET_FOI_RAWREQUEST_TOPIC}                      
+                - name: FORMSFLOW_WF_URL
+                  value: ${FORMSFLOW_WF_URL}                     
+                - name: FOI_REQ_MANAGEMENT_API_URL
+                  value: ${FOI_REQ_MANAGEMENT_API_URL}  
+              imagePullPolicy: Always
+              name: ${NAME}
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /camunda/actuator/health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 60
+                successThreshold: 1
+                timeoutSeconds: 3
+              resources:
+                limits:
+                  cpu: 600m
+                  memory: 1Gi
+                requests:
+                  cpu: 200m
+                  memory: 512Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /app/mail-config.properties
+                  name: ${NAME}-mail-config
+                  subPath: mail-config.properties
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                items:
+                  - key: mail-config.properties
+                    path: mail-config.properties
+                name: ${NAME}-mail-config
+              name: ${NAME}-mail-config
+      test: false
+      triggers:
+      - type: ConfigChange
+      - imageChangeParams:
+          automatic: true
+          containerNames:
+          - ${NAME}
+          from:
+            kind: ImageStreamTag
+            name: ${NAME}:${IMAGE_TAG}
+            namespace: ${TOOLS_WORKSPACE}
+        type: ImageChange
+
+parameters:
+  - name: NAME
+    description: The name for all created objects.
+    required: true
+    value: forms-flow-bpm
+  - name: IMAGE_TAG
+    description: The image tag to pull for the deployment.
+    required: true
+    value: ""
+  - name: TOOLS_WORKSPACE
+    description: The location for your image streams (Tools Workspace).
+    required: true
+    value: ""
+  - name: APP_SECURITY_ORIGIN
+    description: Secrets are referred from this.
+    required: true
+    value: ""
+  - name: DATABASE_SECRET
+    description: Secrets are referred from this.
+    required: true
+    value: patroni-001
+  - name: FOI_SECRET
+    description: Secrets are referred from this.
+    required: true
+    value: foi
+  - name: MSGBROKER_SECRET
+    description: Secrets are referred from this.
+    required: true
+    value: redis-foi-msgbroker-secret
+  - name: DATABASE_SERVICE_NAME
+    description: The Service name used to connect to the database.
+    required: true
+    value: "patroni-master-001"
+  - name: DATABASE_NAME
+    description: The name of the database to connect to.
+    required: true
+    value: "ffa-camunda"
+  - name: DATABASE_PORT
+    description: The port that the database is running on.
+    required: true
+    value: "5432"  
+  - name: FORMSFLOW_API_URL
+    description: FORMSFLOW_API_URL
+    required: true
+    value: "NA"
+  - name: CAMUNDA_APP_ROOT_LOG_FLAG
+    description: CAMUNDA_APP_ROOT_LOG_FLAG
+    required: true
+    value: "info"
+  - name: KEYCLOAK_URL
+    description: The URL used to connnect to the OIDC provider.
+    required: true
+    value: ""
+  - name: KEYCLOAK_URL_REALM
+    description: The realm from OIDC provider.
+    required: true
+    value: ""
+  - name: KEYCLOAK_CLIENTID
+    description: The Client ID.
+    required: true
+    value: "forms-flow-bpm"
+  - name: CAMUNDA_URL
+    displayName: CAMUNDA_URL
+    description:
+      Route to access Camunda
+    required: true
+  - name: WEBSOCKET_MESSAGE_TYPE
+    description: WEBSOCKET_MESSAGE_TYPE
+    required: true
+    value: "TASK_EVENT"
+  - name: WEBSOCKET_SECURITY_ORIGIN
+    description: WEBSOCKET_SECURITY_ORIGIN
+    required: false
+    value: ""
+  - name: WEBSOCKET_BROKER_HOST
+    description: WEBSOCKET_BROKER_HOST
+    required: true
+    value: "redis-foi-msgbroker"
+  - name: WEBSOCKET_BROKER_PORT
+    description: WEBSOCKET_BROKER_PORT
+    required: true
+    value: "6379"
+  - name: WEBSOCKET_FOI_RAWREQUEST_TOPIC
+    description: WEBSOCKET_FOI_RAWREQUEST_TOPIC
+    required: true
+    value: "foi-rawrequest"
+  - name: FORMSFLOW_WF_URL
+    description: FORMSFLOW_WF_URL
+    required: true
+    value: ""
+  - name: FOI_REQ_MANAGEMENT_API_URL
+    description: FOI_REQ_MANAGEMENT_API_URL
+    required: true
+    value: ""
