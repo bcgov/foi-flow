@@ -47,6 +47,7 @@ namespace MCS.FOI.AXISIntegration.DAL
 
                     axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");
                     axisRequest.ReceivedDateUF = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd HH:mm:ss.ffffff");
+                    axisRequest.CompareReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy MMM, dd");
                     axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
                     axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
                     axisRequest.CFRDueDate = RequestsHelper.ConvertDateToString(row, "cfrDueDate", "yyyy-MM-dd");
@@ -206,9 +207,8 @@ namespace MCS.FOI.AXISIntegration.DAL
             string query = @"SELECT loc.vcTerminology AS reason, reqextn.cApprovedStatus AS [status], reqextn.sdtExtendedDate AS extendedduedate, 
                 reqextn.siExtensionDays AS extensiondays, reqextn.dtApprovedDate AS decisiondate 
                 FROM tblRequests req WITH (NOLOCK) INNER JOIN tblRequestExtensions reqextn WITH (NOLOCK) ON req.iRequestID = reqextn.iRequestID 
-                AND req.tiExtension = reqextn.tiExtension 
                 AND req.vcVisibleRequestID = @vcVisibleRequestID
-                INNER JOIN tblExtensions extn WITH (NOLOCK) ON req.tiExtension = extn.tiExtension 
+                INNER JOIN tblExtensions extn WITH (NOLOCK) ON reqextn.tiExtension = extn.tiExtension 
                 LEFT OUTER JOIN tblTerminologyLookup loc WITH (NOLOCK) ON loc.iLabelID = extn.iLabelID AND loc.tiLocaleID = 1";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
