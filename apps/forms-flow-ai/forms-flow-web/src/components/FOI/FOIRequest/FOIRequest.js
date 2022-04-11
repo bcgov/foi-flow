@@ -256,7 +256,20 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const checkValidation = (key,axisData) => {
     var mandatoryField = isMandatoryField(key);
-    if(key === 'compareReceivedDate' && 
+    if(key === 'additionalPersonalInfo'){
+      let foiReqAdditionalPersonalInfo = requestDetails[key];
+      let axisAdditionalPersonalInfo = axisData[key];
+      for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+        for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+          if(axisKey === reqKey){
+            if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+              return true;
+            }
+          }
+        }
+      }
+    }
+    else if(key === 'compareReceivedDate' && 
         (requestDetails['receivedDate'] !== axisData[key] && requestDetails['receivedDate'] !== axisData['receivedDate'])){
         return true;
     }

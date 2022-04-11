@@ -87,7 +87,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       if(mandatoryField && !requestDetailsFromAxis[key])
         return false;
       else{
-        if((key === 'Extensions'))
+        if(key === 'Extensions' || key === 'additionalPersonalInfo')
           return true;
         else if(key === 'compareReceivedDate' && (saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key])){
           return true;
@@ -112,6 +112,16 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'compareReceivedDate':
           updatedObj['receivedDate'] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
+        case 'additionalPersonalInfo':
+          let foiReqAdditionalPersonalInfo = saveRequestObject[key];
+          let axisAdditionalPersonalInfo = requestDetailsFromAxis[key];
+          for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+            for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+              updatedObj = compareAdditionalPersonalInfo(axisKey , reqKey, axisAdditionalPersonalInfo, 
+                foiReqAdditionalPersonalInfo, updatedObj);
+            }
+          }
+          break;
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
           if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
@@ -123,6 +133,25 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           break;
       }
       
+    }
+
+    const compareAdditionalPersonalInfo = (axisKey , reqKey, axisAdditionalPersonalInfo, 
+      foiReqAdditionalPersonalInfo, updatedObj) => {
+      if(axisKey === reqKey){
+        if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+          if(axisKey === 'birthDate')
+            updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey] && 
+              formatDate(axisAdditionalPersonalInfo[axisKey], "MMM dd yyyy");
+          else{
+            if(isAxisSyncDisplayField(axisKey))
+              updatedObj[isAxisSyncDisplayField(axisKey)] = axisAdditionalPersonalInfo[axisKey];
+            else
+              updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey];
+          }
+            
+        }
+      }
+      return updatedObj;
     }
 
     const compareExtensions = (key) => {
