@@ -72,6 +72,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.WorkPhonePrimary = Convert.ToString(row["workPhonePrimary"]);
                     axisRequest.WorkPhoneSecondary = Convert.ToString(row["workPhoneSecondary"]);
                     string applicantDOB = RequestsHelper.ConvertDateToString(row, "birthDate", "yyyy-MM-dd");
+                    applicantDOB = applicantDOB != null ? applicantDOB : "";
                     axisRequest.AdditionalPersonalInfo = new AdditionalPersonalInformation(applicantDOB, Convert.ToString(row["onbehalfFirstName"]), Convert.ToString(row["onbehalfMiddleName"]), Convert.ToString(row["onbehalfLastName"]));
 
                     axisRequest.RequestDescription = Convert.ToString(row["description"]);
