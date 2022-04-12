@@ -44,8 +44,6 @@ const initKeycloak = (store, ...rest) => {
         const UserRoles = KeycloakData.resourceAccess[Keycloak_Client].roles;
         store.dispatch(setUserRole(UserRoles));
         store.dispatch(setUserToken(KeycloakData.token));
-        //Set Cammunda/Formio Base URL
-        setApiBaseUrlToLocalStorage();
 
         KeycloakData.loadUserInfo().then((res) => {
           store.dispatch(setUserDetails(res));
@@ -93,12 +91,6 @@ const userLogout = () => {
   sessionStorage.clear();
   clearInterval(refreshInterval);
   doLogout();
-};
-
-const setApiBaseUrlToLocalStorage = () => {
-  localStorage.setItem("formioApiUrl", AppConfig.projectUrl);
-  localStorage.setItem("formsflow.ai.url", window.location.origin);
-  localStorage.setItem("formsflow.ai.api.url", WEB_BASE_URL);
 };
 
 const authenticateAnonymousUser = (store) => {

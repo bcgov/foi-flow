@@ -160,8 +160,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
     requestState.toLowerCase() !==
       StateEnum.intakeinprogress.name.toLowerCase();
-  const [axisSyncedData, setAxisSyncedData] = useState(false);
-
+  const [axisSyncedData, setAxisSyncedData] = useState({});
+  const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
 
   useEffect(() => {
@@ -209,8 +209,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
             if(typeof(data) !== "string" && Object.entries(data).length > 0){
               setAxisSyncedData(data);
               var axisDataUpdated = checkIfAxisDataUpdated(data);
-              if(axisDataUpdated)
+              if(axisDataUpdated){
+                setCheckExtension(false);
                 setAxisMessage("WARNING");
+              }
             }
             else if(data){
               let responseMsg = data;
@@ -228,41 +230,83 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [requestDetails]);
 
+
+  useEffect(() => {
+    if(checkExtension && Object.entries(axisSyncedData).length !== 0){
+      var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
+      if(axisDataUpdated)
+        setAxisMessage("WARNING");
+      else
+        setAxisMessage("");
+    }
+  }, [axisSyncedData, requestExtensions, checkExtension]);
+
   const checkIfAxisDataUpdated = (axisData) => {
     var updateNeeded= false;
     for(let key of Object.keys(axisData)){
       var updatedField = isAxisSyncDisplayField(key);
-      if(updatedField)
+      if(key !== 'Extensions' && updatedField)
         updateNeeded= checkValidation(key, axisData);
-      if(updateNeeded)
+      if(updateNeeded){
         return true;
+      }
     }
     return false;
   };
 
   const checkValidation = (key,axisData) => {
     var mandatoryField = isMandatoryField(key);
-    if(key === 'Extensions')
-        return extensionComparison(axisData, key);
-    if(mandatoryField && axisData[key] || !mandatoryField){
+    if(key === 'additionalPersonalInfo'){
+      let foiReqAdditionalPersonalInfo = requestDetails[key];
+      let axisAdditionalPersonalInfo = axisData[key];
+      for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+        for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+          if(axisKey === reqKey){
+            if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+              return true;
+            }
+          }
+        }
+      }
+    }
+    else if(key === 'compareReceivedDate' && 
+        (requestDetails['receivedDate'] !== axisData[key] && requestDetails['receivedDate'] !== axisData['receivedDate'])){
+        return true;
+    }
+    else if(key !== 'compareReceivedDate' && (mandatoryField && axisData[key] || !mandatoryField)){
       if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key])
         return true;
     }
+    return false;
   }
 
   const extensionComparison = (axisData, key) => {
-    if(requestExtensions.length > 0){
-      axisData[key].forEach(obj => {
-         requestExtensions?.forEach(obj1 => {
-           if(obj !== obj1)
-             return true;
-         })
-     });
-   }
-   else{
-    if(axisData[key].length > 0)
+    if(requestExtensions.length !== axisData[key].length)
+        return true;
+    const axisReasonIds = axisData[key].map(x => x.extensionreasonid);
+    const foiReqReasonIds = requestExtensions.map(x => x.extensionreasonid);
+    if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
       return true;
-   }
+    }
+      
+    if(requestExtensions.length > 0 && axisData[key].length > 0){
+      axisData[key].forEach(axisObj => {
+        requestExtensions?.forEach(foiReqObj => {
+          if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
+            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
+              axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
+              axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
+              !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
+              return true;
+            }
+          }
+        })
+      });
+    }
+    else{
+      if(axisData[key]?.length > 0)
+        return true;
+    }
    return false;
   }
 
@@ -594,7 +638,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
             <h1>
-              <a href="/foi/dashboard">FOI</a>
+              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
             </h1>
           </div>
           <div className="foileftpaneldropdown">

@@ -1,6 +1,7 @@
 
 
 from marshmallow import EXCLUDE, Schema, fields, validate
+from request_api.utils.constants import MAX_EXCEPTION_MESSAGE
 
 """
 This class  consolidates schemas of document operations.
@@ -20,9 +21,9 @@ class ReplaceDocumentSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    filename = fields.Str(data_key="filename",required=True,allow_none=False)
-    documentpath = fields.Str(data_key="documentpath",required=True,allow_none=False)
-    category = fields.Str(data_key="category",allow_none=True)
+    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    documentpath = fields.Str(data_key="documentpath",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    category = fields.Str(data_key="category",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     
 
 class DocumentSchema(Schema):
@@ -30,9 +31,9 @@ class DocumentSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    filename = fields.Str(data_key="filename",required=True,allow_none=False)
-    documentpath = fields.Str(data_key="documentpath",required=True,allow_none=False)
-    category = fields.Str(data_key="category",allow_none=True)   
+    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    documentpath = fields.Str(data_key="documentpath",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    category = fields.Str(data_key="category",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
 
 class CreateDocumentSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

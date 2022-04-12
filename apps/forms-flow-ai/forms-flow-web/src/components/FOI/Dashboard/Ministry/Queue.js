@@ -96,6 +96,8 @@ const Queue = ({ userDetail, tableInfo }) => {
     const currentStatus = params.row.currentState;
     if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
       return "N/A";
+    } else if(!receivedDateString) {
+      return "";
     } else {
       return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
     }
@@ -106,6 +108,8 @@ const Queue = ({ userDetail, tableInfo }) => {
     const currentStatus = params.row.currentState;
     if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
       return "N/A";
+    } else if(!receivedDateString) {
+      return "";
     } else {
       return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
     }

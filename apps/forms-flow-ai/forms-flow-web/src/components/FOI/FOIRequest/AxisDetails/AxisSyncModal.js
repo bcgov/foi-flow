@@ -13,7 +13,6 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
-import AXIS_SYNC_DISPLAY_FIELDS from '../../../../constants/FOI/axisSyncDisplayFields';
 import { useDispatch, useSelector} from "react-redux";
 import { saveRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
 import {
@@ -26,7 +25,6 @@ import { createRequestDetailsObjectFunc,
          isAxisSyncDisplayField,
          isMandatoryField } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
-import MANDATORY_FOI_REQUEST_FIELDS from "../../../../constants/FOI/mandatoryFOIRequestFields";
 
 
 const useStyles = makeStyles({
@@ -73,9 +71,14 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           var updateNeeded= checkValidation(key);
           if(updateNeeded){
             assignDisplayedReqObj(key, updatedObj, updatedField);
-            if(key !== 'Extensions')
+            if(key !== 'Extensions' && key !== 'compareReceivedDate' && key !== 'cfrDueDate' ||
+              (key === 'cfrDueDate' && requestDetailsFromAxis[key]) ){
               saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
                 key, requestDetailsFromAxis[key], "");
+            }
+            else if(key === 'compareReceivedDate') 
+              saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
+                'receivedDate', requestDetailsFromAxis[key], "");
           }
         }
       }
@@ -89,33 +92,47 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       if(mandatoryField && !requestDetailsFromAxis[key])
         return false;
       else{
-        if((key === 'Extensions'))
+        if(key === 'Extensions' || key === 'additionalPersonalInfo')
           return true;
-        if((saveRequestObject[key] || requestDetailsFromAxis[key]) && saveRequestObject[key] !== requestDetailsFromAxis[key])
+        else if(key === 'compareReceivedDate' && (saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key])){
+          return true;
+        }
+        else if(key !== 'compareReceivedDate' && (saveRequestObject[key] || requestDetailsFromAxis[key]) && 
+          saveRequestObject[key] !== requestDetailsFromAxis[key])
           return true;
       }
       return false;
     }
 
-    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {      
+    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {     
       switch (key) {
         case 'dueDate':
         case 'axisSyncDate':
         case 'fromDate': 
         case 'toDate':
+        case 'cfrDueDate':
         case 'originalDueDate':{
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis[key], "MMM dd yyyy");
           break;
         }
-        case 'receivedDateUF':{
-          updatedObj['receivedDate'] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
+        case 'compareReceivedDate':
+          updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
-        }
+        case 'additionalPersonalInfo':
+          let foiReqAdditionalPersonalInfo = saveRequestObject[key];
+          let axisAdditionalPersonalInfo = requestDetailsFromAxis[key];
+          for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+            for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+              updatedObj = compareAdditionalPersonalInfo(axisKey , reqKey, axisAdditionalPersonalInfo, 
+                foiReqAdditionalPersonalInfo, updatedObj);
+            }
+          }
+          break;
         case 'Extensions':
-            let extensionsArr = compareExtensions(key);
-            if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
-              (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
-              updatedObj[key] = extensionsArr;
+          let extensionsArr = compareExtensions(key);
+          if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
+            (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
+            updatedObj[key] = extensionsArr;
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -124,9 +141,51 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       
     }
 
+    const compareAdditionalPersonalInfo = (axisKey , reqKey, axisAdditionalPersonalInfo, 
+      foiReqAdditionalPersonalInfo, updatedObj) => {
+      if(axisKey === reqKey){
+        if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+          if(axisKey === 'birthDate')
+            updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey] && 
+              formatDate(axisAdditionalPersonalInfo[axisKey], "MMM dd yyyy");
+          else{
+            if(isAxisSyncDisplayField(axisKey))
+              updatedObj[isAxisSyncDisplayField(axisKey)] = axisAdditionalPersonalInfo[axisKey];
+            else
+              updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey];
+          }
+            
+        }
+      }
+      return updatedObj;
+    }
+
     const compareExtensions = (key) => {
       let extensionsArr = [];
-      if(extensions.length > 0){
+      if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0 && 
+          extensions.length === requestDetailsFromAxis[key]?.length ){
+            extensionsArr = assignExtensionForDsiplay(key,extensionsArr);
+      }
+      else{
+        requestDetailsFromAxis[key].forEach(obj => {
+          const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+          extensionsArr.push(property);
+        });
+      }
+    return extensionsArr;
+    } 
+
+
+    const assignExtensionForDsiplay = (key,extensionsArr) => {
+      const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
+      const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
+      if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
+        requestDetailsFromAxis[key].forEach(obj => {
+          const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+          extensionsArr.push(property);
+        });
+      }
+      else{
         requestDetailsFromAxis[key].forEach(axisObj => {
             extensions?.forEach(foiReqObj => {
               if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
@@ -140,15 +199,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
               }
             })
         });
+      }
+      return extensionsArr;
     }
-    else{
-      requestDetailsFromAxis[key].forEach(obj => {
-        const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
-        extensionsArr.push(property);
-      });
-    }
-    return extensionsArr;
-    } 
 
     const handleClose = () => {
         setAxisSyncModalOpen(false);

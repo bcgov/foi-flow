@@ -30,7 +30,10 @@ namespace MCS.FOI.AXISIntegration.DataModels
        
         [DataMember(Name = "receivedDate")]
         public string ReceivedDate { get; set; }
-       
+
+        [DataMember(Name = "compareReceivedDate")]
+        public string CompareReceivedDate { get; set; }
+
         [DataMember(Name = "receivedDateUF")]
         public string ReceivedDateUF { get; set; }
        
