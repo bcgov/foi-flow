@@ -184,3 +184,9 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
 nav.MuiPagination-root {
     background-color: white !important;
 }
+
+.floatAboveEverything {
+	z-index: 999;
+	position: absolute;
+    margin: 125px auto auto 97%; 
+}

@@ -8,11 +8,12 @@ import { setUserAuth } from "../../actions/bpmActions";
 import Home from "./Home";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
+import { decrypt } from "../../helper/FOI/helper";
 
 const FOIUnAuthenticateRouting = React.memo((props) => {
   let isAuth = false;
 
-  const authToken = localStorage.getItem("authToken"); 
+  const authToken = decrypt(localStorage.getItem("authToken")); 
   
   if(authToken !== null && authToken !== '' && authToken !== undefined) {
     isAuth = true;

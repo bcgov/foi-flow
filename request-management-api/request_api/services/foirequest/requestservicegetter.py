@@ -89,8 +89,7 @@ class requestservicegetter:
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
             additionalpersonalinfo.update(additionalpersonalinfodetails)                
-            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
-            
+            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
         return baserequestinfo
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
@@ -110,6 +109,7 @@ class requestservicegetter:
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
             'axisSyncDate': parse(requestministry["axissyncdate"]).strftime('%Y-%m-%d %H:%M:%S.%f') if axissyncdatenoneorempty == False else None,
+            'requestPageCount': requestministry["requestpagecount"],
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
@@ -137,7 +137,7 @@ class requestservicegetter:
     
     def getdivisions(self, ministrydivisions):
         divisions = []
-        if ministrydivisions is not None:            
+        if ministrydivisions is not None:                      
             for ministrydivision in ministrydivisions:
                 division = {
                     "foiministrydivisionid": ministrydivision["foiministrydivisionid"],
@@ -145,8 +145,10 @@ class requestservicegetter:
                     "divisionname": ministrydivision["division.name"],
                     "stageid": ministrydivision["stage.stageid"],
                     "stagename": ministrydivision["stage.name"],
+                    "divisionDueDate": parse(ministrydivision['divisionduedate']).strftime(self.__genericdateformat()) if ministrydivision['divisionduedate'] is not None else None,
+                    "eApproval": ministrydivision["eapproval"]
                     } 
-                divisions.append(division)
+                divisions.append(division) 
         return divisions
 
     

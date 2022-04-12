@@ -13,7 +13,8 @@ const AxisDetails = React.memo(({
     foiAxisRequestIds,
     handleAxisDetailsInitialValue,
     handleAxisDetailsValue,
-    handleAxisIdValidation
+    handleAxisIdValidation,
+    setAxisMessage
 }) => {
     const dispatch = useDispatch();
     const [axisRequestId, setAxisRequestId] = React.useState("");
@@ -62,7 +63,15 @@ const AxisDetails = React.memo(({
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}
                     setValidation(axisIdValidation);  
                 }
+                else if(data){
+                    let responseMsg = data;
+                    responseMsg+='';
+                    if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+                      setAxisMessage("ERROR");
+                }
             }
+            else
+                setAxisMessage("ERROR");
         }));
     }
 

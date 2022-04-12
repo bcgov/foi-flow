@@ -19,6 +19,7 @@ class FOIRawRequestNotification(db.Model):
     requestid =db.Column(db.Integer,  db.ForeignKey('FOIRawRequests.requestid'))
     version =db.Column(db.Integer, db.ForeignKey('FOIRawRequests.version'))    
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
+    axisnumber = db.Column(db.String(50), unique=False, nullable=True)
     notification = db.Column(JSON, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
@@ -32,16 +33,24 @@ class FOIRawRequestNotification(db.Model):
         
     @classmethod
     def savenotification(cls,foinotification)->DefaultMethodResult:
-        db.session.add(foinotification)
-        db.session.commit()
-        return DefaultMethodResult(True,'Notification added',foinotification.requestid)
+        try:
+            db.session.add(foinotification)
+            db.session.commit()
+            return DefaultMethodResult(True,'Notification added',foinotification.requestid)
+        except:
+            db.session.rollback()
+            raise
       
     @classmethod
     def dismissnotification(cls, notificationids):
-        db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
-        db.session.commit()  
-        return DefaultMethodResult(True,'Notifications deleted ', notificationids)
-
+        try:
+            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
+            db.session.commit()  
+            return DefaultMethodResult(True,'Notifications deleted ', notificationids)
+        except:
+            db.session.rollback()
+            raise
+        
     @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
         sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
