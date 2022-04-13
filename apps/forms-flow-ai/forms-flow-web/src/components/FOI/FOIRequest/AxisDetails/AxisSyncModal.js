@@ -71,9 +71,14 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           var updateNeeded= checkValidation(key);
           if(updateNeeded){
             assignDisplayedReqObj(key, updatedObj, updatedField);
-            if(key !== 'Extensions')
+            if(key !== 'Extensions' && key !== 'compareReceivedDate' && key !== 'cfrDueDate' ||
+              (key === 'cfrDueDate' && requestDetailsFromAxis[key]) ){
               saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
                 key, requestDetailsFromAxis[key], "");
+            }
+            else if(key === 'compareReceivedDate') 
+              saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
+                'receivedDate', requestDetailsFromAxis[key], "");
           }
         }
       }
@@ -105,12 +110,13 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'axisSyncDate':
         case 'fromDate': 
         case 'toDate':
+        case 'cfrDueDate':
         case 'originalDueDate':{
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis[key], "MMM dd yyyy");
           break;
         }
         case 'compareReceivedDate':
-          updatedObj['receivedDate'] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
+          updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
         case 'additionalPersonalInfo':
           let foiReqAdditionalPersonalInfo = saveRequestObject[key];
