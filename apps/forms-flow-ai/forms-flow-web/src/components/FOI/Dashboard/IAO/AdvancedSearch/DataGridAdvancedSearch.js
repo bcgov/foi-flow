@@ -10,9 +10,9 @@ import Pagination from '@mui/material/Pagination';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
-import { push } from "connected-react-router";
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import {
   getAssigneeValue,
   updateSortModel,
@@ -70,7 +70,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     } else {
       link = "./reviewrequest/" + params.row.id;
     }
-    return <a href={link}><div className="MuiDataGrid-cellContent">{params.value}</div></a>
+    return <Link href={link}><div className="MuiDataGrid-cellContent">{params.value}</div></Link>
   }
 
   const columns = React.useRef([
@@ -134,7 +134,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell'
     },
-    { field: "xgov", headerName: "XGOV", flex: 0.5, headerAlign: "left" },
+    { field: "xgov", headerName: "XGOV", flex: 0.5, headerAlign: "left", renderCell: hyperlinkRenderCell, 
+      cellClassName: 'foi-advanced-search-result-cell'},
   ]);
 
   if (advancedSearchComponentLoading && queryData) {
