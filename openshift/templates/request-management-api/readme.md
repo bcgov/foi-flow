@@ -26,11 +26,18 @@ oc process -f openshift/templates/request-management-api/request-management-api-
 
 ## API Deploy
 
-```
+```bash
 oc project d7abee-dev
 
 oc process -f openshift/templates/request-management-api/request-management-api-deploy.yaml -o yaml | oc apply -f - 
 oc process -f request-management-api-deploy.yaml -o yaml | oc apply -f - 
+
+
+
+oc process -f openshift/templates/request-management-api/request-management-api-deploy.yaml -o yaml | oc create -f - --dry-run
+
+# Deploy request-management-api-002 to the dev environment
+oc process -n d7abee-dev -f openshift/templates/request-management-api/request-management-api-deploy.yaml -p API_NAME="request-management-api-002" -p TAG_NAME="dev" -p IMAGE_STREAM_NAME_FULL="request-management-api:dev" -p DB_SECRETS="patroni-002" -o yaml | oc -n d7abee-dev create -f - --dry-run
 ```
 
 
@@ -42,9 +49,6 @@ curl --header "Content-Type: application/json" \
   --request POST \
   --data  '{"requestData":{"requestType":{"requestType":"personal"},"choose-idenity":{"answerYes":null},"selectAbout":{"yourself":true,"child":null,"another":null},"ministry":{"selectedMinistry":[{"code":"EMBC","name":"Emergency Management BC","selected":true},{"code":"EMPR","name":"Energy, Mines and Low Carbon Innovation (and Minister Responsible for the Consular Corps of British Columbia)","selected":true}],"ministryPage":"/personal/ministry-confirmation","defaultMinistry":{}},"contactInfo":{"firstName":"DV","middleName":null,"lastName":"DV","alsoKnownAs":null,"businessName":null,"birthDate":"2001-12-12T05:00:00.000Z"},"requestTopic":{"value":"anotherTopic","text":"Other","ministryCode":null},"descriptionTimeframe":{"description":"test personal","fromDate":"2021-06-01T04:00:00.000Z","toDate":"2021-06-06T04:00:00.000Z","correctionalServiceNumber":null,"publicServiceEmployeeNumber":null,"topic":"Other"},"contactInfoOptions":{"email":"test@email.com","phonePrimary":null,"phoneSecondary":null,"address":null,"city":null,"postal":null,"province":null,"country":null},"Attachments":[]}}' \
   https://request-management-api-dev.apps.silver.devops.gov.bc.ca/api/foirawrequests
-
-
-
 ```
 
 ## Tag for test manually
@@ -54,3 +58,19 @@ Deploys dev build to test
 ```
 oc -n d7abee-tools tag request-management-api:dev request-management-api:test
 ```
+
+
+## Deployment v2, create Secrets
+
+The environment file is not committed as it contains secrets.
+
+```bash
+# The env
+oc create secret generic request-management-api-002 --from-env-file=openshift/templates/request-management-api/request-management-secrets.dev.env
+
+# Make sure REQUEST_MANAGMENT_SECRETS matches secret created above
+oc process -n d7abee-dev -f openshift/templates/request-management-api/request-management-api-deploy.yaml -p API_NAME="request-management-api-002" -p TAG_NAME="dev" -p IMAGE_STREAM_NAME_FULL="request-management-api:dev" -p DB_SECRETS="patroni-002" -p DATABASE_HOST="patroni-master-002" -p REQUEST_MANAGEMENT_SECRETS="request-management-api-002" -o yaml | oc -n d7abee-dev create -f - --dry-run
+```
+
+
+
