@@ -17,7 +17,7 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.click(findTestObject('Page_foi.flow/sign in/button_Log In'))
+//WebUI.click(findTestObject('Page_foi.flow/sign in/button_Log In'))
 
 WebUI.setText(findTestObject('Object Repository/Page_Log in to FOI/input_Username or email_username'), username)
 
