@@ -90,6 +90,16 @@ objects:
               name: ${NAME}
               ports:
                 - containerPort: 8080
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /index
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 60
+                successThreshold: 1
+                timeoutSeconds: 3
               resources: {}
               tty: true
               volumeMounts:
