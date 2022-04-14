@@ -41,9 +41,10 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: "${IMAGE_NAMESPACE}"
-          name: "${API_NAME}:${TAG_NAME}"
+          # name: "${API_NAME}:${TAG_NAME}"
+          name: "${IMAGE_STREAM_NAME_FULL}"
     - type: ConfigChange
-    replicas: 2
+    replicas: 3
     test: false
     selector:
       app: "${API_NAME}"
@@ -66,17 +67,17 @@ objects:
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
-                  key: database-user
+                  key: app-db-username
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
-                  key: database-password
+                  key: app-db-password
             - name: DATABASE_NAME
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
-                  key: database-name
+                  key: app-db-name
             - name: DATABASE_HOST
               value: "${DB_SECRETS}"
             - name: FLASK_ENV
@@ -84,7 +85,7 @@ objects:
             - name: FOI_REQUESTQUEUE_REDISHOST
               value: redis-formio
             - name: FOI_REQUESTQUEUE_REDISPORT
-              value: 6379
+              value: "6379"
             - name: FOI_REQUESTQUEUE_REDISPASSWORD
               value: TODO
             - name: FOI_REQUESTQUEUE_REDISCHANNEL
@@ -124,15 +125,15 @@ objects:
             - name: JWT_OIDC_JWKS_URI
               value: TODO
             - name: JWT_OIDC_CACHING_ENABLED
-              value: True
+              value: 'True'
             - name: JWT_OIDC_JWKS_CACHE_TIMEOUT
-              value: 300
+              value: "300"
             - name: CACHE_TIMEOUT
-              value: 36000
+              value: "36000"
             - name: FOI_REQUESTQUEUE_REDISURL
               value: TODO
             - name: CACHE_ENABLED
-              value: N
+              value: 'N'
           # command:
           #   - gunicorn
           #   - '-b'
@@ -246,3 +247,9 @@ parameters:
   description: The TAG name for this environment, e.g., dev, test, prod
   required: true
   value: postgresql
+- name: IMAGE_STREAM_NAME_FULL
+  displayName: Full image stream name (eg "request-management-api:dev")
+  description: Includes ImageStream name and tag
+  required: true
+  value: request-management-api:dev
+  
