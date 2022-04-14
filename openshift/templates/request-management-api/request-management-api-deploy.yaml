@@ -44,7 +44,7 @@ objects:
           # name: "${API_NAME}:${TAG_NAME}"
           name: "${IMAGE_STREAM_NAME_FULL}"
     - type: ConfigChange
-    replicas: 3
+    replicas: 1
     test: false
     selector:
       app: "${API_NAME}"
@@ -76,8 +76,8 @@ objects:
             - name: DATABASE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: "${DB_SECRETS}"
-                  key: app-db-name
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: "DATABASE_NAME"
             - name: DATABASE_HOST
               value: "${DATABASE_HOST}"
             - name: FLASK_ENV
@@ -179,10 +179,7 @@ objects:
                   name: "${REQUEST_MANAGEMENT_SECRETS}"
                   key: JWT_OIDC_ALGORITHMS
             - name: CORS_ORIGIN
-              valueFrom:
-                secretKeyRef:
-                  name: "${REQUEST_MANAGEMENT_SECRETS}"
-                  key: CORS_ORIGIN
+              value: "${CORS_ORIGIN}"
             - name: JWT_OIDC_JWKS_URI
               valueFrom:
                 secretKeyRef:
@@ -269,7 +266,71 @@ objects:
                 secretKeyRef:
                   name: "${REQUEST_MANAGEMENT_SECRETS}"
                   key: CACHE_REDISURL
-                  
+            - name: FOI_WEB_PAY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_WEB_PAY_URL
+            - name: PAYBC_REF_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_REF_NUMBER
+            - name: PAYBC_PORTAL_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_PORTAL_URL
+            - name: PAYBC_TXN_PREFIX
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_TXN_PREFIX
+            - name: PAYBC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_KEY
+            - name: PAYBC_API_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_BASE_URL
+            - name: PAYBC_API_CLIENT
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_CLIENT
+            - name: PAYBC_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_SECRET
+            - name: CDOGS_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_BASE_URL
+            - name: CDOGS_SERVICE_CLIENT
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_SERVICE_CLIENT
+            - name: CDOGS_SERVICE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_SERVICE_CLIENT_SECRET
+            - name: CDOGS_TOKEN_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_TOKEN_URL
+
+
+          ## TODO: NEED TO GET CDOGS AND PAYBC ENVS IN HERE TOO
+          ## TODO: NEED TO GET CDOGS AND PAYBC ENVS IN HERE TOOTODO: NEED TO GET CDOGS AND PAYBC ENVS IN HERE TOO
+  
   
           # command:
           #   - gunicorn
@@ -284,30 +345,21 @@ objects:
           #     name: ${API_NAME}-config
           resources:
             requests:
-              cpu: "100m"
-              memory: "100Mi"
+              cpu: "50m"
+              memory: "250Mi"
             limits:
-              cpu: "750m"
-              memory: "2Gi"
-          # livenessProbe:
-          #   httpGet:
-          #     # TODO - Change to proper health check once
-          #     path: "/"
-          #     port: 5000
-          #     scheme: HTTP
-          #   timeoutSeconds: 1
-          #   periodSeconds: 10
-          #   successThreshold: 1
-          #   failureThreshold: 3
-          # readinessProbe:
-          #   httpGet:
-          #     path: "/"
-          #     port: 5000
-          #     scheme: HTTP
-          #   timeoutSeconds: 1
-          #   periodSeconds: 10
-          #   successThreshold: 1
-          #   failureThreshold: 3
+              cpu: "150m"
+              memory: "500Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/readyz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 60
+            successThreshold: 1
+            failureThreshold: 3          
           terminationMessagePath: "/dev/termination-log"
           terminationMessagePolicy: File
           imagePullPolicy: Always
@@ -397,7 +449,12 @@ parameters:
   description: Includes ImageStream name and tag
   required: true
   value: request-management-api:dev
-
-
-
-  
+- name: CORS_ORIGIN
+  displayName: CORS Origin whitelists
+  description: Whitelist for CORS requests
+  required: true
+- name: DATABASE_NAME
+  displayName: Name of database in the patroni instance
+  description: Name of the database
+  required: true
+  value: foidb
