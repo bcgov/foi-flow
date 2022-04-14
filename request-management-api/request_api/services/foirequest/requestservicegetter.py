@@ -109,7 +109,7 @@ class requestservicegetter:
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
             'axisSyncDate': parse(requestministry["axissyncdate"]).strftime('%Y-%m-%d %H:%M:%S.%f') if axissyncdatenoneorempty == False else None,
-            'requestPageCount': requestministry["requestpagecount"],
+            'requestPageCount': int(requestministry["requestpagecount"]),
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
