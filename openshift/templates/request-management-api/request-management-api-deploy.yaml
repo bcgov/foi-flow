@@ -134,6 +134,44 @@ objects:
               value: TODO
             - name: CACHE_ENABLED
               value: 'N'
+            - name: OSS_S3_FORMS_BUCKET
+              value: TODO
+            - name: OSS_S3_FORMS_ACCESS_KEY_ID
+              value: TODO
+            - name: OSS_S3_FORMS_SECRET_ACCESS_KEY
+              value: TODO
+            - name: OSS_S3_HOST
+              value: TODO
+            - name: OSS_S3_REGION
+              value: TODO
+            - name: OSS_S3_SERVICE
+              value: TODO
+            - name: FOI_NOTIFICATION_DAYS
+              value: TODO
+            - name: FOI_ADDITIONAL_HOLIDAYS
+              value: TODO
+            - name: SOCKETIO_PING_INTERVAL
+              value: TODO
+            - name: SOCKETIO_PING_TIMEOUT
+              value: TODO
+            - name: SOCKETIO_LOG_ENABLED
+              value: TODO
+            - name: SOCKETIO_MESSAGE_QTYPE
+              value: TODO
+            - name: SOCKETIO_REDISURL
+              value: TODO
+            - name: SOCKETIO_REDIS_COMMENT_CHANNEL
+              value: TODO
+            - name: SOCKETIO_REDIS_HEALTHCHECK_INTERVAL
+              value: TODO
+            - name: SOCKETIO_REDIS_CONNECT_TIMEOUT
+              value: TODO
+            - name: SOCKETIO_REDIS_SLEEP_TIME
+              value: TODO
+            - name: SOCKETIO_CONNECT_NONCE
+              value: TODO
+            - name: CACHE_REDISURL
+              value: TODO
           # command:
           #   - gunicorn
           #   - '-b'
