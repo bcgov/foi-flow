@@ -26,20 +26,20 @@ oc process -f openshift/templates/request-management-api/request-management-api-
 
 ## API Deploy
 
+There are two associated environment files you will need for a deploy.  Assuming deploying in dev:
+
+1. `request-management-secrets.dev.env` - contains all secrets
+2. `request-management-api-config.dev.env` - contains non-secret environment configuration variables
+
+The secret file is **not** included as it contains sensitive information.  An example file exists you can use to recreate, or other developers on the project may be able to provide you dev env vars as appropriate.
+
 ```bash
-oc project d7abee-dev
+# The env
+oc create secret generic request-management-api-002 --from-env-file=openshift/templates/request-management-api/request-management-secrets.dev.env
 
-oc process -f openshift/templates/request-management-api/request-management-api-deploy.yaml -o yaml | oc apply -f - 
-oc process -f request-management-api-deploy.yaml -o yaml | oc apply -f - 
-
-
-
-oc process -f openshift/templates/request-management-api/request-management-api-deploy.yaml -o yaml | oc create -f - --dry-run
-
-# Deploy request-management-api-002 to the dev environment
-oc process -n d7abee-dev -f openshift/templates/request-management-api/request-management-api-deploy.yaml -p API_NAME="request-management-api-002" -p TAG_NAME="dev" -p IMAGE_STREAM_NAME_FULL="request-management-api:dev" -p DB_SECRETS="patroni-002" -o yaml | oc -n d7abee-dev create -f - --dry-run
+# Make sure `REQUEST_MANAGEMENT_SECRETS` in the config env matches the name of the secret created in previous step.
+oc process -n d7abee-dev -f openshift/templates/request-management-api/request-management-api-deploy.yaml --param-file=openshift/templates/request-management-api/request-management-api-config.dev.env -o yaml | oc -n d7abee-dev create -f - --dry-run
 ```
-
 
 ## Test Submit
 
@@ -60,17 +60,7 @@ oc -n d7abee-tools tag request-management-api:dev request-management-api:test
 ```
 
 
-## Deployment v2, create Secrets
 
-The environment file is not committed as it contains secrets.
-
-```bash
-# The env
-oc create secret generic request-management-api-002 --from-env-file=openshift/templates/request-management-api/request-management-secrets.dev.env
-
-# Make sure REQUEST_MANAGMENT_SECRETS matches secret created above
-oc process -n d7abee-dev -f openshift/templates/request-management-api/request-management-api-deploy.yaml -p API_NAME="request-management-api-002" -p TAG_NAME="dev" -p IMAGE_STREAM_NAME_FULL="request-management-api:dev" -p DB_SECRETS="patroni-002" -p DATABASE_HOST="patroni-master-002" -p REQUEST_MANAGEMENT_SECRETS="request-management-api-002" -o yaml | oc -n d7abee-dev create -f - --dry-run
-```
 
 
 
