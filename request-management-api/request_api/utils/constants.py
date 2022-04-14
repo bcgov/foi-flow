@@ -16,6 +16,8 @@
 # Group names
 
 FORMAT_CONTACT_ADDRESS='JSON'
+BLANK_EXCEPTION_MESSAGE = 'Field cannot be blank'
+MAX_EXCEPTION_MESSAGE = 'Field exceeds the size limit'
 
 
 

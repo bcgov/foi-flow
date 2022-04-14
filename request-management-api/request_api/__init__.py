@@ -26,12 +26,13 @@ import request_api.config as config
 from request_api.config import _Config
 
 from request_api.models import db, ma
-from request_api.utils.util_logging import setup_logging, setup_filelogging
+from request_api.utils.util_logging import configure_logging
 from request_api.auth import jwt
 from flask_cors import CORS
 import re
 from flask_caching import Cache
 from flask_socketio import SocketIO
+import secure
 
 app = Flask(__name__)
 #Cache Initialization
@@ -44,6 +45,37 @@ SOCKETIO_LOG_ENABLED = True if os.getenv('SOCKETIO_LOG_ENABLED').lower() == "tru
 SOCKETIO_CORS_ORIGIN= os.getenv('CORS_ORIGIN').split(",")
 
 socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_ENABLED,ping_timeout=SOCKETIO_PING_TIMEOUT,ping_interval=SOCKETIO_PING_INTERVAL,cors_allowed_origins=SOCKETIO_CORS_ORIGIN)
+
+#Setup log
+configure_logging(app)
+
+# Security Response headers
+csp = (
+    secure.ContentSecurityPolicy()
+    .default_src("'self'")
+    .script_src("'self'")
+    .object_src('self')
+    .connect_src('self')
+)
+hsts = secure.StrictTransportSecurity().include_subdomains().preload().max_age(31536000)
+referrer = secure.ReferrerPolicy().no_referrer()
+cache_value = secure.CacheControl().no_store().max_age(0)
+xfo_value = secure.XFrameOptions().deny()
+secure_headers = secure.Secure(
+    csp=csp,
+    hsts=hsts,
+    referrer=referrer,
+    cache=cache_value,
+    xfo=xfo_value
+)
+
+@app.after_request
+def set_secure_headers(response):
+    secure_headers.framework.flask(response)
+    response.headers.add('Cross-Origin-Resource-Policy','same-origin')
+    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+    response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
+    return response
 
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   

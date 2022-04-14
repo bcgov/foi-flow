@@ -2,6 +2,8 @@ import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstant
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { formatDate } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
+import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
+import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
 
 export const getTabBottomText = ({
   _daysRemaining,
@@ -186,7 +188,7 @@ export const createRequestDetailsObjectFunc = (
   requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
   switch (name) {
     case FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES:
-      requestObject.receivedDate = value.receivedDate;
+      requestObject.receivedDate = value.receivedDate?formatDate(value.receivedDate, "yyyy MMM, dd"): "";
       requestObject.receivedDateUF = value.receivedDate
         ? new Date(value.receivedDate).toISOString()
         : "";
@@ -346,4 +348,12 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
 
 export const handleBeforeUnload = (e) => {
   alertUser(e);
+};
+
+export  const isAxisSyncDisplayField = (field) => {
+  return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
+};
+
+export const isMandatoryField = (field) => {
+  return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
 };

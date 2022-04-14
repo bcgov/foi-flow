@@ -3,13 +3,14 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     lastName : "Applicant Last Name",
     middleName : "Applicant Middle Name",
     category:"Category",
-    email:"Applicant Email",
     businessName:"Organization",
 
-    anotherFirstName:"Another First Name",
-    anotherLastName:"Another Last Name",
-    anotherMiddleName:"Another Middle Name",
+    additionalPersonalInfo: "Additional Personal Info",
+    anotherFirstName: "On Behalf Of - First Name",
+    anotherLastName: "On Behalf Of - Last Name",
+    anotherMiddleName: "On Behalf Of - Middle Name",
 
+    email:"Applicant Email",
     phonePrimary:"Home Phone",
     phoneSecondary:"Mobile Phone",
     workPhonePrimary:"Work Phone Primary",
@@ -28,19 +29,17 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     requestType:"Request Type",
     receivedMode:"Received Mode",
     deliveryMode:"Delivery Mode",
-    receivedDateUF: "Received Date",
-    //receivedDate:"Received Date",
+    compareReceivedDate: "Received Date",
     requestStartDate:"Request Start Date",
     dueDate:"Legislated Due Date",
 
-    // additionalPersonalInfo:"Additional Personal Information",
-    // birthDate:"DOB",
-
     general:"Request Type General",
     personal:"Request Type Personal",
-    //selectedMinistries:"Selected Ministries",
+ 
+    Extensions : "Extensions",
 
-    Extensions : "Extensions"
+    cfrDueDate: "CFR Due Date",
+    requestPageCount: "Total number of pages"
   };
   
   export default AXIS_SYNC_DISPLAY_FIELDS;

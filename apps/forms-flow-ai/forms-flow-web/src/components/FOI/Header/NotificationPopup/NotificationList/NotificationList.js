@@ -135,7 +135,7 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
       <Row>
         <Col>
           <h6 className="notification-heading">
-            <div className="redirect-url" onClick={() => handleClick(notification)}>{notification.idnumber}</div></h6>
+            <div className="redirect-url" onClick={() => handleClick(notification)}>{notification.axisnumber}</div></h6>
             {openModal && 
             <MinistriesCanvassed  openModal={openModal} selectedMinistries={selectedMinistries} setModal={setModal}/>
             }
