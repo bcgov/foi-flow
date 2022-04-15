@@ -23,12 +23,17 @@ WebUI.maximizeWindow()
 WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID, ('clickOnRequest') : false], 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row by id state',  [('requestID') : 'U-00' + requestID]), 'Unopened')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row by id state', [('requestID') : 'U-00' + 
+            requestID]), 'Unopened')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row by id assignee',  [('requestID') : 'U-00' + requestID]), 'Unassigned')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row by id assignee', [('requestID') : 'U-00' + 
+            requestID]), 'Unassigned')
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row by id',  [('requestID') : 'U-00' + requestID]), 'background-color'), 
-    'rgba(207, 215, 227, 1)', false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row by id', [('requestID') : 'U-00' + 
+                requestID]), 'background-color'), 'rgba(207, 215, 227, 1)', false)
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/queue/div_request queue row by id', [('requestID') : 'U-00' + requestID]), 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row by id', [('requestID') : 'U-00' + requestID]))
 
