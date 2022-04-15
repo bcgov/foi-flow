@@ -62,7 +62,7 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'EDUC-' + requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
