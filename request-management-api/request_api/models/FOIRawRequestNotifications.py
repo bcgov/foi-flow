@@ -9,7 +9,7 @@ from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
-
+import logging
 import json
 class FOIRawRequestNotification(db.Model):
     # Name of the table in our database
@@ -53,29 +53,47 @@ class FOIRawRequestNotification(db.Model):
         
     @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
-        sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
-        rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeid': notificationtypeid})
         notificationids = []
-        for row in rs:
-            notificationids.append(row["notificationid"])
+        try:
+            sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
+            rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeid': notificationtypeid})
+            for row in rs:
+                notificationids.append(row["notificationid"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return notificationids
     
     @classmethod
     def getnotificationidsbynumber(cls, idnumber):
-        sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber """
-        rs = db.session.execute(text(sql), {'idnumber': idnumber})
         notificationids = []
-        for row in rs:
-            notificationids.append(row["notificationid"])
+        try:
+            sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber """
+            rs = db.session.execute(text(sql), {'idnumber': idnumber})
+            for row in rs:
+                notificationids.append(row["notificationid"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return notificationids
 
     @classmethod
     def getnotificationidsbytype(cls, notificationtypeid):
-        sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypeid= :notificationtypeid """
-        rs = db.session.execute(text(sql), {'notificationtypeid': notificationtypeid})
         notificationids = []
-        for row in rs:
-            notificationids.append(row["notificationid"])
+        try:
+            sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypeid= :notificationtypeid """
+            rs = db.session.execute(text(sql), {'notificationtypeid': notificationtypeid})
+            for row in rs:
+                notificationids.append(row["notificationid"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return notificationids
     
 class FOIRawRequestNotificationSchema(ma.Schema):
