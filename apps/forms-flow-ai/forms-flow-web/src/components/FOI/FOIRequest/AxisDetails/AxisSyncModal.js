@@ -135,8 +135,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           break;
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
-          if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
-            (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
+          if(extensions.length > 0 && (requestDetailsFromAxis[key].length > 0 || requestDetailsFromAxis[key].length == 0))
             updatedObj[key] = extensionsArr;
           break;
         default:
