@@ -426,12 +426,14 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
           }
           done(null, res.data);
         } else {
+          done(null,"Exception happened while GET operations of request");
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching request from AXIS.`);
         }
       })
       .catch((error) => {
         catchError(error, dispatch);
+        done(null,"Exception happened while GET operations of request");
       });
   }
 };

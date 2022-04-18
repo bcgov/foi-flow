@@ -11,7 +11,6 @@ import { fetchFOIRequestAttachmentsList } from "./foiAttachmentServices";
 
 
 export const catchError = (error, dispatch) => {
-  console.log(error);
   dispatch(serviceActionError(error));
   dispatch(setFOILoader(false));    
 }
