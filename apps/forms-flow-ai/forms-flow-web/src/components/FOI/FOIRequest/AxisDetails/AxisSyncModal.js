@@ -135,8 +135,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           break;
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
-          if((requestDetailsFromAxis[key].length > 0 && extensionsArr.length > 0) || 
-            (requestDetailsFromAxis[key].length === 0 && extensions.length > 0) )
+          if(extensions.length > 0 && (requestDetailsFromAxis[key].length > 0 || requestDetailsFromAxis[key].length == 0))
             updatedObj[key] = extensionsArr;
           break;
         default:
@@ -167,11 +166,30 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     const compareExtensions = (key) => {
       let extensionsArr = [];
-      if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0 && 
-          extensions.length === requestDetailsFromAxis[key]?.length ){
-            extensionsArr = assignExtensionForDsiplay(key,extensionsArr);
+      const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
+      const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
+      const newAxisExtensionReasonIds = axisReasonIds.filter(x => !foiReqReasonIds.includes(x));
+      const newFoiExtensionReasonIds = foiReqReasonIds.filter(x => !axisReasonIds.includes(x));
+      //Scenario: Additional extension added in FOI system which are not in AXIS.
+      if(newFoiExtensionReasonIds?.length > 0 || foiReqReasonIds?.length > axisReasonIds?.length ){
+        extensions.forEach(obj => {
+          let duplicateFoiExt = foiReqReasonIds.filter((item, index) => foiReqReasonIds.indexOf(item) !== index);
+          if(newFoiExtensionReasonIds.includes(obj.extensionreasonid)){
+            const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
+            extensionsArr.push(property);
+          }
+          else if(duplicateFoiExt.includes(obj.extensionreasonid)){
+            requestDetailsFromAxis[key]?.forEach(axisObj => {
+              extensionsArr= fieldComparisonOfExtensionObj(axisObj,obj,extensionsArr,true);
+            })
+          }
+        });
       }
-      else{
+      //Scenario: Display only those axis extensions which are not yet synced.
+      if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0){
+            extensionsArr = assignExtensionForDsiplay(key,extensionsArr,newAxisExtensionReasonIds);
+      }
+      else if(requestDetailsFromAxis[key]?.length > 0){
         requestDetailsFromAxis[key].forEach(obj => {
           const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
           extensionsArr.push(property);
@@ -180,28 +198,38 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     return extensionsArr;
     } 
 
+    const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase) => {
+      if(axisObj.extensionreasonid === obj.extensionreasonid){
+        if(axisObj.extensionstatusid !== obj.extensionstatusid || axisObj.approvednoofdays !== obj.approvednoofdays ||
+          axisObj.extendedduedays  !== obj.extendedduedays ||
+          axisObj.extendedduedays !== obj.extendedduedays  || 
+          !(obj.decisiondate === axisObj.approveddate || obj.decisiondate === axisObj.denieddate)){
+            if(removeCase){
+              const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
+              extensionsArr.push(property);
+            }
+            else{
+              const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
+              extensionsArr.push(property);
+            }
+        }
+      }
+      return extensionsArr;
+    }
 
-    const assignExtensionForDsiplay = (key,extensionsArr) => {
-      const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
-      const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
-      if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
+    const assignExtensionForDsiplay = (key,extensionsArr,newAxisExtensionReasonIds) => {
+      if(newAxisExtensionReasonIds?.length > 0){
         requestDetailsFromAxis[key].forEach(obj => {
-          const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
-          extensionsArr.push(property);
+          if(newAxisExtensionReasonIds.includes(obj.extensionreasonid)){
+            const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
+            extensionsArr.push(property);
+          }
         });
       }
-      else{
+      else if(extensions?.length === requestDetailsFromAxis[key]?.length){
         requestDetailsFromAxis[key].forEach(axisObj => {
             extensions?.forEach(foiReqObj => {
-              if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
-                if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
-                  axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
-                  axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
-                  !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
-                  const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
-                  extensionsArr.push(property);
-                }
-              }
+              extensionsArr= fieldComparisonOfExtensionObj(axisObj,foiReqObj,extensionsArr,false);
             })
         });
       }
