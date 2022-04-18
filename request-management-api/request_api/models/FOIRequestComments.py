@@ -7,7 +7,7 @@ from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
-
+import logging
 import json
 class FOIRequestComment(db.Model):
     # Name of the table in our database
@@ -84,15 +84,21 @@ class FOIRequestComment(db.Model):
     
     @classmethod 
     def getcommentusers(cls, commentid):
-        sql = """select commentid, createdby, taggedusers from (
-                    select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
-                    union all 
-                    select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
-                ) cmt where commenttypeid =1"""
-        rs = db.session.execute(text(sql), {'commentid': commentid})
         users = []
-        for row in rs:
-            users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
+        try:
+            sql = """select commentid, createdby, taggedusers from (
+                        select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
+                        union all 
+                        select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid)
+                    ) cmt where commenttypeid =1"""
+            rs = db.session.execute(text(sql), {'commentid': commentid})
+            for row in rs:
+                users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return users    
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
