@@ -71,7 +71,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           var updateNeeded= checkValidation(key);
           if(updateNeeded){
             assignDisplayedReqObj(key, updatedObj, updatedField);
-            if(key !== 'Extensions' && key !== 'compareReceivedDate' && key !== 'cfrDueDate' ||
+          if(key !== 'Extensions' && key !== 'compareReceivedDate' && key !== 'cfrDueDate' ||
               (key === 'cfrDueDate' && requestDetailsFromAxis[key]) ){
               saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
                 key, requestDetailsFromAxis[key], "");
@@ -126,6 +126,11 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
               updatedObj = compareAdditionalPersonalInfo(axisKey , reqKey, axisAdditionalPersonalInfo, 
                 foiReqAdditionalPersonalInfo, updatedObj);
             }
+          }
+          for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+              if(!Object.keys(axisAdditionalPersonalInfo).includes(reqKey)){
+                axisAdditionalPersonalInfo[reqKey] = foiReqAdditionalPersonalInfo[reqKey];
+              }
           }
           break;
         case 'Extensions':
