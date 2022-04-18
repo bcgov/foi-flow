@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Chip from "@mui/material/Chip";
 import './foirequest.scss';
 import FOIRequestHeader from './FOIRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -42,7 +44,7 @@ import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
-import { getAssignedTo } from "./FOIRequestHeader/utils";
+import { getAssignedTo, getHeaderText, getStatus } from "./FOIRequestHeader/utils";
 import {
   getTabBottomText,
   confirmChangesLost,
@@ -485,17 +487,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
 
-    if (!_unSaved) {
+    if (!_unSaved) {      
+      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
-
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-        } else {
-          dispatch(push(`/foi/reviewrequest/${id}`));
-        }
+        dispatch(push(getRedirectAfterSaveUrl(ministryId, requestId)));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -628,6 +625,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   );
 
   const stateTransition = requestDetails?.stateTransition;
+  
+  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  
+  const status = getStatus({ headerValue, requestDetails });
+  const headerText = getHeaderText({requestDetails, ministryId, status});
 
   return (!isLoading &&
     requestDetails &&
@@ -724,6 +726,20 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       isAddRequest
                     }
                   >
+                    {showBreadcrumbs ?  
+                      (<Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />
+                        <Chip
+                          label={headerText}
+                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                        />
+                      </Breadcrumbs>) :
+                      (<div style={{marginTop: 20}}></div>)
+                    }
                     <>
                       <FOIRequestHeader
                         headerValue={headerValue}

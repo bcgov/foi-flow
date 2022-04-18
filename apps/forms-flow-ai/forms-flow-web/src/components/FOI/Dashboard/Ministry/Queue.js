@@ -23,6 +23,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import { formatDate } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
+import { setQueueFilter } from "../../../../actions/FOI/foiRequestActions";
 
 const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
@@ -56,7 +57,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     ],
     keyword: null,
   });
-  const [requestFilter, setRequestFilter] = useState("myRequests");
+  const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   // update sortModel for records due, ldd & assignedTo
   const updateSortModel = () => {
@@ -176,7 +177,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       return;
     }
     setRowsState(defaultRowsState);
-    setRequestFilter(filter);
+    dispatch(setQueueFilter(filter));
   };
 
   const setSearch = debounce((e) => {

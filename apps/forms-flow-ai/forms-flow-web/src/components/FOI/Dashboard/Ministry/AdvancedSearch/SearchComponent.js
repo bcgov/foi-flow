@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "../../dashboard.scss";
 import { useSelector } from "react-redux";
 
@@ -83,6 +83,7 @@ const AdvancedSearch = ({ userDetail }) => {
     advancedSearchComponentLoading,
     setAdvancedSearchComponentLoading,
     setSearchLoading,
+    advancedSearchParams,
   } = useContext(ActionContext);
 
   const programAreaList = useSelector(
@@ -96,54 +97,83 @@ const AdvancedSearch = ({ userDetail }) => {
     "content": "In order to search FOI requests you must select one of the advanced search or date filter below to better refine your search results."
   };
 
-  const [searchText, setSearchText] = useState("");
-  const [keywords, setKeywords] = useState([]);
-  const [searchFilterSelected, setSearchFilterSelected] = useState(
-  );
-  const keywordsMode =
-    searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
+  const [searchFilterSelected, setSearchFilterSelected] = useState(advancedSearchParams?.search || null);
+  const keywordsMode = searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
+
+  const [searchText, setSearchText] = useState(() => {
+    if (!keywordsMode && Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.keywords.length > 0) {
+      return advancedSearchParams.keywords[0]
+    } else {
+      return "";
+    }
+  });
+  const [keywords, setKeywords] = useState(() => {
+    if (keywordsMode && Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.keywords.length > 0) {
+      return advancedSearchParams.keywords;
+    } else {
+      return [];
+    }
+  });
 
   const intitialRequestState = {
-    callforrecords: {
-      checked: false,
-      id: StateEnum.callforrecords.id,
-    },
-    review: {
-      checked: false,
-      id: StateEnum.review.id,
-    },
-    signoff: {
-      checked: false,
-      id: StateEnum.signoff.id,
-    },
-    closed: {
-      checked: false,
-      id: StateEnum.closed.id,
-    },
-    callforrecordsoverdue: {
-      checked: false,
-      id: StateEnum.callforrecordsoverdue.id,
-    },
+    [StateEnum.callforrecords.id]: false,
+    [StateEnum.review.id]: false,
+    [StateEnum.signoff.id]: false,
+    [StateEnum.closed.id]: false,
+    [StateEnum.callforrecordsoverdue.id]: false
   };
-  const [requestState, setRequestState] = useState(intitialRequestState);
+
+  const [requestState, setRequestState] = useState(() => {
+    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
+      var savedRequestState = {...intitialRequestState}
+      advancedSearchParams.requestState.forEach(state => {
+        savedRequestState[state] = true;
+      });
+      return savedRequestState;
+    } else {
+      return intitialRequestState;
+    }
+  });
 
   const intitialRequestStatus = {
     overdue: false,
-    onTime: false,
+    ontime: false,
   };
-  const [requestStatus, setRequestStatus] = useState(intitialRequestStatus);
+  
+  const [requestStatus, setRequestStatus] = useState(() => {
+    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestStatus.length > 0) {
+      var savedRequestStatus = { ...intitialRequestStatus }
+      advancedSearchParams.requestStatus.forEach(status => {
+        savedRequestStatus[status] = true;
+      });
+      return savedRequestStatus;
+    } else {
+      return intitialRequestStatus;
+    }
+  });
 
   const initialRequestTypes = {
     personal: false,
     general: false,
   };
-  const [requestTypes, setRequestTypes] = useState(initialRequestTypes);
 
-  const [selectedDateRangeType, setSelectedDateRangeType] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [requestTypes, setRequestTypes] = useState(() => {
+    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestType.length > 0) {
+      var savedRequestType = {...initialRequestTypes}
+      advancedSearchParams.requestType.forEach(type => {
+        savedRequestType[type] = true;
+      });
+      return savedRequestType;
+    } else {
+      return initialRequestTypes;
+    }
+  });
 
-  const [selectedPublicBodies, setSelectedPublicBodies] = useState([]);
+  const [selectedDateRangeType, setSelectedDateRangeType] = useState(advancedSearchParams?.dateRangeType || "");
+  const [fromDate, setFromDate] = useState(advancedSearchParams?.fromDate || "");
+  const [toDate, setToDate] = useState(advancedSearchParams?.toDate || "");
+
+  const [selectedPublicBodies, setSelectedPublicBodies] = useState(advancedSearchParams?.publicBodies || []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl) && Boolean(searchText);
@@ -154,7 +184,7 @@ const AdvancedSearch = ({ userDetail }) => {
         if (value instanceof Object) {
           return value.checked ? value.id : null;
         }
-        return value ? key.toLowerCase() : null;
+        return value ? key : null;
       })
       .filter((value) => value);
   };
@@ -164,7 +194,7 @@ const AdvancedSearch = ({ userDetail }) => {
     }
     setSearchLoading(true);
     handleUpdateSearchFilter({
-      search: searchFilterSelected?.replace("_", "").toLowerCase(),
+      search: searchFilterSelected,
       keywords: keywordsMode ? keywords : [searchText],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
@@ -180,6 +210,16 @@ const AdvancedSearch = ({ userDetail }) => {
     });
   };
 
+  useEffect(() => {
+    if (Object.keys(advancedSearchParams).length > 0) {
+        if (!advancedSearchComponentLoading) {
+          setAdvancedSearchComponentLoading(true);
+        }
+        setSearchLoading(true);
+        handleUpdateSearchFilter(advancedSearchParams)
+      } 
+  }, []);
+
   const noSearchCriteria = () => {
     let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
     let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
@@ -189,6 +229,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const handleResetSearchFilters = () => {
     setSearchText("");
+    setSelectedDateRangeType("");
     setKeywords([]);
     setSearchFilterSelected();
     setRequestState(intitialRequestState);
@@ -222,10 +263,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const handleRequestStateChange = (event) => {
     setRequestState({
       ...requestState,
-      [event.target.name]: {
-        ...requestState[event.target.name],
-        checked: event.target.checked,
-      },
+      [event.target.parentElement.getAttribute('stateid')]: event.target.checked
     });
   };
 
@@ -492,8 +530,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="callforrecords"
+                          stateid={StateEnum.callforrecords.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.callforrecords.checked}
+                          checked={requestState[StateEnum.callforrecords.id]}
                           color="success"
                         />
                       }
@@ -505,8 +544,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="review"
+                          stateid={StateEnum.review.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.review.checked}
+                          checked={requestState[StateEnum.review.id]}
                           color="success"
                         />
                       }
@@ -518,8 +558,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="signoff"
+                          stateid={StateEnum.signoff.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.signoff.checked}
+                          checked={requestState[StateEnum.signoff.id]}
                           color="success"
                         />
                       }
@@ -531,8 +572,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="closed"
+                          stateid={StateEnum.closed.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.closed.checked}
+                          checked={requestState[StateEnum.closed.id]}
                           color="success"
                         />
                       }

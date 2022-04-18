@@ -241,7 +241,7 @@ const BottomButtonGroup = React.memo(
     const handleSaveModal = (value, fileInfoList) => {
       setsaveModal(false);
       if (!value) {
-        handleSaveRequest(requestState, unSavedRequest, "");
+        handleSaveRequest(requestState, true, "");
         return;
       }
 

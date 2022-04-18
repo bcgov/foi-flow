@@ -10,6 +10,7 @@ import {
   setFOIRequestDetail,
   setFOIMinistryViewRequestDetail,
   clearRequestDetails,
+  clearMinistryViewRequestDetails,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
@@ -99,7 +100,7 @@ export const fetchFOIMinistryRequestList = () => {
             foiRequest.bcgovcode = foiRequest.idNumber.split("-")[0];
             return { ...foiRequest };
           });
-          dispatch(clearRequestDetails({}));
+          dispatch(clearMinistryViewRequestDetails({}));
           if (foiRequests > 0)
             dispatch(fetchFOIMinistryAssignedToList( foiRequests[0].bcgovcode.toLowerCase()));     
           dispatch(setFOIMinistryRequestList(data));
@@ -139,7 +140,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
           UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(clearRequestDetails({}));
+          dispatch(clearMinistryViewRequestDetails({}));
           dispatch(setFOIMinistryRequestList(res.data));
           dispatch(setFOILoader(false));
           if (res.data?.data[0]?.bcgovcode)
@@ -232,7 +233,7 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          dispatch(clearRequestDetails({}));
+          dispatch(clearMinistryViewRequestDetails({}));
           dispatch(setFOIMinistryViewRequestDetail(foiRequest));
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
           dispatch(setFOILoader(false));
