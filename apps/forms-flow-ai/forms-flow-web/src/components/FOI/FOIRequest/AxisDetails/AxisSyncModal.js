@@ -135,7 +135,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           break;
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
-          if(extensions.length > 0 && (requestDetailsFromAxis[key].length > 0 || requestDetailsFromAxis[key].length == 0))
+          if(extensions.length > 0 || requestDetailsFromAxis[key].length > 0)
             updatedObj[key] = extensionsArr;
           break;
         default:
@@ -166,6 +166,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     const compareExtensions = (key) => {
       let extensionsArr = [];
+      let extensionSet = new Set();
       const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
       const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
       const newAxisExtensionReasonIds = axisReasonIds.filter(x => !foiReqReasonIds.includes(x));
@@ -180,14 +181,14 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           }
           else if(duplicateFoiExt.includes(obj.extensionreasonid)){
             requestDetailsFromAxis[key]?.forEach(axisObj => {
-              extensionsArr= fieldComparisonOfExtensionObj(axisObj,obj,extensionsArr,true);
+              extensionsArr= fieldComparisonOfExtensionObj(axisObj,obj,extensionsArr,true,extensionSet);
             })
           }
         });
       }
       //Scenario: Display only those axis extensions which are not yet synced.
       if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0){
-            extensionsArr = assignExtensionForDsiplay(key,extensionsArr,newAxisExtensionReasonIds);
+            extensionsArr = assignExtensionForDsiplay(key,extensionsArr,newAxisExtensionReasonIds,extensionSet);
       }
       else if(requestDetailsFromAxis[key]?.length > 0){
         requestDetailsFromAxis[key].forEach(obj => {
@@ -198,7 +199,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     return extensionsArr;
     } 
 
-    const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase) => {
+    const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase, extensionSet) => {
       if(axisObj.extensionreasonid === obj.extensionreasonid){
         if(axisObj.extensionstatusid !== obj.extensionstatusid || axisObj.approvednoofdays !== obj.approvednoofdays ||
           axisObj.extendedduedays  !== obj.extendedduedays ||
@@ -209,15 +210,18 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
               extensionsArr.push(property);
             }
             else{
-              const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
-              extensionsArr.push(property);
+              if(!extensionSet.has(axisObj.extensionreasonid)){
+                const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
+                extensionsArr.push(property);
+                extensionSet.add(axisObj.extensionreasonid);
+              }
             }
         }
       }
       return extensionsArr;
     }
 
-    const assignExtensionForDsiplay = (key,extensionsArr,newAxisExtensionReasonIds) => {
+    const assignExtensionForDsiplay = (key,extensionsArr,newAxisExtensionReasonIds,extensionSet) => {
       if(newAxisExtensionReasonIds?.length > 0){
         requestDetailsFromAxis[key].forEach(obj => {
           if(newAxisExtensionReasonIds.includes(obj.extensionreasonid)){
@@ -226,11 +230,18 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           }
         });
       }
-      else if(extensions?.length === requestDetailsFromAxis[key]?.length){
+      else if(requestDetailsFromAxis[key]?.length >= extensions?.length){
         requestDetailsFromAxis[key].forEach(axisObj => {
             extensions?.forEach(foiReqObj => {
-              extensionsArr= fieldComparisonOfExtensionObj(axisObj,foiReqObj,extensionsArr,false);
+              extensionsArr= fieldComparisonOfExtensionObj(axisObj,foiReqObj,extensionsArr,false,extensionSet);
             })
+        });
+      }
+      else if(extensions?.length > requestDetailsFromAxis[key]?.length){
+        extensions?.forEach(foiReqObj => {
+          requestDetailsFromAxis[key].forEach(axisObj => {
+            extensionsArr= fieldComparisonOfExtensionObj(axisObj,foiReqObj,extensionsArr,false,extensionSet);
+          })
         });
       }
       return extensionsArr;
