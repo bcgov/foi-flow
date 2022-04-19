@@ -629,7 +629,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
   
   const status = getStatus({ headerValue, requestDetails });
-  const headerText = getHeaderText({requestDetails, ministryId, status});
 
   return (!isLoading &&
     requestDetails &&
@@ -734,7 +733,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
                         <Chip
-                          label={getHeaderText(requestDetails)}
+                          label={getHeaderText({requestDetails, ministryId, status})}
                           sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
                         />
                       </Breadcrumbs>
