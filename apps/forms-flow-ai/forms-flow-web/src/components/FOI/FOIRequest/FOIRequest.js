@@ -290,18 +290,18 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
       
     if(requestExtensions.length > 0 && axisData[key].length > 0){
-      axisData[key].forEach(axisObj => {
-        requestExtensions?.forEach(foiReqObj => {
+      for(let axisObj of axisData[key]){
+        for(let foiReqObj of requestExtensions){
           if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
             if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
               axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
               axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
               !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
-              return true;
+                return true;
             }
           }
-        })
-      });
+        }
+      }
     }
     else{
       if(axisData[key]?.length > 0)
