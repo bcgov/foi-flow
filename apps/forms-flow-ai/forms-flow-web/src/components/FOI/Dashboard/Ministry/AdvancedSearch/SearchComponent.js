@@ -140,6 +140,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const initialRequestTypes = {
     personal: false,
     general: false,
+    generaldisabled: false,
   };
   const [requestTypes, setRequestTypes] = useState(initialRequestTypes);
 
@@ -178,10 +179,12 @@ const AdvancedSearch = ({ userDetail }) => {
   const getTrueKeysFromCheckboxObject = (checkboxObject) => {
     return Object.entries(checkboxObject)
       .map(([key, value]) => {
-        if (value instanceof Object) {
-          return value.checked ? value.id : null;
+        if (key !== 'generaldisabled') {
+          if (value instanceof Object) {
+            return value.checked ? value.id : null;
+          }
+          return value ? key.toLowerCase() : null;
         }
-        return value ? key.toLowerCase() : null;
       })
       .filter((value) => value);
   };
@@ -241,6 +244,19 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const clickSearchFilter = (SearchFilterType) => {
+    if (SearchFilterType === SearchFilter.APPLICANT_NAME) {
+      setRequestTypes({
+        personal:true,
+        general:false,
+        generaldisabled: true
+      });
+    }
+    else {
+      setRequestTypes({
+        ...requestTypes,
+        generaldisabled: false
+      });
+    }
     if (searchFilterSelected !== SearchFilterType) {
       setSearchFilterSelected(SearchFilterType);
     }
@@ -652,9 +668,10 @@ const AdvancedSearch = ({ userDetail }) => {
                           onChange={handleRequestTypeChange}
                           checked={requestTypes.general}
                           color="success"
+                          disabled={requestTypes.generaldisabled}
                         />
                       }
-                      label="General"
+                      label={<div style={{display: "flex"}}>General {requestTypes.generaldisabled ? <p style={{color: "#ff0000",fontSize: "0.8rem",lineHeight: "1.6"}}> * </p>: ""}</div>}                      
                     />
                   </FormGroup>
                 </Grid>
@@ -827,6 +844,19 @@ const AdvancedSearch = ({ userDetail }) => {
                       ))}
                     </Select>
                   </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography
+                      sx={{
+                        color: "#ff0000",
+                        fontSize: "0.8rem",
+                        lineHeight: "1.6",
+                      }}
+                      visibility={!requestTypes.generaldisabled ? "hidden" : "visible"}
+                    >
+                      * You are unable to search General Requests with Applicant Name Selected. <br/>
+                      Deselect Applicant Name Search Filter if you wish to search General Requests.
+                    </Typography>
                 </Grid>
               </Grid>
 
