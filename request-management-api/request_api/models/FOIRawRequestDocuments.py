@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
-
+import logging
 class FOIRawRequestDocument(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequestDocuments'
@@ -35,12 +35,19 @@ class FOIRawRequestDocument(db.Model):
 
     @classmethod
     def getdocuments(cls,requestid, requestversion):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid and foirequestversion_id = :requestversion ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
-        rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
         documents = []
-        for row in rs:
-            if row["isactive"] == True:
-                documents.append({"foidocumentid": row["foidocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        try:
+            sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid and foirequestversion_id = :requestversion ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
+            rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
+        
+            for row in rs:
+                if row["isactive"] == True:
+                    documents.append({"foidocumentid": row["foidocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return documents 
     
     @classmethod

@@ -14,7 +14,8 @@ const AxisDetails = React.memo(({
     handleAxisDetailsInitialValue,
     handleAxisDetailsValue,
     handleAxisIdValidation,
-    setAxisMessage
+    setAxisMessage,
+    saveRequestObject
 }) => {
     const dispatch = useDispatch();
     const [axisRequestId, setAxisRequestId] = React.useState("");
@@ -57,7 +58,7 @@ const AxisDetails = React.memo(({
     }
 
     const syncWithAxis = () => {
-        dispatch(fetchRequestDataFromAxis(axisRequestId, false, (err, data) => {
+        dispatch(fetchRequestDataFromAxis(axisRequestId, false, saveRequestObject,(err, data) => {
             if(!err){
                 if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}

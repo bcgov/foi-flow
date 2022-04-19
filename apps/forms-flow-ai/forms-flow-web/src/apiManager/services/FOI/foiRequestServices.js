@@ -271,7 +271,6 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
     httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {
-          console.log("Request saved successfully!");
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
@@ -292,7 +291,6 @@ export const openRequestDetails = (data, ...rest) => {
       .then((res) => {
         if (res.data) {
           done(null, res.data);
-          console.log("Request opened successfully!");
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error while opening the request");
@@ -319,7 +317,6 @@ export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest)
         .then((res) => {
           if (res.data) {
             done(null, res.data);
-            console.log("Request saved successfully!");
           } else {
             dispatch(serviceActionError(res));
             throw new Error(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);            
@@ -411,7 +408,7 @@ export const fetchExistingAxisRequestIds = (...rest) => {
   }
 };
 
-export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
+export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, ...rest) => {
   const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_GET_AXIS_REQUEST_DATA,
@@ -422,10 +419,18 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          if(!isModal && Object.entries(res.data).length !== 0){
-            dispatch(setFOIRequestDetail(res.data));
+          let newRequest = res.data;
+          if(!isModal && Object.entries(newRequest).length !== 0){
+            if(Object.entries(requestDetails).length !== 0){
+              newRequest['assignedGroup'] = requestDetails['assignedGroup'];
+              newRequest['assignedTo'] = requestDetails['assignedTo'];
+              newRequest['assignedToFirstName'] = requestDetails['assignedToFirstName'];
+              newRequest['assignedToLastName'] = requestDetails['assignedToLastName'];
+              newRequest['assignedToName'] = requestDetails['assignedToName'];
+            }
+            dispatch(setFOIRequestDetail(newRequest));
           }
-          done(null, res.data);
+          done(null, newRequest);
         } else {
           done(null,"Exception happened while GET operations of request");
           dispatch(serviceActionError(res));

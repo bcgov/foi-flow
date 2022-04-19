@@ -35,6 +35,10 @@ import { StateEnum } from "../../../../../constants/FOI/statusEnum";
 
 import Tooltip from '../../../customComponents/Tooltip/Tooltip';
 
+import {
+  addYears
+} from "../../utils";
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -173,6 +177,29 @@ const AdvancedSearch = ({ userDetail }) => {
   const [selectedDateRangeType, setSelectedDateRangeType] = useState(advancedSearchParams?.dateRangeType || "");
   const [fromDate, setFromDate] = useState(advancedSearchParams?.fromDate || "");
   const [toDate, setToDate] = useState(advancedSearchParams?.toDate || "");
+  const oneYearFromNow = formatDate(addYears(1));
+  //default max fromDate - now
+  const [maxFromDate, setMaxFromDate] = useState(formatDate(new Date()));
+  //default max toDate - 1 year from now
+  const [maxToDate, setMaxToDate] = useState(oneYearFromNow);
+  const resetDateFields = () => {
+    setFromDate("");
+    setToDate("");
+  }
+  const resetMaxFromDate = (dateRangeType) => {
+    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+      setMaxFromDate(formatDate(new Date()));
+    }else{
+      setMaxFromDate(oneYearFromNow);
+    }
+  }
+  const resetMaxToDate = (dateRangeType) => {
+    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+      setMaxToDate(formatDate(new Date()));
+    }else{
+      setMaxToDate(oneYearFromNow);
+    }
+  }
 
   const [selectedPublicBodies, setSelectedPublicBodies] = useState(advancedSearchParams?.publicBodies || []);
 
@@ -284,7 +311,11 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const handleSelectedDateRangeTypeChange = (event) => {
-    setSelectedDateRangeType(event.target.value);
+    const type = event.target.value;
+    setSelectedDateRangeType(type);
+    resetMaxFromDate(type);
+    resetMaxToDate(type);
+    resetDateFields();
   };
 
   const handleSelectedPublicBodiesChange = (event) => {
@@ -751,7 +782,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       value={fromDate || ""}
                       InputProps={{
                         inputProps: {
-                          max: formatDate(toDate) || formatDate(new Date()),
+                          max: formatDate(toDate) || maxFromDate,
                         },
                       }}
                       onChange={(e) => setFromDate(formatDate(e.target.value))}
@@ -782,6 +813,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       InputProps={{
                         inputProps: {
                           min: formatDate(fromDate),
+                          max: maxToDate
                         },
                       }}
                       value={toDate || ""}

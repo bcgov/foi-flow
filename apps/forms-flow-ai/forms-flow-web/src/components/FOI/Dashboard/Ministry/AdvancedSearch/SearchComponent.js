@@ -35,6 +35,10 @@ import { StateEnum } from "../../../../../constants/FOI/statusEnum";
 
 import Tooltip from '../../../customComponents/Tooltip/Tooltip';
 
+import {
+  addYears
+} from "../../utils";
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -155,6 +159,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const initialRequestTypes = {
     personal: false,
     general: false,
+    generaldisabled: false,
   };
 
   const [requestTypes, setRequestTypes] = useState(() => {
@@ -168,10 +173,32 @@ const AdvancedSearch = ({ userDetail }) => {
       return initialRequestTypes;
     }
   });
-
   const [selectedDateRangeType, setSelectedDateRangeType] = useState(advancedSearchParams?.dateRangeType || "");
   const [fromDate, setFromDate] = useState(advancedSearchParams?.fromDate || "");
   const [toDate, setToDate] = useState(advancedSearchParams?.toDate || "");
+  const oneYearFromNow = formatDate(addYears(1));
+  //default max fromDate - now
+  const [maxFromDate, setMaxFromDate] = useState(formatDate(new Date()));
+  //default max toDate - 1 year from now
+  const [maxToDate, setMaxToDate] = useState(oneYearFromNow);
+  const resetDateFields = () => {
+    setFromDate("");
+    setToDate("");
+  }
+  const resetMaxFromDate = (dateRangeType) => {
+    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+      setMaxFromDate(formatDate(new Date()));
+    }else{
+      setMaxFromDate(oneYearFromNow);
+    }
+  }
+  const resetMaxToDate = (dateRangeType) => {
+    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+      setMaxToDate(formatDate(new Date()));
+    }else{
+      setMaxToDate(oneYearFromNow);
+    }
+  }
 
   const [selectedPublicBodies, setSelectedPublicBodies] = useState(advancedSearchParams?.publicBodies || []);
 
@@ -181,10 +208,9 @@ const AdvancedSearch = ({ userDetail }) => {
   const getTrueKeysFromCheckboxObject = (checkboxObject) => {
     return Object.entries(checkboxObject)
       .map(([key, value]) => {
-        if (value instanceof Object) {
-          return value.checked ? value.id : null;
+        if (key !== 'generaldisabled') {
+          return value ? key : null;
         }
-        return value ? key : null;
       })
       .filter((value) => value);
   };
@@ -255,6 +281,19 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const clickSearchFilter = (SearchFilterType) => {
+    if (SearchFilterType === SearchFilter.APPLICANT_NAME) {
+      setRequestTypes({
+        personal:true,
+        general:false,
+        generaldisabled: true
+      });
+    }
+    else {
+      setRequestTypes({
+        ...requestTypes,
+        generaldisabled: false
+      });
+    }
     if (searchFilterSelected !== SearchFilterType) {
       setSearchFilterSelected(SearchFilterType);
     }
@@ -282,7 +321,11 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const handleSelectedDateRangeTypeChange = (event) => {
-    setSelectedDateRangeType(event.target.value);
+    const type = event.target.value;
+    setSelectedDateRangeType(type);
+    resetMaxFromDate(type);
+    resetMaxToDate(type);
+    resetDateFields();
   };
 
   const handleSelectedPublicBodiesChange = (event) => {
@@ -663,9 +706,10 @@ const AdvancedSearch = ({ userDetail }) => {
                           onChange={handleRequestTypeChange}
                           checked={requestTypes.general}
                           color="success"
+                          disabled={requestTypes.generaldisabled}
                         />
                       }
-                      label="General"
+                      label={<div style={{display: "flex"}}>General {requestTypes.generaldisabled ? <p style={{color: "#ff0000",fontSize: "0.8rem",lineHeight: "1.6"}}> * </p>: ""}</div>}                      
                     />
                   </FormGroup>
                 </Grid>
@@ -734,7 +778,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       value={fromDate || ""}
                       InputProps={{
                         inputProps: {
-                          max: formatDate(toDate) || formatDate(new Date()),
+                          max: formatDate(toDate) || maxFromDate,
                         },
                       }}
                       onChange={(e) => setFromDate(formatDate(e.target.value))}
@@ -765,6 +809,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       InputProps={{
                         inputProps: {
                           min: formatDate(fromDate),
+                          max: maxToDate
                         },
                       }}
                       value={toDate || ""}
@@ -837,6 +882,19 @@ const AdvancedSearch = ({ userDetail }) => {
                       ))}
                     </Select>
                   </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography
+                      sx={{
+                        color: "#ff0000",
+                        fontSize: "0.8rem",
+                        lineHeight: "1.6",
+                      }}
+                      visibility={!requestTypes.generaldisabled ? "hidden" : "visible"}
+                    >
+                      * You are unable to search General Requests with Applicant Name Selected. <br/>
+                      Deselect Applicant Name Search Filter if you wish to search General Requests.
+                    </Typography>
                 </Grid>
               </Grid>
 

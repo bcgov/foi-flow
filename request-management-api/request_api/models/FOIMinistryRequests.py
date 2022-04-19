@@ -18,6 +18,7 @@ from .ProgramAreas import ProgramArea
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
 from request_api.utils.enums import RequestorType
+import logging
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -88,27 +89,43 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
-        sql = """select created_at from "FOIMinistryRequests" 
+        statusdate = None
+        try:
+            sql = """select created_at from "FOIMinistryRequests" 
                     where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
                     order by version desc limit 1;"""
-        rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
-        return [row[0] for row in rs][0]
+            rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
+            statusdate = [row[0] for row in rs][0]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return statusdate
     
     @classmethod
     def getassignmenttransition(cls,requestid):
-        sql = """select version, assignedto, assignedministryperson from "FOIMinistryRequests" 
+        assignments = []
+        try:
+            sql = """select version, assignedto, assignedministryperson from "FOIMinistryRequests" 
                     where foiministryrequestid = :requestid
                     order by version desc limit 2;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
-        assignments = []
-        for row in rs:
-            assignments.append({"assignedto": row["assignedto"], "assignedministryperson": row["assignedministryperson"], "version": row["version"]})
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                assignments.append({"assignedto": row["assignedto"], "assignedministryperson": row["assignedministryperson"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return assignments
     
     @classmethod
     def deActivateFileNumberVersion(cls, ministryid, idnumber, currentversion, userid)->DefaultMethodResult:
         db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryid, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
         return DefaultMethodResult(True,'Request Updated',idnumber)
+            
     
     @classmethod
     def getrequests(cls, group = None):
@@ -176,11 +193,17 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequeststatusById(cls,ministryrequestid):
-        sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatusid != 3 order by version desc;'
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         summary = []
-        for row in rs:
-            summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
+        try:
+            sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatusid != 3 order by version desc;'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return summary      
 
       
@@ -189,36 +212,52 @@ class FOIMinistryRequest(db.Model):
         return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
 
     @classmethod
-    def getstatesummary(cls, ministryrequestid):                
-        sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-        where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
- 
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+    def getstatesummary(cls, ministryrequestid):  
         transitions = []
-        for row in rs:
-            transitions.append({"status": row["status"], "version": row["version"]})
+        try:              
+            sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
+ 
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                transitions.append({"status": row["status"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return transitions
 
     @classmethod
-    def getstatenavigation(cls, ministryrequestid):                
-        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-        where foiministryrequestid=:ministryrequestid  order by version desc limit  2"""
- 
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+    def getstatenavigation(cls, ministryrequestid): 
         requeststates = []
-        for row in rs:
-            requeststates.append(row["status"])
+        try:
+            sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid  order by version desc limit  2"""
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                requeststates.append(row["status"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return requeststates
     
     @classmethod
-    def getallstatenavigation(cls, ministryrequestid):                
-        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-        where foiministryrequestid=:ministryrequestid  order by version desc"""
- 
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
-        requeststates = []
-        for row in rs:
-            requeststates.append(row["status"])
+    def getallstatenavigation(cls, ministryrequestid): 
+        requeststates = []    
+        try:           
+            sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid  order by version desc""" 
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                requeststates.append(row["status"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return requeststates
 
     @classmethod
@@ -508,26 +547,38 @@ class FOIMinistryRequest(db.Model):
          
     @classmethod
     def getupcomingcfrduerecords(cls):
-        sql = """select distinct on (filenumber) filenumber, cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
+        upcomingduerecords = []
+        try:
+            sql = """select distinct on (filenumber) filenumber, to_char(cfrduedate, 'YYYY-MM-DD') as cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
                     where isactive = true and cfrduedate is not null and requeststatusid = 2  
                     and cfrduedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-        rs = db.session.execute(text(sql))
-        upcomingduerecords = []
-        for row in rs:
-            upcomingduerecords.append({"filenumber": row["filenumber"], "cfrduedate": row["cfrduedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+            rs = db.session.execute(text(sql))            
+            for row in rs:
+                upcomingduerecords.append({"filenumber": row["filenumber"], "cfrduedate": row["cfrduedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return upcomingduerecords    
 
     @classmethod
     def getupcominglegislativeduerecords(cls):
-        sql = """select distinct on (filenumber) filenumber, duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
+        upcomingduerecords = []
+        try:
+            sql = """select distinct on (filenumber) filenumber, to_char(duedate, 'YYYY-MM-DD') as duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
                     where isactive = true and duedate is not null and requeststatusid not in (5,6,4,11,3,15)     
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-        rs = db.session.execute(text(sql))
-        upcomingduerecords = []
-        for row in rs:
-            upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return upcomingduerecords    
 
     @classmethod
@@ -541,14 +592,20 @@ class FOIMinistryRequest(db.Model):
     
     @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
-        sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
+        ministries = []
+        try:
+            sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
                     inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 
                     inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
                     where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;""" 
-        rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})
-        ministries = []
-        for row in rs:
-            ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+            rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})           
+            for row in rs:
+                ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return ministries
 
     @classmethod
