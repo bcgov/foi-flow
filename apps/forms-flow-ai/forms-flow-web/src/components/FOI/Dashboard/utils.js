@@ -143,3 +143,8 @@ export const ClickableChip = ({ clicked, ...rest }) => {
     />
   );
 };
+
+export const addYears = (n) => {
+  const currentDate = new Date();
+  return currentDate.setFullYear(currentDate.getFullYear() + n);
+};
