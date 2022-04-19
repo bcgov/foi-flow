@@ -15,7 +15,7 @@ from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIAssignees import FOIAssignee
-
+import logging
 from dateutil import parser
 
 class FOIRawRequest(db.Model):
@@ -155,26 +155,32 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
-        sql = """select * ,
-                    CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
-                            then 'Online Form' 
-                            else savedby END  as createdby 
-                    from (select CASE WHEN lower(status) <> 'unopened' 
-                            then requestrawdata ->> 'description' 
-                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
-                        CASE WHEN lower(status) <> 'unopened' 
-                            then requestrawdata ->> 'fromDate' 
-                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
-                        CASE WHEN lower(status) <> 'unopened'
-                            then requestrawdata ->> 'toDate' 
-                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
-                        to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
-                        createdby as savedby from "FOIRawRequests" fr 
-                    where requestid = :requestid order by version ) as sq;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []
-        for row in rs:
-            requests.append(dict(row))
+        try:
+            sql = """select * ,
+                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
+                                then 'Online Form' 
+                                else savedby END  as createdby 
+                        from (select CASE WHEN lower(status) <> 'unopened' 
+                                then requestrawdata ->> 'description' 
+                                ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
+                            CASE WHEN lower(status) <> 'unopened' 
+                                then requestrawdata ->> 'fromDate' 
+                                ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
+                            CASE WHEN lower(status) <> 'unopened'
+                                then requestrawdata ->> 'toDate' 
+                                ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
+                            to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
+                            createdby as savedby from "FOIRawRequests" fr 
+                        where requestid = :requestid order by version ) as sq;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                requests.append(dict(row))
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return requests
 
     @classmethod
@@ -185,21 +191,35 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def getLastStatusUpdateDate(cls,requestid,status):
-        sql = """select created_at from "FOIRawRequests" 
-                    where requestid = :requestid and status = :status
-                    order by version desc limit 1;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid, 'status': status})
-        return [row[0] for row in rs][0]
+        lastupdatedate = None
+        try:
+            sql = """select created_at from "FOIRawRequests" 
+                        where requestid = :requestid and status = :status
+                        order by version desc limit 1;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid, 'status': status})
+            lastupdatedate = [row[0] for row in rs][0]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return lastupdatedate
 
     @classmethod
     def getassignmenttransition(cls,requestid):
-        sql = """select version, assignedto, status from "FOIRawRequests" 
-                    where requestid = :requestid
-                    order by version desc limit 2;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
         assignments = []
-        for row in rs:
-            assignments.append({"assignedto": row["assignedto"], "status": row["status"], "version": row["version"]})
+        try:
+            sql = """select version, assignedto, status from "FOIRawRequests" 
+                        where requestid = :requestid
+                        order by version desc limit 2;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})            
+            for row in rs:
+                assignments.append({"assignedto": row["assignedto"], "status": row["status"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return assignments
     
     @classmethod
@@ -207,13 +227,20 @@ class FOIRawRequest(db.Model):
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
     @classmethod
-    def getstatesummary(cls, requestid):                
-        sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
-        where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
+    def getstatesummary(cls, requestid):     
         transitions = []
-        for row in rs:
-            transitions.append({"status": row["status"], "version": row["version"]})
+        try:           
+            sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
+            where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            
+            for row in rs:
+                transitions.append({"status": row["status"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return transitions
 
     @classmethod
@@ -647,13 +674,19 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def getDistinctAXISRequestIds(cls):
-        
-        sql = """select distinct axisrequestid from "FOIRawRequests" where axisrequestid is not null;"""
-        axisids = db.session.execute(text(sql))
         axisrequestids = []
-        for axisid in axisids:
-            axisrequestids.append(axisid[0])
-        return axisrequestids 
+        try:
+            sql = """select distinct axisrequestid from "FOIRawRequests" where axisrequestid is not null;"""
+            axisids = db.session.execute(text(sql))
+            
+            for axisid in axisids:
+                axisrequestids.append(axisid[0])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return axisrequestids
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
