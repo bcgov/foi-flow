@@ -9,14 +9,10 @@ import logging
 import redis
 class RedisPublisherService:
 
-    foirequestqueueredishost = os.getenv('FOI_REQUESTQUEUE_REDISHOST')
-    foirequestqueueredisport = os.getenv('FOI_REQUESTQUEUE_REDISPORT')
-    foirequestqueueredispassword = os.getenv('FOI_REQUESTQUEUE_REDISPASSWORD')
     foirequestqueueredischannel = os.getenv('FOI_REQUESTQUEUE_REDISCHANNEL')
     foicommentqueueredischannel = os.getenv('SOCKETIO_REDIS_COMMENT_CHANNEL')
          
-    foiredis = redis.from_url(os.getenv('SOCKETIO_REDISURL'), socket_connect_timeout=int(os.getenv('SOCKETIO_REDIS_CONNECT_TIMEOUT')), retry_on_timeout=True, socket_keepalive=True)
-    #foiredis = Redis(host=foirequestqueueredishost, port=foirequestqueueredisport,password=foirequestqueueredispassword)
+    foimsgredis = redis.from_url(os.getenv('SOCKETIO_REDISURL'), socket_connect_timeout=int(os.getenv('SOCKETIO_REDIS_CONNECT_TIMEOUT')), retry_on_timeout=True, socket_keepalive=True)
     
     async def publishrequest(self, message):  
         self.publishtoredischannel(self.foirequestqueueredischannel, message)
@@ -32,7 +28,7 @@ class RedisPublisherService:
     def publishtoredischannel(self, channel , message):  
         try: 
             if channel == os.getenv('FOI_REQUESTQUEUE_REDISCHANNEL'):
-                self.foiredis.publish(channel, message) 
+                self.foimsgredis.publish(channel, message) 
             if channel == os.getenv('SOCKETIO_REDIS_COMMENT_CHANNEL'):
                 RedisSubscriberService().foicommentredis.publish(channel, message)               
         except BusinessException as exception:            

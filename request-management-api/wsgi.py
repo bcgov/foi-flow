@@ -63,11 +63,7 @@ if __name__ == "__main__":
     messagequeue = os.getenv('SOCKETIO_MESSAGE_QUEUE', 'INMEMORY')
     if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
         RedisSubscriberService().register_subscription()
-    if messagequeue == "REDIS":
-        socketio.init_app(APP, message_queue= os.getenv("SOCKETIO_REDISURL"), async_mode='eventlet', 
-                      path='/api/v1/socket.io')
-    else:
-        socketio.init_app(APP, async_mode='eventlet', 
+    socketio.init_app(APP, async_mode='eventlet', 
                       path='/api/v1/socket.io')    
     socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
     
