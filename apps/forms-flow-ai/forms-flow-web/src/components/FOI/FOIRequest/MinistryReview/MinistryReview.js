@@ -538,8 +538,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   autoComplete="off"
                 >
 
-                    {showBreadcrumbs ? 
-                      (<Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                    <ConditionalComponent condition={showBreadcrumbs}>
+                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
@@ -549,9 +549,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           label={getHeaderText(requestDetails)}
                           sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
                         />
-                      </Breadcrumbs>) :
-                      (<div style={{marginTop: 20}}></div>)
-                    }
+                      </Breadcrumbs>
+                    </ConditionalComponent>
+                    <ConditionalComponent condition={!showBreadcrumbs}>
+                      <div style={{marginTop: 20}}></div>
+                    </ConditionalComponent>
                   {Object.entries(requestDetails).length > 0 &&
                     requestDetails !== undefined && (
                       <>

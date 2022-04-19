@@ -726,20 +726,22 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       isAddRequest
                     }
                   >
-                    {showBreadcrumbs ?  
-                      (<Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                    <ConditionalComponent condition={showBreadcrumbs}>
+                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
                         <Chip
-                          label={headerText}
+                          label={getHeaderText(requestDetails)}
                           sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
                         />
-                      </Breadcrumbs>) :
-                      (<div style={{marginTop: 20}}></div>)
-                    }
+                      </Breadcrumbs>
+                    </ConditionalComponent>
+                    <ConditionalComponent condition={!showBreadcrumbs}>
+                      <div style={{marginTop: 20}}></div>
+                    </ConditionalComponent>
                     <>
                       <FOIRequestHeader
                         headerValue={headerValue}
