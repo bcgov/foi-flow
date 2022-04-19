@@ -219,11 +219,18 @@ const AdvancedSearch = ({ userDetail }) => {
   const clickSearchFilter = (SearchFilterType) => {
     if (SearchFilterType === SearchFilter.APPLICANT_NAME) {
       setRequestTypes({
-        ...requestTypes,
+        personal:true,
+        general:false,
         generaldisabled: true
       });
     }
-    if (searchFilterSelected !== SearchFilterType &&  (SearchFilterType !== SearchFilter.APPLICANT_NAME || (SearchFilterType === SearchFilter.APPLICANT_NAME && !requestTypes.general))) {
+    else {
+      setRequestTypes({
+        ...requestTypes,
+        generaldisabled: false
+      });
+    }
+    if (searchFilterSelected !== SearchFilterType) {
       setSearchFilterSelected(SearchFilterType);
     }
   };
