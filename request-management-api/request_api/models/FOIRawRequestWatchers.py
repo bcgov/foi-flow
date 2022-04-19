@@ -8,7 +8,7 @@ from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy import insert, and_, text, func
 from flask import jsonify
-
+import logging
 class FOIRawRequestWatcher(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequestWatchers' 
@@ -41,14 +41,20 @@ class FOIRawRequestWatcher(db.Model):
         return DefaultMethodResult(True,'Request added')
     
     @classmethod
-    def getwatchers(cls, requestid):                
-        sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid order by watchedby, watchedbygroup, created_at desc'
-        rs = db.session.execute(text(sql), {'requestid': requestid})
+    def getwatchers(cls, requestid):  
         watchers = []
-        for row in rs:
-            if row["isactive"] == True:
-                watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
-        return watchers 
+        try:              
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid order by watchedby, watchedbygroup, created_at desc'
+            rs = db.session.execute(text(sql), {'requestid': requestid})        
+            for row in rs:
+                if row["isactive"] == True:
+                    watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return watchers  
 
     @classmethod
     def getrequestidsbyuserid(cls, userid):
