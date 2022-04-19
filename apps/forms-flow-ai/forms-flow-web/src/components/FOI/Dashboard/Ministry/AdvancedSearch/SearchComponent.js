@@ -168,6 +168,9 @@ const AdvancedSearch = ({ userDetail }) => {
       advancedSearchParams.requestType.forEach(type => {
         savedRequestType[type] = true;
       });
+      if (advancedSearchParams.search === SearchFilter.APPLICANT_NAME) {
+        savedRequestType.generaldisabled = true;
+      }
       return savedRequestType;
     } else {
       return initialRequestTypes;
