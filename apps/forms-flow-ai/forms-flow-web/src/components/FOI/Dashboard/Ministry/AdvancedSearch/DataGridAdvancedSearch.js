@@ -9,22 +9,18 @@ import {
 import Pagination from '@mui/material/Pagination';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
-import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import {
-  getAssigneeValue,
   updateSortModel,
-  getFullName,
   getLDD,
-  getDaysLeft,
+  getRecordsDue,
+  hyperlinkRenderCellforMinistry
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
-  const dispatch = useDispatch();
 
   const {
     handleUpdateSearchFilter,
@@ -34,10 +30,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     setSearchLoading,
     advancedSearchComponentLoading,
   } = useContext(ActionContext);
-
-  const assignedToList = useSelector(
-    (state) => state.foiRequests.foiFullAssignedToList
-  );
 
   const classes = useStyles();
 
@@ -63,77 +55,76 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   }, [rowsState, sortModel]);
 
-  const hyperlinkRenderCell = (params) => {
-    var link;
-    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
-    return <Link href={link}><div className="MuiDataGrid-cellContent">{params.value}</div></Link>
-  }
-
   const columns = React.useRef([
-    {
-      field: "applicantName",
-      headerName: "APPLICANT NAME",
-      flex: 1,
-      headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell',
-      valueGetter: (params) =>
-        getFullName(params.row.firstName, params.row.lastName),
-    },
-    {
-      field: "requestType",
-      headerName: "REQUEST TYPE",
-      flex: 1,
-      headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell'
-    },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
+      width: 170,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+    },
+    {
+      field: "applicantcategory",
+      headerName: "CATEGORY",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell'
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
     },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      flex: 1,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+    },
+
     {
       field: "currentState",
-      headerName: "CURRENT STATE",
-      headerAlign: "left",
+      headerName: "REQUEST STATE",
       flex: 1,
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell'
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
     },
+
     {
-      field: "assignedToFormatted",
+      field: "ministryAssignedToFormatted",
       headerName: "ASSIGNED TO",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell'
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+    },
+    {
+      field: "CFRDueDateValue",
+      headerName: "RECORDS DUE",
+      flex: 1,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getRecordsDue,
     },
     {
       field: "DueDateValue",
       headerName: "LDD",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getLDD,
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell'
     },
     {
-      field: "DaysLeftValue",
-      headerName: "DAYS LEFT",
-      flex: 0.5,
-      headerAlign: "left",
-      valueGetter: getDaysLeft,
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell'
+      field: "cfrduedate",
+      headerName: "",
+      width: 0,
+      hide: true,
+      renderCell: (params) => <span></span>,
     },
-    { field: "xgov", headerName: "XGOV", flex: 0.5, headerAlign: "left", renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell'},
   ]);
-
+  
   if (advancedSearchComponentLoading && queryData) {
     return (
       <Grid item xs={12} container alignItems="center">
