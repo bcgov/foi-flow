@@ -16,6 +16,7 @@ from request_api.auth import AuthHelper
 from request_api.exceptions import BusinessException
 from flask import current_app
 from request_api.utils.redissubscriber import RedisSubscriberService
+import logging
 
 @socketio.on('connect')
 def connect(message):
@@ -36,6 +37,7 @@ def __getauthenticateduserid(message):
     if message.get("userid") is not None and __isvalidnonce(message) == True: 
         return message.get("userid")
     else:
+        logging.info("Getting userid from JWT token")
         return __validatejwt(message)   
       
 
