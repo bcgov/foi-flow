@@ -47,6 +47,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.filenumber = ministryschema["filenumber"]
         foiministryrequest.axissyncdate = ministryschema["axissyncdate"]
         foiministryrequest.axisrequestid = ministryschema["axisrequestid"]
+        foiministryrequest.requestpagecount = ministryschema["requestpagecount"]
         foiministryrequest.cfrduedate = requestdict['cfrduedate']
         foiministryrequest.startdate = requestdict['startdate']
         foiministryrequest.duedate = requestdict['duedate']
