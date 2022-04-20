@@ -259,14 +259,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [stateChanged, setStateChanged] = useState(false);
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    setUnSavedRequest(_unSaved);
     if (!_unSaved && ministryId && requestId) {
+      setUnSavedRequest(_unSaved);
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
         dispatch(push(`/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`))
+        dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);

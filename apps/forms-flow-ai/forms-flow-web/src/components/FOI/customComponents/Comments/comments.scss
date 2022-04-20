@@ -3,7 +3,6 @@
   overflow-y: scroll;
   background-color:white;
   height: 100%;
-  margin-top: 40px;
 }
 .section{
   margin: 0 1em 100px;
@@ -11,6 +10,7 @@
   flex-direction: column;
   overflow-x: hidden;;
   background-color: white;
+  margin-top: 40px;
       
   .addcommentBox{
     width:99%;

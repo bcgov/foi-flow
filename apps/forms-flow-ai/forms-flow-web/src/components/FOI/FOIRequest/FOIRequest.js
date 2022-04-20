@@ -488,9 +488,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    setUnSavedRequest(_unSaved);
 
-    if (!_unSaved) {      
+    if (!_unSaved) {
+      setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       setStateChanged(false);
@@ -506,8 +506,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handleOpenRequest = (parendId, _ministryId, unSaved) => {
-    setUnSavedRequest(unSaved);
     if (!unSaved) {
+      setUnSavedRequest(unSaved);
       setStateChanged(false);
       setcurrentrequestStatus(StateEnum.open.name);
 
