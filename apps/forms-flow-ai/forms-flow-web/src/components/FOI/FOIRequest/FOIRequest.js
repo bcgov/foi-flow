@@ -165,6 +165,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
+  const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -205,6 +206,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
+      setHeaderText(getHeaderText({requestDetails, ministryId, requestState}))
       if(requestDetails.axisRequestId){
         dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
           if(!err){
@@ -483,12 +485,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
+
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
     setUnSavedRequest(_unSaved);
 
     if (!_unSaved) {      
       dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -627,8 +631,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const stateTransition = requestDetails?.stateTransition;
   
   const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
-  
-  const status = getStatus({ headerValue, requestDetails });
 
   return (!isLoading &&
     requestDetails &&
@@ -733,7 +735,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
                         <Chip
-                          label={getHeaderText({requestDetails, ministryId, status})}
+                          label={headerText}
                           sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
                         />
                       </Breadcrumbs>
@@ -744,6 +746,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                     <>
                       <FOIRequestHeader
                         headerValue={headerValue}
+                        headerText={headerText}
                         requestDetails={requestDetails}
                         handleAssignedToValue={handleAssignedToValue}
                         createSaveRequestObject={createSaveRequestObject}
