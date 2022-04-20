@@ -20,7 +20,7 @@ import json
 import os
 import logging
 from flask import Flask
-from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
+#from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
 
 import request_api.config as config
 from request_api.config import _Config
