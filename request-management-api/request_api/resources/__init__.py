@@ -60,7 +60,7 @@ API = Api(
 )
 
 
-HANDLER = ExceptionHandler(API)
+#HANDLER = ExceptionHandler(API)
 
 API.add_namespace(META_API, path="/api")
 API.add_namespace(OPS_API ,path="/api")
