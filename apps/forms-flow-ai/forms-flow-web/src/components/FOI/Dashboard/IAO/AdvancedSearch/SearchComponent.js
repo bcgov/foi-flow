@@ -219,7 +219,13 @@ const AdvancedSearch = ({ userDetail }) => {
     let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
     let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
     let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
-    return !searchText && !fromDate && !toDate && selectedPublicBodies.length===0 && selectedRequestStates.length===0 && selectedRequestTypes.length===0 && selectedRequestStatus.length===0;
+    return ((keywords.length===0 && keywordsMode) || (!searchText && !keywordsMode))
+              && !fromDate
+              && !toDate
+              && selectedPublicBodies.length===0
+              && selectedRequestStates.length===0
+              && selectedRequestTypes.length===0
+              && selectedRequestStatus.length===0;
   };
 
   const handleResetSearchFilters = () => {
