@@ -433,6 +433,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         handleStateChange={handleStateChange}
         isMinistryCoordinator={true}
         isValidationError={isValidationError}
+        requestType={requestDetails?.requestType}
       />
     );
 
