@@ -204,7 +204,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
       if(requestDetails.axisRequestId){
-        dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
+        dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
           if(!err){
             if(typeof(data) !== "string" && Object.entries(data).length > 0){
               setAxisSyncedData(data);
@@ -747,6 +747,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleAxisDetailsValue={handleAxisDetailsValue}
                           handleAxisIdValidation={handleAxisIdValidation}
                           setAxisMessage={setAxisMessage}
+                          saveRequestObject={saveRequestObject}
                         />
                       )}
                       <ApplicantDetails
