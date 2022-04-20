@@ -44,7 +44,7 @@ import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
-import { getAssignedTo, getHeaderText, getStatus } from "./FOIRequestHeader/utils";
+import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
 import {
   getTabBottomText,
   confirmChangesLost,
