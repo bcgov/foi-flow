@@ -496,7 +496,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        dispatch(push(getRedirectAfterSaveUrl(ministryId, requestId)));
+        dispatch(push(getRedirectAfterSaveUrl(ministryId, id || requestId)));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
