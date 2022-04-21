@@ -123,6 +123,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_E
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
 
+WebUI.takeScreenshotAsCheckpoint('current_viewport')
+
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '002021-12-16')
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), '002021-12-16')
@@ -233,7 +235,6 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue ro
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), WebUI.concatenate((([lastname
                 , ', ', firstname]) as String[])))
 
-WebUI.takeScreenshotAsCheckpoint('current_viewport')
 
 WebUI.callTestCase(findTestCase('form/foi-test-request-fields-populated'), [('firstname') : 'Intake', ('lastname') : 'Flex'
         , ('applicantFirstname') : applicantFirstname, ('applicantLastname') : applicantLastname, ('email') : email, ('category') : category
