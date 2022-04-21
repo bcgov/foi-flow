@@ -15,6 +15,7 @@ jobs:
       run: Set-DisplayResolution -Width 1920 -Height 1080 -Force  
     - name: create Test Attachments
       run: |
+            systeminfo
             echo '${{ github.workspace }}'
             cd "testing\foi-qa-automation\Test Attachments"
             fsutil file createnew 50mb.pdf 53428800

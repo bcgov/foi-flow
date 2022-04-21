@@ -59,8 +59,8 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/address/inpu
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description parent'), 
     'class').contains('Mui-error') == true
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/h4_Select Ministry Client'), 'color'), 'rgba(255, 0, 0, 1)', 
-    false)
+//WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/h4_Select Ministry Client'), 'color'), 'rgba(255, 0, 0, 1)', 
+//    false)
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type parent'), 'class').contains(
     'Mui-error') == true
