@@ -12,7 +12,7 @@ import com.kms.katalon.core.testdata.TestData as TestData
 import com.kms.katalon.core.testng.keyword.TestNGBuiltinKeywords as TestNGKW
 import com.kms.katalon.core.testobject.TestObject as TestObject
 import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
-import com.kms.katalon.core.webui.common.WebUiCommonHelper
+import com.kms.katalon.core.webui.common.WebUiCommonHelper as WebUiCommonHelper
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
@@ -30,6 +30,7 @@ WebUI.maximizeWindow()
 
 WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 
+//WebUI.delay(10)
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned parent'), 'class').contains(
     'Mui-error') == true
 
@@ -72,21 +73,24 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/category
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
         findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
 
+//WebUI.executeJavaScript("alert('This is an alert')", null)
 def laterDate = new Date().plus(10)
 
-//WebElement element = WebUiCommonHelper.findWebElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 30)
+WebElement element = WebUiCommonHelper.findWebElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 
+    30)
+
 //
-//WebUI.executeJavaScript("arguments[0].value='" + laterDate.format('yyyy-MM-dd') + "'", Arrays.asList(element))
+WebUI.executeJavaScript(('Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set.call(arguments[0], "' + 
+    laterDate.format('yyyy-MM-dd')) + '")', Arrays.asList(element))
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), laterDate.format('yyyyyyMMdd'))
+WebUI.executeJavaScript('console.log(arguments[0])', Arrays.asList(element))
 
+WebUI.executeJavaScript('arguments[0].dispatchEvent(new Event(\'change\', { bubbles: true}))', Arrays.asList(element))
+
+//WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), laterDate.format('yyyyyyMMdd'))
 //WebUI.sendKeys(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), Keys.chord('0','0','2','2','2','0','0','3','0','5'))
-
-
 //WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), FailureHandling.STOP_ON_FAILURE)
-
 //System.exit(0)
-
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
         findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
 
@@ -105,6 +109,8 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/requ
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
     0)
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
 
