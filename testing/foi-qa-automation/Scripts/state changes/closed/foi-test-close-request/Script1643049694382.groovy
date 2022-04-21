@@ -24,7 +24,7 @@ def today = new Date()
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-if (today.format('HHmm', TimeZone.getTimeZone("Canada/Pacific")).toInteger() > 1630) {
+if (today.format('HHmm').toInteger() > 1630) {
     today = today.next()
 }
 
