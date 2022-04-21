@@ -55,6 +55,8 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Open', 
     0)
 
+WebUI.refresh(FailureHandling.STOP_ON_FAILURE)
+
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Social Tech Team'), 0)
@@ -74,8 +76,6 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.waitForElementClickable(findTestObject('Page_foi.flow/sign in/button_Log In'), 0)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             14), ('username') : findTestData('Login Credentials').getValue('Username', 14)], FailureHandling.STOP_ON_FAILURE)
