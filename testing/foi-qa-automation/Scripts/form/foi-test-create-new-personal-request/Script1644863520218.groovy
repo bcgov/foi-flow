@@ -125,6 +125,8 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request descript
 
 WebUI.takeScreenshotAsCheckpoint('current_viewport')
 
+System.exit(0)
+
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '002021-12-16')
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), '002021-12-16')
