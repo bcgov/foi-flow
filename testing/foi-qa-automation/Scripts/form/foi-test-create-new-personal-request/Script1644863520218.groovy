@@ -61,7 +61,6 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request desc
 
 //WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/h4_Select Ministry Client'), 'color'), 'rgba(255, 0, 0, 1)', 
 //    false)
-
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type parent'), 'class').contains(
     'Mui-error') == true
 
@@ -84,8 +83,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee use
 
 Random random = new Random()
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000) //generate random axis number for sake of test
-    )
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000 //generate random axis number for sake of test
+        ))
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 
     'required', 0)
@@ -119,11 +118,9 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Home Phone
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), description)
 
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
-
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
-
-WebUI.takeScreenshotAsCheckpoint('current_viewport')
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '002021-12-16')
 
@@ -234,7 +231,6 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue ro
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), WebUI.concatenate((([lastname
                 , ', ', firstname]) as String[])))
-
 
 WebUI.callTestCase(findTestCase('form/foi-test-request-fields-populated'), [('firstname') : 'Intake', ('lastname') : 'Flex'
         , ('applicantFirstname') : applicantFirstname, ('applicantLastname') : applicantLastname, ('email') : email, ('category') : category
