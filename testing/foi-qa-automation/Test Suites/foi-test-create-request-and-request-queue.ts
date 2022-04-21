@@ -155,7 +155,7 @@
    <testCaseLink>
       <guid>daa8ce43-73f6-4b12-8170-3127f5c41890</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/form/foi-test-create-new-general-request</testCaseId>
       <variableLink>
          <testDataLinkId></testDataLinkId>
