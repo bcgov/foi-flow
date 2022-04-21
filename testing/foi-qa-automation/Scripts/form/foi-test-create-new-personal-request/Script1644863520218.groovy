@@ -233,6 +233,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue ro
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), WebUI.concatenate((([lastname
                 , ', ', firstname]) as String[])))
 
+WebUI.takeScreenshotAsCheckpoint('current_viewport')
+
 WebUI.callTestCase(findTestCase('form/foi-test-request-fields-populated'), [('firstname') : 'Intake', ('lastname') : 'Flex'
         , ('applicantFirstname') : applicantFirstname, ('applicantLastname') : applicantLastname, ('email') : email, ('category') : category
         , ('streetAddress') : streetAddress, ('streetAddress2') : streetAddress2, ('city') : city, ('province') : province
