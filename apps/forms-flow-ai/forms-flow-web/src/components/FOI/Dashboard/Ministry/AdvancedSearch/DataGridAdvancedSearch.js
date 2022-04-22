@@ -29,18 +29,23 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     queryData,
     setSearchLoading,
     advancedSearchComponentLoading,
+    advancedSearchParams,
   } = useContext(ActionContext);
 
   const classes = useStyles();
 
   const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  const [rowsState, setRowsState] = React.useState(
+    Object.keys(advancedSearchParams).length > 0 ? 
+      {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 
+      defaultRowsState
+  );
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
     { field: "receivedDateUF", sort: "desc" },
   ];
-  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  const [sortModel, setSortModel] = React.useState(advancedSearchParams?.sort || defaultSortModel);
 
   useEffect(() => {
     if (searchResults) {
@@ -161,6 +166,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             disableColumnMenu={true}
             pagination
             paginationMode="server"
+            initialState={{
+              pagination: rowsState
+            }}
             onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
             onPageSizeChange={(pageSize) =>
               setRowsState((prev) => ({ ...prev, pageSize }))
