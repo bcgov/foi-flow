@@ -125,7 +125,7 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'U-00' + requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
