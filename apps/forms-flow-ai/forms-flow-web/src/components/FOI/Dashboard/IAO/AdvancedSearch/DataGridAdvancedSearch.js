@@ -222,7 +222,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "",
       width: 0,
       hide: true,
-      renderCell: (params) => <span></span>,
+      renderCell: (_params) => <span></span>,
     },
   ];
   
