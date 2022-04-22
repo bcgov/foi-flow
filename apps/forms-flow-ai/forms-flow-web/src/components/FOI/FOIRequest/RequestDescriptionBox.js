@@ -268,7 +268,7 @@ const RequestDescription = React.memo(({
                     </div>    
                   </div>
                 )}
-                { (Object.entries(localProgramAreaList).length !== 0 && statesBeforeOpen.includes(requestDetails.currentState.toLowerCase())) &&
+                { (Object.entries(localProgramAreaList).length !== 0 && (!requestDetails.currentState || statesBeforeOpen.includes(requestDetails.currentState?.toLowerCase()))) &&
                 <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
                 }
             </CardContent>
