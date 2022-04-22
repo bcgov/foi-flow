@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import "../dashboard.scss";
 import Grid from "@mui/material/Grid";
@@ -8,6 +9,7 @@ import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
+import { setShowAdvancedSearch } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -24,7 +26,8 @@ const useStyles = makeStyles(() => ({
 
 const MinistryDashboard = ({ userDetail }) => {
   const classes = useStyles();
-  const [advnacedSearchEnabled, setAdvancedSearchEnabled] = useState(false);
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const dispatch = useDispatch();
 
   return (
     <div className="container foi-container">
@@ -52,12 +55,12 @@ const MinistryDashboard = ({ userDetail }) => {
             alignItems="center"
           >
             <ButtonBase
-              onClick={() => setAdvancedSearchEnabled(false)}
+              onClick={() => dispatch(setShowAdvancedSearch(false))}
               disableRipple
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: advnacedSearchEnabled,
+                  [classes.disabledTitle]: showAdvancedSearch,
                 })}
               >
                 Your FOI Request Queue
@@ -75,12 +78,12 @@ const MinistryDashboard = ({ userDetail }) => {
               orientation="vertical"
             />
             <ButtonBase
-              onClick={() => setAdvancedSearchEnabled(true)}
+              onClick={() => dispatch(setShowAdvancedSearch(true))}
               disableRipple
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: !advnacedSearchEnabled,
+                  [classes.disabledTitle]: !showAdvancedSearch,
                 })}
               >
                 Advanced Search
@@ -93,7 +96,7 @@ const MinistryDashboard = ({ userDetail }) => {
           direction="row"
           spacing={1}
           className={clsx({
-            [classes.hidden]: advnacedSearchEnabled,
+            [classes.hidden]: showAdvancedSearch,
           })}
           sx={{
             marginTop: "2em",
@@ -110,7 +113,7 @@ const MinistryDashboard = ({ userDetail }) => {
             marginTop: "2em",
           }}
           className={clsx({
-            [classes.hidden]: !advnacedSearchEnabled,
+            [classes.hidden]: !showAdvancedSearch,
           })}
         >
           <AdvancedSearch userDetail={userDetail} />

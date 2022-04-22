@@ -10,6 +10,7 @@ import Pagination from '@mui/material/Pagination';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
+import { push } from "connected-react-router";
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
@@ -33,6 +34,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     queryData,
     setSearchLoading,
     advancedSearchComponentLoading,
+    advancedSearchParams,
   } = useContext(ActionContext);
 
   const assignedToList = useSelector(
@@ -42,13 +44,17 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   const classes = useStyles();
 
   const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  const [rowsState, setRowsState] = React.useState(
+    Object.keys(advancedSearchParams).length > 0 ? 
+      {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 
+      defaultRowsState
+  );
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
     { field: "receivedDateUF", sort: "desc" },
   ];
-  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  const [sortModel, setSortModel] = React.useState(advancedSearchParams?.sort || defaultSortModel);
 
   useEffect(() => {
     if (searchResults) {
@@ -70,8 +76,25 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     } else {
       link = "./reviewrequest/" + params.row.id;
     }
-    return <Link href={link}><div className="MuiDataGrid-cellContent">{params.value}</div></Link>
+    return (
+      <Link href={link} onClick={e => renderReviewRequest(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link>
+    )
   }
+
+  const renderReviewRequest = (e, row) => {
+    e.preventDefault()
+    if (row.ministryrequestid) {
+      dispatch(
+        push(
+          `/foi/foirequests/${row.id}/ministryrequest/${row.ministryrequestid}`
+        )
+      );
+    } else {
+      dispatch(push(`/foi/reviewrequest/${row.id}`));
+    }
+  };
 
   const columns = React.useRef([
     {
@@ -174,6 +197,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             disableColumnMenu={true}
             pagination
             paginationMode="server"
+            initialState={{
+              pagination: rowsState
+            }}
             onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
             onPageSizeChange={(pageSize) =>
               setRowsState((prev) => ({ ...prev, pageSize }))

@@ -5,6 +5,24 @@ export const setFOILoader = (data) => dispatch =>{
         payload:data
     })
 }
+export const setQueueFilter = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_FILTER,
+        payload:data
+    })
+}
+export const setShowAdvancedSearch = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,
+        payload:data
+    })
+}
+export const setAdvancedSearchParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS,
+        payload:data
+    })
+}
 export const setFOIAssignedToListLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING,
