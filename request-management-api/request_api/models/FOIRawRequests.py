@@ -443,7 +443,25 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'axisRequestId', 'requestPageCount', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
+        validfields = [
+            'firstName',
+            'lastName',
+            'requestType',
+            'idNumber',
+            'axisRequestId',
+            'requestPageCount',
+            'currentState',
+            'assignedTo',
+            'receivedDate',
+            'assignedToFirstName',
+            'assignedToLastName',
+            'duedate',
+            'stateForSorting',
+            'assignedToFormatted',
+            'ministryAssignedToFormatted',
+            'cfrduedate',
+            'applicantcategory'
+        ]
         if x in validfields:
             return True
         else:
