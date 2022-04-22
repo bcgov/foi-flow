@@ -6,7 +6,6 @@ import {
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import Chip from "@mui/material/Chip";
-import Link from "@mui/material/Link";
 
 export const debounce = (func, wait) => {
   let timeout;
@@ -160,20 +159,4 @@ export const ClickableChip = ({ clicked, ...rest }) => {
 export const addYears = (n) => {
   const currentDate = new Date();
   return currentDate.setFullYear(currentDate.getFullYear() + n);
-};
-
-export const hyperlinkRenderCell = (params) => {
-  var link;
-  if (params.row.ministryrequestid) { 
-    link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
-  } else {
-    link = "./reviewrequest/" + params.row.id;
-  }
-  return <Link href={link}><div className="MuiDataGrid-cellContent">{params.value}</div></Link>
-};
-
-export const hyperlinkRenderCellforMinistry = (params) => {
-  var link;
-  link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
-  return <Link href={link}><div className="MuiDataGrid-cellContent">{params.value}</div></Link>
 };

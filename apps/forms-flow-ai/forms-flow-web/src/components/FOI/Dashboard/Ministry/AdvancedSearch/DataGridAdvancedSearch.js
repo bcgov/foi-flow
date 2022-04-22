@@ -14,13 +14,16 @@ import Grid from "@mui/material/Grid";
 import {
   updateSortModel,
   getLDD,
-  getRecordsDue,
-  hyperlinkRenderCellforMinistry
+  getRecordsDue
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
+import { useDispatch } from "react-redux";
+import Link from "@mui/material/Link";
+import { push } from "connected-react-router";
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
+  const dispatch = useDispatch();
 
   const {
     handleUpdateSearchFilter,
@@ -59,6 +62,21 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       });
     }
   }, [rowsState, sortModel]);
+
+  const hyperlinkRenderCellforMinistry = (params) => {
+    var link;
+    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    return (
+      <Link href={link} onClick={e => renderReviewRequestforMinistry(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link>
+    )
+  };
+  
+  const renderReviewRequestforMinistry = (e, row) => {
+    e.preventDefault()
+    dispatch(push(`/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`));
+  };
 
   const columns = React.useRef([
     {
@@ -129,7 +147,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       renderCell: (params) => <span></span>,
     },
   ]);
-  
+
   if (advancedSearchComponentLoading && queryData) {
     return (
       <Grid item xs={12} container alignItems="center">

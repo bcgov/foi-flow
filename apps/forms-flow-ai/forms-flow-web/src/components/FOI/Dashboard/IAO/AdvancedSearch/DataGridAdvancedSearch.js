@@ -9,18 +9,30 @@ import {
 import Pagination from '@mui/material/Pagination';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
 import {
   updateSortModel,
+  getFullName,
+  getDaysLeft,
+  getReceivedDate,
+  onBehalfFullName,
+  getRecordsDue
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
-import { ConditionalComponent } from "../../../../../helper/FOI/helper";
-import { getTableInfo } from "./columns";
+import {
+  ConditionalComponent,
+  isProcessingTeam,
+  isFlexTeam,
+  isIntakeTeam,
+} from "../../../../../helper/FOI/helper";
 import clsx from "clsx";
+import Link from "@mui/material/Link";
+import { push } from "connected-react-router";
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
+  const dispatch = useDispatch();
 
   const {
     handleUpdateSearchFilter,
@@ -33,6 +45,300 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   } = useContext(ActionContext);
 
   const user = useSelector((state) => state.user.userDetail);
+
+  const hyperlinkRenderCell = (params) => {
+    var link;
+    if (params.row.ministryrequestid) { 
+      link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    } else {
+      link = "./reviewrequest/" + params.row.id;
+    }
+    return (
+      <Link href={link} onClick={e => renderReviewRequest(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link>
+    )
+  };
+  
+  const renderReviewRequest = (e, row) => {
+    e.preventDefault()
+    if (row.ministryrequestid) {
+      dispatch(
+        push(
+          `/foi/foirequests/${row.id}/ministryrequest/${row.ministryrequestid}`
+        )
+      );
+    } else {
+      dispatch(push(`/foi/reviewrequest/${row.id}`));
+    }
+  };
+
+  const ProcessingTeamColumns = [
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      width: 160,
+    },
+    {
+      field: "applicantName",
+      headerName: "APPLICANT NAME",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
+      width: 180,
+    },
+    {
+      field: "onBehalf",
+      headerName: "ON BEHALF",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: onBehalfFullName,
+      sortable: false,
+      width: 180,
+    },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 0.75,
+    },
+    {
+      field: "applicantcategory",
+      headerName: "CATEGORY",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "currentState",
+      headerName: "CURRENT STATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "assignedToFormatted",
+      headerName: "ASSIGNED TO",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "DaysLeftValue",
+      headerName: "DAYS LEFT",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getDaysLeft,
+      flex: 0.75,
+      sortable: false,
+    },
+    {
+      field: "extensions",
+      headerName: "EXT.",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 0.5,
+      sortable: false,
+      valueGetter: (params) =>
+        params.row.extensions === undefined ? "N/A" : params.row.extensions,
+    },
+    {
+      field: "requestPageCount",
+      headerName: "PAGES",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 0.5,
+    },
+  ];
+  
+  const IntakeTeamColumns = [
+    {
+      field: "applicantName",
+      headerName: "APPLICANT NAME",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
+      width: 180,
+    },
+    {
+      field: "requestType",
+      headerName: "REQUEST TYPE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "currentState",
+      headerName: "CURRENT STATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "assignedToFormatted",
+      headerName: "ASSIGNED TO",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "receivedDate",
+      headerName: "RECEIVED DATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getReceivedDate,
+      flex: 1,
+    },
+    {
+      field: "receivedDateUF",
+      headerName: "",
+      width: 0,
+      hide: true,
+      renderCell: (params) => <span></span>,
+    },
+  ];
+  
+  const FlexTeamColumns = [
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      width: 160,
+    },
+    {
+      field: "applicantName",
+      headerName: "APPLICANT NAME",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
+      width: 180,
+    },
+    {
+      field: "applicantcategory",
+      headerName: "CATEGORY",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "currentState",
+      headerName: "CURRENT STATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "assignedToFormatted",
+      headerName: "ASSIGNED TO",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "cfrduedate",
+      headerName: "CFR DUE",
+      flex: 1,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getRecordsDue,
+    },
+    {
+      field: "DaysLeftValue",
+      headerName: "DAYS LEFT",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getDaysLeft,
+      flex: 0.75,
+      sortable: false,
+    },
+  ];
+  
+  const defaultTableInfo = {
+    columns: IntakeTeamColumns,
+    sort: [
+      { field: "currentState", sort: "desc" },
+      { field: "receivedDateUF", sort: "desc" },
+    ],
+    stateClassName: {
+      open: "flex-open",
+    },
+  };
+  
+  const getTableInfo = (userGroups) => {
+    if (!userGroups || isIntakeTeam(userGroups)) {
+      return defaultTableInfo;
+    }
+  
+    if (isProcessingTeam(userGroups)) {
+      return {
+        columns: ProcessingTeamColumns,
+        sort: [
+          { field: "currentState", sort: "desc" },
+          { field: "receivedDateUF", sort: "desc" },
+        ],
+      };
+    }
+  
+    if (isFlexTeam(userGroups)) {
+      return {
+        columns: FlexTeamColumns,
+        sort: [
+          { field: "currentState", sort: "desc" },
+          { field: "receivedDateUF", sort: "desc" },
+        ],
+        stateClassName: {
+          open: "flex--open",
+        },
+      };
+    }
+  
+    return defaultTableInfo;
+  };
   const tableInfo = getTableInfo(user.groups);
   
   const classes = useStyles();
