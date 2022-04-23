@@ -61,9 +61,9 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Home Phone
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 'testing 123 description')
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
 
 WebUI.takeScreenshotAsCheckpoint('current_viewport')
 
