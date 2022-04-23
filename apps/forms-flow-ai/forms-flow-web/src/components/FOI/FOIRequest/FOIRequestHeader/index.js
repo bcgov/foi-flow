@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
-import { getMenuItems, getHeaderText, getAssignedTo, getStatus, } from "./utils";
+import { getMenuItems, getAssignedTo, getStatus, } from "./utils";
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
