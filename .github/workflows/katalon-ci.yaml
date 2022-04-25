@@ -1,7 +1,7 @@
 name: Katalon
 on:
   schedule:
-    - cron: "20 6 * * *"
+    - cron: "23 18 * * *"
   # push:
   #   branches: [ dev-NK-automationscripts ]
   # pull_request:
