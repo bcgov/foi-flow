@@ -659,6 +659,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               handleStateChange={handleStateChange}
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
+              requestType={requestDetails?.requestType}
             />
           </div>
 
