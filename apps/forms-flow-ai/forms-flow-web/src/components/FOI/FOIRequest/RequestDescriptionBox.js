@@ -155,13 +155,18 @@ const RequestDescription = React.memo(({
     
     const sortedList = requestDescriptionHistoryList.sort((a, b) => {       
       return new Date(a.createdAt) - new Date(b.createdAt);
-  });
+    });
 
     const filteredList = sortedList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
             copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
         ))
     )
+
+    const statesBeforeOpen = [
+      StateEnum.unopened.name.toLowerCase(),
+      StateEnum.intakeinprogress.name.toLowerCase(),
+    ];
 
      return (
         
@@ -263,9 +268,9 @@ const RequestDescription = React.memo(({
                     </div>    
                   </div>
                 )}
-                { Object.entries(localProgramAreaList).length !== 0 ?
+                { (Object.entries(localProgramAreaList).length !== 0 && (!requestDetails.currentState || statesBeforeOpen.includes(requestDetails.currentState?.toLowerCase()))) &&
                 <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
-                :null}
+                }
             </CardContent>
         </Card>
        
