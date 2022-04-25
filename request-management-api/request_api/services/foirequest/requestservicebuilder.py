@@ -37,14 +37,14 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.createdby = userid
         requeststatusid =  self.getpropertyvaluefromschema(requestschema, 'requeststatusid')
         if requeststatusid is not None:
-            status = self.getstatusname(requeststatusid)       
-            
+            status = self.getstatusname(requeststatusid)
         if self.isNotBlankorNone(requestschema,"fromDate","main") == True:
             foiministryrequest.recordsearchfromdate = requestschema.get("fromDate")
         if self.isNotBlankorNone(requestschema,"toDate","main") == True:
-            foiministryrequest.recordsearchtodate = requestschema.get("toDate")        
+            foiministryrequest.recordsearchtodate = requestschema.get("toDate")
+        
         self.__updateassignedtoandgroup(foiministryrequest, requestschema, ministry, status, filenumber, ministryid)
-        self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)        
+        self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)
 
         if ministryid is not None:
             foiministryrequest.foiministryrequestid = ministryid
