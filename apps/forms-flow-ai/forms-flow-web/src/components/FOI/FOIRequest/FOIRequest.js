@@ -633,8 +633,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
   const disableBannerForClosed = () => {
-    return (!!stateTransition?.find( ({ status }) => status?.toLowerCase() === 
-        StateEnum.intakeinprogress.name.toLowerCase()));
+   if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase())){
+      if(axisMessage === "WARNING")
+        setAxisMessage("");
+      return true;
+    }
+    return false;
   }
 
   return (!isLoading &&
