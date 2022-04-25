@@ -640,9 +640,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1>
-              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
-            </h1>
+            <a href="/foi/dashboard" aria-label="dashboard link">
+              <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
+            </a>
           </div>
           <div className="foileftpaneldropdown">
             <StateDropDown

@@ -171,7 +171,6 @@ const watcherOnChange = (event) => {
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>
                     <Select
-                    labelId="demo-multiple-checkbox-label"
                     id="foi-watcher"
                     className="foi-watcher"
                     multiple

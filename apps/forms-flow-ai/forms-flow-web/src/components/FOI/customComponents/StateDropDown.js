@@ -149,6 +149,7 @@ const StateDropDown = ({
     <TextField
       id="foi-status-dropdown"
       className="foi-state-dropdown"
+      inputProps={{"aria-labelledby": "foi-status-dropdown-label"}}
       InputLabelProps={{ shrink: false }}
       select
       value={status}
