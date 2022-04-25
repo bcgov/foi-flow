@@ -13,6 +13,7 @@ import Popover from "@material-ui/core/Popover";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import { extensionStatusId } from "../../../../constants/FOI/enum";
+import { StateEnum } from "../../../../constants/FOI/statusEnum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,6 +41,7 @@ const ExtensionsTable = ({ showActions = true }) => {
     setSaveModalOpen,
     setDeleteModalOpen,
     setExtensionId,
+    requestState
   } = useContext(ActionContext);
 
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -174,8 +176,9 @@ const ExtensionsTable = ({ showActions = true }) => {
                         setExtensionId(extension.foirequestextensionid);
                       }}
                       disabled={
-                        index > 0 &&
-                        extension.extensionstatus !== extensionStatusId.pending
+                        (index > 0 &&
+                        extension.extensionstatus !== extensionStatusId.pending) || requestState?.toLowerCase() ===  StateEnum.onhold.name.toLowerCase() || 
+                        requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase()
                       }
                     >
                       <MoreHorizIcon />
