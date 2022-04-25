@@ -154,8 +154,10 @@ class dashboardservice:
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 requestqueue.append(unopenrequest)
             else:
+                extensionscount = self.extension_service.getrequestextensionscount(requestid = request.ministryrequestid)
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                _openrequest.update({'extensions': extensionscount})
                 _openrequest.update({'description':request.description})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})

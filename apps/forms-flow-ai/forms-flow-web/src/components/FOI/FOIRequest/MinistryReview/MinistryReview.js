@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Chip from "@mui/material/Chip";
 import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
 import '../FOIRequestHeader/foirequestheader.scss'
@@ -7,6 +9,7 @@ import "./MinistryReviewTabbedContainer.scss";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import { push } from "connected-react-router";
 import {  
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList
@@ -41,7 +44,7 @@ import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConst
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
-import { getMinistryBottomTextMap, alertUser } from "./utils";
+import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
 
 const useStyles = makeStyles((theme) => ({
@@ -158,7 +161,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
-  }, [requestId]);
+  }, [requestId, ministryId, comment, attachments]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] =
@@ -256,12 +259,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [stateChanged, setStateChanged] = useState(false);
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    setUnSavedRequest(_unSaved);
     if (!_unSaved && ministryId && requestId) {
+      setUnSavedRequest(_unSaved);
+      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+      dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`;
+        dispatch(push(`/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`))
+        dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -455,6 +461,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
       />
     );
 
+  
+  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -530,6 +539,23 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   className={`${classes.root} foi-request-form`}
                   autoComplete="off"
                 >
+
+                    <ConditionalComponent condition={showBreadcrumbs}>
+                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />
+                        <Chip
+                          label={getHeaderText(requestDetails)}
+                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                        />
+                      </Breadcrumbs>
+                    </ConditionalComponent>
+                    <ConditionalComponent condition={!showBreadcrumbs}>
+                      <div style={{marginTop: 20}}></div>
+                    </ConditionalComponent>
                   {Object.entries(requestDetails).length > 0 &&
                     requestDetails !== undefined && (
                       <>
