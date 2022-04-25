@@ -1,0 +1,70 @@
+name: Katalon
+on:
+  schedule:
+    - cron: "30 20 * * *"
+  # push:
+  #   branches: [ dev-NK-automationscripts ]
+  # pull_request:
+    # branches: [ dev ]
+
+jobs:
+  katalon-win:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: set screen resolution
+      run: Set-DisplayResolution -Width 1920 -Height 1080 -Force  
+    - name: set date format
+      run: |
+            Import-Module International
+            Set-Culture 'en-CA'
+    - name: create Test Attachments
+      run: |            
+            echo '${{ github.workspace }}'
+            cd "testing\foi-qa-automation\Test Attachments"
+            fsutil file createnew 50mb.pdf 53428800
+            fsutil file createnew 500mb.pdf 534288000
+            fsutil file createnew invalidfiletype.bin 5242880
+            dir
+      shell: cmd
+    - name: Katalon Studio Github Action
+      uses: katalon-studio/katalon-studio-github-action@v2
+      with:
+          version: '8.2.0'
+          projectPath: '${{ github.workspace }}/testing/foi-qa-automation/foi-qa-automation.prj'
+          args: '-noSplash -retry=0  -testSuiteCollectionPath="Test Suites/foi-test" -apiKey=${{ secrets.KATALON_API_KEY }} --config -webui.autoUpdateDrivers=true -licenseRelease=true -browserType="Chrome" -proxy.auth.option=NO_PROXY -proxy.system.option=NO_PROXY -proxy.system.applyToDesiredCapabilities=true -executionProfile="dev" '
+    - name: copy reports to one folder
+      run: | 
+            mkdir artifacts
+            FOR /d  %%a in ("${{ github.workspace }}\testing\foi-qa-automation\Reports\*") DO FOR /d %%b in ("%%a\*") DO FOR /d %%c in ("%%b\*") do (robocopy "%%c" "${{ github.workspace }}\artifacts" *.html
+            robocopy "%%a\foi-test\%%~nxa" "${{ github.workspace }}\artifacts" JUnit_Report.xml
+            rename artifacts\%%~nxc.html %%~nxb.html)
+            cd artifacts
+            dir
+      shell: cmd
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Create collection report    
+      run: |
+            npm i -g xunit-viewer
+            xunit-viewer -r  artifacts\JUnit_Report.xml -o artifacts\foi-test.html
+    - name: Archive Katalon report
+      uses: actions/upload-artifact@v2
+      with:
+        name: katalon-report
+        path: artifacts
+        # D:\a\foi-flow\foi-flow\testing\foi-qa-automation\Reports\20220217_191948\foi-test-homepage-and-login\20220217_191954
+  # katalon-mac:
+  #   runs-on: macos-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v2
+  #   - name: Katalon Studio Github Action
+  #     uses: katalon-studio/katalon-studio-github-action@v2.1
+  #     with:
+  #         version: '7.5.5'
+  #         projectPath: '${{ github.workspace }}'
+  #         args: '-noSplash -retry=0 -browserType=Chrome -statusDelay=15 -testSuitePath="Test Suites/TS_RegressionTest" -apiKey= ${{ secrets.API_KEY }} --config -webui.autoUpdateDrivers=true'
