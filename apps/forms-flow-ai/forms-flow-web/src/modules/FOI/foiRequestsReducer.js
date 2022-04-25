@@ -1,6 +1,9 @@
 import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 const initialState = {
   isLoading: true,
+  queueFilter: "myRequests",
+  showAdvancedSearch: false,
+  foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
   foiRequestsList: null,
@@ -35,6 +38,18 @@ const foiRequests = (state = initialState, action) => {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return { ...state, isLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
+      return { ...state, queueFilter: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
+      return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
+      return { 
+        ...state, 
+        foiAdvancedSearchParams: {
+          ...state.foiAdvancedSearchParams,
+          ...action.payload 
+        }
+      };
     case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
       return { ...state, isAssignedToListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
