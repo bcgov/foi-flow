@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
+import { setQueueFilter } from "../../../../actions/FOI/foiRequestActions";
 import {
   debounce,
   ClickableChip,
@@ -55,7 +56,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     ],
     keyword: null,
   });
-  const [requestFilter, setRequestFilter] = useState("myRequests");
+  const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
@@ -80,7 +81,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       return;
     }
     setRowsState(defaultRowsState);
-    setRequestFilter(filter);
+    dispatch(setQueueFilter(filter));
   };
 
   const setSearch = debounce((e) => {

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Chip from "@mui/material/Chip";
 import './foirequest.scss';
 import FOIRequestHeader from './FOIRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -42,7 +44,7 @@ import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
-import { getAssignedTo } from "./FOIRequestHeader/utils";
+import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
 import {
   getTabBottomText,
   confirmChangesLost,
@@ -163,6 +165,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
+  const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -203,6 +206,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
+      setHeaderText(getHeaderText({requestDetails, ministryId, requestState}))
       if(requestDetails.axisRequestId){
         dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
           if(!err){
@@ -481,21 +485,18 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
+
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    setUnSavedRequest(_unSaved);
 
     if (!_unSaved) {
+      setUnSavedRequest(_unSaved);
+      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
-
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-        } else {
-          dispatch(push(`/foi/reviewrequest/${id}`));
-        }
+        dispatch(push(getRedirectAfterSaveUrl(ministryId, id || requestId)));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -505,8 +506,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handleOpenRequest = (parendId, _ministryId, unSaved) => {
-    setUnSavedRequest(unSaved);
     if (!unSaved) {
+      setUnSavedRequest(unSaved);
       setStateChanged(false);
       setcurrentrequestStatus(StateEnum.open.name);
 
@@ -628,6 +629,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   );
 
   const stateTransition = requestDetails?.stateTransition;
+  
+  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+
+  const disableBannerForClosed = () => {
+    return (!!stateTransition?.find( ({ status }) => status?.toLowerCase() === 
+        StateEnum.intakeinprogress.name.toLowerCase()));
+  }
 
   return (!isLoading &&
     requestDetails &&
@@ -702,7 +710,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
-        { requestState !== StateEnum.intakeinprogress.name &&
+        { requestState !== StateEnum.intakeinprogress.name && !disableBannerForClosed() &&
           <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
         }
           <div
@@ -725,9 +733,26 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       isAddRequest
                     }
                   >
+                    <ConditionalComponent condition={showBreadcrumbs}>
+                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />
+                        <Chip
+                          label={headerText}
+                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                        />
+                      </Breadcrumbs>
+                    </ConditionalComponent>
+                    <ConditionalComponent condition={!showBreadcrumbs}>
+                      <div style={{marginTop: 20}}></div>
+                    </ConditionalComponent>
                     <>
                       <FOIRequestHeader
                         headerValue={headerValue}
+                        headerText={headerText}
                         requestDetails={requestDetails}
                         handleAssignedToValue={handleAssignedToValue}
                         createSaveRequestObject={createSaveRequestObject}
