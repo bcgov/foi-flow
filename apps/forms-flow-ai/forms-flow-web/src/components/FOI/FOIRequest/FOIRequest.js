@@ -491,8 +491,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
-      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
-      dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+      dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
