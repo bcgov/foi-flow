@@ -96,6 +96,18 @@ export const onBehalfFullName = (params) => {
   }`;
 };
 
+export const getRecordsDue = (params) => {
+  let receivedDateString = params.row.cfrduedate;
+  const currentStatus = params.row.currentState;
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+    return "N/A";
+  } else if(!receivedDateString) {
+    return "";
+  } else {
+    return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
+  }
+};
+
 export const getLDD = (params) => {
   let receivedDateString = params.row.duedate;
   const currentStatus = params.row.currentState;
