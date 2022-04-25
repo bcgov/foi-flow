@@ -94,7 +94,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       else{
         if(key === 'Extensions' || key === 'additionalPersonalInfo')
           return true;
-        else if(key === 'compareReceivedDate' && (saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key])){
+        else if(key === 'compareReceivedDate' && (saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key] && 
+                saveRequestObject['receivedDate'] !== requestDetailsFromAxis['receivedDate'])){
           return true;
         }
         else if(key !== 'compareReceivedDate' && (saveRequestObject[key] || requestDetailsFromAxis[key]) && 
@@ -107,7 +108,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const assignDisplayedReqObj = (key,updatedObj, updatedField) => {     
       switch (key) {
         case 'dueDate':
-        case 'axisSyncDate':
+        case 'requestProcessStart':
         case 'fromDate': 
         case 'toDate':
         case 'cfrDueDate':
@@ -135,7 +136,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           break;
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
-          if(extensions.length > 0 || requestDetailsFromAxis[key].length > 0)
+          if(extensionsArr?.length > 0 || (extensionsArr?.length === 0 && 
+              requestDetailsFromAxis[key].length === 0 && extensions?.length > 0))
             updatedObj[key] = extensionsArr;
           break;
         default:

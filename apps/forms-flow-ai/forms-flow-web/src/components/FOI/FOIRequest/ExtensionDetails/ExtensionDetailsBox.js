@@ -10,6 +10,7 @@ import ExtensionsTable from "./ExtensionsTable";
 import "./extensionscss.scss";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
+import { StateEnum } from "../../../../constants/FOI/statusEnum";
 
 const useStyles = makeStyles((theme) => ({
   btndisabled: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 const ExtensionDetailsBox = React.memo(() => {
   const classes = useStyles();
 
-  const { setSaveModalOpen, setExtensionId, pendingExtensionExists, dispatch } =
+  const { setSaveModalOpen, setExtensionId, pendingExtensionExists, dispatch, requestState } =
     useContext(ActionContext);
 
   const { ministryId } = useParams();
@@ -51,7 +52,8 @@ const ExtensionDetailsBox = React.memo(() => {
                 setSaveModalOpen(true);
                 setExtensionId(null);
               }}
-              disabled={pendingExtensionExists}
+              disabled={pendingExtensionExists || requestState?.toLowerCase() ===  StateEnum.onhold.name.toLowerCase() || 
+                requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase()}
             >
               New Extension
             </button>
