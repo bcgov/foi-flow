@@ -632,6 +632,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   
   const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
+  const disableBannerForClosed = () => {
+    return (!!stateTransition?.find( ({ status }) => status?.toLowerCase() === 
+        StateEnum.intakeinprogress.name.toLowerCase()));
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -653,6 +658,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               handleStateChange={handleStateChange}
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
+              requestType={requestDetails?.requestType}
             />
           </div>
 
@@ -704,7 +710,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
-        { requestState !== StateEnum.intakeinprogress.name &&
+        { requestState !== StateEnum.intakeinprogress.name && !disableBannerForClosed() &&
           <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
         }
           <div

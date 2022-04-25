@@ -9,6 +9,8 @@ import {
   StateEnum,
 } from "../../../constants/FOI/statusEnum";
 
+import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
+
 const StateDropDown = ({
   requestState = StateEnum.unopened.name,
   requestStatus,
@@ -16,7 +18,8 @@ const StateDropDown = ({
   isMinistryCoordinator,
   isValidationError,
   stateTransition,
-  updateStateDropDown
+  updateStateDropDown,
+  requestType
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -83,6 +86,9 @@ const StateDropDown = ({
     if (_isMinistryCoordinator) {
       _stateList = MinistryStateList;
     }
+    const personalRequest = requestType?.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL;
+    const personalIAO = !_isMinistryCoordinator && personalRequest;
+
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
         return _stateList.unopened;
@@ -95,6 +101,8 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
+        if (_isMinistryCoordinator && personalRequest)
+          return _stateList.callforrecordsforpersonal;
         return _stateList.callforrecords;
       case StateEnum.review.name.toLowerCase():
         return _stateList.review;
@@ -105,6 +113,8 @@ const StateDropDown = ({
       case StateEnum.signoff.name.toLowerCase():
         return _stateList.signoff;
       case StateEnum.feeassessed.name.toLowerCase():
+        if (personalIAO)
+          return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
       case StateEnum.onhold.name.toLowerCase():
         return _stateList.onhold;
@@ -113,6 +123,8 @@ const StateDropDown = ({
       case StateEnum.harms.name.toLowerCase():
         return _stateList.harms;
       case StateEnum.response.name.toLowerCase():
+        if (personalIAO)
+          return _stateList.responseforpersonal;
         return _stateList.response;
       default:
         return [];
