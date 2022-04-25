@@ -632,6 +632,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
   
   const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
+  const showBannerForClosed = () => {
+    if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase()))
+      return false;
+    return true;
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -704,7 +710,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
-        { requestState !== StateEnum.intakeinprogress.name &&
+        { requestState !== StateEnum.intakeinprogress.name && showBannerForClosed() &&
           <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
         }
           <div
