@@ -702,6 +702,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           onChange={handleRequestTypeChange}
                           checked={requestTypes.personal}
                           color="success"
+                          disabled={requestTypes.generaldisabled}
                         />
                       }
                       label="Personal"

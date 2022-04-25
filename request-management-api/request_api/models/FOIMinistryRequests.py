@@ -761,8 +761,11 @@ class FOIMinistryRequest(db.Model):
         groupfilter = []
         for group in params['groups']:
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
+        
+        #ministry advanced search show cfr onwards
+        statefilter = FOIMinistryRequest.requeststatusid.in_([2,3,7,9,8,10,11,12,13,14,16])
 
-        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee).filter(or_(*groupfilter))
+        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee).filter(and_(or_(*groupfilter), statefilter))
 
         #sorting
         sortingcondition = FOIMinistryRequest.getsorting(params['sortingitems'], params['sortingorders'], iaoassignee, ministryassignee)
