@@ -1,6 +1,7 @@
 import React  from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -169,14 +170,17 @@ const watcherOnChange = (event) => {
               <div className="foi-watcher-all">
                    <button onClick={watcherOnChange} className="foi-eye-container" disabled = {disableInput} > <i className="fa fa-eye foi-eye"></i> {isUseraWatcher? "Unwatch" : "Watch" }</button>
                 <div className="foi-watcher-select">
-                    <i className="fa fa-user-o"></i>
+                    <i className="fa fa-user-o"></i>                    
+                    <InputLabel id="foi-watcher-label">
+                      Watchers
+                    </InputLabel>
                     <Select
-                    labelId="demo-multiple-checkbox-label"
                     id="foi-watcher"
                     className="foi-watcher"
                     multiple
                     value={personName}
                     onChange={handleChange}
+                    inputProps={{'aria-labelledby': 'foi-watcher-label'}}
                     input={<OutlinedInput label="Tag" />}
                     renderValue={renderValue}                    
                     MenuProps={MenuProps}
