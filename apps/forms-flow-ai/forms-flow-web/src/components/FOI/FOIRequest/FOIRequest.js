@@ -491,8 +491,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
-      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
-      dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+      dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
+      dispatch(fetchFOIRequestNotesList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -632,6 +632,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
   
   const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
+  const disableBannerForClosed = () => {
+   if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase())){
+      if(axisMessage === "WARNING")
+        setAxisMessage("");
+      return true;
+    }
+    return false;
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -653,6 +662,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               handleStateChange={handleStateChange}
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
+              requestType={requestDetails?.requestType}
             />
           </div>
 
@@ -704,7 +714,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
-        { requestState !== StateEnum.intakeinprogress.name &&
+        { requestState !== StateEnum.intakeinprogress.name && !disableBannerForClosed() &&
           <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
         }
           <div

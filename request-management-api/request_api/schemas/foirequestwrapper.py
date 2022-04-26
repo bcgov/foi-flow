@@ -90,7 +90,8 @@ class FOIRequestWrapperSchema(Schema):
     assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True)
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True)
 
-    
+    reopen = fields.Bool(data_key="reopen",allow_none=True)
+
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
     workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])  
     phoneSecondary = fields.Str(data_key="phoneSecondary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    

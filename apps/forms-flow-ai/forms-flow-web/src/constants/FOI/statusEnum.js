@@ -5,13 +5,15 @@ const StateList = Object.freeze({
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
+    feeassessedforpersonal: [{status: "Fee Estimate", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     deduplication: [{status: "Deduplication", isSelected: false}, {status: "Harms Assessment", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
     harms: [{status: "Harms Assessment", isSelected: false}, {status: "Closed", isSelected: false}],
     consult: [{status: "Consult", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
     review: [{status: "Records Review", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Consult", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status: "Response", isSelected: false}, {status: "Closed", isSelected: false}],
     signoff: [{status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
-    response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],    
+    response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
+    responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],    
 });
 
 const MinistryStateList = Object.freeze({
@@ -20,6 +22,7 @@ const MinistryStateList = Object.freeze({
     redirect: [{status: "Redirect", isSelected: false}],
     open: [{status: "Open", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Fee Estimate", isSelected: false}, {status: "Harms Assessment", isSelected: false}, {status: "Deduplication", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}],
+    callforrecordsforpersonal: [{status: "Call For Records", isSelected: false}, {status: "Harms Assessment", isSelected: false}, {status: "Deduplication", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}],
     deduplication: [{status: "Deduplication", isSelected: false}],
