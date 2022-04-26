@@ -118,7 +118,6 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                             fullWidth
                             disabled={disableInput}
                         />
-                        <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>
                 </div> 
             </CardContent>
