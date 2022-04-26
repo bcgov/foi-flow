@@ -117,7 +117,6 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             fullWidth
                             disabled={disableInput}
                         />                   
-                        <InputLabel id="demo-simple-select-label" className="foi-attached-documents-label">Attached Documents</InputLabel>
                     </div>
                 </div> 
             </CardContent>
