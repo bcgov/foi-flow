@@ -30,7 +30,7 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     receivedMode:"Received Mode",
     deliveryMode:"Delivery Mode",
     compareReceivedDate: "Received Date",
-    requestStartDate:"Request Start Date",
+    requestProcessStart:"Request Start Date",
     dueDate:"Legislated Due Date",
 
     general:"Request Type General",

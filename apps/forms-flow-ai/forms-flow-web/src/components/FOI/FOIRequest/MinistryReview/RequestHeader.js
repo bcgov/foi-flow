@@ -23,32 +23,39 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
 
     const dispatch = useDispatch();
     useEffect(() => {
-      if (!assignedToList || assignedToList.length === 0) {
+      if (assignedToList?.length === 0) {
         dispatch(fetchFOIFullAssignedToList());
       }
     }, [dispatch]); 
 
-    function getFullName(assignedToList, requestDetails) {
-        const groupName = requestDetails.assignedGroup ? requestDetails.assignedGroup : "Unassigned";
-        const assignedTo = requestDetails.assignedTo ? requestDetails.assignedTo : groupName;
-        if (assignedToList.length > 0) {
-            const assigneeGroup = assignedToList.find(_assigneeGroup => _assigneeGroup.name === groupName);
-            const assignee = assigneeGroup && assigneeGroup.members && assigneeGroup.members.find(_assignee => _assignee.username === assignedTo);
-            if (groupName === assignedTo) {
-                return groupName;
-            }
-            else {
-                return assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
-            }
-        }
-        else {
-            return groupName;
-        }
+    const getGroupName = () => {
+        if (_requestDetails.assignedGroup)
+            return _requestDetails.assignedGroup;
+        return "Unassigned";
     }
 
+    const getAssignedTo = (groupName) => {
+        if (_requestDetails.assignedTo)
+            return _requestDetails.assignedTo;
+        return groupName;
+    }
+    function getFullName() {
+        const groupName = getGroupName();
+        const assignedTo = getAssignedTo(groupName);
+        if (assignedToList?.length > 0) {
+            const assigneeGroup = assignedToList.find(_assigneeGroup => _assigneeGroup.name === groupName);
+            const assignee = assigneeGroup?.members?.find(_assignee => _assignee.username === assignedTo);
+            if (groupName === assignedTo) 
+                return groupName;
+            return assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
+        }
+        return groupName;
+    }
+
+    
     const headerText = getHeaderText(_requestDetails);
     
-    const assignedToValue = getFullName(assignedToList, _requestDetails);
+    const assignedToValue = getFullName();
 
     const watcherBox = (
         requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
