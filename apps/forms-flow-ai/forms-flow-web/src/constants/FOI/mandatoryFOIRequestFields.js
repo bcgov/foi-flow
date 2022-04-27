@@ -12,7 +12,7 @@ const MANDATORY_FOI_REQUEST_FIELDS = {
     REQUEST_TYPE: "requestType",
     RECEIVED_MODE: "receivedMode",
     DELIVERY_MODE: "deliveryMode",
-    REQUEST_START_DATE: "requestStartDate",
+    REQUEST_START_DATE: "requestProcessStart",
     DUE_DATE: "dueDate",
  
     SELECTED_MINISTRIES: "selectedMinistries",

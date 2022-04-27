@@ -12,7 +12,7 @@ import { extensionStatusId } from "../../../../constants/FOI/enum";
 
 export const ActionContext = createContext();
 ActionContext.displayName = "ExtensionContext"
-export const ActionProvider = ({ children, requestDetails }) => {
+export const ActionProvider = ({ children, requestDetails, requestState }) => {
 
   const dispatch = useDispatch();
   const { requestId, ministryId } = useParams();
@@ -112,6 +112,7 @@ export const ActionProvider = ({ children, requestDetails }) => {
         pendingExtensionExists,
         deleteModalOpen,
         setDeleteModalOpen,
+        requestState
       }}
     >
       {children}

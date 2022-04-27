@@ -11,8 +11,6 @@ const ExtensionDetails = React.memo(
 
     const statusesToNotAppearIn = [
       StateEnum.unopened.name.toLowerCase(),
-      StateEnum.onhold.name.toLowerCase(),
-      StateEnum.closed.name.toLowerCase(),
       StateEnum.intakeinprogress.name.toLowerCase(),
       StateEnum.redirect.name.toLowerCase(),
     ];
