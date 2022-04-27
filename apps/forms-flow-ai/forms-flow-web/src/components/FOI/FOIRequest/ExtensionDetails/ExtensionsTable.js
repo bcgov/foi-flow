@@ -133,9 +133,9 @@ const ExtensionsTable = ({ showActions = true }) => {
             <TableCell className={classes.columnLabel}>DAYS</TableCell>
             <TableCell className={classes.columnLabel}>NEW DUE DATE</TableCell>
             <TableCell className={classes.columnLabel}>STATUS</TableCell>
-            <ConditionalTableCell
+            <ConditionalTableCell className={classes.columnLabel}
               condition={showActions}
-            ></ConditionalTableCell>
+            >ACTIONS</ConditionalTableCell>
           </TableRow>
         </TableHead>
         <ConditionalTableBody empty={!extensions || extensions.length < 1}>
