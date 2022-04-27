@@ -151,6 +151,7 @@ const FOIRequestHeader = React.memo(
             <TextField
               id="assignedTo"
               label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+              inputProps={{ "aria-labelledby": "assignedTo-label"}}
               InputLabelProps={{ shrink: true }}
               select
               value={selectedAssignedTo}

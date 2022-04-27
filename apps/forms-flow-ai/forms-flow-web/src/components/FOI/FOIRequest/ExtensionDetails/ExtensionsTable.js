@@ -163,6 +163,7 @@ const ExtensionsTable = ({ showActions = true }) => {
                   <TableCell>{extension.extensionstatus}</TableCell>
                   <ConditionalTableCell condition={showActions}>
                     <IconButton
+                      aria-label= "actions"
                       id={`ellipse-icon-${index}`}
                       key={`ellipse-icon-${index}`}
                       color="primary"

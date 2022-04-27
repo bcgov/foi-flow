@@ -699,7 +699,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
-                return <h4>{text}</h4>;
+                return <div className='remaining-days-alert'>{text}</div>;
               })}
           </div>
         </div>

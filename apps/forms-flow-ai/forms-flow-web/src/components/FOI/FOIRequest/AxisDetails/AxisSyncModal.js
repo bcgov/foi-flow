@@ -301,13 +301,11 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         <>
         <Dialog className={`axis-sync ${classes.root}`}  open={axisSyncModalOpen} id="dialog-style"
           onClose={handleClose}
-          aria-labelledby="state-change-dialog-title"
-          aria-describedby="state-change-dialog-description"
           maxWidth={'md'}
           fullWidth={true}>
           <DialogTitle disableTypography id="state-change-dialog-title">
               <h2 className="state-change-header">Sync with AXIS</h2>
-              <IconButton className="title-col3" onClick={handleClose}>
+              <IconButton aria-label= "close" className="title-col3" onClick={handleClose}>
                   <CloseIcon />
               </IconButton>
           </DialogTitle>
