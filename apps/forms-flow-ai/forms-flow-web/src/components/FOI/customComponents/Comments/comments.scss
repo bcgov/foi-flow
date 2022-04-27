@@ -341,9 +341,12 @@ border: 0px!important;
 }
 
 .commentdate{
-  color:grey;
-  font-size:13px;
-  padding-left: 10px
+  padding-left: 10px;
+  font-size: 13px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 19px;
 }
 .textred{
   color:red
@@ -448,11 +451,13 @@ border: 0px!important;
   }
 
   div.filterComments{
-    display: inline-flex;
     margin-left: 15px;
     margin-top: 15px;
     margin-bottom: 15px;
     width: 100%;
+    fieldset {
+      display: contents;
+    }
     label {
       padding-right: 5%;
       color:#68686d;
