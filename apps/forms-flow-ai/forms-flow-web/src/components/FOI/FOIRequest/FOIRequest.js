@@ -649,9 +649,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1>
-              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
-            </h1>
+            <a href="/foi/dashboard" aria-label="dashboard link">
+              <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
+            </a>
           </div>
           <div className="foileftpaneldropdown">
             <StateDropDown
@@ -709,7 +709,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
-                return <h4>{text}</h4>;
+                return <div className='remaining-days-alert'>{text}</div>;
               })}
           </div>
         </div>
@@ -741,12 +741,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
                         <Chip
                           label={"Advanced Search"}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
                         <Chip
                           label={headerText}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                         />
                       </Breadcrumbs>
                     </ConditionalComponent>

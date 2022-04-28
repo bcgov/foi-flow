@@ -53,7 +53,7 @@
 }
 .foi-details-label {
    // font-family: "BCSans-Regular", sans-serif;
-    color: grey;
+    color: #000 !important;
     padding-left: 15px;
 
 }
@@ -110,4 +110,10 @@ height: fit-content;
     width: 179px;
     font-size: 16px;
     font-weight: bold;
+}
+
+.remaining-days-alert {
+    font-size: 15px;
+    font-weight: bolder;
+    padding-bottom: 1rem;
 }
