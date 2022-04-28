@@ -67,8 +67,10 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
             <CardContent>
                 <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">                       
-                        <TextField                            
+                        <TextField   
+                            id='childFirstName'                        
                             label="First Name" 
+                            inputProps={{ "aria-labelledby": "childFirstName-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             value={childFirstNameText}
                             variant="outlined"
@@ -76,8 +78,10 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                             fullWidth
                             disabled={disableInput}
                         />
-                        <TextField                            
+                        <TextField            
+                            id='childMiddleName'                
                             label="Middle Name" 
+                            inputProps={{ "aria-labelledby": "childMiddleName-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             value={childMiddleNameText}
                             variant="outlined"
@@ -85,8 +89,10 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                             fullWidth
                             disabled={disableInput}
                         />
-                        <TextField                            
+                        <TextField          
+                            id='childLastName'                  
                             label="Last Name" 
+                            inputProps={{ "aria-labelledby": "childLastName-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             value={childLastNameText}
                             variant="outlined"
@@ -96,8 +102,10 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col">
-                        <TextField                            
+                        <TextField          
+                            id='childAlsoKnownAs'                  
                             label="Also Known As" 
+                            inputProps={{ "aria-labelledby": "childAlsoKnownAs-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             value={childNickNameText}
                             variant="outlined"
@@ -105,11 +113,13 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                             fullWidth
                             disabled={disableInput}
                         />                        
-                        <TextField                
+                        <TextField        
+                            id='childDOB'        
                             label="Date of Birth"
                             type="date" 
                             value={childDOBText||''} 
                             onChange={handleDOBChange}
+                            inputProps={{ "aria-labelledby": "childDOB-label"}}
                             InputLabelProps={{
                             shrink: true,
                             }}
