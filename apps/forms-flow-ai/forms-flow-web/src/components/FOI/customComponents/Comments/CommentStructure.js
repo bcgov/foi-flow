@@ -1,6 +1,5 @@
 import React, { useContext, useState, useRef } from 'react'
 import './comments.scss'
-import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faReply, faInfoCircle, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -15,6 +14,11 @@ import { ActionContext } from './ActionContext'
 import 'react-quill/dist/quill.snow.css';
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
+import Popover from "@material-ui/core/Popover";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import IconButton from "@material-ui/core/IconButton";
+import MenuList from "@material-ui/core/MenuList";
+import MenuItem from "@material-ui/core/MenuItem";
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
@@ -84,6 +88,123 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
     return markup
   }
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [anchorPosition, setAnchorPosition] = useState(null);
+  const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
+
+
+
+  const ActionsPopover = () => {
+    return (
+      <>
+      <Popover
+        anchorReference="anchorPosition"
+        anchorPosition={
+          anchorPosition && {
+            top: anchorPosition.top,
+            left: anchorPosition.left,
+          }
+        }
+        open={popoverOpen}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        onClose={() => setPopoverOpen(false)}
+      >
+        <MenuList>
+          <MenuItem
+            onClick={() => {
+                actions.handleAction(i.commentId, edit)
+                setPopoverOpen(false);
+            }}
+          >
+            Edit
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+                closeTooltip();
+                setDeletePopoverOpen(true);
+                setPopoverOpen(false);
+            }}
+          >
+            Delete
+            
+            
+          </MenuItem>          
+        </MenuList>
+      </Popover>
+      <DeleteAction />
+      </>
+    );
+  };
+
+
+
+  const DeleteAction = () => {
+    console.log(`deletePopoverOpen === ${deletePopoverOpen}`)
+    return (
+      <>
+      {deletePopoverOpen ? 
+     
+                        
+                          <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
+  
+                            <div className='header' style={modalHeader} >
+                              {' '}
+                              Delete Comment{' '}
+                            </div>
+                            <div className='content' style={modalContent}>
+                              {hasAnotherUserComment ? <><FontAwesomeIcon icon={faInfoCircle} size='1x' color='darkblue' /><span className="deletevalidationInfo">Parent comments with a reply cannot be deleted. You may edit the comment.</span></> :
+                                ' Delete your comment permanently?'}
+                            </div>
+                            <div className='actions' style={modalActions}>
+                              {
+                                hasAnotherUserComment ?
+                                  <button
+                                    className='button'
+                                    style={modalActionBtn}
+  
+                                    disabled
+                                  >
+                                    Delete
+                                  </button>
+                                  :
+                                  <button
+                                    className='button btn-bottom'
+                                    style={modalActionBtn}
+  
+                                    onClick={() => {
+                                      actions.onDelete(i.commentId, parentId)
+                                      setDeletePopoverOpen(false);
+                                      closeTooltip()
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
+                              }
+                              <button
+                                className='button btn-bottom'
+                                style={modalDelBtn}
+                                onClick={() => {
+                                  
+                                  closeTooltip()
+                                  setDeletePopoverOpen(false);
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                       
+                        : null }
+                        </>
+    )
+  };
 
   return (
     <>
@@ -106,92 +227,23 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         <div className="userActions">
           <div>
             {i.commentTypeId === 1 && actions.userId === i.userId && actions.user && (
-              <Popup
-                ref={ref}
-                role='tooltip'
-                contentStyle={{width: "85px"}}
-                trigger={                
-                    <button className="actionsBtn">
-                      <svg aria-hidden="true" aria-describedby="commentActions" focusable="false" data-prefix="fas" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h fa-w-16 fa-1x " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" color="#003366">
-                      <title id="commentActions" style={{display: 'none'}}>Comment Actions</title>
-                        <path fill="currentColor" d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"></path>
-                      </svg>
-                    </button>
-                }
-                position='right center'
-                nested
-                closeOnDocumentClick
-              >
-                <div className="actionDiv">
-                  <div>
-                    <button
-                      className="editBtn"
-                      onClick={() => actions.handleAction(i.commentId, edit)}
+                <>
+                    <IconButton
+                    aria-label= "actions"
+                    id={`ellipse-icon-${currentIndex}`}
+                    key={`ellipse-icon-${currentIndex}`}
+                    color="primary"
+                    onClick={(e) => {
+                        setPopoverOpen(true);
+                        setAnchorPosition(
+                        e.currentTarget.getBoundingClientRect()
+                        );
+                    }}                      
                     >
-                      {' '}
-                      Edit
-                    </button>
-                  </div>
-                  <div>
-                    <Popup
-                      trigger={
-                        <button className="deleteBtn" onClick={closeTooltip}> Delete</button>
-                      }
-                      modal
-                      nested
-                      closeOnDocumentClick
-                    >
-                      {(close) => (
-                        <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
-
-                          <div className='header' style={modalHeader} >
-                            {' '}
-                            Delete Comment{' '}
-                          </div>
-                          <div className='content' style={modalContent}>
-                            {hasAnotherUserComment ? <><FontAwesomeIcon icon={faInfoCircle} size='1x' color='darkblue' /><span className="deletevalidationInfo">Parent comments with a reply cannot be deleted. You may edit the comment.</span></> :
-                              ' Delete your comment permanently?'}
-                          </div>
-                          <div className='actions' style={modalActions}>
-                            {
-                              hasAnotherUserComment ?
-                                <button
-                                  className='button'
-                                  style={modalActionBtn}
-
-                                  disabled
-                                >
-                                  Delete
-                                </button>
-                                :
-                                <button
-                                  className='button btn-bottom'
-                                  style={modalActionBtn}
-
-                                  onClick={() => {
-                                    actions.onDelete(i.commentId, parentId)
-                                    close()
-                                  }}
-                                >
-                                  Delete
-                                </button>
-                            }
-                            <button
-                              className='button btn-bottom'
-                              style={modalDelBtn}
-                              onClick={() => {
-                                close(); closeTooltip()
-                              }}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </Popup>
-                  </div>
-                </div>
-              </Popup>
+                    <MoreHorizIcon />
+                    </IconButton>
+                    <ActionsPopover />
+                </>
             )}
           </div>
           <div>

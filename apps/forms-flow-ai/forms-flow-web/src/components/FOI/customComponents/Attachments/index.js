@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import './attachments.scss'
-import Popup from 'reactjs-popup'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
@@ -15,6 +12,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx"
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
+import Popover from "@material-ui/core/Popover";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import IconButton from "@material-ui/core/IconButton";
+import MenuList from "@material-ui/core/MenuList";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const useStyles = makeStyles((theme) => ({
   createButton: {
@@ -234,7 +236,8 @@ export const AttachmentSection = ({
   for(var i=0; i<attachments.length; i++) {
     attachmentsList.push(
     <Attachment 
-      key={i} 
+      key={i}
+      indexValue={i} 
       attachment={attachments[i]} 
       handlePopupButtonClick={handlePopupButtonClick} 
       getFullname={getFullname} 
@@ -305,7 +308,7 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
+const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
   
   const classes = useStyles();
   const [filename, setFilename] = useState("");
@@ -367,6 +370,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
         alignItems="flex-start"
       >
         <AttachmentPopup
+          indexValue={indexValue}
           attachment={attachment}
           handlePopupButtonClick={handlePopupButtonClick}
           disabled={disabled}
@@ -398,7 +402,7 @@ const Attachment = React.memo(({attachment, handlePopupButtonClick, getFullname,
   );
 })
 
-const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disabled}) => {
+const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled}) => {
   
   const classes = useStyles();
   const ref = React.useRef();
@@ -435,47 +439,93 @@ const AttachmentPopup = React.memo(({attachment, handlePopupButtonClick, disable
   const showReplace = (category) => {
     return transitionStates.includes(category.toLowerCase());
   }
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [anchorPosition, setAnchorPosition] = useState(null);
 
-  return (
-    <Popup
-      role="tooltip"
-      ref={ref}
-      trigger={
-        <button className="actionsBtn" disabled={disabled}>
-          <FontAwesomeIcon
-            icon={faEllipsisH}
-            size="1x"
-            className={classes.ellipses}
-          />
-        </button>
-      }
-      id="attachment-actions"
-      className="attachment-popup"
-      position={"bottom right"}
-      closeOnDocumentClick
-      disabled={disabled}
-      // keepTooltipInside=".tooltipBoundary"
-    >
-      <div>
-        <button className="childActionsBtn" onClick={handleDownload}>
-          Download
-        </button>
-        <button className="childActionsBtn" onClick={handleRename}>
-          Rename
-        </button>
-        {attachment.category === "personal" ? (
+
+
+  const ActionsPopover = () => {
+    return (
+      <Popover
+        anchorReference="anchorPosition"
+        anchorPosition={
+          anchorPosition && {
+            top: anchorPosition.top,
+            left: anchorPosition.left,
+          }
+        }
+        open={popoverOpen}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        onClose={() => setPopoverOpen(false)}
+      >
+        <MenuList>
+          <MenuItem
+            onClick={() => {
+                handleDownload();
+                setPopoverOpen(false);
+            }}
+          >
+            Download
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+                handleRename();
+                setPopoverOpen(false);
+            }}
+          >
+            Rename
+          </MenuItem>
+          {attachment.category === "personal" ? (
           ""
         ) : showReplace(attachment.category) ? (
-          <button className="childActionsBtn" onClick={handleReplace}>
-            Replace
-          </button>
+            <MenuItem
+                onClick={() => {
+                    handleReplace();
+                    setPopoverOpen(false);
+                }}
+            >
+                Replace
+            </MenuItem>
         ) : (
-          <button className="childActionsBtn" onClick={handleDelete}>
-            Delete
-          </button>
-        )}
-      </div>
-    </Popup>
+            <MenuItem
+                onClick={() => {
+                    handleDelete();
+                    setPopoverOpen(false);
+                }}
+            >
+                Delete
+            </MenuItem>
+          )}
+        </MenuList>
+      </Popover>
+    );
+  };
+
+  return (
+    <>
+      <IconButton
+        aria-label= "actions"
+        id={`ellipse-icon-${indexValue}`}
+        key={`ellipse-icon-${indexValue}`}
+        color="primary"
+        onClick={(e) => {
+          setPopoverOpen(true);
+          setAnchorPosition(
+            e.currentTarget.getBoundingClientRect()
+          );
+        }}                      
+      >
+      <MoreHorizIcon />
+    </IconButton>
+    <ActionsPopover />
+  </>
   );
 })
 
