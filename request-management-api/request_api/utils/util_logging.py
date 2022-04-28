@@ -19,7 +19,7 @@ LOG_BASIC = os.getenv('LOG_BASIC', "WARNING").upper()
 LOG_TRACING = os.getenv('LOG_TRACING', "ERROR").upper()
 LOGGING_FORMAT = '[%(asctime)s] %(levelname)-8s (%(name)s) <%(module)s.py:%(filename)s:%(lineno)d>.%(funcName)s: %(message)s'
 
-def configure_logging(app):    
+def configure_logging():    
     # Set up basic logging for the application.
     logging.basicConfig(format=LOGGING_FORMAT, level=string_to_debug_level(LOG_ROOT))
     temp_logger = logging.getLogger()

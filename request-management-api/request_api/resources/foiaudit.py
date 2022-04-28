@@ -47,7 +47,7 @@ class FOIAuditByField(Resource):
 
         try:
             isall = False if request.url.endswith('summary') else True      
-            result = auditservice().getauditforfield(type, id, field, AuthHelper.getusergroups(),isall)
+            result = auditservice().getauditforfield(type, id, field, isall)
             if result is not None:
                 return {"audit": result}, 200
             else:
