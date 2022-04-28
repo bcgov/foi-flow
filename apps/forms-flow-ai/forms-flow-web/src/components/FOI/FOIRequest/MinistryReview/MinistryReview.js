@@ -517,7 +517,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               condition={!hideBottomText.includes(requestState?.toLowerCase())}
             >
               {Array.from(bottomTextMap.values()).map((value) => (
-                <h4>{value}</h4>
+                <div className='remaining-days-alert'>{value}</div>
               ))}
             </ConditionalComponent>
           </div>
