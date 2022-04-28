@@ -2,7 +2,7 @@ import React, { useContext, useState, useRef } from 'react'
 import './comments.scss'
 import Popup from 'reactjs-popup'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faReply, faEllipsisH, faInfoCircle, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
+import { faReply, faInfoCircle, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
 import {
   modal,
   modalHeader,
@@ -112,7 +112,10 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                 contentStyle={{width: "85px"}}
                 trigger={                
                     <button className="actionsBtn">
-                      <FontAwesomeIcon icon={faEllipsisH} size='1x' color='#003366' />
+                      <svg aria-hidden="true" aria-describedby="commentActions" focusable="false" data-prefix="fas" data-icon="ellipsis-h" class="svg-inline--fa fa-ellipsis-h fa-w-16 fa-1x " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" color="#003366">
+                      <title id="commentActions" style={{display: 'none'}}>Comment Actions</title>
+                        <path fill="currentColor" d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"></path>
+                      </svg>
                     </button>
                 }
                 position='right center'
