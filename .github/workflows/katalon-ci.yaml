@@ -1,7 +1,7 @@
 name: Katalon
 on:
   schedule:
-    - cron: "40 19 * * *"
+    - cron: "0 13 * * *"
   # push:
   #   branches: [ dev-NK-automationscripts ]
   # pull_request:
@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        ref: dev-NK-automationscripts
     - name: set screen resolution
       run: Set-DisplayResolution -Width 1920 -Height 1080 -Force  
     - name: set date format

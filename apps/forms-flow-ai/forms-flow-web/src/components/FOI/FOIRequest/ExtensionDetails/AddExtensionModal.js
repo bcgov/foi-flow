@@ -398,6 +398,7 @@ const AddExtensionModal = () => {
         <DialogTitle disableTypography id="extension-dialog-title">
           <h2 className="extension-header">Extension</h2>
           <IconButton
+            aria-label= "close"
             className="title-col3"
             onClick={() => setSaveModalOpen(false)}
           >

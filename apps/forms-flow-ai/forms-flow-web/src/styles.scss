@@ -543,3 +543,15 @@ div[disabled] {
 .css-79elbk {
  // position: none;
 }
+
+.MuiFormLabel-root.Mui-error {
+  color: #9E2929 !important;
+}
+
+.MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+  border-color: #9E2929 !important;
+}
+
+.MuiFormLabel-asterisk.Mui-error {
+  color: #9E2929 !important;
+}
