@@ -45,12 +45,13 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), 'Unassigned')
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
+    'value', 'EDUC Ministry Team', 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), 'aria-disabled', 
-    'true', 0)
+WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
+    'disabled', 0, FailureHandling.STOP_ON_FAILURE)
 
 requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
 
@@ -133,8 +134,9 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), 'foiedu, foiedu')
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
+    'value', 'foiedu, foiedu', 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), 'aria-disabled', 
-    'true', 0)
+WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
+    'disabled', 0, FailureHandling.STOP_ON_FAILURE)
 

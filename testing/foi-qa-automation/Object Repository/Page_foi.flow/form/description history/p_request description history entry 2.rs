@@ -7,14 +7,15 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>(//div[@id='panel1a-content']/div/div/p[2])[2]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
+         <value>//div[@id='request-history-content']/div[2]/div[2]/div/div/div/div/div/p[2]</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'testest test analyst update' or . = 'testest test analyst update')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value></value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -74,5 +75,12 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[2]/div/div/div/div/div/p[2]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//p[(text() = 'testing 123 descriptiontest analyst update' or . = 'testing 123 descriptiontest analyst update')]</value>
    </webElementXpaths>
 </WebElementEntity>

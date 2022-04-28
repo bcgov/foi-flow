@@ -6,6 +6,20 @@
    <comment></comment>
    <testCaseGuid>6f229466-1969-47be-9740-7722d0361c1c</testCaseGuid>
    <variable>
+      <defaultValue>GlobalVariable.password</defaultValue>
+      <description></description>
+      <id>d8476295-361b-4a4e-9fd1-21d5a4e2e4cc</id>
+      <masked>false</masked>
+      <name>password</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.username</defaultValue>
+      <description></description>
+      <id>c1fd1d18-eb46-4dce-9446-1944f1a44699</id>
+      <masked>false</masked>
+      <name>username</name>
+   </variable>
+   <variable>
       <defaultValue>GlobalVariable.firstname</defaultValue>
       <description></description>
       <id>2ff5a88a-260c-4e6f-bf11-0db54965e2d4</id>
@@ -137,5 +151,12 @@
       <id>aba88ff9-5532-4030-84d5-4adce1512870</id>
       <masked>false</masked>
       <name>deliveryMode</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>2bd6f25d-a38a-4275-bf53-acaf9d98d9e7</id>
+      <masked>false</masked>
+      <name>requestID</name>
    </variable>
 </TestCaseEntity>
