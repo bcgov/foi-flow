@@ -289,6 +289,16 @@ class FOIRawRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
+        receiveddate = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
+        receiveddateuf = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
 
         assignedtoformatted = case([
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
@@ -321,8 +331,8 @@ class FOIRawRequest(db.Model):
             firstname,
             lastname,
             requesttype,
-            FOIRawRequest.requestrawdata['receivedDate'].astext.label('receivedDate'),
-            FOIRawRequest.requestrawdata['receivedDateUF'].astext.label('receivedDateUF'),
+            receiveddate,
+            receiveddateuf,
             FOIRawRequest.status.label('currentState'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
@@ -626,51 +636,72 @@ class FOIRawRequest(db.Model):
     def getfilterforsearch(cls, params):
         #axis request #, raw request #, applicant name, assignee name, request description, subject code
         if(params['search'] == 'requestdescription'):
-            searchcondition1 = []
-            searchcondition2 = []
-            for keyword in params['keywords']:
-                searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2))
+            return FOIRawRequest.__getfilterfordescription(params)
         elif(params['search'] == 'applicantname'):
-            searchcondition1 = []
-            searchcondition2 = []
-            searchcondition3 = []
-            searchcondition4 = []
-            for keyword in params['keywords']:
-                searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
-                searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
-                searchcondition4.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
+            return FOIRawRequest.__getfilterforapplicantname(params)
         elif(params['search'] == 'assigneename'):
-            searchcondition1 = []
-            searchcondition2 = []
-            for keyword in params['keywords']:
-                searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2))
+            return FOIRawRequest.__getfilterforassigneename(params)
         elif(params['search'] == 'idnumber'):
-            searchcondition = []
-            for keyword in params['keywords']:
-                keyword = keyword.lower()
-                keyword = keyword.replace('u-00', '')
-                searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
-            return and_(*searchcondition)
+            return FOIRawRequest.__getfilterforidnumber(params)
         elif(params['search'] == 'axisrequest_number'):
-            searchcondition1 = []
-            searchcondition2 = []
-            for keyword in params['keywords']:
-                keyword = keyword.lower()
-                keyword = keyword.replace('u-00', '')
-                searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('axisrequest_number').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2))
+            return FOIRawRequest.__getfilterforaxisnumber(params)
         else:
             searchcondition = []
             for keyword in params['keywords']:
                 searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
             return and_(*searchcondition)
+    
+    @classmethod
+    def __getfilterfordescription(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))    
+    
+    @classmethod
+    def __getfilterforapplicantname(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        searchcondition3 = []
+        searchcondition4 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
+            searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+            searchcondition4.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
+    
+    @classmethod        
+    def __getfilterforassigneename(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))
+
+    @classmethod
+    def __getfilterforidnumber(cls,params):
+        searchcondition = []
+        for keyword in params['keywords']:
+            keyword = keyword.lower()
+            keyword = keyword.replace('u-00', '')
+            searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
+        return and_(*searchcondition)
+    
+    @classmethod
+    def __getfilterforaxisnumber(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            keyword = keyword.lower()
+            keyword = keyword.replace('u-00', '')
+            searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('axisrequest_number').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))
+    
     
     @classmethod
     def getDistinctAXISRequestIds(cls):

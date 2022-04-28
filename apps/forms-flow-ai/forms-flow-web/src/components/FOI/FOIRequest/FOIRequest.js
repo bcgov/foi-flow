@@ -741,12 +741,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
                         <Chip
                           label={"Advanced Search"}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
                         <Chip
                           label={headerText}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                         />
                       </Breadcrumbs>
                     </ConditionalComponent>
