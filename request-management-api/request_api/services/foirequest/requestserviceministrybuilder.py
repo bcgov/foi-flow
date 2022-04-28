@@ -54,9 +54,9 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.assignedministrygroup = requestdict['assignedministrygroup']
         if 'assignedministryperson' in requestschema and requestschema['assignedministryperson'] not in (None,''):
             foiministryrequest.assignedministryperson = requestschema['assignedministryperson']
-            firstname = requestschema['assignedministrypersonFirstName'] if requestschema['assignedministryperson'] != None else None
+            firstname = requestschema['assignedministrypersonFirstName']
             middlename = None
-            lastname = requestschema['assignedministrypersonLastName'] if requestschema['assignedministryperson'] != None else None
+            lastname = requestschema['assignedministrypersonLastName']
             self.createfoiassigneefromobject(requestschema['assignedministryperson'], firstname, middlename, lastname)
         else:
             foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
