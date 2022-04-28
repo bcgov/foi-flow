@@ -650,8 +650,9 @@ class FOIRawRequest(db.Model):
             for keyword in params['keywords']:
                 searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
             return and_(*searchcondition)
-        
-    def __getfilterfordescription(cls, params):
+    
+    @classmethod
+    def __getfilterfordescription(cls,params):
         searchcondition1 = []
         searchcondition2 = []
         for keyword in params['keywords']:
@@ -659,6 +660,7 @@ class FOIRawRequest(db.Model):
             searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2))    
     
+    @classmethod
     def __getfilterforapplicantname(cls,params):
         searchcondition1 = []
         searchcondition2 = []
@@ -670,7 +672,8 @@ class FOIRawRequest(db.Model):
             searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
             searchcondition4.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
-            
+    
+    @classmethod        
     def __getfilterforassigneename(cls,params):
         searchcondition1 = []
         searchcondition2 = []
@@ -679,6 +682,7 @@ class FOIRawRequest(db.Model):
             searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2))
 
+    @classmethod
     def __getfilterforidnumber(cls,params):
         searchcondition = []
         for keyword in params['keywords']:
@@ -687,6 +691,7 @@ class FOIRawRequest(db.Model):
             searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
         return and_(*searchcondition)
     
+    @classmethod
     def __getfilterforaxisnumber(cls,params):
         searchcondition1 = []
         searchcondition2 = []
