@@ -2,7 +2,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 
-const getFullName = (lastName, firstName, username) => {
+export const getFullName = (lastName, firstName, username) => {
   return firstName !== "" ? `${lastName}, ${firstName}` : username;
 };
 

@@ -4,13 +4,12 @@ import { useSelector } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
-import { getMenuItems, getAssignedTo, getStatus, } from "./utils";
+import { getMenuItems, getAssignedTo, getStatus, getFullName} from "./utils";
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
-import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
 import { Watcher } from '../../customComponents'
 
 const useStyles = makeStyles((theme) => ({
@@ -45,14 +44,9 @@ const FOIRequestHeader = React.memo(
     const classes = useStyles();
     const { requestId, ministryId } = useParams();
 
-    let _isMinistryCoordinator = false;
-
     //get the assignedTo master data
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
-    );
-    const ministryAssignedToList = useSelector(
-      (state) => state.foiRequests.foiMinistryAssignedToList
     );
 
     //handle default value for the validation of required fields
@@ -74,7 +68,6 @@ const FOIRequestHeader = React.memo(
     const [menuItems, setMenuItems] = useState([])
 
     const preventDefault = (event) => event.preventDefault();
-    const requestState = requestDetails?.currentState;
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -105,10 +98,6 @@ const FOIRequestHeader = React.memo(
       );
     };
 
-    const handleMinistryAssignedToValue = (value) => {
-      //place holder - do nothing here
-    };
-
     const status = getStatus({ headerValue, requestDetails });
 
     const showMinistryAssignedTo =
@@ -121,6 +110,12 @@ const FOIRequestHeader = React.memo(
       status.toLowerCase() === StateEnum.onhold.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.response.name.toLowerCase();
 
+    const getMinistryAssignedTo = () => {
+      if (requestDetails?.assignedministryperson)
+        return getFullName(requestDetails?.assignedministrypersonLastName, requestDetails?.assignedministrypersonFirstName, requestDetails?.assignedministryperson);
+      return requestDetails.assignedministrygroup;
+    }
+    const ministryAssignedTo = getMinistryAssignedTo();
     return (
       <div className="foi-request-review-header-row1">
         <div className="foi-request-review-header-col1">
@@ -168,13 +163,14 @@ const FOIRequestHeader = React.memo(
 
           {showMinistryAssignedTo && (
             <>
-              <MinistryAssignToDropdown
-                requestState = {requestState}
-                requestDetails={requestDetails}
-                ministryAssignedToList={ministryAssignedToList}
-                handleMinistryAssignedToValue={handleMinistryAssignedToValue}
-                createSaveRequestObject={createSaveRequestObject}
-                isMinistryCoordinator={_isMinistryCoordinator}
+            <TextField
+                id="ministryAssignedTotxt"
+                label="Ministry Assigned To"
+                InputLabelProps={{ shrink: true }}
+                value={ministryAssignedTo}
+                variant="outlined"
+                fullWidth
+                disabled={true}
               />
             </>
           )}
