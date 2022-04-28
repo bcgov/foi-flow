@@ -289,6 +289,16 @@ class FOIRawRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
+        receiveddate = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
+        receiveddateuf = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
 
         assignedtoformatted = case([
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
@@ -321,8 +331,8 @@ class FOIRawRequest(db.Model):
             firstname,
             lastname,
             requesttype,
-            FOIRawRequest.requestrawdata['receivedDate'].astext.label('receivedDate'),
-            FOIRawRequest.requestrawdata['receivedDateUF'].astext.label('receivedDateUF'),
+            receiveddate,
+            receiveddateuf,
             FOIRawRequest.status.label('currentState'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
