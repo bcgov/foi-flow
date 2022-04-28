@@ -26,19 +26,16 @@ class notificationservice:
     """ FOI notification management service
     """
     
-    def createnotification(self, message, requestid, requesttype, notificationtype, userid):
+    def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True):
         foirequest = self.__getrequest(requestid, requesttype)
-        self.__cleanupnotifications(requesttype, notificationtype, foirequest)
+        if iscleanup == True:
+            self.__cleanupnotifications(requesttype, notificationtype, foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
 
     def createremindernotification(self, message, requestid, requesttype, notificationtype, userid):
         foirequest = self.__getrequest(requestid, requesttype)
         return  self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
     
-    def createnotificationwithoutcleanup(self, message, requestid, requesttype, notificationtype, userid):
-        foirequest = self.__getrequest(requestid, requesttype)
-        return  self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
-
     def createcommentnotification(self, message, comment, commenttype, requesttype, userid):
         requestid = comment["ministryrequestid"] if requesttype == "ministryrequest" else comment["requestid"]
         foirequest = self.__getrequest(requestid, requesttype)        

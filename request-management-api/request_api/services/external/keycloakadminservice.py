@@ -57,11 +57,11 @@ class KeycloakAdminService:
     def getgroupsandmembers(self, allowedgroups = None):
         allowedgroups = self.getgroups(allowedgroups)
         for group in allowedgroups:
-            group["members"] = self.getgroupmembersbyid(group["id"], group["name"])
+            group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups  
     
 
-    def getgroupmembersbyid(self, groupid, groupname):
+    def getgroupmembersbyid(self, groupid):
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
         users = []
