@@ -22,7 +22,6 @@ That are used to expose operational health information about the service, and me
 """
 
 from flask import Blueprint
-#from sbc_common_components.exception_handling.exception_handler import ExceptionHandler
 
 from .apihelper import Api
 
@@ -60,7 +59,6 @@ API = Api(
 )
 
 
-#HANDLER = ExceptionHandler(API)
 
 API.add_namespace(META_API, path="/api")
 API.add_namespace(OPS_API ,path="/api")
