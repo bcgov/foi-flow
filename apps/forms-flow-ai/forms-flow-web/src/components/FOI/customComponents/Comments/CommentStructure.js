@@ -19,6 +19,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import Backdrop from '@mui/material/Backdrop';
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
@@ -151,7 +152,13 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       <>
       {deletePopoverOpen ? 
      
-                        
+        <Backdrop
+        sx={{ color: '#fff', zIndex: 1000 }}
+        open={deletePopoverOpen}
+        onClick={() => {
+          closeTooltip()
+          setDeletePopoverOpen(false);
+        }}>
                           <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
   
                             <div className='header' style={modalHeader} >
@@ -200,6 +207,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                               </button>
                             </div>
                           </div>
+                          </Backdrop>
                        
                         : null }
                         </>
