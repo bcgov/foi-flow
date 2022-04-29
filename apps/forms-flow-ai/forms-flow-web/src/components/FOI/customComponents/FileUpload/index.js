@@ -187,6 +187,8 @@ const FileUpload = ({
           <div className="file-upload-column file-upload-column-2">
             <input
             className={multipleFiles ? "file-upload-input-multiple" : "file-upload-input"}
+            id="fileupload"
+            aria-label="fileUpload"
             type="file"
             ref={fileInputField}
             onChange={handleNewFileUpload}
