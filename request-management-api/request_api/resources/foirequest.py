@@ -86,7 +86,7 @@ class FOIRequests(Resource):
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
             assignedtomiddlename = request_json["assignedToMiddleName"] if request_json.get("assignedToMiddleName") != None else None
             assignedtolastname = request_json["assignedToLastName"] if request_json.get("assignedToLastName") != None else None
-            rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), AuthHelper.getusername(),AuthHelper.isministrymember(),assignedtofirstname,assignedtomiddlename,assignedtolastname)               
+            rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), assignedtofirstname,assignedtomiddlename,assignedtolastname)               
             eventservice().posteventsync(request_json['id'],"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember())
             if rawresult.success == True:   
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
