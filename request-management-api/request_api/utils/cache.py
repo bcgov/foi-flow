@@ -30,7 +30,7 @@ class Config(object):
 cache_client = redis.from_url(os.getenv('CACHE_REDISURL'))
 
 ## If true, bypass cache
-def cache_filter(*args, **kwargs):
+def cache_filter():
     if os.getenv('CACHE_ENABLED') != 'Y':
         return True    
     
