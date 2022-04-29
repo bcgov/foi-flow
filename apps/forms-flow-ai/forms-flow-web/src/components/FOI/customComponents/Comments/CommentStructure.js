@@ -147,11 +147,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
 
   const DeleteAction = () => {
-    console.log(`deletePopoverOpen === ${deletePopoverOpen}`)
     return (
-      <>
-      {deletePopoverOpen ? 
-     
         <Backdrop
         sx={{ color: '#fff', zIndex: 1000 }}
         open={deletePopoverOpen}
@@ -208,9 +204,6 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                             </div>
                           </div>
                           </Backdrop>
-                       
-                        : null }
-                        </>
     )
   };
 
