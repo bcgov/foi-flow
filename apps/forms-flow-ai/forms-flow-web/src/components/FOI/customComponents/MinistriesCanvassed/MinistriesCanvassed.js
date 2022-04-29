@@ -43,13 +43,11 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
     <div>     
     <Dialog className={classes.root} open={openModal} id="dialog-style"
       onClose={handleClose}
-      aria-labelledby="state-change-dialog-title"
-      aria-describedby="state-change-dialog-description"
       maxWidth={'md'}
       fullWidth={true}>
       <DialogTitle disableTypography id="state-change-dialog-title">
           <h2 className="state-change-header">Ministries Canvassed</h2>
-          <IconButton
+          <IconButton aria-label= "close"
               className="title-col3"
               onClick={handleClose}>
               <CloseIcon />
