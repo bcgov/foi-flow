@@ -32,13 +32,14 @@ const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, op
           open={openModal}
           onClose={handleModalClose}
           aria-labelledby="request-history-dialog-title"
-          aria-describedby="request-history-dialog-description"
+          aria-description="request-history-dialog-description"
           fullWidth
           maxWidth={'md'}
         >
             <DialogTitle disableTypography id="request-history-dialog-title">
               <h2 className="request-history-header">Request History            </h2>
-              <IconButton onClick={handleModalClose}>
+              <IconButton onClick={handleModalClose} value="close">
+                <i className="dialog-close-button">Close</i>
                 <CloseIcon />
               </IconButton>
             </DialogTitle>

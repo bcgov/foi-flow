@@ -26,64 +26,70 @@
     display: none !important;
 }
 
+#foi-status-dropdown-label {
+    display: none;
+}
+
 .unopened {
-    background-color: #FAA915;
+    background-color: #C45303;
 }
 
 .intakeinprogress {
-    background-color: #EC7D10;
+    background-color: #8C3601;
 }
 
 .open {
-    background-color: #00A676;
+    background-color: #1D8800;
 }
 
 .redirect {
-    background-color: #1B8103;
+    background-color: #0E4602;
 }
 
 .callforrecords {
-    background-color: #F25489;
+    background-color: #D0017A;
 }
 
 .deduplication {
-    background-color: #DD2255;
+    background-color: #B1063F;
 }
 
 .feeestimate {
-    background-color: #A0192F;
+    background-color: #721121;
 }
 
 .onhold {
-    background-color: #808080;
+    background-color: #595959;
 }
 
 .harmsassessment {
-    background-color: #B988D3;
+    background-color: #832AB7;
 }
 
 .consult {
-    background-color: #9448BC;
+    background-color: #7A3A9C;
 }
 
 .ministrysignoff {
-    background-color: #683286;
+    background-color: #4B296B;
 }
 
 .recordsreview {
-    background-color: #248BA8;
+    background-color: #04596C;
 }
 
 .response {
-    background-color: #0A4454;
+    background-color: #020A80;
 }
 
 .closed {
-    background-color: #000000;
+    background-color: #1A1A1A;
 }
 
 
-
+#foi-status-dropdown-label {
+    display: none;
+}
 
 
 
