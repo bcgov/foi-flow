@@ -210,7 +210,6 @@ const RequestDetails = React.memo(
                             select
                             value={selectedRequestType}
                             onChange={handleRequestTypeChange}
-                            inputProps={{ "aria-label": "Request Type"}}
                             // input={<Input />} 
                             variant="outlined"
                             fullWidth
