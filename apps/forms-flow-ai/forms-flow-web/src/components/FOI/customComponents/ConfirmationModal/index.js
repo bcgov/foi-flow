@@ -186,7 +186,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               </IconButton>
             </DialogTitle>
           <DialogContent className={`${reOpenRequest ? 'dialog-content': 'dialog-content-nomargin'}`}>
-            <DialogContentText id="state-change-description" component={'span'}>
+            <DialogContentText id="state-change-dialog-description" component={'span'}>
             <span className="confirmation-message">
                 {message.body}
               </span>
@@ -297,6 +297,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
         <TextField
             id="closingReason"
             label="Reason for Closing Request"
+            inputProps={{ "aria-labelledby": "closingReason-label"}}
             InputLabelProps={{ shrink: true, }}          
             select
             value={selectedReason}
