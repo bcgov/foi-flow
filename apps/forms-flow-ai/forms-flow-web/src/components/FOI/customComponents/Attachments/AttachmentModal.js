@@ -197,12 +197,12 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
               <h2 className="state-change-header">{message.title}</h2>
-              <IconButton onClick={handleClose}>
+              <IconButton aria-label= "close" onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
             </DialogTitle>
           <DialogContent>
-            <DialogContentText id="state-change-description" component={'span'}>
+            <DialogContentText id="state-change-dialog-description" component={'span'}>
               <div className="modal-message">
                 <span className="confirmation-message">
                   {message.body}                               
@@ -224,8 +224,10 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 <div className="row">
                   <div className="col-sm-1"></div>
                   <div className="col-sm-9">
-                    <TextField                            
+                    <TextField
+                    id="renameAttachment"                        
                     label="Rename Attachment"
+                    inputProps={{ "aria-labelledby": "renameAttachment-label"}}
                     InputLabelProps={{ shrink: true, }}
                     variant="outlined"
                     fullWidth
