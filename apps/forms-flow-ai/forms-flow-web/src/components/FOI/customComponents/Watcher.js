@@ -83,7 +83,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
                    disabled={assignee.username.toLowerCase().includes("unassigned")}
                    name={`${group.name}|${assignee.username}`}               
                    >
-                        <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} />
+                        <Checkbox id='watcher' inputProps={{'aria-labelledby': 'watcher'}} checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} />
                         {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
                     </MenuItem>)
                }
