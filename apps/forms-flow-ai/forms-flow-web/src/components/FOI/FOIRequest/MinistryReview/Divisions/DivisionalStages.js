@@ -200,7 +200,8 @@ const DivisionalStages = React.memo(
                 className="foi-division-dropdown"
                 id="foi-division-dropdown"
                 value={row.divisionid || -1}
-                input={<OutlinedInput label="Select Divison" notched />}
+                inputProps={{ "aria-labelledby": "foi-division-dropdown-label"}}
+                input={<OutlinedInput  label="Select Divison" notched />}
                 onChange={(e) => handleDivisionChange(e, _id)}
                 fullWidth
                 renderValue={(value) => {
@@ -228,6 +229,7 @@ const DivisionalStages = React.memo(
                 className="foi-divisionstage-dropdown"
                 id="foi-divisionstage-dropdown"
                 value={row.stageid || -1}
+                inputProps={{ "aria-labelledby": "foi-divisionstage-dropdown-label"}}
                 input={<OutlinedInput label="Select Divison Stage" notched />}
                 onChange={(e) => handleDivisionStageChange(e, _id)}
                 fullWidth
@@ -250,12 +252,13 @@ const DivisionalStages = React.memo(
               <TextField
                 style={{marginTop: '0px'}}
                 label="E-Apps/Other"
+                id="eapps"
                 value={row.eApproval}
                 onChange={(e) => handleEApprovalChange(e, _id)}
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 fullWidth
-                inputProps={{maxLength :12}}
+                inputProps={{maxLength :12, "aria-label": "eapps-label"}}
               />
             </div>
             <div className="col-lg-3 foi-details-col foi-request-dates due-date-field">
@@ -269,7 +272,7 @@ const DivisionalStages = React.memo(
                   InputLabelProps={{
                   shrink: true,
                   }} 
-                  InputProps={{inputProps: { min: formatDate(new Date()) } }}   
+                  InputProps={{inputProps: { min: formatDate(new Date()), "aria-label": "Division Due Date" } }}
                   variant="outlined"
                   fullWidth
               />  
