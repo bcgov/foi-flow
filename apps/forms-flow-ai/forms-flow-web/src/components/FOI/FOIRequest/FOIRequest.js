@@ -95,7 +95,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
-  const isAddRequest = urlIndexCreateRequest > -1;
+  const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
   //gets the request detail from the store
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -886,6 +886,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         disableInput={disableInput}
                         requestState={requestState}
                         setSaveRequestObject={setSaveRequestObject}
+                        setIsAddRequest={setIsAddRequest}
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
                       />
