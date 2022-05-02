@@ -519,7 +519,10 @@ class FOIMinistryRequest(db.Model):
                     groupfilter.append(
                         or_(
                             FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1])
+                            and_(
+                                FOIMinistryRequest.assignedgroup == 'Flex Team',
+                                FOIMinistryRequest.requeststatusid.in_([1])
+                            )
                         )
                     )
                 else:
