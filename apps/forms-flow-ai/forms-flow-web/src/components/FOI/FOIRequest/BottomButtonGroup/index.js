@@ -97,12 +97,12 @@ const BottomButtonGroup = React.memo(
       }
     }, [stateChanged]);
 
-    const saveRequest = async () => {
+    const saveRequest = async (setLoader = false) => {
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
         setIsAddRequest(false);
       }      
-      dispatch(setFOILoader(true))
+      dispatch(setFOILoader(setLoader))
       dispatch(
         saveRequestDetails(
           saveRequestObject,
@@ -371,7 +371,7 @@ const BottomButtonGroup = React.memo(
               [classes.btnenabled]: !isValidationError,
             })}
             disabled={isValidationError || disableInput}
-            onClick={saveRequest}
+            onClick={() => saveRequest(true)}
           >
             Save
           </button>

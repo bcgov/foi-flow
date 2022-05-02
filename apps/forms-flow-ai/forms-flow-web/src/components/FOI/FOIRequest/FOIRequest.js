@@ -492,11 +492,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
-      dispatch(fetchFOIRequestNotesList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
         dispatch(push(getRedirectAfterSaveUrl(ministryId, id || requestId)));
+        dispatch(fetchFOIRequestNotesList(id || requestId, ministryId));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
