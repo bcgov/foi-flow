@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate, isIntakeTeam, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -360,21 +360,15 @@ export const isMandatoryField = (field) => {
 
 export const closeApplicantDetails = (user, requestType) => {
   const userGroups = user?.groups?.map(group => group.slice(1));
-  if(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
-    return true;
-  return false;
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
 }
 
 export const closeChildDetails = (user, requestType) => {
   const userGroups = user?.groups?.map(group => group.slice(1));
-  if(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)
-    return true;
-  return false;
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
 }
 
-export const closeContactInfo = (user, requestType) => {
+export const closeContactInfo = (user) => {
   const userGroups = user?.groups?.map(group => group.slice(1));
-  if(isProcessingTeam(userGroups) || isIntakeTeam(userGroups))
-    return true;
-  return false;
+  return !!(isProcessingTeam(userGroups) || isFlexTeam(userGroups));
 }

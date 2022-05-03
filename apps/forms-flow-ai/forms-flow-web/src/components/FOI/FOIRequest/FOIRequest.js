@@ -801,7 +801,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput}
                             userDetail={userDetail}
-                          />
+                            requestType={
+                              requestDetails?.requestType
+                            }                          />
                           <OnBehalfOfDetails
                             additionalInfo={
                               requestDetails.additionalPersonalInfo

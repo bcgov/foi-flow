@@ -12,7 +12,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {closeChildDetails} from '../FOIRequest/utils';
 
 
-const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail}) => {
+const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail,requestType}) => {
 
      /**
      *  Child details box in the UI
@@ -78,7 +78,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     }  
      return (
         <div className='request-accordian' >
-        <Accordion defaultExpanded={closeChildDetails(userDetail,createSaveRequestObject?.requestType)} >
+        <Accordion defaultExpanded={!closeChildDetails(userDetail,requestType)} >
         <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
             aria-controls="panel1a-content" id="panel1a-header">
             <Typography className={classes.heading}>CHILD DETAILS</Typography>
