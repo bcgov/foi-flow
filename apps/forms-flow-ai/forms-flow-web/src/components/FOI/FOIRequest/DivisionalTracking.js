@@ -1,11 +1,27 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import {Row,Col} from 'react-bootstrap';
 import './divisionaltracking.scss';
+import { makeStyles } from '@material-ui/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
 const DivisionalTracking = React.memo(({divisions}) => {
+
+    const useStyles = makeStyles({
+        heading: {
+          color: '#FFF',
+          fontSize: '16px !important',
+          fontWeight: 'bold !important'
+        },
+        accordionSummary: {
+          flexDirection: 'row-reverse'
+        }
+      });
+      const classes = useStyles();
 
     const displayDivisions = divisions?.map((division, index) =>
         <Row key={index} className='divisions-row'>
@@ -21,12 +37,22 @@ const DivisionalTracking = React.memo(({divisions}) => {
     );
 
     return (
-        <Card className="foi-details-card" id="divisionalTracking">
-        <label className="foi-details-label">DIVISIONAL TRACKING</label>
-        <CardContent className='align-division'> 
-        {displayDivisions}
-        </CardContent>
-    </Card>
+        <div className='request-accordian' >
+            <Accordion defaultExpanded={true}>
+            <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+            <Typography className={classes.heading}>DIVISIONAL TRACKING</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+                {displayDivisions}
+            </AccordionDetails>
+            </Accordion>
+        </div>
+        // <Card className="foi-details-card" id="divisionalTracking">
+        // <label className="foi-details-label">DIVISIONAL TRACKING</label>
+        // <CardContent className='align-division'> 
+        // {displayDivisions}
+        // </CardContent>
+        // </Card>
     );
 });
 export default DivisionalTracking;

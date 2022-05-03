@@ -1,13 +1,17 @@
 import React from 'react';
 import { useSelector } from "react-redux";
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
-import { shouldDisableFieldForMinistryRequests } from "./utils";
+import { shouldDisableFieldForMinistryRequests,closeApplicantDetails } from "./utils";
+import { makeStyles } from '@material-ui/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const ApplicantDetails = React.memo(
   ({
@@ -17,7 +21,20 @@ const ApplicantDetails = React.memo(
     createSaveRequestObject,
     disableInput,
     requestStatus,
+    userDetail
   }) => {
+
+    const useStyles = makeStyles({
+      heading: {
+        color: '#FFF',
+        fontSize: '16px !important',
+        fontWeight: 'bold !important'
+      },
+      accordionSummary: {
+        flexDirection: 'row-reverse'
+      }
+    });
+    const classes = useStyles();
     const disableFieldForMinistryRequest =
       shouldDisableFieldForMinistryRequests(requestStatus);
     /**
@@ -209,76 +226,81 @@ const ApplicantDetails = React.memo(
     });
 
     return (
-      <Card className="foi-details-card">
-        <label className="foi-details-label">APPLICANT DETAILS</label>
-        <CardContent>
-          <div className="row foi-details-row">
-            <div className="col-lg-6 foi-details-col">
-              <TextField
-                id="firstName"
-                label="Applicant First Name"
-                InputLabelProps={{ shrink: true }}
-                variant="outlined"
-                value={applicantFirstNameText}
-                fullWidth
-                onChange={handleFirtNameChange}
-                required={true}
-                disabled={disableInput}
-                error={applicantFirstNameText === ""}
-              />
-              <TextField
-                id="middleName"
-                label="Applicant Middle Name"
-                InputLabelProps={{ shrink: true }}
-                value={applicantMiddleNameText}
-                variant="outlined"
-                fullWidth
-                disabled={disableInput}
-                onChange={handleMiddleNameChange}
-              />
-              <TextField
-                id="lastName"
-                label="Applicant Last Name"
-                InputLabelProps={{ shrink: true }}
-                value={applicantLastNameText}
-                variant="outlined"
-                fullWidth
-                onChange={handleLastNameChange}
-                required={true}
-                disabled={disableInput}
-                error={applicantLastNameText === ""}
-              />
-            </div>
-            <div className="col-lg-6 foi-details-col">
-              <TextField
-                label="Organization"
-                InputLabelProps={{ shrink: true }}
-                value={organizationText}
-                variant="outlined"
-                fullWidth
-                disabled={disableInput}
-                onChange={handleOrganizationChange}
-              />
-              <TextField
-                id="category"
-                label="Category"
-                InputLabelProps={{ shrink: true }}
-                select
-                value={selectedCategory}
-                onChange={handleCategoryOnChange}
-                input={<Input />}
-                variant="outlined"
-                fullWidth
-                required
-                disabled={disableInput || disableFieldForMinistryRequest}
-                error={selectedCategory.toLowerCase().includes("select")}
-              >
-                {menuItems}
-              </TextField>
-            </div>
+
+      <div className='request-accordian' >
+      <Accordion defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}>
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+      <Typography className={classes.heading}>APPLICANT DETAILS</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <div className="row foi-details-row">
+          <div className="col-lg-6 foi-details-col">
+            <TextField
+              id="firstName"
+              label="Applicant First Name"
+              InputLabelProps={{ shrink: true }}
+              variant="outlined"
+              value={applicantFirstNameText}
+              fullWidth
+              onChange={handleFirtNameChange}
+              required={true}
+              disabled={disableInput}
+              error={applicantFirstNameText === ""}
+            />
+            <TextField
+              id="middleName"
+              label="Applicant Middle Name"
+              InputLabelProps={{ shrink: true }}
+              value={applicantMiddleNameText}
+              variant="outlined"
+              fullWidth
+              disabled={disableInput}
+              onChange={handleMiddleNameChange}
+            />
+            <TextField
+              id="lastName"
+              label="Applicant Last Name"
+              InputLabelProps={{ shrink: true }}
+              value={applicantLastNameText}
+              variant="outlined"
+              fullWidth
+              onChange={handleLastNameChange}
+              required={true}
+              disabled={disableInput}
+              error={applicantLastNameText === ""}
+            />
           </div>
-        </CardContent>
-      </Card>
+          <div className="col-lg-6 foi-details-col">
+            <TextField
+              label="Organization"
+              InputLabelProps={{ shrink: true }}
+              value={organizationText}
+              variant="outlined"
+              fullWidth
+              disabled={disableInput}
+              onChange={handleOrganizationChange}
+            />
+            <TextField
+              id="category"
+              label="Category"
+              InputLabelProps={{ shrink: true }}
+              select
+              value={selectedCategory}
+              onChange={handleCategoryOnChange}
+              input={<Input />}
+              variant="outlined"
+              fullWidth
+              required
+              disabled={disableInput || disableFieldForMinistryRequest}
+              error={selectedCategory.toLowerCase().includes("select")}
+            >
+              {menuItems}
+            </TextField>
+          </div>
+        </div>
+      </AccordionDetails>
+    </Accordion>
+  </div>
     );
   }
 );

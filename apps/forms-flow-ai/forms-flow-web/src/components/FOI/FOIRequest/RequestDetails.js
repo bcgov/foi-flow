@@ -1,7 +1,5 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -10,6 +8,12 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { shouldDisableFieldForMinistryRequests } from "./utils"
+import { makeStyles } from '@material-ui/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
 const RequestDetails = React.memo(
@@ -25,6 +29,17 @@ const RequestDetails = React.memo(
      *  All fields are mandatory here
      */
 
+    const useStyles = makeStyles({
+      heading: {
+        color: '#FFF',
+        fontSize: '16px !important',
+        fontWeight: 'bold !important'
+      },
+      accordionSummary: {
+        flexDirection: 'row-reverse'
+      }
+    });
+    const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
     const {ministryId} = useParams();    
     const validateFields = (request, name, value) => {
@@ -197,129 +212,132 @@ const RequestDetails = React.memo(
     }
      return (
         
-        <Card className="foi-details-card">            
-            <label className="foi-details-label">REQUEST DETAILS</label>
-            <CardContent>            
-                <div className="row foi-details-row">
-                    <div className="col-lg-6 foi-details-col">
-                    <TextField
-                            id="requestType"
-                            label="Request Type"
-                            InputLabelProps={{ shrink: true, }}          
-                            select
-                            value={selectedRequestType}
-                            onChange={handleRequestTypeChange}
-                            input={<Input />} 
-                            variant="outlined"
-                            fullWidth
-                            required
-                            disabled={disableInput || disableFieldForMinistryRequest}
-                            error={selectedRequestType.toLowerCase().includes("select")}                            
-                        >            
-                        {requestTypes}
-                        </TextField> 
-                    <TextField
-                            id="receivedMode"
-                            label="Received Mode"
-                            InputLabelProps={{ shrink: true, }}          
-                            select
-                            value={selectedReceivedMode}
-                            onChange={handleReceivedModeChange}
-                            input={<Input />} 
-                            variant="outlined"
-                            fullWidth
-                            required
-                            error={selectedReceivedMode.toLowerCase().includes("select")}
-                            disabled={disableInput || 
-                              requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() ||
-                              requestDetails.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() ||
-                              disableFieldForMinistryRequest
-                            }                         
-                        >            
-                        {receivedModes}
-                        </TextField> 
-                    <TextField
-                            id="deliveryMode"
-                            label="Delivery Mode"
-                            InputLabelProps={{ shrink: true, }}          
-                            select
-                            value={selectedDeliveryMode}
-                            onChange={handleDeliveryModeChange}
-                            input={<Input />} 
-                            variant="outlined"
-                            fullWidth
-                            required
-                            disabled={disableInput || disableFieldForMinistryRequest}
-                            error={selectedDeliveryMode.toLowerCase().includes("select")}                            
-                        >            
-                        {deliveryModes}
-                        </TextField> 
-                    </div>
-                    <div className="col-lg-6 foi-details-col"> 
-                    <TextField
-                            id="receivedDate"
-                            label="Received Date"
-                            type="date" 
-                            value={receivedDateText || ''} 
-                            onChange={handleReceivedDateChange}
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
-                            variant="outlined" 
-                            required
-                            error={receivedDateText === undefined || receivedDateText === ""}
-                            fullWidth
-                            disabled={!!ministryId || disableInput}
-                        />
-                        <TextField
-                            id="startDate"
-                            label="Start Date"
-                            type="date" 
-                            value={startDateText || ''} 
-                            onChange={handleStartDateChange}
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
-                            InputProps={{inputProps: { min: receivedDateText} }}
-                            variant="outlined" 
-                            required
-                            error={startDateText === undefined || startDateText === ""}
-                            fullWidth
-                            disabled={!!ministryId || disableInput}
-                        />
-                        {requestDetails.currentState === undefined || (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) ?
-                        <TextField
-                            id="dueDate"
-                            label="Due Date"
-                            type="date" 
-                            value={dueDateText || ''}                            
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
-                            variant="outlined" 
-                            required
-                            disabled
-                            fullWidth
-                        />
-                        :
-                        <TextField
-                            id="dueDate"
-                            label="Due Date"                            
-                            value="N/A"                            
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
-                            variant="outlined" 
-                            required
-                            disabled
-                            fullWidth
-                        />
-                      }
-                    </div>
-                </div>                
-            </CardContent>
-        </Card>
-       
+      <div className='request-accordian' >
+      <Accordion defaultExpanded={true}>
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+      <Typography className={classes.heading}>REQUEST DETAILS</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <div className="row foi-details-row">
+          <div className="col-lg-6 foi-details-col">
+            <TextField
+                    id="requestType"
+                    label="Request Type"
+                    InputLabelProps={{ shrink: true, }}          
+                    select
+                    value={selectedRequestType}
+                    onChange={handleRequestTypeChange}
+                    input={<Input />} 
+                    variant="outlined"
+                    fullWidth
+                    required
+                    disabled={disableInput || disableFieldForMinistryRequest}
+                    error={selectedRequestType.toLowerCase().includes("select")}                            
+                >            
+                {requestTypes}
+                </TextField> 
+            <TextField
+                    id="receivedMode"
+                    label="Received Mode"
+                    InputLabelProps={{ shrink: true, }}          
+                    select
+                    value={selectedReceivedMode}
+                    onChange={handleReceivedModeChange}
+                    input={<Input />} 
+                    variant="outlined"
+                    fullWidth
+                    required
+                    error={selectedReceivedMode.toLowerCase().includes("select")}
+                    disabled={disableInput || 
+                      requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() ||
+                      requestDetails.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() ||
+                      disableFieldForMinistryRequest
+                    }                         
+                >            
+                {receivedModes}
+                </TextField> 
+            <TextField
+                    id="deliveryMode"
+                    label="Delivery Mode"
+                    InputLabelProps={{ shrink: true, }}          
+                    select
+                    value={selectedDeliveryMode}
+                    onChange={handleDeliveryModeChange}
+                    input={<Input />} 
+                    variant="outlined"
+                    fullWidth
+                    required
+                    disabled={disableInput || disableFieldForMinistryRequest}
+                    error={selectedDeliveryMode.toLowerCase().includes("select")}                            
+                >            
+                {deliveryModes}
+                </TextField> 
+            </div>
+            <div className="col-lg-6 foi-details-col"> 
+            <TextField
+                    id="receivedDate"
+                    label="Received Date"
+                    type="date" 
+                    value={receivedDateText || ''} 
+                    onChange={handleReceivedDateChange}
+                    InputLabelProps={{
+                    shrink: true,
+                    }}
+                    variant="outlined" 
+                    required
+                    error={receivedDateText === undefined || receivedDateText === ""}
+                    fullWidth
+                    disabled={!!ministryId || disableInput}
+                />
+                <TextField
+                    id="startDate"
+                    label="Start Date"
+                    type="date" 
+                    value={startDateText || ''} 
+                    onChange={handleStartDateChange}
+                    InputLabelProps={{
+                    shrink: true,
+                    }}
+                    InputProps={{inputProps: { min: receivedDateText} }}
+                    variant="outlined" 
+                    required
+                    error={startDateText === undefined || startDateText === ""}
+                    fullWidth
+                    disabled={!!ministryId || disableInput}
+                />
+                {requestDetails.currentState === undefined || (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) ?
+                <TextField
+                    id="dueDate"
+                    label="Due Date"
+                    type="date" 
+                    value={dueDateText || ''}                            
+                    InputLabelProps={{
+                    shrink: true,
+                    }}
+                    variant="outlined" 
+                    required
+                    disabled
+                    fullWidth
+                />
+                :
+                <TextField
+                    id="dueDate"
+                    label="Due Date"                            
+                    value="N/A"                            
+                    InputLabelProps={{
+                    shrink: true,
+                    }}
+                    variant="outlined" 
+                    required
+                    disabled
+                    fullWidth
+                />
+              }
+            </div>
+        </div>                
+      </AccordionDetails>
+    </Accordion>
+  </div>
     );
   });
 
