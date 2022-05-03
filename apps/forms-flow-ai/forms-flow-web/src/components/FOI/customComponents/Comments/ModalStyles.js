@@ -1,5 +1,3 @@
-import { color } from "@mui/system"
-
 export const modal = {
   fontSize: '16px'
 }
