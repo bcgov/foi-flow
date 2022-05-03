@@ -340,11 +340,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const requiredContactDetailsValue = {
-    primaryAddress: "",
+    address: "",
     city: "",
     province: "",
     country: "",
-    postalCode: "",
+    postal: "",
   };
 
   const requiredAxisDetailsValue = {
