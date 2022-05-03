@@ -217,6 +217,7 @@ const ApplicantDetails = React.memo(
               <TextField
                 id="firstName"
                 label="Applicant First Name"
+                inputProps={{ "aria-labelledby": "firstName-label"}}
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 value={applicantFirstNameText}
@@ -229,6 +230,7 @@ const ApplicantDetails = React.memo(
               <TextField
                 id="middleName"
                 label="Applicant Middle Name"
+                inputProps={{ "aria-labelledby": "middleName-label"}}
                 InputLabelProps={{ shrink: true }}
                 value={applicantMiddleNameText}
                 variant="outlined"
@@ -239,6 +241,7 @@ const ApplicantDetails = React.memo(
               <TextField
                 id="lastName"
                 label="Applicant Last Name"
+                inputProps={{ "aria-labelledby": "lastName-label"}}
                 InputLabelProps={{ shrink: true }}
                 value={applicantLastNameText}
                 variant="outlined"
@@ -251,7 +254,9 @@ const ApplicantDetails = React.memo(
             </div>
             <div className="col-lg-6 foi-details-col">
               <TextField
+                id="organization"
                 label="Organization"
+                inputProps={{ "aria-labelledby": "organization-label"}}
                 InputLabelProps={{ shrink: true }}
                 value={organizationText}
                 variant="outlined"
@@ -262,6 +267,7 @@ const ApplicantDetails = React.memo(
               <TextField
                 id="category"
                 label="Category"
+                inputProps={{ "aria-labelledby": "category-label"}}
                 InputLabelProps={{ shrink: true }}
                 select
                 value={selectedCategory}

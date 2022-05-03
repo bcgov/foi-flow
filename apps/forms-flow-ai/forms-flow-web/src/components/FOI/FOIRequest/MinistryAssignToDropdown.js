@@ -108,6 +108,7 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
                     id="ministryAssignedTo"
                     label="Ministry Assigned To"
                     InputLabelProps={{ shrink: true, }}          
+                    inputProps={{ "aria-labelledby": "ministryAssignedTo-label"}}
                     select
                     value={selectedMinistryAssignedTo}
                     onChange={handleMinistryAssignedToOnChange}

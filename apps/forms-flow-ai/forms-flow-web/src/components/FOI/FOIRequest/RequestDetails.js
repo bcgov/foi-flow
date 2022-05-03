@@ -205,11 +205,12 @@ const RequestDetails = React.memo(
                     <TextField
                             id="requestType"
                             label="Request Type"
+                            inputProps={{ "aria-labelledby": "requestType-label"}}
                             InputLabelProps={{ shrink: true, }}          
                             select
                             value={selectedRequestType}
                             onChange={handleRequestTypeChange}
-                            input={<Input />} 
+                            // input={<Input />} 
                             variant="outlined"
                             fullWidth
                             required
@@ -221,6 +222,7 @@ const RequestDetails = React.memo(
                     <TextField
                             id="receivedMode"
                             label="Received Mode"
+                            inputProps={{ "aria-labelledby": "receivedMode-label"}}
                             InputLabelProps={{ shrink: true, }}          
                             select
                             value={selectedReceivedMode}
@@ -241,6 +243,7 @@ const RequestDetails = React.memo(
                     <TextField
                             id="deliveryMode"
                             label="Delivery Mode"
+                            inputProps={{ "aria-labelledby": "deliveryMode-label"}}
                             InputLabelProps={{ shrink: true, }}          
                             select
                             value={selectedDeliveryMode}
@@ -262,6 +265,7 @@ const RequestDetails = React.memo(
                             type="date" 
                             value={receivedDateText || ''} 
                             onChange={handleReceivedDateChange}
+                            inputProps={{ "aria-labelledby": "receivedDate-label"}}
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -277,6 +281,7 @@ const RequestDetails = React.memo(
                             type="date" 
                             value={startDateText || ''} 
                             onChange={handleStartDateChange}
+                            inputProps={{ "aria-labelledby": "startDate-label"}}
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -292,7 +297,8 @@ const RequestDetails = React.memo(
                             id="dueDate"
                             label="Due Date"
                             type="date" 
-                            value={dueDateText || ''}                            
+                            value={dueDateText || ''}   
+                            inputProps={{ "aria-labelledby": "dueDate-label"}}                         
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -305,7 +311,8 @@ const RequestDetails = React.memo(
                         <TextField
                             id="dueDate"
                             label="Due Date"                            
-                            value="N/A"                            
+                            value="N/A"       
+                            inputProps={{ "aria-labelledby": "dueDate-label"}}                      
                             InputLabelProps={{
                             shrink: true,
                             }}

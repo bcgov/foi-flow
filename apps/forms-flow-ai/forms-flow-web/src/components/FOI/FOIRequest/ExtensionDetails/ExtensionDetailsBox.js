@@ -44,7 +44,7 @@ const ExtensionDetailsBox = React.memo(() => {
           </div>
           <div className="col-lg-4 foi-details-col">
             <button
-              className={clsx("btn", "btn-link", "btn-description-history", {
+              className={clsx("btn", "new-extension-link", "btn-description-history", {
                 [classes.btndisabled]: pendingExtensionExists,
               })}
               onClick={(e) => {

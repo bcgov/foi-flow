@@ -192,7 +192,7 @@ const RequestDescription = React.memo(({
                 />
                 <div className="row foi-details-row foi-request-description-row">
                     <div className="col-lg-6 foi-details-col">
-                        <h5 className="foi-date-range-h5">Date Range for Record Search</h5>
+                        <div className="foi-date-range-h5">Date Range for Record Search</div>
                     </div>
                     <div className="col-lg-3 foi-details-col foi-request-dates">
                       <TextField  
