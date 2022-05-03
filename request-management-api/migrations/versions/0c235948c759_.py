@@ -17,14 +17,14 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('Update public."ProgramAreas" set bcgovcode = \'EDU\' where iaocode = \'EDU\';')
-    op.execute('Update public."ProgramAreas" set bcgovcode = \'AGR\' where iaocode = \'AGR\';')
-    op.execute('Update public."ProgramAreas" set bcgovcode = \'FOR\', iaocode = \'FOR\' where iaocode = \'FNR\';')
+    op.execute('Update public."ProgramAreas" set bcgovcode = \'EDU\', name = \'EDU Ministry Team\' where iaocode = \'EDU\';')
+    op.execute('Update public."ProgramAreas" set bcgovcode = \'AGR\', name = \'AGR Ministry Team\' where iaocode = \'AGR\';')
+    op.execute('Update public."ProgramAreas" set bcgovcode = \'FOR\', iaocode = \'FOR\', name = \'FOR Ministry Team\' where iaocode = \'FNR\';')
     op.execute('INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES (\'Lands, Water and Resource Stewardship\', \'BC GOV Ministry\', True, \'LWR\', \'LWR\');commit;')
     op.execute('INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode)	VALUES (\'Declaration Act Secretariat\', \'Other\', True, \'DAS\', \'DAS\');commit;')
     
 def downgrade():
-    op.execute('Update public."ProgramAreas" set bcgovcode = \'EDUC\' where iaocode = \'EDU\';')
-    op.execute('Update public."ProgramAreas" set bcgovcode = \'AFF\' where iaocode = \'AGR\';')
-    op.execute('Update public."ProgramAreas" set bcgovcode = \'FLNR\', iaocode = \'FNR\' where iaocode = \'FOR\';')
+    op.execute('Update public."ProgramAreas" set bcgovcode = \'EDUC\', name = \'EDUC Ministry Team\' where iaocode = \'EDU\';')
+    op.execute('Update public."ProgramAreas" set bcgovcode = \'AFF\', name = \'AFF Ministry Team\' where iaocode = \'AGR\';')
+    op.execute('Update public."ProgramAreas" set bcgovcode = \'FLNR\', iaocode = \'FNR\', name = \'FLNR Ministry Team\' where iaocode = \'FOR\';')
     op.execute('DELETE FROM public."ProgramAreas" WHERE iaocode in (\'LWR\', \'DAS\');commit;')
