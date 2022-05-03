@@ -21,7 +21,7 @@ WebUI.openBrowser(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('username') : username, ('password') : password], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/span_username'), firstname +  ' ' + lastname)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/span_username'), (firstname + ' ') + lastname)
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/span_username'))
 
@@ -44,6 +44,12 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_Watching Requ
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_My Requests'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 0)
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiChip-filledPrimary')
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlinedPrimary')
+
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-outlinedPrimary')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 0)
 
@@ -72,4 +78,14 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ASSIGNED TO'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header RECEIVED DATE'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/navbar/reporting link'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.switchToWindowIndex(1, FailureHandling.STOP_ON_FAILURE)
+
+assert WebUI.getUrl() == 'https://dev.reports.foirequests.gov.bc.ca/'
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/h3_Your FOI Request Queue'))
 

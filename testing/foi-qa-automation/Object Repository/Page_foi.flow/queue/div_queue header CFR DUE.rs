@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>div_queue header APPLICANT TYPE</name>
+   <name>div_queue header CFR DUE</name>
    <tag></tag>
-   <elementGuidId>63de41f7-31a1-4da4-9546-c24266e6e023</elementGuidId>
+   <elementGuidId>45a7e970-c382-4180-95c9-e56d1e7077f0</elementGuidId>
    <selectorCollection>
       <entry>
          <key>XPATH</key>
@@ -11,7 +11,7 @@
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>//*[(text() = 'APPLICANT TYPE' or . = 'APPLICANT TYPE') and @data-field = 'applicantcategory']</value>
+         <value>//*[(text() = 'CFR DUE' or . = 'CFR DUE') and @role = 'columnheader' and @data-field = 'cfrduedate']</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -39,7 +39,7 @@
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>CATEGORY</value>
+      <value>CFR DUE</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -49,7 +49,7 @@
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;col-sm-12 col-md-12 foi-grid-container&quot;]/div[@class=&quot;jss1&quot;]/div[@class=&quot;MuiDataGrid-root MuiDataGrid-root foi-data-grid&quot;]/div[@class=&quot;MuiDataGrid-main&quot;]/div[@class=&quot;MuiDataGrid-columnsContainer&quot;]/div[@class=&quot;MuiDataGrid-columnHeaderWrapper&quot;]/div[@class=&quot;MuiDataGrid-columnHeader--sortable MuiDataGrid-columnHeader--sorted MuiDataGrid-columnHeader&quot;]/div[@class=&quot;MuiDataGrid-columnHeaderDraggableContainer&quot;]/div[@class=&quot;MuiDataGrid-columnHeaderTitleContainer&quot;]/div[@class=&quot;MuiDataGrid-columnHeaderTitle&quot;]</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>role</name>
       <type>Main</type>
@@ -60,7 +60,7 @@
       <matchCondition>equals</matchCondition>
       <name>data-field</name>
       <type>Main</type>
-      <value>applicantcategory</value>
+      <value>cfrduedate</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>

@@ -149,6 +149,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/label_User Comm
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0)
 
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/i_Home logo'), 0)
+
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 'href', GlobalVariable.BASE_URL + 
     '/foi/dashboard', 0)
 

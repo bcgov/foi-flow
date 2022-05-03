@@ -82,6 +82,26 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header APPLICANT NAME'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header APPLICANT TYPE'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ON BEHALF OF'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header TYPE'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ASSIGNED TO'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header DAYS LEFT'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header EXT'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header NO PAGES'), 0)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)

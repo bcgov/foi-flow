@@ -6,12 +6,12 @@
    <elementGuidId>29e3fcc2-302e-4b31-9f55-24eff341cd5a</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>BASIC</key>
-         <value>id(&quot;responsive-navbar-nav&quot;)/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;ml-auto banner-right foihamburgermenu&quot;]/ul[@class=&quot;navbar-nav foihamburgermenulist&quot;]/li[@class=&quot;report-icon foinavitem&quot;]/a[1][count(. | //*[@href = 'https://foi-flow-reporting-c84b95-dev.apps.silver.devops.gov.bc.ca/saml/login?next=%2Fdashboards']) = count(//*[@href = 'https://foi-flow-reporting-c84b95-dev.apps.silver.devops.gov.bc.ca/saml/login?next=%2Fdashboards'])]</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//div[@id='responsive-navbar-nav']/div/div/ul/li[2]/a</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@href = 'https://dev.reports.foirequests.gov.bc.ca/saml/login?next=%2Fdashboards']</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -32,7 +32,7 @@
       <matchCondition>equals</matchCondition>
       <name>href</name>
       <type>Main</type>
-      <value>https://foi-flow-reporting-c84b95-dev.apps.silver.devops.gov.bc.ca/saml/login?next=%2Fdashboards</value>
+      <value>https://dev.reports.foirequests.gov.bc.ca/saml/login?next=%2Fdashboards</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,7 +42,7 @@
       <value>_blank</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
@@ -81,7 +81,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:href</name>
       <type>Main</type>
-      <value>//a[contains(@href, 'https://foi-flow-reporting-c84b95-dev.apps.silver.devops.gov.bc.ca/saml/login?next=%2Fdashboards')]</value>
+      <value>//a[contains(@href, 'https://dev.reports.foirequests.gov.bc.ca/saml/login?next=%2Fdashboards')]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -95,6 +95,6 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//a[@href = 'https://foi-flow-reporting-c84b95-dev.apps.silver.devops.gov.bc.ca/saml/login?next=%2Fdashboards']</value>
+      <value>//a[@href = 'https://dev.reports.foirequests.gov.bc.ca/saml/login?next=%2Fdashboards']</value>
    </webElementXpaths>
 </WebElementEntity>
