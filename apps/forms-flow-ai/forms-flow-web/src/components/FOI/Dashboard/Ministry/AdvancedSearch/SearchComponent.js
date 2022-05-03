@@ -491,7 +491,7 @@ const AdvancedSearch = ({ userDetail }) => {
                   }}
                   variant="h6"
                 >
-                  Advanced Search
+                  Filter by
                 </Typography>
               </Grid>
 
