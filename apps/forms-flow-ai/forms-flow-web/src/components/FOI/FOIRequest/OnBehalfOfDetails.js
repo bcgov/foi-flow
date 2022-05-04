@@ -77,6 +77,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_DOB, e.target.value);
     }   
      return (
+        
         <div className='request-accordian' >
         <Accordion defaultExpanded={true}>
         <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
@@ -84,64 +85,73 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
             <Typography className={classes.heading}>ON BEHALF OF DETAILS</Typography>
         </AccordionSummary>
         <AccordionDetails>
-            <div className="row foi-details-row">
-                <div className="col-lg-6 foi-details-col">                        
-                    <TextField                           
-                        label="First Name" 
-                        InputLabelProps={{ shrink: true, }} 
-                        variant="outlined" 
-                        value={anotherFirstNameText}
-                        onChange={handleFirtNameChange}
-                        fullWidth
-                        disabled={disableInput}
-                    />
-                    <TextField                          
-                        label="Middle Name" 
-                        InputLabelProps={{ shrink: true, }} 
-                        value={anotherMiddleNameText}
-                        variant="outlined" 
-                        onChange={handleMiddleNameChange}
-                        fullWidth
-                        disabled={disableInput}
-                    />
-                    <TextField                           
-                        label="Last Name" 
-                        InputLabelProps={{ shrink: true, }} 
-                        value={anotherLastNameText}
-                        variant="outlined"
-                        onChange={handleLastNameChange}
-                        fullWidth
-                        disabled={disableInput}
-                    />                                                
-                </div>
-                <div className="col-lg-6 foi-details-col"> 
-                    <TextField                            
-                        label="Also Known As" 
-                        InputLabelProps={{ shrink: true, }} 
-                        value={anotherNickNameText}
-                        variant="outlined" 
-                        onChange={handleNickNameChange}
-                        fullWidth
-                        disabled={disableInput}
-                    />                       
-                    <TextField                
-                        label="Date of Birth"
-                        type="date" 
-                        value={anotherDOBText||''} 
-                        onChange={handleDOBChange}
-                        InputLabelProps={{
-                        shrink: true,
-                        }}
-                        variant="outlined"
-                        fullWidth
-                        disabled={disableInput}
-                    />                   
-                </div>
-            </div> 
-        </AccordionDetails>
-    </Accordion>
-  </div>
-       
+                <div className="row foi-details-row">
+                    <div className="col-lg-6 foi-details-col">                        
+                        <TextField      
+                            id='onBehalfOfFirstName'                     
+                            label="First Name" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfFirstName-label"}}
+                            InputLabelProps={{ shrink: true, }} 
+                            variant="outlined" 
+                            value={anotherFirstNameText}
+                            onChange={handleFirtNameChange}
+                            fullWidth
+                            disabled={disableInput}
+                        />
+                        <TextField       
+                            id='onBehalfOfMiddleName'                    
+                            label="Middle Name" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfMiddleName-label"}}
+                            InputLabelProps={{ shrink: true, }} 
+                            value={anotherMiddleNameText}
+                            variant="outlined" 
+                            onChange={handleMiddleNameChange}
+                            fullWidth
+                            disabled={disableInput}
+                        />
+                        <TextField      
+                            id='onBehalfOfLastName'                     
+                            label="Last Name" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfLastName-label"}}
+                            InputLabelProps={{ shrink: true, }} 
+                            value={anotherLastNameText}
+                            variant="outlined"
+                            onChange={handleLastNameChange}
+                            fullWidth
+                            disabled={disableInput}
+                        />                                                
+                    </div>
+                    <div className="col-lg-6 foi-details-col"> 
+                        <TextField                 
+                            id='onBehalfOfAlsoKnownAs'           
+                            label="Also Known As" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfAlsoKnownAs-label"}}
+                            InputLabelProps={{ shrink: true, }} 
+                            value={anotherNickNameText}
+                            variant="outlined" 
+                            onChange={handleNickNameChange}
+                            fullWidth
+                            disabled={disableInput}
+                        />                       
+                        <TextField       
+                            id='onBehalfOfDOB'         
+                            label="Date of Birth"
+                            type="date" 
+                            value={anotherDOBText||''} 
+                            onChange={handleDOBChange}
+                            inputProps={{ "aria-labelledby": "onBehalfOfDOB-label"}}
+                            InputLabelProps={{
+                            shrink: true,
+                            }}
+                            variant="outlined"
+                            fullWidth
+                            disabled={disableInput}
+                        />                   
+                    </div>
+                </div> 
+            </AccordionDetails>
+      </Accordion>
+    </div>
     );
   });
 

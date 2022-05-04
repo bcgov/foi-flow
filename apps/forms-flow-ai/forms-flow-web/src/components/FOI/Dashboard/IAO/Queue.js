@@ -150,6 +150,7 @@ const Queue = ({ userDetail, tableInfo }) => {
               backgroundColor: "rgba(56,89,138,0.1)",
             }}
           >
+            <label className="hideContent" for="filter">Search in Queue</label>
             <InputBase
               id="filter"
               placeholder="Search in Queue ..."
@@ -160,6 +161,7 @@ const Queue = ({ userDetail, tableInfo }) => {
               startAdornment={
                 <InputAdornment position="start">
                   <IconButton sx={{ color: "#38598A" }}>
+                    <span className="hideContent">Search in Queue</span>
                     <SearchIcon />
                   </IconButton>
                 </InputAdornment>

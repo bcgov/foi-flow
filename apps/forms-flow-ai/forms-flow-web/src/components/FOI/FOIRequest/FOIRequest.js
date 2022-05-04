@@ -94,7 +94,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
-  const isAddRequest = urlIndexCreateRequest > -1;
+  const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
   //gets the request detail from the store
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -491,11 +491,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
-      dispatch(fetchFOIRequestNotesList(id || requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
         dispatch(push(getRedirectAfterSaveUrl(ministryId, id || requestId)));
+        dispatch(fetchFOIRequestNotesList(id || requestId, ministryId));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -647,9 +648,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1>
-              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
-            </h1>
+            <a href="/foi/dashboard" aria-label="dashboard link">
+              <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
+            </a>
           </div>
           <div className="foileftpaneldropdown">
             <StateDropDown
@@ -707,7 +708,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
-                return <h4>{text}</h4>;
+                return <div className='remaining-days-alert'>{text}</div>;
               })}
           </div>
         </div>
@@ -739,12 +740,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
                         <Chip
                           label={"Advanced Search"}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
                         <Chip
                           label={headerText}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                         />
                       </Breadcrumbs>
                     </ConditionalComponent>
@@ -888,6 +889,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         disableInput={disableInput}
                         requestState={requestState}
                         setSaveRequestObject={setSaveRequestObject}
+                        setIsAddRequest={setIsAddRequest}
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
                       />

@@ -134,8 +134,10 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
       <AccordionDetails>
           <div className="row foi-details-row">
               <div className="col-lg-6 foi-details-col">                       
-                  <TextField                            
+                  <TextField   
+                      id='personalHealthNumber'                         
                       label="Personal Health Number" 
+                      inputProps={{ "aria-labelledby": "personalHealthNumber-label"}}
                       InputLabelProps={{ shrink: true, }} 
                       variant="outlined" 
                       value={personalHealthNumberText}
@@ -143,41 +145,49 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       fullWidth
                       disabled={disableInput}
                   />                 
-                  <TextField                
-                            label="Date of Birth"
-                            type="date" 
-                            value={birthDateText || ''} 
-                            onChange={handleBirthDate}
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
-                            variant="outlined" 
-                            fullWidth
-                            disabled={disableInput}
-                        />
+                  <TextField        
+                    id='DOB'
+                    label="Date of Birth"
+                    type="date" 
+                    value={birthDateText || ''} 
+                    onChange={handleBirthDate}
+                    inputProps={{ "aria-labelledby": "DOB-label"}}
+                    InputLabelProps={{
+                    shrink: true,
+                    }}
+                    variant="outlined" 
+                    fullWidth
+                    disabled={disableInput}
+                  />
                   
-                  <TextField                            
-                      label="Identity Verified" 
-                      InputLabelProps={{ shrink: true, }}                       
-                      variant="outlined"
-                      value={identityVerifiedText}
-                      onChange={handleIdentityVerified}
-                      fullWidth
-                      disabled={disableInput}
+                  <TextField  
+                    id='identityVerified'                          
+                    label="Identity Verified" 
+                    inputProps={{ "aria-labelledby": "identityVerified-label"}}
+                    InputLabelProps={{ shrink: true, }}                       
+                    variant="outlined"
+                    value={identityVerifiedText}
+                    onChange={handleIdentityVerified}
+                    fullWidth
+                    disabled={disableInput}
                   />                                                
               </div>
               <div className="col-lg-6 foi-details-col">
-                  <TextField                            
-                      label="Corrections Number" 
-                      InputLabelProps={{ shrink: true, }} 
-                      variant="outlined" 
-                      value={correctionsNumberText}
-                      onChange={handleCorrectionsNumber}
-                      fullWidth
-                      disabled={disableInput}
+                  <TextField       
+                    id='correctionsNumber'                     
+                    label="Corrections Number" 
+                    inputProps={{ "aria-labelledby": "correctionsNumber-label"}}
+                    InputLabelProps={{ shrink: true, }} 
+                    variant="outlined" 
+                    value={correctionsNumberText}
+                    onChange={handleCorrectionsNumber}
+                    fullWidth
+                    disabled={disableInput}
                   /> 
-                  <TextField                            
+                  <TextField   
+                      id='employeeNumber'                         
                       label="Employee Number" 
+                      inputProps={{ "aria-labelledby": "employeeNumber-label"}}
                       InputLabelProps={{ shrink: true, }}                       
                       variant="outlined" 
                       value={employeeNumberText}

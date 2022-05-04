@@ -401,6 +401,7 @@ const AdvancedSearch = ({ userDetail }) => {
               className={classes.search}
             >
               <Grid item xs={keywordsMode ? 6 : 12}>
+                <label className="hideContent" for="advancedSearch">Search</label>
                 <InputBase
                   id="advancedSearch"
                   placeholder="Search"
@@ -414,6 +415,7 @@ const AdvancedSearch = ({ userDetail }) => {
                   startAdornment={
                     <InputAdornment position="start">
                       <IconButton sx={{ color: "#38598A" }}>
+                        <span className="hideContent">Search</span>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
@@ -930,6 +932,7 @@ const AdvancedSearch = ({ userDetail }) => {
       </Grid>
       <Grid className="floatAboveEverything">
         <Tooltip content={tooltipContent} />
+        <p className="hideContent" id="popup-6">Information</p>
       </Grid>
     </>
   );

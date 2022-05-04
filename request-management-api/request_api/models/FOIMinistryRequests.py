@@ -15,7 +15,7 @@ from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .ProgramAreas import ProgramArea
-from request_api.utils.enums import ProcessingTeamWithKeycloackGroup
+from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
 from request_api.utils.enums import RequestorType
 import logging
@@ -134,7 +134,7 @@ class FOIMinistryRequest(db.Model):
  
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
-        elif (group == 'Flex Team'):
+        elif (group == IAOTeamWithKeycloackGroup.flex.value):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])))).all()
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])))).all()           
@@ -509,17 +509,20 @@ class FOIMinistryRequest(db.Model):
         else:
             groupfilter = []
             for group in groups:
-                if (group == 'Flex Team' or group in ProcessingTeamWithKeycloackGroup.list()):
+                if (group == IAOTeamWithKeycloackGroup.flex.value or group in ProcessingTeamWithKeycloackGroup.list()):
                     groupfilter.append(
                         and_(
                             FOIMinistryRequest.assignedgroup == group
                         )
                     )
-                elif (group == 'Intake Team'):
+                elif (group == IAOTeamWithKeycloackGroup.intake.value):
                     groupfilter.append(
                         or_(
                             FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1])
+                            and_(
+                                FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
+                                FOIMinistryRequest.requeststatusid.in_([1])
+                            )
                         )
                     )
                 else:

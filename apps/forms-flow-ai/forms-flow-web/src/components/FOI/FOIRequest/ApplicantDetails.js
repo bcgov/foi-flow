@@ -226,81 +226,113 @@ const ApplicantDetails = React.memo(
     });
 
     return (
-
-      <div className='request-accordian' >
-      <Accordion defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}>
-      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-      <Typography className={classes.heading}>APPLICANT DETAILS</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <div className="row foi-details-row">
-          <div className="col-lg-6 foi-details-col">
-            <TextField
-              id="firstName"
-              label="Applicant First Name"
-              InputLabelProps={{ shrink: true }}
-              variant="outlined"
-              value={applicantFirstNameText}
-              fullWidth
-              onChange={handleFirtNameChange}
-              required={true}
-              disabled={disableInput}
-              error={applicantFirstNameText === ""}
-            />
-            <TextField
-              id="middleName"
-              label="Applicant Middle Name"
-              InputLabelProps={{ shrink: true }}
-              value={applicantMiddleNameText}
-              variant="outlined"
-              fullWidth
-              disabled={disableInput}
-              onChange={handleMiddleNameChange}
-            />
-            <TextField
-              id="lastName"
-              label="Applicant Last Name"
-              InputLabelProps={{ shrink: true }}
-              value={applicantLastNameText}
-              variant="outlined"
-              fullWidth
-              onChange={handleLastNameChange}
-              required={true}
-              disabled={disableInput}
-              error={applicantLastNameText === ""}
-            />
+      <div className='request-accordian'>
+        <Accordion defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}>
+          <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+            <Typography className={classes.heading}>APPLICANT DETAILS</Typography>
+          </AccordionSummary>
+        <AccordionDetails>
+          <div className="row foi-details-row">
+            <div className="col-lg-6 foi-details-col">
+              <TextField
+                id="firstName"
+                label="Applicant First Name"
+                inputProps={{ "aria-labelledby": "firstName-label"}}
+                InputLabelProps={{ shrink: true }}
+                variant="outlined"
+                value={applicantFirstNameText}
+                fullWidth
+                onChange={handleFirtNameChange}
+                required={true}
+                disabled={disableInput}
+                error={applicantFirstNameText === ""}
+              />
+              <TextField
+                id="middleName"
+                label="Applicant Middle Name"
+                inputProps={{ "aria-labelledby": "middleName-label"}}
+                InputLabelProps={{ shrink: true }}
+                value={applicantMiddleNameText}
+                variant="outlined"
+                fullWidth
+                disabled={disableInput}
+                onChange={handleMiddleNameChange}
+              />
+              <TextField
+                id="lastName"
+                label="Applicant Last Name"
+                inputProps={{ "aria-labelledby": "lastName-label"}}
+                InputLabelProps={{ shrink: true }}
+                value={applicantLastNameText}
+                variant="outlined"
+                fullWidth
+                onChange={handleLastNameChange}
+                required={true}
+                disabled={disableInput}
+                error={applicantLastNameText === ""}
+              />
+            </div>
+            <div className="col-lg-6 foi-details-col">
+              <TextField
+                id="organization"
+                label="Organization"
+                inputProps={{ "aria-labelledby": "organization-label"}}
+                InputLabelProps={{ shrink: true }}
+                value={organizationText}
+                variant="outlined"
+                fullWidth
+                disabled={disableInput}
+                onChange={handleOrganizationChange}
+              />
+              <TextField
+                id="category"
+                label="Category"
+                inputProps={{ "aria-labelledby": "category-label"}}
+                InputLabelProps={{ shrink: true }}
+                select
+                value={selectedCategory}
+                onChange={handleCategoryOnChange}
+                input={<Input />}
+                variant="outlined"
+                fullWidth
+                required
+                disabled={disableInput || disableFieldForMinistryRequest}
+                error={selectedCategory.toLowerCase().includes("select")}
+              >
+                {menuItems}
+              </TextField>
+            </div>
+            <div className="col-lg-6 foi-details-col">
+              <TextField
+                label="Organization"
+                InputLabelProps={{ shrink: true }}
+                value={organizationText}
+                variant="outlined"
+                fullWidth
+                disabled={disableInput}
+                onChange={handleOrganizationChange}
+              />
+              <TextField
+                id="category"
+                label="Category"
+                InputLabelProps={{ shrink: true }}
+                select
+                value={selectedCategory}
+                onChange={handleCategoryOnChange}
+                input={<Input />}
+                variant="outlined"
+                fullWidth
+                required
+                disabled={disableInput || disableFieldForMinistryRequest}
+                error={selectedCategory.toLowerCase().includes("select")}
+              >
+                {menuItems}
+              </TextField>
+            </div>
           </div>
-          <div className="col-lg-6 foi-details-col">
-            <TextField
-              label="Organization"
-              InputLabelProps={{ shrink: true }}
-              value={organizationText}
-              variant="outlined"
-              fullWidth
-              disabled={disableInput}
-              onChange={handleOrganizationChange}
-            />
-            <TextField
-              id="category"
-              label="Category"
-              InputLabelProps={{ shrink: true }}
-              select
-              value={selectedCategory}
-              onChange={handleCategoryOnChange}
-              input={<Input />}
-              variant="outlined"
-              fullWidth
-              required
-              disabled={disableInput || disableFieldForMinistryRequest}
-              error={selectedCategory.toLowerCase().includes("select")}
-            >
-              {menuItems}
-            </TextField>
-          </div>
-        </div>
-      </AccordionDetails>
-    </Accordion>
-  </div>
+        </AccordionDetails>
+      </Accordion>
+      </div>
     );
   }
 );

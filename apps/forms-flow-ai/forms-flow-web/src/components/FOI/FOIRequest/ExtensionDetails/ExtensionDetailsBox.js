@@ -58,7 +58,7 @@ const ExtensionDetailsBox = React.memo(() => {
       <AccordionDetails>
           <div>
             <button
-              className={clsx("btn", "btn-link", "btn-description-history", {
+              className={clsx("btn", "new-extension-link", "btn-description-history", {
                 [classes.btndisabled]: pendingExtensionExists,
               })}
               onClick={(e) => {
