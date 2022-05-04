@@ -91,7 +91,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/div[4]/div/div/div/div</value>
+      <value>//span[@id='state-change-dialog-description']/div[4]/div/div/div/div</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

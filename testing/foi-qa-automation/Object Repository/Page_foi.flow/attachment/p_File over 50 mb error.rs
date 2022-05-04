@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//span[@id='state-change-description']/ul/li/div/p</value>
+         <value>//span[@id='state-change-dialog-description']/ul/li/div/p</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -39,14 +39,14 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/ul[@class=&quot;error-message-ul&quot;]/li[1]/div[@class=&quot;error-message-container&quot;]/p[1]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/ul[@class=&quot;error-message-ul&quot;]/li[1]/div[@class=&quot;error-message-container&quot;]/p[1]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/ul/li/div/p</value>
+      <value>//span[@id='state-change-dialog-description']/ul/li/div/p</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//span[@id='state-change-description']/ul/li/div/p</value>
+         <value>//span[@id='state-change-dialog-description']/ul/li/div/p</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -15,7 +15,7 @@
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;state-change-description&quot;)/ul[@class=&quot;error-message-ul&quot;]/li[1]/div[@class=&quot;error-message-container&quot;]/p[1][count(. | //p[(text() = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.' or . = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.')]) = count(//p[(text() = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.' or . = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.')])]</value>
+         <value>id(&quot;state-change-dialog-description&quot;)/ul[@class=&quot;error-message-ul&quot;]/li[1]/div[@class=&quot;error-message-container&quot;]/p[1][count(. | //p[(text() = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.' or . = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.')]) = count(//p[(text() = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.' or . = 'A attachment with this file name(s) test.docx already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.')])]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -39,14 +39,14 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/ul[@class=&quot;error-message-ul&quot;]/li[1]/div[@class=&quot;error-message-container&quot;]/p[1]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/ul[@class=&quot;error-message-ul&quot;]/li[1]/div[@class=&quot;error-message-container&quot;]/p[1]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/ul/li/div/p</value>
+      <value>//span[@id='state-change-dialog-description']/ul/li/div/p</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

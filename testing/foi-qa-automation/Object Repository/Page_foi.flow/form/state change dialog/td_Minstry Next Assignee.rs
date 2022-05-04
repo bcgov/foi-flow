@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//span[@id='state-change-description']/table[2]/tbody/tr/td</value>
+         <value>//span[@id='state-change-dialog-description']/table[2]/tbody/tr/td</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -35,14 +35,14 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/table[@class=&quot;table table-bordered table-assignedto&quot;]/tbody[1]/tr[1]/td[1]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/table[@class=&quot;table table-bordered table-assignedto&quot;]/tbody[1]/tr[1]/td[1]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/table/tbody/tr/td</value>
+      <value>//span[@id='state-change-dialog-description']/table/tbody/tr/td</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

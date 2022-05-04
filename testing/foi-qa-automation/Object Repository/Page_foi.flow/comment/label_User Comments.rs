@@ -6,15 +6,15 @@
    <elementGuidId>6d608a8d-73a4-472f-bf2f-f5126bde019e</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
+         <key>BASIC</key>
+         <value>//*[(text() = 'User Comments' or . = 'User Comments')]</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[@class='displayComments']/div/label[3]</value>
+         <value>//div[@id='Comments']/div/div[@class='displayComments']/div/fieldset/label[3]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = 'User Comments' or . = 'User Comments')]</value>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

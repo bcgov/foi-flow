@@ -31,11 +31,9 @@ requestID = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form')
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
@@ -47,13 +45,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
@@ -67,13 +61,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Return to Queue'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 

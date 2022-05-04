@@ -6,12 +6,12 @@
    <elementGuidId>c2ca88ee-6d9c-4309-997e-01663008b8c3</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='app']/div/div[3]/div/div/div[4]/h4</value>
+         <key>BASIC</key>
+         <value>//div[(text() = 'CFR Due in 10 Days' or . = 'CFR Due in 10 Days')]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//h4[(text() = 'CFR Due in 10 Days' or . = 'CFR Due in 10 Days')]</value>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div/div[4]/h4</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -25,7 +25,7 @@
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
-      <value>h4</value>
+      <value>div</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -39,7 +39,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderCFRG&quot;]/div[@class=&quot;foileftpanelstatus&quot;]/h4[1]</value>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderCFRG&quot;]/div[@class=&quot;foileftpanelstatus&quot;]/div[1]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>

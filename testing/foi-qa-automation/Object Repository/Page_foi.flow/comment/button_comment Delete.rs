@@ -6,12 +6,12 @@
    <elementGuidId>c06aee76-770a-4054-b155-4cc8b86d823b</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='popup-5']/div[2]/div[2]/button</value>
+         <key>BASIC</key>
+         <value>//li[(text() = 'Delete' or . = 'Delete')]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>id(&quot;popup-root&quot;)/div/div[@class=&quot;actionDiv&quot;]/div[2]/button[@class=&quot;deleteBtn&quot;]</value>
+         <key>XPATH</key>
+         <value>//div[@id='popup-5']/div[2]/div[2]/button</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -21,11 +21,11 @@
    <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
-      <value>button</value>
+      <value>li</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,14 +42,14 @@
       <value>popup-33</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value> Delete</value>
+      <value>Delete</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>

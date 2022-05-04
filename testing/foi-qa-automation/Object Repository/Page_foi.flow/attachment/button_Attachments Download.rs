@@ -6,12 +6,12 @@
    <elementGuidId>17e981dc-0df7-4a6c-9ea3-ff6df049fda7</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='popup-1']/div[2]/button</value>
+         <key>BASIC</key>
+         <value>//li[(text() = 'Download' or . = 'Download')]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//button[@class = 'childActionsBtn' and (text() = 'Download' or . = 'Download')]</value>
+         <key>XPATH</key>
+         <value>//div[@id='popup-1']/div[2]/button</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -25,10 +25,10 @@
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
-      <value>button</value>
+      <value>li</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>

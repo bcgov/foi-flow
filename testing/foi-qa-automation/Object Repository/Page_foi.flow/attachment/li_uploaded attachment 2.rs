@@ -7,11 +7,11 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//span[@id='state-change-description']/section/div/div/article/section/ol/li[2]/</value>
+         <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li[2]/</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;state-change-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[1]/li[2]</value>
+         <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[1]/li[2]</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -39,14 +39,14 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[1]/li[2]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[1]/li[2]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/section/div/div/article/section/ol/li/section/div/div/aside</value>
+      <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

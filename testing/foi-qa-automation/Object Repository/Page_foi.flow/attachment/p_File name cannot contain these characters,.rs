@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//span[@id='state-change-description']/div[2]/div[2]/div/p</value>
+         <value>//span[@id='state-change-dialog-description']/div[2]/div[2]/div/p</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -46,14 +46,14 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/div[@class=&quot;row&quot;]/div[@class=&quot;col-sm-9&quot;]/div[@class=&quot;MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth&quot;]/p[@class=&quot;MuiFormHelperText-root MuiFormHelperText-contained Mui-error MuiFormHelperText-filled Mui-focused&quot;]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/div[@class=&quot;row&quot;]/div[@class=&quot;col-sm-9&quot;]/div[@class=&quot;MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth&quot;]/p[@class=&quot;MuiFormHelperText-root MuiFormHelperText-contained Mui-error MuiFormHelperText-filled Mui-focused&quot;]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/div[2]/div[2]/div/p</value>
+      <value>//span[@id='state-change-dialog-description']/div[2]/div[2]/div/p</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

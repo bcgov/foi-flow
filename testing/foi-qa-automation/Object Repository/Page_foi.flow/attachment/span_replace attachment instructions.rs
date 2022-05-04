@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//span[@id='state-change-description']/div/span</value>
+         <value>//span[@id='state-change-dialog-description']/div/span</value>
       </entry>
       <entry>
          <key>BASIC</key>
@@ -38,7 +38,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/div[@class=&quot;modal-message&quot;]/span[@class=&quot;confirmation-message&quot;]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/div[@class=&quot;modal-message&quot;]/span[@class=&quot;confirmation-message&quot;]</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -52,7 +52,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/div/span</value>
+      <value>//span[@id='state-change-dialog-description']/div/span</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

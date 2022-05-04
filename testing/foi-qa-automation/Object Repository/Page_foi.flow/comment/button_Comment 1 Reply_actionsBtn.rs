@@ -6,16 +6,16 @@
    <elementGuidId>76856c1b-175a-403d-9469-e0cd74ac8914</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>button.actionsBtn</value>
+         <key>BASIC</key>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/button[@class=&quot;actionsBtn&quot;]</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/div/button[@class=&quot;actionsBtn&quot;]</value>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/div[1]/button</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/button[@class=&quot;actionsBtn&quot;]</value>
+         <key>CSS</key>
+         <value>button.actionsBtn</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

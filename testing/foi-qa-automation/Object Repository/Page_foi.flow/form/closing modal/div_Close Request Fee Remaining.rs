@@ -41,14 +41,14 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/div[@class=&quot;row foi-details-row confirm-modal-row&quot;]/div[@class=&quot;col-lg-6 foi-details-col confirm-label-area&quot;]/div[@class=&quot;confirm-label-area&quot;]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/div[@class=&quot;row foi-details-row confirm-modal-row&quot;]/div[@class=&quot;col-lg-6 foi-details-col confirm-label-area&quot;]/div[@class=&quot;confirm-label-area&quot;]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/div[2]/div[2]/div</value>
+      <value>//span[@id='state-change-dialog-description']/div[2]/div[2]/div</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

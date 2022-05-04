@@ -6,12 +6,12 @@
    <elementGuidId>3a8d426c-d1e5-421c-b806-181d5c3f4ae9</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='popup-5']/div[2]/div/button</value>
+         <key>BASIC</key>
+         <value>//li[(text() = 'Edit' or . = 'Edit')]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>id(&quot;popup-root&quot;)/div[@class=&quot;actionDiv&quot;]/div[1]/button[@class=&quot;editBtn&quot;]</value>
+         <key>XPATH</key>
+         <value>//div[@id='popup-5']/div[2]/div/button</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -21,11 +21,11 @@
    <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
-      <value>button</value>
+      <value>li</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -35,14 +35,14 @@
       <value>editBtn</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value> Edit</value>
+      <value>Edit</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>

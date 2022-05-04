@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//span[@id='state-change-description']/div/div/div/b[.='Applicant: ']/following-sibling::span</value>
+         <value>//span[@id='state-change-dialog-description']/div/div/div/b[.='Applicant: ']/following-sibling::span</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -42,14 +42,14 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-description&quot;)/div[@class=&quot;row foi-details-row confirm-modal-row first-row&quot;]/div[@class=&quot;col-lg-6 foi-details-col&quot;]/div[@class=&quot;confirm-label-area&quot;]/span[@class=&quot;confirm-label-content&quot;]</value>
+      <value>id(&quot;state-change-dialog-description&quot;)/div[@class=&quot;row foi-details-row confirm-modal-row first-row&quot;]/div[@class=&quot;col-lg-6 foi-details-col&quot;]/div[@class=&quot;confirm-label-area&quot;]/span[@class=&quot;confirm-label-content&quot;]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-description']/div/div/div/b[.='Applicant: ']/following-sibling::span</value>
+      <value>//span[@id='state-change-dialog-description']/div/div/div/b[.='Applicant: ']/following-sibling::span</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

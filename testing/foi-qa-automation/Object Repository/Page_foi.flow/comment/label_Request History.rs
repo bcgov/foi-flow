@@ -6,15 +6,15 @@
    <elementGuidId>b5617f2d-c267-45e4-bf2a-5c36a916c436</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Request History' or . = 'Request History')]</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[@class='displayComments']/div/label[2]</value>
+         <value>//div[@id='Comments']/div/div[@class='displayComments']/div/fieldset/label[2]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = 'Request History' or . = 'Request History')]</value>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
