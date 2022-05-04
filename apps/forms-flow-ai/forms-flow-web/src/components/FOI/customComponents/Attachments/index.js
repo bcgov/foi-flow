@@ -515,6 +515,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
         id={`ellipse-icon-${indexValue}`}
         key={`ellipse-icon-${indexValue}`}
         color="primary"
+        disabled={disabled}
         onClick={(e) => {
           setPopoverOpen(true);
           setAnchorPosition(
