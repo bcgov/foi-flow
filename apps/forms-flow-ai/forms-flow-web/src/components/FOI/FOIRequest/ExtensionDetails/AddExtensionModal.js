@@ -398,6 +398,7 @@ const AddExtensionModal = () => {
         <DialogTitle disableTypography id="extension-dialog-title">
           <h2 className="extension-header">Extension</h2>
           <IconButton
+            aria-label= "close"
             className="title-col3"
             onClick={() => setSaveModalOpen(false)}
           >
@@ -441,6 +442,7 @@ const AddExtensionModal = () => {
                   required
                   select
                   label="Reason for Extension"
+                  inputProps={{ "aria-labelledby": "extension-reasons-label"}}
                   value={reason?.extensionreasonid || 0}
                   onChange={handleReasonChange}
                   error={!reason}
@@ -524,6 +526,7 @@ const AddExtensionModal = () => {
                   <Grid item xs={6} />
                   <Grid item xs={6}>
                     <TextField
+                      id="approvedDate"
                       label="Approved Date"
                       type="date"
                       value={approvedDate || ""}
@@ -534,7 +537,7 @@ const AddExtensionModal = () => {
                         setApprovedDate(e.target.value);
                       }}
                       InputProps={{
-                        inputProps: { max: formatDate(new Date()) },
+                        inputProps: { max: formatDate(new Date()) , "aria-labelledby": "approvedDate-label"},
                       }}
                       variant="outlined"
                       fullWidth
@@ -544,7 +547,7 @@ const AddExtensionModal = () => {
 
                   <Grid item xs={6}>
                     <TextField
-                      id="outlined-extension-number-days"
+                      id="outlined-approved-number-days"
                       name="approvedNumberDays"
                       value={approvedNumberDays || 0}
                       type="number"
@@ -568,6 +571,7 @@ const AddExtensionModal = () => {
                 >
                   <Grid item xs={6}>
                     <TextField
+                      id="deniedDate"
                       label="Denied Date"
                       type="date"
                       InputLabelProps={{
@@ -578,7 +582,7 @@ const AddExtensionModal = () => {
                         setDeniedDate(e.target.value);
                       }}
                       InputProps={{
-                        inputProps: { max: formatDate(new Date()) },
+                        inputProps: { max: formatDate(new Date()) , "aria-labelledby": "deniedDate-label"},
                       }}
                       variant="outlined"
                       fullWidth
