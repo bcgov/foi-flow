@@ -265,11 +265,11 @@ export const createRequestDetailsObjectFunc = (
 
 export const checkContactGiven = (requiredContactDetails) => {
   return (
-    (requiredContactDetails.primaryAddress === "" ||
+    (requiredContactDetails.address === "" ||
       requiredContactDetails.city === "" ||
       requiredContactDetails.province === "" ||
       requiredContactDetails.country === "" ||
-      requiredContactDetails.postalCode === "") &&
+      requiredContactDetails.postal === "") &&
     requiredContactDetails.email === ""
   );
 };
