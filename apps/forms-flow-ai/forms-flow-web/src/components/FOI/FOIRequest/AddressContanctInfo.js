@@ -97,7 +97,7 @@ const AddressContactDetails = memo(
     React.useEffect(() => {
       setFieldValues();
       const contanctDetailsObject = {
-        primaryAddress: validateFields(
+        address: validateFields(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY
         ),
@@ -110,7 +110,7 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.COUNTRY
         ),
-        postalCode: validateFields(
+        postal: validateFields(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.POSTALCODE
         ),
