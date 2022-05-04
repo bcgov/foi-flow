@@ -152,14 +152,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const DeleteAction = () => {
     return (
-        // <Backdrop
-        // sx={{ color: '#fff', zIndex: 1000 }}
-        // open={deletePopoverOpen}
-        // onClick={() => {
-        //   closeTooltip()
-        //   setDeletePopoverOpen(false);
-        // }}>
-          <Dialog
+        <Dialog
           open={deletePopoverOpen}
           onClose={handleDialogClose}
           aria-labelledby="delete-comment-dialog-title"
