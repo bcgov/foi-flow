@@ -247,7 +247,8 @@ const Queue = ({ userDetail, tableInfo }) => {
                 .replace(/ +/g, "")}`,
               tableInfo?.stateClassName?.[
                 params.row.currentState.toLowerCase().replace(/ +/g, "")
-              ]
+              ],
+              (params.row.assignedTo == null) && tableInfo?.noAssignedClassName
             )
           }
           onRowClick={renderReviewRequest}
