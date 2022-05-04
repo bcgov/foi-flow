@@ -14,12 +14,12 @@ import { ActionContext } from './ActionContext'
 import 'react-quill/dist/quill.snow.css';
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
+import Dialog from '@material-ui/core/Dialog';
 import Popover from "@material-ui/core/Popover";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
-import Backdrop from '@mui/material/Backdrop';
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
@@ -144,17 +144,21 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     );
   };
 
-
+  const handleDialogClose = () => {
+    closeTooltip()
+    setDeletePopoverOpen(false);
+  }
 
   const DeleteAction = () => {
     return (
-        <Backdrop
-        sx={{ color: '#fff', zIndex: 1000 }}
-        open={deletePopoverOpen}
-        onClick={() => {
-          closeTooltip()
-          setDeletePopoverOpen(false);
-        }}>
+        <Dialog
+          open={deletePopoverOpen}
+          onClose={handleDialogClose}
+          aria-label="Delete Comment"
+          aria-description="Delete Comment"
+          maxWidth={'md'}
+          fullWidth={true}
+        >
                           <div id="deletemodal" onBlur={closeTooltip} className='modal deletemodal' style={modal}>
   
                             <div className='header' style={modalHeader} >
@@ -193,17 +197,13 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                               <button
                                 className='button btn-bottom'
                                 style={modalDelBtn}
-                                onClick={() => {
-                                  
-                                  closeTooltip()
-                                  setDeletePopoverOpen(false);
-                                }}
+                                onClick={handleDialogClose}
                               >
                                 Cancel
                               </button>
                             </div>
                           </div>
-                          </Backdrop>
+      </Dialog>
     )
   };
 

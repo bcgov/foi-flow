@@ -112,7 +112,7 @@ export const getTabBG = (_tabStatus, _requestState) => {
     case StateEnum.callforrecords.name:
       return "foitabheadercollection foitabheaderCFRG";
     case StateEnum.callforrecordsoverdue.name:
-      return "foitabheadercollection foitabheaderCFROverdueBG";
+      return "foitabheadercollection foitabheaderCFRG";
     case StateEnum.redirect.name:
       return "foitabheadercollection foitabheaderRedirectBG";
     case StateEnum.review.name:
@@ -265,11 +265,11 @@ export const createRequestDetailsObjectFunc = (
 
 export const checkContactGiven = (requiredContactDetails) => {
   return (
-    (requiredContactDetails.primaryAddress === "" ||
+    (requiredContactDetails.address === "" ||
       requiredContactDetails.city === "" ||
       requiredContactDetails.province === "" ||
       requiredContactDetails.country === "" ||
-      requiredContactDetails.postalCode === "") &&
+      requiredContactDetails.postal === "") &&
     requiredContactDetails.email === ""
   );
 };
