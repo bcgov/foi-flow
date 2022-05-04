@@ -147,4 +147,8 @@ height: fit-content;
     .MuiIconButton-label {
         color: white !important;
     }
+
+    .MuiAccordionSummary-content.Mui-expanded {
+        margin: 0px !important;
+    }
 }
