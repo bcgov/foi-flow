@@ -154,7 +154,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         <Dialog
           open={deletePopoverOpen}
           onClose={handleDialogClose}
-          aria-labelledby="delete-comment-dialog-title"
+          aria-label="Delete Comment"
           aria-description="Delete Comment"
           maxWidth={'md'}
           fullWidth={true}
