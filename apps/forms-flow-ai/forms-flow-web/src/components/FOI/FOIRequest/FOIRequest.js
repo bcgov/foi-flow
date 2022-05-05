@@ -206,30 +206,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
       setHeaderText(getHeaderText({requestDetails, ministryId, requestState}))
-      if(requestDetails.axisRequestId){
-        dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
-          if(!err){
-            if(typeof(data) !== "string" && Object.entries(data).length > 0){
-              setAxisSyncedData(data);
-              var axisDataUpdated = checkIfAxisDataUpdated(data);
-              if(axisDataUpdated){
-                setCheckExtension(false);
-                setAxisMessage("WARNING");
-              }
-            }
-            else if(data){
-              let responseMsg = data;
-              responseMsg+='';
-              if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
-                setAxisMessage("ERROR");
-            }
-            
-          }
-          else
-            setAxisMessage("ERROR");
-
-        }));
-      }
+      if(requestDetails.axisRequestId)
+        axisBannerCheck();
     }
   }, [requestDetails]);
 
@@ -243,6 +221,31 @@ const FOIRequest = React.memo(({ userDetail }) => {
         setAxisMessage("");
     }
   }, [axisSyncedData, requestExtensions, checkExtension]);
+
+  const axisBannerCheck = () =>{
+    dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
+      if(!err){
+        if(typeof(data) !== "string" && Object.entries(data).length > 0){
+          setAxisSyncedData(data);
+          var axisDataUpdated = checkIfAxisDataUpdated(data);
+          if(axisDataUpdated){
+            setCheckExtension(false);
+            setAxisMessage("WARNING");
+          }
+          else
+            setAxisMessage("");
+        }
+        else if(data){
+          let responseMsg = data;
+          responseMsg+='';
+          if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+            setAxisMessage("ERROR");
+        }
+      }
+      else
+        setAxisMessage("ERROR");
+    }));
+  }
 
   const checkIfAxisDataUpdated = (axisData) => {
     var updateNeeded= false;
@@ -339,11 +342,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const requiredContactDetailsValue = {
-    primaryAddress: "",
+    address: "",
     city: "",
     province: "",
     country: "",
-    postalCode: "",
+    postal: "",
   };
 
   const requiredAxisDetailsValue = {
