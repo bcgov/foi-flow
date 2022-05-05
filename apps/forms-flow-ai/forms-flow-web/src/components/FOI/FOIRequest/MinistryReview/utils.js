@@ -16,10 +16,8 @@ export const getMinistryBottomTextMap = (
       ? `${_daysRemaining} Days Remaining`
       : `${Math.abs(_daysRemaining)} Days Overdue`;
 
-  const _cfrDaysRemainingText =
-    _cfrDaysRemaining > 0
-      ? `CFR Due in ${_cfrDaysRemaining} Days`
-      : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+  const _cfrDaysRemainingText = `CFR Due in ${_cfrDaysRemaining} Days`;
+      
 
   const hideCFRDaysRemaining = [
     StateEnum.review.name.toLowerCase(),

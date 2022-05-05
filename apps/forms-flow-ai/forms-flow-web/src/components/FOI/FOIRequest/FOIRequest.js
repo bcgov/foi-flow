@@ -531,9 +531,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining) => {
-    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {
-      settabStatus(StateEnum.callforrecordsoverdue.name);
-    }
 
     const mappedBottomText = getTabBottomText({
       _daysRemaining,
