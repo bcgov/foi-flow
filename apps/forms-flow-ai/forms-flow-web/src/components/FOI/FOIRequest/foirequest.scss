@@ -121,3 +121,34 @@ height: fit-content;
     font-weight: bolder;
     padding-bottom: 1rem;
 }
+
+.request-accordian {
+
+    .MuiAccordion-root {       
+        border: #003366 1px solid;
+        margin-top: 30px !important;
+        margin-bottom: 30px !important;
+        background-color: #FFFFFF !important; 
+    }
+
+    .MuiAccordionDetails-root {
+        padding: 16px !important;
+        display: block !important;
+    }
+
+    .MuiAccordionSummary-root {
+        background-color: #003366 !important;  
+    }
+
+    .MuiIconButton-edgeEnd{
+        margin-right: 0px !important;
+    }
+
+    .MuiIconButton-label {
+        color: white !important;
+    }
+
+    .MuiAccordionSummary-content.Mui-expanded {
+        margin: 0px !important;
+    }
+}
