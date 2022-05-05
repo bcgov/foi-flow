@@ -35,7 +35,7 @@
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>EDUC-2022-340455790</value>
+      <value>EDU-2022-340455790</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -91,6 +91,6 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//div[(text() = 'EDUC-2022-340455790' or . = 'EDUC-2022-340455790')]</value>
+      <value>//div[(text() = 'EDU-2022-340455790' or . = 'EDU-2022-340455790')]</value>
    </webElementXpaths>
 </WebElementEntity>

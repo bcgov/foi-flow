@@ -36,7 +36,7 @@
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Are you sure you want to change Request #EDUC-2022-29063611 to Consult?</value>
+      <value>Are you sure you want to change Request #EDU-2022-29063611 to Consult?</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -85,7 +85,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='Are you sure you want to change Request #EDUC-2022-29063611 to Consult?']/parent::*</value>
+      <value>//*/text()[normalize-space(.)='Are you sure you want to change Request #EDU-2022-29063611 to Consult?']/parent::*</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

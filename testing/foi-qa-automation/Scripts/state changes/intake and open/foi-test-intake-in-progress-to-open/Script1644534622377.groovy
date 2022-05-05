@@ -68,7 +68,7 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/inputs/request 
 // put next three lines in back after axis is phased out
 //def requestNo = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
 //def year = new Date().format('yyyy')
-//WebUI.verifyMatch('EDUC-' + year, requestNo.substring(0, 9), false)
+//WebUI.verifyMatch('EDU-' + year, requestNo.substring(0, 9), false)
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (1)')

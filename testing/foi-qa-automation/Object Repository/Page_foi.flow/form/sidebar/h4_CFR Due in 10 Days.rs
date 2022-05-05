@@ -60,7 +60,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #EDUC-2022-39720'])[1]/preceding::h4[2]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #EDU-2022-39720'])[1]/preceding::h4[2]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

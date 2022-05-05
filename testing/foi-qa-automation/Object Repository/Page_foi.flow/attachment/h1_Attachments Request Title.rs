@@ -45,7 +45,7 @@
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Request #EDUC-2022-44122</value>
+      <value>Request #EDU-2022-44122</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>false</isSelected>

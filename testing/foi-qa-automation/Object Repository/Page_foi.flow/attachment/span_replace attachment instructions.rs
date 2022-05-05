@@ -45,7 +45,7 @@
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #EDUC-2022-44122 changing from  Call For Records  to  Fee Estimate .</value>
+      <value>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #EDU-2022-44122 changing from  Call For Records  to  Fee Estimate .</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>

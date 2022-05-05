@@ -6,15 +6,15 @@
    <elementGuidId>ea97d78f-ec60-41d7-9d5e-ed3a6750f64e</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>BASIC</key>
+         <value>//*[@data-value = 'EDU Ministry Team|EDU Ministry Team']</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//div[@id='menu-']/div[3]/ul/li[4]</value>
       </entry>
       <entry>
          <key>CSS</key>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[@data-value = 'EDUC Ministry Team|EDUC Ministry Team' and (text() = 'EDUC Ministry Team' or . = 'EDUC Ministry Team')]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -59,14 +59,14 @@
       <matchCondition>equals</matchCondition>
       <name>data-value</name>
       <type>Main</type>
-      <value>EDUC Ministry Team|EDUC Ministry Team</value>
+      <value>EDU Ministry Team|EDU Ministry Team</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>EDUC Ministry Team</value>
+      <value>EDU Ministry Team</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -87,7 +87,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='EDUC Ministry Team'])[1]/following::li[1]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='EDU Ministry Team'])[1]/following::li[1]</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

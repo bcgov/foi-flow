@@ -73,7 +73,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue
 
 // put the following code back in once axis is phased out
 //assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), FailureHandling.STOP_ON_FAILURE).contains(
-//    'EDUC-' + requestID)
+//    'EDU-' + requestID)
 //
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 2'), 0)
 //

@@ -48,7 +48,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 0)
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
-    'value', 'EDUC Ministry Team', 0)
+    'value', 'EDU Ministry Team', 0)
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
     'disabled', 0, FailureHandling.STOP_ON_FAILURE)

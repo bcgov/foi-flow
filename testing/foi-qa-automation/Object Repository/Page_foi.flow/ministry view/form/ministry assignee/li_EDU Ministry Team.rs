@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>li_EDUC Ministry Team</name>
+   <name>li_EDU Ministry Team</name>
    <tag></tag>
    <elementGuidId>83720dc9-a701-4b6b-a7b8-a1f202fb6e5d</elementGuidId>
    <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'EDU Ministry Team' or . = 'EDU Ministry Team')]</value>
+      </entry>
       <entry>
          <key>XPATH</key>
          <value>//div[@id='menu-']/div[3]/ul/li[15]</value>
       </entry>
       <entry>
          <key>CSS</key>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = 'EDUC Ministry Team' or . = 'EDUC Ministry Team')]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -59,14 +59,14 @@
       <matchCondition>equals</matchCondition>
       <name>data-value</name>
       <type>Main</type>
-      <value>EDUC Ministry Team|EDUC Ministry Team</value>
+      <value>EDU Ministry Team|EDU Ministry Team</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>EDUC Ministry Team</value>
+      <value>EDU Ministry Team</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
