@@ -81,7 +81,7 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 state'), 'Open')
 
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 'background-color'), 
-    'rgba(29, 136, 0, 1)', false)
+    'rgba(207, 215, 227, 1)', false)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'), 0)
 
