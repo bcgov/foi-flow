@@ -403,8 +403,6 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
 })
 
 const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled}) => {
-  
-  const classes = useStyles();
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
