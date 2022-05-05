@@ -302,33 +302,6 @@ const ApplicantDetails = React.memo(
                 {menuItems}
               </TextField>
             </div>
-            <div className="col-lg-6 foi-details-col">
-              <TextField
-                label="Organization"
-                InputLabelProps={{ shrink: true }}
-                value={organizationText}
-                variant="outlined"
-                fullWidth
-                disabled={disableInput}
-                onChange={handleOrganizationChange}
-              />
-              <TextField
-                id="category"
-                label="Category"
-                InputLabelProps={{ shrink: true }}
-                select
-                value={selectedCategory}
-                onChange={handleCategoryOnChange}
-                input={<Input />}
-                variant="outlined"
-                fullWidth
-                required
-                disabled={disableInput || disableFieldForMinistryRequest}
-                error={selectedCategory.toLowerCase().includes("select")}
-              >
-                {menuItems}
-              </TextField>
-            </div>
           </div>
         </AccordionDetails>
       </Accordion>

@@ -47,12 +47,6 @@ const DivisionalTracking = React.memo(({divisions}) => {
             </AccordionDetails>
             </Accordion>
         </div>
-        // <Card className="foi-details-card" id="divisionalTracking">
-        // <label className="foi-details-label">DIVISIONAL TRACKING</label>
-        // <CardContent className='align-division'> 
-        // {displayDivisions}
-        // </CardContent>
-        // </Card>
     );
 });
 export default DivisionalTracking;
