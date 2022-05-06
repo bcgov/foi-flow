@@ -368,7 +368,7 @@ export const closeChildDetails = (user, requestType) => {
   return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
 }
 
-export const closeContactInfo = (user) => {
+export const closeContactInfo = (user,requestDetails) => {
   const userGroups = user?.groups?.map(group => group.slice(1));
-  return !!(isProcessingTeam(userGroups) || isFlexTeam(userGroups));
+  return !!(Object.entries(requestDetails)?.length !== 0 && (isProcessingTeam(userGroups) || isFlexTeam(userGroups)));
 }
