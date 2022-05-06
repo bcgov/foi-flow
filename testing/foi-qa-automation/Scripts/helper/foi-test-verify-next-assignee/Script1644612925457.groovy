@@ -26,14 +26,14 @@ if (requestType == 'general') {
 
 def jsonSlurper = new JsonSlurper()
 
-def ministryProcessingMap = jsonSlurper.parseText((((((((((((((((((((((((((((((((('{"AEST" : "Social Tech Team",' + '"AGR" : "Resource Team",') + 
-    '"BRD" : "Central Team",') + '"CAS" : "Central Team",') + '"MCF" : "MCFD Personals Team",') + '"CLB" : "Social Tech Team",') + 
-    '"CITZ" : "Central Team",') + '"EAO" : "Resource Team",') + '"EDU" : "Social Tech Team",') + '"EMBC" : "Justice Health Team",') + 
-    '"EMLI" : "Resource Team",') + '"FIN" : "Central Team",') + '"FOR" : "Resource Team",') + '"GCPE" : "Social Tech Team",') + 
+def ministryProcessingMap = jsonSlurper.parseText((((((((((((((((((((((((((((((((('{"AEST" : "Social Education",' + '"AGR" : "Resource Team",') + 
+    '"BRD" : "Central Team",') + '"CAS" : "Central Team",') + '"MCF" : "MCFD Personals Team",') + '"CLB" : "Social Education",') + 
+    '"CITZ" : "Central Team",') + '"EAO" : "Resource Team",') + '"EDU" : "Social Education",') + '"EMBC" : "Justice Health Team",') + 
+    '"EMLI" : "Resource Team",') + '"FIN" : "Central Team",') + '"FOR" : "Resource Team",') + '"GCPE" : "Social Education",') + 
     '"HLTH" : "Justice Health Team",') + '"IIO" : "Justice Health Team",') + '"IRR" : "Resource Team",') + '"JERI" : "Business Team",') + 
     '"LBR" : "Business Team",') + '"LDB" : "Justice Health Team",') + '"AG" : "Justice Health Team",') + '"MGC" : "Central Team",') + 
-    '"MMHA" : "Justice Health Team",') + '"MUNI" : "Business Team",') + '"ENV" : "Resource Team",') + '"SDPR" : "Social Tech Team",') + 
-    '"OBC" : "Central Team",') + '"OCC" : "Justice Health Team",') + '"PREM" : "Central Team",') + '"PSA" : "Social Tech Team",') + 
+    '"MMHA" : "Justice Health Team",') + '"MUNI" : "Business Team",') + '"ENV" : "Resource Team",') + '"SDPR" : "Social Education",') + 
+    '"OBC" : "Central Team",') + '"OCC" : "Justice Health Team",') + '"PREM" : "Central Team",') + '"PSA" : "Social Education",') + 
     '"PSSG" : "Justice Health Team",') + '"TACS" : "Business Team",') + '"TIC" : "Business Team",') + '"TRAN" : "Business Team"}')
 
 if (!(ministryCode)) {

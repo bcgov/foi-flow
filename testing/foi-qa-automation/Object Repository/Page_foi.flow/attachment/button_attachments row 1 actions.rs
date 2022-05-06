@@ -81,7 +81,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='Attachments']/div/div/div[3]/div/div[2]/button</value>
+      <value>//div[@id='Attachments']/div/div/div[4]/div/div[2]/button</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

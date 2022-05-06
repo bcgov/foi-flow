@@ -11,7 +11,7 @@
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Attachments']/div/div/div[3]/div[1]/div[1]/div</value>
+         <value>//div[@id='Attachments']/div/div/div[4]/div[1]/div[1]/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
@@ -53,7 +53,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='Attachments']/div/div/div[3]/div/div/div</value>
+      <value>//div[@id='Attachments']/div/div/div[4]/div/div/div</value>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>

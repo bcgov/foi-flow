@@ -76,7 +76,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/
 //WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Business Team'), 0)
 //WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Central Team'), 0)
 //WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_MCFD Personals Team'), 0)
-//WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Social Tech Team'), 0)
+//WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Social Education'), 0)
 //WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Resource Team'), 0)
 //WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Business Team'), 0)
 //

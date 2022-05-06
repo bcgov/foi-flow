@@ -10,7 +10,7 @@
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Attachments']/div/div/div[3]/div[3]/div/div</value>
+         <value>//div[@id='Attachments']/div/div/div[4]/div[3]/div/div</value>
       </entry>
       <entry>
          <key>BASIC</key>

@@ -40,10 +40,10 @@ WebUI.click(findTestObject('Object Repository/Page_foi.flow/form/inputs/applican
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
 
-if (WebUI.getText(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'), FailureHandling.STOP_ON_FAILURE) == 'general') {	
-	WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
+if (WebUI.getText(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'), FailureHandling.STOP_ON_FAILURE) == 
+'general') {
+    WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
 }
-
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
 

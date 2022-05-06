@@ -59,7 +59,7 @@ WebUI.refresh(FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Social Tech Team'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Social Education'), 0)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
 
@@ -108,7 +108,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Social Tech Team')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Social Education')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 

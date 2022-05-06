@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>li_Social Tech Team</name>
+   <name>li_Social Education</name>
    <tag></tag>
    <elementGuidId>c0f39a51-29d3-4981-b4c9-525d30e0d316</elementGuidId>
    <selectorCollection>
@@ -11,7 +11,7 @@
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>//*[(text() = 'Social Tech Team' or . = 'Social Tech Team')]</value>
+         <value>//*[(text() = 'Social Education' or . = 'Social Education')]</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -74,7 +74,7 @@
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Social Tech Team</value>
+      <value>Social Education</value>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
