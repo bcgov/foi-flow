@@ -102,8 +102,10 @@ const AxisDetails = React.memo(({
         <AccordionDetails>         
             <div className="row foi-details-row">
                 <div className="col-lg-6 foi-details-col">                       
-                    <TextField                            
+                    <TextField   
+                        id='axisId'                         
                         label="AXIS ID Number" 
+                        inputProps={{ "aria-labelledby": "axisId-label"}}
                         InputLabelProps={{ shrink: true, }} 
                         variant="outlined"                             
                         value={axisRequestId}
