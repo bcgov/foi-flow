@@ -167,9 +167,9 @@ export const AttachmentSection = ({
     ];
     getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
       if (!err) {
-        res.map(async (header, index) => {
-          getFileFromS3(header, (err, res) => {
-            var blob = new Blob([res.data], {type: "application/octet-stream"});
+        res.map(async (header, _index) => {
+          getFileFromS3(header, (_err, response) => {
+            var blob = new Blob([response.data], {type: "application/octet-stream"});
             saveAs(blob, file.filename)
           });
         });
@@ -193,10 +193,10 @@ export const AttachmentSection = ({
     var blobs = [];
     try {
       const response = await getOSSHeaderDetails(fileInfoList, dispatch);
-      for (var i = 0; i < response.data.length; i++) {
-        await getFileFromS3(response.data[i], (err, res) => {
+      for (let header of response.data) {
+        await getFileFromS3(header, (_err, res) => {
           var blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: response.data[i].filename, lastModified: res.headers['last-modified'], input: blob})
+          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
         });
       }
     } catch (error) {
