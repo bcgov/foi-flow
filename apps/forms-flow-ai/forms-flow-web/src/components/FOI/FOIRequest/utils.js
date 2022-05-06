@@ -54,10 +54,8 @@ const getDaysRemainingText = (_daysRemaining) => {
     : `${Math.abs(_daysRemaining)} Days Overdue`;
 };
 
-const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
-  return _cfrDaysRemaining > 0
-    ? `CFR Due in ${_cfrDaysRemaining} Days`
-    : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {  
+     return`CFR Due in ${_cfrDaysRemaining} Days`    
 };
 
 export const getExtensionsCountText = (extensions) => {
@@ -110,8 +108,6 @@ export const getTabBG = (_tabStatus, _requestState) => {
     case StateEnum.closed.name:
       return "foitabheadercollection foitabheaderClosedBG";
     case StateEnum.callforrecords.name:
-      return "foitabheadercollection foitabheaderCFRG";
-    case StateEnum.callforrecordsoverdue.name:
       return "foitabheadercollection foitabheaderCFRG";
     case StateEnum.redirect.name:
       return "foitabheadercollection foitabheaderRedirectBG";

@@ -297,11 +297,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG";
       break;
     case StateEnum.callforrecords.name:
-      if (_cfrDaysRemaining < 0) {
-        foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG";
-      } else {
-        foitabheaderBG = "foitabheadercollection foitabheaderCFRG";
-      }
+      foitabheaderBG = "foitabheadercollection foitabheaderCFRG";
       break;
     case StateEnum.redirect.name:
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG";
