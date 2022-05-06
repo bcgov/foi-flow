@@ -36,6 +36,8 @@ WebUI.verifyMatch(WebUI.getUrl(), GlobalVariable.BASE_URL + '/foi/dashboard', fa
 
 WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/address/div_ADDRESS AND CONTACT INFORMATION header'), FailureHandling.STOP_ON_FAILURE)
+
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address_outlined-streetAddress'), streetAddress)
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)

@@ -56,23 +56,10 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/div_CHILD DETAILS secti
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/div_CHILD DETAILS section'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/label_CHILD DETAILS'), 0)
-
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/div_ON BEHALF OF DETAILS section'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/label_ON BEHALF OF DETAILS'), 0) //    def response = WS.sendRequest(findTestObject('FoiRawRequest'))
-
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
-	
-
-//    def jsonSlurper = new JsonSlurper()
-//
-//    requestID = jsonSlurper.parseText(response.responseText).id.toString()
-//
-//    WS.verifyResponseStatusCode(response, 200)
-
     WebUI.openBrowser(GlobalVariable.BASE_URL)
 
     WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)

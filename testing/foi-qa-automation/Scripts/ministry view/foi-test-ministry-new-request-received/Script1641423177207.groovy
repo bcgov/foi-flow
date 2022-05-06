@@ -47,7 +47,7 @@ WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [:], Fa
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
     WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Call For Records?')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Minstry Next Assignee'), 'Ministry of Education Queue')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Minstry Next Assignee'), 'Ministry of Education and Childcare Queue')
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
@@ -152,7 +152,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_minis
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/p_ministry form request description'), 'testing 123 description')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Selected Ministry Ministry of Education'), 
-    'Selected Ministry: Ministry of Education')
+    'Selected Ministry: Ministry of Education and Childcare')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Request Opened'), 'Request Opened')
 
