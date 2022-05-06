@@ -287,10 +287,9 @@ const AddressContactDetails = memo(
         e.target.value
       );
     };
-
     return (
       <div className='request-accordian' >
-      <Accordion defaultExpanded={!closeContactInfo(userDetail)}>
+      <Accordion defaultExpanded={!closeContactInfo(userDetail,requestDetails)}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
           aria-controls="panel1a-content" id="panel1a-header">
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
