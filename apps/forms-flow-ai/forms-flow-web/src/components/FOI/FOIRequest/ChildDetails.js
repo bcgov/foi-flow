@@ -1,18 +1,34 @@
 import React from 'react';
 import "./childdetails.scss";
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import { formatDate } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { makeStyles } from '@material-ui/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {closeChildDetails} from '../FOIRequest/utils';
 
-const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput}) => {
+
+const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail,requestType}) => {
 
      /**
      *  Child details box in the UI
      *  No mandatory fields here
      */ 
-
+    const useStyles = makeStyles({
+        heading: {
+            color: '#FFF',
+            fontSize: '16px !important',
+            fontWeight: 'bold !important'
+        },
+        accordionSummary: {
+            flexDirection: 'row-reverse'
+        }
+    });
+    const classes = useStyles();
     const validateFields = (data, name, options = {
       dateFormat: false,
       defaultValue: ""
@@ -62,76 +78,80 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     }  
      return (
         
-        <Card className="foi-details-card" id="childDetails">
-            <label className="foi-details-label">CHILD DETAILS</label>
-            <CardContent>
-                <div className="row foi-details-row">
-                    <div className="col-lg-6 foi-details-col">                       
-                        <TextField   
-                            id='childFirstName'                        
-                            label="First Name" 
-                            inputProps={{ "aria-labelledby": "childFirstName-label"}}
-                            InputLabelProps={{ shrink: true, }} 
-                            value={childFirstNameText}
-                            variant="outlined"
-                            onChange={handleFirtNameChange}
-                            fullWidth
-                            disabled={disableInput}
-                        />
-                        <TextField            
-                            id='childMiddleName'                
-                            label="Middle Name" 
-                            inputProps={{ "aria-labelledby": "childMiddleName-label"}}
-                            InputLabelProps={{ shrink: true, }} 
-                            value={childMiddleNameText}
-                            variant="outlined"
-                            onChange={handleMiddleNameChange}
-                            fullWidth
-                            disabled={disableInput}
-                        />
-                        <TextField          
-                            id='childLastName'                  
-                            label="Last Name" 
-                            inputProps={{ "aria-labelledby": "childLastName-label"}}
-                            InputLabelProps={{ shrink: true, }} 
-                            value={childLastNameText}
-                            variant="outlined"
-                            onChange={handleLastNameChange}
-                            fullWidth
-                            disabled={disableInput}
-                        />                                                
-                    </div>
-                    <div className="col-lg-6 foi-details-col">
-                        <TextField          
-                            id='childAlsoKnownAs'                  
-                            label="Also Known As" 
-                            inputProps={{ "aria-labelledby": "childAlsoKnownAs-label"}}
-                            InputLabelProps={{ shrink: true, }} 
-                            value={childNickNameText}
-                            variant="outlined"
-                            onChange={handleNickNameChange}
-                            fullWidth
-                            disabled={disableInput}
-                        />                        
-                        <TextField        
-                            id='childDOB'        
-                            label="Date of Birth"
-                            type="date" 
-                            value={childDOBText||''} 
-                            onChange={handleDOBChange}
-                            inputProps={{ "aria-labelledby": "childDOB-label"}}
-                            InputLabelProps={{
-                            shrink: true,
-                            }}
-                            variant="outlined"
-                            fullWidth
-                            disabled={disableInput}
-                        />
-                    </div>
-                </div> 
-            </CardContent>
-        </Card>
-       
+        <div className='request-accordian' >
+        <Accordion defaultExpanded={!closeChildDetails(userDetail,requestType)} >
+        <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
+            aria-controls="panel1a-content" id="panel1a-header">
+            <Typography className={classes.heading}>CHILD DETAILS</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+            <div className="row foi-details-row">
+                <div className="col-lg-6 foi-details-col">                       
+                    <TextField   
+                        id='childFirstName'                        
+                        label="First Name" 
+                        inputProps={{ "aria-labelledby": "childFirstName-label"}}
+                        InputLabelProps={{ shrink: true, }} 
+                        value={childFirstNameText}
+                        variant="outlined"
+                        onChange={handleFirtNameChange}
+                        fullWidth
+                        disabled={disableInput}
+                    />
+                    <TextField            
+                        id='childMiddleName'                
+                        label="Middle Name" 
+                        inputProps={{ "aria-labelledby": "childMiddleName-label"}}
+                        InputLabelProps={{ shrink: true, }} 
+                        value={childMiddleNameText}
+                        variant="outlined"
+                        onChange={handleMiddleNameChange}
+                        fullWidth
+                        disabled={disableInput}
+                    />
+                    <TextField          
+                        id='childLastName'                  
+                        label="Last Name" 
+                        inputProps={{ "aria-labelledby": "childLastName-label"}}
+                        InputLabelProps={{ shrink: true, }} 
+                        value={childLastNameText}
+                        variant="outlined"
+                        onChange={handleLastNameChange}
+                        fullWidth
+                        disabled={disableInput}
+                    />                                                
+                </div>
+                <div className="col-lg-6 foi-details-col">
+                    <TextField          
+                        id='childAlsoKnownAs'                  
+                        label="Also Known As" 
+                        inputProps={{ "aria-labelledby": "childAlsoKnownAs-label"}}
+                        InputLabelProps={{ shrink: true, }} 
+                        value={childNickNameText}
+                        variant="outlined"
+                        onChange={handleNickNameChange}
+                        fullWidth
+                        disabled={disableInput}
+                    />                        
+                    <TextField        
+                        id='childDOB'        
+                        label="Date of Birth"
+                        type="date" 
+                        value={childDOBText||''} 
+                        onChange={handleDOBChange}
+                        inputProps={{ "aria-labelledby": "childDOB-label"}}
+                        InputLabelProps={{
+                        shrink: true,
+                        }}
+                        variant="outlined"
+                        fullWidth
+                        disabled={disableInput}
+                    />
+                </div>
+            </div> 
+        </AccordionDetails>
+      </Accordion>
+      </div>
     );
   });
 

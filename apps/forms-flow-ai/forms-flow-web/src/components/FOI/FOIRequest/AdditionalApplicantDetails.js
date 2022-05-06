@@ -1,11 +1,14 @@
 import React, {useEffect} from 'react';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import './additionalapplicantdetails.scss';
 import { formatDate } from "../../../helper/FOI/helper";
-
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { makeStyles } from '@material-ui/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput}) => {
     /**
@@ -13,6 +16,17 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
      *  No mandatory fields here
      */ 
 
+     const useStyles = makeStyles({
+      heading: {
+        color: '#FFF',
+        fontSize: '16px !important',
+        fontWeight: 'bold !important'
+      },
+      accordionSummary: {
+        flexDirection: 'row-reverse'
+      }
+    });
+    const classes = useStyles();
     const validateField = (data, name, options = {
       dateFormat: false,
       defaultValue: ""
@@ -111,9 +125,13 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
   }
 
      return (
-      <Card className="foi-details-card">            
-      <label className="foi-details-label">ADDITIONAL APPLICANT DETAILS</label>
-      <CardContent>     
+      <div className='request-accordian' >
+      <Accordion defaultExpanded={true}>
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
+        aria-controls="panel1a-content" id="panel1a-header">
+        <Typography className={classes.heading}>ADDITIONAL APPLICANT DETAILS</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
           <div className="row foi-details-row">
               <div className="col-lg-6 foi-details-col">                       
                   <TextField   
@@ -179,9 +197,9 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                   />                 
               </div>
           </div> 
-
-      </CardContent>
-  </Card>
+        </AccordionDetails>
+    </Accordion>
+  </div>
     );
   });
 

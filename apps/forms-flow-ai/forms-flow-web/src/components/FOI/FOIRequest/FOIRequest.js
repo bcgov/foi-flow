@@ -12,7 +12,6 @@ import RequestDescriptionBox from './RequestDescriptionBox';
 import RequestDetails from "./RequestDetails";
 import ExtensionDetails from "./ExtensionDetails";
 import AdditionalApplicantDetails from './AdditionalApplicantDetails';
-import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
 import {
@@ -207,30 +206,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
       setHeaderText(getHeaderText({requestDetails, ministryId, requestState}))
-      if(requestDetails.axisRequestId){
-        dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
-          if(!err){
-            if(typeof(data) !== "string" && Object.entries(data).length > 0){
-              setAxisSyncedData(data);
-              var axisDataUpdated = checkIfAxisDataUpdated(data);
-              if(axisDataUpdated){
-                setCheckExtension(false);
-                setAxisMessage("WARNING");
-              }
-            }
-            else if(data){
-              let responseMsg = data;
-              responseMsg+='';
-              if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
-                setAxisMessage("ERROR");
-            }
-            
-          }
-          else
-            setAxisMessage("ERROR");
-
-        }));
-      }
+      if(requestDetails.axisRequestId)
+        axisBannerCheck();
     }
   }, [requestDetails]);
 
@@ -244,6 +221,31 @@ const FOIRequest = React.memo(({ userDetail }) => {
         setAxisMessage("");
     }
   }, [axisSyncedData, requestExtensions, checkExtension]);
+
+  const axisBannerCheck = () =>{
+    dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
+      if(!err){
+        if(typeof(data) !== "string" && Object.entries(data).length > 0){
+          setAxisSyncedData(data);
+          var axisDataUpdated = checkIfAxisDataUpdated(data);
+          if(axisDataUpdated){
+            setCheckExtension(false);
+            setAxisMessage("WARNING");
+          }
+          else
+            setAxisMessage("");
+        }
+        else if(data){
+          let responseMsg = data;
+          responseMsg+='';
+          if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+            setAxisMessage("ERROR");
+        }
+      }
+      else
+        setAxisMessage("ERROR");
+    }));
+  }
 
   const checkIfAxisDataUpdated = (axisData) => {
     var updateNeeded= false;
@@ -528,9 +530,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining) => {
-    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {
-      settabStatus(StateEnum.callforrecordsoverdue.name);
-    }
 
     const mappedBottomText = getTabBottomText({
       _daysRemaining,
@@ -605,7 +604,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random";
   var lastName = "",
     firstName = "";
-
   if (userDetail) {
     firstName = userDetail.given_name;
     lastName = userDetail.family_name;
@@ -792,6 +790,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         }
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
+                        userDetail={userDetail}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -802,7 +801,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                             }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput}
-                          />
+                            userDetail={userDetail}
+                            requestType={
+                              requestDetails?.requestType
+                            }                          />
                           <OnBehalfOfDetails
                             additionalInfo={
                               requestDetails.additionalPersonalInfo
@@ -823,6 +825,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleContanctDetailsValue={handleContanctDetailsValue}
                         disableInput={disableInput}
                         handleEmailValidation={handleEmailValidation}
+                        userDetail={userDetail}
                       />
 
                       <RequestDescriptionBox
@@ -872,7 +875,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
-                      <RequestNotes />
 
                       <BottomButtonGroup
                         stateChanged={stateChanged}

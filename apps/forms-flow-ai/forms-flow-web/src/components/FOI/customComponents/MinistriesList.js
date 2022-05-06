@@ -6,7 +6,7 @@ import clsx from 'clsx'
 
 const useStyles = makeStyles((theme) => ({  
   headingError: {
-    color: "#ff0000"    
+    color: "#9e2929"    
   },
   headingNormal: {
     color: "000000"
