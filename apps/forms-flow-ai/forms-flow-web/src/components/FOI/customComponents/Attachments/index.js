@@ -15,6 +15,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx"
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
+import { saveAs } from "file-saver";
+import { downloadZip } from "client-zip";
 
 const useStyles = makeStyles((theme) => ({
   createButton: {
@@ -160,11 +162,43 @@ export const AttachmentSection = ({
     ];
     getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
       if (!err) {
-        res.map((header, index) => {
-          dispatch(getFileFromS3(header, file, (err, res) => {}));
+        res.map(async (header, index) => {
+          getFileFromS3(header, (err, res) => {
+            var blob = new Blob([res.data], {type: "application/octet-stream"});
+            saveAs(blob, file.filename)
+          });
         });
       }
     });
+  }
+
+  const downloadAllDocuments = async () => {
+    var fileInfoList = []
+    attachments.forEach(attachment => {
+      if (!(isMinistryCoordinator && attachment.category == 'personal')) {
+        fileInfoList.push({
+            ministrycode: "Misc",
+            requestnumber: `U-00${requestId}`,
+            filestatustransition: attachment.category,
+            filename: attachment.filename,
+            s3sourceuri: attachment.documentpath
+        });
+      }
+    })
+    var blobs = [];
+    try {
+      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
+      for (var i = 0; i < response.data.length; i++) {
+        await getFileFromS3(response.data[i], (err, res) => {
+          var blob = new Blob([res.data], {type: "application/octet-stream"});
+          blobs.push({name: response.data[i].filename, lastModified: res.headers['last-modified'], input: blob})
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    const zipfile = await downloadZip(blobs).blob()
+    saveAs(zipfile, requestNumber + ".zip");
   }
 
   const handlePopupButtonClick = (action, _attachment) => {
@@ -258,12 +292,22 @@ export const AttachmentSection = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={9}>
+            <Grid item xs={6}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext">
                 {`Request #${
                   requestNumber ? requestNumber : `U-00${requestId}`
                 }`}
               </h1>
+            </Grid>
+            <Grid item xs={3}>
+              <button
+                className="btn addAttachment foi-export-button"
+                variant="contained"
+                onClick={downloadAllDocuments}
+                color="primary"
+              >
+                Export All
+              </button>
             </Grid>
             <Grid item xs={3}>
               <button
