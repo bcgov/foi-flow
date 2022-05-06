@@ -543,6 +543,10 @@ div[disabled] {
 .css-79elbk {
  // position: none;
 }
+body ::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 15px !important;
+}
 
 .MuiFormLabel-root.Mui-error {
   color: #9E2929 !important;

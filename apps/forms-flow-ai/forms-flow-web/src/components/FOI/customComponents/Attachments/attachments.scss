@@ -1,7 +1,6 @@
 /* add css module styles here (optional) */
 #Attachments{
   height: 100%;
-  overflow-y: scroll;
   width: auto;
   background-color:white;
 }
@@ -62,6 +61,28 @@
 
 .attachment-disabled {
   color:lightslategrey;
+}
+
+.foi-export-button {
+  margin: 0;
+  width: 100%;
+  background-color: #FFFFFF;
+  color: #38598A !important;
+  outline-color: #38598A;
+  outline-style: solid;
+  outline-offset: -3px;
+  font-family: BCSans-Bold, sans-serif !important;
+}
+
+.foi-export-button:focus {
+  outline-color: #38598A !important;
+  outline-style: solid !important;
+  outline-offset: -3px;
+}
+
+.foi-export-button:focus:not(:focus-visible) {
+  outline: #38598A solid !important;
+  outline-offset: -3px;
 }
 
 button[disabled]{

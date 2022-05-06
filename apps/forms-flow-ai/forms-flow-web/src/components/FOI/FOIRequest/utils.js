@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -54,10 +54,8 @@ const getDaysRemainingText = (_daysRemaining) => {
     : `${Math.abs(_daysRemaining)} Days Overdue`;
 };
 
-const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
-  return _cfrDaysRemaining > 0
-    ? `CFR Due in ${_cfrDaysRemaining} Days`
-    : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {  
+     return`CFR Due in ${_cfrDaysRemaining} Days`    
 };
 
 export const getExtensionsCountText = (extensions) => {
@@ -110,8 +108,6 @@ export const getTabBG = (_tabStatus, _requestState) => {
     case StateEnum.closed.name:
       return "foitabheadercollection foitabheaderClosedBG";
     case StateEnum.callforrecords.name:
-      return "foitabheadercollection foitabheaderCFRG";
-    case StateEnum.callforrecordsoverdue.name:
       return "foitabheadercollection foitabheaderCFRG";
     case StateEnum.redirect.name:
       return "foitabheadercollection foitabheaderRedirectBG";
@@ -357,3 +353,18 @@ export  const isAxisSyncDisplayField = (field) => {
 export const isMandatoryField = (field) => {
   return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
 };
+
+export const closeApplicantDetails = (user, requestType) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
+}
+
+export const closeChildDetails = (user, requestType) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+}
+
+export const closeContactInfo = (user,requestDetails) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(Object.entries(requestDetails)?.length !== 0 && (isProcessingTeam(userGroups) || isFlexTeam(userGroups)));
+}
