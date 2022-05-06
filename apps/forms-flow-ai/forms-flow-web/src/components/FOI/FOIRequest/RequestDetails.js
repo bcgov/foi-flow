@@ -1,7 +1,5 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -10,6 +8,12 @@ import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/he
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { shouldDisableFieldForMinistryRequests } from "./utils"
+import { makeStyles } from '@material-ui/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
 const RequestDetails = React.memo(
@@ -25,6 +29,17 @@ const RequestDetails = React.memo(
      *  All fields are mandatory here
      */
 
+    const useStyles = makeStyles({
+      heading: {
+        color: '#FFF',
+        fontSize: '16px !important',
+        fontWeight: 'bold !important'
+      },
+      accordionSummary: {
+        flexDirection: 'row-reverse'
+      }
+    });
+    const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
     const {ministryId} = useParams();    
     const validateFields = (request, name, value) => {
@@ -197,19 +212,23 @@ const RequestDetails = React.memo(
     }
      return (
         
-        <Card className="foi-details-card">            
-            <label className="foi-details-label">REQUEST DETAILS</label>
-            <CardContent>            
+      <div className='request-accordian' >
+      <Accordion defaultExpanded={true}>
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+      <Typography className={classes.heading}>REQUEST DETAILS</Typography>
+      </AccordionSummary>
+      <AccordionDetails>           
                 <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">
                     <TextField
                             id="requestType"
                             label="Request Type"
+                            inputProps={{ "aria-labelledby": "requestType-label"}}
                             InputLabelProps={{ shrink: true, }}          
                             select
                             value={selectedRequestType}
                             onChange={handleRequestTypeChange}
-                            input={<Input />} 
+                            // input={<Input />} 
                             variant="outlined"
                             fullWidth
                             required
@@ -221,6 +240,7 @@ const RequestDetails = React.memo(
                     <TextField
                             id="receivedMode"
                             label="Received Mode"
+                            inputProps={{ "aria-labelledby": "receivedMode-label"}}
                             InputLabelProps={{ shrink: true, }}          
                             select
                             value={selectedReceivedMode}
@@ -241,6 +261,7 @@ const RequestDetails = React.memo(
                     <TextField
                             id="deliveryMode"
                             label="Delivery Mode"
+                            inputProps={{ "aria-labelledby": "deliveryMode-label"}}
                             InputLabelProps={{ shrink: true, }}          
                             select
                             value={selectedDeliveryMode}
@@ -262,6 +283,7 @@ const RequestDetails = React.memo(
                             type="date" 
                             value={receivedDateText || ''} 
                             onChange={handleReceivedDateChange}
+                            inputProps={{ "aria-labelledby": "receivedDate-label"}}
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -277,6 +299,7 @@ const RequestDetails = React.memo(
                             type="date" 
                             value={startDateText || ''} 
                             onChange={handleStartDateChange}
+                            inputProps={{ "aria-labelledby": "startDate-label"}}
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -292,7 +315,8 @@ const RequestDetails = React.memo(
                             id="dueDate"
                             label="Due Date"
                             type="date" 
-                            value={dueDateText || ''}                            
+                            value={dueDateText || ''}   
+                            inputProps={{ "aria-labelledby": "dueDate-label"}}                         
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -305,7 +329,8 @@ const RequestDetails = React.memo(
                         <TextField
                             id="dueDate"
                             label="Due Date"                            
-                            value="N/A"                            
+                            value="N/A"       
+                            inputProps={{ "aria-labelledby": "dueDate-label"}}                      
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -317,9 +342,9 @@ const RequestDetails = React.memo(
                       }
                     </div>
                 </div>                
-            </CardContent>
-        </Card>
-       
+          </AccordionDetails>
+        </Accordion>
+      </div>
     );
   });
 

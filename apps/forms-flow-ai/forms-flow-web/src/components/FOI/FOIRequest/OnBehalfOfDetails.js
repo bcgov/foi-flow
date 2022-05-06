@@ -1,10 +1,14 @@
 import React from 'react';
 import "./onbehalfofdetails.scss";
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import { formatDate } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import { makeStyles } from '@material-ui/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput}) => {
     
@@ -12,6 +16,19 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
      *  On Behalf of details box in the UI
      *  No mandatory fields here
      */ 
+      const useStyles = makeStyles({
+        heading: {
+            color: '#FFF',
+            fontSize: '16px !important',
+            fontWeight: 'bold !important'
+        },
+        accordionSummary: {
+            flexDirection: 'row-reverse'
+        }
+      });
+      
+      const classes = useStyles();
+
       const validateFields = (data, name, options = {
         dateFormat: false,
         defaultValue: ""
@@ -61,13 +78,19 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
     }   
      return (
         
-        <Card className="foi-details-card" id="onBehalfOfDetails">            
-            <label className="foi-details-label">ON BEHALF OF DETAILS</label>
-            <CardContent>
+        <div className='request-accordian' >
+        <Accordion defaultExpanded={true}>
+        <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
+            aria-controls="panel1a-content" id="panel1a-header">
+            <Typography className={classes.heading}>ON BEHALF OF DETAILS</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
                 <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">                        
-                        <TextField                           
+                        <TextField      
+                            id='onBehalfOfFirstName'                     
                             label="First Name" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfFirstName-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             variant="outlined" 
                             value={anotherFirstNameText}
@@ -75,8 +98,10 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             fullWidth
                             disabled={disableInput}
                         />
-                        <TextField                          
+                        <TextField       
+                            id='onBehalfOfMiddleName'                    
                             label="Middle Name" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfMiddleName-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             value={anotherMiddleNameText}
                             variant="outlined" 
@@ -84,8 +109,10 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             fullWidth
                             disabled={disableInput}
                         />
-                        <TextField                           
+                        <TextField      
+                            id='onBehalfOfLastName'                     
                             label="Last Name" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfLastName-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             value={anotherLastNameText}
                             variant="outlined"
@@ -95,8 +122,10 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col"> 
-                        <TextField                            
+                        <TextField                 
+                            id='onBehalfOfAlsoKnownAs'           
                             label="Also Known As" 
+                            inputProps={{ "aria-labelledby": "onBehalfOfAlsoKnownAs-label"}}
                             InputLabelProps={{ shrink: true, }} 
                             value={anotherNickNameText}
                             variant="outlined" 
@@ -104,11 +133,13 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             fullWidth
                             disabled={disableInput}
                         />                       
-                        <TextField                
+                        <TextField       
+                            id='onBehalfOfDOB'         
                             label="Date of Birth"
                             type="date" 
                             value={anotherDOBText||''} 
                             onChange={handleDOBChange}
+                            inputProps={{ "aria-labelledby": "onBehalfOfDOB-label"}}
                             InputLabelProps={{
                             shrink: true,
                             }}
@@ -118,9 +149,9 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                         />                   
                     </div>
                 </div> 
-            </CardContent>
-        </Card>
-       
+            </AccordionDetails>
+      </Accordion>
+    </div>
     );
   });
 

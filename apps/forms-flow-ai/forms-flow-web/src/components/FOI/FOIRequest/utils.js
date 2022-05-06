@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -112,7 +112,7 @@ export const getTabBG = (_tabStatus, _requestState) => {
     case StateEnum.callforrecords.name:
       return "foitabheadercollection foitabheaderCFRG";
     case StateEnum.callforrecordsoverdue.name:
-      return "foitabheadercollection foitabheaderCFROverdueBG";
+      return "foitabheadercollection foitabheaderCFRG";
     case StateEnum.redirect.name:
       return "foitabheadercollection foitabheaderRedirectBG";
     case StateEnum.review.name:
@@ -357,3 +357,18 @@ export  const isAxisSyncDisplayField = (field) => {
 export const isMandatoryField = (field) => {
   return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
 };
+
+export const closeApplicantDetails = (user, requestType) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
+}
+
+export const closeChildDetails = (user, requestType) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+}
+
+export const closeContactInfo = (user,requestDetails) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(Object.entries(requestDetails)?.length !== 0 && (isProcessingTeam(userGroups) || isFlexTeam(userGroups)));
+}

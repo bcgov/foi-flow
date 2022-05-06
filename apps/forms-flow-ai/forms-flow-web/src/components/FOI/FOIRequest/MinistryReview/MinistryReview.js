@@ -472,9 +472,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1>
-              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
-            </h1>
+            <a href="/foi/dashboard" aria-label="dashboard link"><i className='fa fa-home' style={{fontSize:"45px", color: "white"}}></i></a>
           </div>
           <div className="foileftpaneldropdown">{stateBox}</div>
 
@@ -519,7 +517,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               condition={!hideBottomText.includes(requestState?.toLowerCase())}
             >
               {Array.from(bottomTextMap.values()).map((value) => (
-                <h4>{value}</h4>
+                <div className='remaining-days-alert'>{value}</div>
               ))}
             </ConditionalComponent>
           </div>
