@@ -52,7 +52,7 @@ const ExtensionDetailsBox = React.memo(() => {
     <>
      <div className='request-accordian' >
       <Accordion defaultExpanded={true}>
-      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="extensionDetails-header">
       <Typography className={classes.heading}>EXTENSION DETAILS</Typography>
       </AccordionSummary>
       <AccordionDetails>

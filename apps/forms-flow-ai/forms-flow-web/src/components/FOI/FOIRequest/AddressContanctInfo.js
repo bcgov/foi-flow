@@ -288,10 +288,10 @@ const AddressContactDetails = memo(
       );
     };
     return (
-      <div className='request-accordian' >
+      <div className='request-accordian' id="addressContactInfo">
       <Accordion defaultExpanded={!closeContactInfo(userDetail,requestDetails)}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
-          aria-controls="panel1a-content" id="panel1a-header">
+          id="addressContactInfo-header">
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
       </AccordionSummary>
       <AccordionDetails>

@@ -6,7 +6,7 @@ import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
-import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
+import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx"
@@ -17,6 +17,8 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import { saveAs } from "file-saver";
+import { downloadZip } from "client-zip";
 
 const useStyles = makeStyles((theme) => ({
   createButton: {
@@ -150,6 +152,9 @@ export const AttachmentSection = ({
   }
   }
 
+  
+  
+
   const downloadDocument = (file) => {
     const fileInfoList = [
       {
@@ -162,12 +167,46 @@ export const AttachmentSection = ({
     ];
     getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
       if (!err) {
-        res.map((header, index) => {
-          dispatch(getFileFromS3(header, file, (err, res) => {}));
+        res.map(async (header, _index) => {
+          getFileFromS3(header, (_err, response) => {
+            var blob = new Blob([response.data], {type: "application/octet-stream"});
+            saveAs(blob, file.filename)
+          });
         });
       }
     });
   }
+
+  const downloadAllDocuments = async () => {
+    var fileInfoList = []
+    attachments.forEach(attachment => {
+      if (!(isMinistryCoordinator && attachment.category == 'personal')) {
+        fileInfoList.push({
+            ministrycode: "Misc",
+            requestnumber: `U-00${requestId}`,
+            filestatustransition: attachment.category,
+            filename: attachment.filename,
+            s3sourceuri: attachment.documentpath
+        });
+      }
+    })
+    var blobs = [];
+    try {
+      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
+      for (let header of response.data) {
+        await getFileFromS3(header, (_err, res) => {
+          var blob = new Blob([res.data], {type: "application/octet-stream"});
+          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    const zipfile = await downloadZip(blobs).blob()
+    saveAs(zipfile, requestNumber + ".zip");
+  }
+
+  const hasDocumentsToExport = attachments.filter(attachment => !(isMinistryCoordinator && attachment.category == 'personal')).length > 0;
 
   const handlePopupButtonClick = (action, _attachment) => {
     setUpdateAttachment(_attachment);
@@ -261,12 +300,24 @@ export const AttachmentSection = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={9}>
+            <Grid item xs={6}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext">
                 {`Request #${
                   requestNumber ? requestNumber : `U-00${requestId}`
                 }`}
               </h1>
+            </Grid>
+            <Grid item xs={3}>
+              <ConditionalComponent condition={hasDocumentsToExport}>
+                <button
+                  className="btn addAttachment foi-export-button"
+                  variant="contained"
+                  onClick={downloadAllDocuments}
+                  color="primary"
+                >
+                  Export All
+                </button>
+              </ConditionalComponent>
             </Grid>
             <Grid item xs={3}>
               <button
