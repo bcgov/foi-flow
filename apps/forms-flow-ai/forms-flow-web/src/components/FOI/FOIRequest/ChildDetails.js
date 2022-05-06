@@ -78,10 +78,10 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     }  
      return (
         
-        <div className='request-accordian' >
+        <div className='request-accordian' id="childDetails">
         <Accordion defaultExpanded={!closeChildDetails(userDetail,requestType)} >
         <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
-            aria-controls="panel1a-content" id="panel1a-header">
+            id="childDetails-header">
             <Typography className={classes.heading}>CHILD DETAILS</Typography>
         </AccordionSummary>
         <AccordionDetails>

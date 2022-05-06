@@ -39,7 +39,7 @@ const DivisionalTracking = React.memo(({divisions}) => {
     return (
         <div className='request-accordian' >
             <Accordion defaultExpanded={true}>
-            <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+            <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="divisionalTracking" id="divisionalTracking-header">
             <Typography className={classes.heading}>DIVISIONAL TRACKING</Typography>
             </AccordionSummary>
             <AccordionDetails>

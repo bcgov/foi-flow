@@ -228,7 +228,7 @@ const ApplicantDetails = React.memo(
     return (
       <div className='request-accordian'>
         <Accordion defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}>
-          <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+          <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
             <Typography className={classes.heading}>APPLICANT DETAILS</Typography>
           </AccordionSummary>
         <AccordionDetails>
