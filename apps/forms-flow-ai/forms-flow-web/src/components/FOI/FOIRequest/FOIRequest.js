@@ -12,7 +12,6 @@ import RequestDescriptionBox from './RequestDescriptionBox';
 import RequestDetails from "./RequestDetails";
 import ExtensionDetails from "./ExtensionDetails";
 import AdditionalApplicantDetails from './AdditionalApplicantDetails';
-import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
 import {
@@ -605,7 +604,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random";
   var lastName = "",
     firstName = "";
-
   if (userDetail) {
     firstName = userDetail.given_name;
     lastName = userDetail.family_name;
@@ -792,6 +790,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         }
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
+                        userDetail={userDetail}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -802,7 +801,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                             }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput}
-                          />
+                            userDetail={userDetail}
+                            requestType={
+                              requestDetails?.requestType
+                            }                          />
                           <OnBehalfOfDetails
                             additionalInfo={
                               requestDetails.additionalPersonalInfo
@@ -823,6 +825,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleContanctDetailsValue={handleContanctDetailsValue}
                         disableInput={disableInput}
                         handleEmailValidation={handleEmailValidation}
+                        userDetail={userDetail}
                       />
 
                       <RequestDescriptionBox
@@ -872,7 +875,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
-                      <RequestNotes />
 
                       <BottomButtonGroup
                         stateChanged={stateChanged}
