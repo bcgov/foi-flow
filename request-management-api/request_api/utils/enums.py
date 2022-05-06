@@ -79,7 +79,7 @@ class ProcessingTeamWithKeycloackGroup(Enum):
     justicehealthteam = "Justice Health Team"
     mcfdpersonalteam = "MCFD Personals Team"
     resouceteam = "Resource Team"
-    socialtechteam = "Social Tech Team"
+    socialtechteam = "Social Education"
 
     @staticmethod
     def list():
