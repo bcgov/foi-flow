@@ -96,7 +96,7 @@ const AxisDetails = React.memo(({
         
         <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
-          <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+          <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="axisDetails-header">
             <Typography className={classes.heading}>AXIS DETAILS</Typography>
           </AccordionSummary>
         <AccordionDetails>         

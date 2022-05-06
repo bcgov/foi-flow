@@ -6,7 +6,7 @@ import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
-import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
+import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx"
@@ -152,6 +152,9 @@ export const AttachmentSection = ({
   }
   }
 
+  
+  
+
   const downloadDocument = (file) => {
     const fileInfoList = [
       {
@@ -202,6 +205,8 @@ export const AttachmentSection = ({
     const zipfile = await downloadZip(blobs).blob()
     saveAs(zipfile, requestNumber + ".zip");
   }
+
+  const hasDocumentsToExport = attachments.filter(attachment => !(isMinistryCoordinator && attachment.category == 'personal')).length > 0;
 
   const handlePopupButtonClick = (action, _attachment) => {
     setUpdateAttachment(_attachment);
@@ -303,14 +308,16 @@ export const AttachmentSection = ({
               </h1>
             </Grid>
             <Grid item xs={3}>
-              <button
-                className="btn addAttachment foi-export-button"
-                variant="contained"
-                onClick={downloadAllDocuments}
-                color="primary"
-              >
-                Export All
-              </button>
+              <ConditionalComponent condition={hasDocumentsToExport}>
+                <button
+                  className="btn addAttachment foi-export-button"
+                  variant="contained"
+                  onClick={downloadAllDocuments}
+                  color="primary"
+                >
+                  Export All
+                </button>
+              </ConditionalComponent>
             </Grid>
             <Grid item xs={3}>
               <button
