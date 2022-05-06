@@ -78,7 +78,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
 
       setPersonalHealthNumber(validateField(
         requestDetails?.additionalPersonalInfo,
-        FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED
+        FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER
       ));
       setIdentityVerified(validateField(
         requestDetails?.additionalPersonalInfo,
