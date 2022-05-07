@@ -31,10 +31,6 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToPosition(0, 0)
-
-WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/button_Add Comment'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test comment')
