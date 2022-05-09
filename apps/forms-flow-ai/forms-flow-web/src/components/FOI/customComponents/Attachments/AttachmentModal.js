@@ -130,15 +130,15 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
       else {
         let fileInfoList = [];
-        if (files.length > 0) {
+        
           let fileStatusTransition = "";
           if (modalFor === 'replace') {
-            fileStatusTransition = attachment && attachment.category;
+            fileStatusTransition = attachment?.category;
           }
           else {
             fileStatusTransition = "general";
           }
-            fileInfoList = files.map(file => {
+            fileInfoList = files?.map(file => {
             return {
                 ministrycode: "Misc",
                 requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
@@ -146,7 +146,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 filename: file.filename? file.filename : file.name,
             }
             });
-        }
+        
         handleModal(true, fileInfoList, files);
       }
     }  
