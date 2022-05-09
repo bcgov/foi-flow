@@ -37,9 +37,7 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-
-WebUI.delay(7)
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Requests'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
