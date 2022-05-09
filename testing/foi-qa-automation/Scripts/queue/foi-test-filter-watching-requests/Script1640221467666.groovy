@@ -51,9 +51,11 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.takeScreenshotAsCheckpoint('current_viewport')
+//WebUI.takeScreenshotAsCheckpoint('current_viewport')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
@@ -68,6 +70,8 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
