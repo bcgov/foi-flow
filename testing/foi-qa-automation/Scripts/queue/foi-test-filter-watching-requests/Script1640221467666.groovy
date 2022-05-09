@@ -39,6 +39,8 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request qu
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.delay(7)
+
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
