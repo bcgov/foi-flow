@@ -53,6 +53,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "browserslist": "^4.16.6",
+    "client-zip": "^2.2.0",
     "clsx": "^1.1.1",
     "connected-react-router": "^6.9.1",
     "create-react-class": "^15.7.0",

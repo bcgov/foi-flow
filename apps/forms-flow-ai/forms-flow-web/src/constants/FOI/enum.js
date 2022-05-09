@@ -40,7 +40,7 @@ const KCProcessingTeams = [
   "Justice Health Team", 
   "MCFD Personals Team", 
   "Resource Team", 
-  "Social Tech Team"]
+  "Social Education"]
 
 export {
   MimeTypeList,

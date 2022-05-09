@@ -78,10 +78,10 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
     }   
      return (
         
-        <div className='request-accordian' >
+        <div className='request-accordian' id="onBehalfOfDetails">
         <Accordion defaultExpanded={true}>
         <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
-            aria-controls="panel1a-content" id="panel1a-header">
+            id="onBehalfOfDetails-header">
             <Typography className={classes.heading}>ON BEHALF OF DETAILS</Typography>
         </AccordionSummary>
         <AccordionDetails>

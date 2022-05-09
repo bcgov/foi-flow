@@ -78,7 +78,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
 
       setPersonalHealthNumber(validateField(
         requestDetails?.additionalPersonalInfo,
-        FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED
+        FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER
       ));
       setIdentityVerified(validateField(
         requestDetails?.additionalPersonalInfo,
@@ -128,7 +128,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
       <div className='request-accordian' >
       <Accordion defaultExpanded={true}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
-        aria-controls="panel1a-content" id="panel1a-header">
+        id="additionalApplicantDetails-header">
         <Typography className={classes.heading}>ADDITIONAL APPLICANT DETAILS</Typography>
       </AccordionSummary>
       <AccordionDetails>
