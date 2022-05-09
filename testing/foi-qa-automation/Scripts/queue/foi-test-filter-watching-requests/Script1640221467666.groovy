@@ -55,8 +55,6 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-//WebUI.takeScreenshotAsCheckpoint('current_viewport')
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
