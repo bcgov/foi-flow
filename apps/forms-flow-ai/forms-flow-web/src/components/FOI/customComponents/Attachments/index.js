@@ -20,7 +20,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   createButton: {
     margin: 0,
     width: "100%",
@@ -64,14 +64,10 @@ export const AttachmentSection = ({
 }) => {
   const classes = useStyles();
   const [attachments, setAttachments] = useState(attachmentsArray)
-  const [iaoList, setIaoList] = useState(iaoassignedToList)
-  const [ministryList, setMinistryList] = useState(ministryAssignedToList)
   
   useEffect(() => {
     setAttachments(attachmentsArray);
-    setIaoList(iaoassignedToList);
-    setMinistryList(ministryAssignedToList);
-  }, [attachmentsArray, iaoassignedToList, ministryAssignedToList])
+  }, [attachmentsArray])
   
 
   const [openModal, setModal] = useState(false);
@@ -97,25 +93,30 @@ export const AttachmentSection = ({
         setModal(false);
         const documentsObject = {documents: documents};
         if (modalFor === 'replace' && updateAttachment) {
-          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
-          const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
-          dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
-            if (!err) {
-              setAttachmentLoading(false);
-              setSuccessCount(0);
-            }
-          }));
+          replaceAttachment();
         }
         else {
           dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
-          if (!err) {
-            setAttachmentLoading(false);
-            setSuccessCount(0);
-          }
+            dispatchRequestAttachment(err);
         }));
       }
     }
   },[successCount])
+
+  const replaceAttachment = () => {
+    const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
+    const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
+    dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
+      dispatchRequestAttachment(err);
+    }));
+  }
+
+  const dispatchRequestAttachment = (err) => {
+    if (!err) {
+      setAttachmentLoading(false);
+      setSuccessCount(0);
+    }
+  }
 
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
@@ -124,11 +125,16 @@ export const AttachmentSection = ({
       dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
     }
     else if (files) {
-    setFileCount(files.length);
+      setFileCount(files.length);
+      saveDocument(value, fileInfoList, files);
+    }
+  }
+  
+  const saveDocument = (value, fileInfoList, files) => {
     if (value) {
-        if (files.length !== 0) {
-          setAttachmentLoading(true);
-          getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+      if (files.length !== 0) {
+        setAttachmentLoading(true);
+        getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
           let _documents = [];
           if (!err) {
             res.map((header, index) => {
@@ -136,24 +142,20 @@ export const AttachmentSection = ({
               const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
               _documents.push(documentDetails);
               setDocuments(_documents);
-              saveFilesinS3(header, _file, dispatch, (err, res) => {
-              if (res === 200) {
-                setSuccessCount(index+1);
-              }
-              else {
-                setSuccessCount(0);
-              }
-            })
+              saveFilesinS3(header, _file, dispatch, (_err, _res) => {
+                if (_res === 200) {
+                  setSuccessCount(index+1);
+                }
+                else {
+                  setSuccessCount(0);
+                }
+              })
             });
           }
         })
-        }             
+      }             
     }
   }
-  }
-
-  
-  
 
   const downloadDocument = (file) => {
     const fileInfoList = [
@@ -271,6 +273,12 @@ export const AttachmentSection = ({
     }
   };
 
+  const getRequestNumber = ()=> {
+    if (requestNumber)
+      return `Request #${requestNumber}`;
+    return `Request #U-00${requestId}`;
+  }
+
   var attachmentsList = [];
   for(var i=0; i<attachments.length; i++) {
     attachmentsList.push(
@@ -302,9 +310,7 @@ export const AttachmentSection = ({
           >
             <Grid item xs={6}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext">
-                {`Request #${
-                  requestNumber ? requestNumber : `U-00${requestId}`
-                }`}
+                {getRequestNumber()}
               </h1>
             </Grid>
             <Grid item xs={3}>
@@ -362,13 +368,9 @@ export const AttachmentSection = ({
 const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
   
   const classes = useStyles();
-  const [filename, setFilename] = useState("");
   const [disabled, setDisabled] = useState(isMinistryCoordinator && attachment.category == 'personal');
-  let lastIndex = 0;
   useEffect(() => {
     if(attachment && attachment.filename) {
-      lastIndex = attachment.filename.lastIndexOf(".");
-      setFilename(lastIndex>0?attachment.filename.substr(0, lastIndex):attachment.filename);
       setDisabled(isMinistryCoordinator && attachment.category == 'personal')
     }
   }, [attachment])
@@ -491,7 +493,39 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
 
+  const ReplaceMenu = () => {
+    return (
+      <MenuItem
+        onClick={() => {
+          handleReplace();
+          setPopoverOpen(false);
+         }}
+      >
+        Replace
+      </MenuItem>
+    )
+  }
 
+  const DeleteMenu = () => {
+
+    return (
+      <MenuItem
+        onClick={() => {
+          handleDelete();
+          setPopoverOpen(false);
+         }}
+      >
+        Delete
+      </MenuItem>
+    )
+
+  }
+
+  const AddMenuItems = () => {
+    if (showReplace(attachment.category))
+      return (<ReplaceMenu />)
+    return (<DeleteMenu />)
+  }
 
   const ActionsPopover = () => {
     return (
@@ -533,25 +567,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
           </MenuItem>
           {attachment.category === "personal" ? (
           ""
-        ) : showReplace(attachment.category) ? (
-            <MenuItem
-                onClick={() => {
-                    handleReplace();
-                    setPopoverOpen(false);
-                }}
-            >
-                Replace
-            </MenuItem>
-        ) : (
-            <MenuItem
-                onClick={() => {
-                    handleDelete();
-                    setPopoverOpen(false);
-                }}
-            >
-                Delete
-            </MenuItem>
-          )}
+        ) : <AddMenuItems />}
         </MenuList>
       </Popover>
     );
