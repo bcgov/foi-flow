@@ -207,7 +207,7 @@ const getTableInfo = (userGroups) => {
   if (isProcessingTeam(userGroups)) {
     return {
       columns: ProcessingTeamColumns,
-      sort: [{ field: "assignedTo", sort: "asc" }, { field: "duedate", sort: "asc" }],
+      sort: [{ field: "processingTeamSorting", sort: "asc" }],
       noAssignedClassName: "processing--not-assigned",
     };
   }
