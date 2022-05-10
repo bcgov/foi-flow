@@ -64,14 +64,10 @@ export const AttachmentSection = ({
 }) => {
   const classes = useStyles();
   const [attachments, setAttachments] = useState(attachmentsArray)
-  const [iaoList, setIaoList] = useState(iaoassignedToList)
-  const [ministryList, setMinistryList] = useState(ministryAssignedToList)
   
   useEffect(() => {
     setAttachments(attachmentsArray);
-    setIaoList(iaoassignedToList);
-    setMinistryList(ministryAssignedToList);
-  }, [attachmentsArray, iaoassignedToList, ministryAssignedToList])
+  }, [attachmentsArray])
   
 
   const [openModal, setModal] = useState(false);
@@ -97,14 +93,7 @@ export const AttachmentSection = ({
         setModal(false);
         const documentsObject = {documents: documents};
         if (modalFor === 'replace' && updateAttachment) {
-          const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
-          const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
-          dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
-            if (!err) {
-              setAttachmentLoading(false);
-              setSuccessCount(0);
-            }
-          }));
+          replaceAttachment();
         }
         else {
           dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
@@ -117,6 +106,17 @@ export const AttachmentSection = ({
     }
   },[successCount])
 
+  const replaceAttachment = () => {
+    const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
+    const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
+    dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
+      if (!err) {
+        setAttachmentLoading(false);
+        setSuccessCount(0);
+      }
+    }));
+  }
+
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
     if (modalFor === 'delete' && value) { 
@@ -124,11 +124,16 @@ export const AttachmentSection = ({
       dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
     }
     else if (files) {
-    setFileCount(files.length);
+      setFileCount(files.length);
+      saveDocument(value, fileInfoList, files);
+    }
+  }
+  
+  const saveDocument = (value, fileInfoList, files) => {
     if (value) {
-        if (files.length !== 0) {
-          setAttachmentLoading(true);
-          getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+      if (files.length !== 0) {
+        setAttachmentLoading(true);
+        getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
           let _documents = [];
           if (!err) {
             res.map((header, index) => {
@@ -137,23 +142,19 @@ export const AttachmentSection = ({
               _documents.push(documentDetails);
               setDocuments(_documents);
               saveFilesinS3(header, _file, dispatch, (err, res) => {
-              if (res === 200) {
-                setSuccessCount(index+1);
-              }
-              else {
-                setSuccessCount(0);
-              }
-            })
+                if (res === 200) {
+                  setSuccessCount(index+1);
+                }
+                else {
+                  setSuccessCount(0);
+                }
+              })
             });
           }
         })
-        }             
+      }             
     }
   }
-  }
-
-  
-  
 
   const downloadDocument = (file) => {
     const fileInfoList = [
