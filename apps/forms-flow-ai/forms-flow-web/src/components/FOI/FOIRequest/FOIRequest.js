@@ -644,7 +644,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
     isAddRequest ? (
-    <div className="foiformcontent">
+    <div className={`foiformcontent ${axisMessage === "WARNING" && !disableBannerForClosed() && 'request-scrollbar-height'}`}>
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
