@@ -97,10 +97,7 @@ export const AttachmentSection = ({
         }
         else {
           dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
-          if (!err) {
-            setAttachmentLoading(false);
-            setSuccessCount(0);
-          }
+            dispatchRequestAttachment(err);
         }));
       }
     }
@@ -110,11 +107,15 @@ export const AttachmentSection = ({
     const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
     const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
     dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
-      if (!err) {
-        setAttachmentLoading(false);
-        setSuccessCount(0);
-      }
+      dispatchRequestAttachment(err);
     }));
+  }
+
+  const dispatchRequestAttachment = (err) => {
+    if (!err) {
+      setAttachmentLoading(false);
+      setSuccessCount(0);
+    }
   }
 
   const handleContinueModal = (value, fileInfoList, files) => {
@@ -141,8 +142,8 @@ export const AttachmentSection = ({
               const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
               _documents.push(documentDetails);
               setDocuments(_documents);
-              saveFilesinS3(header, _file, dispatch, (err, res) => {
-                if (res === 200) {
+              saveFilesinS3(header, _file, dispatch, (_err, _res) => {
+                if (_res === 200) {
                   setSuccessCount(index+1);
                 }
                 else {
