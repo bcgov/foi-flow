@@ -53,7 +53,7 @@ const MenuProps = {
   },
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
   search: {
     borderBottom: "1px solid #38598A",
     backgroundColor: "rgba(56,89,138,0.1)",

@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 import clsx from 'clsx'
 
-const useStyles = makeStyles((theme) => ({  
+const useStyles = makeStyles((_theme) => ({  
   headingError: {
     color: "#9e2929"    
   },

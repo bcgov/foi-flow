@@ -15,7 +15,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
       headingError: {
         color: "#ff0000"    
       },
