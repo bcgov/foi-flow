@@ -20,7 +20,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((_theme) => ({
   createButton: {
     margin: 0,
     width: "100%",
@@ -96,7 +96,7 @@ export const AttachmentSection = ({
           replaceAttachment();
         }
         else {
-          dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, res) => {
+          dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, _res) => {
             dispatchRequestAttachment(err);
         }));
       }
@@ -106,7 +106,7 @@ export const AttachmentSection = ({
   const replaceAttachment = () => {
     const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
     const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
-    dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, res) => {
+    dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
@@ -242,7 +242,7 @@ export const AttachmentSection = ({
 
     if (updateAttachment.filename !== newFilename) {
       const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
-      dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err, res) => {
+      dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err, _res) => {
         if (!err) {
           setAttachmentLoading(false);
         }

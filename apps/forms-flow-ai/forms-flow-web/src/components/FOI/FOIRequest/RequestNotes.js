@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: theme.typography.fontWeightRegular,
     },
   }));
-const RequestNotes = React.memo((props) => {
+const RequestNotes = React.memo((_props) => {
     const classes = useStyles();
 
      return (

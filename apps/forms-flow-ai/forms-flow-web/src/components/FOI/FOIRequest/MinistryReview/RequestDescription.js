@@ -8,7 +8,7 @@ import { formatDate } from '../../../../helper/FOI/helper';
 import RequestDescriptionHistory from "../../RequestDescriptionHistory";
 import './RequestDescription.scss'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
     headingError: {
         color: "#ff0000"
     },
