@@ -6,13 +6,11 @@ import "../assets/styles/layouts.scss";
 import "../assets/styles/user-styles.css";
 import {Helmet} from "react-helmet";
 import {KEYCLOAK_URL} from "../constants/constants";
-import {APPLICATION_NAME} from "../constants/constants";
 
 import FOIBaseRouting from "./FOI/FOIBaseRouting"
 
 
 const App = React.memo((props) => {
-  const appName = APPLICATION_NAME;
     const { store, history } = props;
     return (
       <div>

@@ -33,7 +33,7 @@ const Dashboard = ({ userDetail }) => {
 
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
-  const addRequest = (e) => {
+  const addRequest = (_e) => {
     dispatch(push(`/foi/addrequest`));
   };
 

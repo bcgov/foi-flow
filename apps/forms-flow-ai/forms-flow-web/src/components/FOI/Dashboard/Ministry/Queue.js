@@ -168,7 +168,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       headerName: "",
       width: 0,
       hide: true,
-      renderCell: (params) => <span></span>,
+      renderCell: (_params) => <span></span>,
     },
   ]);
 
@@ -350,7 +350,7 @@ const CustomPagination = () => {
     <Pagination
       count={pageCount}
       page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
+      onChange={(_event, value) => apiRef.current.setPage(value - 1)}
     />
   );
 };

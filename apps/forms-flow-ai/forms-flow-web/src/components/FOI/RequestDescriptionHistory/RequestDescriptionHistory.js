@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 const RequestDescriptionHistory = React.memo(({requestDescriptionHistoryList, openModal, handleModalClose}) => {  
 
     const [expanded, setExpanded] = React.useState('panel1');
-    const handleChange = (panel) => (event, newExpanded) => {
+    const handleChange = (panel) => (_event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
     };
     
