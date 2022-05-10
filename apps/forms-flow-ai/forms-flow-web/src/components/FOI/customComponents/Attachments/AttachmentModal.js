@@ -130,15 +130,15 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
       else {
         let fileInfoList = [];
-        if (files.length > 0) {
+        
           let fileStatusTransition = "";
           if (modalFor === 'replace') {
-            fileStatusTransition = attachment && attachment.category;
+            fileStatusTransition = attachment?.category;
           }
           else {
             fileStatusTransition = "general";
           }
-            fileInfoList = files.map(file => {
+            fileInfoList = files?.map(file => {
             return {
                 ministrycode: "Misc",
                 requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
@@ -146,7 +146,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 filename: file.filename? file.filename : file.name,
             }
             });
-        }
+        
         handleModal(true, fileInfoList, files);
       }
     }  
@@ -185,6 +185,8 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
     }
     let message = getMessage();
+    const btnClass = (files.length === 0 && modalFor !== 'delete') ? classes.btndisabled : classes.btnenabled
+  
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -220,7 +222,34 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   updateFilesCb={updateFilesCb} 
                 /> 
                 :
-                (modalFor === 'rename'?
+                <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
+              }
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            {
+              modalFor === 'rename'?
+              <button className={`btn-bottom btn-save ${classes.btnenabled}`} onClick={saveNewFilename}>
+                Save
+              </button>
+              :
+              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={files.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
+                Continue
+              </button>
+            }
+            <button className="btn-bottom btn-cancel" onClick={handleClose}>
+              Cancel
+            </button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    );
+}
+
+const ModalForRename = ({modalFor, newFilename, updateFilename, errorMessage, extension}) => {
+
+  return(
+  modalFor === 'rename'?
                 <div className="row">
                   <div className="col-sm-1"></div>
                   <div className="col-sm-9">
@@ -242,26 +271,6 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   </div>
                   <div className="col-sm-1"></div>
                 </div>                 
-                : null)
-              }
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            {
-              modalFor === 'rename'?
-              <button className={`btn-bottom btn-save ${classes.btnenabled}`} onClick={saveNewFilename}>
-                Save
-              </button>
-              :
-              <button className={`btn-bottom btn-save ${ (files.length === 0 && modalFor !== 'delete') ? classes.btndisabled : classes.btnenabled }`} disabled={files.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
-                Continue
-              </button>
-            }
-            <button className="btn-bottom btn-cancel" onClick={handleClose}>
-              Cancel
-            </button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    );
+                : null
+  )
 }
