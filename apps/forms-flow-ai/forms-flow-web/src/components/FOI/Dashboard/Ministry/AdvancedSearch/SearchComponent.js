@@ -446,7 +446,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       key={`keyword-${index}`}
                       label={keyword}
                       onDelete={() => {
-                        setKeywords(keywords.filter((kw, i) => index !== i));
+                        setKeywords(keywords.filter((_kw, i) => index !== i));
                       }}
                       color="primary"
                       sx={{

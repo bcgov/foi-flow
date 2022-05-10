@@ -93,7 +93,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
    }
 
   const handleWatcherUpdate = (watcher) => {
-    dispatch(saveWatcher(ministryId, watcher, (err, res) => {
+    dispatch(saveWatcher(ministryId, watcher, (err, _res) => {
       if(!err) {
         setUpdateWatchList(!updateWatchList);
       }
@@ -161,7 +161,7 @@ const watcherOnChange = (event) => {
         event.preventDefault();
 }
 
-  const renderValue = (option) => {
+  const renderValue = (_option) => {
     return <span>{noOfWatchers}</span>;
   }
     return (  

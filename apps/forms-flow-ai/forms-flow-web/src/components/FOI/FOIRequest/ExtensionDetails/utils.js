@@ -42,7 +42,7 @@ export const uploadFiles = async (
         (file) => file.filename === header.filename
       );
       return new Promise((resolve, reject) => {
-        saveFilesinS3(header, _file, dispatch, (err, res) => {
+        saveFilesinS3(header, _file, dispatch, (err, _res) => {
           if (err) {
             reject("An error occurred while attempting to upload files");
           }
