@@ -56,9 +56,9 @@ const RequestDescription = React.memo((requestDetails) => {
               <button
                 type="button"
                 className={`btn btn-link btn-description-history ${
-                  !(filteredList.length > 1) ? classes.btndisabled : ""
+                  (filteredList.length <= 1) ? classes.btndisabled : ""
                 }`}
-                disabled={!(filteredList.length > 1)}
+                disabled={(filteredList.length <= 1)}
                 onClick={handleDescriptionHistoryClick}
               >
                 Description History

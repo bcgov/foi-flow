@@ -22,7 +22,6 @@ const FileUpload = ({
     existingDocuments = [],
 }) => {
     const fileInputField = useRef(null);
-    const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]); 

@@ -285,7 +285,7 @@ const DivisionalStages = React.memo(
                 hidebin: index === 0 && stageIterator.length === 1,
               })}
               aria-hidden="true"
-              onClick={(e) => deleteMinistryDivision(_id)}
+              onClick={() => deleteMinistryDivision(_id)}
             ></i>
           </div>
         </div>
