@@ -355,7 +355,7 @@ class FOIRawRequest(db.Model):
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
             FOIRawRequest.status.label('stateForSorting'),
-            literal(None).label('processingteamsorting'),
+            literal(None).label('processingTeamSorting'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
             literal(None).label('closedate')
@@ -468,6 +468,7 @@ class FOIRawRequest(db.Model):
             'assignedToLastName',
             'duedate',
             'stateForSorting',
+            'processingTeamSorting',
             'assignedToFormatted',
             'ministryAssignedToFormatted',
             'cfrduedate',
