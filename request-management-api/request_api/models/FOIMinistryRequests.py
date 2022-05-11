@@ -416,8 +416,10 @@ class FOIMinistryRequest(db.Model):
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
+            activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
+
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(ministryfilter)
+            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter)
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
