@@ -290,6 +290,12 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
 
+        processingteamsorting = case([
+                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('processingTeamSorting')
+
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
                              func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
@@ -358,6 +364,7 @@ class FOIMinistryRequest(db.Model):
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             stateforsorting,
+            processingteamsorting,
             assignedtoformatted,
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate
@@ -635,6 +642,12 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIRequestStatus.name).label('stateForSorting')
 
+        processingteamsorting = case([
+                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('processingTeamSorting')
+
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
                              func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
@@ -704,6 +717,7 @@ class FOIMinistryRequest(db.Model):
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             stateforsorting,
+            processingteamsorting,
             assignedtoformatted,
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate

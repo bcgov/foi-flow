@@ -30,6 +30,24 @@
   }
 }
 
+@media screen and (max-height: 655px) {
+  .foileftpanelstatus {
+    padding-top: 0px !important;
+    padding-bottom:0px !important;
+  }
+}
+
+@media screen and (max-height: 595px) {
+  .tab div.tablinks{
+    height: 35px !important;
+    padding: 2px 8px 2px 15px !important;
+  }
+  .foileftpanelheader {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+}
+
 .foitabbedContainer{
   display: inline-flex;  
   background-color: white;
@@ -49,7 +67,7 @@
     border-width: 1px;
     border-style: solid;
     
-    left: 5% !important;;
+    left: 5% !important;
     top: unset !important;
     right: unset!important;
     bottom: unset!important;
@@ -151,7 +169,6 @@
 .foileftpanelstatus h4{
   font-size: 15px;
   font-weight: bolder;
-  //font-family: "BCSans-Regular", sans-serif;
   padding-bottom: 1rem;
 }
 
@@ -165,15 +182,7 @@
     color: white;
     font-size: 15px;
     font-weight: bolder;
-   // font-family: "BCSans-Regular", sans-serif;
   }
-
-.tabcontent { 
-     
-    display: inline-block;
-}
-
-
 
 .MuiBox-root {
     padding: 0px!important;
@@ -195,9 +204,6 @@
     width: auto;
     color: white;
     border-style: none!important;
-}
-.MuiTab-root {
-  //font-family: "BCSans-Regular", sans-serif !important;
 }
 
 .foitabbedContainer .Mui-selected {
@@ -224,7 +230,6 @@
 /* Style the buttons inside the tab */
 .tab div.tablinks {
   background-color: inherit;
-  // color:lightgray;
   color: white !important;
   border: none;
   outline: none;
@@ -284,9 +289,6 @@ span.circle
 /* Style the tab content */
 .tabcontent {
   display: none;
-  // padding: 6px 12px;
-  // border: 1px solid #ccc;
-  // border-top: none;
 }
 
 .foitabpanelcollection .active {

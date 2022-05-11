@@ -53,7 +53,7 @@ const MenuProps = {
   },
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
   search: {
     borderBottom: "1px solid #38598A",
     backgroundColor: "rgba(56,89,138,0.1)",
@@ -416,6 +416,7 @@ const AdvancedSearch = ({ userDetail }) => {
               <Grid item xs={keywordsMode ? 6 : 12}>
                 <label className="hideContent" for="advancedSearch">Search</label>
                 <InputBase
+                  id="advancedSearch"
                   placeholder="Search"
                   onChange={handleSearchChange}
                   value={searchText}
@@ -445,7 +446,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       key={`keyword-${index}`}
                       label={keyword}
                       onDelete={() => {
-                        setKeywords(keywords.filter((kw, i) => index !== i));
+                        setKeywords(keywords.filter((_kw, i) => index !== i));
                       }}
                       color="primary"
                       sx={{
@@ -741,15 +742,16 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label" shrink>
+                    <InputLabel id="date-type-label" shrink>
                       Type of Date Range
                     </InputLabel>
                     <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
+                      labelId="date-type-label"
+                      id="date-type"
                       displayEmpty
                       value={selectedDateRangeType}
                       onChange={handleSelectedDateRangeTypeChange}
+                      inputProps={{ "aria-labelledby": "date-type-label"}}
                       input={<OutlinedInput label="Type of Date Range" notched />}
                     >
                       <MenuItem disabled value="" key="date-range-type-default">
@@ -846,16 +848,17 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="multiple-checkbox-label" shrink>
+                    <InputLabel id="public-body-label" shrink>
                       Public Body
                     </InputLabel>
                     <Select
-                      labelId="multiple-checkbox-label"
-                      id="multiple-checkbox"
+                      labelId="public-body-label"
+                      id="public-body-checkbox"
                       multiple
                       displayEmpty
                       value={selectedPublicBodies}
                       onChange={handleSelectedPublicBodiesChange}
+                      inputProps={{ "aria-labelledby": "public-body-label"}}
                       input={<OutlinedInput label="Public Body" notched />}
                       renderValue={(selected) => {
                         if (programAreaList?.length === 1) {

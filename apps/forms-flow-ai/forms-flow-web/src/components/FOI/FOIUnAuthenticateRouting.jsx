@@ -23,7 +23,7 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
 
   useEffect(()=>{
     if(props.store && isAuth){
-      UserService.initKeycloak(props.store, (err, res) => {
+      UserService.initKeycloak(props.store, (_err, res) => {
         dispatch(setUserAuth(res.authenticated));
       });
     }

@@ -550,16 +550,16 @@ button.bc4rxid {
 }
 
 strong {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }
 
 span[style="font-weight: bold;"] > span  {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }
 span[style="font-weight: bold;"] > *  {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }
 
 span[style*="font-weight: bold;"] > *  {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }

@@ -14,7 +14,7 @@ import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
 import { isMinistryLogin } from '../../helper/FOI/helper';
 import UnAuthorized from "./UnAuthorized";
 
-//import TabbedContainer from "./TabbedContainer/TabbedContainer";
+
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated); 
@@ -23,7 +23,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
   useEffect(()=>{
     console.log('authenticate')
     if(props.store){
-      UserService.initKeycloak(props.store, (err, res) => {
+      UserService.initKeycloak(props.store, (_err, res) => {
         dispatch(setUserAuth(res.authenticated));
       });
     }

@@ -41,7 +41,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     }
   }
 
-  const showhiddencomments = (e, count) => {
+  const showhiddencomments = (_e, count) => {
     var hiddencomments = document.getElementsByName('commentsectionhidden')
     if (hiddencomments && Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length > 0) {
       var cnt = 0
