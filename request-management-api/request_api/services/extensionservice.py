@@ -95,13 +95,21 @@ class extensionservice:
     def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
         version = self.__getversionforrequest(ministryrequestid)
         # delete all exisitng extensions for this ministry
-        FOIRequestExtension.deleteextensionbyministry(ministryrequestid)
+        existingextensions = FOIRequestExtension.getextensions(ministryrequestid, version)        
+        for existingextension in existingextensions:            
+            self.__deleteextension(existingextension["foirequestextensionid"], ministryrequestid, userid)
         newextensions = []
         for extension in extensions:
             newextensions.append(self.__createextension(extension, ministryrequestid, version, userid))
         extnsionresult = FOIRequestExtension.saveextensions(newextensions)
         return extnsionresult
 
+    def __deleteextension(self, extensionid, ministryrequestid, userid):
+        extension = FOIRequestExtension.getextension(extensionid)
+        extensionversion = extension['version']
+        self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)  
+        FOIRequestExtension.deleteextensionbyministryid(ministryrequestid, userid)
+        
     def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid):       
         extensionreason = extensionreasonservice().getextensionreasonbyid(extension['extensionreasonid'])   
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
