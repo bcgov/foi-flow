@@ -97,7 +97,7 @@ class FOIRequestExtension(db.Model):
     def getextensions(cls,ministryrequestid,ministryrequestversion):
         extensions = []
         try:
-            sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, er.extensiontype, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby, fre.version FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY created_at DESC'
+            sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, er.extensiontype, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby, fre.version FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY extensionstatusid ASC'
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
             for row in rs:
                 if row["isactive"] == True:

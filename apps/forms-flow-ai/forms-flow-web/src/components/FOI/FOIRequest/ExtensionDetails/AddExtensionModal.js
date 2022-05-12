@@ -41,6 +41,8 @@ import {
   getSelectedDays
 } from "./utils";
 import { fetchExtensions } from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { fetchFOIRequestNotesList } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 import { useParams } from "react-router-dom";
 import { setRequestDueDate } from "../../../../actions/FOI/foiRequestActions";
 
@@ -78,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AddExtensionModal = () => {
   const classes = useStyles();
-  const { ministryId } = useParams();
+  const { requestId, ministryId } = useParams();
 
   const costumFormat = useMemo(() => {
     return {
@@ -314,6 +316,9 @@ const AddExtensionModal = () => {
             },
             dispatch,
           });
+          dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+          dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+
           setSaveModalOpen(false);
           setSaveLoading(false);
           if (data.newduedate) {
