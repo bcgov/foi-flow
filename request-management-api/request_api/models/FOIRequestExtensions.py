@@ -154,10 +154,10 @@ class FOIRequestExtension(db.Model):
         return extension_schema.dump(extension)
 
     @classmethod
-    def deleteextensionbyministryid(cls, extensionid, userid):
-        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == extensionid).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+    def deleteextensionbyministryid(cls, ministryrequestid, userid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
-        return DefaultMethodResult(True,'Extensions disabled for the ministry',extensionid)
+        return DefaultMethodResult(True,'Extensions disabled for the ministry',ministryrequestid)
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
