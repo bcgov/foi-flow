@@ -26,6 +26,7 @@ const MinistriesList = React.memo(
     );
     //required field validation error object
     const [isError, setError] = React.useState(false);
+    const [disable, setDisable]= React.useState(false);
 
     //sets the isError to true if no program area selected by default
     useEffect(() => {
@@ -37,20 +38,28 @@ const MinistriesList = React.memo(
 
     //handle onChange event of checkbox
     const handleOnChangeProgramArea = (e) => {
+      e.preventDefault();
+      console.log("e.target",e.target);
+      console.log("e.target.dataset",e.target.dataset);
       const newProgramAreaList = [...programAreaList];
       newProgramAreaList.forEach((programArea) => {
-        if (
-          programArea.programareaid.toString() ===
-          e.target.dataset.programareaid
-        ) {
-          programArea.isChecked = e.target.checked;
+        if (programArea.programareaid.toString() === e.target.dataset.programareaid) {
+          programArea.isChecked = true;
         }
       });
       //sets the program area list with updated values
       setProgramAreaListItems(newProgramAreaList);
       //event bubble up - send the updated list to RequestDescriptionBox component
       handleUpdatedMasterProgramAreaList(newProgramAreaList);
+      console.log("newProgramAreaList",newProgramAreaList);
     };
+
+    // const disableCheckBox = (checked) => {
+    //   console.log("checked",checked);
+    //   setDisable(!!(!checked && Object.values(programAreaList).filter((element) => element.isChecked === true)?.length >= 1));
+    // }
+
+
     return (
       <div className="foi-ministries-container">
         <h4
@@ -65,8 +74,9 @@ const MinistriesList = React.memo(
           {programAreaList.map((programArea, index) => (
             <label key={index} className="check-item">
               <input
-                type="checkbox"
+                type="radio"
                 className="checkmark"
+                name="ministry-select"
                 key={programArea.iaocode}
                 data-programareaid={programArea.programareaid}
                 onChange={handleOnChangeProgramArea}
