@@ -14,7 +14,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {isValidMinistryCode} from '../FOIRequest/utils';
+import {isValidMinistryCode, countOfMinistrySelected} from '../FOIRequest/utils';
 
 const useStyles = makeStyles((_theme) => ({
       headingError: {
@@ -71,9 +71,10 @@ const RequestDescription = React.memo(({
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
-            isProgramAreaSelected: !!requestDetails.selectedMinistries,
+            isProgramAreaSelected: requestDetails?.selectedMinistries?.length === 1 && requestDetails?.selectedMinistries.some(programArea =>
+              (isValidMinistryCode(programArea.code, masterProgramAreaList))),
             ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted
-        }    
+        }
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
     
@@ -150,8 +151,8 @@ const RequestDescription = React.memo(({
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
     const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
-        handleOnChangeRequiredRequestDescriptionValues(updatedProgramAreaList.some(programArea => 
-          (programArea.isChecked && isValidMinistryCode(programArea,masterProgramAreaList))), 
+        handleOnChangeRequiredRequestDescriptionValues(countOfMinistrySelected(updatedProgramAreaList) === 1 && updatedProgramAreaList.some(programArea =>
+          (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList))), 
           FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     //event bubble up- update the required fields to validate later
         handleUpdatedProgramAreaList(updatedProgramAreaList);    //event bubble up - Updated program area list
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, updatedProgramAreaList);

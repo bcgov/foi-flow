@@ -286,7 +286,6 @@ export const checkValidationError = (
   requiredAxisDetails,
   isAddRequest
 ) => {
-  console.log("@",requiredRequestDescriptionValues);
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
@@ -370,11 +369,12 @@ export const closeContactInfo = (user,requestDetails) => {
   return !!(Object.entries(requestDetails)?.length !== 0 && (isProcessingTeam(userGroups) || isFlexTeam(userGroups)));
 }
 
-export const isValidMinistryCode = (selectedMinistry,ministriesList) => {
-  ministriesList.forEach((ministry) => {
-    if (ministry.bcgovcode === selectedMinistry.bcgovcode) {
-      console.log("true");
-      return true;
-    }
-  });
+export const isValidMinistryCode = (selectedMinistry, ministriesList) => {
+  return ministriesList.some(ministry => ministry.bcgovcode === selectedMinistry)
+}
+
+export const countOfMinistrySelected = (selectedMinistryList) => {
+  return selectedMinistryList.reduce(function(n, ministry) {
+    return n + (ministry.isChecked);
+  }, 0);
 }

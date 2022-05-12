@@ -3,6 +3,7 @@ import "./ministrieslist.scss";
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 import clsx from 'clsx'
+import {isValidMinistryCode, countOfMinistrySelected} from '../FOIRequest/utils';
 
 const useStyles = makeStyles((_theme) => ({  
   headingError: {
@@ -10,6 +11,13 @@ const useStyles = makeStyles((_theme) => ({
   },
   headingNormal: {
     color: "000000"
+  },
+  hideValidation: {
+    visibility: 'hidden'
+  },
+  showValidation: {
+    color: "#9e2929",
+    marginTop: '12px'
   }
 }));
 
@@ -26,40 +34,33 @@ const MinistriesList = React.memo(
     );
     //required field validation error object
     const [isError, setError] = React.useState(false);
-    const [disable, setDisable]= React.useState(false);
 
     //sets the isError to true if no program area selected by default
     useEffect(() => {
       setProgramAreaListItems(masterProgramAreaList);
       setError(
-        !programAreaList.some((programArea) => programArea.isChecked)
+        countOfMinistrySelected(programAreaList) !== 1 || !programAreaList.some((programArea) => (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)))
       );
     },[masterProgramAreaList, programAreaList])
 
     //handle onChange event of checkbox
     const handleOnChangeProgramArea = (e) => {
-      e.preventDefault();
-      console.log("e.target",e.target);
-      console.log("e.target.dataset",e.target.dataset);
       const newProgramAreaList = [...programAreaList];
       newProgramAreaList.forEach((programArea) => {
-        if (programArea.programareaid.toString() === e.target.dataset.programareaid) {
-          programArea.isChecked = true;
+        if (
+          programArea.programareaid.toString() ===
+          e.target.dataset.programareaid
+        ) {
+          programArea.isChecked = e.target.checked;
         }
       });
       //sets the program area list with updated values
       setProgramAreaListItems(newProgramAreaList);
       //event bubble up - send the updated list to RequestDescriptionBox component
       handleUpdatedMasterProgramAreaList(newProgramAreaList);
-      console.log("newProgramAreaList",newProgramAreaList);
     };
 
-    // const disableCheckBox = (checked) => {
-    //   console.log("checked",checked);
-    //   setDisable(!!(!checked && Object.values(programAreaList).filter((element) => element.isChecked === true)?.length >= 1));
-    // }
-
-
+    const countOfMinistry = countOfMinistrySelected(programAreaList);
     return (
       <div className="foi-ministries-container">
         <h4
@@ -74,9 +75,8 @@ const MinistriesList = React.memo(
           {programAreaList.map((programArea, index) => (
             <label key={index} className="check-item">
               <input
-                type="radio"
+                type="checkbox"
                 className="checkmark"
-                name="ministry-select"
                 key={programArea.iaocode}
                 data-programareaid={programArea.programareaid}
                 onChange={handleOnChangeProgramArea}
@@ -89,6 +89,14 @@ const MinistriesList = React.memo(
             </label>
           ))}
         </div>
+        <h5
+          className={clsx({
+            [classes.showValidation]: countOfMinistry > 1,
+            [classes.hideValidation]: countOfMinistry <= 1,
+          })}
+        >
+          * Only Select 1 Ministry Client per request. Please deselect all expect 1 and open others as separate requests
+        </h5>
       </div>
     );
   }
