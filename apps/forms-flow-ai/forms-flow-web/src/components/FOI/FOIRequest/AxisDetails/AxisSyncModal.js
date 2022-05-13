@@ -14,7 +14,9 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import './axissyncmodal.scss';
 import { useDispatch, useSelector} from "react-redux";
-import { saveRequestDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
+import { saveRequestDetails, fetchFOIRequestDetailsWrapper, fetchFOIRequestDescriptionList } from '../../../../apiManager/services/FOI/foiRequestServices';
+import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { fetchFOIRequestNotesList } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 import {
   addAXISExtensions
 } from '../../../../apiManager/services/FOI/foiExtensionServices';
@@ -57,7 +59,12 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     },[axisSyncedData])
 
     const saveExtensions = () => {
-      dispatch(addAXISExtensions(axisExtensions, ministryId));
+      dispatch(addAXISExtensions(axisExtensions, ministryId, (_err, _res) => {
+        dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+        dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+        dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+        dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      }));
     }
 
     const compareFields = () => {
