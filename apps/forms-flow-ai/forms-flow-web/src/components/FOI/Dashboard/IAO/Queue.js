@@ -248,7 +248,8 @@ const Queue = ({ userDetail, tableInfo }) => {
               tableInfo?.stateClassName?.[
                 params.row.currentState.toLowerCase().replace(/ +/g, "")
               ],
-              (params.row.assignedTo == null) && tableInfo?.noAssignedClassName
+              (params.row.assignedTo == null && userDetail.groups.indexOf("/" + params.row.assignedGroup) > -1)
+              && tableInfo?.noAssignedClassName
             )
           }
           onRowClick={renderReviewRequest}

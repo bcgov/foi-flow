@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy.orm import relationship, backref, aliased
-from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast
+from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast, TIMESTAMP
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
@@ -324,6 +324,12 @@ class FOIRawRequest(db.Model):
             ],
             else_ = cast(FOIRawRequest.requestrawdata['requestPageCount'], String)).label('requestPageCount')
 
+        intakesorting = case([
+                            (FOIRawRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIRawRequest.requestrawdata['receivedDateUF'].astext, TIMESTAMP)).label('intakeSorting')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -354,8 +360,9 @@ class FOIRawRequest(db.Model):
             description,
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
-            FOIRawRequest.status.label('stateForSorting'),
-            literal(None).label('processingTeamSorting'),
+            literal(None).label('defaultSorting'),
+            intakesorting,
+            literal(None).label('ministrySorting'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
             literal(None).label('closedate')
@@ -467,8 +474,9 @@ class FOIRawRequest(db.Model):
             'assignedToFirstName',
             'assignedToLastName',
             'duedate',
-            'stateForSorting',
-            'processingTeamSorting',
+            'defaultSorting',
+            'intakeSorting',
+            'ministrySorting'
             'assignedToFormatted',
             'ministryAssignedToFormatted',
             'cfrduedate',
@@ -495,7 +503,7 @@ class FOIRawRequest(db.Model):
             sortingcondition.append(asc('currentState'))
 
         #always sort by created_at last to prevent pagination collisions
-        sortingcondition.append(desc('created_at'))
+        sortingcondition.append(asc('created_at'))
         
         return sortingcondition
 
