@@ -6,12 +6,12 @@
    <elementGuidId>017c1e5c-23ed-4997-98cf-021a9b87396e</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='app']/div/div[3]/div/div/div/a/i</value>
+         <key>BASIC</key>
+         <value>//div[@class=&quot;foitabheadercollection foitabheaderdefaultBG&quot;]/div[@class=&quot;foileftpanelheader&quot;]/a[1]/i[@class=&quot;fa fa-home&quot;][count(. | //*[@class = 'fa fa-home']) = count(//*[@class = 'fa fa-home'])]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderdefaultBG&quot;]/div[@class=&quot;foileftpanelheader&quot;]/a[1]/i[@class=&quot;fa fa-home&quot;][count(. | //*[@class = 'fa fa-home']) = count(//*[@class = 'fa fa-home'])]</value>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div/div/a/i</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -39,7 +39,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderdefaultBG&quot;]/div[@class=&quot;foileftpanelheader&quot;]/a[1]/i[@class=&quot;fa fa-home&quot;]</value>
+      <value>//div[@class=&quot;foitabheadercollection foitabheaderdefaultBG&quot;]/div[@class=&quot;foileftpanelheader&quot;]/a[1]/i[@class=&quot;fa fa-home&quot;]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>

@@ -6,6 +6,10 @@
    <elementGuidId>1507d79b-7008-43e5-8998-80706eed4ea9</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>BASIC</key>
+         <value></value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//div[@id='app']/div/div[3]/div/div</value>
       </entry>
@@ -31,7 +35,7 @@
       <value>foitabheadercollection foitabheaderReviewBG</value>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>

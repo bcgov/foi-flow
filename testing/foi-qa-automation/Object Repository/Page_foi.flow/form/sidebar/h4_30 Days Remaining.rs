@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderOpenBG&quot;]/div[@class=&quot;foileftpanelstatus&quot;]/div[1]</value>
+         <value>//div[@class=&quot;foitabheadercollection foitabheaderOpenBG&quot;]/div[@class=&quot;foileftpanelstatus&quot;]/div[1]</value>
       </entry>
       <entry>
          <key>XPATH</key>
@@ -39,7 +39,7 @@
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderOpenBG&quot;]/div[@class=&quot;foileftpanelstatus&quot;]/div[1]</value>
+      <value>//div[@class=&quot;foitabheadercollection foitabheaderOpenBG&quot;]/div[@class=&quot;foileftpanelstatus&quot;]/div[1]</value>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>false</isSelected>
