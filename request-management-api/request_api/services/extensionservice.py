@@ -119,9 +119,9 @@ class extensionservice:
         decisiondate = approveddate if approveddate else denieddate
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
 
-        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value: 
-            extensionstatusid = 2
-        elif 'extensionstatusid' in extension:
+        # if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value: 
+        #     extensionstatusid = 2
+        if 'extensionstatusid' in extension:
             extensionstatusid = extension['extensionstatusid']
         else:
             extensionstatusid = 1        
