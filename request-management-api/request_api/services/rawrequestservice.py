@@ -13,6 +13,7 @@ from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 from request_api.services.rawrequest.rawrequestservicegetter import rawrequestservicegetter
 from request_api.exceptions import BusinessException, Error
+from request_api.models.default_method_result import DefaultMethodResult
 
 class rawrequestservice:
     """ FOI Raw Request management service
@@ -30,24 +31,30 @@ class rawrequestservice:
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
 
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
+        isaxisrequestidpresent = False
+        if axisrequestid is not None:
+            isaxisrequestidpresent = self.__isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
 
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
-        result = FOIRawRequest.saverawrequest(
-                                                _requestrawdata=requestdatajson,
-                                                sourceofsubmission= sourceofsubmission,
-                                                ispiiredacted=ispiiredacted,
-                                                userid= userid,
-                                                assigneegroup=assigneegroup,
-                                                assignee=assignee,
-                                                requirespayment=requirespayment,
-                                                notes=notes,
-                                                assigneefirstname=assigneefirstname,
-                                                assigneemiddlename=assigneemiddlename,
-                                                assigneelastname=assigneelastname,
-                                                axisrequestid=axisrequestid,
-                                                axissyncdate=axissyncdate
-                                            )
+        if axisrequestid is None or isaxisrequestidpresent == False:
+            result = FOIRawRequest.saverawrequest(
+                                                    _requestrawdata=requestdatajson,
+                                                    sourceofsubmission= sourceofsubmission,
+                                                    ispiiredacted=ispiiredacted,
+                                                    userid= userid,
+                                                    assigneegroup=assigneegroup,
+                                                    assignee=assignee,
+                                                    requirespayment=requirespayment,
+                                                    notes=notes,
+                                                    assigneefirstname=assigneefirstname,
+                                                    assigneemiddlename=assigneemiddlename,
+                                                    assigneelastname=assigneelastname,
+                                                    axisrequestid=axisrequestid,
+                                                    axissyncdate=axissyncdate
+                                                )
+        else:            
+            raise ValueError("Duplicate AXIS Request ID")
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
@@ -116,4 +123,10 @@ class rawrequestservice:
         return 'Intake in Progress'
 
     def getaxisequestids(self):
-        return rawrequestservicegetter().getaxisequestids()     
+        return rawrequestservicegetter().getaxisequestids()
+    
+    def __isaxisrequestidpresent(self, axisrequestid):
+        countofaxisrequestid = rawrequestservicegetter().getcountofaxisequestidbyaxisequestid(axisrequestid)
+        if countofaxisrequestid > 0:
+            return True
+        return False

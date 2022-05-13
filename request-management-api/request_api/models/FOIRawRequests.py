@@ -714,7 +714,6 @@ class FOIRawRequest(db.Model):
         try:
             sql = """select distinct axisrequestid from "FOIRawRequests" where axisrequestid is not null;"""
             axisids = db.session.execute(text(sql))
-            
             for axisid in axisids:
                 axisrequestids.append(axisid[0])
         except Exception as ex:
@@ -723,6 +722,17 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()
         return axisrequestids
+
+    @classmethod
+    def getCountOfAXISRequestIdbyAXISRequestId(cls, axisrequestid):       
+        try:
+            query  = db.session.query(func.count(FOIRawRequest.axisrequestid)).filter_by(axisrequestid=axisrequestid)
+            return query.scalar()
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()        
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

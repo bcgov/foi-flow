@@ -81,9 +81,10 @@ class FOIRawRequest(Resource):
                     asyncio.create_task(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")               
-                asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")
+                if result.success == True:
+                    asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
@@ -137,7 +138,7 @@ class FOIRawRequestLoadTest(Resource):
                 asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
-            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
+            return {'status': 400, 'message':INVALID_REQUEST_ID}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
