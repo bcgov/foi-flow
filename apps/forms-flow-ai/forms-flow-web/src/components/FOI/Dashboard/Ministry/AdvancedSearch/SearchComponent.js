@@ -286,7 +286,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const handleSearchChange = (e) => {
     setAnchorEl(e.currentTarget);
-    setSearchText(e.target.value);
+    setSearchText(e.target.value.trim());
   };
 
   const clickSearchFilter = (SearchFilterType) => {

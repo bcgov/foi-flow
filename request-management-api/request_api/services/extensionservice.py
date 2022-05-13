@@ -110,8 +110,7 @@ class extensionservice:
         self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)  
         FOIRequestExtension.deleteextensionbyministryid(ministryrequestid, userid)
         
-    def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid):       
-        extensionreason = extensionreasonservice().getextensionreasonbyid(extension['extensionreasonid'])   
+    def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid): 
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
         approveddate = extension['approveddate'] if 'approveddate' in extension else None
@@ -119,8 +118,6 @@ class extensionservice:
         decisiondate = approveddate if approveddate else denieddate
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
 
-        # if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value: 
-        #     extensionstatusid = 2
         if 'extensionstatusid' in extension:
             extensionstatusid = extension['extensionstatusid']
         else:
