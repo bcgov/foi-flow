@@ -902,6 +902,13 @@ class FOIMinistryRequest(db.Model):
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'ministryassigneename'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIMinistryRequest.findfield('assignedministrypersonFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('assignedministrypersonLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
             else:
                 searchcondition = []
                 for keyword in params['keywords']:

@@ -436,7 +436,7 @@ class FOIRawRequest(db.Model):
             'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
             'requestTypeRequestType': FOIRawRequest.requestrawdata['requestType']['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
-            # 'axisRequestId': cast(FOIRawRequest.axisrequestid, String),
+            'axisRequestId': cast(FOIRawRequest.axisrequestid, String),
             'axisrequest_number': cast(FOIRawRequest.axisrequestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
