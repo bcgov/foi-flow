@@ -460,6 +460,9 @@ class FOIMinistryRequest(db.Model):
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
+
+        #always sort by created_at last to prevent pagination collisions
+        sortingcondition.append(desc('created_at'))
         
         return sortingcondition
     
