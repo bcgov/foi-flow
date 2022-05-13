@@ -4,7 +4,7 @@ const SearchFilter = Object.freeze({
   ID_NUM: "idnumber",
   AXIS_REQUEST_NUM: "axisrequest_number",
   APPLICANT_NAME: "applicantname",
-  ASSIGNEE_NAME: "assigneename",
+  ASSIGNEE_NAME: "ministryassigneename",
   SUBJECT_CODE: "subjectcode",
 });
 
