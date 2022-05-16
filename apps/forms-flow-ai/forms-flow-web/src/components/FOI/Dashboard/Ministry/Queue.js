@@ -181,7 +181,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    var keyword = e.target.value;
+    var keyword = e.target.value.trim();
     setFilterModel((prev) => ({ ...prev, keyword }));
     setRowsState(defaultRowsState);
   }, 500);
