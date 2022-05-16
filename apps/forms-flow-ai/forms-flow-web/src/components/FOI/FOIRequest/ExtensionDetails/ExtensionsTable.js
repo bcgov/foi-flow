@@ -141,18 +141,7 @@ const ExtensionsTable = ({ showActions = true }) => {
           </TableRow>
         </TableHead>
         <ConditionalTableBody empty={!extensions || extensions.length < 1}>
-          {extensions
-            .sort((extensionA, extensionB) => {
-              if (!extensionA.extendedduedate || !extensionB.extendedduedate) {
-                return 0;
-              } else {
-                return (
-                  new Date(extensionB.extendedduedate) -
-                  new Date(extensionA.extendedduedate)
-                );
-              }
-            })
-            .map((extension, index) => {
+          {extensions.map((extension, index) => {
               return (
                 <TableRow key={`extenstion-row-${index}`} hover>
                   <TableCell>{extension.extensionreson}</TableCell>

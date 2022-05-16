@@ -436,7 +436,7 @@ class FOIRawRequest(db.Model):
             'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
             'requestTypeRequestType': FOIRawRequest.requestrawdata['requestType']['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
-            # 'axisRequestId': cast(FOIRawRequest.axisrequestid, String),
+            'axisRequestId': cast(FOIRawRequest.axisrequestid, String),
             'axisrequest_number': cast(FOIRawRequest.axisrequestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
@@ -493,6 +493,9 @@ class FOIRawRequest(db.Model):
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(asc('currentState'))
+
+        #always sort by created_at last to prevent pagination collisions
+        sortingcondition.append(desc('created_at'))
         
         return sortingcondition
 
@@ -711,7 +714,6 @@ class FOIRawRequest(db.Model):
         try:
             sql = """select distinct axisrequestid from "FOIRawRequests" where axisrequestid is not null;"""
             axisids = db.session.execute(text(sql))
-            
             for axisid in axisids:
                 axisrequestids.append(axisid[0])
         except Exception as ex:
@@ -720,6 +722,17 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()
         return axisrequestids
+
+    @classmethod
+    def getCountOfAXISRequestIdbyAXISRequestId(cls, axisrequestid):       
+        try:
+            query  = db.session.query(func.count(FOIRawRequest.axisrequestid)).filter_by(axisrequestid=axisrequestid)
+            return query.scalar()
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()        
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

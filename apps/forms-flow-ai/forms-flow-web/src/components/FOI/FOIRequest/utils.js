@@ -368,3 +368,13 @@ export const closeContactInfo = (user,requestDetails) => {
   const userGroups = user?.groups?.map(group => group.slice(1));
   return !!(Object.entries(requestDetails)?.length !== 0 && (isProcessingTeam(userGroups) || isFlexTeam(userGroups)));
 }
+
+export const isValidMinistryCode = (selectedMinistry, ministriesList) => {
+  return ministriesList.some(ministry => ministry.bcgovcode === selectedMinistry)
+}
+
+export const countOfMinistrySelected = (selectedMinistryList) => {
+  return selectedMinistryList.reduce(function(n, ministry) {
+    return n + (ministry.isChecked);
+  }, 0);
+}

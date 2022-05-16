@@ -94,6 +94,9 @@ class rawrequestservicegetter:
     
     def getaxisequestids(self):
         return FOIRawRequest.getDistinctAXISRequestIds()
+
+    def getcountofaxisequestidbyaxisequestid(self, axisrequestid):
+        return FOIRawRequest.getCountOfAXISRequestIdbyAXISRequestId(axisrequestid)
         
     def __attachministriesinfo(self,request):        
         if request != {} and request['status'] == 'Archived':

@@ -416,8 +416,10 @@ class FOIMinistryRequest(db.Model):
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
+            activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
+
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(ministryfilter)
+            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter)
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
@@ -458,6 +460,9 @@ class FOIMinistryRequest(db.Model):
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
+
+        #always sort by created_at last to prevent pagination collisions
+        sortingcondition.append(desc('created_at'))
         
         return sortingcondition
     
@@ -896,6 +901,13 @@ class FOIMinistryRequest(db.Model):
                 for keyword in params['keywords']:
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'ministryassigneename'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIMinistryRequest.findfield('assignedministrypersonFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('assignedministrypersonLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
             else:
                 searchcondition = []

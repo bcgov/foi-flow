@@ -670,9 +670,9 @@ const AdvancedSearch = ({ userDetail }) => {
                       control={
                         <Checkbox
                           size="small"
-                          name="onTime"
+                          name="ontime"
                           onChange={handleRequestStatusChange}
-                          checked={requestStatus.onTime}
+                          checked={requestStatus.ontime}
                           color="success"
                         />
                       }

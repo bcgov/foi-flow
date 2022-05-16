@@ -16,6 +16,8 @@ import {
   deleteExtensionRequest,
   fetchExtensions,
 } from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { fetchFOIRequestNotesList } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 import { useParams } from "react-router-dom";
 import { errorToast } from "./utils";
 import { setRequestDueDate } from "../../../../actions/FOI/foiRequestActions";
@@ -75,6 +77,8 @@ const DeleteExtensionModal = () => {
           },
           dispatch,
         });
+        dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+        dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
         setLoading(false);
         setDeleteModalOpen(false);
         if (data.newduedate) {

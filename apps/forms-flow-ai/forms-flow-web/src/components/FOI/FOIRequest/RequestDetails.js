@@ -287,6 +287,7 @@ const RequestDetails = React.memo(
                             InputLabelProps={{
                             shrink: true,
                             }}
+                            InputProps={{inputProps: { max: formatDate(new Date())} }}
                             variant="outlined" 
                             required
                             error={receivedDateText === undefined || receivedDateText === ""}
@@ -303,7 +304,7 @@ const RequestDetails = React.memo(
                             InputLabelProps={{
                             shrink: true,
                             }}
-                            InputProps={{inputProps: { min: receivedDateText} }}
+                            InputProps={{inputProps: { min: receivedDateText, max: formatDate(new Date())} }}
                             variant="outlined" 
                             required
                             error={startDateText === undefined || startDateText === ""}
