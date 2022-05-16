@@ -476,7 +476,7 @@ class FOIRawRequest(db.Model):
             'duedate',
             'defaultSorting',
             'intakeSorting',
-            'ministrySorting'
+            'ministrySorting',
             'assignedToFormatted',
             'ministryAssignedToFormatted',
             'cfrduedate',
