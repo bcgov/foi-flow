@@ -98,7 +98,11 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const tooltipContent = {
     "title": "Advanced Search",
-    "content": "In order to search FOI requests you must select one of the advanced search or date filter below to better refine your search results."
+    "content": <>{"In order to search requests, you must perform at least one of the following:"}
+    <ol style={{paddingLeft: '15px'}}><li>{"Enter a key word(s) in the search field and select a \"filter by\" button AND/OR"}</li>
+    <li>{"Select one of the boxes in the Request State/Status/Type sections AND/OR"}</li>
+    <li>{"Search by Date Range AND/OR"}</li>
+    <li>{"Search by Public Body"}</li></ol></>
   };
 
 

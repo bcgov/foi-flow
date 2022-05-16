@@ -12,7 +12,7 @@ const Tooltip = ({
   };
 
   const _content = (content && content["title"] && content["content"]) ? content : defaultContent;
-  const _position = position ? position : "right top";
+  const _position = position ? position : "bottom left";
 
   return (
     <Popup className="tooltip" trigger={<img src="/assets/Images/infoicon.svg" width="30px" alt="Infomation" />} position={_position}>
