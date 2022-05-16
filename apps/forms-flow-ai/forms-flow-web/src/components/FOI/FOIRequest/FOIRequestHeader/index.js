@@ -103,6 +103,8 @@ const FOIRequestHeader = React.memo(
     const showMinistryAssignedTo =
       status.toLowerCase() === StateEnum.callforrecords.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.closed.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.deduplication.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.harms.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.review.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.consult.name.toLowerCase() ||
