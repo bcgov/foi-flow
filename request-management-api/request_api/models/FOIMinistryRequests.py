@@ -284,17 +284,23 @@ class FOIMinistryRequest(db.Model):
             for field in filterfields:
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
-        stateforsorting = case([
-                            (FOIRequestStatus.requeststatusid == 1, # Open
+        intakesorting = case([
+                            (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
                              literal(None)),
                            ],
-                           else_ = FOIRequestStatus.name).label('stateForSorting')
+                           else_ = FOIRequest.receiveddate).label('intakeSorting')
 
-        processingteamsorting = case([
+        defaultsorting = case([
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
-                           else_ = FOIMinistryRequest.duedate).label('processingTeamSorting')
+                           else_ = FOIMinistryRequest.duedate).label('defaultSorting')
+
+        ministrysorting = case([
+                            (FOIMinistryRequest.assignedministryperson == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('ministrySorting')
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -363,8 +369,9 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting,
-            processingteamsorting,
+            defaultsorting,
+            intakesorting,
+            ministrysorting,
             assignedtoformatted,
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate
@@ -462,14 +469,14 @@ class FOIMinistryRequest(db.Model):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
 
         #always sort by created_at last to prevent pagination collisions
-        sortingcondition.append(desc('created_at'))
+        sortingcondition.append(asc('created_at'))
         
         return sortingcondition
     
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -641,17 +648,23 @@ class FOIMinistryRequest(db.Model):
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
-        stateforsorting = case([
-                            (FOIRequestStatus.name == 'Open',
-                             literal(None)),
-                           ],
-                           else_ = FOIRequestStatus.name).label('stateForSorting')
-
-        processingteamsorting = case([
+        intakesorting = case([
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
-                           else_ = FOIMinistryRequest.duedate).label('processingTeamSorting')
+                           else_ = FOIRequest.receiveddate).label('intakeSorting')
+
+        defaultsorting = case([
+                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('defaultSorting')
+
+        ministrysorting = case([
+                            (FOIMinistryRequest.assignedministryperson == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('ministrySorting')
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -721,8 +734,9 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,            
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting,
-            processingteamsorting,
+            defaultsorting,
+            intakesorting,
+            ministrysorting,
             assignedtoformatted,
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate

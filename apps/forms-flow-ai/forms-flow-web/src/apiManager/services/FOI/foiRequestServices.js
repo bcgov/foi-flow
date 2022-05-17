@@ -46,7 +46,7 @@ export const fetchFOIRequestList = () => {
 export const fetchFOIRequestListByPage = (
   page = 1,
   size = 10,
-  sort = [{ field: "currentState", sort: "desc" }],
+  sort = [{ field: "defaultSorting", sort: "asc" }],
   filters = null,
   keyword = null,
   additionalFilter = "All",
@@ -116,7 +116,7 @@ export const fetchFOIMinistryRequestList = () => {
   };
 };
 
-export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
   let sortingItems = [];
   let sortingOrders = [];
   sort.forEach((item)=>{

@@ -229,7 +229,7 @@ const AdvancedSearch = ({ userDetail }) => {
     setSearchLoading(true);
     handleUpdateSearchFilter({
       search: searchFilterSelected,
-      keywords: keywordsMode ? keywords : [searchText],
+      keywords: keywordsMode ? keywords : [searchText.trim()],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
@@ -285,7 +285,7 @@ const AdvancedSearch = ({ userDetail }) => {
       return;
     }
     setAnchorEl(null);
-    setKeywords([...keywords, searchText]);
+    setKeywords([...keywords, searchText.trim()]);
     setSearchText("");
   };
 

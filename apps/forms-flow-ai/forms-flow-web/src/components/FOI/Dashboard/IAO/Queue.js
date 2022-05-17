@@ -85,7 +85,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    var keyword = e.target.value;
+    var keyword = e.target.value.trim();
     setFilterModel((prev) => ({ ...prev, keyword }));
     setRowsState(defaultRowsState);
   }, 500);
@@ -248,7 +248,8 @@ const Queue = ({ userDetail, tableInfo }) => {
               tableInfo?.stateClassName?.[
                 params.row.currentState.toLowerCase().replace(/ +/g, "")
               ],
-              (params.row.assignedTo == null) && tableInfo?.noAssignedClassName
+              (params.row.assignedTo == null && userDetail.groups.indexOf("/" + params.row.assignedGroup) > -1)
+              && tableInfo?.noAssignedClassName
             )
           }
           onRowClick={renderReviewRequest}
