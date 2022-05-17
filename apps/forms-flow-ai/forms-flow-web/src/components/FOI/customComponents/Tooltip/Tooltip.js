@@ -14,8 +14,9 @@ const Tooltip = ({
   const _content = (content && content["title"] && content["content"]) ? content : defaultContent;
   const _position = position ? position : "bottom left";
 
+
   return (
-    <Popup className="tooltip" trigger={<img src="/assets/Images/infoicon.svg" width="30px" alt="Infomation" />} position={_position}>
+    <Popup className={`tooltip ${position ? "tooltipLeft" : ""}`} trigger={<img src="/assets/Images/infoicon.svg" style={{transform : position ? 'scaleX(-1)' : "none", cursor: "pointer"}} width="30px" alt="Infomation" />} nested position={_position}>
       <div className="tooltipTitle">{_content["title"]}</div>
       <div className="tooltipContent">{_content["content"]}</div>
     </Popup>
