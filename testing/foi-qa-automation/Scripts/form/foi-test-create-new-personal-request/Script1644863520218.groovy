@@ -124,9 +124,9 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '002021-12-16')
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '2021-12-16')
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), '002021-12-16')
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), '2021-12-16')
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
 
