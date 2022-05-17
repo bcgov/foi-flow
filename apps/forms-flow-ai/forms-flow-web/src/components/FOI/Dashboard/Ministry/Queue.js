@@ -39,8 +39,8 @@ const Queue = ({ userDetail, tableInfo }) => {
   const [rowsState, setRowsState] = useState(defaultRowsState);
 
   const defaultSortModel = [
-    { field: "currentState", sort: "asc" },
-    { field: "cfrduedate", sort: "asc" },
+    { field: "ministrySorting", sort: "asc" },
+    { field: "cfrduedate", sort: "asc" }
   ];
   const [sortModel, setSortModel] = useState(defaultSortModel);
 
@@ -181,7 +181,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    var keyword = e.target.value;
+    var keyword = e.target.value.trim();
     setFilterModel((prev) => ({ ...prev, keyword }));
     setRowsState(defaultRowsState);
   }, 500);
@@ -319,20 +319,13 @@ const Queue = ({ userDetail, tableInfo }) => {
             Pagination: CustomPagination,
           }}
           sortingOrder={["desc", "asc"]}
-          sortModel={[sortModel[0]]}
           sortingMode={"server"}
           onSortModelChange={(model) => {
             if (model) {
               setSortModel(model);
             }
           }}
-          getRowClassName={(params) =>
-            `super-app-theme--${params.row.currentState
-              .toLowerCase()
-              .replace(/ +/g, "")}-${params.row.cfrstatus
-              .toLowerCase()
-              .replace(/ +/g, "")}`
-          }
+          getRowClassName={(params) => (params.row.assignedministryperson == null) && "not-assigned"}
           onRowClick={renderReviewRequest}
           loading={isLoading}
         />

@@ -27,7 +27,8 @@ class duecalculator:
         return now_pst.strftime(self.__getdefaultdateformat()) 
     
     def formatduedate(self,input):
-        return input.strftime(self.__getdefaultdateformat())
+        _inpdate = datetime.strptime(input, "%Y-%m-%d") if isinstance(input, str) else input   
+        return _inpdate.strftime(self.__getdefaultdateformat())
     
     def getholidays(self):        
         ca_holidays = []
@@ -41,7 +42,7 @@ class duecalculator:
         
     def __getpreviousweekday(self, cfrduedate):
         diff = 1
-        _cfrduedate = datetime.strptime(cfrduedate, "%Y-%m-%d %H:%M:%S") if isinstance(cfrduedate, str) else cfrduedate   
+        _cfrduedate = datetime.strptime(cfrduedate, "%Y-%m-%d") if isinstance(cfrduedate, str) else cfrduedate   
         if _cfrduedate.weekday() == 0:
             diff = 3
         elif _cfrduedate.weekday() == 6:
