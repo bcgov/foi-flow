@@ -189,37 +189,28 @@ const FlexTeamColumns = [
 ];
 
 const defaultTableInfo = {
-  columns: IntakeTeamColumns,
   sort: [
-    { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
+    { field: "defaultSorting", sort: "asc" },
+    { field: "duedate", sort: "asc" }
   ],
-  stateClassName: {
-    open: "flex-open",
-  },
+  noAssignedClassName: "not-assigned"
 };
 
 const getTableInfo = (userGroups) => {
   if (!userGroups || isIntakeTeam(userGroups)) {
-    return defaultTableInfo;
+    defaultTableInfo.columns = IntakeTeamColumns;
+    defaultTableInfo.sort = [
+      { field: "intakeSorting", sort: "asc" },
+      { field: "duedate", sort: "asc" }
+    ];
   }
 
   if (isProcessingTeam(userGroups)) {
-    return {
-      columns: ProcessingTeamColumns,
-      sort: [{ field: "processingTeamSorting", sort: "asc" }],
-      noAssignedClassName: "processing--not-assigned",
-    };
+    defaultTableInfo.columns = ProcessingTeamColumns;
   }
 
   if (isFlexTeam(userGroups)) {
-    return {
-      columns: FlexTeamColumns,
-      sort: [{ field: "stateForSorting", sort: "asc" }],
-      stateClassName: {
-        open: "flex--open",
-      },
-    };
+    defaultTableInfo.columns = FlexTeamColumns;
   }
 
   return defaultTableInfo;
