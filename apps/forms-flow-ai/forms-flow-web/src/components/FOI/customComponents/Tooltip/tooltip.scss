@@ -2,13 +2,18 @@
     width: 150px;
     border-radius: 0px;
     position: absolute;
-    margin: 25px auto auto 15px
+    margin: -10px auto 30px 30px;
 }
 
 .tooltip-content {
     border: 1px solid #38598A;
-    background-color: rgba(56,89,138,0.1);
+    background-color: #E5EAEF;
 }
+
+[role=tooltip].tooltipLeft-content {
+    margin: -8px -8px!important;
+}
+
 
 .tooltip-arrow {
     // color: rgba(56,89,138,0.1);
