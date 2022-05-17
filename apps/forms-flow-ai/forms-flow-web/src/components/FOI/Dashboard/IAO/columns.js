@@ -199,7 +199,10 @@ const defaultTableInfo = {
 const getTableInfo = (userGroups) => {
   if (!userGroups || isIntakeTeam(userGroups)) {
     defaultTableInfo.columns = IntakeTeamColumns;
-    defaultTableInfo.sort = [{ field: "intakeSorting", sort: "asc" }]
+    defaultTableInfo.sort = [
+      { field: "intakeSorting", sort: "asc" },
+      { field: "duedate", sort: "asc" }
+    ];
   }
 
   if (isProcessingTeam(userGroups)) {
