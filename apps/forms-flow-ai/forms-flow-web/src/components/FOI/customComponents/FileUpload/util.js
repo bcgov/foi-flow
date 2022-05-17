@@ -18,8 +18,12 @@
     return newFileName;
   }
 
-  export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles) => {
+  export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes) => {
     let _errorMessage = [];
+    let singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx";
+    if (mimeTypes.some(mimeType => mimeType === '.msg' || mimeType === '.eml'))
+      singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx, msg, eml";
+
     if (_duplicateFiles.length > 0 && _duplicateFiles[0]) {
       _errorMessage.push(<>A attachment with this file name(s) <b>{_duplicateFiles.join(", ")}</b> already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.</>);
     }
@@ -27,7 +31,7 @@
       _errorMessage.push(<>The specified file(s) <b>{_overSizedFiles.join(", ")}</b> could not be uploaded. Only files <b>{maxFileSize}MB</b> or under can be uploaded.</>);
     }
     if (_typeErrorFiles.length > 0) {
-      _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : 'pdf, xlsx, docx'}</b></>);
+      _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : singleFileUploadAllowedFileExtensions}</b></>);
     }
     return _errorMessage;
   }
