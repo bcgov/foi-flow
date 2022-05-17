@@ -178,8 +178,7 @@ const RequestDetails = React.memo(
     //handling the received date change
     const handleReceivedDateChange = (e) => {
       setReceivedDate(e.target.value);
-      if(startDateText === "" || new Date(e.target.value) > new Date(startDateText))
-        setStartDate(e.target.value);
+
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value);
@@ -287,7 +286,7 @@ const RequestDetails = React.memo(
                             InputLabelProps={{
                             shrink: true,
                             }}
-                            InputProps={{inputProps: { max: formatDate(new Date())} }}
+                            InputProps={{inputProps: { max: startDateText || formatDate(new Date())} }}
                             variant="outlined" 
                             required
                             error={receivedDateText === undefined || receivedDateText === ""}
