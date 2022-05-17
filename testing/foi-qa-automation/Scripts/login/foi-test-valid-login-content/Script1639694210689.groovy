@@ -67,18 +67,6 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/button_Sign Out'), 
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/nav_pagination'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header APPLICANT NAME'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header REQUEST TYPE'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header CURRENT STATE'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ASSIGNED TO'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header RECEIVED DATE'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/navbar/reporting link'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.switchToWindowIndex(1, FailureHandling.STOP_ON_FAILURE)

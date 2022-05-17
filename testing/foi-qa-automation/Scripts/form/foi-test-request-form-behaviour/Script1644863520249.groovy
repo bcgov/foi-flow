@@ -73,15 +73,19 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/category
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
         findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
 
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'max', today.format('yyyy-MM-dd'), 0)
+
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'max', today.format('yyyy-MM-dd'), 0)
+
 //WebUI.executeJavaScript("alert('This is an alert')", null)
-def laterDate = new Date().plus(10)
+def earlierDate = new Date().plus(10)
 
 WebElement element = WebUiCommonHelper.findWebElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 
     30)
 
 //
 WebUI.executeJavaScript(('Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set.call(arguments[0], "' + 
-    laterDate.format('yyyy-MM-dd')) + '")', Arrays.asList(element))
+    earlierDate.format('yyyy-MM-dd')) + '")', Arrays.asList(element))
 
 WebUI.executeJavaScript('console.log(arguments[0])', Arrays.asList(element))
 
@@ -94,8 +98,7 @@ WebUI.executeJavaScript('arguments[0].dispatchEvent(new Event(\'change\', { bubb
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
         findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'value', 
-    laterDate.format('yyyy-MM-dd'), 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'max', today.format('yyyy-MM-dd'), 0)
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/input_Search Start Date'), 
     'max', today.format('yyyy-MM-dd'), 0)

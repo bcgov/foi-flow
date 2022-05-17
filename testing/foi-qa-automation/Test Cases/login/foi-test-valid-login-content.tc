@@ -5,6 +5,30 @@
    <tag></tag>
    <comment></comment>
    <testCaseGuid>f9bdbea4-4eec-4f06-bcc5-c6602afa7f00</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>94827f55-a251-4025-9719-11c192cf9bf1</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>9f013253-ef8b-4088-ac4e-034a93f87198</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>c97fd75e-a2ad-42ab-9bbd-d9dc42260a7d</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>ed9c7b40-9cee-4260-9823-ac9df645252f</variableId>
+   </variableLinks>
    <variable>
       <defaultValue>GlobalVariable.username</defaultValue>
       <description></description>
