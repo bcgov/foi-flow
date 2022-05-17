@@ -1,6 +1,6 @@
 from enum import unique
 
-from sqlalchemy.sql.sqltypes import DateTime, String
+from sqlalchemy.sql.sqltypes import DateTime, String, Date
 
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
@@ -584,24 +584,24 @@ class FOIRawRequest(db.Model):
                     #online form submission has no receivedDate in json - using created_at
                     filterconditionfordate.append(
                         or_(
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at >= parser.parse(params['fromdate'])),
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate']),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at.cast(Date) >= parser.parse(params['fromdate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate'])),
                         )
                     )
                 else:
-                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate'])
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate']))
 
             if(params['todate'] is not None):
                 if(params['daterangetype'] == 'receivedDate'):
                     #online form submission has no receivedDate in json - using created_at
                     filterconditionfordate.append(
                         or_(
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at <= parser.parse(params['todate'])),
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at.cast(Date) <= parser.parse(params['todate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(Date) <= parser.parse(params['todate'])),
                         )
                     )
                 else:
-                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate']))
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(Date) <= parser.parse(params['todate']))
 
         return filterconditionfordate
 
