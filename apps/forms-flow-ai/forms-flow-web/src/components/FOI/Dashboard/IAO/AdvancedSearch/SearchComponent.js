@@ -96,9 +96,14 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
-  const tooltipContent = {
+  const tooltipContentRight = {
     "title": "Advanced Search",
-    "content": "In order to search FOI requests you must select one of the advanced search or date filter below to better refine your search results."
+    "content": "To conduct an Advanced Search using one of the six filter buttons, you must also enter one or more key words."
+  };
+
+  const tooltipContentLeft = {
+    "title": "Advanced Search",
+    "content": "Use one or more fields from the following sections on their own or to narrow your search: Request State/Status/Type, Date Range, or Public Body."
   };
 
 
@@ -639,7 +644,6 @@ const AdvancedSearch = ({ userDetail }) => {
                   </FormGroup>
                 </Grid>
               </Grid>
-
               <Grid item xs={2} container direction="row" rowSpacing={2}>
                 <Grid item xs={12}>
                   <Typography
@@ -932,9 +936,13 @@ const AdvancedSearch = ({ userDetail }) => {
           </Paper>
         </Grid>
       </Grid>
+      <Grid className="floatAboveEverythingLeft">
+        <Tooltip content={tooltipContentLeft} position={"bottom right"} />
+        <p className="hideContent" id="popup-6">Information1</p>
+      </Grid>
       <Grid className="floatAboveEverything">
-        <Tooltip content={tooltipContent} />
-        <p className="hideContent" id="popup-6">Information</p>
+        <Tooltip content={tooltipContentRight} />
+        <p className="hideContent" id="popup-7">Information2</p>
       </Grid>
     </>
   );
