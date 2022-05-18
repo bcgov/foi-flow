@@ -505,6 +505,7 @@ class FOIMinistryRequest(db.Model):
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
             'receivedDate': FOIRequest.receiveddate,
+            'receivedDateUF': FOIRequest.receiveddate,
             'applicantcategory': ApplicantCategory.name,
             'assignedministryperson': FOIMinistryRequest.assignedministryperson,
             'assignedToFirstName': iaoassignee.firstname,
