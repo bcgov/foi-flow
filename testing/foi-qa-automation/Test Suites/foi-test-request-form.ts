@@ -408,7 +408,7 @@
    <testCaseLink>
       <guid>77e9a16e-d457-494d-a89b-81b1504e9681</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/form/foi-test-request-description-history</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
@@ -547,7 +547,7 @@
    <testCaseLink>
       <guid>548f176f-69dc-4df1-b478-7b1284209223</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/form/foi-test-request-description-history-personal</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>

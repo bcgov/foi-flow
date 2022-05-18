@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_watching notification list 1 time</name>
+   <tag></tag>
+   <elementGuidId>22ad3fb4-3585-4c20-8e78-dc32b7cdb3ca</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='uncontrolled-tab-example-tabpane-watch-request']/div[2]/div[1]/div[3]/div[2]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>06e2f9f3-da0d-450a-adea-1756e153ad98</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>col</value>
+      <webElementGuid>f9e78b50-9ec6-4842-9ea1-4909f3063530</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>2022 FEB 10 | 03:23 PM</value>
+      <webElementGuid>6724064c-c2ed-4005-9aff-80031961a43a</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;uncontrolled-tab-example-tabpane-my-request&quot;)/div[@class=&quot;notification-list list-group&quot;]/div[@class=&quot;list-group-item&quot;]/div[@class=&quot;notification-item-footer row&quot;]/div[@class=&quot;col&quot;]</value>
+      <webElementGuid>5b48feb4-a37d-4606-89bb-dbc783ef8ca9</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='uncontrolled-tab-example-tabpane-my-request']/div[2]/div/div[3]/div[2]</value>
+      <webElementGuid>2af6f12b-c161-415d-9f13-ef6979cf7b04</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='User, Super'])[1]/following::div[1]</value>
+      <webElementGuid>83b72b35-d43d-4953-b364-6b1f220860de</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='New Request Assigned to You.'])[1]/following::div[3]</value>
+      <webElementGuid>5b185169-b874-4e9f-88f5-2766301aeb37</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='U-002463'])[2]/preceding::div[1]</value>
+      <webElementGuid>ec92a676-5910-4310-92f4-7da358f46338</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Moved to Intake in Progress State'])[1]/preceding::div[5]</value>
+      <webElementGuid>84b0b796-5f5a-4294-9d37-c7baf8cfa759</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='2022 FEB 10 | 03:23 PM']/parent::*</value>
+      <webElementGuid>dbd5ca8f-fabc-4538-8e4b-77354896dfe0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div/div[3]/div[2]</value>
+      <webElementGuid>284a17c3-4284-4898-8743-035bc005cbe6</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = '2022 FEB 10 | 03:23 PM' or . = '2022 FEB 10 | 03:23 PM')]</value>
+      <webElementGuid>93522ceb-86f3-48b7-b7cc-30e225573090</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

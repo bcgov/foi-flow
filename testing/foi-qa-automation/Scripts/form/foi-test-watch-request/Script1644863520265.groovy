@@ -83,6 +83,9 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/
 //WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Processing Team'), 0)
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
 
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_EDU Ministry Team'), 
+    0)
+
 WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]), 
     'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
 
