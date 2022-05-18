@@ -471,6 +471,7 @@ class FOIRawRequest(db.Model):
             'currentState',
             'assignedTo',
             'receivedDate',
+            'receivedDateUF',
             'assignedToFirstName',
             'assignedToLastName',
             'duedate',
