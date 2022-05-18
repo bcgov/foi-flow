@@ -19,6 +19,8 @@ from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWit
 from .FOIAssignees import FOIAssignee
 from request_api.utils.enums import RequestorType
 import logging
+from sqlalchemy.sql.sqltypes import Date
+from dateutil import parser
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -857,10 +859,10 @@ class FOIMinistryRequest(db.Model):
             filtercondition.append(searchcondition)
 
         if(params['fromdate'] is not None and params['daterangetype'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) >= params['fromdate'])
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee).cast(Date) >= parser.parse(params['fromdate']))
 
         if(params['todate'] is not None and params['daterangetype'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) <= params['todate'])
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee).cast(Date) <= parser.parse(params['todate']))
         
         return filtercondition
 
