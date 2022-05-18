@@ -118,6 +118,7 @@ const FOIRequestHeader = React.memo(
       return requestDetails.assignedministrygroup;
     }
     const ministryAssignedTo = getMinistryAssignedTo();
+    const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
     return (
       <div className="foi-request-review-header-row1">
         <div className="foi-request-review-header-col1">
@@ -133,7 +134,7 @@ const FOIRequestHeader = React.memo(
               style={{ marginTop: 5 + "px", display: "block" }}
             >
               <Watcher
-                watcherFullList={assignedToList}
+                watcherFullList={watcherList}
                 requestId={requestId}
                 ministryId={ministryId}
                 userDetail={userDetail}
