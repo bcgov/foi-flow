@@ -5,6 +5,24 @@
    <tag></tag>
    <comment></comment>
    <testCaseGuid>47ec9572-7ed1-4999-83f1-d6760440cf6f</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>637459fa-45f0-466e-82c4-e0ddb045d262</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>6f27ee28-2c2b-4c35-b7fd-7fcdcb7a6cbc</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>6f27ee28-2c2b-4c35-b7fd-7fcdcb7a6cbc</variableId>
+   </variableLinks>
    <variable>
       <defaultValue>findTestData('Login Credentials').getValue('First Name', 8)</defaultValue>
       <description></description>

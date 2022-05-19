@@ -45,6 +45,17 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
+WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake Team'), 0)
+
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_EDU Ministry Team'), 
+    0)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_close dropdown'))
+
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
