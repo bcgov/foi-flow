@@ -153,14 +153,14 @@ const calculateDaysRemaining = (endDate, startDate) => {
   const noOfDays = daysBetween(startDate, endDate);
   if (noOfDays < 0) {
     return (
-      Math.round(noOfDays) +
+      Math.floor(noOfDays) +
       Math.round(publicHoliDays) -
       Math.round(weekendDays) -
       1
     )
   } else {
     return (
-      Math.round(noOfDays) -
+      Math.floor(noOfDays) -
       Math.round(publicHoliDays) -
       Math.round(weekendDays) +
       1
