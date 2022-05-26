@@ -41,6 +41,7 @@ import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
+import { CFRForm } from '../customComponents/CFRForm';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
 import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
@@ -134,6 +135,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
       active: false,
     },
     Attachments: {
+      display: false,
+      active: false,
+    },
+    CFRForm: {
       display: false,
       active: false,
     },
@@ -690,6 +695,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 </div>
                 <div
                   className={clsx("tablinks", {
+                    active: tabLinksStatuses.CFRForm.active,
+                  })}
+                  name="CFRForm"
+                  onClick={() => tabclick("CFRForm")}
+                >
+                  CFR Form{" "}
+                </div>
+                <div
+                  className={clsx("tablinks", {
                     active: tabLinksStatuses.Comments.active,
                   })}
                   name="Comments"
@@ -926,6 +940,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
             ) : (
               <Loading />
             )}
+          </div>
+          <div
+            id="CFRForm"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.CFRForm.active,
+              [classes.displayed]: tabLinksStatuses.CFRForm.display,
+              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+            })}
+          >
+            <CFRForm/>
           </div>
           <div
             id="Comments"
