@@ -881,9 +881,9 @@ class FOIMinistryRequest(db.Model):
     def getfilterforrequeststatus(cls, params, iaoassignee, ministryassignee):        
         #request status: overdue || on time
         if(params['requeststatus'][0] == 'overdue'):
-            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now()
+            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date()
         else:
-            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now()
+            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now().date()
 
     @classmethod
     def getfilterforrequesttype(cls, params, iaoassignee, ministryassignee):  
