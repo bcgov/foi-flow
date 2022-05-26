@@ -55,4 +55,4 @@ def upgrade():
 
 
 def downgrade():
-    op.execute('DELETE FROM public."FOIRequestTeams" WHERE requesttype = \'General\'and requeststatusid in (select requeststatusid from public."FOIRequestStatuses" where name in (\'Call For Records\'));commit;')
+    op.execute('DELETE FROM public."FOIRequestTeams" WHERE requesttype = \'General\'and requeststatusid in (select requeststatusid from public."FOIRequestStatuses" where name in (\'Call For Records\') and teamid not in (select teamid from public."OperatingTeams" where name in (\'Intake Team\', \'Flex Team\')));commit;')
