@@ -49,7 +49,7 @@ export const getTabBottomText = ({
 };
 
 const getDaysRemainingText = (_daysRemaining) => {
-  return _daysRemaining > 0
+  return _daysRemaining >= 0
     ? `${_daysRemaining} Days Remaining`
     : `${Math.abs(_daysRemaining)} Days Overdue`;
 };
