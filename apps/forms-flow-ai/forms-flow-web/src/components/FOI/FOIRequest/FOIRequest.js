@@ -681,7 +681,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
               Request
             </div>
             {!isAddRequest && (
-              <>
+              <>                
+                <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.CFRForm.active,
+                  })}
+                  name="CFRForm"
+                  onClick={() => tabclick("CFRForm")}
+                >
+                  CFR Form
+                </div>
                 <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Attachments.active,
@@ -693,15 +702,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   {requestAttachments?.length > 0
                     ? `(${requestAttachments.length})`
                     : ""}
-                </div>
-                <div
-                  className={clsx("tablinks", {
-                    active: tabLinksStatuses.CFRForm.active,
-                  })}
-                  name="CFRForm"
-                  onClick={() => tabclick("CFRForm")}
-                >
-                  CFR Form{" "}
                 </div>
                 <div
                   className={clsx("tablinks", {
@@ -952,7 +952,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.CFRForm.display,
             })}
           >
-            <CFRForm/>
+            <CFRForm            
+              requestNumber={requestNumber}              
+              requestid={requestId}
+            />
           </div>
           <div
             id="Comments"
