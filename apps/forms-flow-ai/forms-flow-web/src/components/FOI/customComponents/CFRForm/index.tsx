@@ -33,15 +33,13 @@ export const CFRForm = ({
   
   return (  
     <div className="foi-review-container">
-    <form
-      className="foi-request-form"
-      autoComplete="off"
-    >
     <Box
+      component="form"
       sx={{
         '& .MuiTextField-root': { m: 1 },
       }}
-    >
+      autoComplete="off"
+    ><div className="foi-request-form">
     <div style={{marginTop: 20}}></div>
     <div className="container foi-review-request-container">
       <div className="foi-request-review-header-row1">
@@ -347,8 +345,7 @@ export const CFRForm = ({
         </Accordion>
       </div> 
     </div>
-  </Box>
-  </form>
+  </div></Box>
   </div>
   );
 }
