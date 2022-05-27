@@ -1,34 +1,12 @@
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import './index.scss'
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    "& .MuiTextField-root": {
-      margin: theme.spacing(1),
-    },
-  },
-  validationErrorMessage: {
-    marginTop: "30px",
-    color: "#fd0404",
-  },
-  validationMessage: {
-    marginTop: "30px",
-    color: "#000000",
-  },
-  displayed: {
-    display: "block",
-  },
-  hidden: {
-    display: "none",
-  },
-}));
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Box from '@mui/material/Box';
 
 type CFRForm = {
   requestNumber: string;
@@ -37,8 +15,6 @@ type CFRForm = {
 export const CFRForm = ({  
   requestNumber,  
 }: CFRForm) => {
-
-  const classes = useStyles();
 
   const CFRStatuses = [
     {
@@ -58,8 +34,13 @@ export const CFRForm = ({
   return (  
     <div className="foi-review-container">
     <form
-      className={`${classes.root} foi-request-form`}
+      className="foi-request-form"
       autoComplete="off"
+    >
+    <Box
+      sx={{
+        '& .MuiTextField-root': { m: 1 },
+      }}
     >
     <div style={{marginTop: 20}}></div>
     <div className="container foi-review-request-container">
@@ -67,7 +48,7 @@ export const CFRForm = ({
         <div className="col-9 foi-request-number-header">
           <h3 className="foi-review-request-text">{requestNumber}</h3>
         </div>      
-        <div className="col-3 addcommentBox">
+        <div className="col-3">
           <TextField
             id="cfrStatus"
             label={"CFR Status"}
@@ -106,6 +87,7 @@ export const CFRForm = ({
                   inputProps={{ "aria-labelledby": "amountpaid-label"}}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
+                  placeholder="hr"
                   // value={applicantFirstNameText}
                   fullWidth
                   // onChange={handleFirtNameChange}
@@ -122,6 +104,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   // value={applicantMiddleNameText}
                   variant="outlined"
+                  placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
                   // onChange={handleMiddleNameChange}
@@ -155,6 +138,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   // value={applicantLastNameText}
                   variant="outlined"
+                  placeholder="hr"
                   fullWidth
                   // onChange={handleLastNameChange}
                   // required={true}
@@ -170,6 +154,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   // value={organizationText}
                   variant="outlined"
+                  placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
                   // onChange={handleOrganizationChange}
@@ -190,11 +175,11 @@ export const CFRForm = ({
                   label="Estimated Hours"
                   inputProps={{ "aria-labelledby": "estimatedproducing-label"}}
                   InputLabelProps={{ shrink: true }}
-                  select
                   // value={selectedCategory}
                   // onChange={handleCategoryOnChange}
                   // input={<Input />}
                   variant="outlined"
+                  placeholder="hr"
                   fullWidth
                   // required
                   // disabled={disableInput || disableFieldForMinistryRequest}
@@ -211,6 +196,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   // value={organizationText}
                   variant="outlined"
+                  placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
                   // onChange={handleOrganizationChange}
@@ -231,11 +217,11 @@ export const CFRForm = ({
                   label="Estimated Hours"
                   inputProps={{ "aria-labelledby": "estimatedpreparing-label"}}
                   InputLabelProps={{ shrink: true }}
-                  select
                   // value={selectedCategory}
                   // onChange={handleCategoryOnChange}
                   // input={<Input />}
                   variant="outlined"
+                  placeholder="hr"
                   fullWidth
                   // required
                   // disabled={disableInput || disableFieldForMinistryRequest}
@@ -252,6 +238,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   // value={organizationText}
                   variant="outlined"
+                  placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
                   // onChange={handleOrganizationChange}
@@ -272,11 +259,11 @@ export const CFRForm = ({
                   label="Electronic Estimated Pages"
                   inputProps={{ "aria-labelledby": "estimatedelectronic-label"}}
                   InputLabelProps={{ shrink: true }}
-                  select
                   // value={selectedCategory}
                   // onChange={handleCategoryOnChange}
                   // input={<Input />}
                   variant="outlined"
+                  placeholder="pgs"
                   fullWidth
                   // required
                   // disabled={disableInput || disableFieldForMinistryRequest}
@@ -289,11 +276,11 @@ export const CFRForm = ({
                   label="Hardcopy Estimated Pages"
                   inputProps={{ "aria-labelledby": "estimatedhardcopy-label"}}
                   InputLabelProps={{ shrink: true }}
-                  select
                   // value={selectedCategory}
                   // onChange={handleCategoryOnChange}
                   // input={<Input />}
                   variant="outlined"
+                  placeholder="pgs"
                   fullWidth
                   // required
                   // disabled={disableInput || disableFieldForMinistryRequest}
@@ -310,6 +297,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   // value={organizationText}
                   variant="outlined"
+                  placeholder="pgs"
                   fullWidth
                   // disabled={disableInput}
                   // onChange={handleOrganizationChange}
@@ -321,6 +309,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   // value={organizationText}
                   variant="outlined"
+                  placeholder="pgs"
                   fullWidth
                   // disabled={disableInput}
                   // onChange={handleOrganizationChange}
@@ -341,7 +330,7 @@ export const CFRForm = ({
                 <TextField
                   id="combinedsuggestions"
                   // required={true}
-                  label="Combined suggestions for futher clarifications"
+                  label="Combined suggestions for futher clarifications   "
                   multiline
                   rows={4}
                   // value={requestDescriptionText}
@@ -358,6 +347,7 @@ export const CFRForm = ({
         </Accordion>
       </div> 
     </div>
+  </Box>
   </form>
   </div>
   );
