@@ -1,0 +1,23 @@
+/* add css module styles here (optional) */
+
+.container {
+  padding-left: 5%;
+  padding-right: 5%;
+  margin-top: 20px;
+}
+
+.heading {
+  color: #FFF;
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.accordionSummary {
+  flex-direction: row-reverse;
+}
+
+.formLabel {
+  padding: 15px 5px;
+  font-size: 15px;
+  font-weight: 600;
+}
