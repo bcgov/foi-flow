@@ -1,0 +1,31 @@
+{
+    "version": "1.0.0",
+    "locating": {
+        "type": "hour",
+        "freehours": 3,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "producing": {
+        "type": "hour",
+        "freehours": 0,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "preparing": {
+        "type": "hour",
+        "freehours": 0,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "electronicpages":  {
+        "type": "page",
+        "unit": 1,
+        "price": 0
+    },
+    "hardcopypages":  {
+        "type": "page",
+        "unit": 1,
+        "price": 0.1
+    }
+}  
