@@ -7,13 +7,19 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
+import { SetStateAction, useState } from 'react';
+import { isMinistryLogin } from "../../../../helper/FOI/helper";
 
 type CFRForm = {
   requestNumber: string;
+  userDetail: {
+    groups: string[];
+  };
 }
 
 export const CFRForm = ({  
-  requestNumber,  
+  requestNumber,
+  userDetail  
 }: CFRForm) => {
 
   const CFRStatuses = [
@@ -30,6 +36,16 @@ export const CFRForm = ({
       label: 'Clarification'
     },
   ];
+
+  const userGroups = userDetail.groups.map(group => group.slice(1));
+  const isMinistry = isMinistryLogin(userGroups);
+
+  const [cfrStatus, setCfrStatus] = useState('review');
+
+  // temp code, remove when integrated with back end
+  const handleCFRStatusChange = (e: { target: { value: SetStateAction<string>; }; }) => {
+    setCfrStatus(e.target.value);
+  }
   
   return (  
     <div className="foi-review-container">
@@ -53,12 +69,12 @@ export const CFRForm = ({
             inputProps={{ "aria-labelledby": "cfrStatus-label"}}
             InputLabelProps={{ shrink: true }}
             select
-            // value={selectedAssignedTo}
-            // onChange={handleAssignedToOnChange}
+            value={cfrStatus}
+            onChange={handleCFRStatusChange}
             variant="outlined"
             fullWidth
             required
-            // disabled={disableInput}
+            // disabled={isMinistry} comment back in when back end is intergrated
             // error={selectedAssignedTo.toLowerCase().includes("unassigned")}
           >
             {CFRStatuses.map((option) => (
@@ -90,7 +106,6 @@ export const CFRForm = ({
                   fullWidth
                   // onChange={handleFirtNameChange}
                   // required={true}
-                  // disabled={disableInput}
                   // error={applicantFirstNameText === ""}
                 />
               </div>
@@ -140,7 +155,7 @@ export const CFRForm = ({
                   fullWidth
                   // onChange={handleLastNameChange}
                   // required={true}
-                  // disabled={disableInput}
+                  disabled={!isMinistry}
                   // error={applicantLastNameText === ""}
                 />
               </div>
@@ -154,7 +169,7 @@ export const CFRForm = ({
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
                   // onChange={handleOrganizationChange}
                 />
               </div>
@@ -180,7 +195,7 @@ export const CFRForm = ({
                   placeholder="hr"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -196,7 +211,7 @@ export const CFRForm = ({
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
                   // onChange={handleOrganizationChange}
                 />
               </div>
@@ -222,7 +237,7 @@ export const CFRForm = ({
                   placeholder="hr"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -238,7 +253,7 @@ export const CFRForm = ({
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
                   // onChange={handleOrganizationChange}
                 />
               </div>
@@ -264,7 +279,7 @@ export const CFRForm = ({
                   placeholder="pgs"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -281,7 +296,7 @@ export const CFRForm = ({
                   placeholder="pgs"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -297,7 +312,7 @@ export const CFRForm = ({
                   variant="outlined"
                   placeholder="pgs"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry}
                   // onChange={handleOrganizationChange}
                 />
                 <TextField
@@ -309,7 +324,7 @@ export const CFRForm = ({
                   variant="outlined"
                   placeholder="pgs"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
                   // onChange={handleOrganizationChange}
                 />
               </div>
@@ -337,7 +352,7 @@ export const CFRForm = ({
                   // onChange={handleRequestDescriptionChange}
                   // error={requestDescriptionText===""}
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry}
                 />
               </div>
             </div>
