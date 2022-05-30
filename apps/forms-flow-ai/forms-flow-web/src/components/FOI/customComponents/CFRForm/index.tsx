@@ -10,6 +10,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
 import type { CFRFormData } from './types';
 import { calculateFees } from './util';
+import { SetStateAction, useState } from 'react';
+import { isMinistryLogin } from "../../../../helper/FOI/helper";
 
 export const CFRForm = (props: CFRFormData) => {
 
@@ -44,6 +46,15 @@ export const CFRForm = (props: CFRFormData) => {
 
     setFormData(values => ({...values, [name]: value}));
   };
+  const userGroups = props.userDetail.groups.map(group => group.slice(1));
+  const isMinistry = isMinistryLogin(userGroups);
+
+  const [cfrStatus, setCfrStatus] = useState('review');
+
+  // temp code, remove when integrated with back end
+  const handleCFRStatusChange = (e: { target: { value: SetStateAction<string>; }; }) => {
+    setCfrStatus(e.target.value);
+  }
   
   const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
@@ -96,7 +107,7 @@ export const CFRForm = (props: CFRFormData) => {
             variant="outlined"
             fullWidth
             required
-            // disabled={disableInput}
+            // disabled={isMinistry} comment back in when back end is intergrated
             // error={selectedAssignedTo.toLowerCase().includes("unassigned")}
           >
             {CFRStatuses.map((option) => (
@@ -127,7 +138,6 @@ export const CFRForm = (props: CFRFormData) => {
                   onChange={handleAmountChanges}
                   fullWidth
                   // required={true}
-                  // disabled={disableInput}
                   // error={applicantFirstNameText === ""}
                 />
               </div>
@@ -179,7 +189,7 @@ export const CFRForm = (props: CFRFormData) => {
                   placeholder="hr"
                   fullWidth
                   // required={true}
-                  // disabled={disableInput}
+                  disabled={!isMinistry}
                   // error={applicantLastNameText === ""}
                 />
               </div>
@@ -195,7 +205,8 @@ export const CFRForm = (props: CFRFormData) => {
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
+                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -221,7 +232,7 @@ export const CFRForm = (props: CFRFormData) => {
                   placeholder="hr"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -239,7 +250,8 @@ export const CFRForm = (props: CFRFormData) => {
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
+                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -265,7 +277,7 @@ export const CFRForm = (props: CFRFormData) => {
                   placeholder="hr"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -283,7 +295,8 @@ export const CFRForm = (props: CFRFormData) => {
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
+                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -309,7 +322,7 @@ export const CFRForm = (props: CFRFormData) => {
                   placeholder="pgs"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -327,7 +340,7 @@ export const CFRForm = (props: CFRFormData) => {
                   placeholder="pgs"
                   fullWidth
                   // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
                   // error={selectedCategory.toLowerCase().includes("select")}
                 >
                   {/* {menuItems} */}
@@ -345,7 +358,8 @@ export const CFRForm = (props: CFRFormData) => {
                   variant="outlined"
                   placeholder="pgs"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry}
+                  // onChange={handleOrganizationChange}
                 />
                 <TextField
                   id="actualhardcopy"
@@ -358,7 +372,8 @@ export const CFRForm = (props: CFRFormData) => {
                   variant="outlined"
                   placeholder="pgs"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || cfrStatus !== 'approved'}
+                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -386,7 +401,7 @@ export const CFRForm = (props: CFRFormData) => {
                   onChange={handleTextChanges}
                   // error={requestDescriptionText===""}
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry}
                 />
               </div>
             </div>

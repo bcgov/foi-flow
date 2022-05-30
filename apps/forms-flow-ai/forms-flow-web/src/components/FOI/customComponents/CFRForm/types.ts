@@ -18,4 +18,7 @@ export type CFRFormData = {
       hardcopyPages: number;
     };
     suggestions: string;
+    userDetail: {
+      groups: string[];
+    };
 }
