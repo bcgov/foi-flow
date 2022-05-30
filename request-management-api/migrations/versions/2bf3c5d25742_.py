@@ -22,9 +22,8 @@ def upgrade():
     sa.Column('cfrfeeid', sa.Integer(), primary_key=True, autoincrement=True, nullable=False),
     sa.Column('ministryrequestid', sa.Integer(), nullable=False),
     sa.Column('ministryrequestversion', sa.Integer(), nullable=True),
-    sa.Column('version', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('amountpaid', sa.Float(), nullable=True),
-    sa.Column('amountdue', sa.Float(), nullable=True),
+    sa.Column('version', sa.Integer(), primary_key=True, nullable=False),
+    sa.Column('feedata', postgresql.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('overallsuggestions', sa.Text(), nullable=True),
     sa.Column('status', sa.String(length=120), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
@@ -32,7 +31,7 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('updatedby', sa.String(length=120), nullable=True),
     sa.ForeignKeyConstraint(['ministryrequestid', 'version'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
-    sa.PrimaryKeyConstraint('cfrfeeid')
+    sa.PrimaryKeyConstraint('cfrfeeid' , 'version')
     )
     # ### end Alembic commands ###
 
