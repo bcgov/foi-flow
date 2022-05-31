@@ -1,5 +1,6 @@
 {
     "version": "1.0.0",
+    "createdat": "2022-05-27",
     "locating": {
         "type": "hour",
         "freehours": 3,
@@ -18,12 +19,12 @@
         "unit": 0.25,
         "price": 7.5
     },
-    "electronicpages":  {
+    "electronicPages":  {
         "type": "page",
         "unit": 1,
         "price": 0
     },
-    "hardcopypages":  {
+    "hardcopyPages":  {
         "type": "page",
         "unit": 1,
         "price": 0.1
