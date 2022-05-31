@@ -226,33 +226,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
     hasincompleteDivstage;
 
-  const createMinistryRequestDetailsObject = (
-    requestObject,
-    propName,
-    value
-  ) => {
-    // requestDetails.
-    if (propName === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
-      const assignedToValue = value.split("|");
-      if (
-        assignedToValue.length > 1 &&
-        assignedToValue[0] &&
-        assignedToValue[1] &&
-        assignedToValue[2] &&
-        assignedToValue[3]
-      ) {
-        requestObject.assignedministrygroup = assignedToValue[0];
-        requestObject.assignedministryperson = assignedToValue[1];
-        requestObject.assignedministrypersonFirstName = assignedToValue[2];
-        requestObject.assignedministrypersonLastName = assignedToValue[3];
-      }
-    }
-  };
-
   const createMinistrySaveRequestObject = (propName, value, value2) => {
     const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
-    createMinistryRequestDetailsObject(requestObject, propName, value);
     setSaveMinistryRequestObject(requestObject);
   };
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
@@ -558,9 +534,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           userDetail={userDetail}
                           handleMinistryAssignedToValue={
                             handleMinistryAssignedToValue
-                          }
-                          createMinistrySaveRequestObject={
-                            createMinistrySaveRequestObject
                           }
                         />
                         <ApplicantDetails requestDetails={requestDetails} />

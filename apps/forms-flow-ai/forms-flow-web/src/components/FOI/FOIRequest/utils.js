@@ -167,6 +167,37 @@ export const updateAdditionalInfo = (name, value, requestObject) => {
   return requestObject;
 };
 
+export const createAssigneeDetails = (value, value2) => {
+  const assigneeObject = {
+    assignedGroup: "",
+    assignedTo: "",
+    assignedToFirstName: "",
+    assignedToLastName: "",
+    assignedToName: ""
+  }
+  const assignedTo = value.split("|");
+      if (
+        FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(
+          (groupName) =>
+            groupName === assignedTo[0] && groupName === assignedTo[1]
+        ) || KCProcessingTeams.find((groupName) =>
+        groupName === assignedTo[0] && groupName === assignedTo[1])
+      ) {
+        assigneeObject.assignedGroup = assignedTo[0];
+        assigneeObject.assignedTo = "";
+      } else if (assignedTo.length > 3) {
+        assigneeObject.assignedGroup = assignedTo[0];
+        assigneeObject.assignedTo = assignedTo[1];
+        assigneeObject.assignedToFirstName = assignedTo[2];
+        assigneeObject.assignedToLastName = assignedTo[3];
+      } else {
+        assigneeObject.assignedGroup = "Unassigned";
+        assigneeObject.assignedTo = assignedTo[0];
+      }
+      assigneeObject.assignedToName = value2;
+      return assigneeObject;
+}
+
 export const createRequestDetailsObjectFunc = (
   requestObject,
   requiredRequestDetailsValues,
@@ -194,26 +225,12 @@ export const createRequestDetailsObjectFunc = (
       requestObject.deliveryMode = value.deliveryMode;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
-      const assignedTo = value.split("|");
-      if (
-        FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(
-          (groupName) =>
-            groupName === assignedTo[0] && groupName === assignedTo[1]
-        ) || KCProcessingTeams.find((groupName) =>
-        groupName === assignedTo[0] && groupName === assignedTo[1])
-      ) {
-        requestObject.assignedGroup = assignedTo[0];
-        requestObject.assignedTo = "";
-      } else if (assignedTo.length > 3) {
-        requestObject.assignedGroup = assignedTo[0];
-        requestObject.assignedTo = assignedTo[1];
-        requestObject.assignedToFirstName = assignedTo[2];
-        requestObject.assignedToLastName = assignedTo[3];
-      } else {
-        requestObject.assignedGroup = "Unassigned";
-        requestObject.assignedTo = assignedTo[0];
-      }
-      requestObject.assignedToName = value2;
+      const assigneeDetails = createAssigneeDetails(value, value2);
+      requestObject.assignedGroup = assigneeDetails.assignedGroup;
+      requestObject.assignedTo = assigneeDetails.assignedTo;
+      requestObject.assignedToFirstName = assigneeDetails.assignedToFirstName;
+      requestObject.assignedToLastName = assigneeDetails.assignedToLastName;
+      requestObject.assignedToName = assigneeDetails.assignedToName
       break;
     case FOI_COMPONENT_CONSTANTS.RECEIVED_DATE:
       requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
