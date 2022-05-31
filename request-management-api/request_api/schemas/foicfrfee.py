@@ -34,7 +34,6 @@ class FOICFRFeeSchema(Schema):
 
         unknown = EXCLUDE    
     ministryrequestid = fields.Int(data_key="ministryrequestid")
-    cfrfeeid = fields.Int(data_key="cfrfeeid")
     feedata = fields.Nested(FOIFeeDataSchema,allow_none=False)
     overallsuggestions = fields.Str(data_key="overallsuggestions")
     status = fields.Str(data_key="status")

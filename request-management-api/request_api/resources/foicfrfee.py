@@ -75,23 +75,23 @@ class FOICFRFee(Resource):
 
         
 
-@cors_preflight('PUT,OPTIONS')
-@API.route('/foicfrfee')
-class FOICFRFeeUpdate(Resource):
-    """Update cfr fee based on id."""
+    @cors_preflight('PUT,OPTIONS')
+    @API.route('/foicfrfee/<id>')
+    class FOICFRFeeUpdate(Resource):
+        """Update cfr fee based on id."""
 
-   
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def put():      
-        try:
-            requestjson = request.get_json()    
-            foicfrfeeschema = FOICFRFeeSchema().load(requestjson)          
-            result = cfrfeeservice().updatecfrfee(foicfrfeeschema,AuthHelper.getuserid())
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
+    
+        @staticmethod
+        @TRACER.trace()
+        @cross_origin(origins=allowedorigins())
+        @auth.require
+        def put(id):      
+            try:
+                requestjson = request.get_json()    
+                foicfrfeeschema = FOICFRFeeSchema().load(requestjson)          
+                result = cfrfeeservice().updatecfrfee(foicfrfeeschema,AuthHelper.getuserid(),id)
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+            except KeyError as err:
+                return {'status': False, 'message':err.messages}, 400        
+            except BusinessException as exception:            
+                return {'status': exception.status_code, 'message':exception.message}, 500

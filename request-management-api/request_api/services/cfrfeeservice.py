@@ -20,17 +20,19 @@ class cfrfeeservice:
         ministryrequestversion = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])  
         return FOIRequestCFRFee.createcfrfee(data, ministryrequestversion, userid)
         
-    def updatecfrfee(self, data, userid):
-        return FOIRequestCFRFee.updatecfrfee(data, userid)       
+    def updatecfrfee(self, data, userid,cfrfeeid):
+        return FOIRequestCFRFee.updatecfrfee(data, userid,cfrfeeid)       
         
     def getcfrfee(self, ministryrequestid):
         cfrfeeforms = FOIRequestCFRFee.getcfrfee(ministryrequestid)
         return self.__formatcfrfee(cfrfeeforms)
            
     def __formatcfrfee(self, cfrfeeforms):
+        formattedcfrfees = []
         for cfrfee in cfrfeeforms:
             formattedcfrfee = self.__cfrfeeformat(cfrfee)
-        return formattedcfrfee
+            formattedcfrfees.append(formattedcfrfee)
+        return formattedcfrfees
 
     def __cfrfeeformat(self, cfrfeeform):
         return {
