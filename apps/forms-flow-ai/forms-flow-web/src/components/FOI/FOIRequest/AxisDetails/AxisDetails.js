@@ -68,9 +68,9 @@ const AxisDetails = React.memo(({
             setValidation(axisIdValidation);  
         }
         handleAxisIdValidation(axisIdValidation);
-        setAxisRequestId(e.target.value);
-        handleAxisDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, e.target.value);
+        setAxisRequestId(e.target.value.toUpperCase());
+        handleAxisDetailsValue(e.target.value.toUpperCase(), FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, e.target.value.toUpperCase());
     }
 
     const syncWithAxis = () => {
