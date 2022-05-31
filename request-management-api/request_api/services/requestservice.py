@@ -23,8 +23,8 @@ class requestservice:
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
         return requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid)     
     
-    def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid):
-         return requestservicecreate().saveministryrequestversion(ministryrequestschema, foirequestid , ministryid, userid)      
+    def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, actiontype = None):
+         return requestservicecreate().saveministryrequestversion(ministryrequestschema, foirequestid , ministryid, userid, actiontype)      
      
     def updaterequest(self,foirequestschema,foirequestid,userid):
         return requestserviceupdate().updaterequest(foirequestschema,foirequestid,userid) 

@@ -34,7 +34,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foirequest.createdby = userid
         return foirequest
     
-    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):
+    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid, actiontype = None):
         requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
@@ -61,13 +61,15 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         else:
             foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
 
-        foiministryrequest.assignedgroup = requestdict['assignedgroup']
+        foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema and requestschema['assignedgroup'] not in (None,'') else requestdict['assignedgroup']
         if 'assignedto' in requestschema and requestschema['assignedto'] not in (None,''):
             foiministryrequest.assignedto = requestschema['assignedto']
-            fn = requestschema['assignedtoFirstName'] if requestschema['assignedto'] != None else None
+            fn = requestschema['assignedToFirstName'] if requestschema['assignedto'] != None else None
             mn = None
-            ln = requestschema['assignedtoLastName'] if requestschema['assignedto'] != None else None
+            ln = requestschema['assignedToLastName'] if requestschema['assignedto'] != None else None
             self.createfoiassigneefromobject(requestschema['assignedto'], fn, mn, ln)
+        elif actiontype == "assignee":            
+            foiministryrequest.assignedto = None
         else:
             foiministryrequest.assignedto = ministryschema["assignedto"]
 

@@ -10,9 +10,9 @@ import { useParams } from 'react-router-dom';
 import { getHeaderText } from './utils';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
-const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
+const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue}) => {
 
-    const {ministryId} = useParams();
+    const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     const requestState = requestDetails?.currentState;
@@ -99,7 +99,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
 
             
                     <>
-                      <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
+                      <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} />
                     </>
                 
             </div>
