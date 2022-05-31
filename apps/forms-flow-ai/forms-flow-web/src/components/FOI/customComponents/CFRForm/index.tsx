@@ -1,3 +1,4 @@
+import React from 'react';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import './index.scss'
@@ -7,14 +8,10 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
+import type { CFRFormData } from './types';
+import { calculateFees } from './util';
 
-type CFRForm = {
-  requestNumber: string;
-}
-
-export const CFRForm = ({  
-  requestNumber,  
-}: CFRForm) => {
+export const CFRForm = (props: CFRFormData) => {
 
   const CFRStatuses = [
     {
@@ -30,7 +27,50 @@ export const CFRForm = ({
       label: 'Clarification'
     },
   ];
+
+  // let formData = JSON.parse(JSON.stringify(props));
+  const [formData, setFormData] = React.useState(props);
+
+  React.useEffect(() => {
+    let newFormData: CFRFormData = calculateFees(formData);
+    console.log("newFormData");
+    console.log(newFormData);
+    setFormData(newFormData);
+    console.log("formData");
+    console.log(formData);
+  }, [formData]);
+
+  const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name;
+    const value = e.target.value;
+
+    setFormData(values => ({...values, [name]: value}));
+  };
   
+  const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: number = +e.target.value;
+
+    // console.log(formData);
+    const estimates = formData.estimates;
+    const newEstimates = {...estimates, [name]: value};
+    // console.log(newEstimates);
+
+    setFormData(values => ({...values, ["estimates"]: newEstimates}));
+  };
+  
+  const handleActualChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: number = +e.target.value;
+
+    // console.log(formData);
+    const actual = formData.actual;
+    const newActual = {...actual, [name]: value};
+
+    setFormData(values => ({...values, ["actual"]: newActual}));
+  };
+
+
   return (  
     <div className="foi-review-container">
     <Box
@@ -44,7 +84,7 @@ export const CFRForm = ({
     <div className="container foi-review-request-container">
       <div className="foi-request-review-header-row1">
         <div className="col-9 foi-request-number-header">
-          <h3 className="foi-review-request-text">{requestNumber}</h3>
+          <h3 className="foi-review-request-text">{formData?.requestNumber}</h3>
         </div>      
         <div className="col-3">
           <TextField
@@ -53,8 +93,9 @@ export const CFRForm = ({
             inputProps={{ "aria-labelledby": "cfrStatus-label"}}
             InputLabelProps={{ shrink: true }}
             select
-            // value={selectedAssignedTo}
-            // onChange={handleAssignedToOnChange}
+            name="formStatus"
+            value={formData?.formStatus || ""}
+            onChange={handleChanges}
             variant="outlined"
             fullWidth
             required
@@ -68,8 +109,6 @@ export const CFRForm = ({
             ))}
           </TextField>
         </div>
-
-        
       </div>
       <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
@@ -86,9 +125,10 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   placeholder="hr"
-                  // value={applicantFirstNameText}
+                  name="amountPaid"
+                  value={formData?.amountPaid || ""}
+                  onChange={handleChanges}
                   fullWidth
-                  // onChange={handleFirtNameChange}
                   // required={true}
                   // disabled={disableInput}
                   // error={applicantFirstNameText === ""}
@@ -100,12 +140,13 @@ export const CFRForm = ({
                   label="Total Amount Due"
                   inputProps={{ "aria-labelledby": "totalamountdue-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={applicantMiddleNameText}
+                  name="amountDue"
+                  value={formData?.amountDue || ""}
+                  onChange={handleChanges}
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
-                  // onChange={handleMiddleNameChange}
                 />
               </div>
             </div>
@@ -114,7 +155,7 @@ export const CFRForm = ({
                 <span className="formLabel">Balance Remaining</span>
               </div>
               <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">$00.00</span>
+                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid)}</span>
               </div>
             </div>
             <div className="row foi-details-row">
@@ -124,7 +165,7 @@ export const CFRForm = ({
             </div>
             <div className="row foi-details-row">
               <div className="col-lg-12 foi-details-col">
-                <div className="formLabel">Locating/Tetrieving - this includes searching all relevant sources.</div>
+                <div className="formLabel">Locating/Retrieving - this includes searching all relevant sources.</div>
               </div>
             </div>
             <div className="row foi-details-row">
@@ -134,11 +175,12 @@ export const CFRForm = ({
                   label="Estimated Hours"
                   inputProps={{ "aria-labelledby": "estimatedlocating-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={applicantLastNameText}
+                  name="locating"
+                  value={formData?.estimates?.locating || ""}
+                  onChange={handleEstimateChanges}
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
-                  // onChange={handleLastNameChange}
                   // required={true}
                   // disabled={disableInput}
                   // error={applicantLastNameText === ""}
@@ -150,12 +192,13 @@ export const CFRForm = ({
                   label="Actual Hours"
                   inputProps={{ "aria-labelledby": "actuallocating-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={organizationText}
+                  name="locating"
+                  value={formData?.actual?.locating || ""}
+                  onChange={handleActualChanges}
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
-                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -173,8 +216,9 @@ export const CFRForm = ({
                   label="Estimated Hours"
                   inputProps={{ "aria-labelledby": "estimatedproducing-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={selectedCategory}
-                  // onChange={handleCategoryOnChange}
+                  name="producing"
+                  value={formData?.estimates?.producing || ""}
+                  onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
                   placeholder="hr"
@@ -192,12 +236,13 @@ export const CFRForm = ({
                   label="Actual Hours"
                   inputProps={{ "aria-labelledby": "actualproducing-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={organizationText}
+                  name="producing"
+                  value={formData?.actual?.producing || ""}
+                  onChange={handleActualChanges}
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
-                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -215,8 +260,9 @@ export const CFRForm = ({
                   label="Estimated Hours"
                   inputProps={{ "aria-labelledby": "estimatedpreparing-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={selectedCategory}
-                  // onChange={handleCategoryOnChange}
+                  name="preparing"
+                  value={formData?.estimates?.preparing || ""}
+                  onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
                   placeholder="hr"
@@ -234,12 +280,13 @@ export const CFRForm = ({
                   label="Actual Hours"
                   inputProps={{ "aria-labelledby": "actualpreparing-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={organizationText}
+                  name="preparing"
+                  value={formData?.actual?.preparing || ""}
+                  onChange={handleActualChanges}
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
                   // disabled={disableInput}
-                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -257,8 +304,9 @@ export const CFRForm = ({
                   label="Electronic Estimated Pages"
                   inputProps={{ "aria-labelledby": "estimatedelectronic-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={selectedCategory}
-                  // onChange={handleCategoryOnChange}
+                  name="electronicPages"
+                  value={formData?.estimates?.electronicPages || ""}
+                  onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
                   placeholder="pgs"
@@ -274,8 +322,9 @@ export const CFRForm = ({
                   label="Hardcopy Estimated Pages"
                   inputProps={{ "aria-labelledby": "estimatedhardcopy-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={selectedCategory}
-                  // onChange={handleCategoryOnChange}
+                  name="electronicPages"
+                  value={formData?.actual?.electronicPages || ""}
+                  onChange={handleActualChanges}
                   // input={<Input />}
                   variant="outlined"
                   placeholder="pgs"
@@ -293,24 +342,26 @@ export const CFRForm = ({
                   label="Electronic Actual Pages"
                   inputProps={{ "aria-labelledby": "actualelectronic-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={organizationText}
+                  name="hardcopyPages"
+                  value={formData?.estimates?.hardcopyPages || ""}
+                  onChange={handleEstimateChanges}
                   variant="outlined"
                   placeholder="pgs"
                   fullWidth
                   // disabled={disableInput}
-                  // onChange={handleOrganizationChange}
                 />
                 <TextField
                   id="actualhardcopy"
                   label="Hardcopy Actual Pages"
                   inputProps={{ "aria-labelledby": "actualhardcopy-label"}}
                   InputLabelProps={{ shrink: true }}
-                  // value={organizationText}
+                  name="hardcopyPages"
+                  value={formData?.actual?.hardcopyPages || ""}
+                  onChange={handleActualChanges}
                   variant="outlined"
                   placeholder="pgs"
                   fullWidth
                   // disabled={disableInput}
-                  // onChange={handleOrganizationChange}
                 />
               </div>
             </div>
@@ -331,10 +382,11 @@ export const CFRForm = ({
                   label="Combined suggestions for futher clarifications   "
                   multiline
                   rows={4}
-                  // value={requestDescriptionText}
+                  name="suggestions"
+                  value={formData?.suggestions || ""}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }} 
-                  // onChange={handleRequestDescriptionChange}
+                  onChange={handleChanges}
                   // error={requestDescriptionText===""}
                   fullWidth
                   // disabled={disableInput}
@@ -343,7 +395,16 @@ export const CFRForm = ({
             </div>
           </AccordionDetails>
         </Accordion>
-      </div> 
+      </div>
+      <div className="col-lg-4 buttonContainer">
+        <button
+          className="btn saveButton"
+          // onClick={saveCFRForm}
+          color="primary"
+        >
+          Save
+        </button>
+      </div>
     </div>
   </div></Box>
   </div>
