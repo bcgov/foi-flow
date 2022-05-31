@@ -63,26 +63,8 @@ const getPublicHoliDays = (startDate, endDate) => {
   const endYear = dayjs(endDate).year();
   const holidays = getHolidayList(startYear, endYear);
   for (const entry of holidays) {
-    let day = dayjs(entry.date).day();
     if (
       entry.type === "public" &&
-      dayjs(entry.date).isBetween(startDate, endDate, null, "[]") &&
-      day >= 1 &&
-      day <= 5
-    ) {
-      publicHoliDays++;
-    }
-    //Handle Easter Monday
-    if (
-      entry.name === "Good Friday" &&
-      dayjs(entry.date).add(3, "day").isBetween(startDate, endDate, null, "[]")
-    ) {
-      publicHoliDays++;
-    }
-    //Handle Boxing Day weekends
-    if (
-      entry.name === "Boxing Day" &&
-      (day === 6 || day === 0) &&
       dayjs(entry.date).isBetween(startDate, endDate, null, "[]")
     ) {
       publicHoliDays++;
