@@ -34,7 +34,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foirequest.createdby = userid
         return foirequest
     
-    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid, actiontype = None):
+    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid, usertype = None):
         requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
@@ -68,10 +68,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             mn = None
             ln = requestschema['assignedToLastName'] if requestschema['assignedto'] != None else None
             self.createfoiassigneefromobject(requestschema['assignedto'], fn, mn, ln)
-        elif actiontype == "assignee":            
-            foiministryrequest.assignedto = None
         else:
-            foiministryrequest.assignedto = ministryschema["assignedto"]
+            foiministryrequest.assignedto = requestschema['assignedto'] if 'assignedto' in requestschema and usertype == "assignee" else ministryschema["assignedto"] 
 
         foiministryrequest.requeststatusid = requestdict['requeststatusid']
         foiministryrequest.programareaid = requestdict['programareaid']
