@@ -30,7 +30,7 @@ def upgrade():
     sa.Column('createdby', sa.String(length=120), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('updatedby', sa.String(length=120), nullable=True),
-    sa.ForeignKeyConstraint(['ministryrequestid', 'version'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
+    sa.ForeignKeyConstraint(['ministryrequestid', 'ministryrequestversion'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
     sa.PrimaryKeyConstraint('cfrfeeid' , 'version')
     )
     # ### end Alembic commands ###
