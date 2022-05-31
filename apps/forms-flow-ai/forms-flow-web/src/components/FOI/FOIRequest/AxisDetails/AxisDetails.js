@@ -53,7 +53,7 @@ const AxisDetails = React.memo(({
     const handleAxisIdChange = (e) => {
         if(e.target.value) {
             let helperText = "";
-            if(/^[A-Z]+(?:[-]){0,2}\d+\-\d+$/.test(e.target.value)){
+            if(/^[A-Za-z]+(?:[-]){0,2}\d+\-\d+$/.test(e.target.value)){
                 helperText =  foiAxisRequestIds?.includes(e.target.value)
                     ? "AXIS ID Number already exists": "";
             }
@@ -105,7 +105,7 @@ const AxisDetails = React.memo(({
                     <TextField   
                         id='axisId'                         
                         label="AXIS ID Number" 
-                        inputProps={{ "aria-labelledby": "axisId-label"}}
+                        inputProps={{ "aria-labelledby": "axisId-label", style: { textTransform: "uppercase" }}}
                         InputLabelProps={{ shrink: true, }} 
                         variant="outlined"                             
                         value={axisRequestId}
