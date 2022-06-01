@@ -2,13 +2,12 @@ import foiFees from '../../../../constants/FOI/foiFees.json';
 import type { CFRFormData } from './types';
 
 export const calculateFees = (cfrForm: CFRFormData) => {
-  let newObj : any = {...cfrForm.estimates, ...cfrForm.actual};
-  let k: keyof typeof newObj;
-  let newFoiFees : any = foiFees;
+  let k: keyof typeof cfrForm.estimates;
   let totalFee = 0;
 
-  for (k in newObj) {
-    totalFee += newFoiFees[k]["type"] == "hour" ? calculateFeesByTime(k, newObj[k]) : calculateFeesByPages(k, newObj[k]);
+  for (k in cfrForm.estimates) {
+    let value = cfrForm.actual && cfrForm.actual[k] && cfrForm.actual[k] > 0 ? cfrForm.actual[k] : cfrForm.estimates[k];
+    totalFee += foiFees[k].type == "hour" ? calculateFeesByTime(k, value) : calculateFeesByPages(k, value);
   }
 
   cfrForm.amountDue = totalFee;
