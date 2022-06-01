@@ -108,7 +108,7 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'No request foound')
     
     @classmethod
-    def saverawrequestassigneeversion(cls,requestid,assigneegroup,assignee,status,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
+    def saverawrequestassigneeversion(cls,requestid,assigneegroup,assignee,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
             _assginee = assignee if assignee not in (None,'') else None
@@ -119,7 +119,7 @@ class FOIRawRequest(db.Model):
             closereasonid = request.closereasonid
             axisrequestid = request.axisrequestid
             axissyncdate = request.axissyncdate
-            _version = request.version+1  
+            _version = request.version+1
             rawrequest = request.requestrawdata
             rawrequest["assignedGroup"] = assigneegroup
             rawrequest["assignedTo"] = _assginee
@@ -133,7 +133,7 @@ class FOIRawRequest(db.Model):
                     version=_version,
                     updatedby=None,
                     updated_at=datetime.now(),
-                    status=status,
+                    status=request.status,
                     assignedgroup=assigneegroup,
                     assignedto=_assginee,
                     wfinstanceid=request.wfinstanceid,
@@ -203,7 +203,7 @@ class FOIRawRequest(db.Model):
         requests = []
         try:
             sql = """select * ,
-                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
+                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened' and version = 1) 
                                 then 'Online Form' 
                                 else savedby END  as createdby 
                         from (select CASE WHEN lower(status) <> 'unopened' 
