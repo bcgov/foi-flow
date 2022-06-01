@@ -19,6 +19,7 @@ from flask import g, request
 from flask_jwt_oidc import JwtManager
 from jose import jwt as josejwt
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 jwt = (
     JwtManager()
 )  # pylint: disable=invalid-name; lower case name as used by convention in most Flask apps
@@ -39,6 +40,24 @@ class Auth:
             return f(*args, **kwargs)
 
         return decorated
+
+
+
+    @classmethod
+    def belongstosameministry(cls,func):
+        @wraps(func)
+        def decorated(type, id, field,*args, **kwargs):           
+            usertype = AuthHelper.getusertype()
+            requestministry = FOIMinistryRequest.getrequestbyministryrequestid(id)
+            ministrygroups = AuthHelper.getministrygroups()
+            expectedministrygroup = MinistryTeamWithKeycloackGroup[requestministry['programarea.bcgovcode']].value
+            retval = "Unauthorized" , 401
+            if(usertype == "ministry" and expectedministrygroup not in ministrygroups):
+                return retval
+            return func(type, id, field,*args, **kwargs)            
+        return decorated           
+           
+             
     
     @classmethod
     def ismemberofgroups(cls, groups):
