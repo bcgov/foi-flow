@@ -1,5 +1,6 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
+import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from '@mui/material/MenuItem';
 import './index.scss'
 import Accordion from '@mui/material/Accordion';
@@ -8,10 +9,17 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
-import type { CFRFormData } from './types';
+import { isMinistryLogin } from "../../../../helper/FOI/helper";
+import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
+import foiFees from '../../../../constants/FOI/foiFees.json';
+import _ from 'lodash';
 
-export const CFRForm = (props: CFRFormData) => {
+export const CFRForm = ({
+  requestNumber,
+  userDetail,
+  cfrFormData
+}: params) => {
 
   const CFRStatuses = [
     {
@@ -28,8 +36,8 @@ export const CFRForm = (props: CFRFormData) => {
     },
   ];
 
-  // let formData = JSON.parse(JSON.stringify(props));
-  const [formData, setFormData] = React.useState(props);
+  const userGroups = userDetail.groups.map(group => group.slice(1));
+  const isMinistry = isMinistryLogin(userGroups);
 
   const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
@@ -38,13 +46,57 @@ export const CFRForm = (props: CFRFormData) => {
     setFormData(values => ({...values, [name]: value}));
   };
 
+  const emptyFormData: CFRFormData = {
+    requestNumber: "",
+    formStatus: "review",
+    amountDue: 0,
+    amountPaid: 0,
+    estimates: {
+      locating: 0,
+      producing: 0,
+      preparing: 0,
+      electronicPages: 0,
+      hardcopyPages: 0,
+    },
+    actual: {
+      locating: 0,
+      producing: 0,
+      preparing: 0,
+      electronicPages: 0,
+      hardcopyPages: 0,
+    },
+    suggestions: "",
+  }
+  const [formData, setFormData] = React.useState(cfrFormData || emptyFormData);
+  const initialFormData: CFRFormData = _.cloneDeep(cfrFormData || emptyFormData);
+
+  const validateField = (value: number, step: number) => {
+    return (value % step) !== 0;
+  }
+
+  const validateFields = () => {
+    var field: keyof typeof formData.estimates;
+    for (field in formData.estimates) {
+      if (validateField(formData.estimates[field], foiFees[field].unit)) {
+        return false;
+      }
+    }
+    var field: keyof typeof formData.actual
+    for (field in formData.actual) {
+      if (validateField(formData.estimates[field], foiFees[field].unit)) {
+        return false;
+      }
+    }
+    return !_.isEqual(initialFormData, formData);
+  }
+
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : number = +e.target.value;
 
     setFormData(values => ({...values, [name]: value}));
   };
-  
+
   const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: number = +e.target.value;
@@ -54,8 +106,9 @@ export const CFRForm = (props: CFRFormData) => {
     let newFormData : CFRFormData = {...formData, ["estimates"]: newEstimates};
     newFormData = calculateFees(newFormData);
     setFormData(newFormData);
+    console.log(newFormData);
   };
-  
+
   const handleActualChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: number = +e.target.value;
@@ -68,7 +121,7 @@ export const CFRForm = (props: CFRFormData) => {
   };
 
 
-  return (  
+  return (
     <div className="foi-review-container">
     <Box
       component="form"
@@ -81,8 +134,8 @@ export const CFRForm = (props: CFRFormData) => {
     <div className="container foi-review-request-container">
       <div className="foi-request-review-header-row1">
         <div className="col-9 foi-request-number-header">
-          <h3 className="foi-review-request-text">{formData?.requestNumber}</h3>
-        </div>      
+          <h3 className="foi-review-request-text">{requestNumber}</h3>
+        </div>
         <div className="col-3">
           <TextField
             id="cfrStatus"
@@ -91,12 +144,12 @@ export const CFRForm = (props: CFRFormData) => {
             InputLabelProps={{ shrink: true }}
             select
             name="formStatus"
-            value={formData?.formStatus || ""}
+            value={formData?.formStatus}
             onChange={handleTextChanges}
             variant="outlined"
             fullWidth
             required
-            // disabled={disableInput}
+            // disabled={isMinistry} comment back in when back end is intergrated
             // error={selectedAssignedTo.toLowerCase().includes("unassigned")}
           >
             {CFRStatuses.map((option) => (
@@ -119,15 +172,17 @@ export const CFRForm = (props: CFRFormData) => {
                   id="amountpaid"
                   label="Amount Paid"
                   inputProps={{ "aria-labelledby": "amountpaid-label"}}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
-                  placeholder="hr"
+                  placeholder="0"
                   name="amountPaid"
-                  value={formData?.amountPaid || ""}
+                  value={formData?.amountPaid}
                   onChange={handleAmountChanges}
                   fullWidth
                   // required={true}
-                  // disabled={disableInput}
                   // error={applicantFirstNameText === ""}
                 />
               </div>
@@ -136,14 +191,17 @@ export const CFRForm = (props: CFRFormData) => {
                   id="totalamountdue"
                   label="Total Amount Due"
                   inputProps={{ "aria-labelledby": "totalamountdue-label"}}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="amountDue"
-                  value={formData?.amountDue || ""}
+                  value={formData?.amountDue}
                   onChange={handleAmountChanges}
                   variant="outlined"
-                  placeholder="hr"
+                  placeholder="0"
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={true}
                 />
               </div>
             </div>
@@ -170,32 +228,52 @@ export const CFRForm = (props: CFRFormData) => {
                 <TextField
                   id="estimatedlocating"
                   label="Estimated Hours"
-                  inputProps={{ "aria-labelledby": "estimatedlocating-label"}}
+                  inputProps={{
+                    "aria-labelledby": "estimatedlocating-label",
+                    step: foiFees.locating.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="locating"
-                  value={formData?.estimates?.locating || ""}
+                  value={formData?.estimates?.locating}
                   onChange={handleEstimateChanges}
                   variant="outlined"
-                  placeholder="hr"
                   fullWidth
-                  // required={true}
-                  // disabled={disableInput}
-                  // error={applicantLastNameText === ""}
+                  type="number"
+                  error={validateField(formData?.estimates?.locating, foiFees.locating.unit)}
+                  helperText={validateField(formData?.estimates?.locating, foiFees.locating.unit) &&
+                    "Hours must be entered in increments of " + foiFees.locating.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus === 'approved'}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
                 <TextField
                   id="actuallocating"
                   label="Actual Hours"
-                  inputProps={{ "aria-labelledby": "actuallocating-label"}}
+                  inputProps={{
+                    "aria-labelledby": "actuallocating-label",
+                    step: foiFees.locating.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="locating"
-                  value={formData?.actual?.locating || ""}
+                  value={formData?.actual?.locating}
                   onChange={handleActualChanges}
                   variant="outlined"
-                  placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  type="number"
+                  error={validateField(formData?.actual?.locating, foiFees.locating.unit)}
+                  helperText={validateField(formData?.actual?.locating, foiFees.locating.unit) &&
+                    "Hours must be entered in increments of " + foiFees.locating.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
                 />
               </div>
             </div>
@@ -211,35 +289,54 @@ export const CFRForm = (props: CFRFormData) => {
                 <TextField
                   id="estimatedproducing"
                   label="Estimated Hours"
-                  inputProps={{ "aria-labelledby": "estimatedproducing-label"}}
+                  inputProps={{
+                    "aria-labelledby": "estimatedproducing-label",
+                    step: foiFees.producing.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="producing"
-                  value={formData?.estimates?.producing || ""}
+                  value={formData?.estimates?.producing}
                   onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
-                  placeholder="hr"
                   fullWidth
-                  // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
-                  // error={selectedCategory.toLowerCase().includes("select")}
+                  type="number"
+                  error={validateField(formData?.estimates?.producing, foiFees.producing.unit)}
+                  helperText={validateField(formData?.estimates?.producing, foiFees.producing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.producing.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus === 'approved'}
                 >
-                  {/* {menuItems} */}
                 </TextField>
               </div>
               <div className="col-lg-6 foi-details-col">
                 <TextField
                   id="actualproducing"
                   label="Actual Hours"
-                  inputProps={{ "aria-labelledby": "actualproducing-label"}}
+                  inputProps={{
+                    "aria-labelledby": "actualproducing-label",
+                    step: foiFees.producing.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="producing"
-                  value={formData?.actual?.producing || ""}
+                  value={formData?.actual?.producing}
                   onChange={handleActualChanges}
                   variant="outlined"
-                  placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  type="number"
+                  error={validateField(formData?.actual?.producing, foiFees.producing.unit)}
+                  helperText={validateField(formData?.actual?.producing, foiFees.producing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.producing.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
                 />
               </div>
             </div>
@@ -255,18 +352,27 @@ export const CFRForm = (props: CFRFormData) => {
                 <TextField
                   id="estimatedpreparing"
                   label="Estimated Hours"
-                  inputProps={{ "aria-labelledby": "estimatedpreparing-label"}}
+                  inputProps={{
+                    "aria-labelledby": "estimatedpreparing-label",
+                    step: foiFees.preparing.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="preparing"
-                  value={formData?.estimates?.preparing || ""}
+                  value={formData?.estimates?.preparing}
                   onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
-                  placeholder="hr"
                   fullWidth
-                  // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
-                  // error={selectedCategory.toLowerCase().includes("select")}
+                  type="number"
+                  error={validateField(formData?.estimates?.preparing, foiFees.preparing.unit)}
+                  helperText={validateField(formData?.estimates?.preparing, foiFees.preparing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.preparing.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus === 'approved'}
                 >
                   {/* {menuItems} */}
                 </TextField>
@@ -275,15 +381,26 @@ export const CFRForm = (props: CFRFormData) => {
                 <TextField
                   id="actualpreparing"
                   label="Actual Hours"
-                  inputProps={{ "aria-labelledby": "actualpreparing-label"}}
+                  inputProps={{
+                    "aria-labelledby": "actualpreparing-label",
+                    step: foiFees.preparing.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="preparing"
-                  value={formData?.actual?.preparing || ""}
+                  value={formData?.actual?.preparing}
                   onChange={handleActualChanges}
                   variant="outlined"
-                  placeholder="hr"
                   fullWidth
-                  // disabled={disableInput}
+                  type="number"
+                  error={validateField(formData?.actual?.preparing, foiFees.preparing.unit)}
+                  helperText={validateField(formData?.actual?.preparing, foiFees.preparing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.preparing.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
                 />
               </div>
             </div>
@@ -299,72 +416,110 @@ export const CFRForm = (props: CFRFormData) => {
                 <TextField
                   id="estimatedelectronic"
                   label="Electronic Estimated Pages"
-                  inputProps={{ "aria-labelledby": "estimatedelectronic-label"}}
+                  inputProps={{
+                    "aria-labelledby": "estimatedelectronic-label",
+                    step: foiFees.electronicPages.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="electronicPages"
-                  value={formData?.estimates?.electronicPages || ""}
+                  value={formData?.estimates?.electronicPages}
                   onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
-                  placeholder="pgs"
                   fullWidth
-                  // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
-                  // error={selectedCategory.toLowerCase().includes("select")}
+                  type="number"
+                  error={validateField(formData?.estimates?.electronicPages, foiFees.electronicPages.unit)}
+                  helperText={validateField(formData?.estimates?.electronicPages, foiFees.electronicPages.unit) &&
+                    "Pages must be entered in increments of " + foiFees.electronicPages.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus === 'approved'}
                 >
-                  {/* {menuItems} */}
                 </TextField>
                 <TextField
                   id="estimatedhardcopy"
                   label="Hardcopy Estimated Pages"
-                  inputProps={{ "aria-labelledby": "estimatedhardcopy-label"}}
+                  inputProps={{
+                    "aria-labelledby": "estimatedelectronic-label",
+                    step: foiFees.hardcopyPages.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="hardcopyPages"
-                  value={formData?.estimates?.hardcopyPages || ""}
+                  value={formData?.estimates?.hardcopyPages}
                   onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
-                  placeholder="pgs"
                   fullWidth
-                  // required
-                  // disabled={disableInput || disableFieldForMinistryRequest}
-                  // error={selectedCategory.toLowerCase().includes("select")}
+                  type="number"
+                  error={validateField(formData?.estimates?.hardcopyPages, foiFees.hardcopyPages.unit)}
+                  helperText={validateField(formData?.estimates?.hardcopyPages, foiFees.hardcopyPages.unit) &&
+                    "Pages must be entered in increments of " + foiFees.hardcopyPages.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus === 'approved'}
                 >
-                  {/* {menuItems} */}
                 </TextField>
               </div>
               <div className="col-lg-6 foi-details-col">
                 <TextField
                   id="actualelectronic"
                   label="Electronic Actual Pages"
-                  inputProps={{ "aria-labelledby": "actualelectronic-label"}}
+                  inputProps={{
+                    "aria-labelledby": "estimatedelectronic-label",
+                    step: foiFees.electronicPages.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="electronicPages"
-                  value={formData?.actual?.electronicPages || ""}
+                  value={formData?.actual?.electronicPages}
                   onChange={handleActualChanges}
                   variant="outlined"
-                  placeholder="pgs"
                   fullWidth
-                  // disabled={disableInput}
+                  type="number"
+                  error={validateField(formData?.actual?.electronicPages, foiFees.electronicPages.unit)}
+                  helperText={validateField(formData?.actual?.electronicPages, foiFees.electronicPages.unit) &&
+                    "Pages must be entered in increments of " + foiFees.electronicPages.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
                 />
                 <TextField
                   id="actualhardcopy"
                   label="Hardcopy Actual Pages"
-                  inputProps={{ "aria-labelledby": "actualhardcopy-label"}}
+                  inputProps={{
+                    "aria-labelledby": "estimatedelectronic-label",
+                    step: foiFees.hardcopyPages.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                  }}
                   InputLabelProps={{ shrink: true }}
                   name="hardcopyPages"
-                  value={formData?.actual?.hardcopyPages || ""}
+                  value={formData?.actual?.hardcopyPages}
                   onChange={handleActualChanges}
                   variant="outlined"
-                  placeholder="pgs"
                   fullWidth
-                  // disabled={disableInput}
+                  type="number"
+                  error={validateField(formData?.actual?.hardcopyPages, foiFees.hardcopyPages.unit)}
+                  helperText={validateField(formData?.actual?.hardcopyPages, foiFees.hardcopyPages.unit) &&
+                    "Pages must be entered in increments of " + foiFees.hardcopyPages.unit
+                  }
+                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
                 />
               </div>
             </div>
           </AccordionDetails>
         </Accordion>
-      </div> 
+      </div>
       <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
           <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
@@ -380,13 +535,13 @@ export const CFRForm = (props: CFRFormData) => {
                   multiline
                   rows={4}
                   name="suggestions"
-                  value={formData?.suggestions || ""}
+                  value={formData?.suggestions}
                   variant="outlined"
-                  InputLabelProps={{ shrink: true, }} 
+                  InputLabelProps={{ shrink: true, }}
                   onChange={handleTextChanges}
                   // error={requestDescriptionText===""}
                   fullWidth
-                  // disabled={disableInput}
+                  disabled={!isMinistry || formData?.formStatus === 'approved'}
                 />
               </div>
             </div>
@@ -398,6 +553,7 @@ export const CFRForm = (props: CFRFormData) => {
           className="btn saveButton"
           // onClick={saveCFRForm}
           color="primary"
+          disabled={!validateFields()}
         >
           Save
         </button>

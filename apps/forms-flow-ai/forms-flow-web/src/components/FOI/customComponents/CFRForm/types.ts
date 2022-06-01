@@ -19,3 +19,11 @@ export type CFRFormData = {
     };
     suggestions: string;
 }
+
+export type params = {
+  requestNumber: string;
+  userDetail: {
+    groups: string[];
+  };
+  cfrFormData: CFRFormData;
+}

@@ -644,6 +644,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
     return false;
   }
 
+  const showCFRTab = () => {
+    return (requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name &&
+      requestState !== StateEnum.open.name
+    );
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -680,16 +687,17 @@ const FOIRequest = React.memo(({ userDetail }) => {
               Request
             </div>
             {!isAddRequest && (
-              <>                
-                <div
-                  className={clsx("tablinks", {
-                    active: tabLinksStatuses.CFRForm.active,
-                  })}
-                  name="CFRForm"
-                  onClick={() => tabclick("CFRForm")}
-                >
-                  CFR Form
-                </div>
+              <>
+                {(showCFRTab() && <div
+                    className={clsx("tablinks", {
+                      active: tabLinksStatuses.CFRForm.active,
+                    })}
+                    name="CFRForm"
+                    onClick={() => tabclick("CFRForm")}
+                  >
+                    CFR Form
+                  </div>
+                )}
                 <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Attachments.active,
@@ -941,7 +949,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
-          <div
+          {(showCFRTab() && <div
             id="CFRForm"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.CFRForm.active,
@@ -950,10 +958,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
             })}
           >
             <CFRForm            
-              requestNumber={requestNumber}              
-              requestid={requestId}
+              requestNumber={requestNumber}
+              userDetail={userDetail}
             />
-          </div>
+          </div>)}
           <div
             id="Comments"
             className={clsx("tabcontent", {
