@@ -83,9 +83,9 @@ export const CFRForm = ({
         return false;
       }
     }
-    var field: keyof typeof formData.actual
-    for (field in formData.actual) {
-      if (validateField(formData.estimates[field], foiFees[field].unit)) {
+    var afield: keyof typeof formData.actual
+    for (afield in formData.actual) {
+      if (validateField(formData.estimates[afield], foiFees[afield].unit)) {
         return false;
       }
     }
@@ -208,8 +208,8 @@ export const CFRForm = ({
                   }}
                   InputLabelProps={{ shrink: true }}
                   name="amountDue"
-                  value={formData?.amountDue}
-                  onChange={handleChanges}
+                  value={formData?.amountDue.toFixed(2)}
+                  onChange={handleAmountChanges}
                   variant="outlined"
                   placeholder="0"
                   fullWidth
@@ -223,7 +223,7 @@ export const CFRForm = ({
                 <span className="formLabel">Balance Remaining</span>
               </div>
               <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid > 0 ? formData?.amountDue - formData?.amountPaid : "00.00")}</span>
+                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid > 0 ? (formData?.amountDue - formData?.amountPaid).toFixed(2) : "00.00")}</span>
               </div>
             </div>
             <div className="row foi-details-row">

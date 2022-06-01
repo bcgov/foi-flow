@@ -10,7 +10,7 @@ export const calculateFees = (cfrForm: CFRFormData) => {
     totalFee += foiFees[k].type == "hour" ? calculateFeesByTime(k, value) : calculateFeesByPages(k, value);
   }
 
-  cfrForm.amountDue = totalFee;
+  cfrForm.amountDue = +totalFee.toFixed(2);
 
   return cfrForm;
 };
