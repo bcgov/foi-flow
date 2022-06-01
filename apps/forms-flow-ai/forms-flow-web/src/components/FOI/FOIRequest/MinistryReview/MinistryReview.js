@@ -595,6 +595,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             <CFRForm            
               requestNumber={requestNumber}
               userDetail={userDetail}
+              ministryId={ministryId}
             />
           </div>
           <div

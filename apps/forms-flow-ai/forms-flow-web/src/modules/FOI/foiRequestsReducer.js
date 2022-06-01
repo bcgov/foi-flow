@@ -30,6 +30,27 @@ const initialState = {
   foiWatcherList: [],
   foiRequestComments: [],
   foiRequestAttachments: [],
+  foiRequestCFRForm: {
+    requestNumber: "",
+    formStatus: "review",
+    amountDue: 0,
+    amountPaid: 0,
+    estimates: {
+      locating: 0,
+      producing: 0,
+      preparing: 0,
+      electronicPages: 0,
+      hardcopyPages: 0,
+    },
+    actual: {
+      locating: 0,
+      producing: 0,
+      preparing: 0,
+      electronicPages: 0,
+      hardcopyPages: 0,
+    },
+    suggestions: "",
+  },
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
@@ -107,6 +128,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestComments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
       return { ...state, foiRequestAttachments: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
+      return { ...state, foiRequestCFRForm: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:
