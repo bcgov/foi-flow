@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from '@mui/material/MenuItem';
@@ -13,12 +14,13 @@ import { isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
+import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
 
 export const CFRForm = ({
   requestNumber,
-  userDetail,
-  cfrFormData
+  ministryId,
+  userDetail
 }: params) => {
 
   const CFRStatuses = [
@@ -36,39 +38,33 @@ export const CFRForm = ({
     },
   ];
 
+  const dispatch = useDispatch();
+
   const userGroups = userDetail.groups.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
 
-  const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+  React.useEffect(() => {
+    if (ministryId) {
+      fetchCFRForm({
+        ministryId,
+        dispatch,
+      });
+    }
+  }, [ministryId]);
+
+    const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : string = e.target.value;
 
     setFormData(values => ({...values, [name]: value}));
   };
 
-  const emptyFormData: CFRFormData = {
-    requestNumber: "",
-    formStatus: "review",
-    amountDue: 0,
-    amountPaid: 0,
-    estimates: {
-      locating: 0,
-      producing: 0,
-      preparing: 0,
-      electronicPages: 0,
-      hardcopyPages: 0,
-    },
-    actual: {
-      locating: 0,
-      producing: 0,
-      preparing: 0,
-      electronicPages: 0,
-      hardcopyPages: 0,
-    },
-    suggestions: "",
-  }
-  const [formData, setFormData] = React.useState(cfrFormData || emptyFormData);
-  const initialFormData: CFRFormData = _.cloneDeep(cfrFormData || emptyFormData);
+  const initialFormData: CFRFormData = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
+  const [formData, setFormData] = React.useState(initialFormData);
+
+  React.useEffect(() => {
+    setFormData(initialFormData);
+  }, [initialFormData])
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -89,6 +85,14 @@ export const CFRForm = ({
     }
     return !_.isEqual(initialFormData, formData);
   }
+
+  const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name : string = e.target.name;
+    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    if (value <= formData.amountDue) {
+      setFormData(values => ({...values, [name]: value}));
+    }
+  };
 
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
@@ -119,6 +123,15 @@ export const CFRForm = ({
     newFormData = calculateFees(newFormData);
     setFormData(newFormData);
   };
+
+  const save = () => {
+    saveCFRForm({
+      data: formData,
+      ministryId: ministryId,
+      dispatch: dispatch,
+    });
+
+  }
 
 
   return (
@@ -171,16 +184,24 @@ export const CFRForm = ({
                 <TextField
                   id="amountpaid"
                   label="Amount Paid"
-                  inputProps={{ "aria-labelledby": "amountpaid-label"}}
+                  inputProps={{
+                    "aria-labelledby": "amountpaid-label",
+                    step: 0.01,
+                    max: formData.amountDue,
+                    min: 0
+                  }}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>
                   }}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
-                  placeholder="0"
                   name="amountPaid"
+                  type="number"
                   value={formData?.amountPaid}
-                  onChange={handleAmountChanges}
+                  onChange={handleAmountPaidChanges}
+                  onBlur={(e) => {
+                    e.target.value = parseFloat(e.target.value).toFixed(2);
+                  }}
                   fullWidth
                   // required={true}
                   // error={applicantFirstNameText === ""}
@@ -190,13 +211,15 @@ export const CFRForm = ({
                 <TextField
                   id="totalamountdue"
                   label="Total Amount Due"
-                  inputProps={{ "aria-labelledby": "totalamountdue-label"}}
+                  inputProps={{
+                    "aria-labelledby": "totalamountdue-label"
+                  }}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>
                   }}
                   InputLabelProps={{ shrink: true }}
                   name="amountDue"
-                  value={formData?.amountDue}
+                  value={formData?.amountDue.toFixed(2)}
                   onChange={handleAmountChanges}
                   variant="outlined"
                   placeholder="0"
@@ -210,7 +233,7 @@ export const CFRForm = ({
                 <span className="formLabel">Balance Remaining</span>
               </div>
               <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid > 0 ? formData?.amountDue - formData?.amountPaid : "00.00")}</span>
+                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid).toFixed(2)}</span>
               </div>
             </div>
             <div className="row foi-details-row">
@@ -446,6 +469,7 @@ export const CFRForm = ({
                     "aria-labelledby": "estimatedelectronic-label",
                     step: foiFees.hardcopyPages.unit,
                     min: 0,
+                    pattern: "^([1-9]+|0{1})(?:\.\d{1,2})?$"
                   }}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
@@ -550,8 +574,9 @@ export const CFRForm = ({
       </div>
       <div className="col-lg-4 buttonContainer">
         <button
+          type="button"
           className="btn saveButton"
-          // onClick={saveCFRForm}
+          onClick={save}
           color="primary"
           disabled={!validateFields()}
         >
