@@ -39,6 +39,19 @@ class Auth:
             return f(*args, **kwargs)
 
         return decorated
+
+
+
+    @classmethod
+    def belongstosameministry(cls,func):
+        @wraps(func)
+        def decorated(type, id, field,*args, **kwargs):
+            usergroups = AuthHelper.getusergroups()
+            print(usergroups)
+            return func(type, id, field,*args, **kwargs)            
+        return decorated           
+           
+             
     
     @classmethod
     def ismemberofgroups(cls, groups):
