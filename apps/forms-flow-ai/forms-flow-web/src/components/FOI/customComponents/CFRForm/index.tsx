@@ -77,9 +77,9 @@ export const CFRForm = ({
         return false;
       }
     }
-    var field: keyof typeof formData.actual
-    for (field in formData.actual) {
-      if (validateField(formData.estimates[field], foiFees[field].unit)) {
+    var afield: keyof typeof formData.actual
+    for (afield in formData.actual) {
+      if (validateField(formData.estimates[afield], foiFees[afield].unit)) {
         return false;
       }
     }
@@ -110,7 +110,6 @@ export const CFRForm = ({
     let newFormData : CFRFormData = {...formData, ["estimates"]: newEstimates};
     newFormData = calculateFees(newFormData);
     setFormData(newFormData);
-    console.log(newFormData);
   };
 
   const handleActualChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
