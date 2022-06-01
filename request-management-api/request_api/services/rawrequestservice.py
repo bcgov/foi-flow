@@ -88,7 +88,7 @@ class rawrequestservice:
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
         #Get documents
         if actiontype == "assignee":
-            result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname)
+            result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         else:
             result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
