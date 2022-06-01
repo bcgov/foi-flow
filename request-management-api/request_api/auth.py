@@ -47,6 +47,7 @@ class Auth:
         @wraps(func)
         def decorated(type, id, field,*args, **kwargs):
             usergroups = AuthHelper.getusergroups()
+            
             print(usergroups)
             return func(type, id, field,*args, **kwargs)            
         return decorated           
