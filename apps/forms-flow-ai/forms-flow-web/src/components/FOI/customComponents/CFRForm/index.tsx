@@ -31,18 +31,16 @@ export const CFRForm = (props: CFRFormData) => {
   // let formData = JSON.parse(JSON.stringify(props));
   const [formData, setFormData] = React.useState(props);
 
-  React.useEffect(() => {
-    let newFormData: CFRFormData = calculateFees(formData);
-    console.log("newFormData");
-    console.log(newFormData);
-    setFormData(newFormData);
-    console.log("formData");
-    console.log(formData);
-  }, [formData]);
+  const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name : string = e.target.name;
+    const value : string = e.target.value;
 
-  const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    setFormData(values => ({...values, [name]: value}));
+  };
+
+  const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name : string = e.target.name;
+    const value : number = +e.target.value;
 
     setFormData(values => ({...values, [name]: value}));
   };
@@ -51,23 +49,22 @@ export const CFRForm = (props: CFRFormData) => {
     const name: string = e.target.name;
     const value: number = +e.target.value;
 
-    // console.log(formData);
     const estimates = formData.estimates;
     const newEstimates = {...estimates, [name]: value};
-    // console.log(newEstimates);
-
-    setFormData(values => ({...values, ["estimates"]: newEstimates}));
+    let newFormData : CFRFormData = {...formData, ["estimates"]: newEstimates};
+    newFormData = calculateFees(newFormData);
+    setFormData(newFormData);
   };
   
   const handleActualChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: number = +e.target.value;
 
-    // console.log(formData);
     const actual = formData.actual;
     const newActual = {...actual, [name]: value};
-
-    setFormData(values => ({...values, ["actual"]: newActual}));
+    let newFormData : CFRFormData = {...formData, ["actual"]: newActual};
+    newFormData = calculateFees(newFormData);
+    setFormData(newFormData);
   };
 
 
@@ -95,7 +92,7 @@ export const CFRForm = (props: CFRFormData) => {
             select
             name="formStatus"
             value={formData?.formStatus || ""}
-            onChange={handleChanges}
+            onChange={handleTextChanges}
             variant="outlined"
             fullWidth
             required
@@ -127,7 +124,7 @@ export const CFRForm = (props: CFRFormData) => {
                   placeholder="hr"
                   name="amountPaid"
                   value={formData?.amountPaid || ""}
-                  onChange={handleChanges}
+                  onChange={handleAmountChanges}
                   fullWidth
                   // required={true}
                   // disabled={disableInput}
@@ -142,7 +139,7 @@ export const CFRForm = (props: CFRFormData) => {
                   InputLabelProps={{ shrink: true }}
                   name="amountDue"
                   value={formData?.amountDue || ""}
-                  onChange={handleChanges}
+                  onChange={handleAmountChanges}
                   variant="outlined"
                   placeholder="hr"
                   fullWidth
@@ -151,11 +148,11 @@ export const CFRForm = (props: CFRFormData) => {
               </div>
             </div>
             <div className="row foi-details-row">
-              <div className="col-lg-5 foi-details-col">
+              <div className="col-lg-4 foi-details-col">
                 <span className="formLabel">Balance Remaining</span>
               </div>
               <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid)}</span>
+                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid > 0 ? formData?.amountDue - formData?.amountPaid : "00.00")}</span>
               </div>
             </div>
             <div className="row foi-details-row">
@@ -322,9 +319,9 @@ export const CFRForm = (props: CFRFormData) => {
                   label="Hardcopy Estimated Pages"
                   inputProps={{ "aria-labelledby": "estimatedhardcopy-label"}}
                   InputLabelProps={{ shrink: true }}
-                  name="electronicPages"
-                  value={formData?.actual?.electronicPages || ""}
-                  onChange={handleActualChanges}
+                  name="hardcopyPages"
+                  value={formData?.estimates?.hardcopyPages || ""}
+                  onChange={handleEstimateChanges}
                   // input={<Input />}
                   variant="outlined"
                   placeholder="pgs"
@@ -342,9 +339,9 @@ export const CFRForm = (props: CFRFormData) => {
                   label="Electronic Actual Pages"
                   inputProps={{ "aria-labelledby": "actualelectronic-label"}}
                   InputLabelProps={{ shrink: true }}
-                  name="hardcopyPages"
-                  value={formData?.estimates?.hardcopyPages || ""}
-                  onChange={handleEstimateChanges}
+                  name="electronicPages"
+                  value={formData?.actual?.electronicPages || ""}
+                  onChange={handleActualChanges}
                   variant="outlined"
                   placeholder="pgs"
                   fullWidth
@@ -386,7 +383,7 @@ export const CFRForm = (props: CFRFormData) => {
                   value={formData?.suggestions || ""}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }} 
-                  onChange={handleChanges}
+                  onChange={handleTextChanges}
                   // error={requestDescriptionText===""}
                   fullWidth
                   // disabled={disableInput}
