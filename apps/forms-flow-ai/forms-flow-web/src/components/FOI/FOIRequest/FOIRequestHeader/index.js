@@ -97,9 +97,9 @@ const FOIRequestHeader = React.memo(
       );
     }, [selectedAssignedTo, assignedToList]);
     
-    const saveAssigneeDetails = (event) => {
+    const saveAssigneeDetails = (event, isUnopened) => {
       setAssignedTo(event.target.value);
-          if (isAddRequest) {
+          if (isAddRequest || isUnopened) {
             //event bubble up - to validate required fields
             handleAssignedToValue(event.target.value);
             createSaveRequestObject(
@@ -125,7 +125,6 @@ const FOIRequestHeader = React.memo(
                   //event bubble up - to validate required fields
                   handleAssignedToValue(event.target.value);
                 } else {
-                  console.log(err)
                   toast.error(
                     "Temporarily unable to save the assignee. Please try again in a few minutes.",
                     {
@@ -145,11 +144,12 @@ const FOIRequestHeader = React.memo(
         }
 
     //handle onChange event for assigned To
-    const handleAssignedToOnChange = (event) => {      
-      if ((!isAddRequest && unSavedRequest && window.confirm(
+    const handleAssignedToOnChange = (event) => {
+      const isUnopened = requestDetails?.currentState === StateEnum.unopened.name;
+      if ((!isAddRequest && !isUnopened && unSavedRequest && window.confirm(
         "Are you sure you want to leave? Your changes will be lost."
-      )) || !unSavedRequest || isAddRequest) {
-        saveAssigneeDetails(event);        
+      )) || !unSavedRequest || isAddRequest || isUnopened) {
+        saveAssigneeDetails(event, isUnopened);        
       } 
     };
 
