@@ -33,7 +33,7 @@ class FOICFRFeeSchema(Schema):
 
     feedata = fields.Nested(FOIFeeDataSchema,allow_none=False)
     overallsuggestions = fields.Str(data_key="overallsuggestions")
-    status = fields.Str(data_key="status")
+    status = fields.Str(data_key="status",required=True)
  
 class FOIFeeDataSanctionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -46,4 +46,4 @@ class FOICFRFeeSanctionSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
         
     feedata = fields.Nested(FOIFeeDataSanctionSchema,allow_none=False)
-    status = fields.Str(data_key="status")
+    status = fields.Str(data_key="status", required=True)

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API endpoints for managing a FOI Requests resource."""
+"""API endpoints for managing a FOI CFR Fee resource."""
 
 
 from flask import g, request
@@ -56,7 +56,7 @@ class CreateFOICFRFee(Resource):
             return {'status': False, 'message':verr.messages}, 400     
         except KeyError as err:
             logging.error(err)
-            return {'status': False, 'message':'Bad Request'}, 400        
+            return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -82,7 +82,7 @@ class SanctionFOICFRFee(Resource):
             return {'status': False, 'message':verr.messages}, 400     
         except KeyError as err:
             logging.error(err)
-            return {'status': False, 'message':'Bad Request'}, 400        
+            return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
