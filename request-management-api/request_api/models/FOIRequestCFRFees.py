@@ -19,14 +19,15 @@ class FOIRequestCFRFee(db.Model):
     version =db.Column(db.Integer,primary_key=True,nullable=False)
     feedata = db.Column(JSON, unique=False, nullable=True)
     overallsuggestions = db.Column(db.Text, unique=False, nullable=True)
-    status = db.Column(db.String(120), unique=False, nullable=True)
+    cfrfeestatusid =db.Column(db.Integer, db.ForeignKey('CFRFeeStatuses.cfrfeestatusid'))
+    cfrfeestatus = relationship("CFRFeeStatus",backref=backref("CFRFeeStatus"),uselist=False)
     created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     
-    @classmethod
+    @classmethod    
     def createcfrfee(cls, cfrfee, userid)->DefaultMethodResult:   
         cfrfee.created_at=datetime2.now().isoformat(), 
         cfrfee.createdby=userid 
@@ -34,20 +35,17 @@ class FOIRequestCFRFee(db.Model):
         db.session.commit()               
         return DefaultMethodResult(True,'CFR Fee added for ministry request : '+ str(cfrfee.ministryrequestid), cfrfee.cfrfeeid)  
 
-    @classmethod
-    def getversionforrequest(cls,ministryrequestid):   
-        return db.session.query(FOIRequestCFRFee.version).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).first()
-      
+
     @classmethod
     def getcfrfee(cls, ministryrequestid)->DefaultMethodResult:   
         comment_schema = FOIRequestCommentSchema(many=False)
-        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.cfrfeeid.desc()).first()
+        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).first()
         return comment_schema.dump(query)   
     
     @classmethod
     def getcfrfeehistory(cls, ministryrequestid)->DefaultMethodResult:   
         comment_schema = FOIRequestCommentSchema(many=True)
-        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.cfrfeeid.desc()).all()
+        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).all()
         return comment_schema.dump(query) 
 
     @classmethod
@@ -58,4 +56,4 @@ class FOIRequestCFRFee(db.Model):
        
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
-        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','status') 
+        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','cfrfeestatusid', 'cfrfeestatus.name','version') 
