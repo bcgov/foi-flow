@@ -106,6 +106,51 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
         else:
             return DefaultMethodResult(True,'No request foound')
+    
+    @classmethod
+    def saverawrequestassigneeversion(cls,requestid,assigneegroup,assignee,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
+        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        if request is not None:
+            _assginee = assignee if assignee not in (None,'') else None
+            if _assginee not in (None,''):
+                FOIAssignee.saveassignee(_assginee, assigneefirstname, assigneemiddlename, assigneelastname)
+
+            closedate = request.closedate
+            closereasonid = request.closereasonid
+            axisrequestid = request.axisrequestid
+            axissyncdate = request.axissyncdate
+            _version = request.version+1
+            rawrequest = request.requestrawdata
+            rawrequest["assignedGroup"] = assigneegroup
+            rawrequest["assignedTo"] = _assginee
+            rawrequest["assignedToFirstName"] = assigneefirstname
+            rawrequest["assignedToLastName"] = assigneelastname
+            insertstmt =(
+                insert(FOIRawRequest).
+                values(
+                    requestid=request.requestid, 
+                    requestrawdata=rawrequest,
+                    version=_version,
+                    updatedby=None,
+                    updated_at=datetime.now(),
+                    status=request.status,
+                    assignedgroup=assigneegroup,
+                    assignedto=_assginee,
+                    wfinstanceid=request.wfinstanceid,
+                    sourceofsubmission=request.sourceofsubmission,
+                    ispiiredacted=request.ispiiredacted,
+                    createdby=userid,
+                    closedate=closedate,
+                    closereasonid=closereasonid,
+                    axisrequestid= axisrequestid,
+                    axissyncdate=axissyncdate,
+                )
+            )
+            db.session.execute(insertstmt)               
+            db.session.commit()                
+            return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
+        else:
+            return DefaultMethodResult(True,'No request foound')
             
     @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid, userid)->DefaultMethodResult:
@@ -158,7 +203,7 @@ class FOIRawRequest(db.Model):
         requests = []
         try:
             sql = """select * ,
-                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
+                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened' and version = 1) 
                                 then 'Online Form' 
                                 else savedby END  as createdby 
                         from (select CASE WHEN lower(status) <> 'unopened' 

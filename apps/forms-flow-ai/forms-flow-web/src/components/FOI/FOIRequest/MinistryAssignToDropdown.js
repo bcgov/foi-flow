@@ -4,8 +4,16 @@ import "./ministryassigntodropdown.scss";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import { createAssignedToDetailsObject } from './MinistryReview/utils';
+import {
+  saveAssignee
+} from "../../../apiManager/services/FOI/foiAssigneeServices";
+import {  
+  fetchFOIMinistryViewRequestDetails
+} from "../../../apiManager/services/FOI/foiRequestServices";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -20,13 +28,14 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
+const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, isMinistryCoordinator, requestId, ministryId, unSavedRequest}) => {
    
      /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     //local state management for assignedTo
     //------- update this later when $567 is ready
@@ -95,11 +104,50 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
       return menuItems;
     };
 
+    const saveAssigneeDetails = (event) => {
+      setMinistryAssignedTo(event.target.value);
+      const assigneeDetails = createAssignedToDetailsObject(event.target.value);
+      dispatch(
+        saveAssignee(assigneeDetails, requestId, ministryId, isMinistryCoordinator, (err, _res) => {
+          if(!err) {
+            toast.success("Assignee has been saved successfully.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+            //event bubble up - to validate required fields
+            handleMinistryAssignedToValue(event.target.value);
+          }
+          else {
+            toast.error(
+              "Temporarily unable to save the assignee. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+          }
+        })
+      )
+    }
+
     //handle onChange event for assigned To
     const handleMinistryAssignedToOnChange = (event) => {
-        setMinistryAssignedTo(event.target.value);
-        handleMinistryAssignedToValue(event.target.value);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO, event.target.value, event.target.name);
+      if ((unSavedRequest && window.confirm(
+        "Are you sure you want to leave? Your changes will be lost."
+      )) || !unSavedRequest) {
+        saveAssigneeDetails(event);        
+      } 
     }
 
     return (

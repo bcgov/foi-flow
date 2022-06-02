@@ -23,7 +23,7 @@ class ProgramAreaDivision(db.Model):
     @classmethod
     def getprogramareadivisions(cls,programareaid):
         division_schema = ProgramAreaDivisionSchema(many=True)
-        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid).order_by(ProgramAreaDivision.name.asc())
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
              
