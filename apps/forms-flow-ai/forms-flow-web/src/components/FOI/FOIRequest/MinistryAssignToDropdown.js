@@ -108,7 +108,7 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
       setMinistryAssignedTo(event.target.value);
       const assigneeDetails = createAssignedToDetailsObject(event.target.value);
       dispatch(
-        saveAssignee(assigneeDetails, requestId, ministryId, isMinistryCoordinator, (err, res) => {
+        saveAssignee(assigneeDetails, requestId, ministryId, isMinistryCoordinator, (err, _res) => {
           if(!err) {
             toast.success("Assignee has been saved successfully.", {
               position: "top-right",
