@@ -26,8 +26,11 @@ class cfrfeeservice:
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
         
     def getcfrfee(self, ministryrequestid):
+        return FOIRequestCFRFee.getcfrfee(ministryrequestid)
+    
+    def getcfrfeehistory(self, ministryrequestid):
         cfrfees = []
-        _cfrfees = FOIRequestCFRFee.getcfrfee(ministryrequestid)
+        _cfrfees = FOIRequestCFRFee.getcfrfeehistory(ministryrequestid)
         for cfrfee in _cfrfees:
             cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])
             cfrfees.append(cfrfee)
