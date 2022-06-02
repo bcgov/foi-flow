@@ -33,3 +33,35 @@
   color: #FFFFFF !important;
   font-family: BCSans-Bold, sans-serif !important;
 }
+
+.floatRight {
+  cursor: pointer;
+  display: block;
+  z-index: 3;
+  position: absolute;
+  right: 37px;
+}
+
+.locating {
+  top: 345px;
+}
+
+.producing {
+  top: 465px;
+}
+
+.preparing {
+  top: 615px;
+}
+
+.volume {
+  top: 735px;
+}
+
+.hideContent {
+    display: none;
+}
+
+.toolTipContent ul {
+  padding-left: 20px;
+}
