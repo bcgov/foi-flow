@@ -146,9 +146,9 @@ const FOIRequestHeader = React.memo(
 
     //handle onChange event for assigned To
     const handleAssignedToOnChange = (event) => {      
-      if ((unSavedRequest && window.confirm(
+      if ((!isAddRequest && unSavedRequest && window.confirm(
         "Are you sure you want to leave? Your changes will be lost."
-      )) || !unSavedRequest) {
+      )) || !unSavedRequest || isAddRequest) {
         saveAssigneeDetails(event);        
       } 
     };
