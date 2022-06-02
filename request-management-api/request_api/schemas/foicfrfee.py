@@ -13,27 +13,24 @@ class FOIFeeDataSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
 
-        unknown = EXCLUDE
     amountpaid = fields.Float(data_key="amountpaid")
     amountdue = fields.Float(data_key="amountdue")
-    locatingestimatedhrs = fields.Float(data_key="locatingestimatedhrs")
-    locatingactualhrs = fields.Float(data_key="locatingactualhrs")
-    producingestimatedhrs = fields.Float(data_key="producingestimatedhrs")
-    producingactualhrs = fields.Float(data_key="producingactualhrs")
-    preparingestimatedhrs = fields.Float(data_key="preparingestimatedhrs")
-    preparingactualhrs = fields.Float(data_key="preparingactualhrs")
-    electronicestimatedpages = fields.Int(data_key="electronicestimatedpages")
-    electronicactualpages = fields.Int(data_key="electronicactualpages")
-    hardcopyestimatedpages = fields.Int(data_key="hardcopyestimatedpages")
-    hardcopyactualpages = fields.Int(data_key="hardcopyactualpages")
+    estimatedlocatinghrs = fields.Float(data_key="estimatedlocatinghrs")
+    actuallocatinghrs = fields.Float(data_key="actuallocatinghrs")
+    estimatedproducinghrs = fields.Float(data_key="estimatedproducinghrs")
+    actualproducinghrs = fields.Float(data_key="actualproducinghrs")
+    estimatedpreparinghrs = fields.Float(data_key="estimatedpreparinghrs")
+    actualpreparinghrs = fields.Float(data_key="actualpreparinghrs")
+    estimatedelectronicpages = fields.Int(data_key="estimatedelectronicpages")
+    actualelectronicpages = fields.Int(data_key="actualelectronicpages")
+    estimatedhardcopypages = fields.Int(data_key="estimatedhardcopypages")
+    actualhardcopypages = fields.Int(data_key="actualhardcopypages")
 
 
 class FOICFRFeeSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
 
-        unknown = EXCLUDE    
-    ministryrequestid = fields.Int(data_key="ministryrequestid")
     feedata = fields.Nested(FOIFeeDataSchema,allow_none=False)
     overallsuggestions = fields.Str(data_key="overallsuggestions")
     status = fields.Str(data_key="status")

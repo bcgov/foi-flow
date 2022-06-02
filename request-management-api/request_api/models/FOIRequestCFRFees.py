@@ -27,50 +27,17 @@ class FOIRequestCFRFee(db.Model):
 
     
     @classmethod
-    def createcfrfee(cls, foirequestcfrfee,ministryrequestversion,userid,createddate=None)->DefaultMethodResult:    
-        _createddate = datetime2.now().isoformat() if createddate is None else createddate      
-        newcfrfee = FOIRequestCFRFee(ministryrequestid=foirequestcfrfee["ministryrequestid"], 
-        ministryrequestversion=ministryrequestversion, 
-        version='1', 
-        feedata= foirequestcfrfee["feedata"],
-        overallsuggestions=foirequestcfrfee["overallsuggestions"],
-        created_at=_createddate, 
-        createdby=userid)
-        db.session.add(newcfrfee)
+    def createcfrfee(cls, cfrfee, userid)->DefaultMethodResult:   
+        cfrfee.created_at=datetime2.now().isoformat(), 
+        cfrfee.createdby=userid 
+        db.session.add(cfrfee)
         db.session.commit()               
-        message= 'CFR Fee added for ministry request : '+ str(foirequestcfrfee["ministryrequestid"])
-        return DefaultMethodResult(True,message,foirequestcfrfee["ministryrequestid"])  
+        return DefaultMethodResult(True,'CFR Fee added for ministry request : '+ str(cfrfee.ministryrequestid), cfrfee.cfrfeeid)  
 
-        
     @classmethod
-    def updatecfrfee(cls, foirequestcfrfee,userid,cfrfeeid):   
-        dbquery = db.session.query(FOIRequestCFRFee)
-        cfrfee = dbquery.filter_by(cfrfeeid=cfrfeeid).order_by(FOIRequestCFRFee.version.desc()).first()
-        if cfrfee is not None: 
-            status = foirequestcfrfee["status"] if 'status' in foirequestcfrfee  else None         
-            _version = cfrfee.version+1, 
-            _ministryrequestid= cfrfee.ministryrequestid, 
-            _ministryrequestversion= cfrfee.ministryrequestversion          
-            insertstmt =(
-                insert(FOIRequestCFRFee).
-                values(
-                    cfrfeeid=cfrfeeid,
-                    feedata=foirequestcfrfee["feedata"], 
-                    overallsuggestions=foirequestcfrfee["overallsuggestions"],
-                    createdby=userid,
-                    status=status,
-                    ministryrequestid= _ministryrequestid, 
-                    ministryrequestversion= _ministryrequestversion,
-                    version=_version
-                    )
-            ) 
-            db.session.execute(insertstmt)
-            db.session.commit()
-            message= 'CFR Fee updated for ministry request : '+ str(cfrfee.ministryrequestid)
-            return DefaultMethodResult(True,message,cfrfee.ministryrequestid)
-        else:
-            return DefaultMethodResult(True,'No CFR Fee found ')
-            
+    def getversionforrequest(cls,ministryrequestid):   
+        return db.session.query(FOIRequestCFRFee.version).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).first()
+      
     @classmethod
     def getcfrfee(cls, ministryrequestid)->DefaultMethodResult:   
         comment_schema = FOIRequestCommentSchema(many=True)
