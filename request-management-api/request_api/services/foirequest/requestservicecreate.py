@@ -63,7 +63,7 @@ class requestservicecreate:
             self.__disablewatchers(ministryid, foirequestschema, userid)
             return self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])    
     
-    def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid):        
+    def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
         _foirequest = FOIRequest().getrequest(foirequestid) 
         _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)
         _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicants(foirequestid,_foirequest["version"])
@@ -71,7 +71,7 @@ class requestservicecreate:
         _foirequestpersonalattrbs = FOIRequestPersonalAttribute().getrequestpersonalattributes(foirequestid,_foirequest["version"])
         foiministryrequestarr = []     
         foirequest = requestserviceministrybuilder().createfoirequestfromobject(_foirequest, userid)
-        foiministryrequest = requestserviceministrybuilder().createfoiministryrequestfromobject(_foiministryrequest, ministryrequestschema, userid)
+        foiministryrequest = requestserviceministrybuilder().createfoiministryrequestfromobject(_foiministryrequest, ministryrequestschema, userid, usertype)
         foiministryrequestarr.append(foiministryrequest)
         foirequest.ministryRequests = foiministryrequestarr
         foirequest.requestApplicants = requestserviceministrybuilder().createfoirequestappplicantfromobject(_foirequestapplicant, foirequestid,  _foirequest['version']+1, userid)

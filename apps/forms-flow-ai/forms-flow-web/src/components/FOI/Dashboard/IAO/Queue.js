@@ -248,7 +248,7 @@ const Queue = ({ userDetail, tableInfo }) => {
               tableInfo?.stateClassName?.[
                 params.row.currentState.toLowerCase().replace(/ +/g, "")
               ],
-              (params.row.assignedTo == null && userDetail.groups.indexOf("/" + params.row.assignedGroup) > -1)
+              (params.row.assignedTo == null && userDetail?.groups?.indexOf("/" + params.row.assignedGroup) > -1)
               && tableInfo?.noAssignedClassName
             )
           }
