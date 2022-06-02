@@ -6,6 +6,7 @@ from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from dateutil.parser import parse
 import maya
+from request_api.models.FOIAssignees import FOIAssignee
 
 class rawrequestservicegetter:
     """ This class consolidates retrival of FOI raw request for actors: iao. 
@@ -49,7 +50,7 @@ class rawrequestservicegetter:
     def getrawrequestforid(self, requestid):
         request = FOIRawRequest.get_request(requestid)
         request = self.__attachministriesinfo(request)
-        if request != {} and request['version'] == 1 and  request['sourceofsubmission'] != "intake":
+        if request != {} and (request['version'] == 1 or request['status'] == 'Unopened') and  request['sourceofsubmission'] != "intake":
             requestrawdata = request['requestrawdata']
             requesttype = requestrawdata['requestType']['requestType']
             baserequestinfo = self.__preparebaserequestinfo(requestid, request, requesttype, requestrawdata)
@@ -111,6 +112,9 @@ class rawrequestservicegetter:
         contactinfooptions = requestrawdata.get('contactInfoOptions')           
         _fromdate = parse(decriptiontimeframe['fromDate'])
         _todate = parse(decriptiontimeframe['toDate'])
+        assignee = None
+        if ("assignedto" in request and request["assignedto"] not in (None,'')):
+            assignee = FOIAssignee.getassignee(request["assignedto"])
         return {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
                                'ispiiredacted': request['ispiiredacted'],
@@ -123,8 +127,10 @@ class rawrequestservicegetter:
                                'currentState': request['status'],
                                'receivedDate': _createddate.strftime('%Y %b, %d'),
                                'receivedDateUF': _createddate.strftime('%Y-%m-%d %H:%M:%S.%f'),
-                               'assignedGroup': "Unassigned",
-                               'assignedTo': "Unassigned",
+                               'assignedGroup': request["assignedgroup"] if "assignedgroup" in request else "Unassigned",
+                               'assignedTo': request["assignedto"] if "assignedto" in request else "Unassigned",
+                               'assignedToFirstName': assignee["firstname"] if assignee is not None and "firstname" in assignee else None,
+                               'assignedToLastName': assignee["lastname"] if assignee is not None and "lastname" in assignee else None,
                                'xgov': 'No',
                                'idNumber': 'U-00' + str(request['requestid']),
                                'axisRequestId': request['axisrequestid'],

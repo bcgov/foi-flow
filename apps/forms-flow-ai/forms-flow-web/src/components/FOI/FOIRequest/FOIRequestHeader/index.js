@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from '@material-ui/core/Link';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
@@ -10,7 +10,15 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
-import { Watcher } from '../../customComponents'
+import { Watcher } from '../../customComponents';
+import { createAssigneeDetails } from '../utils'
+import {
+  saveAssignee
+} from "../../../../apiManager/services/FOI/foiAssigneeServices";
+import {
+  fetchFOIRequestDetailsWrapper  
+} from "../../../../apiManager/services/FOI/foiRequestServices";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -36,12 +44,15 @@ const FOIRequestHeader = React.memo(
     handlestatusudpate,
     userDetail,
     disableInput,
+    isAddRequest,
+    unSavedRequest
   }) => {
     /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */
     const classes = useStyles();
+    const dispatch = useDispatch();
     const { requestId, ministryId } = useParams();
 
     //get the assignedTo master data
@@ -84,18 +95,62 @@ const FOIRequestHeader = React.memo(
       setMenuItems(
         getMenuItems({ classes, assignedToList, selectedAssignedTo })
       );
-    }, [selectedAssignedTo, assignedToList]);    
+    }, [selectedAssignedTo, assignedToList]);
+    
+    const saveAssigneeDetails = (event) => {
+      setAssignedTo(event.target.value);
+          if (isAddRequest) {
+            //event bubble up - to validate required fields
+            handleAssignedToValue(event.target.value);
+            createSaveRequestObject(
+              FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+              event.target.value,
+              event.target.name
+            );
+          } else {
+            const assigneeDetails = createAssigneeDetails(event.target.value, event.target.name);       
+            dispatch(
+              saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
+                if(!err) {
+                  toast.success("Assignee has been saved successfully.", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                  dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+                  //event bubble up - to validate required fields
+                  handleAssignedToValue(event.target.value);
+                } else {
+                  console.log(err)
+                  toast.error(
+                    "Temporarily unable to save the assignee. Please try again in a few minutes.",
+                    {
+                      position: "top-right",
+                      autoClose: 3000,
+                      hideProgressBar: true,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                    }
+                  );
+                }
+              })
+            )
+          }
+        }
 
     //handle onChange event for assigned To
-    const handleAssignedToOnChange = (event) => {
-      setAssignedTo(event.target.value);
-      //event bubble up - to validate required fields
-      handleAssignedToValue(event.target.value);
-      createSaveRequestObject(
-        FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
-        event.target.value,
-        event.target.name
-      );
+    const handleAssignedToOnChange = (event) => {      
+      if ((unSavedRequest && window.confirm(
+        "Are you sure you want to leave? Your changes will be lost."
+      )) || !unSavedRequest) {
+        saveAssigneeDetails(event);        
+      } 
     };
 
     const status = getStatus({ headerValue, requestDetails });
