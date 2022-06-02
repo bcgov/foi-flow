@@ -535,6 +535,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           handleMinistryAssignedToValue={
                             handleMinistryAssignedToValue
                           }
+                          unSavedRequest={unSavedRequest}
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />

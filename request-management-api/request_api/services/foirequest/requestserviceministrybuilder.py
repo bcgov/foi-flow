@@ -69,7 +69,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             ln = requestschema['assignedToLastName'] if requestschema['assignedto'] != None else None
             self.createfoiassigneefromobject(requestschema['assignedto'], fn, mn, ln)
         else:
-            foiministryrequest.assignedto = requestschema['assignedto'] if 'assignedto' in requestschema and usertype == "assignee" else ministryschema["assignedto"] 
+            foiministryrequest.assignedto = None if usertype == "iao" and 'assignedto' in requestschema and requestschema['assignedto'] in (None, '') else ministryschema["assignedto"] 
 
         foiministryrequest.requeststatusid = requestdict['requeststatusid']
         foiministryrequest.programareaid = requestdict['programareaid']
