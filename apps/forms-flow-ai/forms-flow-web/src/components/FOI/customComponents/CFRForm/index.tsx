@@ -18,6 +18,7 @@ import foiFees from '../../../../constants/FOI/foiFees.json';
 import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
 import Tooltip from '../Tooltip/Tooltip';
+import { valueToPercent } from '@mui/base';
 
 export const CFRForm = ({
   requestNumber,
@@ -124,12 +125,80 @@ export const CFRForm = ({
     setFormData(values => ({...values, [name]: value}));
   };
 
-  const initialFormData: CFRFormData = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
+  const initialState: any = useSelector((state: any) => {
+    // return {
+    //   formStatus: state.foiRequests.foiRequestCFRForm.status,
+    //   amountDue: state.foiRequests.foiRequestCFRForm.feedata.amountdue,
+    //   amountPaid: state.foiRequests.foiRequestCFRForm.feedata.amountpaid,
+    //   estimates: {
+    //     locating: state.foiRequests.foiRequestCFRForm.feedata.estimatedlocatinghrs,
+    //     producing: state.foiRequests.foiRequestCFRForm.feedata.estimatedproducinghrs,
+    //     preparing: state.foiRequests.foiRequestCFRForm.feedata.estimatedpreparinghrs,
+    //     electronicPages: state.foiRequests.foiRequestCFRForm.feedata.estimatedelectronicpages,
+    //     hardcopyPages: state.foiRequests.foiRequestCFRForm.feedata.estimatedhardcopypages,
+    //   },
+    //   actual: {
+    //     locating: state.foiRequests.foiRequestCFRForm.feedata.actuallocatinghrs,
+    //     producing: state.foiRequests.foiRequestCFRForm.feedata.actualproducinghrs,
+    //     preparing: state.foiRequests.foiRequestCFRForm.feedata.actualpreparinghrs,
+    //     electronicPages: state.foiRequests.foiRequestCFRForm.feedata.actualelectronicpages,
+    //     hardcopyPages: state.foiRequests.foiRequestCFRForm.feedata.estimatedhardcopypages,
+    //   },
+    //   suggestions: state.foiRequests.foiRequestCFRForm.overallsuggestions
+    // };
+    return state.foiRequests.foiRequestCFRForm;
+  });
+
+  const [initialFormData, setInitialFormData] = React.useState({ 
+    formStatus: '',
+    amountDue: 0,
+    amountPaid: 0,
+    estimates: {
+      locating: 0,
+      producing: 0,
+      preparing: 0,
+      electronicPages: 0,
+      hardcopyPages: 0
+    },
+    actual: {
+      locating: 0,
+      producing: 0,
+      preparing: 0,
+      electronicPages: 0,
+      hardcopyPages: 0
+    },
+    suggestions: ''
+  });
+  
   const [formData, setFormData] = React.useState(initialFormData);
 
   React.useEffect(() => {
-    setFormData(initialFormData);
-  }, [initialFormData])
+    var formattedData = {
+      formStatus: initialState.status,
+      amountDue: initialState.feedata.amountdue,
+      amountPaid: initialState.feedata.amountpaid,
+      estimates: {
+        locating: initialState.feedata.estimatedlocatinghrs,
+        producing: initialState.feedata.estimatedproducinghrs,
+        preparing: initialState.feedata.estimatedpreparinghrs,
+        electronicPages: initialState.feedata.estimatedelectronicpages,
+        hardcopyPages: initialState.feedata.estimatedhardcopypages,
+      },
+      actual: {
+        locating: initialState.feedata.actuallocatinghrs,
+        producing: initialState.feedata.actualproducinghrs,
+        preparing: initialState.feedata.actualpreparinghrs,
+        electronicPages: initialState.feedata.actualelectronicpages,
+        hardcopyPages: initialState.feedata.estimatedhardcopypages,
+      },
+      suggestions: initialState.overallsuggestions
+    };
+    setInitialFormData(formattedData)
+    setFormData(formattedData);
+  }, [initialState]);
+
+
+  
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -148,7 +217,8 @@ export const CFRForm = ({
         return false;
       }
     }
-    return !_.isEqual(initialFormData, formData);
+    var retval = !_.isEqual(initialFormData, formData);
+    return retval
   }
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
