@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, isMinistryCoordinator, requestId, ministryId}) => {
+const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, isMinistryCoordinator, requestId, ministryId, unSavedRequest}) => {
    
      /**
      *  Header of Review request in the UI
@@ -104,14 +104,29 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
       return menuItems;
     };
 
-    //handle onChange event for assigned To
-    const handleMinistryAssignedToOnChange = (event) => {
-        setMinistryAssignedTo(event.target.value);
-        const assigneeDetails = createAssignedToDetailsObject(event.target.value);
-        dispatch(
-          saveAssignee(assigneeDetails, requestId, ministryId, isMinistryCoordinator, (err, res) => {
-            if(!err) {
-              toast.success("Assignee has been saved successfully.", {
+    const saveAssigneeDetails = (event) => {
+      setMinistryAssignedTo(event.target.value);
+      const assigneeDetails = createAssignedToDetailsObject(event.target.value);
+      dispatch(
+        saveAssignee(assigneeDetails, requestId, ministryId, isMinistryCoordinator, (err, res) => {
+          if(!err) {
+            toast.success("Assignee has been saved successfully.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+            //event bubble up - to validate required fields
+            handleMinistryAssignedToValue(event.target.value);
+          }
+          else {
+            toast.error(
+              "Temporarily unable to save the assignee. Please try again in a few minutes.",
+              {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -119,27 +134,20 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-              });
-              dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-              //event bubble up - to validate required fields
-              handleMinistryAssignedToValue(event.target.value);
-            }
-            else {
-              toast.error(
-                "Temporarily unable to save the assignee. Please try again in a few minutes.",
-                {
-                  position: "top-right",
-                  autoClose: 3000,
-                  hideProgressBar: true,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                }
-              );
-            }
-          })
-        )
+              }
+            );
+          }
+        })
+      )
+    }
+
+    //handle onChange event for assigned To
+    const handleMinistryAssignedToOnChange = (event) => {
+      if ((unSavedRequest && window.confirm(
+        "Are you sure you want to leave? Your changes will be lost."
+      )) || !unSavedRequest) {
+        saveAssigneeDetails(event);        
+      } 
     }
 
     return (
