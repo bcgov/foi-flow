@@ -110,7 +110,7 @@ const FOIRequestHeader = React.memo(
           } else {
             const assigneeDetails = createAssigneeDetails(event.target.value, event.target.name);       
             dispatch(
-              saveAssignee(assigneeDetails, requestId, ministryId, false, (err, res) => {
+              saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
                 if(!err) {
                   toast.success("Assignee has been saved successfully.", {
                     position: "top-right",
