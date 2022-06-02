@@ -9,35 +9,30 @@ from dateutil import parser
 from dateutil import tz
 import pytz
 import maya
-
+from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
 
 class cfrfeeservice:
     """ FOI CFR Fee Form management service
     Supports creation, update and delete of CFR fee form
     """
 
-    def createcfrfee(self, data, userid):
-        ministryrequestversion = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])  
-        return FOIRequestCFRFee.createcfrfee(data, ministryrequestversion, userid)
-        
-    def updatecfrfee(self, data, userid,cfrfeeid):
-        return FOIRequestCFRFee.updatecfrfee(data, userid,cfrfeeid)       
+    def createcfrfee(self, ministryrequestid, data, userid):
+        lkupversion = FOIRequestCFRFee.getversionforrequest(ministryrequestid)
+        cfrfee = FOIRequestCFRFee()
+        cfrfee.__dict__.update(data)
+        cfrfee.version = 1 if lkupversion is None else (lkupversion[0]+1)
+        cfrfee.ministryrequestid = ministryrequestid
+        cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
         
     def getcfrfee(self, ministryrequestid):
-        cfrfeeforms = FOIRequestCFRFee.getcfrfee(ministryrequestid)
-        return self.__formatcfrfee(cfrfeeforms)
+        cfrfees = []
+        _cfrfees = FOIRequestCFRFee.getcfrfee(ministryrequestid)
+        for cfrfee in _cfrfees:
+            cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])
+            cfrfees.append(cfrfee)
+        return cfrfees
            
-    def __formatcfrfee(self, cfrfeeforms):
-        formattedcfrfees = []
-        for cfrfee in cfrfeeforms:
-            formattedcfrfee = self.__cfrfeeformat(cfrfee)
-            formattedcfrfees.append(formattedcfrfee)
-        return formattedcfrfees
-
-    def __cfrfeeformat(self, cfrfeeform):
-        return {
-                "cfrfeeid": cfrfeeform['cfrfeeid'],
-                "ministryrequestid":cfrfeeform["ministryrequestid"],
-                "feedata": cfrfeeform['feedata'],
-                "overallsuggestions": cfrfeeform['overallsuggestions']
-        }
+    def __pstformat(self, inpdate):
+        formateddate = maya.parse(inpdate).datetime(to_timezone='America/Vancouver', naive=False)
+        return formateddate.strftime('%Y %b %d | %I:%M %p')

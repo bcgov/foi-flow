@@ -25,6 +25,8 @@ from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.schemas.foicfrfee import FOICFRFeeSchema
 import json
 from flask_cors import cross_origin
+import logging
+from marshmallow import Schema, fields, validate, ValidationError
 
 API = Namespace('FOICFRFee', description='Endpoints for FOI CFR Fee Form management')
 TRACER = Tracer.get_instance()
@@ -33,7 +35,7 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foicfrfee')
+@API.route('/foicfrfee/ministryrequest/<ministryrequestid>')
 class CreateFOICFRFee(Resource):
     """Creates CFR Fee for ministry request."""
        
@@ -41,14 +43,18 @@ class CreateFOICFRFee(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post():      
+    def post(ministryrequestid):      
         try:
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSchema().load(requestjson)  
-            result = cfrfeeservice().createcfrfee(foicfrfeeschema,AuthHelper.getuserid())
+            result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValidationError as verr:
+            logging.error(verr)
+            return {'status': False, 'message':verr.messages}, 400     
         except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+            logging.error(err)
+            return {'status': False, 'message':'Bad Request'}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -72,26 +78,3 @@ class FOICFRFee(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
         
-
-        
-
-    @cors_preflight('PUT,OPTIONS')
-    @API.route('/foicfrfee/<id>')
-    class FOICFRFeeUpdate(Resource):
-        """Update cfr fee based on id."""
-
-    
-        @staticmethod
-        @TRACER.trace()
-        @cross_origin(origins=allowedorigins())
-        @auth.require
-        def put(id):      
-            try:
-                requestjson = request.get_json()    
-                foicfrfeeschema = FOICFRFeeSchema().load(requestjson)          
-                result = cfrfeeservice().updatecfrfee(foicfrfeeschema,AuthHelper.getuserid(),id)
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-            except KeyError as err:
-                return {'status': False, 'message':err.messages}, 400        
-            except BusinessException as exception:            
-                return {'status': exception.status_code, 'message':exception.message}, 500
