@@ -40,9 +40,15 @@ class FOIRequestCFRFee(db.Model):
       
     @classmethod
     def getcfrfee(cls, ministryrequestid)->DefaultMethodResult:   
+        comment_schema = FOIRequestCommentSchema(many=False)
+        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.cfrfeeid.desc()).first()
+        return comment_schema.dump(query)   
+    
+    @classmethod
+    def getcfrfeehistory(cls, ministryrequestid)->DefaultMethodResult:   
         comment_schema = FOIRequestCommentSchema(many=True)
         query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.cfrfeeid.desc()).all()
-        return comment_schema.dump(query)   
+        return comment_schema.dump(query) 
 
     @classmethod
     def getcfrfeebyid(cls, cfrfeeid) -> DefaultMethodResult:
@@ -52,4 +58,4 @@ class FOIRequestCFRFee(db.Model):
        
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
-        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby') 
+        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','status') 

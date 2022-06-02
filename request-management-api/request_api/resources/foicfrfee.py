@@ -78,3 +78,21 @@ class FOICFRFee(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
         
+@cors_preflight('GET,OPTIONS')
+@API.route('/foicfrfee/ministryrequest/<requestid>/history')
+class FOICFRFee(Resource):
+    """Retrieves cfr fee form based on ministry id."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(requestid):      
+        try:
+            result = cfrfeeservice().getcfrfeehistory(requestid)
+            return json.dumps(result), 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500  
