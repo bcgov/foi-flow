@@ -783,6 +783,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handlestatusudpate={handlestatusudpate}
                         userDetail={userDetail}
                         disableInput={disableInput}
+                        isAddRequest={isAddRequest}
+                        unSavedRequest={unSavedRequest}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (

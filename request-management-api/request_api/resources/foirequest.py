@@ -27,6 +27,7 @@ from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema
+from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
@@ -134,6 +135,7 @@ class FOIRequestsById(Resource):
     
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>/<string:actiontype>')
 class FOIRequestsByIdAndType(Resource):
     """Creates a new version of foi request for ministry updates"""
 
@@ -141,14 +143,17 @@ class FOIRequestsByIdAndType(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(foirequestid,foiministryrequestid,usertype):
+    def post(foirequestid,foiministryrequestid,actiontype = None,usertype = None):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            if usertype != "ministry":
-                return {'status': False, 'message':'Bad Request'}, 400   
-            request_json = request.get_json()    
-            ministryrequestschema = FOIRequestMinistrySchema().load(request_json)    
-            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
+            if usertype != "ministry" and actiontype != "assignee":
+                return {'status': False, 'message':'Bad Request'}, 400
+            request_json = request.get_json()
+            if actiontype == "assignee":
+                ministryrequestschema = FOIRequestAssigneeSchema().load(request_json)
+            else:
+                ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
+            result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
                 asyncio.create_task(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
@@ -159,7 +164,7 @@ class FOIRequestsByIdAndType(Resource):
         except ValidationError as err:
             return {'status': False, 'message':err.messages}, 400
         except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400    
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     

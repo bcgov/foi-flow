@@ -144,8 +144,8 @@ class FOIRequestMinistrySchema(Schema):
         unknown = EXCLUDE    
     assignedministrygroup = fields.Str(data_key="assignedministrygroup",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
     assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
-    assignedgroup = fields.Str(data_key="assignedgroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])   
-    assignedto = fields.Str(data_key="assignedto",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
+    assignedgroup = fields.Str(data_key="assignedGroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])   
+    assignedto = fields.Str(data_key="assignedTo",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
     divisions = fields.Nested(FOIMinistryRequestDivisionSchema, many=True,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)

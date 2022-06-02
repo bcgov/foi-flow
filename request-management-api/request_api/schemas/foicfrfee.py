@@ -14,7 +14,7 @@ class FOIFeeDataSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
     amountpaid = fields.Float(data_key="amountpaid")
-    amountdue = fields.Float(data_key="amountdue")
+    totalamountdue = fields.Float(data_key="totalamountdue")
     estimatedlocatinghrs = fields.Float(data_key="estimatedlocatinghrs")
     actuallocatinghrs = fields.Float(data_key="actuallocatinghrs")
     estimatedproducinghrs = fields.Float(data_key="estimatedproducinghrs")
@@ -33,4 +33,17 @@ class FOICFRFeeSchema(Schema):
 
     feedata = fields.Nested(FOIFeeDataSchema,allow_none=False)
     overallsuggestions = fields.Str(data_key="overallsuggestions")
-    status = fields.Str(data_key="status")
+    status = fields.Str(data_key="status",required=True)
+ 
+class FOIFeeDataSanctionSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+    amountpaid = fields.Float(data_key="amountpaid") 
+    
+class FOICFRFeeSanctionSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+        
+    feedata = fields.Nested(FOIFeeDataSanctionSchema,allow_none=False)
+    status = fields.Str(data_key="status", required=True)

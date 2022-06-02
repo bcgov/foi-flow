@@ -3,6 +3,7 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.services.cfrfeestatusservice import cfrfeestatusservice
 from dateutil.parser import parse
 
 from dateutil import parser
@@ -17,24 +18,51 @@ class cfrfeeservice:
     """
 
     def createcfrfee(self, ministryrequestid, data, userid):
-        lkupversion = FOIRequestCFRFee.getversionforrequest(ministryrequestid)
-        cfrfee = FOIRequestCFRFee()
+        cfrfee = self.__preparecfrfee(ministryrequestid, data)
         cfrfee.__dict__.update(data)
-        cfrfee.version = 1 if lkupversion is None else (lkupversion[0]+1)
+        return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
+    
+    def sanctioncfrfee(self, ministryrequestid, data, userid):     
+        cfrfee = self.__preparecfrfee(ministryrequestid, data)   
+        cfrfee.feedata.update(data['feedata'])
+        return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
+    
+  
+    def __preparecfrfee(self, ministryrequestid, data):
+        cfrfee = FOIRequestCFRFee()
+        lkupcfrfee = self.getcfrfee(ministryrequestid)           
+        _version = 1
+        if lkupcfrfee is not None:
+            cfrfee.__dict__.update(lkupcfrfee)
+            _version =  lkupcfrfee['version'] + 1
+        cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
-        
+        cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status'])
+        return cfrfee
+    
+    
     def getcfrfee(self, ministryrequestid):
-        return FOIRequestCFRFee.getcfrfee(ministryrequestid)
+        cfrfee = FOIRequestCFRFee.getcfrfee(ministryrequestid)
+        return self.__formatcfrfee(cfrfee)
+
     
     def getcfrfeehistory(self, ministryrequestid):
         cfrfees = []
         _cfrfees = FOIRequestCFRFee.getcfrfeehistory(ministryrequestid)
         for cfrfee in _cfrfees:
-            cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])
-            cfrfees.append(cfrfee)
+            cfrfees.append(self.__formatcfrfee(cfrfee))
         return cfrfees
+    
+    def __formatcfrfee(self,cfrfee):
+        if cfrfee is not None and cfrfee != {}:
+            cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])   
+            cfrfee['status'] = cfrfee['cfrfeestatus.name']
+            cfrfee.pop('cfrfeestatus.name')
+            return cfrfee 
+        else:
+            return None
+        
            
     def __pstformat(self, inpdate):
         formateddate = maya.parse(inpdate).datetime(to_timezone='America/Vancouver', naive=False)

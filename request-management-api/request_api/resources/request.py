@@ -38,6 +38,7 @@ INVALID_REQUEST_ID = 'Invalid Request Id'
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
+@API.route('/foirawrequest/<requestid>/<string:actiontype>')
 class FOIRawRequest(Resource):
     """Consolidates create and retrival of raw request"""
 
@@ -62,7 +63,7 @@ class FOIRawRequest(Resource):
     #@Tracer.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid=None):
+    def post(requestid=None, actiontype=None):
         try :                        
             updaterequest = request.get_json()
             if int(requestid) and str(requestid) != "-1" :
@@ -75,7 +76,7 @@ class FOIRawRequest(Resource):
                 assigneefirstname = requestdata['assigneefirstname']
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname)
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)
                 asyncio.create_task(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
                 if result.success == True:
                     asyncio.create_task(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))

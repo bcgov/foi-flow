@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API endpoints for managing a FOI Requests resource."""
+"""API endpoints for managing a FOI CFR Fee resource."""
 
 
 from flask import g, request
@@ -22,7 +22,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.cfrfeeservice import cfrfeeservice
-from request_api.schemas.foicfrfee import FOICFRFeeSchema
+from request_api.schemas.foicfrfee import FOICFRFeeSchema, FOICFRFeeSanctionSchema
 import json
 from flask_cors import cross_origin
 import logging
@@ -45,6 +45,8 @@ class CreateFOICFRFee(Resource):
     @auth.require
     def post(ministryrequestid):      
         try:
+            if AuthHelper.getusertype() != "ministry":
+                return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSchema().load(requestjson)  
             result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
@@ -54,7 +56,33 @@ class CreateFOICFRFee(Resource):
             return {'status': False, 'message':verr.messages}, 400     
         except KeyError as err:
             logging.error(err)
-            return {'status': False, 'message':'Bad Request'}, 400        
+            return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foicfrfee/ministryrequest/<ministryrequestid>/sanction')
+class SanctionFOICFRFee(Resource):
+    """Updates CFR Fee for status."""
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(ministryrequestid):      
+        try:
+            if AuthHelper.getusertype() != "iao":
+                return {'status': False, 'message':'UnAuthorized'}, 403
+            requestjson = request.get_json() 
+            foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)  
+            result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except ValidationError as verr:
+            logging.error(verr)
+            return {'status': False, 'message':verr.messages}, 400     
+        except KeyError as err:
+            logging.error(err)
+            return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 

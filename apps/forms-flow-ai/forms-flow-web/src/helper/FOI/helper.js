@@ -45,43 +45,26 @@ const businessDay = (date) => {
   return dayjs(date).isBusinessDay();
 };
 
-const getHolidayList = (years) => {
+const getHolidayList = (startYear, endYear) => {
   let holidays = [];
-  for (const year of years) {
-    holidays = hd.getHolidays(year);
+  if (startYear > endYear) {
+    var temp = startYear;
+    startYear = endYear;
+    endYear = temp;
+  }
+  for (; startYear <= endYear; startYear++) {
+    holidays = holidays.concat(hd.getHolidays(startYear));
   }
   return holidays;
 };
 const getPublicHoliDays = (startDate, endDate) => {
   let publicHoliDays = 0;
-  let years = [];
-  years.push(dayjs(startDate).year());
+  const startYear = dayjs(startDate).year();
   const endYear = dayjs(endDate).year();
-  if (years.includes(endYear) === false) {
-    years.push(endYear);
-  }
-  const holidays = getHolidayList(years);
+  const holidays = getHolidayList(startYear, endYear);
   for (const entry of holidays) {
-    let day = dayjs(entry.date).day();
     if (
       entry.type === "public" &&
-      dayjs(entry.date).isBetween(startDate, endDate, null, "[]") &&
-      day >= 1 &&
-      day <= 5
-    ) {
-      publicHoliDays++;
-    }
-    //Handle Easter Monday
-    if (
-      entry.name === "Good Friday" &&
-      dayjs(entry.date).add(3, "day").isBetween(startDate, endDate, null, "[]")
-    ) {
-      publicHoliDays++;
-    }
-    //Handle Boxing Day weekends
-    if (
-      entry.name === "Boxing Day" &&
-      (day === 6 || day === 0) &&
       dayjs(entry.date).isBetween(startDate, endDate, null, "[]")
     ) {
       publicHoliDays++;
