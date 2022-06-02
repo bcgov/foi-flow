@@ -48,13 +48,17 @@ class Auth:
         @wraps(func)
         def decorated(type, id, field,*args, **kwargs):           
             usertype = AuthHelper.getusertype()
-            requestministry = FOIMinistryRequest.getrequestbyministryrequestid(id)
-            ministrygroups = AuthHelper.getministrygroups()
-            expectedministrygroup = MinistryTeamWithKeycloackGroup[requestministry['programarea.bcgovcode']].value
-            retval = "Unauthorized" , 401
-            if(usertype == "ministry" and expectedministrygroup not in ministrygroups):
-                return retval
-            return func(type, id, field,*args, **kwargs)            
+            if(usertype == "iao"):
+                return func(type, id, field,*args, **kwargs)
+            elif(usertype == "ministry"):    
+                requestministry = FOIMinistryRequest.getrequestbyministryrequestid(id)
+                ministrygroups = AuthHelper.getministrygroups()
+                expectedministrygroup = MinistryTeamWithKeycloackGroup[requestministry['programarea.bcgovcode']].value
+                retval = "Unauthorized" , 401
+                if(expectedministrygroup not in ministrygroups):
+                    return retval
+                else:
+                    return func(type, id, field,*args, **kwargs)            
         return decorated           
            
              
