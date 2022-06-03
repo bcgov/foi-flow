@@ -6,7 +6,7 @@ import API from "../../endpoints";
     setRequestCFRForm,
   } from "../../../actions/FOI/foiRequestActions";
   import { replaceUrl } from "../../../helper/FOI/helper";
-  import { fnDone, catchError } from "./foiServicesUtil";
+  import { catchError } from "./foiServicesUtil";
 
 export const fetchCFRForm = (
   ministryId,
@@ -47,7 +47,7 @@ export const saveCFRForm = (
   if (!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
-  var baseUrl;
+  let baseUrl;
   if (isMinistry) {
     baseUrl = API.FOI_POST_CFR_FORM;
   } else {
