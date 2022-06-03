@@ -581,6 +581,28 @@ export const CFRForm = ({
                 />
               </div>
             </div>
+
+            <div className="cfrform-floatRight cfrform-locating">
+              <Tooltip content={tooltipLocating} position={""} />
+              <p className="hideContent" id="popup-1">Information1</p>
+            </div>
+            <div className="cfrform-floatRightRight cfrform-locating">
+              <Chip className="cfrform-chip" label='Click "i" for more details' color="primary" variant="outlined" />
+              <p className="hideContent" id="popup-5">Information5</p>
+            </div>
+            <div className="cfrform-floatRight cfrform-producing">
+              <Tooltip content={tooltipProducing} position={""} />
+              <p className="hideContent" id="popup-2">Information2</p>
+            </div>
+            <div className="cfrform-floatRight cfrform-preparing">
+              <Tooltip content={tooltipPreparing} position={""} />
+              <p className="hideContent" id="popup-3">Information3</p>
+            </div>
+            <div className="cfrform-floatRight cfrform-volume">
+              <Tooltip content={tooltipVolume} position={""} />
+              <p className="hideContent" id="popup-4">Information4</p>
+            </div>
+
           </AccordionDetails>
         </Accordion>
       </div>
@@ -622,26 +644,6 @@ export const CFRForm = ({
           Save
         </button>
       </div>
-    </div>
-    <div className="cfrform-floatRight cfrform-locating">
-      <Tooltip content={tooltipLocating} position={""} />
-      <p className="hideContent" id="popup-1">Information1</p>
-    </div>
-    <div className="cfrform-floatRightRight cfrform-locating">
-      <Chip className="cfrform-chip" label='Click "i" for more details' color="primary" variant="outlined" />
-      <p className="hideContent" id="popup-5">Information5</p>
-    </div>
-    <div className="cfrform-floatRight cfrform-producing">
-      <Tooltip content={tooltipProducing} position={""} />
-      <p className="hideContent" id="popup-2">Information2</p>
-    </div>
-    <div className="cfrform-floatRight cfrform-preparing">
-      <Tooltip content={tooltipPreparing} position={""} />
-      <p className="hideContent" id="popup-3">Information3</p>
-    </div>
-    <div className="cfrform-floatRight cfrform-volume">
-      <Tooltip content={tooltipVolume} position={""} />
-      <p className="hideContent" id="popup-4">Information4</p>
     </div>
   </div></Box>
   </div>

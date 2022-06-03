@@ -32,6 +32,8 @@
   background-color: #38598A !important;
   color: #FFFFFF !important;
   font-family: BCSans-Bold, sans-serif !important;
+  margin-top: 20px;
+  margin-bottom: 50px;
 }
 
 .cfrform-floatRight {
@@ -39,7 +41,7 @@
   display: block;
   z-index: 3;
   position: absolute;
-  right: 37px;
+  right: -20px;
 }
 
 .cfrform-floatRightRight {
@@ -47,23 +49,23 @@
   display: block;
   z-index: 3;
   position: absolute;
-  right: -130px;
+  right: -190px;
 }
 
 .cfrform-locating {
-  top: 345px;
+  top: 200px;
 }
 
 .cfrform-producing {
-  top: 465px;
+  top: 325px;
 }
 
 .cfrform-preparing {
-  top: 615px;
+  top: 465px;
 }
 
 .cfrform-volume {
-  top: 735px;
+  top: 590px;
 }
 
 .hideContent {
@@ -85,3 +87,7 @@
   border-left-color: #38598A !important;
   border-left-width: 2px !important;
 }
+
+// .request-accordian>div>div>div>.MuiIconButton-label {
+//   color: #fff!important;
+// }
