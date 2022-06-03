@@ -65,8 +65,8 @@ export const CFRForm = ({
     return state.foiRequests.foiRequestCFRForm;
   });
 
-  const [initialFormData, setInitialFormData] = React.useState({ 
-    formStatus: '',
+  const blankForm: CFRFormData = {
+    formStatus: "review",
     amountDue: 0,
     amountPaid: 0,
     estimates: {
@@ -84,8 +84,10 @@ export const CFRForm = ({
       hardcopyPages: 0
     },
     suggestions: ''
-  });
-  
+  };
+
+  const [initialFormData, setInitialFormData] = React.useState(blankForm);
+
   const [formData, setFormData] = React.useState(initialFormData);
 
   React.useEffect(() => {
@@ -174,7 +176,7 @@ export const CFRForm = ({
   const save = () => {
     var callback = (_res: string) => {
       setInitialFormData(formData)
-      toast.success("The request has been saved successfully.", {
+      toast.success("CFR Form has been saved successfully.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: true,
@@ -184,9 +186,9 @@ export const CFRForm = ({
         progress: undefined,
       });
     };
-
-    saveCFRForm(
-      {
+    var data;
+    if (isMinistry) {
+      data = {
         feedata:{
           amountpaid: formData.amountPaid,
           totalamountdue: formData.amountDue,
@@ -203,8 +205,19 @@ export const CFRForm = ({
         },
         overallsuggestions: formData.suggestions,
         status: formData.formStatus
-      },
+      }
+    } else {
+      data = {
+        feedata:{
+          amountpaid: formData.amountPaid,
+        },
+        status: formData.formStatus
+      }
+    }
+    saveCFRForm(
+      data,
       ministryId,
+      isMinistry,
       dispatch,
       callback,
       (errorMessage: string) => {
@@ -242,7 +255,7 @@ export const CFRForm = ({
             variant="outlined"
             fullWidth
             required
-            disabled={isMinistry}
+            disabled={isMinistry || _.isEqual(formData, blankForm)}
           >
             {CFRStatuses.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -282,6 +295,7 @@ export const CFRForm = ({
                     e.target.value = parseFloat(e.target.value).toFixed(2);
                   }}
                   fullWidth
+                  disabled={_.isEqual(formData, blankForm)}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
