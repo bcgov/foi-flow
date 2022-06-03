@@ -10,6 +10,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
@@ -18,6 +19,7 @@ import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/f
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { valueToPercent } from '@mui/base';
+import Tooltip from '../Tooltip/Tooltip';
 
 export const CFRForm = ({
   requestNumber,
@@ -54,7 +56,70 @@ export const CFRForm = ({
     }
   }, [ministryId]);
 
-    const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const tooltipLocating = {
+    "title": "Locating/Retrieving",
+    "content": [
+      <div className="toolTipContent">
+        <strong>Areas to consider searching:</strong>
+        <ul>
+          <li>Outlook (including 'deleted' and 'sent' folders)</li>
+          <li>Records management systems (ex. EDRMS)</li>
+          <li>LAN, shared drives, SharePoint, databases</li>
+          <li>Offsite records</li>
+        </ul>
+      </div>]
+  };
+  const tooltipProducing = {
+    "title": "Producing",
+    "content": [
+      <div className="toolTipContent">
+        <strong>Tasks include:</strong>
+        <ul>
+          <li>Includes gathering and providing records, not creating records</li>
+          <li>Identifying relevant sources of data/information</li>
+          <li>Manual time spent creating and producing records</li>
+          <li>Ex: generating a custom report from a database using existing data</li>
+        </ul>
+      </div>]
+  };
+  const tooltipPreparing = {
+    "title": "Preparing",
+    "content": [
+      <div className="toolTipContent">
+        <strong>Tasks include:</strong>
+        <ul>
+          <li>Converting records to PDF</li>
+          <li>Consolidating records into a single PDF document</li>
+          <li>Organizing records packages (e.g. by date department, staff, records type, etc.)</li>
+          <li>Photocopying or scanning records into electronic format</li>
+          <li>Ensuring completeness of responsive records</li>
+          <li>Copying other types of media (audio and /or video)</li>
+          <li>For electronic records, you do not need to provide a time estimate, please provide the number of files where requested below and IAO will be in a position to calculate the time required and to consider charging a fee.</li>
+        </ul>
+      </div>]
+  };
+  const tooltipVolume = {
+    "title": "Volume",
+    "content": [
+      <div className="toolTipContent">
+        <strong>Electronic:</strong>
+        <ul>
+          <li>Files (e.g. emails, Word Docs, Excel sheets, PDFs, photos, etc.)</li>
+        </ul>
+        <strong>Hardcopy:</strong>
+        <ul>
+          <li>Average file folder = 1" and holds approx. 200 pages (single-sided)</li>
+          <li>1 standard Records Centre</li>
+        </ul>
+        <strong>Services box:</strong>
+        <ul>
+          <li>Legal sized folders = 1800 pages</li>
+          <li>Letter sized folders = 2200 pages</li>
+        </ul>
+      </div>]
+  };
+
+  const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : string = e.target.value;
 
@@ -668,6 +733,26 @@ export const CFRForm = ({
           Save
         </button>
       </div>
+    </div>
+    <div className="cfrform-floatRight cfrform-locating">
+      <Tooltip content={tooltipLocating} position={""} />
+      <p className="hideContent" id="popup-1">Information1</p>
+    </div>
+    <div className="cfrform-floatRightRight cfrform-locating">
+      <Chip className="cfrform-chip" label='Click "i" for more details' color="primary" variant="outlined" />
+      <p className="hideContent" id="popup-5">Information5</p>
+    </div>
+    <div className="cfrform-floatRight cfrform-producing">
+      <Tooltip content={tooltipProducing} position={""} />
+      <p className="hideContent" id="popup-2">Information2</p>
+    </div>
+    <div className="cfrform-floatRight cfrform-preparing">
+      <Tooltip content={tooltipPreparing} position={""} />
+      <p className="hideContent" id="popup-3">Information3</p>
+    </div>
+    <div className="cfrform-floatRight cfrform-volume">
+      <Tooltip content={tooltipVolume} position={""} />
+      <p className="hideContent" id="popup-4">Information4</p>
     </div>
   </div></Box>
   </div>
