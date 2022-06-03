@@ -34,7 +34,7 @@
   font-family: BCSans-Bold, sans-serif !important;
 }
 
-.floatRight {
+.cfrform-floatRight {
   cursor: pointer;
   display: block;
   z-index: 3;
@@ -42,19 +42,27 @@
   right: 37px;
 }
 
-.locating {
+.cfrform-floatRightRight {
+  cursor: pointer;
+  display: block;
+  z-index: 3;
+  position: absolute;
+  right: -130px;
+}
+
+.cfrform-locating {
   top: 345px;
 }
 
-.producing {
+.cfrform-producing {
   top: 465px;
 }
 
-.preparing {
+.cfrform-preparing {
   top: 615px;
 }
 
-.volume {
+.cfrform-volume {
   top: 735px;
 }
 
@@ -64,4 +72,16 @@
 
 .toolTipContent ul {
   padding-left: 20px;
+}
+
+.cfrform-chip {
+  color: #38598A !important;
+  border-top-color:#38598A !important;
+  border-top-width: 2px !important;
+  border-right-color:#38598A !important;
+  border-right-width: 2px !important;
+  border-bottom-color:#38598A !important;
+  border-bottom-width: 2px !important;
+  border-left-color: #38598A !important;
+  border-left-width: 2px !important;
 }
