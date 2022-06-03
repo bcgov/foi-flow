@@ -34,7 +34,7 @@ const initialState = {
     overallsuggestions: "",
     status: "review",
     feedata: {
-       amountdue: 0,
+       totalamountdue: 0,
        actualhardcopypages: 0,
        actualproducinghrs: 0,
        actuallocatinghrs: 0,
@@ -125,7 +125,13 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
       return { ...state, foiRequestAttachments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
-      return { ...state, foiRequestCFRForm: action.payload };
+      return { 
+        ...state,
+        foiRequestCFRForm:{
+          ...state.foiRequestCFRForm,
+          ...action.payload
+        }
+      };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:
