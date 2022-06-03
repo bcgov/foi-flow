@@ -68,6 +68,7 @@ const API = {
 
   FOI_GET_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
+  FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>/sanction`,
 
   FOI_GET_OPENED_MINISTRIES: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/fields?names=ministries`,
 
