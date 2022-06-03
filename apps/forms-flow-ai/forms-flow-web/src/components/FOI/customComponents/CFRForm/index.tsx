@@ -11,13 +11,14 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import { isMinistryLogin } from "../../../../helper/FOI/helper";
+import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
 import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
 import Tooltip from '../Tooltip/Tooltip';
+import { toast } from "react-toastify";
 import { valueToPercent } from '@mui/base';
 
 export const CFRForm = ({
@@ -111,10 +112,10 @@ export const CFRForm = ({
 
   React.useEffect(() => {
     if (ministryId) {
-      fetchCFRForm({
+      fetchCFRForm(
         ministryId,
         dispatch,
-      });
+      );
     }
   }, [ministryId]);
 
@@ -126,26 +127,6 @@ export const CFRForm = ({
   };
 
   const initialState: any = useSelector((state: any) => {
-    // return {
-    //   formStatus: state.foiRequests.foiRequestCFRForm.status,
-    //   amountDue: state.foiRequests.foiRequestCFRForm.feedata.amountdue,
-    //   amountPaid: state.foiRequests.foiRequestCFRForm.feedata.amountpaid,
-    //   estimates: {
-    //     locating: state.foiRequests.foiRequestCFRForm.feedata.estimatedlocatinghrs,
-    //     producing: state.foiRequests.foiRequestCFRForm.feedata.estimatedproducinghrs,
-    //     preparing: state.foiRequests.foiRequestCFRForm.feedata.estimatedpreparinghrs,
-    //     electronicPages: state.foiRequests.foiRequestCFRForm.feedata.estimatedelectronicpages,
-    //     hardcopyPages: state.foiRequests.foiRequestCFRForm.feedata.estimatedhardcopypages,
-    //   },
-    //   actual: {
-    //     locating: state.foiRequests.foiRequestCFRForm.feedata.actuallocatinghrs,
-    //     producing: state.foiRequests.foiRequestCFRForm.feedata.actualproducinghrs,
-    //     preparing: state.foiRequests.foiRequestCFRForm.feedata.actualpreparinghrs,
-    //     electronicPages: state.foiRequests.foiRequestCFRForm.feedata.actualelectronicpages,
-    //     hardcopyPages: state.foiRequests.foiRequestCFRForm.feedata.estimatedhardcopypages,
-    //   },
-    //   suggestions: state.foiRequests.foiRequestCFRForm.overallsuggestions
-    // };
     return state.foiRequests.foiRequestCFRForm;
   });
 
@@ -175,7 +156,7 @@ export const CFRForm = ({
   React.useEffect(() => {
     var formattedData = {
       formStatus: initialState.status,
-      amountDue: initialState.feedata.amountdue,
+      amountDue: initialState.feedata.totalamountdue,
       amountPaid: initialState.feedata.amountpaid,
       estimates: {
         locating: initialState.feedata.estimatedlocatinghrs,
@@ -196,9 +177,6 @@ export const CFRForm = ({
     setInitialFormData(formattedData)
     setFormData(formattedData);
   }, [initialState]);
-
-
-  
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -259,13 +237,46 @@ export const CFRForm = ({
   };
 
   const save = () => {
-    saveCFRForm({
-      data: formData,
-      ministryId: ministryId,
-      dispatch: dispatch,
-    });
+    var callback = (_res: string) => {
+      setInitialFormData(formData)
+      toast.success("The request has been saved successfully.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    };
 
-  }
+    saveCFRForm(
+      {
+        feedata:{
+          amountpaid: formData.amountPaid,
+          totalamountdue: formData.amountDue,
+          estimatedlocatinghrs: formData.estimates.locating,
+          actuallocatinghrs: formData.actual.locating,
+          estimatedproducinghrs: formData.estimates.producing,
+          actualproducinghrs: formData.actual.producing,
+          estimatedpreparinghrs: formData.estimates.preparing,
+          actualpreparinghrs: formData.actual.preparing,
+          estimatedelectronicpages: formData.estimates.electronicPages,
+          actualelectronicpages: formData.actual.electronicPages,
+          estimatedhardcopypages: formData.estimates.hardcopyPages,
+          actualhardcopypages: formData.actual.hardcopyPages,
+        },
+        overallsuggestions: formData.suggestions,
+        status: formData.formStatus
+      },
+      ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        errorToast(errorMessage)
+      },
+    )
+  };
 
 
   return (
@@ -296,8 +307,7 @@ export const CFRForm = ({
             variant="outlined"
             fullWidth
             required
-            // disabled={isMinistry} comment back in when back end is intergrated
-            // error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+            disabled={isMinistry}
           >
             {CFRStatuses.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -339,16 +349,14 @@ export const CFRForm = ({
                     e.target.value = parseFloat(e.target.value).toFixed(2);
                   }}
                   fullWidth
-                  // required={true}
-                  // error={applicantFirstNameText === ""}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
                 <TextField
-                  id="totalamountdue"
+                  id="amountdue"
                   label="Total Amount Due"
                   inputProps={{
-                    "aria-labelledby": "totalamountdue-label"
+                    "aria-labelledby": "amountdue-label"
                   }}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>
@@ -461,7 +469,6 @@ export const CFRForm = ({
                   name="producing"
                   value={formData?.estimates?.producing}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -524,7 +531,6 @@ export const CFRForm = ({
                   name="preparing"
                   value={formData?.estimates?.preparing}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -588,7 +594,6 @@ export const CFRForm = ({
                   name="electronicPages"
                   value={formData?.estimates?.electronicPages}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -615,7 +620,6 @@ export const CFRForm = ({
                   name="hardcopyPages"
                   value={formData?.estimates?.hardcopyPages}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -713,7 +717,6 @@ export const CFRForm = ({
               <div className="col-lg-12 foi-details-col">
                 <TextField
                   id="combinedsuggestions"
-                  // required={true}
                   label="Combined suggestions for futher clarifications   "
                   multiline
                   rows={4}
@@ -722,7 +725,6 @@ export const CFRForm = ({
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
                   onChange={handleTextChanges}
-                  // error={requestDescriptionText===""}
                   fullWidth
                   disabled={!isMinistry || formData?.formStatus === 'approved'}
                 />
