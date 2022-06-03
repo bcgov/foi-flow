@@ -50,3 +50,30 @@ export const alertUser = (e) => {
   e.returnValue = "";
   e.preventDefault();
 };
+
+
+export const createAssignedToDetailsObject = (
+    value
+) => {
+  const assigneeObject = {
+    assignedministrygroup: "",
+    assignedministryperson: "",
+    assignedministrypersonFirstName: "",
+    assignedministrypersonLastName: ""
+  }
+  const assignedToValue = value?.split("|");
+      if (
+        assignedToValue.length > 1 &&
+        assignedToValue[0] &&
+        assignedToValue[1] &&
+        assignedToValue[2] &&
+        assignedToValue[3]
+      ) {
+        assigneeObject.assignedministrygroup = assignedToValue[0];
+        assigneeObject.assignedministryperson = assignedToValue[1];
+        assigneeObject.assignedministrypersonFirstName = assignedToValue[2];
+        assigneeObject.assignedministrypersonLastName = assignedToValue[3];
+      }
+  return assigneeObject;
+  
+};

@@ -39,6 +39,7 @@ class FOIAuditByField(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.belongstosameministry
     def get(type, id, field):
         """ GET Method for auditing of FOI request field"""
         
