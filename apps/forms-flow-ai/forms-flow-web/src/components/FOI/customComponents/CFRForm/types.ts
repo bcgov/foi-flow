@@ -1,5 +1,4 @@
 export type CFRFormData = {
-    requestNumber: string;
     formStatus: string;
     amountDue: number;
     amountPaid: number;
@@ -22,8 +21,8 @@ export type CFRFormData = {
 
 export type params = {
   requestNumber: string;
+  ministryId: number;
   userDetail: {
     groups: string[];
   };
-  cfrFormData: CFRFormData;
 }

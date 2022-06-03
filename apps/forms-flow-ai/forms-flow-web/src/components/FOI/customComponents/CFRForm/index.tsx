@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from '@mui/material/MenuItem';
@@ -10,17 +11,20 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import { isMinistryLogin } from "../../../../helper/FOI/helper";
+import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
+import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
+import { toast } from "react-toastify";
+import { valueToPercent } from '@mui/base';
 import Tooltip from '../Tooltip/Tooltip';
 
 export const CFRForm = ({
   requestNumber,
-  userDetail,
-  cfrFormData
+  ministryId,
+  userDetail
 }: params) => {
 
   const CFRStatuses = [
@@ -38,8 +42,19 @@ export const CFRForm = ({
     },
   ];
 
+  const dispatch = useDispatch();
+
   const userGroups = userDetail.groups.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
+
+  React.useEffect(() => {
+    if (ministryId) {
+      fetchCFRForm(
+        ministryId,
+        dispatch,
+      );
+    }
+  }, [ministryId]);
 
   const tooltipLocating = {
     "title": "Locating/Retrieving",
@@ -111,8 +126,11 @@ export const CFRForm = ({
     setFormData(values => ({...values, [name]: value}));
   };
 
-  const emptyFormData: CFRFormData = {
-    requestNumber: "",
+  const initialState: any = useSelector((state: any) => {
+    return state.foiRequests.foiRequestCFRForm;
+  });
+
+  const blankForm: CFRFormData = {
     formStatus: "review",
     amountDue: 0,
     amountPaid: 0,
@@ -121,19 +139,46 @@ export const CFRForm = ({
       producing: 0,
       preparing: 0,
       electronicPages: 0,
-      hardcopyPages: 0,
+      hardcopyPages: 0
     },
     actual: {
       locating: 0,
       producing: 0,
       preparing: 0,
       electronicPages: 0,
-      hardcopyPages: 0,
+      hardcopyPages: 0
     },
-    suggestions: "",
-  }
-  const [formData, setFormData] = React.useState(cfrFormData || emptyFormData);
-  const initialFormData: CFRFormData = _.cloneDeep(cfrFormData || emptyFormData);
+    suggestions: ''
+  };
+
+  const [initialFormData, setInitialFormData] = React.useState(blankForm);
+
+  const [formData, setFormData] = React.useState(initialFormData);
+
+  React.useEffect(() => {
+    var formattedData = {
+      formStatus: initialState.status,
+      amountDue: initialState.feedata.totalamountdue,
+      amountPaid: initialState.feedata.amountpaid,
+      estimates: {
+        locating: initialState.feedata.estimatedlocatinghrs,
+        producing: initialState.feedata.estimatedproducinghrs,
+        preparing: initialState.feedata.estimatedpreparinghrs,
+        electronicPages: initialState.feedata.estimatedelectronicpages,
+        hardcopyPages: initialState.feedata.estimatedhardcopypages,
+      },
+      actual: {
+        locating: initialState.feedata.actuallocatinghrs,
+        producing: initialState.feedata.actualproducinghrs,
+        preparing: initialState.feedata.actualpreparinghrs,
+        electronicPages: initialState.feedata.actualelectronicpages,
+        hardcopyPages: initialState.feedata.estimatedhardcopypages,
+      },
+      suggestions: initialState.overallsuggestions
+    };
+    setInitialFormData(formattedData)
+    setFormData(formattedData);
+  }, [initialState]);
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -152,8 +197,17 @@ export const CFRForm = ({
         return false;
       }
     }
-    return !_.isEqual(initialFormData, formData);
+    var retval = !_.isEqual(initialFormData, formData);
+    return retval
   }
+
+  const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name : string = e.target.name;
+    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    if (value <= formData.amountDue) {
+      setFormData(values => ({...values, [name]: value}));
+    }
+  };
 
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
@@ -182,6 +236,59 @@ export const CFRForm = ({
     let newFormData : CFRFormData = {...formData, ["actual"]: newActual};
     newFormData = calculateFees(newFormData);
     setFormData(newFormData);
+  };
+
+  const save = () => {
+    var callback = (_res: string) => {
+      setInitialFormData(formData)
+      toast.success("CFR Form has been saved successfully.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    };
+    var data;
+    if (isMinistry) {
+      data = {
+        feedata:{
+          amountpaid: formData.amountPaid,
+          totalamountdue: formData.amountDue,
+          estimatedlocatinghrs: formData.estimates.locating,
+          actuallocatinghrs: formData.actual.locating,
+          estimatedproducinghrs: formData.estimates.producing,
+          actualproducinghrs: formData.actual.producing,
+          estimatedpreparinghrs: formData.estimates.preparing,
+          actualpreparinghrs: formData.actual.preparing,
+          estimatedelectronicpages: formData.estimates.electronicPages,
+          actualelectronicpages: formData.actual.electronicPages,
+          estimatedhardcopypages: formData.estimates.hardcopyPages,
+          actualhardcopypages: formData.actual.hardcopyPages,
+        },
+        overallsuggestions: formData.suggestions,
+        status: formData.formStatus
+      }
+    } else {
+      data = {
+        feedata:{
+          amountpaid: formData.amountPaid,
+        },
+        status: formData.formStatus
+      }
+    }
+    saveCFRForm(
+      data,
+      ministryId,
+      isMinistry,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        errorToast(errorMessage)
+      },
+    )
   };
 
 
@@ -213,8 +320,7 @@ export const CFRForm = ({
             variant="outlined"
             fullWidth
             required
-            // disabled={isMinistry} comment back in when back end is intergrated
-            // error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+            disabled={isMinistry || _.isEqual(formData, blankForm)}
           >
             {CFRStatuses.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -235,26 +341,35 @@ export const CFRForm = ({
                 <TextField
                   id="amountpaid"
                   label="Amount Paid"
-                  inputProps={{ "aria-labelledby": "amountpaid-label"}}
+                  inputProps={{
+                    "aria-labelledby": "amountpaid-label",
+                    step: 0.01,
+                    max: formData.amountDue,
+                    min: 0
+                  }}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>
                   }}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
-                  placeholder="0"
                   name="amountPaid"
+                  type="number"
                   value={formData?.amountPaid}
-                  onChange={handleAmountChanges}
+                  onChange={handleAmountPaidChanges}
+                  onBlur={(e) => {
+                    e.target.value = parseFloat(e.target.value).toFixed(2);
+                  }}
                   fullWidth
-                  // required={true}
-                  // error={applicantFirstNameText === ""}
+                  disabled={_.isEqual(formData, blankForm)}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
                 <TextField
-                  id="totalamountdue"
+                  id="amountdue"
                   label="Total Amount Due"
-                  inputProps={{ "aria-labelledby": "totalamountdue-label"}}
+                  inputProps={{
+                    "aria-labelledby": "amountdue-label"
+                  }}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>
                   }}
@@ -274,7 +389,7 @@ export const CFRForm = ({
                 <span className="formLabel">Balance Remaining</span>
               </div>
               <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid > 0 ? (formData?.amountDue - formData?.amountPaid).toFixed(2) : "00.00")}</span>
+                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid).toFixed(2)}</span>
               </div>
             </div>
             <div className="row foi-details-row">
@@ -365,7 +480,6 @@ export const CFRForm = ({
                   name="producing"
                   value={formData?.estimates?.producing}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -428,7 +542,6 @@ export const CFRForm = ({
                   name="preparing"
                   value={formData?.estimates?.preparing}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -492,7 +605,6 @@ export const CFRForm = ({
                   name="electronicPages"
                   value={formData?.estimates?.electronicPages}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -510,6 +622,7 @@ export const CFRForm = ({
                     "aria-labelledby": "estimatedelectronic-label",
                     step: foiFees.hardcopyPages.unit,
                     min: 0,
+                    pattern: "^([1-9]+|0{1})(?:\.\d{1,2})?$"
                   }}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
@@ -518,7 +631,6 @@ export const CFRForm = ({
                   name="hardcopyPages"
                   value={formData?.estimates?.hardcopyPages}
                   onChange={handleEstimateChanges}
-                  // input={<Input />}
                   variant="outlined"
                   fullWidth
                   type="number"
@@ -616,7 +728,6 @@ export const CFRForm = ({
               <div className="col-lg-12 foi-details-col">
                 <TextField
                   id="combinedsuggestions"
-                  // required={true}
                   label="Combined suggestions for futher clarifications   "
                   multiline
                   rows={4}
@@ -625,7 +736,6 @@ export const CFRForm = ({
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
                   onChange={handleTextChanges}
-                  // error={requestDescriptionText===""}
                   fullWidth
                   disabled={!isMinistry || formData?.formStatus === 'approved'}
                 />
@@ -636,8 +746,9 @@ export const CFRForm = ({
       </div>
       <div className="col-lg-4 buttonContainer">
         <button
+          type="button"
           className="btn saveButton"
-          // onClick={saveCFRForm}
+          onClick={save}
           color="primary"
           disabled={!validateFields()}
         >

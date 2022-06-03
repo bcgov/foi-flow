@@ -463,7 +463,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             >
               Request
             </div>
-            <div
+            {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.CFRForm.active,
               })}
@@ -471,7 +471,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               onClick={() => tabclick("CFRForm")}
             >
               CFR Form
-            </div>
+            </div>)}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Attachments.active,
@@ -582,7 +582,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               </div>
             </div>
           </div>
-          <div
+          {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
             id="CFRForm"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.CFRForm.active,
@@ -593,8 +593,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
             <CFRForm            
               requestNumber={requestNumber}
               userDetail={userDetail}
+              ministryId={ministryId}
             />
-          </div>
+          </div>)}
           <div
             id="Attachments"
             className={clsx("tabcontent", {
