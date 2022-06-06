@@ -1,0 +1,94 @@
+/* add css module styles here (optional) */
+
+.container {
+  padding-left: 5%;
+  padding-right: 5%;
+  margin-top: 20px;
+}
+
+.heading {
+  color: #FFF;
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.accordionSummary {
+  flex-direction: row-reverse;
+}
+
+.formLabel {
+  padding: 15px 5px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.buttonContainer {
+  padding-left: 0px !important;
+}
+
+.saveButton {
+  margin: 0;
+  width: 100%;
+  background-color: #38598A !important;
+  color: #FFFFFF !important;
+  font-family: BCSans-Bold, sans-serif !important;
+  margin-top: 20px;
+  margin-bottom: 50px;
+}
+
+.cfrform-floatRight {
+  cursor: pointer;
+  display: block;
+  z-index: 3;
+  position: absolute;
+  right: -20px;
+}
+
+.cfrform-floatRightRight {
+  cursor: pointer;
+  display: block;
+  z-index: 3;
+  position: absolute;
+  right: -190px;
+}
+
+.cfrform-locating {
+  top: 200px;
+}
+
+.cfrform-producing {
+  top: 325px;
+}
+
+.cfrform-preparing {
+  top: 465px;
+}
+
+.cfrform-volume {
+  top: 590px;
+}
+
+.hideContent {
+    display: none;
+}
+
+.toolTipContent ul {
+  padding-left: 20px;
+}
+
+.cfrform-chip {
+  color: #38598A !important;
+  border-top-color:#38598A !important;
+  border-top-width: 2px !important;
+  border-right-color:#38598A !important;
+  border-right-width: 2px !important;
+  border-bottom-color:#38598A !important;
+  border-bottom-width: 2px !important;
+  border-left-color: #38598A !important;
+  border-left-width: 2px !important;
+}
+
+.cfrform-container .MuiAccordionSummary-expandIconWrapper {
+  padding: 12px;
+  color: #FFF;
+}
