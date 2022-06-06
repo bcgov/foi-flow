@@ -40,6 +40,7 @@ import RequestTracking from "./RequestTracking";
 import BottomButtonGroup from "./BottomButtonGroup";
 import { CommentSection } from "../../customComponents/Comments";
 import { AttachmentSection } from "../../customComponents/Attachments";
+import { CFRForm } from '../../customComponents/CFRForm';
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
@@ -118,6 +119,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const initialStatuses = {
     Request: {
+      display: false,
+      active: false,
+    },
+    CFRForm: {
       display: false,
       active: false,
     },
@@ -458,6 +463,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
             >
               Request
             </div>
+            {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.CFRForm.active,
+              })}
+              name="CFRForm"
+              onClick={() => tabclick("CFRForm")}
+            >
+              CFR Form
+            </div>)}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Attachments.active,
@@ -568,6 +582,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
               </div>
             </div>
           </div>
+          {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
+            id="CFRForm"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.CFRForm.active,
+              [classes.displayed]: tabLinksStatuses.CFRForm.display,
+              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+            })}
+          >
+            <CFRForm            
+              requestNumber={requestNumber}
+              userDetail={userDetail}
+              ministryId={ministryId}
+            />
+          </div>)}
           <div
             id="Attachments"
             className={clsx("tabcontent", {
