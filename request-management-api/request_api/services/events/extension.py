@@ -247,12 +247,15 @@ class extensionevent:
         if self.__getvalueof('extensionreasonid', extension) != self.__getvalueof('extensionreasonid', prevextension):
             comment = "Extension reason has been updated to " + self.__getvalueof('reason', extensionsummary)   
         
-        if self.__getvalueof('extendedduedays', extension) != self.__getvalueof('extendedduedays', prevextension):
-            comment += " AND " if comment not in [None,""] else ""
-            comment += "Approved" if isapproved is True else "Denied"   
-            comment +=" number of days for extension has changed to " + str(self.__getvalueof('extendedduedays', extension))+ "."
-            if isapproved == True:
+        if isapproved is True:
+            if self.__getvalueof('approvednoofdays', extension) != self.__getvalueof('approvednoofdays', prevextension):
+                comment += " AND " if comment not in [None,""] else ""
+                comment +="Approved number of days for extension has changed to " + str(self.__getvalueof('approvednoofdays', extension))+ "."            
                 comment +=  " The new legislated due date is "+ self.__formatdate(self.__getvalueof('extendedduedate', extension), self.__genericdateformat())
+        else:
+            if self.__getvalueof('extendedduedays', extension) != self.__getvalueof('extendedduedays', prevextension):
+                comment += " AND " if comment not in [None,""] else ""    
+                comment +="Denied number of days for extension has changed to " + str(self.__getvalueof('extendedduedays', extension))+ "."            
         return comment
 
     def __getreasonfromid(self, curreasonid):
