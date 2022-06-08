@@ -284,7 +284,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
             InputLabelProps={{
               shrink: true,
             }}
-            InputProps={{inputProps: { min: lastStatusChangeDate, max: formatDate(today)} }}
+            InputProps={{inputProps: { min: _requestDetails.requestProcessStart, max: formatDate(today)} }}
             variant="outlined" 
             required
             error={closingDateText === undefined || closingDateText === ""}
