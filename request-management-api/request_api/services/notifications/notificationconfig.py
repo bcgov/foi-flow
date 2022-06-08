@@ -27,7 +27,9 @@ class notificationconfig:
         elif notificationtype == "Reply User Comments":
             return 9  
         elif notificationtype == "Tagged User Comments":
-            return 10  
+            return 10
+        elif notificationtype == "CFR Fee Form":
+            return 11  
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):
