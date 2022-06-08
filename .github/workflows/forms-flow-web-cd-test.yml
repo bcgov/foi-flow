@@ -56,11 +56,6 @@ jobs:
         run: |
           oc start-build ${{ env.APP_NAME }} --wait
 
-      - name: Tag+Deploy for DEV
-        shell: bash
-        run: |
-          oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:dev
-
       - name: Tag+Deploy for TEST
         shell: bash
         run: |
