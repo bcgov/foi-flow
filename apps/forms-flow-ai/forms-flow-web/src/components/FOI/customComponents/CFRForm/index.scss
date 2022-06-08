@@ -39,15 +39,20 @@
 .cfrform-floatRight {
   cursor: pointer;
   display: block;
-  z-index: 3;
+  z-index: 2;
   position: absolute;
   right: -20px;
+}
+
+.cfrform-floatRight button{
+  padding: 0px;
+  min-width: 0px;
 }
 
 .cfrform-floatRightRight {
   cursor: pointer;
   display: block;
-  z-index: 3;
+  // z-index: 0;
   position: absolute;
   right: -190px;
 }
@@ -73,7 +78,7 @@
 }
 
 .toolTipContent ul {
-  padding-left: 20px;
+  padding-left: 10px;
 }
 
 .cfrform-chip {
@@ -92,3 +97,7 @@
   padding: 12px;
   color: #FFF;
 }
+
+// .tooltip-content {
+//   max-height: calc(100vh - 10px);
+// }

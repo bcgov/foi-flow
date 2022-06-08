@@ -19,7 +19,7 @@ import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/f
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { valueToPercent } from '@mui/base';
-import Tooltip from '../Tooltip/Tooltip';
+import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 
 export const CFRForm = ({
   requestNumber,
@@ -695,7 +695,7 @@ export const CFRForm = ({
             </div>
 
             <div className="cfrform-floatRight cfrform-locating">
-              <Tooltip content={tooltipLocating} position={""} />
+              <CustomizedTooltip content={tooltipLocating} position={""} />
               <p className="hideContent" id="popup-1">Information1</p>
             </div>
             <div className="cfrform-floatRightRight cfrform-locating">
@@ -703,15 +703,15 @@ export const CFRForm = ({
               <p className="hideContent" id="popup-5">Information5</p>
             </div>
             <div className="cfrform-floatRight cfrform-producing">
-              <Tooltip content={tooltipProducing} position={""} />
+              <CustomizedTooltip content={tooltipProducing} position={""} />
               <p className="hideContent" id="popup-2">Information2</p>
             </div>
             <div className="cfrform-floatRight cfrform-preparing">
-              <Tooltip content={tooltipPreparing} position={""} />
+              <CustomizedTooltip content={tooltipPreparing} position={""} />
               <p className="hideContent" id="popup-3">Information3</p>
             </div>
             <div className="cfrform-floatRight cfrform-volume">
-              <Tooltip content={tooltipVolume} position={""} />
+              <CustomizedTooltip content={tooltipVolume} position={""} />
               <p className="hideContent" id="popup-4">Information4</p>
             </div>
 
