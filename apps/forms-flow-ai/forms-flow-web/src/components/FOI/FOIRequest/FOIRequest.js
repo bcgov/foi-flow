@@ -966,6 +966,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               requestState={requestState}
               userDetail={userDetail}
               ministryId={ministryId}
+              requestId={requestId}
             />
           </div>)}
           <div

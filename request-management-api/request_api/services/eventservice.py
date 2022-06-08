@@ -8,6 +8,7 @@ from request_api.services.events.cfrdate import cfrdateevent
 from request_api.services.events.comment import commentevent
 from request_api.services.events.legislativedate import legislativedateevent
 from request_api.services.events.extension import extensionevent
+from request_api.services.events.cfrfeeform import cfrfeeformevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 import json
@@ -65,6 +66,14 @@ class eventservice:
                 current_app.logger.error("FOI Notification failed for comment event=%s" % (commentresponse.message))     
                 return DefaultMethodResult(False,'Comment notifications failed',commentresponse.identifier)
             return DefaultMethodResult(True,'Comment notifications created',commentresponse.identifier)
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+            
+    async def posteventforcfrfeeform(self, ministryrequestid, userid, username):
+        try:
+            cfrfeeeventresponse = cfrfeeformevent().createstatetransitionevent(ministryrequestid, userid, username)
+            if cfrfeeeventresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
         

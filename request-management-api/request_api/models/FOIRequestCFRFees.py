@@ -53,7 +53,16 @@ class FOIRequestCFRFee(db.Model):
         comment_schema = FOIRequestCommentSchema()
         query = db.session.query(FOIRequestCFRFee).filter_by(cfrfeeid=cfrfeeid, isactive=True).first()
         return comment_schema.dump(query)
+    
+    @classmethod
+    def getstatenavigation(cls, ministryrequestid):
+        _session = db.session
+        _entries = _session.query(FOIRequestCFRFee).filter(FOIRequestCFRFee.ministryrequestid == ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).limit(2)
+        requeststates = []
+        for _entry in _entries:
+            requeststates.append(_entry.cfrfeestatus.description)
+        return requeststates  
        
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
-        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','cfrfeestatusid', 'cfrfeestatus.name','version') 
+        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','cfrfeestatusid', 'cfrfeestatus.name','cfrfeestatus.description','version') 
