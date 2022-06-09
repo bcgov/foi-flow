@@ -637,7 +637,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
           >
             {!isLoading &&
             requestNotes &&
-            iaoassignedToList.length > 0 &&
+            iaoassignedToList.length > 0 ||
             ministryAssignedToList.length > 0 ? (
               <>
                 <CommentSection
