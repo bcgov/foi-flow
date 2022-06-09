@@ -96,3 +96,9 @@
   padding: 12px;
   color: #FFF;
 }
+
+@media (max-width: 1444px) {
+  .cfrform-floatRightRight {
+    display: none;
+  }
+}
