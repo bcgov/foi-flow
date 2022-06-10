@@ -390,13 +390,13 @@ export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
 
 export const checkDuplicateAndFetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, ...rest) => {
   const done = fnDone(rest);
-  const apiUrlGetExistingAxisRequestIds = replaceUrl(
+  const apiUrlCheckAxisIdExists = replaceUrl(
     API.FOI_CHECK_AXIS_REQUEST_ID,
     "<axisrequestid>",
     axisRequestId
   );
   return (dispatch) => {
-    httpGETRequest(apiUrlGetExistingAxisRequestIds, {}, UserService.getToken())
+    httpGETRequest(apiUrlCheckAxisIdExists, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           if(!res.data.ispresent){
