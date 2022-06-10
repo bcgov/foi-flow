@@ -388,15 +388,30 @@ export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
   }
 };
 
-export const fetchExistingAxisRequestIds = (...rest) => {
+export const checkDuplicateAndFetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, ...rest) => {
   const done = fnDone(rest);
-  const apiUrlgetRequestDetails = replaceUrl(API.FOI_GET_AXIS_REQUEST_IDS);
+  const apiUrlGetExistingAxisRequestIds = replaceUrl(
+    API.FOI_CHECK_AXIS_REQUEST_ID,
+    "<axisrequestid>",
+    axisRequestId
+  );
   return (dispatch) => {
-    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlGetExistingAxisRequestIds, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(setExistingAxisRequestIds(res.data));
-          done(null, res.data);
+          if(!res.data.ispresent){
+            dispatch(fetchRequestDataFromAxis(axisRequestId, isModal,requestDetails,(err, data) => {
+              if(!err)
+                done(null, data);
+              else {
+                  done(null,"Exception happened while fetching request from AXIS.");
+                  dispatch(serviceActionError(res));
+                  throw new Error(`Error in fetching request from AXIS.`);
+              }
+            }));
+          }
+          else
+            done(null,"Axis Id exists");
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching axis request ids.`);
