@@ -962,6 +962,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           >
             <CFRForm            
               requestNumber={requestNumber}
+              requestState={requestState}
               userDetail={userDetail}
               ministryId={ministryId}
             />
