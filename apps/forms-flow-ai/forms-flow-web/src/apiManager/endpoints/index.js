@@ -74,7 +74,7 @@ const API = {
 
   FOI_GET_ADVANCED_SEARCH: `${FOI_BASE_API_URL}/api/advancedsearch`,
 
-  FOI_GET_AXIS_REQUEST_IDS: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestids`,
+  FOI_CHECK_AXIS_REQUEST_ID: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestid/<axisrequestid>`,
   
   FOI_GET_AXIS_REQUEST_DATA: `${AXIS_API_URL}/api/RequestSearch/<axisrequestid>`,
 

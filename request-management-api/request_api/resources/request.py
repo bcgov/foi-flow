@@ -100,21 +100,19 @@ def getparams(updaterequest):
         'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
     }
 
-@cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirawrequest/axisrequestids')
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirawrequest/axisrequestid/<axisrequestid>')
 class FOIAXISRequest(Resource):
-    """Consolidates create and retrival of raw request"""
+    """Check if axis request id already exists in db"""
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    def get():
+    def get(axisrequestid=None):
         try : 
-            jsondata = {}
-            axisrequestids = rawrequestservice().getaxisequestids()                                    
-            jsondata = json.dumps(axisrequestids)
-            return jsondata , 200 
+            isaxisrequestidpresent = rawrequestservice().isaxisrequestidpresent(axisrequestid)                                   
+            return {"axisrequestid" : axisrequestid, "ispresent": isaxisrequestidpresent}, 200
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
