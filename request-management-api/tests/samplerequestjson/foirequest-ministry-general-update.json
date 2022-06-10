@@ -1,8 +1,12 @@
 {
     "assignedGroup":"Intake Team",
-    "assignedTo":"suthirum@idir",
+    "assignedTo":"foiintake@idir",
+    "assignedToFirstName":"FOI",
+    "assignedToLastName":"Intake",
     "assignedministrygroup":"EDU Ministry Team",
     "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu",
     "category":"Individual",
     "categoryid":2,
     "cfrDueDate":"2021-11-26",
