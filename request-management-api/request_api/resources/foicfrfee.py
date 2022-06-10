@@ -79,7 +79,7 @@ class SanctionFOICFRFee(Resource):
             foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)  
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
             
-            asyncio.create_task(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)

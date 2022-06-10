@@ -62,7 +62,7 @@ class rawrequestservice:
             data['assignedGroup'] = assigneegroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
-            asyncio.create_task(redispubservice.publishrequest(json_data))
+            asyncio.ensure_future(redispubservice.publishrequest(json_data))
         return result
 
     @staticmethod

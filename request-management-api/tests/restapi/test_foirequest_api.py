@@ -331,7 +331,7 @@ def test_post_foirequest_general_cfr_division(app, client):
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
     foidivisionrequest = {
-    "assignedministrygroup":"EDUC Ministry Team",
+    "assignedministrygroup":"EDU Ministry Team",
     "assignedministryperson": "foiedu@idir",
     "requeststatusid": 2,
      "divisions": [{"divisionid":1,"stageid":1},{"divisionid":2,"stageid":1}]
@@ -361,13 +361,13 @@ def test_post_foirequest_general_cfr_document(app, client):
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
     foidivisionrequest = {
-    "assignedministrygroup":"EDUC Ministry Team",
+    "assignedministrygroup":"EDU Ministry Team",
     "assignedministryperson": "foiedu@idir",
     "requeststatusid": 2,
     "documents":  [
         {
             "category": "cfr-feeassessed",
-            "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
+            "documentpath":"/EDU/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
             "filename":"test.docx"
         }
         ]

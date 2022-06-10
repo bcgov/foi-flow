@@ -59,4 +59,4 @@ class cfrfeeformevent:
         return  username+' updated Fee Estimate status to '+state
 
     def __notificationmessage(self, state):
-        return  'User has updated Fee Estimate Status to '+state 
+        return  'Updated Fee Estimate Status to '+state 
