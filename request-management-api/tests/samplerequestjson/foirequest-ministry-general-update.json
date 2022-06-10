@@ -1,7 +1,7 @@
 {
     "assignedGroup":"Intake Team",
     "assignedTo":"suthirum@idir",
-    "assignedministrygroup":"EDUC Ministry Team",
+    "assignedministrygroup":"EDU Ministry Team",
     "assignedministryperson":"foiedu@idir",
     "category":"Individual",
     "categoryid":2,
@@ -29,8 +29,8 @@
     "requestType":"general",
     "selectedMinistries":[
        {
-          "code":"EDUC",
-          "name":"Ministry of Education",
+          "code":"EDU",
+          "name":"Ministry of Education and Childcare",
           "selected":"true"
        }
     ],

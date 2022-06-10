@@ -51,7 +51,7 @@ class CreateFOIRequestComment(Resource):
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
             result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid())
             if result.success == True:
-                asyncio.create_task(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -74,7 +74,7 @@ class CreateFOIRawRequestComment(Resource):
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
             result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
             if result.success == True:
-                asyncio.create_task(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -126,7 +126,7 @@ class FOIDisableComment(Resource):
             else:
                 result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getuserid())
             if result.success == True:
-                asyncio.create_task(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
