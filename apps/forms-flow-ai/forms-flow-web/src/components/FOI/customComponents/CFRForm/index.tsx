@@ -24,6 +24,7 @@ import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 export const CFRForm = ({
   requestNumber,
   ministryId,
+  requestId,
   userDetail
 }: params) => {
 
@@ -282,6 +283,7 @@ export const CFRForm = ({
     saveCFRForm(
       data,
       ministryId,
+      requestId,
       isMinistry,
       dispatch,
       callback,
