@@ -24,6 +24,7 @@ import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import Tooltip from '../Tooltip/Tooltip';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { handleBeforeUnload } from '../../../FOI/FOIRequest/utils';
+import { returnToQueue } from '../../../FOI/FOIRequest/BottomButtonGroup/utils';
 
 export const CFRForm = ({
   requestNumber,
@@ -187,28 +188,20 @@ export const CFRForm = ({
 
   React.useEffect(() => {
     if (!_.isEqual(initialFormData, formData)) {
-      var handler = (e: any) => {
-        e.preventDefault();
-        return e.returnValue = "";        
-      };
-      var popstatehandler = () => {
-        if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
-          window.history.back();
-        } else {
-          window.history.pushState(null, "", null);
-        }
-      };
-      window.addEventListener("popstate", popstatehandler); 
-      window.addEventListener("beforeunload", handler);
-      return () => {      
-        window.removeEventListener("popstate", popstatehandler);
-        window.removeEventListener("beforeunload", handler);
-      }
+      window.addEventListener("popstate", (e) => returnToQueue(e, true));
+      window.addEventListener("beforeunload", handleBeforeUnload);
+    } else {
+      window.removeEventListener("popstate", (e) => returnToQueue(e, true));
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
+    return () => {
+      window.removeEventListener("popstate", (e) => returnToQueue(e, true));
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     }
   }, [initialFormData, formData]);
 
   React.useEffect(() => {
-      window.history.pushState(null, "", null);
+    window.history.pushState(null, "", null);
   }, []);
 
   const validateField = (value: number, step: number) => {
@@ -331,15 +324,6 @@ export const CFRForm = ({
       },
     )
   };
-  
-// window.addEventListener("beforeunload", (e) => {
-//   console.log("here")
-//   console.log(initialFormData)
-//   console.log(formData)
-//   if (!_.isEqual(initialFormData, formData)) {
-//     handleBeforeUnload(e)
-//   }
-// });
 
 
   return (
@@ -412,7 +396,7 @@ export const CFRForm = ({
                     e.target.value = parseFloat(e.target.value).toFixed(2);
                   }}
                   fullWidth
-                  disabled={_.isEqual(formData, blankForm)}
+                  disabled={isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved'}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
