@@ -195,6 +195,7 @@ export const createAssigneeDetails = (value, value2) => {
         assigneeObject.assignedTo = assignedTo[0];
       }
       assigneeObject.assignedToName = value2;
+      console.log("Createed Assignee in utils:",assigneeObject);
       return assigneeObject;
 }
 
