@@ -77,14 +77,14 @@ class FOIRawRequest(Resource):
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)
-                asyncio.create_task(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
+                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
                 if result.success == True:
-                    asyncio.create_task(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
+                    asyncio.ensure_future(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")
                 if result.success == True:
-                    asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
@@ -100,21 +100,19 @@ def getparams(updaterequest):
         'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
     }
 
-@cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirawrequest/axisrequestids')
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirawrequest/axisrequestid/<axisrequestid>')
 class FOIAXISRequest(Resource):
-    """Consolidates create and retrival of raw request"""
+    """Check if axis request id already exists in db"""
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    def get():
+    def get(axisrequestid=None):
         try : 
-            jsondata = {}
-            axisrequestids = rawrequestservice().getaxisequestids()                                    
-            jsondata = json.dumps(axisrequestids)
-            return jsondata , 200 
+            isaxisrequestidpresent = rawrequestservice().isaxisrequestidpresent(axisrequestid)                                   
+            return {"axisrequestid" : axisrequestid, "ispresent": isaxisrequestidpresent}, 200
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
@@ -136,7 +134,7 @@ class FOIRawRequestLoadTest(Resource):
             username = 'Super Tester'
             if int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
+                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 400, 'message':INVALID_REQUEST_ID}, 400    

@@ -33,7 +33,7 @@ class rawrequestservice:
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
         isaxisrequestidpresent = False
         if axisrequestid is not None:
-            isaxisrequestidpresent = self.__isaxisrequestidpresent(axisrequestid)
+            isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
 
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
@@ -62,7 +62,7 @@ class rawrequestservice:
             data['assignedGroup'] = assigneegroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
-            asyncio.create_task(redispubservice.publishrequest(json_data))
+            asyncio.ensure_future(redispubservice.publishrequest(json_data))
         return result
 
     @staticmethod
@@ -128,7 +128,7 @@ class rawrequestservice:
     def getaxisequestids(self):
         return rawrequestservicegetter().getaxisequestids()
     
-    def __isaxisrequestidpresent(self, axisrequestid):
+    def isaxisrequestidpresent(self, axisrequestid):
         countofaxisrequestid = rawrequestservicegetter().getcountofaxisequestidbyaxisequestid(axisrequestid)
         if countofaxisrequestid > 0:
             return True

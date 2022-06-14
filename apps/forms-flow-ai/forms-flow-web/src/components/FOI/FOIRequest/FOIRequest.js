@@ -26,7 +26,6 @@ import {
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
-  fetchExistingAxisRequestIds,
   fetchRequestDataFromAxis
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
@@ -175,7 +174,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
     }
-    dispatch(fetchExistingAxisRequestIds());
   }, []);
 
   const dispatch = useDispatch();
@@ -965,6 +963,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               requestState={requestState}
               userDetail={userDetail}
               ministryId={ministryId}
+              requestId={requestId}
             />
           </div>)}
           <div
