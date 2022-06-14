@@ -21,6 +21,7 @@ export type CFRFormData = {
 
 export type params = {
   requestNumber: string;
+  requestState: string;
   ministryId: number;
   requestId: number;
   userDetail: {
