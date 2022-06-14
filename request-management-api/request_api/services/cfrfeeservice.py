@@ -61,7 +61,7 @@ class cfrfeeservice:
             cfrfee.pop('cfrfeestatus.name')
             return cfrfee 
         else:
-            return None
+            return {}
         
            
     def __pstformat(self, inpdate):
