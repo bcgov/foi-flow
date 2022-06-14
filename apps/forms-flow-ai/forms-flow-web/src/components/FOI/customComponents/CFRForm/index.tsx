@@ -138,7 +138,7 @@ export const CFRForm = ({
   });
 
   const blankForm: CFRFormData = {
-    formStatus: "review",
+    formStatus: "",
     amountDue: 0,
     amountPaid: 0,
     estimates: {
@@ -179,7 +179,7 @@ export const CFRForm = ({
         producing: initialState.feedata.actualproducinghrs,
         preparing: initialState.feedata.actualpreparinghrs,
         electronicPages: initialState.feedata.actualelectronicpages,
-        hardcopyPages: initialState.feedata.estimatedhardcopypages,
+        hardcopyPages: initialState.feedata.actualhardcopypages,
       },
       suggestions: initialState.overallsuggestions
     };
@@ -354,6 +354,7 @@ export const CFRForm = ({
             value={formData?.formStatus}
             onChange={handleTextChanges}
             variant="outlined"
+            placeholder='Select CFR Form Status'
             fullWidth
             required
             disabled={cfrStatusDisabled()}
@@ -469,7 +470,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.locating, foiFees.locating.unit) &&
                     "Hours must be entered in increments of " + foiFees.locating.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved' || requestState === StateEnum.feeassessed.name}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
@@ -530,7 +531,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.producing, foiFees.producing.unit) &&
                     "Hours must be entered in increments of " + foiFees.producing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved' || requestState === StateEnum.feeassessed.name}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                 </TextField>
               </div>
@@ -592,7 +593,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.preparing, foiFees.preparing.unit) &&
                     "Hours must be entered in increments of " + foiFees.preparing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved' || requestState === StateEnum.feeassessed.name}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                   {/* {menuItems} */}
                 </TextField>
@@ -655,7 +656,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.electronicPages, foiFees.electronicPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.electronicPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved' || requestState === StateEnum.feeassessed.name}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                 </TextField>
                 <TextField
@@ -681,7 +682,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.hardcopyPages, foiFees.hardcopyPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.hardcopyPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved' || requestState === StateEnum.feeassessed.name}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                 </TextField>
               </div>
@@ -780,7 +781,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true, }}
                   onChange={handleTextChanges}
                   fullWidth
-                  disabled={!isMinistry || formData?.formStatus === 'approved' || requestState === StateEnum.feeassessed.name}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 />
               </div>
             </div>
