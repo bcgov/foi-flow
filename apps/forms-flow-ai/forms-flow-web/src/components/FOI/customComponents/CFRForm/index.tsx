@@ -35,7 +35,7 @@ export const CFRForm = ({
   const CFRStatuses = [
     {
       value: 'review',
-      label: 'In Review'
+      label: 'In Review with IAO'
     },
     {
       value: 'approved',
@@ -43,7 +43,7 @@ export const CFRForm = ({
     },
     {
       value: 'clarification',
-      label: 'Clarification'
+      label: 'Needs Clarification with Ministry'
     },
   ];
 
@@ -263,9 +263,9 @@ export const CFRForm = ({
   const cfrStatusDisabled = () => {
     if (requestState === StateEnum.feeassessed.name) {
       if (isMinistry) {
-        return formData.formStatus !== 'clarification';
+        return initialFormData.formStatus !== 'clarification';
       } else {
-        return formData.formStatus === 'clarification';
+        return initialFormData.formStatus === 'clarification';
       }
     }
     return true;
@@ -357,7 +357,11 @@ export const CFRForm = ({
             disabled={cfrStatusDisabled()}
           >
             {CFRStatuses.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem
+              key={option.value}
+              value={option.value}
+              disabled={isMinistry && option.value === 'approved'}
+            >
               {option.label}
             </MenuItem>
             ))}
