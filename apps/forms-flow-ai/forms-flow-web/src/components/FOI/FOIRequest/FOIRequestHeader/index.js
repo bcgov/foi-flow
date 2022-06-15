@@ -57,7 +57,7 @@ const FOIRequestHeader = React.memo(
       (state) => state.foiRequests.foiAssignedToList
     );
    
-    var assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
+    let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
     const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
     //handle default value for the validation of required fields
@@ -72,8 +72,7 @@ const FOIRequestHeader = React.memo(
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
 
     useEffect(() => {
-      console.log("!!");
-        setAssignedTo(getAssignedTo(assigneeObj));
+      setAssignedTo(getAssignedTo(assigneeObj));
     }, [assigneeObj]);
   
     const [menuItems, setMenuItems] = useState([]);
