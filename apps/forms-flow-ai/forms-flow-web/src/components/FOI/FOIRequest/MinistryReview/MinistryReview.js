@@ -189,7 +189,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
-
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
@@ -231,6 +230,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setUnSavedRequest(true);
     setSaveMinistryRequestObject(requestObject);
   };
+
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
   const handleSaveRequest = (_state, _unSaved, id) => {
@@ -535,7 +535,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           handleMinistryAssignedToValue={
                             handleMinistryAssignedToValue
                           }
-                          unSavedRequest={unSavedRequest}
+                          setSaveMinistryRequestObject={
+                            setSaveMinistryRequestObject
+                          }
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />

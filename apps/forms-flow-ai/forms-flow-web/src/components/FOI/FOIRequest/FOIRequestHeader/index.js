@@ -15,9 +15,6 @@ import { createAssigneeDetails } from '../utils'
 import {
   saveAssignee
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
-import {
-  fetchFOIRequestDetailsWrapper  
-} from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import _ from 'lodash';
 
@@ -59,8 +56,7 @@ const FOIRequestHeader = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-    // const [assigneeDetails, setAssigneeDetails] = React.useState(() => Object.entries(requestDetails).length> 0 ? 
-    // createAssigneeObjFromRequest() : {});
+   
     var assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
     const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
@@ -86,11 +82,6 @@ const FOIRequestHeader = React.memo(
 
     const preventDefault = (event) => event.preventDefault();
 
-    // const createAssigneeObjFromRequest = () => {
-    //   console.log("!!");
-    //   return _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
-    // 'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
-    // };
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -109,9 +100,9 @@ const FOIRequestHeader = React.memo(
       );
     }, [selectedAssignedTo, assignedToList]);
     
-    const saveAssigneeDetails = (event, isUnopened) => {
+    const saveAssigneeDetails = (event) => {
       setAssignedTo(event.target.value);
-          if (isAddRequest || isUnopened) {
+          if (isAddRequest) {
             //event bubble up - to validate required fields
             handleAssignedToValue(event.target.value);
             createSaveRequestObject(
@@ -134,7 +125,11 @@ const FOIRequestHeader = React.memo(
                     draggable: true,
                     progress: undefined,
                   });
-                  //dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+                  createSaveRequestObject(
+                    FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+                    event.target.value,
+                    event.target.name
+                  );
                   //event bubble up - to validate required fields
                   handleAssignedToValue(event.target.value);
                 } else {
@@ -155,15 +150,6 @@ const FOIRequestHeader = React.memo(
             )
           }
         }
-
-    //handle onChange event for assigned To
-    const handleAssignedToOnChange = (event) => {
-      const isUnopened = requestDetails?.currentState === StateEnum.unopened.name;
-      saveAssigneeDetails(event, isUnopened); 
-      // if (!unSavedRequest || isAddRequest || isUnopened) {
-      //   saveAssigneeDetails(event, isUnopened);        
-      // } 
-    };
 
     const status = getStatus({ headerValue, requestDetails });
 
@@ -220,7 +206,7 @@ const FOIRequestHeader = React.memo(
               InputLabelProps={{ shrink: true }}
               select
               value={selectedAssignedTo}
-              onChange={handleAssignedToOnChange}
+              onChange={saveAssigneeDetails}
               input={<Input />}
               variant="outlined"
               fullWidth
