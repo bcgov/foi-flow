@@ -15,10 +15,8 @@ import { createAssigneeDetails } from '../utils'
 import {
   saveAssignee
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
-import {
-  fetchFOIRequestDetailsWrapper  
-} from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
+import _ from 'lodash';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -54,12 +52,14 @@ const FOIRequestHeader = React.memo(
     const classes = useStyles();
     const dispatch = useDispatch();
     const { requestId, ministryId } = useParams();
-
     //get the assignedTo master data
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-
+   
+    let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
+    'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
+    const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
     //handle default value for the validation of required fields
     React.useEffect(() => {
       let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
@@ -72,13 +72,15 @@ const FOIRequestHeader = React.memo(
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
 
     useEffect(() => {
-        setAssignedTo(getAssignedTo(requestDetails));
-    }, [requestDetails]);
-
-    const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(requestDetails));
-    const [menuItems, setMenuItems] = useState([])
+      setAssignedTo(getAssignedTo(assigneeObj));
+    }, [assigneeObj]);
+  
+    const [menuItems, setMenuItems] = useState([]);
+ 
+    const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(assigneeDetails));
 
     const preventDefault = (event) => event.preventDefault();
+
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -97,9 +99,9 @@ const FOIRequestHeader = React.memo(
       );
     }, [selectedAssignedTo, assignedToList]);
     
-    const saveAssigneeDetails = (event, isUnopened) => {
+    const saveAssigneeDetails = (event) => {
       setAssignedTo(event.target.value);
-          if (isAddRequest || isUnopened) {
+          if (isAddRequest) {
             //event bubble up - to validate required fields
             handleAssignedToValue(event.target.value);
             createSaveRequestObject(
@@ -108,7 +110,8 @@ const FOIRequestHeader = React.memo(
               event.target.name
             );
           } else {
-            const assigneeDetails = createAssigneeDetails(event.target.value, event.target.name);       
+            setAssigneeObj(createAssigneeDetails(event.target.value, event.target.name));  
+            assigneeDetails = createAssigneeDetails(event.target.value, event.target.name);
             dispatch(
               saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
                 if(!err) {
@@ -121,7 +124,11 @@ const FOIRequestHeader = React.memo(
                     draggable: true,
                     progress: undefined,
                   });
-                  dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+                  createSaveRequestObject(
+                    FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+                    event.target.value,
+                    event.target.name
+                  );
                   //event bubble up - to validate required fields
                   handleAssignedToValue(event.target.value);
                 } else {
@@ -143,16 +150,6 @@ const FOIRequestHeader = React.memo(
           }
         }
 
-    //handle onChange event for assigned To
-    const handleAssignedToOnChange = (event) => {
-      const isUnopened = requestDetails?.currentState === StateEnum.unopened.name;
-      if ((!isAddRequest && !isUnopened && unSavedRequest && window.confirm(
-        "Are you sure you want to leave? Your changes will be lost."
-      )) || !unSavedRequest || isAddRequest || isUnopened) {
-        saveAssigneeDetails(event, isUnopened);        
-      } 
-    };
-
     const status = getStatus({ headerValue, requestDetails });
 
     const showMinistryAssignedTo =
@@ -168,9 +165,9 @@ const FOIRequestHeader = React.memo(
       status.toLowerCase() === StateEnum.response.name.toLowerCase();
 
     const getMinistryAssignedTo = () => {
-      if (requestDetails?.assignedministryperson)
-        return getFullName(requestDetails?.assignedministrypersonLastName, requestDetails?.assignedministrypersonFirstName, requestDetails?.assignedministryperson);
-      return requestDetails.assignedministrygroup;
+      if (assigneeDetails?.assignedministryperson)
+        return getFullName(assigneeDetails?.assignedministrypersonLastName, assigneeDetails?.assignedministrypersonFirstName, assigneeDetails?.assignedministryperson);
+      return assigneeDetails.assignedministrygroup;
     }
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
@@ -208,7 +205,7 @@ const FOIRequestHeader = React.memo(
               InputLabelProps={{ shrink: true }}
               select
               value={selectedAssignedTo}
-              onChange={handleAssignedToOnChange}
+              onChange={saveAssigneeDetails}
               input={<Input />}
               variant="outlined"
               fullWidth

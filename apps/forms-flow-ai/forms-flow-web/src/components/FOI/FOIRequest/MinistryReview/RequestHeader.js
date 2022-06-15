@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import { getHeaderText } from './utils';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
-const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, unSavedRequest}) => {
+const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, setSaveMinistryRequestObject}) => {
 
     const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
@@ -76,32 +76,30 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                  
                     {watcherBox}
-                   
                 </div>
             </div>
-            
             <div className="foi-assigned-to-container">
                 <div className="foi-assigned-to-inner-container">
-                <TextField
-                    id="assignedTo"
-                    label="IAO Assigned To"
-                    InputLabelProps={{ shrink: true, }}                              
-                    value={assignedToValue}                    
-                    input={<InputLabel />} 
-                    variant="outlined"
-                    fullWidth                    
-                    disabled = {true}                                        
-                >                               
-                </TextField> 
+                    <TextField
+                        id="assignedTo"
+                        label="IAO Assigned To"
+                        InputLabelProps={{ shrink: true, }}                              
+                        value={assignedToValue}                    
+                        input={<InputLabel />} 
+                        variant="outlined"
+                        fullWidth                    
+                        disabled = {true}                                        
+                    >                               
+                    </TextField> 
                 </div>
-
-            
-                    <>
-                      <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} unSavedRequest={unSavedRequest} />
-                    </>
-                
+                <>
+                    <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} 
+                    ministryAssignedToList={ministryAssignedToList} 
+                    handleMinistryAssignedToValue={handleMinistryAssignedToValue} 
+                    isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} 
+                    setSaveMinistryRequestObject={setSaveMinistryRequestObject} />
+                </>
             </div>
         </div>
 
