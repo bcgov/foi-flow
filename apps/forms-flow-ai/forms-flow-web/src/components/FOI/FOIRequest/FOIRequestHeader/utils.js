@@ -83,7 +83,6 @@ export const getHeaderText = ({requestDetails, ministryId, status}) => {
 };
 
 export const getAssignedTo = (assigneeDetails) => {
-  console.log("Assignee in utils:",assigneeDetails);
   if (!assigneeDetails.assignedGroup || assigneeDetails.assignedTo === "Unassigned") {
     return "|Unassigned";
   }
