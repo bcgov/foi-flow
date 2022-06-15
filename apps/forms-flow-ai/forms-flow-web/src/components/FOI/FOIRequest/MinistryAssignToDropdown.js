@@ -34,7 +34,7 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
      */ 
     const classes = useStyles();
     const dispatch = useDispatch();
-    var assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
+    let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
 
     //local state management for assignedTo
