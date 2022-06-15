@@ -475,9 +475,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const createSaveRequestObject = (name, value, value2) => {
     let requestObject = { ...saveRequestObject };
-    setUnSavedRequest(
-      name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
-    );
+    if(name !== 'assignedTo'){
+      setUnSavedRequest(
+        name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
+      );  
+    }
 
     requestObject = createRequestDetailsObject(
       requestObject,
