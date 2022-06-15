@@ -10,7 +10,7 @@ from dateutil import parser
 from dateutil import tz
 import pytz
 import maya
-from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
+
 
 class cfrfeeservice:
     """ FOI CFR Fee Form management service
@@ -32,7 +32,7 @@ class cfrfeeservice:
         cfrfee = FOIRequestCFRFee()
         lkupcfrfee = self.getcfrfee(ministryrequestid)           
         _version = 1
-        if lkupcfrfee is not None:
+        if lkupcfrfee:
             cfrfee.__dict__.update(lkupcfrfee)
             _version =  lkupcfrfee['version'] + 1
         cfrfee.version = _version   
@@ -61,7 +61,7 @@ class cfrfeeservice:
             cfrfee.pop('cfrfeestatus.name')
             return cfrfee 
         else:
-            return None
+            return {}
         
            
     def __pstformat(self, inpdate):
