@@ -56,14 +56,14 @@ export const CFRForm = ({
       disabled: false,
     },
     {
-      value: 'approved',
-      label: 'Approved',
-      disabled: isMinistry,
-    },
-    {
       value: 'clarification',
       label: 'Needs Clarification with Ministry',
       disabled: false
+    },
+    {
+      value: 'approved',
+      label: 'Approved',
+      disabled: isMinistry,
     },
   ];
 
