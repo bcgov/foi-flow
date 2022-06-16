@@ -23,7 +23,7 @@ export const ActionProvider = ({ children }) => {
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
+    // { field: "receivedDateUF", sort: "desc" },
   ];
 
   useEffect(() => {

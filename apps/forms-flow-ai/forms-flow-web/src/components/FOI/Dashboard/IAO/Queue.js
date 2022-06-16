@@ -74,14 +74,14 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (filter === requestFilter) {
       return;
     }
-    setRowsState(defaultRowsState);
+    setRowsState((prev) => ({ ...prev, page: 0 }));
     dispatch(setQueueFilter(filter));
   };
 
   const setSearch = debounce((e) => {
     var keyword = e.target.value.trim();
     setFilterModel((prev) => ({ ...prev, keyword }));
-    setRowsState(defaultRowsState);
+    setRowsState((prev) => ({ ...prev, page: 0 }));
   }, 500);
 
   const rows = useMemo(() => {
