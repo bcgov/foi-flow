@@ -64,6 +64,7 @@ export const CustomFooter = ({rowCount, defaultSortModel}) => {
   
     const resumeDefaultSorting = useSelector((state) => state.foiRequests.resumeDefaultSorting)
   
+    //apply default sorting model
     useEffect(() => {
       if(resumeDefaultSorting) {
         apiRef.current.setSortModel(defaultSortModel);
