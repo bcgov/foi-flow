@@ -236,3 +236,9 @@ export const setRequestDueDate = (data) => (dispatch) => {
   });
 };
 
+export const setResumeDefaultSorting = (data) => (dispatch) => {
+    dispatch({
+        type: FOI_ACTION_CONSTANTS.RESUME_DEFAULT_SORTING,
+        payload: data,
+    });
+};
