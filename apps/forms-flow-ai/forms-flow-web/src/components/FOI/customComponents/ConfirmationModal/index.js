@@ -65,7 +65,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
 
-    const cfrStatus = useSelector((state) => state.foiRequests.foiRequestCFRForm.status);
+    const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
 
     React.useEffect(() => {
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
@@ -140,11 +140,10 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           />
         );
       }
-      else {
-
+      else if (state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init') {
         return (
           <>
-          {(state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init') ? null :
+          {
           ((currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
             <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
               <tbody>
