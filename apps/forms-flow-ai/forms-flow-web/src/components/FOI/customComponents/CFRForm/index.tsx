@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
@@ -17,14 +17,19 @@ import { calculateFees } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
 import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
-import Tooltip from '../Tooltip/Tooltip';
 import { toast } from "react-toastify";
 import { valueToPercent } from '@mui/base';
-import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
-import Tooltip from '../Tooltip/Tooltip';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { handleBeforeUnload } from '../../../FOI/FOIRequest/utils';
 import { returnToQueue } from '../../../FOI/FOIRequest/BottomButtonGroup/utils';
+import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import CloseIcon from '@material-ui/icons/Close';
+import IconButton from '@material-ui/core/IconButton';
 
 export const CFRForm = ({
   requestNumber,
@@ -347,6 +352,34 @@ export const CFRForm = ({
   };
 
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState(<></>);
+  const handleSave = () => {
+    setModalOpen(false);
+    save();
+  };
+  const handleClose = () => {
+    setFormData(values => ({...values, formStatus: initialFormData.formStatus}));
+    setModalOpen(false);
+  };
+  const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleTextChanges(e);
+    if (e.target.value === 'review') {
+      setModalMessage(<>By changing the CFR Form Status to <b>"In Review with IAO"</b>
+      you will be sending the form to the IAO user and locking your ability to edit the form.
+      Are you sure you would like to continue?</>);
+    } else if (e.target.value === 'approved') {
+      setModalMessage(<>Are you sure you want to change the status to <b>"Approved"</b>?
+      The CFR form will be locked for editing, and can only be unlocked by changing the status back</>);
+    } else if (e.target.value === 'clarification') {
+      setModalMessage(<>By changing the CFR Form Status to <b>"Needs Clarification with Ministry" </b>
+      you will be sending the form to the Ministry user and locking your ability to edit the form.
+      Are you sure you would like to continue?</>);
+    }
+    setModalOpen(true);
+  };
+
+
   return (
     <div className="foi-review-container">
     <Box
@@ -371,7 +404,7 @@ export const CFRForm = ({
             select
             name="formStatus"
             value={formData?.formStatus}
-            onChange={handleTextChanges}
+            onChange={handleStatusChange}
             variant="outlined"
             fullWidth
             required
@@ -819,6 +852,44 @@ export const CFRForm = ({
       </div>
     </div>
   </div></Box>
+
+  <div className="state-change-dialog">
+    <Dialog
+      open={modalOpen}
+      onClose={handleClose}
+      aria-labelledby="state-change-dialog-title"
+      aria-describedby="state-change-dialog-description"
+      maxWidth={'md'}
+      fullWidth={true}
+      // id="state-change-dialog"
+    >
+      <DialogTitle disableTypography id="state-change-dialog-title">
+          <h2 className="state-change-header">CFR Form Status</h2>
+          <IconButton className="title-col3" onClick={handleClose}>
+            <i className="dialog-close-button">Close</i>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+      <DialogContent className={'dialog-content-nomargin'}>
+        <DialogContentText id="state-change-dialog-description" component={'span'}>
+        <span className="confirmation-message">
+            {modalMessage}
+          </span>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <button
+          className={`btn-bottom btn-save btn`}
+          onClick={handleSave}
+        >
+          Save Change
+        </button>
+        <button className="btn-bottom btn-cancel" onClick={handleClose}>
+          Cancel
+        </button>
+      </DialogActions>
+    </Dialog>
+  </div>
   </div>
   );
 }

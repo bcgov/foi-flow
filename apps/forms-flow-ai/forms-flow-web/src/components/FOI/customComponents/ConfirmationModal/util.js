@@ -74,7 +74,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
               body: "To update the state you must first complete the estimated hours in the CFR Form so that Total Fees are due."
             };
           } else {
-            return {title: "Fee Estimate", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}?`};
+            return {title: "Fee Estimate", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}? The CFR Form will be locked for editing and sent to IAO for review.`};
           }
       case StateEnum.deduplication.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
