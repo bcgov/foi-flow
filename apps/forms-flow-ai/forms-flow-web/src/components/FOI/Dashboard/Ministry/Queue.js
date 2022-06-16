@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from "@mui/x-data-grid";
-import Pagination from "@mui/material/Pagination";
+import { DataGrid } from "@mui/x-data-grid";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +17,7 @@ import Paper from "@mui/material/Paper";
 import { formatDate } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { setQueueFilter } from "../../../../actions/FOI/foiRequestActions";
+import { CustomFooter } from "../CustomFooter"
 
 const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
@@ -40,7 +34,7 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const defaultSortModel = [
     { field: "ministrySorting", sort: "asc" },
-    { field: "cfrduedate", sort: "asc" }
+    // { field: "cfrduedate", sort: "asc" }
   ];
   const [sortModel, setSortModel] = useState(defaultSortModel);
 
@@ -71,6 +65,13 @@ const Queue = ({ userDetail, tableInfo }) => {
           row.field = "duedate";
         }
       });
+
+      //add cfrduedate asc to default sorting
+      if(JSON.stringify(smodel) == JSON.stringify(defaultSortModel)) {
+        smodel.push(
+          { field: "cfrduedate", sort: "asc" },
+        );
+      }
     }
 
     return smodel;
@@ -295,8 +296,9 @@ const Queue = ({ userDetail, tableInfo }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
+      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
         <DataGrid
+          autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
           rows={rows}
@@ -305,18 +307,18 @@ const Queue = ({ userDetail, tableInfo }) => {
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
           pageSize={rowsState.pageSize}
-          rowsPerPageOptions={[10]}
+          // rowsPerPageOptions={[10,20,50,100]}
           hideFooterSelectedRowCount={true}
           disableColumnMenu={true}
           pagination
           paginationMode="server"
           page={rowsState.page}
-          onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-          onPageSizeChange={(pageSize) =>
-            setRowsState((prev) => ({ ...prev, pageSize }))
+          onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+          onPageSizeChange={(newpageSize) =>
+            setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
           }
           components={{
-            Pagination: CustomPagination,
+            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={defaultSortModel}></CustomFooter>
           }}
           sortingOrder={["desc", "asc"]}
           sortingMode={"server"}
@@ -331,20 +333,6 @@ const Queue = ({ userDetail, tableInfo }) => {
         />
       </Grid>
     </>
-  );
-};
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(_event, value) => apiRef.current.setPage(value - 1)}
-    />
   );
 };
 

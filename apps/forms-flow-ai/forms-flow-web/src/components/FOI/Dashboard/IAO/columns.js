@@ -191,7 +191,7 @@ const FlexTeamColumns = [
 const defaultTableInfo = {
   sort: [
     { field: "defaultSorting", sort: "asc" },
-    { field: "duedate", sort: "asc" }
+    // { field: "duedate", sort: "asc" }
   ],
   noAssignedClassName: "not-assigned"
 };
@@ -201,7 +201,7 @@ const getTableInfo = (userGroups) => {
     defaultTableInfo.columns = IntakeTeamColumns;
     defaultTableInfo.sort = [
       { field: "intakeSorting", sort: "asc" },
-      { field: "duedate", sort: "asc" }
+      // { field: "duedate", sort: "asc" }
     ];
   }
 
