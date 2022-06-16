@@ -32,25 +32,33 @@ export const CFRForm = ({
   userDetail
 }: params) => {
 
-  const CFRStatuses = [
-    {
-      value: 'review',
-      label: 'In Review with IAO'
-    },
-    {
-      value: 'approved',
-      label: 'Approved'
-    },
-    {
-      value: 'clarification',
-      label: 'Needs Clarification with Ministry'
-    },
-  ];
-
   const dispatch = useDispatch();
 
   const userGroups = userDetail.groups.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
+
+  const CFRStatuses = [
+    {
+      value: 'init',
+      label: 'Select CFR Form Status',
+      disabled: true,
+    },
+    {
+      value: 'review',
+      label: 'In Review with IAO',
+      disabled: false,
+    },
+    {
+      value: 'approved',
+      label: 'Approved',
+      disabled: isMinistry,
+    },
+    {
+      value: 'clarification',
+      label: 'Needs Clarification with Ministry',
+      disabled: false
+    },
+  ];
 
   React.useEffect(() => {
     if (ministryId) {
@@ -131,12 +139,10 @@ export const CFRForm = ({
     setFormData(values => ({...values, [name]: value}));
   };
 
-  const initialState: any = useSelector((state: any) => {
-    return state.foiRequests.foiRequestCFRForm;
-  });
+  const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
 
   const blankForm: CFRFormData = {
-    formStatus: "",
+    formStatus: "init",
     amountDue: 0,
     amountPaid: 0,
     estimates: {
@@ -162,7 +168,7 @@ export const CFRForm = ({
 
   React.useEffect(() => {
     var formattedData = {
-      formStatus: initialState.status,
+      formStatus: initialState.status === null ? 'init' : initialState.status,
       amountDue: initialState.feedata.totalamountdue,
       amountPaid: initialState.feedata.amountpaid,
       estimates: {
@@ -283,6 +289,10 @@ export const CFRForm = ({
         draggable: true,
         progress: undefined,
       });
+      fetchCFRForm(
+        ministryId,
+        dispatch,
+      );
     };
     var data;
     if (isMinistry) {
@@ -302,7 +312,7 @@ export const CFRForm = ({
           actualhardcopypages: formData.actual.hardcopyPages,
         },
         overallsuggestions: formData.suggestions,
-        status: formData.formStatus
+        status: formData.formStatus === 'init' ? '' : formData.formStatus
       }
     } else {
       data = {
@@ -352,7 +362,6 @@ export const CFRForm = ({
             value={formData?.formStatus}
             onChange={handleTextChanges}
             variant="outlined"
-            placeholder='Select CFR Form Status'
             fullWidth
             required
             disabled={cfrStatusDisabled()}
@@ -361,7 +370,7 @@ export const CFRForm = ({
             <MenuItem
               key={option.value}
               value={option.value}
-              disabled={isMinistry && option.value === 'approved'}
+              disabled={option.disabled}
             >
               {option.label}
             </MenuItem>
@@ -491,7 +500,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.locating, foiFees.locating.unit) &&
                     "Hours must be entered in increments of " + foiFees.locating.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
@@ -553,7 +562,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.producing, foiFees.producing.unit) &&
                     "Hours must be entered in increments of " + foiFees.producing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
@@ -616,7 +625,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.preparing, foiFees.preparing.unit) &&
                     "Hours must be entered in increments of " + foiFees.preparing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
@@ -704,7 +713,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.electronicPages, foiFees.electronicPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.electronicPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
                 <TextField
                   id="actualhardcopy"
@@ -728,7 +737,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.hardcopyPages, foiFees.hardcopyPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.hardcopyPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
