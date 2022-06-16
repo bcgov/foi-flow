@@ -410,7 +410,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
               setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort}></CustomFooter>
+              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={tableInfo.sort}></CustomFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
@@ -433,19 +433,5 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     </ConditionalComponent>
   );
 };
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
 
 export default DataGridAdvancedSearch;
