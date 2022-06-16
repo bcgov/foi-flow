@@ -221,3 +221,27 @@ nav.MuiPagination-root {
     margin-left: 10px;
     margin-top: 170px;
 }
+
+.footerContent {
+    padding: 10px 0;
+    font-size: 0.875rem !important;
+}
+
+.footerContent ul {
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+}
+
+.footerContent .MuiNativeSelect-root::before {
+    transition: none !important;
+    border-bottom: 0px !important;
+}
+
+.footerContent .MuiNativeSelect-root::after {
+    border-bottom: 0px !important;
+}
+
+.MuiNativeSelect-standard {
+    padding-right: 15px !important;
+}
