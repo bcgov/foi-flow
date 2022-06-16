@@ -143,8 +143,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       else if (state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init') {
         return (
           <>
-          {
-          ((currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
+          {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
             <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
               <tbody>
                 <tr>
@@ -152,8 +151,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                   <td>{updatedAssignedTo}</td>
                 </tr>
               </tbody>
-          </table> : null
-        (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ?
+          </table> : null }
+        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ?
           <table className="table table-bordered table-assignedto">
             <tbody>
               <tr>
@@ -161,8 +160,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 <td>{selectedMinistryAssignedTo}</td>
               </tr>
             </tbody>
-          </table> : null
-          )}
+          </table> : null }
           </>
         );
 
