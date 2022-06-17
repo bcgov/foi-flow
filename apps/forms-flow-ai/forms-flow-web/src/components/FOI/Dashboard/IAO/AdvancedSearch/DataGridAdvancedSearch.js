@@ -10,7 +10,7 @@ import {
   getFullName,
   getDaysLeft,
   getReceivedDate,
-  onBehalfFullName,
+  // onBehalfFullName,
   getRecordsDue
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
@@ -87,13 +87,13 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       width: 180,
     },
     {
-      field: "onBehalf",
+      field: "onBehalfFormatted",
       headerName: "ON BEHALF",
       headerAlign: "left",
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
-      valueGetter: onBehalfFullName,
-      sortable: false,
+      // valueGetter: onBehalfFullName,
+      // sortable: false,
       width: 180,
     },
     {
@@ -136,7 +136,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getDaysLeft,
       flex: 0.75,
-      sortable: false,
+      // sortable: false,
     },
     {
       field: "extensions",
@@ -288,7 +288,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getDaysLeft,
       flex: 0.75,
-      sortable: false,
+      // sortable: false,
     },
   ];
   

@@ -2,7 +2,7 @@ import {
   getFullName,
   getDaysLeft,
   getReceivedDate,
-  onBehalfFullName,
+  // onBehalfFullName,
 } from "../utils";
 import {
   isProcessingTeam,
@@ -27,11 +27,11 @@ const ProcessingTeamColumns = [
     width: 180,
   },
   {
-    field: "onBehalf",
+    field: "onBehalfFormatted",
     headerName: "ON BEHALF",
     headerAlign: "left",
-    valueGetter: onBehalfFullName,
-    sortable: false,
+    // valueGetter: onBehalfFullName,
+    // sortable: false,
     width: 180,
   },
   {
@@ -64,7 +64,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: getDaysLeft,
     flex: 0.75,
-    sortable: false,
+    // sortable: false,
   },
   {
     field: "extensions",
@@ -184,7 +184,7 @@ const FlexTeamColumns = [
     headerAlign: "left",
     valueGetter: getDaysLeft,
     flex: 0.75,
-    sortable: false,
+    // sortable: false,
   },
 ];
 
