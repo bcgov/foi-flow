@@ -31,11 +31,19 @@ const Dashboard = ({ userDetail }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch);
 
   const addRequest = (_e) => {
     dispatch(push(`/foi/addrequest`));
   };
+
+  React.useEffect(() => {
+    if (showAdvancedSearch) {
+      document.title = 'FOI Advanced Search'
+    } else {
+      document.title = 'FOI Request Queue'
+    }
+  }, [showAdvancedSearch]);
 
   return (
     <div className="container foi-container">
@@ -63,7 +71,7 @@ const Dashboard = ({ userDetail }) => {
             alignItems="center"
           >
             <ButtonBase
-              onClick={() => {                
+              onClick={() => {
                 dispatch(setShowAdvancedSearch(false));
                 dispatch(setResumeDefaultSorting(true));
               }}

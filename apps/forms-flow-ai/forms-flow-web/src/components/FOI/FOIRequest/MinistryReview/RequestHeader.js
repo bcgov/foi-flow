@@ -54,6 +54,8 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
 
     
     const headerText = getHeaderText(_requestDetails);
+
+    document.title = headerText;
     
     const assignedToValue = getFullName();
 

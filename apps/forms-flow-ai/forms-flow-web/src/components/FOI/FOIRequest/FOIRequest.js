@@ -163,7 +163,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
-  const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));
+  const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));  
+  document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -203,7 +204,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
-      setHeaderText(getHeaderText({requestDetails, ministryId, requestState}))
+      setHeaderText(getHeaderText({requestDetails, ministryId, requestState}));
       if(requestDetails.axisRequestId)
         axisBannerCheck();
     }
