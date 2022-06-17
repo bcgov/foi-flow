@@ -54,7 +54,7 @@ const CustomPageSize = ({apiRef, pageSize}) => {
     );
 };
   
-export const CustomFooter = ({rowCount, defaultSortModel}) => {
+export const CustomFooter = ({rowCount, defaultSortModel, footerFor}) => {
     const dispatch = useDispatch();
   
     const apiRef = useGridApiContext();
@@ -63,12 +63,15 @@ export const CustomFooter = ({rowCount, defaultSortModel}) => {
     const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
   
     const resumeDefaultSorting = useSelector((state) => state.foiRequests.resumeDefaultSorting)
+    const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
   
     //apply default sorting model
     useEffect(() => {
       if(resumeDefaultSorting) {
-        apiRef.current.setSortModel(defaultSortModel);
-        dispatch(setResumeDefaultSorting(false));
+        if((showAdvancedSearch && footerFor == 'advancedsearch') || (!showAdvancedSearch && footerFor != 'advancedsearch')) {
+          apiRef.current.setSortModel(defaultSortModel);
+          dispatch(setResumeDefaultSorting(false));
+        }
       }
     }, [resumeDefaultSorting]);
   
