@@ -187,7 +187,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
               setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={defaultSortModel}></CustomFooter>
+              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={defaultSortModel} footerFor={"advancedsearch"}></CustomFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}

@@ -318,7 +318,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
           }
           components={{
-            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={defaultSortModel}></CustomFooter>
+            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={defaultSortModel} footerFor={"queue"}></CustomFooter>
           }}
           sortingOrder={["desc", "asc"]}
           sortingMode={"server"}
