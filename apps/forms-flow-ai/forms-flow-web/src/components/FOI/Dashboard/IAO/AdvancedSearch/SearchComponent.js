@@ -237,7 +237,7 @@ const AdvancedSearch = ({ userDetail }) => {
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
       page: 1,
-      size: 10,
+      size: advancedSearchParams?.size || 10,
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
     });

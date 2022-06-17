@@ -410,7 +410,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('ministrySorting'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
-            literal(None).label('closedate')
+            literal(None).label('closedate'),
+            literal(None).label('onBehalfFormatted'),
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -526,7 +527,8 @@ class FOIRawRequest(db.Model):
             'assignedToFormatted',
             'ministryAssignedToFormatted',
             'cfrduedate',
-            'applicantcategory'
+            'applicantcategory',
+            'onBehalfFormatted'
         ]
         if x in validfields:
             return True

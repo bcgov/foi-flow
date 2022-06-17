@@ -10,7 +10,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
 import { getTableInfo } from "./columns";
-import { setShowAdvancedSearch } from "../../../../actions/FOI/foiRequestActions";
+import { setShowAdvancedSearch, setResumeDefaultSorting } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -64,7 +64,8 @@ const Dashboard = ({ userDetail }) => {
           >
             <ButtonBase
               onClick={() => {                
-                dispatch(setShowAdvancedSearch(false))
+                dispatch(setShowAdvancedSearch(false));
+                dispatch(setResumeDefaultSorting(true));
               }}
               disableRipple
             >
@@ -89,7 +90,8 @@ const Dashboard = ({ userDetail }) => {
             />
             <ButtonBase
               onClick={() => {
-                dispatch(setShowAdvancedSearch(true))
+                dispatch(setShowAdvancedSearch(true));
+                dispatch(setResumeDefaultSorting(true));
               }}
               disableRipple
             >
