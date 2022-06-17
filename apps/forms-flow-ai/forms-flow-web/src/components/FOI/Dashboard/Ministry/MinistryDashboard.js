@@ -9,7 +9,7 @@ import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
-import { setShowAdvancedSearch } from "../../../../actions/FOI/foiRequestActions";
+import { setShowAdvancedSearch, setResumeDefaultSorting } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -55,7 +55,10 @@ const MinistryDashboard = ({ userDetail }) => {
             alignItems="center"
           >
             <ButtonBase
-              onClick={() => dispatch(setShowAdvancedSearch(false))}
+              onClick={() => {
+                dispatch(setShowAdvancedSearch(false));
+                dispatch(setResumeDefaultSorting(true));
+              }}
               disableRipple
             >
               <h3
@@ -78,7 +81,10 @@ const MinistryDashboard = ({ userDetail }) => {
               orientation="vertical"
             />
             <ButtonBase
-              onClick={() => dispatch(setShowAdvancedSearch(true))}
+              onClick={() => {
+                dispatch(setShowAdvancedSearch(true));
+                dispatch(setResumeDefaultSorting(true));
+              }}
               disableRipple
             >
               <h3
