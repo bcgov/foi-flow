@@ -110,7 +110,6 @@ const BottomButtonGroup = React.memo(
           requestId,
           ministryId,
           (err, res) => {            
-            dispatch(setFOILoader(false))
             if (!err) {
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
