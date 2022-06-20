@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import null, text, insert
+from sqlalchemy import text, insert
 import logging
 
 class FOIRequestCFRFee(db.Model):
@@ -57,7 +57,7 @@ class FOIRequestCFRFee(db.Model):
     @classmethod
     def getstatenavigation(cls, ministryrequestid):
         _session = db.session
-        _entries = _session.query(FOIRequestCFRFee).filter(FOIRequestCFRFee.ministryrequestid == ministryrequestid and FOIRequestCFRFee.cfrfeestatusid is not null).order_by(FOIRequestCFRFee.version.desc()).limit(2)
+        _entries = _session.query(FOIRequestCFRFee).filter(FOIRequestCFRFee.ministryrequestid == ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).limit(2)
         requeststates = []
         for _entry in _entries:
             requeststates.append(_entry.cfrfeestatus.description)

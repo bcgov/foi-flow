@@ -2,7 +2,6 @@
 from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
-from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.commentservice import commentservice
 from request_api.services.notificationservice import notificationservice
 import json
@@ -48,17 +47,13 @@ class cfrfeeformevent:
         return self.__notificationmessage(state)
         
     def __haschanged(self, requestid):
-        status = FOIMinistryRequest.getrequeststatusById(requestid)
-        if status[0]['requeststatusid'] != 8:
-            return None
-        else:
-            states = FOIRequestCFRFee.getstatenavigation(requestid)        
-            if len(states) == 2:
-                newstate = states[0]
-                oldstate = states[1]
-                if newstate != oldstate and status:
-                    return newstate
-            return None    
+        states = FOIRequestCFRFee.getstatenavigation(requestid)
+        if len(states) == 2:
+            newstate = states[0]
+            oldstate = states[1]
+            if newstate != oldstate:
+                return newstate
+        return None    
     
     def __commentmessage(self, state, username):
         return  username+' updated Fee Estimate status to '+state
