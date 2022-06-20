@@ -10,7 +10,7 @@ from dateutil import parser
 from dateutil import tz
 import pytz
 import maya
-
+from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
 
 class cfrfeeservice:
     """ FOI CFR Fee Form management service

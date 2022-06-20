@@ -596,7 +596,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
               requestNumber={requestNumber}
               userDetail={userDetail}
               ministryId={ministryId}
-              requestId={requestId}
             />
           </div>)}
           <div
