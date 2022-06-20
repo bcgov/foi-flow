@@ -32,7 +32,7 @@ const initialState = {
   foiRequestAttachments: [],
   foiRequestCFRForm: {
     overallsuggestions: "",
-    status: "review",
+    status: "init",
     feedata: {
        totalamountdue: 0,
        actualhardcopypages: 0,
