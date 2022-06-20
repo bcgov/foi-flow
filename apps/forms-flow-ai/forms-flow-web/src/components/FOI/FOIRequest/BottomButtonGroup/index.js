@@ -243,7 +243,7 @@ const BottomButtonGroup = React.memo(
       );
     };
 
-    const handleSaveModal = (value, fileInfoList) => {
+    const handleSaveModal = (value) => {
       setsaveModal(false);
       if (!value) {
         handleSaveRequest(requestState, true, "");

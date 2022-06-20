@@ -41,7 +41,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   const user = useSelector((state) => state.user.userDetail);
 
   const hyperlinkRenderCell = (params) => {
-    var link;
+    let link;
     if (params.row.ministryrequestid) { 
       link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     } else {

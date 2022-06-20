@@ -116,9 +116,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
   var foitabheaderBG = getTabBG(_tabStatus, requestState);
-  var foiAxisRequestIds = useSelector(
-    (state) => state.foiRequests.foiAxisRequestIds
-  );
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
@@ -785,14 +782,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         userDetail={userDetail}
                         disableInput={disableInput}
                         isAddRequest={isAddRequest}
-                        unSavedRequest={unSavedRequest}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
                         <AxisDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          foiAxisRequestIds={foiAxisRequestIds}
                           handleAxisDetailsInitialValue={
                             handleAxisDetailsInitialValue
                           }

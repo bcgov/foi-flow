@@ -73,9 +73,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       saveReqCopy.axisSyncDate = requestDetailsFromAxis.axisSyncDate;
       saveReqCopy.requestPageCount = requestDetailsFromAxis.requestPageCount;      
       for(let key of Object.keys(requestDetailsFromAxis)){
-        var updatedField = isAxisSyncDisplayField(key);
+        let updatedField = isAxisSyncDisplayField(key);
         if(updatedField){
-          var updateNeeded= checkValidation(key);
+          let updateNeeded= checkValidation(key);
           if(updateNeeded){
             assignDisplayedReqObj(key, updatedObj, updatedField);
           if(key !== 'Extensions' && key !== 'compareReceivedDate' && key !== 'cfrDueDate' ||
@@ -95,7 +95,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
 
     const checkValidation = (key) => {
-      var mandatoryField = isMandatoryField(key);
+      let mandatoryField = isMandatoryField(key);
       if(mandatoryField && !requestDetailsFromAxis[key])
         return false;
       else{

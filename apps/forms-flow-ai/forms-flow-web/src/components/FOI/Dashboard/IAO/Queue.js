@@ -79,7 +79,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    var keyword = e.target.value.trim();
+    let keyword = e.target.value.trim();
     setFilterModel((prev) => ({ ...prev, keyword }));
     setRowsState((prev) => ({ ...prev, page: 0 }));
   }, 500);

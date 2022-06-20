@@ -8,7 +8,6 @@ import {
     serviceActionError,
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
-  import { saveAs } from "file-saver";
   
   export const getOSSHeaderDetails = (data, dispatch, ...rest) => {
     const done = fnDone(rest);
@@ -30,7 +29,7 @@ import {
   
   export const saveFilesinS3Async = async (headerDetails, file, dispatch, ...rest) => {
     const done = fnDone(rest);
-    var requestOptions = {
+    let requestOptions = {
       headers: {
         "X-Amz-Date": headerDetails.amzdate,
         Authorization: headerDetails.authheader,
@@ -53,7 +52,7 @@ import {
   
   export const saveFilesinS3 = (headerDetails, file, dispatch, ...rest) => {
     const done = fnDone(rest);
-    var requestOptions = {
+    let requestOptions = {
       headers: {
         'X-Amz-Date': headerDetails.amzdate,
         'Authorization': headerDetails.authheader,
@@ -76,7 +75,7 @@ import {
   
   export const getFileFromS3 = (headerDetails, ...rest) => {  
     const done = fnDone(rest);
-    var requestOptions = {
+    let requestOptions = {
       headers: {
         "X-Amz-Date": headerDetails.amzdate,
         Authorization: headerDetails.authheader,     

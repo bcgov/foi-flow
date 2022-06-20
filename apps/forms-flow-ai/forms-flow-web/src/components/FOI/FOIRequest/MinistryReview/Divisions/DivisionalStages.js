@@ -152,7 +152,7 @@ const DivisionalStages = React.memo(
     };
 
     const getDivisionalStages = () => {
-      var divisionstagesItems = [];
+      let divisionstagesItems = [];
       divisionstagesItems.push(
         <MenuItem key={0} name="selectmenuitem" value={-1}>
           <em>Select Division Stage</em>
@@ -285,7 +285,7 @@ const DivisionalStages = React.memo(
                 hidebin: index === 0 && stageIterator.length === 1,
               })}
               aria-hidden="true"
-              onClick={(e) => deleteMinistryDivision(_id)}
+              onClick={() => deleteMinistryDivision(_id)}
             ></i>
           </div>
         </div>

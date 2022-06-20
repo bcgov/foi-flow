@@ -26,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, isMinistryCoordinator, requestId, ministryId, setSaveMinistryRequestObject}) => {
+const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, 
+  handleMinistryAssignedToValue, isMinistryCoordinator, requestId, ministryId, setSaveMinistryRequestObject}) => {
    
      /**
      *  Header of Review request in the UI
@@ -49,7 +50,7 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
     
     //creates the grouped menu items for assignedTo combobox    
     const getMenuItems = () => {
-      var menuItems = [];
+      let menuItems = [];
       menuItems.push(
         <MenuItem className={classes.group} key={0} value={"|"} disabled={true}>
           {}

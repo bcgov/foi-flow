@@ -58,8 +58,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   }, [rowsState, sortModel]);
 
   const hyperlinkRenderCellforMinistry = (params) => {
-    var link;
-    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    let link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     return (
       <Link href={link} onClick={e => renderReviewRequestforMinistry(e, params.row)}>
         <div className="MuiDataGrid-cellContent">{params.value}</div>
