@@ -26,7 +26,6 @@ import {
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
-  fetchExistingAxisRequestIds,
   fetchRequestDataFromAxis
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
@@ -175,7 +174,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
     }
-    dispatch(fetchExistingAxisRequestIds());
   }, []);
 
   const dispatch = useDispatch();
@@ -477,9 +475,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const createSaveRequestObject = (name, value, value2) => {
     let requestObject = { ...saveRequestObject };
-    setUnSavedRequest(
-      name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
-    );
+    if(name !== 'assignedTo'){
+      setUnSavedRequest(
+        name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
+      );  
+    }
 
     requestObject = createRequestDetailsObject(
       requestObject,
@@ -962,6 +962,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           >
             <CFRForm            
               requestNumber={requestNumber}
+              requestState={requestState}
               userDetail={userDetail}
               ministryId={ministryId}
               requestId={requestId}

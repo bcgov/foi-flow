@@ -1,12 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+import { DataGrid } from '@mui/x-data-grid';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,7 +10,7 @@ import {
   getFullName,
   getDaysLeft,
   getReceivedDate,
-  onBehalfFullName,
+  // onBehalfFullName,
   getRecordsDue
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
@@ -30,6 +23,7 @@ import {
 import clsx from "clsx";
 import Link from "@mui/material/Link";
 import { push } from "connected-react-router";
+import { CustomFooter } from "../../CustomFooter"
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -93,13 +87,13 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       width: 180,
     },
     {
-      field: "onBehalf",
+      field: "onBehalfFormatted",
       headerName: "ON BEHALF",
       headerAlign: "left",
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
-      valueGetter: onBehalfFullName,
-      sortable: false,
+      // valueGetter: onBehalfFullName,
+      // sortable: false,
       width: 180,
     },
     {
@@ -142,7 +136,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getDaysLeft,
       flex: 0.75,
-      sortable: false,
+      // sortable: false,
     },
     {
       field: "extensions",
@@ -294,7 +288,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getDaysLeft,
       flex: 0.75,
-      sortable: false,
+      // sortable: false,
     },
   ];
   
@@ -302,7 +296,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     columns: IntakeTeamColumns,
     sort: [
       { field: "currentState", sort: "desc" },
-      { field: "receivedDateUF", sort: "desc" },
+      // { field: "receivedDateUF", sort: "desc" },
     ],
     stateClassName: {
       open: "flex-open",
@@ -319,7 +313,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         columns: ProcessingTeamColumns,
         sort: [
           { field: "currentState", sort: "desc" },
-          { field: "receivedDateUF", sort: "desc" },
+          // { field: "receivedDateUF", sort: "desc" },
         ],
       };
     }
@@ -329,7 +323,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         columns: FlexTeamColumns,
         sort: [
           { field: "currentState", sort: "desc" },
-          { field: "receivedDateUF", sort: "desc" },
+          // { field: "receivedDateUF", sort: "desc" },
         ],
         stateClassName: {
           open: "flex--open",
@@ -352,7 +346,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
+    // { field: "receivedDateUF", sort: "desc" },
   ];
   const [sortModel, setSortModel] = useState(advancedSearchParams?.sort || defaultSortModel);
 
@@ -392,8 +386,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         <Grid item xs={12}>
           <h4 className="foi-request-queue-text">Search Results</h4>
         </Grid>
-        <Grid item xs={12} style={{ height: 450 }}>
+        <Grid item xs={12} style={{ minHeight: 300 }}>
           <DataGrid
+            autoHeight
             className="foi-data-grid"
             getRowId={(row) => row.idNumber}
             rows={searchResults?.data || []}
@@ -402,7 +397,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             headerHeight={50}
             rowCount={searchResults?.meta?.total || 0}
             pageSize={rowsState.pageSize}
-            rowsPerPageOptions={[10]}
+            // rowsPerPageOptions={[10]}
             hideFooterSelectedRowCount={true}
             disableColumnMenu={true}
             pagination
@@ -410,12 +405,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             initialState={{
               pagination: rowsState
             }}
-            onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-            onPageSizeChange={(pageSize) =>
-              setRowsState((prev) => ({ ...prev, pageSize }))
+            onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+            onPageSizeChange={(newpageSize) =>
+              setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Pagination: CustomPagination,
+              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
@@ -438,19 +433,5 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     </ConditionalComponent>
   );
 };
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
 
 export default DataGridAdvancedSearch;

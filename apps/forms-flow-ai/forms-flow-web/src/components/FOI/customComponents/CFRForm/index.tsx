@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
@@ -19,34 +19,53 @@ import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/f
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { valueToPercent } from '@mui/base';
+import { StateEnum } from '../../../../constants/FOI/statusEnum';
+import { handleBeforeUnload } from '../../../FOI/FOIRequest/utils';
+import { returnToQueue } from '../../../FOI/FOIRequest/BottomButtonGroup/utils';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import CloseIcon from '@material-ui/icons/Close';
+import IconButton from '@material-ui/core/IconButton';
 
 export const CFRForm = ({
   requestNumber,
+  requestState,
   ministryId,
   requestId,
   userDetail
 }: params) => {
 
-  const CFRStatuses = [
-    {
-      value: 'review',
-      label: 'In Review'
-    },
-    {
-      value: 'approved',
-      label: 'Approved'
-    },
-    {
-      value: 'clarification',
-      label: 'Clarification'
-    },
-  ];
-
   const dispatch = useDispatch();
 
   const userGroups = userDetail.groups.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
+
+  const CFRStatuses = [
+    {
+      value: 'init',
+      label: 'Select CFR Form Status',
+      disabled: true,
+    },
+    {
+      value: 'review',
+      label: 'In Review with IAO',
+      disabled: false,
+    },
+    {
+      value: 'clarification',
+      label: 'Needs Clarification with Ministry',
+      disabled: false
+    },
+    {
+      value: 'approved',
+      label: 'Approved',
+      disabled: isMinistry,
+    },
+  ];
 
   React.useEffect(() => {
     if (ministryId) {
@@ -127,12 +146,10 @@ export const CFRForm = ({
     setFormData(values => ({...values, [name]: value}));
   };
 
-  const initialState: any = useSelector((state: any) => {
-    return state.foiRequests.foiRequestCFRForm;
-  });
+  const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
 
   const blankForm: CFRFormData = {
-    formStatus: "review",
+    formStatus: "init",
     amountDue: 0,
     amountPaid: 0,
     estimates: {
@@ -158,7 +175,7 @@ export const CFRForm = ({
 
   React.useEffect(() => {
     var formattedData = {
-      formStatus: initialState.status,
+      formStatus: initialState.status === null ? 'init' : initialState.status,
       amountDue: initialState.feedata.totalamountdue,
       amountPaid: initialState.feedata.amountpaid,
       estimates: {
@@ -173,13 +190,31 @@ export const CFRForm = ({
         producing: initialState.feedata.actualproducinghrs,
         preparing: initialState.feedata.actualpreparinghrs,
         electronicPages: initialState.feedata.actualelectronicpages,
-        hardcopyPages: initialState.feedata.estimatedhardcopypages,
+        hardcopyPages: initialState.feedata.actualhardcopypages,
       },
       suggestions: initialState.overallsuggestions
     };
     setInitialFormData(formattedData)
     setFormData(formattedData);
   }, [initialState]);
+
+  React.useEffect(() => {
+    if (!_.isEqual(initialFormData, formData)) {
+      window.addEventListener("popstate", (e) => returnToQueue(e, true));
+      window.addEventListener("beforeunload", handleBeforeUnload);
+    } else {
+      window.removeEventListener("popstate", (e) => returnToQueue(e, true));
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
+    return () => {
+      window.removeEventListener("popstate", (e) => returnToQueue(e, true));
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
+  }, [initialFormData, formData]);
+
+  React.useEffect(() => {
+    window.history.pushState(null, "", null);
+  }, []);
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -198,8 +233,7 @@ export const CFRForm = ({
         return false;
       }
     }
-    var retval = !_.isEqual(initialFormData, formData);
-    return retval
+    return !_.isEqual(initialFormData, formData);
   }
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -239,6 +273,17 @@ export const CFRForm = ({
     setFormData(newFormData);
   };
 
+  const cfrStatusDisabled = () => {
+    if (requestState === StateEnum.feeassessed.name) {
+      if (isMinistry) {
+        return initialFormData.formStatus !== 'clarification';
+      } else {
+        return initialFormData.formStatus === 'clarification';
+      }
+    }
+    return true;
+  }
+
   const save = () => {
     var callback = (_res: string) => {
       setInitialFormData(formData)
@@ -251,6 +296,10 @@ export const CFRForm = ({
         draggable: true,
         progress: undefined,
       });
+      fetchCFRForm(
+        ministryId,
+        dispatch,
+      );
     };
     var data;
     if (isMinistry) {
@@ -270,7 +319,7 @@ export const CFRForm = ({
           actualhardcopypages: formData.actual.hardcopyPages,
         },
         overallsuggestions: formData.suggestions,
-        status: formData.formStatus
+        status: formData.formStatus === 'init' ? '' : formData.formStatus
       }
     } else {
       data = {
@@ -291,6 +340,34 @@ export const CFRForm = ({
         errorToast(errorMessage)
       },
     )
+  };
+
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState(<></>);
+  const handleSave = () => {
+    setModalOpen(false);
+    save();
+  };
+  const handleClose = () => {
+    setFormData(values => ({...values, formStatus: initialFormData.formStatus}));
+    setModalOpen(false);
+  };
+  const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleTextChanges(e);
+    if (e.target.value === 'review') {
+      setModalMessage(<>By changing the CFR Form Status to <b>"In Review with IAO"</b> you
+      will be sending the form to the IAO user and locking your ability to edit the form.
+      Are you sure you would like to continue?</>);
+    } else if (e.target.value === 'approved') {
+      setModalMessage(<>Are you sure you want to change the status to <b>"Approved"</b>? The
+      CFR form will be locked for editing, and can only be unlocked by changing the status back</>);
+    } else if (e.target.value === 'clarification') {
+      setModalMessage(<>By changing the CFR Form Status to <b>"Needs Clarification with Ministry" </b> you
+      will be sending the form to the Ministry user and locking your ability to edit the form.
+      Are you sure you would like to continue?</>);
+    }
+    setModalOpen(true);
   };
 
 
@@ -318,14 +395,18 @@ export const CFRForm = ({
             select
             name="formStatus"
             value={formData?.formStatus}
-            onChange={handleTextChanges}
+            onChange={handleStatusChange}
             variant="outlined"
             fullWidth
             required
-            disabled={isMinistry || _.isEqual(formData, blankForm)}
+            disabled={cfrStatusDisabled()}
           >
             {CFRStatuses.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
               {option.label}
             </MenuItem>
             ))}
@@ -362,7 +443,7 @@ export const CFRForm = ({
                     e.target.value = parseFloat(e.target.value).toFixed(2);
                   }}
                   fullWidth
-                  disabled={_.isEqual(formData, blankForm)}
+                  disabled={isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved'}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
@@ -428,7 +509,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.locating, foiFees.locating.unit) &&
                     "Hours must be entered in increments of " + foiFees.locating.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved'}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
@@ -454,7 +535,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.locating, foiFees.locating.unit) &&
                     "Hours must be entered in increments of " + foiFees.locating.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
@@ -489,7 +570,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.producing, foiFees.producing.unit) &&
                     "Hours must be entered in increments of " + foiFees.producing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved'}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                 </TextField>
               </div>
@@ -516,7 +597,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.producing, foiFees.producing.unit) &&
                     "Hours must be entered in increments of " + foiFees.producing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
@@ -551,7 +632,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.preparing, foiFees.preparing.unit) &&
                     "Hours must be entered in increments of " + foiFees.preparing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved'}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                   {/* {menuItems} */}
                 </TextField>
@@ -579,7 +660,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.preparing, foiFees.preparing.unit) &&
                     "Hours must be entered in increments of " + foiFees.preparing.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
@@ -614,7 +695,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.electronicPages, foiFees.electronicPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.electronicPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved'}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                 </TextField>
                 <TextField
@@ -640,7 +721,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.estimates?.hardcopyPages, foiFees.hardcopyPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.hardcopyPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus === 'approved'}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                 </TextField>
               </div>
@@ -667,7 +748,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.electronicPages, foiFees.electronicPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.electronicPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
                 <TextField
                   id="actualhardcopy"
@@ -691,7 +772,7 @@ export const CFRForm = ({
                   helperText={validateField(formData?.actual?.hardcopyPages, foiFees.hardcopyPages.unit) &&
                     "Pages must be entered in increments of " + foiFees.hardcopyPages.unit
                   }
-                  disabled={!isMinistry || formData?.formStatus !== 'approved'}
+                  disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />
               </div>
             </div>
@@ -739,7 +820,7 @@ export const CFRForm = ({
                   InputLabelProps={{ shrink: true, }}
                   onChange={handleTextChanges}
                   fullWidth
-                  disabled={!isMinistry || formData?.formStatus === 'approved'}
+                  disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 />
               </div>
             </div>
@@ -759,6 +840,44 @@ export const CFRForm = ({
       </div>
     </div>
   </div></Box>
+
+  <div className="state-change-dialog">
+    <Dialog
+      open={modalOpen}
+      onClose={handleClose}
+      aria-labelledby="state-change-dialog-title"
+      aria-describedby="state-change-dialog-description"
+      maxWidth={'md'}
+      fullWidth={true}
+      // id="state-change-dialog"
+    >
+      <DialogTitle disableTypography id="state-change-dialog-title">
+          <h2 className="state-change-header">CFR Form Status</h2>
+          <IconButton className="title-col3" onClick={handleClose}>
+            <i className="dialog-close-button">Close</i>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+      <DialogContent className={'dialog-content-nomargin'}>
+        <DialogContentText id="state-change-dialog-description" component={'span'}>
+        <span className="confirmation-message">
+            {modalMessage}
+          </span>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <button
+          className={`btn-bottom btn-save btn`}
+          onClick={handleSave}
+        >
+          Save Change
+        </button>
+        <button className="btn-bottom btn-cancel" onClick={handleClose}>
+          Cancel
+        </button>
+      </DialogActions>
+    </Dialog>
+  </div>
   </div>
   );
 }

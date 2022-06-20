@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from "@mui/x-data-grid";
-import Pagination from "@mui/material/Pagination";
+import { DataGrid } from "@mui/x-data-grid";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +20,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import clsx from "clsx";
+import { CustomFooter } from "../CustomFooter"
 
 const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
@@ -80,14 +74,14 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (filter === requestFilter) {
       return;
     }
-    setRowsState(defaultRowsState);
+    setRowsState((prev) => ({ ...prev, page: 0 }));
     dispatch(setQueueFilter(filter));
   };
 
   const setSearch = debounce((e) => {
     var keyword = e.target.value.trim();
     setFilterModel((prev) => ({ ...prev, keyword }));
-    setRowsState(defaultRowsState);
+    setRowsState((prev) => ({ ...prev, page: 0 }));
   }, 500);
 
   const rows = useMemo(() => {
@@ -209,8 +203,9 @@ const Queue = ({ userDetail, tableInfo }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
+      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
         <DataGrid
+          autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
           rows={rows}
@@ -219,18 +214,18 @@ const Queue = ({ userDetail, tableInfo }) => {
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
           pageSize={rowsState.pageSize}
-          rowsPerPageOptions={[10]}
+          // rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
           disableColumnMenu={true}
           pagination
           paginationMode="server"
           page={rowsState.page}
-          onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-          onPageSizeChange={(pageSize) =>
-            setRowsState((prev) => ({ ...prev, pageSize }))
+          onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+          onPageSizeChange={(newpageSize) =>
+            setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
           }
           components={{
-            Pagination: CustomPagination,
+            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"}></CustomFooter>
           }}
           sortingOrder={["desc", "asc"]}
           sortModel={[sortModel[0]]}
@@ -257,20 +252,6 @@ const Queue = ({ userDetail, tableInfo }) => {
         />
       </Grid>
     </>
-  );
-};
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(_event, value) => apiRef.current.setPage(value - 1)}
-    />
   );
 };
 

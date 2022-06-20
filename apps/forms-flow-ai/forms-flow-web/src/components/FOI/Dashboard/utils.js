@@ -75,6 +75,18 @@ export const updateSortModel = (sortModel) => {
         { field: "duedate", sort: order },
       );
     }
+
+    //add duedate to default sorting
+    if (smodel.length == 1 && (field == "defaultSorting" || field == "intakeSorting")) {
+      smodel.push(
+        { field: "duedate", sort: order },
+      );
+    }
+    if (smodel.length == 1 && field == "currentState") {
+      smodel.push(
+        { field: "receivedDateUF", sort: "desc" },
+      );
+    }
   }
 
   return smodel;

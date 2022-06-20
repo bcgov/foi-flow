@@ -32,7 +32,7 @@ const initialState = {
   foiRequestAttachments: [],
   foiRequestCFRForm: {
     overallsuggestions: "",
-    status: "review",
+    status: "init",
     feedata: {
        totalamountdue: 0,
        actualhardcopypages: 0,
@@ -50,6 +50,7 @@ const initialState = {
  },
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
+  resumeDefaultSorting: false,
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -138,6 +139,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiOpenedMinistries: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_AXIS_REQUEST_IDS:
       return { ...state, foiAxisRequestIds: action.payload };
+    case FOI_ACTION_CONSTANTS.RESUME_DEFAULT_SORTING:
+      return { ...state, resumeDefaultSorting: action.payload };
     default:
       return state;
   }
