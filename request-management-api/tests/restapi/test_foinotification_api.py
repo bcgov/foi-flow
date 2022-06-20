@@ -54,9 +54,8 @@ def test_post_get_foirequest_general_cfr_notification(app, client):
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foiministryreqresponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
     foinotification = client.get('/api/foinotifications',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
-    print(foinotification)
     assert foiministryreqresponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foinotification.status_code == 200
-    #assert foiministryreqresponse.status_code == 200
+
 
 with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplerequestjson/foirequest-general.json') as y, open('tests/samplerequestjson/foirequest-general-update.json') as z:
   generalrequestjson = json.load(y)
