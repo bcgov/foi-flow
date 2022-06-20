@@ -61,7 +61,6 @@
 
 #state-change-dialog-description {
     padding-left: 50px;
-    display: block;
     color: black; 
 }
 
@@ -71,7 +70,7 @@
 
 .table-assignedto {
     width: 80% !important;
-    margin-left: 20px;
+    margin-left: 70px;
     margin-top: 1rem;
 }
 
@@ -109,6 +108,10 @@
 .modal-message {
     margin-left: 50px;
     margin-bottom: 20px;
+}
+
+.confirm-message-2 {
+    padding-left: 50px;
 }
 
 

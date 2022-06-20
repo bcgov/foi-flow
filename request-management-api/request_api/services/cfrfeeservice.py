@@ -38,7 +38,7 @@ class cfrfeeservice:
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status']) if "status" in data and data['status'] not in (None,'') else None
+        cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status'])
         return cfrfee
     
     
@@ -57,11 +57,8 @@ class cfrfeeservice:
     def __formatcfrfee(self,cfrfee):
         if cfrfee is not None and cfrfee != {}:
             cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])   
-            if cfrfee['cfrfeestatusid'] is not None:
-                cfrfee['status'] = cfrfee['cfrfeestatus.name']
-                cfrfee.pop('cfrfeestatus.name')
-            else:
-                cfrfee['status'] = None    
+            cfrfee['status'] = cfrfee['cfrfeestatus.name']
+            cfrfee.pop('cfrfeestatus.name')
             return cfrfee 
         else:
             return {}
