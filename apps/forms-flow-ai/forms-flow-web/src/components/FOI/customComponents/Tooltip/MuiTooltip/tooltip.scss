@@ -1,3 +1,10 @@
+// [role=tooltip].tooltip-content {
+//     width: 150px;
+//     border-radius: 0px;
+//     position: absolute;
+//     margin: -10px auto 30px 30px;
+// }
+
 [role=tooltip].tooltipLeft-content {
     margin: -8px -8px!important;
 }
@@ -7,10 +14,10 @@
 }
 
 .tooltipTitle {
-    font-size: 14px;
+    font-size: small;
     font-weight: bold;
 }
 
 .tooltipContent {
-    font-size: 12px;
+    font-size: smaller;
 }
