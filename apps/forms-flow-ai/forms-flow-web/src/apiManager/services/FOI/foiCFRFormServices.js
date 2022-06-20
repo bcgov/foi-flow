@@ -8,7 +8,6 @@ import API from "../../endpoints";
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { catchError } from "./foiServicesUtil";
   import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
-  import _ from 'lodash';
 
 export const fetchCFRForm = (
   ministryId,
@@ -23,9 +22,7 @@ export const fetchCFRForm = (
   httpGETRequest(apiUrl, {}, UserService.getToken())
     .then((res) => {
       if (res.data) {
-        if (!_.isEmpty(res.data)) {
-          dispatch(setRequestCFRForm(res.data));
-        }
+        dispatch(setRequestCFRForm(res.data));
       } else {
         console.log("Error in fetching CFR Form data", res);
         dispatch(serviceActionError(res));
