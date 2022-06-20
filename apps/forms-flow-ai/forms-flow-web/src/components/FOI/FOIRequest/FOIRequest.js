@@ -40,6 +40,7 @@ import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
+import { CFRForm } from '../customComponents/CFRForm';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
 import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
@@ -133,6 +134,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
       active: false,
     },
     Attachments: {
+      display: false,
+      active: false,
+    },
+    CFRForm: {
       display: false,
       active: false,
     },
@@ -640,6 +645,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
     return false;
   }
 
+  const showCFRTab = () => {
+    return (requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name &&
+      requestState !== StateEnum.open.name &&
+      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+    );
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -677,6 +690,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
             </div>
             {!isAddRequest && (
               <>
+                {(showCFRTab() && <div
+                    className={clsx("tablinks", {
+                      active: tabLinksStatuses.CFRForm.active,
+                    })}
+                    name="CFRForm"
+                    onClick={() => tabclick("CFRForm")}
+                  >
+                    CFR Form
+                  </div>
+                )}
                 <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Attachments.active,
@@ -930,6 +953,20 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
+          {(showCFRTab() && <div
+            id="CFRForm"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.CFRForm.active,
+              [classes.displayed]: tabLinksStatuses.CFRForm.display,
+              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+            })}
+          >
+            <CFRForm            
+              requestNumber={requestNumber}
+              userDetail={userDetail}
+              ministryId={ministryId}
+            />
+          </div>)}
           <div
             id="Comments"
             className={clsx("tabcontent", {
