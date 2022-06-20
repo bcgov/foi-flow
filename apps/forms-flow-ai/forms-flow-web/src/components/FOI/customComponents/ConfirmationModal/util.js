@@ -1,6 +1,6 @@
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
-import { getFullnameList } from "../../../../helper/FOI/helper";
-
+import { getFullnameList } from "../../../../helper/FOI/helper"
+  
   export const getAssignedTo = (_saveRequestObject) => {
 
     if (_saveRequestObject?.assignedTo) {
@@ -14,7 +14,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     if(!username) {
       return null
     }
-
+    
     const fullNameList = getFullnameList()
       .filter(assignee => assignee.username === username)
 
@@ -24,10 +24,10 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
 
     return username;
   };
-
+  
   export const getMinistryGroup = (_saveRequestObject) => {
     if (_saveRequestObject.selectedMinistries?.length > 0 )
-      return `${_saveRequestObject.selectedMinistries[0].name} Queue`;
+      return `${_saveRequestObject.selectedMinistries[0].name} Queue`; 
   }
   export const getSelectedMinistry = (_saveRequestObject, _ministryGroup) => {
     if (_saveRequestObject?.assignedministrygroup)
@@ -40,10 +40,10 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     return _selectedMinistry;
   }
 
-  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus) => {
+  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId) => {
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       _saveRequestObject.reopen = true;
-      return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
+      return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> <span className="confirm-message-2"> The request will be re-opened to the previous state: {_state}</span> </>}; 
     }
     switch(_state.toLowerCase()) {
       case StateEnum.intakeinprogress.name.toLowerCase():
@@ -51,9 +51,9 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
       case StateEnum.open.name.toLowerCase():
           return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
       case StateEnum.closed.name.toLowerCase():
-        return {title: "Close Request", body: ""};
+        return {title: "Close Request", body: ""}; 
       case StateEnum.redirect.name.toLowerCase():
-          return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};
+          return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};  
       case StateEnum.callforrecords.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
       case StateEnum.review.name.toLowerCase():
@@ -68,20 +68,13 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
       case StateEnum.signoff.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.signoff.name}?`};
       case StateEnum.feeassessed.name.toLowerCase():
-          if (_cfrStatus === 'init') {
-            return {
-              title: "Fee Estimate",
-              body: "To update the state you must first complete the estimated hours in the CFR Form so that Total Fees are due."
-            };
-          } else {
-            return {title: "Fee Estimate", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}? The CFR Form will be locked for editing and sent to IAO for review.`};
-          }
+          return {title: "Fee Estimate", body: `Upload Fee Estimate in order to change the state.`};
       case StateEnum.deduplication.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
       case StateEnum.harms.name.toLowerCase():
-          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
+          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};       
       case StateEnum.onhold.name.toLowerCase():
-          return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> This will <b>stop</b> the clock. </>};
+          return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <span className="confirm-message-2">This will <b>stop</b> the clock.</span> </>};
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
           return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
@@ -99,8 +92,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
   }
 
   export const getUpdatedAssignedTo = (_assignedTo, _processingTeamList, _state, _requestType) => {
-    if (_requestType?.toLowerCase() === 'personal' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase())
-      return _processingTeamList.join(", ");
+    if (_requestType?.toLowerCase() === 'personal' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase()) 
+      return _processingTeamList.join(", ");    
     else if (_requestType?.toLowerCase() === 'general' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase())
       return "Flex Team";
     else

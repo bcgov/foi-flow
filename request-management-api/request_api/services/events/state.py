@@ -3,7 +3,6 @@ from os import stat
 from re import VERBOSE
 from request_api.services.commentservice import commentservice
 from request_api.services.notificationservice import notificationservice
-from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
@@ -19,13 +18,12 @@ class stateevent:
         if state is not None:
             _commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
             _notificationresponse = self.__createnotification(requestid, state, requesttype, userid)
-            _cfrresponse = self.__createcfrentry(state, requestid, userid)
-            if _commentresponse.success == True and _notificationresponse.success == True and _cfrresponse.success == True:
+            if _commentresponse.success == True and _notificationresponse.success == True :
                 return DefaultMethodResult(True,'Comment posted',requestid)
-            else:
+            else:   
                 return DefaultMethodResult(False,'unable to post comment',requestid)
         return  DefaultMethodResult(True,'No change',requestid)
-
+            
     def __haschanged(self, requestid, requesttype):
         if requesttype == "rawrequest":
             states =  FOIRawRequest.getstatenavigation(requestid)
@@ -36,8 +34,8 @@ class stateevent:
             oldstate = states[1]
             if newstate != oldstate and newstate != 'Intake in Progress':
                 return newstate
-        return None
-
+        return None 
+    
     def __createcomment(self, requestid, state, requesttype, userid, username):
         comment = self.__preparecomment(requestid, state, requesttype, username)
         if requesttype == "ministryrequest":
@@ -69,11 +67,5 @@ class stateevent:
         return  username+' changed the state of the request to '+self.__formatstate(state)
 
     def __notificationmessage(self, state):
-        return  'Moved to '+self.__formatstate(state)+ ' State'
-
-    def __createcfrentry(self, state, ministryrequestid, userid):
-        if (state == "Fee Estimate"):
-            return cfrfeeservice().createcfrfee(ministryrequestid, {"status": "review"}, userid)
-        else:
-            return DefaultMethodResult(True,'No action needed',ministryrequestid)
-
+        return  'Moved to '+self.__formatstate(state)+ ' State'        
+            
