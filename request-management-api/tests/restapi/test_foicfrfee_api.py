@@ -33,8 +33,7 @@ TEST_CFR_FEE_SCHEMA = {
         "estimatedhardcopypages": 11.00, 
         "actualhardcopypages": 9 
     }, 
-    "overallsuggestions":"test", 
-    "status":"review" 
+    "overallsuggestions":"test"
 }
 
 TEST_CFR_FEE_SANCTION_SCHEMA = {
@@ -93,10 +92,8 @@ def test_foicfrfees_create(app, client):
     cfrrequest = generalcfrrequestjson
     cfrrequest["requeststatusid"] = 2
     foicfrrequestresponse = client.post(cfrrequestposturl,data=json.dumps(cfrrequest), headers=factory_intake_auth_header(app, client), content_type=CONTENT_TYPE)
-    print(foicfrrequestresponse.data)
     foicfrrequestjsondata = json.loads(foicfrrequestresponse.data)  
     createfoicfrfeesresponse = client.post(CREATE_CFR_FEE_URL+str(foicfrrequestjsondata["ministryRequests"][0]["id"]),data=json.dumps(TEST_CFR_FEE_SCHEMA), headers=factory_ministry_auth_header(app, client), content_type=CONTENT_TYPE)
-    print(createfoicfrfeesresponse)
     assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
 
 
@@ -114,11 +111,9 @@ def test_foicfrfees_sanction(app, client):
     cfrrequest = generalcfrrequestjson
     cfrrequest["requeststatusid"] = 2
     foicfrrequestresponse = client.post(cfrrequestposturl,data=json.dumps(cfrrequest), headers=factory_intake_auth_header(app, client), content_type=CONTENT_TYPE)
-    print(foicfrrequestresponse.data)
     foicfrrequestjsondata = json.loads(foicfrrequestresponse.data)  
     createfoicfrfeesresponse = client.post(CREATE_CFR_FEE_URL+str(foicfrrequestjsondata["ministryRequests"][0]["id"]),data=json.dumps(TEST_CFR_FEE_SCHEMA), headers=factory_ministry_auth_header(app, client), content_type=CONTENT_TYPE)
     sanctionfoicfrfeesresponse = client.post(CREATE_CFR_FEE_URL+str(foicfrrequestjsondata["ministryRequests"][0]["id"])+"/sanction",data=json.dumps(TEST_CFR_FEE_SANCTION_SCHEMA), headers=factory_intake_auth_header(app, client), content_type=CONTENT_TYPE)
-    print(sanctionfoicfrfeesresponse)
     assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
 
 
@@ -139,5 +134,4 @@ def test_foicfrfees_get(app, client):
     foicfrrequestjsondata = json.loads(foicfrrequestresponse.data)  
     createfoicfrfeesresponse = client.post(CREATE_CFR_FEE_URL+str(foicfrrequestjsondata["ministryRequests"][0]["id"]),data=json.dumps(TEST_CFR_FEE_SCHEMA), headers=factory_ministry_auth_header(app, client), content_type=CONTENT_TYPE)
     getfoicfrfeeresponse = client.get(CREATE_CFR_FEE_URL+str(foicfrrequestjsondata["ministryRequests"][0]["id"]), headers=factory_intake_auth_header(app, client), content_type=CONTENT_TYPE)
-    print(getfoicfrfeeresponse)
     assert rawresponse.status_code == 200 and foiresponse.status_code == 200 and wfupdateresponse.status_code == 200
