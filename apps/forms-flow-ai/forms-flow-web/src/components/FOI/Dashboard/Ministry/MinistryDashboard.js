@@ -29,6 +29,14 @@ const MinistryDashboard = ({ userDetail }) => {
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
   const dispatch = useDispatch();
 
+  React.useEffect(() => {
+    if (showAdvancedSearch) {
+      document.title = 'FOI Advanced Search'
+    } else {
+      document.title = 'FOI Request Queue'
+    }
+  }, [showAdvancedSearch]);
+
   return (
     <div className="container foi-container">
       <Grid
