@@ -32,7 +32,7 @@ class cfrfeeservice:
         cfrfee = FOIRequestCFRFee()
         lkupcfrfee = self.getcfrfee(ministryrequestid)           
         _version = 1
-        if lkupcfrfee:
+        if lkupcfrfee is not None:
             cfrfee.__dict__.update(lkupcfrfee)
             _version =  lkupcfrfee['version'] + 1
         cfrfee.version = _version   
@@ -61,7 +61,7 @@ class cfrfeeservice:
             cfrfee.pop('cfrfeestatus.name')
             return cfrfee 
         else:
-            return {}
+            return None
         
            
     def __pstformat(self, inpdate):
