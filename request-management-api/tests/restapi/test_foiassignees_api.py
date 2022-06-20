@@ -26,7 +26,7 @@ def test_get_foiassigneesforgeneralopen(app, client):
     assert response.status_code == 200 and len(jsondata) >=1
     
 def test_get_foiassigneesforgeneralcfr(app, client):
-    response = client.get('/api/foiassignees/general/callforrecords/educ', headers=factory_auth_header(app, client), content_type='application/json')
+    response = client.get('/api/foiassignees/general/callforrecords/edu', headers=factory_auth_header(app, client), content_type='application/json')
     jsondata = json.loads(response.data)    
     assert response.status_code == 200 and len(jsondata) >=1
 

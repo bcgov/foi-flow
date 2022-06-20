@@ -7,6 +7,7 @@ import API from "../../endpoints";
   } from "../../../actions/FOI/foiRequestActions";
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { catchError } from "./foiServicesUtil";
+  import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
 
 export const fetchCFRForm = (
   ministryId,
@@ -39,6 +40,7 @@ export const fetchCFRForm = (
 export const saveCFRForm = (
   data,
   ministryId,
+  requestId,
   isMinistry,
   dispatch,
   callback,
@@ -65,6 +67,7 @@ export const saveCFRForm = (
         if (callback) {
           callback(res.data);
         }
+        dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       } else {
         dispatch(serviceActionError(res));
         throw new Error();
