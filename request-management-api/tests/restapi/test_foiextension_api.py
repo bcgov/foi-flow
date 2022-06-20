@@ -78,7 +78,7 @@ def test_foiministryextension_list(app, client):
     foiministryrequest2["documents"] = [
         {
             "category": "cfr-feeassessed",
-            "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
+            "documentpath":"/EDU/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
             "filename":"test.docx"
         }
         ]
