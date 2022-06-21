@@ -77,7 +77,7 @@ class FOIRawRequest(Resource):
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)
-                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
+                asyncio.create_task(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
                 if result.success == True:
                     asyncio.ensure_future(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
