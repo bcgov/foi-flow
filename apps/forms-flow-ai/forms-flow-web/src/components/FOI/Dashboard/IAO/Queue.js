@@ -32,7 +32,7 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 10 };
+  const defaultRowsState = { page: 0, pageSize: 100 };
   const [rowsState, setRowsState] = useState(defaultRowsState);
   const [sortModel, setSortModel] = useState(tableInfo.sort);
 
