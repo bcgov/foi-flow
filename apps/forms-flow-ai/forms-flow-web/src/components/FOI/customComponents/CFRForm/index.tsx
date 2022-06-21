@@ -349,7 +349,7 @@ export const CFRForm = ({
         errorToast(errorMessage)
       },
     )
-  };
+  }; 
 
 
   const [modalOpen, setModalOpen] = useState(false);
