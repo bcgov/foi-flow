@@ -24,6 +24,7 @@ COPY ./${CUSTOM_SRC_DIR}/  /app/${CUSTOM_SRC_DIR}/
 
 ARG CUSTOM_SVG_DIR=public/webfonts
 COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
+COPY package.json /app/package.json
 
 RUN npm install
 RUN npm run build
@@ -32,5 +33,6 @@ FROM docker-remote.artifacts.developer.gov.bc.ca/nginx:1.17 as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
+
 EXPOSE 8080:8080
 CMD ["nginx", "-g", "daemon off;"]
