@@ -62,6 +62,7 @@ import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
+import HomeIcon from '@mui/icons-material/Home';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -629,7 +630,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const stateTransition = requestDetails?.stateTransition;
   
-  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
   const disableBannerForClosed = () => {
    if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase())){
@@ -736,22 +737,25 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       isAddRequest
                     }
                   >
-                    <ConditionalComponent condition={showBreadcrumbs}>
-                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
-                        <Chip
+                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                      {showAdvancedSearch ? 
+                        (<Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
-                        />
-                        <Chip
-                          label={headerText}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
-                        />
-                      </Breadcrumbs>
-                    </ConditionalComponent>
-                    <ConditionalComponent condition={!showBreadcrumbs}>
-                      <div style={{marginTop: 20}}></div>
-                    </ConditionalComponent>
+                        />) :
+                        (<Chip
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />)
+                      }
+                      <Chip
+                        label={headerText}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                    </Breadcrumbs>
                     <>
                       <FOIRequestHeader
                         headerValue={headerValue}
