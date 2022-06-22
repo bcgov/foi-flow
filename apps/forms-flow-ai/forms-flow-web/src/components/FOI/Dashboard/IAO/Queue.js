@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
-import { setQueueFilter } from "../../../../actions/FOI/foiRequestActions";
+import { setQueueFilter, setQueueParams } from "../../../../actions/FOI/foiRequestActions";
 import {
   debounce,
   ClickableChip,
@@ -32,24 +32,14 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 100 };
-  const [rowsState, setRowsState] = useState(defaultRowsState);
-  const [sortModel, setSortModel] = useState(tableInfo.sort);
+  const queueParams = useSelector((state) => state.foiRequests.queueParams);
+  const rowsState = useSelector((state) => state.foiRequests.queueParams.rowsState);
+  const sortModel = useSelector((state) => state.foiRequests.queueParams.sortModel || tableInfo.sort);
 
   let serverSortModel;
-  const [filterModel, setFilterModel] = useState({
-    fields: [
-      "firstName",
-      "lastName",
-      "requestType",
-      "idNumber",
-      "axisRequestId",
-      "currentState",
-      "assignedToLastName",
-      "assignedToFirstName",
-    ],
-    keyword: null,
-  });
+
+  
+  const filterModel = useSelector((state) => state.foiRequests.queueParams.filterModel);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   useEffect(() => {
@@ -74,14 +64,14 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (filter === requestFilter) {
       return;
     }
-    setRowsState((prev) => ({ ...prev, page: 0 }));
+    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
     dispatch(setQueueFilter(filter));
   };
 
   const setSearch = debounce((e) => {
     var keyword = e.target.value.trim();
-    setFilterModel((prev) => ({ ...prev, keyword }));
-    setRowsState((prev) => ({ ...prev, page: 0 }));
+    dispatch(setQueueParams({...queueParams, filterModel: {...filterModel, keyword: keyword}}));
+    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
   }, 500);
 
   const rows = useMemo(() => {
@@ -112,8 +102,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (model.length === 0) {
       return;
     }
-
-    setSortModel(model);
+    dispatch(setQueueParams({...queueParams, sortModel: model}));
   };
 
   return (
@@ -220,9 +209,9 @@ const Queue = ({ userDetail, tableInfo }) => {
           pagination
           paginationMode="server"
           page={rowsState.page}
-          onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+          onPageChange={(newPage) => dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: newPage}}))}
           onPageSizeChange={(newpageSize) =>
-            setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
+            dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, pageSize: newpageSize}}))
           }
           components={{
             Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"}></CustomFooter>

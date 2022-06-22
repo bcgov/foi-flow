@@ -16,7 +16,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import { formatDate } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
-import { setQueueFilter } from "../../../../actions/FOI/foiRequestActions";
+import { setQueueFilter, setQueueParams } from "../../../../actions/FOI/foiRequestActions";
 import { CustomFooter } from "../CustomFooter"
 
 const Queue = ({ userDetail, tableInfo }) => {
@@ -29,17 +29,18 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 100 };
-  const [rowsState, setRowsState] = useState(defaultRowsState);
-
   const defaultSortModel = [
     { field: "ministrySorting", sort: "asc" },
     // { field: "cfrduedate", sort: "asc" }
   ];
-  const [sortModel, setSortModel] = useState(defaultSortModel);
+
+  const queueParams = useSelector((state) => state.foiRequests.queueParams);
+  const rowsState = useSelector((state) => state.foiRequests.queueParams.rowsState);
+  const sortModel = useSelector((state) => state.foiRequests.queueParams.sortModel || defaultSortModel);
 
   let serverSortModel;
-  const [filterModel, setFilterModel] = useState({
+  const filterModel = useSelector((state) => state.foiRequests.queueParams.filterModel);
+  dispatch(setQueueParams({...queueParams, filterModel: {
     fields: [
       "applicantcategory",
       "requestType",
@@ -50,7 +51,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       "assignedministrypersonFirstName",
     ],
     keyword: null,
-  });
+  }}));
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   // update sortModel for records due, ldd & assignedTo
@@ -177,14 +178,14 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (filter === requestFilter) {
       return;
     }
-    setRowsState((prev) => ({ ...prev, page: 0 }));
+    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
     dispatch(setQueueFilter(filter));
   };
 
   const setSearch = debounce((e) => {
     var keyword = e.target.value.trim();
-    setFilterModel((prev) => ({ ...prev, keyword }));
-    setRowsState((prev) => ({ ...prev, page: 0 }));
+    dispatch(setQueueParams({...queueParams, filterModel: {...filterModel, keyword: keyword}}));
+    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
   }, 500);
 
   const rows = useMemo(() => {
@@ -313,9 +314,9 @@ const Queue = ({ userDetail, tableInfo }) => {
           pagination
           paginationMode="server"
           page={rowsState.page}
-          onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+          onPageChange={(newPage) => dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: newPage}}))}
           onPageSizeChange={(newpageSize) =>
-            setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
+            dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, pageSize: newpageSize}}))
           }
           components={{
             Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={defaultSortModel} footerFor={"queue"}></CustomFooter>
@@ -324,7 +325,7 @@ const Queue = ({ userDetail, tableInfo }) => {
           sortingMode={"server"}
           onSortModelChange={(model) => {
             if (model) {
-              setSortModel(model);
+              dispatch(setQueueParams({...queueParams, sortModel: model}));
             }
           }}
           getRowClassName={(params) => (params.row.assignedministryperson == null) && "not-assigned"}
