@@ -21,13 +21,19 @@ import json
 from datetime import datetime
 from dateutil.parser import parse
 from pytz import timezone
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
+from request_api.models.OperatingTeams import OperatingTeam
 
 class notificationservice:
     """ FOI notification management service
     """
     
-    def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True):
+    def createnotification(self, message, requestid, requesttype, state, userid, iscleanup=True):
         foirequest = self.__getrequest(requestid, requesttype)
+        if(state == 'Call For Records' and foirequest['assignedministryperson'] is None):
+            notificationtype = "Group Members"
+        else:
+            notificationtype = "State"
         if iscleanup == True:
             self.__cleanupnotifications(requesttype, notificationtype, foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
@@ -101,6 +107,8 @@ class notificationservice:
             _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationid)
         else:
             _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationid)
+        print("ids:",_ids)
+        print("requesttype:",requesttype)
         self.__deletenotificationids(requesttype, _ids) 
         
     def __deletenotificationids(self, requesttype, notificationids):
@@ -185,7 +193,13 @@ class notificationservice:
     def __getnotificationtypefromid(self, idnumber):
         return 'rawrequest' if idnumber.lower().startswith('u-00') else 'ministryrequest'    
             
-    def __preparenotification(self, message, requesttype, notificationtype, userid, foirequest, foicomment=None):            
+    def __preparenotification(self, message, requesttype, notificationtype, userid, foirequest, foicomment=None):
+        # if 'assignedministrygroup' in foirequest:
+        #     print("Id:",foirequest["assignedministrygroup"])
+        #     print("Inside!", str(KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])))  
+        #     usersfromkeycloak= KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"]) 
+        #     print(">>>"+str(usersfromkeycloak)) 
+        print("Req:",str(foirequest))
         if requesttype == "ministryrequest":
             notification = FOIRequestNotification()
             notification.requestid = foirequest["foiministryrequestid"]

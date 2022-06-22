@@ -6,6 +6,7 @@ from request_api.services.watcherservice import watcherservice
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.services.notifications.notificationconfig import notificationconfig
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 class notificationuser:
     """ Notfication user service
@@ -20,6 +21,8 @@ class notificationuser:
             _users = self.__getcommentusers(foirequest, foicomment, requesttype)
         elif 'Tagged User Comments' in notificationtype:
             _users = self.__gettaggedusers(foicomment)
+        elif 'Group Members' in notificationtype:
+            _users = self.__getwatchers(foirequest, requesttype) + self.__getgroupmembers(foirequest["assignedministrygroup"])
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
         for user in _users:
@@ -104,4 +107,15 @@ class notificationuser:
         for entry in data:
             taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypeid("comment tagged user")})
         return taggedusers
+
+    def __getgroupmembers(self,groupid):
+        notificationusers = []
+        notificationtypeid = notificationconfig().getnotificationusertypeid("Group Members")
+        usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname(groupid) 
+        print("Members::"+str(usergroupfromkeycloak))
+        print("MemberVal::"+str(usergroupfromkeycloak[0].get("members")))
+        for user in usergroupfromkeycloak[0].get("members"):
+            notificationusers.append({"userid":user["username"], "usertype":notificationtypeid})
+        print("notificationusers-->",notificationusers)
+        return notificationusers 
         

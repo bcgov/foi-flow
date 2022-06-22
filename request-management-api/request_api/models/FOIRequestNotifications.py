@@ -115,9 +115,12 @@ class FOIRequestNotification(db.Model):
     @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
         notificationids = []
+        notificationtypeids = []
+        notificationtypeids.append(notificationtypeid)
+        notificationtypeids.append(12)
         try:
-            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
-            rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeid': notificationtypeid})
+            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypeid = ANY(:notificationtypeids) """
+            rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeids': notificationtypeids})
             for row in rs:
                 notificationids.append(row["notificationid"])
         except Exception as ex:
