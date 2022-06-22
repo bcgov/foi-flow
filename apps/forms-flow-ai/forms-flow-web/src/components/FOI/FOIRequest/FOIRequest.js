@@ -738,19 +738,21 @@ const FOIRequest = React.memo(({ userDetail }) => {
                     }
                   >
                     <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
-                      {showAdvancedSearch ? 
-                        (<Chip
+                      <ConditionalComponent condition={showAdvancedSearch}>
+                        <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
-                        />) :
-                        (<Chip
+                        />
+                        <ConditionalComponent condition={!showAdvancedSearch}>
+                        </ConditionalComponent>
+                        <Chip
                           icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
                           label={"Request Queue"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
-                        />)
-                      }
+                        />
+                      </ConditionalComponent>
                       <Chip
                         label={headerText}
                         sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
