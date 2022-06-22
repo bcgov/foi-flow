@@ -91,11 +91,9 @@ class KeycloakAdminService:
         return input.lower().replace(' ', '')  
 
     def getmembersbygroupname(self, groupname):
-        print("Group Name:",str(groupname))
         _groups = []
         _groups.append({"name":groupname, "type": OperatingTeam.gettype(groupname)})
         allowedgroups = self.getgroups(_groups)
-        # print("<<>>",str(allowedgroups))
         for group in allowedgroups:
             if(group["name"] == groupname):
                 group["members"] = self.getgroupmembersbyid(group["id"])

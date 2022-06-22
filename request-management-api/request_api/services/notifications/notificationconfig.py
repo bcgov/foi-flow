@@ -10,7 +10,6 @@ class notificationconfig:
     """
     
     def getnotificationtypeid(self, notificationtype):
-        print(notificationtype)
         if notificationtype == "State":
             return 1
         elif notificationtype == "Extension":
@@ -36,10 +35,8 @@ class notificationconfig:
     def getnotificationusertypeid(self, notificationusertype):
         if notificationusertype.lower() == "watcher":
             return 1
-        elif notificationusertype.lower() == "assignee" or "comment" in notificationusertype.lower():
+        elif notificationusertype.lower() == "assignee" or "comment"  or "group members" in notificationusertype.lower():
             return 2
-        elif notificationusertype.lower() == "group members":
-            return 3
         return 0
     
     def getnotificationdays(self):

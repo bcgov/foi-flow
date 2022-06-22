@@ -112,10 +112,7 @@ class notificationuser:
         notificationusers = []
         notificationtypeid = notificationconfig().getnotificationusertypeid("Group Members")
         usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname(groupid) 
-        print("Members::"+str(usergroupfromkeycloak))
-        print("MemberVal::"+str(usergroupfromkeycloak[0].get("members")))
         for user in usergroupfromkeycloak[0].get("members"):
             notificationusers.append({"userid":user["username"], "usertype":notificationtypeid})
-        print("notificationusers-->",notificationusers)
         return notificationusers 
         

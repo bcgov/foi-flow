@@ -101,14 +101,15 @@ class notificationservice:
         return  DefaultMethodResult(True,'No change',requestid) 
     
     def __cleanupnotifications(self, requesttype, notificationtype, foirequest):
-        notificationid = notificationconfig().getnotificationtypeid(notificationtype)        
+        notificationid = notificationconfig().getnotificationtypeid(notificationtype) 
+        notificationtypeids = []
+        notificationtypeids.append(notificationid)
+        notificationtypeids.append(notificationconfig().getnotificationtypeid("Group Members"))       
         if requesttype == "ministryrequest":
             idnumber = foirequest["filenumber"]
-            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationid)
+            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationtypeids)
         else:
             _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationid)
-        print("ids:",_ids)
-        print("requesttype:",requesttype)
         self.__deletenotificationids(requesttype, _ids) 
         
     def __deletenotificationids(self, requesttype, notificationids):
@@ -194,12 +195,6 @@ class notificationservice:
         return 'rawrequest' if idnumber.lower().startswith('u-00') else 'ministryrequest'    
             
     def __preparenotification(self, message, requesttype, notificationtype, userid, foirequest, foicomment=None):
-        # if 'assignedministrygroup' in foirequest:
-        #     print("Id:",foirequest["assignedministrygroup"])
-        #     print("Inside!", str(KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])))  
-        #     usersfromkeycloak= KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"]) 
-        #     print(">>>"+str(usersfromkeycloak)) 
-        print("Req:",str(foirequest))
         if requesttype == "ministryrequest":
             notification = FOIRequestNotification()
             notification.requestid = foirequest["foiministryrequestid"]
