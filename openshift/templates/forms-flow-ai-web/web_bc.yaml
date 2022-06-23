@@ -1,10 +1,10 @@
 kind: Template
 apiVersion: template.openshift.io/v1
 metadata:
-  name: forms-flow-web
+  name: forms-flow-ai-web
   annotations:
     description: "FOI Web Tier"
-    tags: forms-flow-web
+    tags: forms-flow-ai-web
 parameters:
   - name: SOURCE_REPOSITORY_URL
     displayName: Git Repository URL
@@ -23,17 +23,17 @@ objects:
   apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
-    name: forms-flow-web
+    name: forms-flow-ai-web
     labels:
-      app: forms-flow-web
+      app: forms-flow-ai-web
   spec:
     resources:
       limits:
         cpu: '1'
-        memory: 1Gi
+        memory: 8Gi
       requests:
         cpu: '1'
-        memory: 1Gi
+        memory: 4Gi
     runPolicy: Serial
     source:
       contextDir: ${SOURCE_CONTEXT_DIR}
@@ -43,7 +43,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: 'forms-flow-web:latest'
+        name: 'forms-flow-ai-web:latest'
     strategy:
       type: Docker
       dockerStrategy:
@@ -51,9 +51,9 @@ objects:
           name: artifactory-creds
         env:
           - name: FORMIO_SOURCE_REPO_URL
-            value: ${FORMIO_SOURCE_REPO_URL}
+            value: 'https://github.com/AOT-Technologies/forms-flow-ai.git'
           - name: FORMIO_SOURCE_REPO_BRANCH
-            value: ${FORMIO_SOURCE_REPO_BRANCH}
+            value: 'v4.0.5-alpha'
         dockerfilePath: Dockerfile
     triggers:
       - type: ImageChange
@@ -64,4 +64,4 @@ objects:
   apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
-    name: forms-flow-web
+    name: forms-flow-ai-web
