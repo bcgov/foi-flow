@@ -172,6 +172,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     React.useState(requestDetails);
 
   const [divstages, setdivStages] = React.useState([]);
+  const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -223,9 +224,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    hasincompleteDivstage;
+    hasincompleteDivstage || !hasReceivedDate;
 
-  const createMinistrySaveRequestObject = (propName, value, value2) => {
+  const createMinistrySaveRequestObject = (_propName, _value, _value2) => {
     const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
     setSaveMinistryRequestObject(requestObject);
@@ -430,6 +431,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
         existingDivStages={divisions}
         ministrycode={ministrycode}
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
+        requestStartDate = {requestDetails?.requestProcessStart}
+        setHasReceivedDate={setHasReceivedDate}
       />
     );
 

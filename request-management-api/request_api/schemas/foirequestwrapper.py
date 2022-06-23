@@ -134,6 +134,7 @@ class FOIMinistryRequestDivisionSchema(Schema):
     stageid = fields.Int(data_key="stageid")
     divisionDueDate = fields.Str(data_key="divisionDueDate",allow_none=True)
     eApproval = fields.Str(data_key="eApproval",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])
+    divisionReceivedDate = fields.Str(data_key="divisionReceivedDate",allow_none=True)
 
   
 class FOIRequestMinistrySchema(Schema):

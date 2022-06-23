@@ -6,7 +6,8 @@ export const calculateStageCounter = (existingDivStages) => {
       divisionid: -1,
       stageid: -1,
       divisionDueDate: null,
-      eApproval: null
+      eApproval: null,
+      divisionReceivedDate: null
     }];
   }
 
@@ -16,7 +17,8 @@ export const calculateStageCounter = (existingDivStages) => {
       divisionid: item.divisionid,
       stageid: item.stageid,
       divisionDueDate: item.divisionDueDate,
-      eApproval: item.eApproval
+      eApproval: item.eApproval,
+      divisionReceivedDate: item.divisionReceivedDate
     };
   });
 };
@@ -54,6 +56,9 @@ export const updateDivisionsState = (e, id, minDivStages, setStates) => {
         item.divisionDueDate = null;
         item.eApproval = null;
       }
+      else if(!(item.stageid == 6 || item.stageid == 8 || item.stageid == 10)){
+        item.divisionReceivedDate = null;
+      }
 
     });
   setStates(arr);
@@ -88,7 +93,7 @@ export const updateEApproval = (e, id, minDivStages, setStates) => {
   setStates(arr);
 };
 
-export const updateDueDate = (e, id, minDivStages, setStates) => {
+export const updateDivisonDate = (e, id, dateType, minDivStages, setStates) => {
   let arr = minDivStages;
 
   const exists = arr.some((st) => st.id === id);
@@ -100,7 +105,10 @@ export const updateDueDate = (e, id, minDivStages, setStates) => {
   arr
     .filter((st) => st.id === id)
     .forEach((item) => {
-        item.divisionDueDate = e.target.value;
+        if(dateType.toLowerCase() == 'duedate')
+          item.divisionDueDate = e.target.value;
+        else if(dateType.toLowerCase() == 'receiveddate')
+          item.divisionReceivedDate = e.target.value;
     });
   setStates(arr);
 };

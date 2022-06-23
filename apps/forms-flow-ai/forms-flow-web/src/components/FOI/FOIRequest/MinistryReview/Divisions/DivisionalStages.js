@@ -11,7 +11,7 @@ import {
   updateDivisionsState,
   addDivisionalStage,
   updateEApproval,
-  updateDueDate
+  updateDivisonDate
 } from "./utils";
 import clsx from "clsx";
 import FOI_COMPONENT_CONSTANTS from "../../../../../constants/FOI/foiComponentConstants";
@@ -24,6 +24,8 @@ const DivisionalStages = React.memo(
     existingDivStages,
     popSelectedDivStages,
     createMinistrySaveRequestObject,
+    requestStartDate,
+    setHasReceivedDate
   }) => {
 
     const [minDivStages, setMinDivStages] = React.useState(() =>
@@ -96,17 +98,19 @@ const DivisionalStages = React.memo(
       );
     };
 
-    const handleDivisionDueDateChange = (e,id) => {
-      updateDueDate(e, id, minDivStages, (newStages) => {
+    const handleDivisionDateChange = (e,id, dateType) => {
+      console.log(">>",dateType.toLowerCase());
+      if(dateType.toLowerCase() == "receiveddate"){
+        console.log("Inside receiveddate!!");
+        setHasReceivedDate(true);
+      }
+      updateDivisonDate(e, id, dateType, minDivStages, (newStages) => {
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
       });
-      createMinistrySaveRequestObject(
-        FOI_COMPONENT_CONSTANTS.DIVISION_DUE_DATE,
-        e.target.value,
-        e.target.name
-      );
+      createMinistrySaveRequestObject();
     };
+
 
     const getdivisionMenuList = () => {
       let _divisionItems = [];
@@ -185,7 +189,11 @@ const DivisionalStages = React.memo(
 
     const divisionalStagesRow = (row, index) => {
       let _id = row.id;
-
+      if((row.stageid == 6 || row.stageid == 8 || row.stageid == 10 ) && 
+        (row.divisionReceivedDate === undefined || row.divisionReceivedDate === "" || row.divisionReceivedDate === null)){
+          setHasReceivedDate(false);
+      }
+        
       return (
         <div className="row foi-details-row" id={`foi-division-row${_id}`}>
           <div className="col-lg-3 foi-details-col">
@@ -267,7 +275,7 @@ const DivisionalStages = React.memo(
                   id="divisionDueDate"              
                   label="Division Due Date"
                   value={row.divisionDueDate}
-                  onChange={(e) => handleDivisionDueDateChange(e, _id)}
+                  onChange={(e) => handleDivisionDateChange(e, _id, "dueDate")}
                   type="date"
                   InputLabelProps={{
                   shrink: true,
@@ -279,13 +287,38 @@ const DivisionalStages = React.memo(
             </div>
             </>
           }
+          {(row.stageid == 6 || row.stageid == 8 || row.stageid == 10) && 
+          <>
+          <div className="col-lg-3 foi-details-col foi-request-dates due-date-field">
+            <TextField  
+                style={{marginTop: '0px'}}
+                id="divisionReceivedDate"              
+                label="Received Date"
+                value={row.divisionReceivedDate}
+                onChange={(e) => handleDivisionDateChange(e, _id, "receivedDate")}
+                type="date"
+                InputLabelProps={{
+                shrink: true,
+                }} 
+                InputProps={{inputProps: { 
+                  min: formatDate(requestStartDate), 
+                  max: formatDate(new Date()),
+                  "aria-label": "Division Received Date" } }}
+                variant="outlined"
+                fullWidth
+                required
+                error={row.divisionReceivedDate === undefined || row.divisionReceivedDate === "" || row.divisionReceivedDate === null}
+            />  
+          </div>
+          </>
+          }
           <div className="col-lg-1 foi-details-col">
             <i
               className={clsx("fa fa-trash fa-3 foi-bin", {
                 hidebin: index === 0 && stageIterator.length === 1,
               })}
               aria-hidden="true"
-              onClick={(e) => deleteMinistryDivision(_id)}
+              onClick={() => deleteMinistryDivision(_id)}
             ></i>
           </div>
         </div>
@@ -301,7 +334,7 @@ const DivisionalStages = React.memo(
               divisionalStagesRow(item, index)
             )}
         </div>
-        {divisionList && divisionList.length > stageIterator.length ? (
+        {divisionList && divisionList.length > stageIterator.length && (
           <div className="row foi-details-row">
             <div className="col-lg-7 foi-details-col">
               <i
@@ -316,8 +349,6 @@ const DivisionalStages = React.memo(
               </button>
             </div>
           </div>
-        ) : (
-          <span />
         )}
       </>
     );
