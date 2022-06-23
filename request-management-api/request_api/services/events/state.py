@@ -44,13 +44,27 @@ class stateevent:
             return commentservice().createrawrequestcomment(comment, userid,2)
 
     def __createnotification(self, requestid, state, requesttype, userid):
+        _notificationtype = "State"
+        _axisrequestid = ""
+        if state == 'Call For Records' and requesttype == "ministryrequest":
+            foirequest = notificationservice().getrequest(requestid, requesttype)
+            _notificationtype = "Group Members" if foirequest['assignedministryperson'] is None else "State"
+            _axisrequestid = foirequest["axisrequestid"]
         notification = self.__preparenotification(state)
         if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, state, userid)
+        response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
+        if _notificationtype == "Group Members":
+            notification = self.__preparegroupmembernotification(_axisrequestid, state)
+            groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, _notificationtype, userid)
+            return response and groupmemberresponse
+        return response
 
     def __preparenotification(self, state):
         return self.__notificationmessage(state)
+
+    def __preparegroupmembernotification(self, axisrequestid, state):
+        return self.__groupmembernotificationmessage(axisrequestid, state)
 
     def __preparecomment(self, requestid, state,requesttype, username):
         comment = {"comment": self.__commentmessage(state, username)}
@@ -68,4 +82,7 @@ class stateevent:
 
     def __notificationmessage(self, state):
         return  'Moved to '+self.__formatstate(state)+ ' State'        
+
+    def __groupmembernotificationmessage(self, axisrequestid, state):
+        return  'New request ( '+axisrequestid+ ') is in '+state  
             

@@ -22,7 +22,7 @@ class notificationuser:
         elif 'Tagged User Comments' in notificationtype:
             _users = self.__gettaggedusers(foicomment)
         elif 'Group Members' in notificationtype:
-            _users = self.__getwatchers(foirequest, requesttype) + self.__getgroupmembers(foirequest["assignedministrygroup"])
+            _users = self.__getgroupmembers(foirequest["assignedministrygroup"])
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
         for user in _users:
