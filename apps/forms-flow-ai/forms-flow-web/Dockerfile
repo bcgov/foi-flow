@@ -24,7 +24,6 @@ COPY ./${CUSTOM_SRC_DIR}/  /app/${CUSTOM_SRC_DIR}/
 
 ARG CUSTOM_SVG_DIR=public/webfonts
 COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
-COPY package.json /app/package.json
 
 RUN npm install
 RUN npm run build
