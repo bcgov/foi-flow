@@ -46,6 +46,7 @@ import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
+import HomeIcon from '@mui/icons-material/Home';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -437,7 +438,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     );
 
   
-  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
   return !isLoading &&
     requestDetails &&
@@ -513,22 +514,27 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   autoComplete="off"
                 >
 
-                    <ConditionalComponent condition={showBreadcrumbs}>
-                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                      <ConditionalComponent condition={showAdvancedSearch}>
                         <Chip
                           label={"Advanced Search"}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
+                        <ConditionalComponent condition={!showAdvancedSearch}>
+                        </ConditionalComponent>
                         <Chip
-                          label={getHeaderText(requestDetails)}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
-                      </Breadcrumbs>
-                    </ConditionalComponent>
-                    <ConditionalComponent condition={!showBreadcrumbs}>
-                      <div style={{marginTop: 20}}></div>
-                    </ConditionalComponent>
+                      </ConditionalComponent>
+                      <Chip
+                        label={getHeaderText(requestDetails)}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                    </Breadcrumbs>
                   {Object.entries(requestDetails).length > 0 &&
                     requestDetails !== undefined && (
                       <>

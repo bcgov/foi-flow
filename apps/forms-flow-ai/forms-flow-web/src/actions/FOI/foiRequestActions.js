@@ -11,6 +11,12 @@ export const setQueueFilter = (data) => dispatch =>{
         payload:data
     })
 }
+export const setQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_PARAMS,
+        payload:data
+    })
+}
 export const setShowAdvancedSearch = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,
