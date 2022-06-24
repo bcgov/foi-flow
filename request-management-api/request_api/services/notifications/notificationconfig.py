@@ -27,13 +27,15 @@ class notificationconfig:
         elif notificationtype == "Reply User Comments":
             return 9  
         elif notificationtype == "Tagged User Comments":
-            return 10  
+            return 10 
+        elif notificationtype == "Group Members":
+            return 12 
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):
         if notificationusertype.lower() == "watcher":
             return 1
-        elif notificationusertype.lower() == "assignee" or "comment" in notificationusertype.lower():
+        elif notificationusertype.lower() == "assignee" or "comment"  or "group members" in notificationusertype.lower():
             return 2
         return 0
     

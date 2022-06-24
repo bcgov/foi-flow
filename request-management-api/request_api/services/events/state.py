@@ -44,13 +44,31 @@ class stateevent:
             return commentservice().createrawrequestcomment(comment, userid,2)
 
     def __createnotification(self, requestid, state, requesttype, userid):
+        _notificationtype = "State"
+        if state == 'Call For Records' and requesttype == "ministryrequest":
+            foirequest = notificationservice().getrequest(requestid, requesttype)
+            _notificationtype = "Group Members" if foirequest['assignedministryperson'] is None else "State"
         notification = self.__preparenotification(state)
         if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
+        response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
+        if _notificationtype == "Group Members":
+            notification = self.__preparegroupmembernotification(state)
+            groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, _notificationtype, userid)
+            if response.success == True and groupmemberresponse.success == True :
+                return DefaultMethodResult(True,'Notification added',requestid)
+            else:   
+                return DefaultMethodResult(False,'Unable to add notification',requestid)
+        if response.success == True:
+            return DefaultMethodResult(True,'Notification added',requestid)
+        return  DefaultMethodResult(True,'No change',requestid)
+            
 
     def __preparenotification(self, state):
         return self.__notificationmessage(state)
+
+    def __preparegroupmembernotification(self, state):
+        return self.__groupmembernotificationmessage(state)
 
     def __preparecomment(self, requestid, state,requesttype, username):
         comment = {"comment": self.__commentmessage(state, username)}
@@ -68,4 +86,7 @@ class stateevent:
 
     def __notificationmessage(self, state):
         return  'Moved to '+self.__formatstate(state)+ ' State'        
+
+    def __groupmembernotificationmessage(self, state):
+        return  'New request is in '+state  
             
