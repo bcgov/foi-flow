@@ -40,18 +40,21 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   let serverSortModel;
   const filterModel = useSelector((state) => state.foiRequests.queueParams.filterModel);
-  dispatch(setQueueParams({...queueParams, filterModel: {
-    fields: [
-      "applicantcategory",
-      "requestType",
-      "idNumber",
-      "axisRequestId",
-      "currentState",
-      "assignedministrypersonLastName",
-      "assignedministrypersonFirstName",
-    ],
-    keyword: null,
-  }}));
+  useEffect(() => {
+    dispatch(setQueueParams({...queueParams, filterModel: {
+      fields: [
+        "applicantcategory",
+        "requestType",
+        "idNumber",
+        "axisRequestId",
+        "currentState",
+        "assignedministrypersonLastName",
+        "assignedministrypersonFirstName",
+      ],
+      keyword: null,
+    }}));
+  }, [])
+
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   // update sortModel for records due, ldd & assignedTo
