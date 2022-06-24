@@ -744,8 +744,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
-                        <ConditionalComponent condition={!showAdvancedSearch}>
-                        </ConditionalComponent>
+                      </ConditionalComponent>
+                      <ConditionalComponent condition={!showAdvancedSearch}>
                         <Chip
                           icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
                           label={"Request Queue"}
