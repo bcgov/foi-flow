@@ -55,8 +55,14 @@ class stateevent:
         if _notificationtype == "Group Members":
             notification = self.__preparegroupmembernotification(state)
             groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, _notificationtype, userid)
-            return response and groupmemberresponse
-        return response
+            if response.success == True and groupmemberresponse.success == True :
+                return DefaultMethodResult(True,'Notification added',requestid)
+            else:   
+                return DefaultMethodResult(False,'Unable to add notification',requestid)
+        if response.success == True:
+            return DefaultMethodResult(True,'Notification added',requestid)
+        return  DefaultMethodResult(True,'No change',requestid)
+            
 
     def __preparenotification(self, state):
         return self.__notificationmessage(state)
