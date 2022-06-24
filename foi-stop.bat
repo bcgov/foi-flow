@@ -20,7 +20,7 @@ set /P servicenames="Enter services(s) here (ex: web, api, bpm, redis) separated
    )
    if /I %%a == web ( 
 	echo "Stopping Web..."
-	docker-compose -f docker-compose.yml stop forms-flow-web
+	docker-compose -f docker-compose.yml stop foi-web
    )
    if /I %%a == redis ( 
 	echo "Stopping Redis..."

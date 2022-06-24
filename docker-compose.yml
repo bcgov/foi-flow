@@ -147,8 +147,8 @@ services:
     networks:
       - forms-flow-bpm-network
       
-  forms-flow-web:
-    container_name: forms-flow-web
+  foi-web:
+    container_name: foi-web
     build:
       context: ./forms-flow-web/
       dockerfile: Dockerfile.local

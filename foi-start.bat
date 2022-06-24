@@ -43,7 +43,7 @@ set /P servicenames="Enter services(s) here (ex: web, api, bpm) separated by spa
    )
    if /I %%a == web ( 
 	echo "Starting Web..."
-	docker-compose -f docker-compose.yml up --build -d forms-flow-web
+	docker-compose -f docker-compose.yml up --build -d foi-web
    )
    if !START_REDIS! == Y ( 
 	echo "Starting Redis..."
