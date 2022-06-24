@@ -23,6 +23,28 @@ export const calculateStageCounter = (existingDivStages) => {
   });
 };
 
+export const stageForReceivedDateExists = (divisionstageList, selectedStageId) => {
+  if(selectedStageId != -1){
+    const stagesForReceivedDate = divisionstageList?.filter(
+      (element) => (element.name === "Records Received" || element.name === "Harms Received" || 
+      element.name === "Sign Off Complete")
+    ).map(obj => obj.stageid);
+    return !!(stagesForReceivedDate.includes(selectedStageId))
+  }
+  return false;
+}
+
+export const stageForDueDateExists = (divisionstageList, selectedStageId) => {
+  if(selectedStageId != -1){
+    const stagesForDueDate = divisionstageList?.filter(
+      (element) => (element.name === "Gathering Records" || element.name === "Awaiting Harms" || 
+      element.name === "Pending Sign Off")
+    ).map(obj => obj.stageid);
+    return !!(stagesForDueDate.includes(selectedStageId))
+  }
+  return false;
+}
+
 export const updateDivisions = (e, id, minDivStages, setStates) => {
   let arr = minDivStages;
   const idExists = arr.some((st) => st.id === id);
@@ -52,11 +74,11 @@ export const updateDivisionsState = (e, id, minDivStages, setStates) => {
     .filter((st) => st.id === id)
     .forEach((item) => {
       item.stageid = e.target.value;
-      if(!(item.stageid == 5 || item.stageid == 7 || item.stageid == 9)){
+      if(!stageForDueDateExists(arr, item.stageid)){
         item.divisionDueDate = null;
         item.eApproval = null;
       }
-      else if(!(item.stageid == 6 || item.stageid == 8 || item.stageid == 10)){
+      if(!stageForReceivedDateExists(arr, item.stageid)){
         item.divisionReceivedDate = null;
       }
 

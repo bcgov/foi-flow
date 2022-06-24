@@ -11,7 +11,9 @@ import {
   updateDivisionsState,
   addDivisionalStage,
   updateEApproval,
-  updateDivisonDate
+  updateDivisonDate,
+  stageForReceivedDateExists,
+  stageForDueDateExists
 } from "./utils";
 import clsx from "clsx";
 import FOI_COMPONENT_CONSTANTS from "../../../../../constants/FOI/foiComponentConstants";
@@ -99,11 +101,9 @@ const DivisionalStages = React.memo(
     };
 
     const handleDivisionDateChange = (e,id, dateType) => {
-      console.log(">>",dateType.toLowerCase());
-      if(dateType.toLowerCase() == "receiveddate"){
-        console.log("Inside receiveddate!!");
+      if(dateType.toLowerCase() == "receiveddate")
         setHasReceivedDate(true);
-      }
+
       updateDivisonDate(e, id, dateType, minDivStages, (newStages) => {
         setMinDivStages([...newStages]);
         appendStageIterator([...newStages]);
@@ -148,6 +148,8 @@ const DivisionalStages = React.memo(
 
     const divisionstageList = divisionalstages.stages;
 
+
+
     const renderMenuItem = (value, menuList, key, emptyMenuItem) => {
       if (value === -1) {
         return emptyMenuItem;
@@ -189,10 +191,12 @@ const DivisionalStages = React.memo(
 
     const divisionalStagesRow = (row, index) => {
       let _id = row.id;
-      if((row.stageid == 6 || row.stageid == 8 || row.stageid == 10 ) && 
+      if(stageForReceivedDateExists(divisionstageList, row.stageid) && 
         (row.divisionReceivedDate === undefined || row.divisionReceivedDate === "" || row.divisionReceivedDate === null)){
           setHasReceivedDate(false);
       }
+      else
+        setHasReceivedDate(true);
         
       return (
         <div className="row foi-details-row" id={`foi-division-row${_id}`}>
@@ -254,7 +258,7 @@ const DivisionalStages = React.memo(
               </Select>
             </FormControl>
           </div>
-          {(row.stageid == 5 || row.stageid == 7 || row.stageid == 9) && 
+          {stageForDueDateExists(divisionstageList, row.stageid) && 
             <>
             <div className="col-lg-2 foi-details-col due-date-field">
               <TextField
@@ -287,7 +291,7 @@ const DivisionalStages = React.memo(
             </div>
             </>
           }
-          {(row.stageid == 6 || row.stageid == 8 || row.stageid == 10) && 
+          {stageForReceivedDateExists(divisionstageList, row.stageid) && 
           <>
           <div className="col-lg-3 foi-details-col foi-request-dates due-date-field">
             <TextField  
