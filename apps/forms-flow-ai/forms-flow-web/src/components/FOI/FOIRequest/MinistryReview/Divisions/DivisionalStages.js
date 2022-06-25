@@ -46,6 +46,7 @@ const DivisionalStages = React.memo(
       );
     };
 
+
     const handleDivisionStageChange = (e, id) => {
       updateDivisionsState(e, id, minDivStages, (newStages) => {
         setMinDivStages([...newStages]);
@@ -148,7 +149,15 @@ const DivisionalStages = React.memo(
 
     const divisionstageList = divisionalstages.stages;
 
-
+    const isReceivedDateEmpty = () => {
+      if(minDivStages?.length > 0){
+        const divWithoutReceivedDate = minDivStages?.filter(
+          (element) => (stageForReceivedDateExists(divisionstageList, element.stageid) && !element.divisionReceivedDate)
+        );
+        return divWithoutReceivedDate.length > 0;
+      }
+      return false;
+    }
 
     const renderMenuItem = (value, menuList, key, emptyMenuItem) => {
       if (value === -1) {
@@ -191,10 +200,8 @@ const DivisionalStages = React.memo(
 
     const divisionalStagesRow = (row, index) => {
       let _id = row.id;
-      if(stageForReceivedDateExists(divisionstageList, row.stageid) && 
-        (row.divisionReceivedDate === undefined || row.divisionReceivedDate === "" || row.divisionReceivedDate === null)){
-          setHasReceivedDate(false);
-      }
+      if(isReceivedDateEmpty())
+        setHasReceivedDate(false);
       else
         setHasReceivedDate(true);
         
