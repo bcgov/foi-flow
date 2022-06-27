@@ -7,7 +7,7 @@ on:
       - dev
       - dev-AC-212d
     paths:
-      - "forms-flow-web/**"
+      - "apps/forms-flow-ai/forms-flow-web/**"
   workflow_dispatch:
     inputs:
       environment:
@@ -18,7 +18,7 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: ./forms-flow-web
+    working-directory: ./apps/forms-flow-ai/forms-flow-web
 
 env:
   APP_NAME: "forms-flow-web"
