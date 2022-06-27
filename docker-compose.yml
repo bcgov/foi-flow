@@ -147,10 +147,10 @@ services:
     networks:
       - forms-flow-bpm-network
       
-  forms-flow-web:
-    container_name: forms-flow-web
+  foi-web:
+    container_name: foi-web
     build:
-      context: ./apps/forms-flow-ai/forms-flow-web/
+      context: ./forms-flow-web/
       dockerfile: Dockerfile.local
       args:
         - NODE_ENV=${NODE_ENV:-development}
