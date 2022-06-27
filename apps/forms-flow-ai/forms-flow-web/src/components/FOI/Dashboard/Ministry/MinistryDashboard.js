@@ -27,6 +27,12 @@ const useStyles = makeStyles(() => ({
 const MinistryDashboard = ({ userDetail }) => {
   const classes = useStyles();
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const tableInfo = {
+    sort: [
+      { field: "ministrySorting", sort: "asc" },
+      // { field: "cfrduedate", sort: "asc" }
+    ]
+  };
   const dispatch = useDispatch();
 
   React.useEffect(() => {
@@ -116,7 +122,7 @@ const MinistryDashboard = ({ userDetail }) => {
             marginTop: "2em",
           }}
         >
-          <Queue userDetail={userDetail} />
+          <Queue userDetail={userDetail} tableInfo={tableInfo}/>
         </Grid>
 
         <Grid
