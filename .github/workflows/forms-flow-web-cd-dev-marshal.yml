@@ -24,7 +24,7 @@ env:
   TAG_NAME: "dev-marshal"
 
 jobs:
-  forms-flow-web-cd-by-push:
+  forms-flow-web-cd-dev-marshal-by-push:
     runs-on: ubuntu-20.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
