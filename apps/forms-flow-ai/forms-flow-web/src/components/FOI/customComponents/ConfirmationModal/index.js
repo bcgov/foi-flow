@@ -217,9 +217,6 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
   const [closingDateText, setClosingDate] = React.useState( formatDate(today) );
   const [selectedReason, setClosingReason] = React.useState( 0 );
 
-  //############### replace this with the last status change date
-  const lastStatusChangeDate = _requestDetails.lastStatusUpdateDate;
-
   const _handleClosingDateChange = (e) => {
     let pickedDate = e.target.value;
     if(new Date(pickedDate) > today)

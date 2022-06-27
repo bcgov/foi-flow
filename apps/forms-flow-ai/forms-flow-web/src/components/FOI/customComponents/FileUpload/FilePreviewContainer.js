@@ -5,7 +5,7 @@ function FilePreviewContainer({files, removeFile}) {
       <article className="file-preview-container">     
         <section>
           <ol className={`${Object.keys(files).length === 1 ? "ol-display-none": ""}`}>
-          {Object.keys(files).map((fileName, index) => {
+          {Object.keys(files).map((fileName, _index) => {
             let file = files[fileName];
             return (
               <li className={`${Object.keys(files).length === 1 ? "ol-display-none": ""}`}>

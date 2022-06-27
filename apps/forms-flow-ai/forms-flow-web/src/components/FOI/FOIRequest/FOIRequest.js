@@ -115,10 +115,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const disableInput =
     requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  var foitabheaderBG = getTabBG(_tabStatus, requestState);
-  var foiAxisRequestIds = useSelector(
-    (state) => state.foiRequests.foiAxisRequestIds
-  );
+  let foitabheaderBG = getTabBG(_tabStatus, requestState);
+
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
@@ -199,7 +197,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
-      var requestStateFromId = findRequestState(requestDetails.requeststatusid)
+      let requestStateFromId = findRequestState(requestDetails.requeststatusid)
         ? findRequestState(requestDetails.requeststatusid)
         : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
@@ -214,7 +212,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   useEffect(() => {
     if(checkExtension && Object.entries(axisSyncedData).length !== 0){
-      var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
+      let axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
       if(axisDataUpdated)
         setAxisMessage("WARNING");
       else
@@ -227,7 +225,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       if(!err){
         if(typeof(data) !== "string" && Object.entries(data).length > 0){
           setAxisSyncedData(data);
-          var axisDataUpdated = checkIfAxisDataUpdated(data);
+          let axisDataUpdated = checkIfAxisDataUpdated(data);
           if(axisDataUpdated){
             setCheckExtension(false);
             setAxisMessage("WARNING");
@@ -248,9 +246,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   }
 
   const checkIfAxisDataUpdated = (axisData) => {
-    var updateNeeded= false;
+    let updateNeeded= false;
     for(let key of Object.keys(axisData)){
-      var updatedField = isAxisSyncDisplayField(key);
+      let updatedField = isAxisSyncDisplayField(key);
       if(key !== 'Extensions' && updatedField)
         updateNeeded= checkValidation(key, axisData);
       if(updateNeeded){
@@ -261,7 +259,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const checkValidation = (key,axisData) => {
-    var mandatoryField = isMandatoryField(key);
+    let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
       let foiReqAdditionalPersonalInfo = requestDetails[key];
       let axisAdditionalPersonalInfo = axisData[key];
@@ -603,7 +601,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const userId = userDetail?.preferred_username;
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random";
-  var lastName = "",
+  let lastName = "",
     firstName = "";
   if (userDetail) {
     firstName = userDetail.given_name;
@@ -769,14 +767,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         userDetail={userDetail}
                         disableInput={disableInput}
                         isAddRequest={isAddRequest}
-                        unSavedRequest={unSavedRequest}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
                         <AxisDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          foiAxisRequestIds={foiAxisRequestIds}
                           handleAxisDetailsInitialValue={
                             handleAxisDetailsInitialValue
                           }

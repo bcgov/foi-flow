@@ -264,7 +264,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setcurrentrequestStatus("");
   };
 
-  var foitabheaderBG;
+  let foitabheaderBG;
   const classes = useStyles();
 
   switch (_tabStatus) {
