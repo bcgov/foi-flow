@@ -30,6 +30,8 @@ const DivisionalStages = React.memo(
     setHasReceivedDate
   }) => {
 
+    const today = new Date();
+
     const [minDivStages, setMinDivStages] = React.useState(() =>
       calculateStageCounter(existingDivStages)
     );
@@ -200,6 +202,9 @@ const DivisionalStages = React.memo(
 
     const divisionalStagesRow = (row, index) => {
       let _id = row.id;
+      if(!row.divisionReceivedDate)
+        row.divisionReceivedDate= formatDate(today);
+        
       if(isReceivedDateEmpty())
         setHasReceivedDate(false);
       else
@@ -313,7 +318,7 @@ const DivisionalStages = React.memo(
                 }} 
                 InputProps={{inputProps: { 
                   min: formatDate(requestStartDate), 
-                  max: formatDate(new Date()),
+                  max: formatDate(today),
                   "aria-label": "Division Received Date" } }}
                 variant="outlined"
                 fullWidth
