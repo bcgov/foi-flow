@@ -48,7 +48,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   // update sortModel for records due, ldd & assignedTo
-  const updateSortModel = (sortModel) => {
+  const updateSortModel = () => {
     let smodel = JSON.parse(JSON.stringify(sortModel));
     if (smodel) {
       smodel.map((row) => {
@@ -72,7 +72,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   useEffect(() => {
-    serverSortModel = updateSortModel(sortModel);
+    serverSortModel = updateSortModel();
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
       fetchFOIMinistryRequestListByPage(
