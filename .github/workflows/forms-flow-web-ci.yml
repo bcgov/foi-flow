@@ -7,7 +7,7 @@ on:
       - main
       - dev
     paths:
-      - "forms-flow-web/**"
+      - "apps/forms-flow-ai/forms-flow-web/**"
   # Todo - Remove before merging in.
   push:
     branches:
@@ -17,7 +17,7 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: ./forms-flow-web
+    working-directory: ./apps/forms-flow-ai/forms-flow-web
 
 jobs:
   forms-flow-web-docker-build-check:
