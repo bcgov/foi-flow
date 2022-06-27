@@ -48,8 +48,7 @@ jobs:
       - name: Build from dev-marshal branch
         shell: bash
         run: |
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev-marshal"}}}}'
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"contextDir":"forms-flow-web"}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"contextDir":"forms-flow-web","git":{"ref":"dev-marshal"}}}}'
 
       - name: Start Build Openshift
         shell: bash
