@@ -24,8 +24,7 @@ robocopy "%FFA_DIRECTORY%/forms-flow-web" "%FFA_WEB_DIRECTORY%" /E /XC /XN /XO /
 docker-compose -f docker-compose.yml up --build -d forms-flow-forms
 set /p choice=Is the role mapping variables provided in .env? [Y/N]
 if '%choice%'=='Y' (
-docker-compose -f docker-compose.yml up --build -d forms-flow-webapi
-docker-compose -f docker-compose.yml up --build -d forms-flow-web
+docker-compose -f docker-compose.yml up --build -d forms-flow-webapi forms-flow-web
 ) 
 :end
 
