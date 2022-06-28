@@ -8,7 +8,6 @@ on:
       - dev-AC-212d
     paths:
       - "apps/forms-flow-ai/forms-flow-web/**"
-      - ".github/workflows/forms-flow-web-cd.yml"
   workflow_dispatch:
     inputs:
       environment:
