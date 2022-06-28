@@ -7,6 +7,7 @@ on:
       - dev-marshal
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
+      - ".github/workflows/forms-flow-ai-web-cd-dev-marshal.yml"
   workflow_dispatch:
     inputs:
       environment:
