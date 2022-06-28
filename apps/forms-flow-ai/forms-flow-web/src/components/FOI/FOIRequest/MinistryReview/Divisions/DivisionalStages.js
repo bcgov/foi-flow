@@ -202,8 +202,6 @@ const DivisionalStages = React.memo(
 
     const divisionalStagesRow = (row, index) => {
       let _id = row.id;
-      if(!row.divisionReceivedDate)
-        row.divisionReceivedDate= formatDate(today);
         
       if(isReceivedDateEmpty())
         setHasReceivedDate(false);
