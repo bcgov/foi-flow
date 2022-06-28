@@ -5,10 +5,8 @@ import {useSelector} from "react-redux";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 
-/*import SideBar from "../containers/SideBar";*/
 import NavBar from "../containers/NavBar";
-import Header from "./Header";
-import {FooterPublic, Footer} from "./Footer";
+import Footer from "./Footer";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -19,7 +17,6 @@ const BaseRouting = React.memo(({store}) => {
     <>
       {isAuth?<NavBar/>:null}
       <div className="wrapper">
-        {/*{isAuth?<SideBar store={store} />:null}*/}
           <div className="container-fluid content main-container">
             <ToastContainer />
             <Switch>
@@ -28,7 +25,7 @@ const BaseRouting = React.memo(({store}) => {
                 <PrivateRoute store={store} />
               </Route>
             </Switch>
-            {isAuth?<FooterPublic />:null}
+            {isAuth?<Footer />:null}
           </div>
       </div>
     </>
