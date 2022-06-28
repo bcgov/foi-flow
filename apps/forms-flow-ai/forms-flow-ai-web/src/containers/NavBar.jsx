@@ -34,35 +34,18 @@ const NavBar = React.memo(() => {
     <header>
       <Navbar collapseOnSelect expand="lg" className="topheading-border-bottom" fixed="top">
         <Container fluid className="service-bc-navbar-background">
-          {/*<Nav className="d-lg-none">
-            <div className="mt-1" onClick={menuToggle}>
-              <i className="fa fa-bars fa-lg"/>
-            </div>
-          </Nav>*/}
           <Navbar.Brand className="d-flex" >
             <Link to="/">
               <img
-                className="img-fluid"
                 src={logoPath}
-                width="100px"
+                width="150px"
                 min-width="87px"
                 max-width="100px"
                 max-height="55px"
                 alt="Logo"
               />
             </Link>
-            <div className="custom-app-name pl-2">{appName}</div>
           </Navbar.Brand>
-         {/*
-           <Navbar.Brand className="d-flex">
-            <Link to="/">
-                  <img
-                    className="img-xs rounded-circle"
-                    src="/assets/Images/user.svg"
-                    alt="profile"
-                  />
-            </Link>
-          </Navbar.Brand>*/}
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           {isAuthenticated?
             <Navbar.Collapse id="responsive-navbar-nav" className="navbar-nav">
@@ -127,14 +110,6 @@ const NavBar = React.memo(() => {
                 :
                 null:
                 null}
-
-{/*              {getUserRolePermission(userRoles, STAFF_REVIEWER) ?
-                <Nav.Link as={Link} to='/task'  className={`main-nav nav-item ${
-                  pathname.match(/^\/task/) ? "active-tab" : ""
-                }`}><i className="fa fa-list"/> Tasks</Nav.Link>
-                :
-                null}*/}
-
               {getUserRolePermission(userRoles, STAFF_REVIEWER) ?
                 <NavDropdown
                   title={
@@ -230,7 +205,7 @@ const NavBar = React.memo(() => {
                   }
               </NavDropdown>:null}
             </Nav>
-            <Nav className="ml-auto">
+            <Nav className="ml-auto banner-right">
               <Dropdown alignRight>
                 <Dropdown.Toggle id="dropdown-basic" as="div">
                   <span className="mr-1">
@@ -253,7 +228,7 @@ const NavBar = React.memo(() => {
                 </Dropdown.Menu>
               </Dropdown>
               </Nav>
-          </Navbar.Collapse>:<Link to="/" className="btn btn-primary">Login</Link>}
+          </Navbar.Collapse>:null}
         </Container>
       </Navbar>
     </header>
