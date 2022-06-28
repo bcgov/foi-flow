@@ -74,6 +74,11 @@ const StateTransitionCategories = Object.freeze({
     fromState: "Harms Assessment",
     toState: "Records Review",
   },
+  feeonhold: {
+    name: "feeassessed-onhold",
+    fromState: "Fee Estimate",
+    toState: "On Hold",
+  },
 });
 
 export { StateList, MinistryStateList, StateEnum, StateTransitionCategories };

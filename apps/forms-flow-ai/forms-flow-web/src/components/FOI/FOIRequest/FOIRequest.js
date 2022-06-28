@@ -500,6 +500,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
+      dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -917,6 +918,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         setIsAddRequest={setIsAddRequest}
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
+                        attachmentsArray={requestAttachments}
                       />
                     </>
                   </ConditionalComponent>

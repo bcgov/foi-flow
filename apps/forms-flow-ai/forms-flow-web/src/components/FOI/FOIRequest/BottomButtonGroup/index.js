@@ -3,6 +3,10 @@ import "./bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
+  getOSSHeaderDetails,
+  saveFilesinS3,
+} from "../../../../apiManager/services/FOI/foiOSSServices";
+import {
   saveRequestDetails,
   openRequestDetails
 } from "../../../../apiManager/services/FOI/foiRequestServices";
@@ -64,7 +68,8 @@ const BottomButtonGroup = React.memo(
     setIsAddRequest,
     requestState,
     axisSyncedData,
-    axisMessage
+    axisMessage,
+    attachmentsArray
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -243,8 +248,91 @@ const BottomButtonGroup = React.memo(
       );
     };
 
-    const handleSaveModal = (value, fileInfoList) => {
+    const [successCount, setSuccessCount] = useState(0);
+    const [fileCount, setFileCount] = useState(0);
+    const [documents, setDocuments] = useState([]);
+
+    const saveStatusId = () => {
+      if (currentSelectedStatus) {
+        switch (currentSelectedStatus) {
+          case StateEnum.closed.name:
+            saveRequestObject.requeststatusid = StateEnum.closed.id;
+            saveRequestObject.closedate = closingDate;
+            saveRequestObject.closereasonid = closingReasonId;
+            break;
+  
+          case StateEnum.callforrecords.name:
+            saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
+            if (
+              !("cfrDueDate" in saveRequestObject) ||
+              saveRequestObject.cfrDueDate === ""
+            ) {
+              const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
+              saveRequestObject.cfrDueDate = calculatedCFRDueDate;
+            }
+            if (
+              ![StateEnum.closed.name, StateEnum.onhold.name].includes(
+                currentSelectedStatus
+              ) &&
+              saveRequestObject.onholdTransitionDate
+            ) {
+              const today = new Date();
+  
+              // make it start of today
+              today.setHours(0, 0, 0, 0);
+  
+              const onHoldDays = calculateDaysRemaining(
+                today,
+                saveRequestObject.onholdTransitionDate
+              );
+              const calculatedCFRDueDate = addBusinessDays(
+                saveRequestObject.cfrDueDate,
+                onHoldDays
+              );
+              const calculatedRequestDueDate = addBusinessDays(
+                saveRequestObject.dueDate,
+                onHoldDays
+              );
+              saveRequestObject.cfrDueDate = calculatedCFRDueDate;
+              saveRequestObject.dueDate = calculatedRequestDueDate;
+            }
+            break;
+  
+          case StateEnum.redirect.name:
+          case StateEnum.open.name:
+          case StateEnum.intakeinprogress.name:
+          case StateEnum.review.name:
+          case StateEnum.onhold.name:
+          case StateEnum.signoff.name:
+          case StateEnum.feeassessed.name:
+          case StateEnum.consult.name:
+          case StateEnum.deduplication.name:
+          case StateEnum.harms.name:
+          case StateEnum.response.name:
+            const status = Object.values(StateEnum).find(
+              (statusValue) => statusValue.name === currentSelectedStatus
+            );
+  
+            saveRequestObject.requeststatusid = status.id;
+            break;
+        }
+      }
+    };
+
+    React.useEffect(() => {
+      if (successCount === fileCount && successCount !== 0) {
+        setsaveModal(false);
+        saveStatusId();
+        saveRequestObject.documents = documents;
+        saveRequest();
+        hasStatusRequestSaved(currentSelectedStatus);
+      }
+    }, [successCount]);
+
+    const handleSaveModal = (value, fileInfoList, files) => {
       setsaveModal(false);
+      setFileCount(files?.length);
+
       if (!value) {
         handleSaveRequest(requestState, true, "");
         return;
@@ -254,74 +342,35 @@ const BottomButtonGroup = React.memo(
         return;
       }
 
-      switch (currentSelectedStatus) {
-        case StateEnum.closed.name:
-          saveRequestObject.requeststatusid = StateEnum.closed.id;
-          saveRequestObject.closedate = closingDate;
-          saveRequestObject.closereasonid = closingReasonId;
-          saveRequest();
-          break;
-
-        case StateEnum.callforrecords.name:
-          saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
-          if (
-            !("cfrDueDate" in saveRequestObject) ||
-            saveRequestObject.cfrDueDate === ""
-          ) {
-            const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
-            saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-          }
-          if (
-            ![StateEnum.closed.name, StateEnum.onhold.name].includes(
-              currentSelectedStatus
-            ) &&
-            saveRequestObject.onholdTransitionDate
-          ) {
-            const today = new Date();
-
-            // make it start of today
-            today.setHours(0, 0, 0, 0);
-
-            const onHoldDays = calculateDaysRemaining(
-              today,
-              saveRequestObject.onholdTransitionDate
-            );
-            const calculatedCFRDueDate = addBusinessDays(
-              saveRequestObject.cfrDueDate,
-              onHoldDays
-            );
-            const calculatedRequestDueDate = addBusinessDays(
-              saveRequestObject.dueDate,
-              onHoldDays
-            );
-            saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-            saveRequestObject.dueDate = calculatedRequestDueDate;
-          }
-          saveRequest();
-          break;
-
-        case StateEnum.redirect.name:
-        case StateEnum.open.name:
-        case StateEnum.intakeinprogress.name:
-        case StateEnum.review.name:
-        case StateEnum.onhold.name:
-        case StateEnum.signoff.name:
-        case StateEnum.feeassessed.name:
-        case StateEnum.consult.name:
-        case StateEnum.deduplication.name:
-        case StateEnum.harms.name:
-        case StateEnum.response.name:
-          const status = Object.values(StateEnum).find(
-            (statusValue) => statusValue.name === currentSelectedStatus
-          );
-
-          saveRequestObject.requeststatusid = status.id;
-          saveRequest();
-          break;
-
-        default:
-          return;
+      if (!files || files.length < 1) {
+        saveStatusId();
+        saveRequest();
+        hasStatusRequestSaved(currentSelectedStatus);
+        return;
       }
+
+      getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+        let _documents = [];
+        if (!err) {
+          res.map((header, index) => {
+            const _file = files?.find((file) => file.name === header.filename);
+            const documentpath = {
+              documentpath: header.filepath,
+              filename: header.filename,
+              category: header.filestatustransition,
+            };
+            _documents.push(documentpath);
+            setDocuments(_documents);
+            saveFilesinS3(header, _file, dispatch, (_err, _res) => {
+              let count = 0;
+              if (_res === 200) {
+                count = index + 1;
+              }
+              setSuccessCount(count);
+            });
+          });
+        }
+      });
     };
 
     return (
@@ -345,6 +394,7 @@ const BottomButtonGroup = React.memo(
             saveRequestObject={saveRequestObject}
             handleClosingDateChange={handleClosingDateChange}
             handleClosingReasonChange={handleClosingReasonChange}
+            attachmentsArray={attachmentsArray}
           />
         </ConditionalComponent>
 

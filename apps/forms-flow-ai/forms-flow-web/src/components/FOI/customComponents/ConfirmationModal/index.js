@@ -123,6 +123,10 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         else if (saveRequestObject.requeststatusid === StateEnum.harms.id
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.harmsreview.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+          && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.feeonhold.name;
+
         fileInfoList = files.map(file => {
           return {
             ministrycode: requestNumber.split("-")[0],
