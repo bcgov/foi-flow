@@ -81,7 +81,21 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
       case StateEnum.harms.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
       case StateEnum.onhold.name.toLowerCase():
-          return {title: "Hold Request", body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> This will <b>stop</b> the clock. </>};
+          if (_cfrStatus !== 'approved') {
+            return {
+              title: "On Hold",
+              body: "You must review and approve the CFR Form before you can put this request On Hold."
+            };
+          } else if(!_saveRequestObject.email) {
+            return {
+              title: "On Hold",
+              body: "There is no applicant email on file. Please check the box to confirm that you have mailed the applicant a letter before you put this request On Hold."
+            };
+          } else {
+            return {
+              title: "On Hold",
+              body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> This will <b>stop</b> the clock and automatically email the applicant the fee estimate. </>};
+          }
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
           return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};

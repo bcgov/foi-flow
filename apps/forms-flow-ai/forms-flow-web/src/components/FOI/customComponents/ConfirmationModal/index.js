@@ -129,7 +129,21 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
         );
       }
-      else if ((currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid)) || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id))) {
+      else if (
+        (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase())
+        && 
+        (
+          (state.toLowerCase() === StateEnum.review.name.toLowerCase() 
+            && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid))
+          ||
+          (state.toLowerCase() === StateEnum.response.name.toLowerCase()
+            && saveRequestObject.requeststatusid === StateEnum.signoff.id)
+          ||
+          (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
+            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+            && saveRequestObject.email
+            && cfrStatus == 'approved')
+        )) {
         return (
           <FileUpload
             attchmentFileNameList={attchmentFileNameList}
@@ -140,7 +154,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           />
         );
       }
-      else if (state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init') {
+      else if ((state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init')
+                && (state.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')) {
         return (
           <>
           {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
