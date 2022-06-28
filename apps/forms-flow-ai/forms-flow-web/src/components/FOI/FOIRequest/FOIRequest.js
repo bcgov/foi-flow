@@ -99,6 +99,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+  const [saveRequestObject, setSaveRequestObject] =
+  React.useState(requestDetails);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -156,8 +158,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   });
   const [removeComment, setRemoveComment] = useState(false);
 
-  const [saveRequestObject, setSaveRequestObject] =
-    React.useState(requestDetails);
   const showDivisionalTracking =
     requestDetails &&
     requestDetails.divisions?.length > 0 &&

@@ -173,7 +173,7 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatusid = StateEnum.open.id;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
-        } else {
+        } else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
           openRequest();
         }
       }
