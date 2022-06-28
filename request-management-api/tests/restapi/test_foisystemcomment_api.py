@@ -18,6 +18,12 @@ TEST_MINISTRY_USER_PAYLOAD = {
     'password': os.getenv('TEST_MINISTRY_PASSWORD')
 }
 
+FOI_DIVISION_BASE_PAYLOAD = {
+    "assignedministrygroup":"EDU Ministry Team",
+    "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu"    
+}
 
 def factory_auth_header(app, client):
     url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(os.getenv('KEYCLOAK_ADMIN_HOST'),os.getenv('KEYCLOAK_ADMIN_REALM'))        
@@ -70,26 +76,18 @@ def test_createrawrequest_division_comment(app, client):
     foiupdaterequest["requeststatusid"] = 2
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_auth_header(app, client), content_type='application/json')
     foiministryreqresponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministry_auth_header(app, client), content_type='application/json')
-    addfoidivisionrequest = {
-    "assignedministrygroup":"EDUC Ministry Team",
-    "assignedministryperson": "foiedu@idir",
-    "requeststatusid": 2,
-     "divisions": [{"divisionid":1,"stageid":1},{"divisionid":2,"stageid":1}]
-    }
+    
+    addfoidivisionrequest = FOI_DIVISION_BASE_PAYLOAD
+    addfoidivisionrequest["requeststatusid"] = 2
+    addfoidivisionrequest["divisions"] = [{"divisionid":1,"stageid":1},{"divisionid":2,"stageid":1}]
     addfoicfrdivisionresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(addfoidivisionrequest), headers=factory_ministry_auth_header(app, client), content_type='application/json')
-    modfoidivisionrequest = {
-    "assignedministrygroup":"EDUC Ministry Team",
-    "assignedministryperson": "foiedu@idir",
-    "requeststatusid": 2,
-     "divisions": [{"divisionid":1,"stageid":2},{"divisionid":2,"stageid":1}]
-    }
+    modfoidivisionrequest = FOI_DIVISION_BASE_PAYLOAD
+    modfoidivisionrequest["requeststatusid"] = 2
+    modfoidivisionrequest["divisions"] = [{"divisionid":1,"stageid":2},{"divisionid":2,"stageid":1}]
     modfoicfrdivisionresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(modfoidivisionrequest), headers=factory_ministry_auth_header(app, client), content_type='application/json')
-    delfoidivisionrequest = {
-    "assignedministrygroup":"EDUC Ministry Team",
-    "assignedministryperson": "foiedu@idir",
-    "requeststatusid": 2,
-     "divisions": [{"divisionid":2,"stageid":1}]
-    }
+    delfoidivisionrequest = FOI_DIVISION_BASE_PAYLOAD
+    delfoidivisionrequest["requeststatusid"] = 2
+    delfoidivisionrequest["divisions"] = [{"divisionid":2,"stageid":1}]
     delfoicfrdivisionresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(delfoidivisionrequest), headers=factory_ministry_auth_header(app, client), content_type='application/json')
     getcommentresponse = client.get('/api/foicomment/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]), headers=factory_ministry_auth_header(app, client), content_type='application/json')
     assert foiministryreqresponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and addfoicfrdivisionresponse.status_code == 200  and modfoicfrdivisionresponse.status_code == 200 and delfoicfrdivisionresponse.status_code == 200 and getcommentresponse.status_code == 200  and len(getcommentresponse.data) >=1 

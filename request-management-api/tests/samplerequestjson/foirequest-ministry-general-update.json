@@ -1,8 +1,12 @@
 {
     "assignedGroup":"Intake Team",
-    "assignedTo":"suthirum@idir",
-    "assignedministrygroup":"EDUC Ministry Team",
+    "assignedTo":"foiintake@idir",
+    "assignedToFirstName":"FOI",
+    "assignedToLastName":"Intake",
+    "assignedministrygroup":"EDU Ministry Team",
     "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu",
     "category":"Individual",
     "categoryid":2,
     "cfrDueDate":"2021-11-26",
@@ -29,8 +33,8 @@
     "requestType":"general",
     "selectedMinistries":[
        {
-          "code":"EDUC",
-          "name":"Ministry of Education",
+          "code":"EDU",
+          "name":"Ministry of Education and Childcare",
           "selected":"true"
        }
     ],
