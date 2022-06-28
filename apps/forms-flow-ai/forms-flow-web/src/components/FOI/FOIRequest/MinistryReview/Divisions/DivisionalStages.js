@@ -30,6 +30,8 @@ const DivisionalStages = React.memo(
     setHasReceivedDate
   }) => {
 
+    const today = new Date();
+
     const [minDivStages, setMinDivStages] = React.useState(() =>
       calculateStageCounter(existingDivStages)
     );
@@ -45,6 +47,7 @@ const DivisionalStages = React.memo(
         e.target.name
       );
     };
+
 
     const handleDivisionStageChange = (e, id) => {
       updateDivisionsState(e, id, minDivStages, (newStages) => {
@@ -148,7 +151,15 @@ const DivisionalStages = React.memo(
 
     const divisionstageList = divisionalstages.stages;
 
-
+    const isReceivedDateEmpty = () => {
+      if(minDivStages?.length > 0){
+        const divWithoutReceivedDate = minDivStages?.filter(
+          (element) => (stageForReceivedDateExists(divisionstageList, element.stageid) && !element.divisionReceivedDate)
+        );
+        return divWithoutReceivedDate.length > 0;
+      }
+      return false;
+    }
 
     const renderMenuItem = (value, menuList, key, emptyMenuItem) => {
       if (value === -1) {
@@ -191,10 +202,11 @@ const DivisionalStages = React.memo(
 
     const divisionalStagesRow = (row, index) => {
       let _id = row.id;
-      if(stageForReceivedDateExists(divisionstageList, row.stageid) && 
-        (row.divisionReceivedDate === undefined || row.divisionReceivedDate === "" || row.divisionReceivedDate === null)){
-          setHasReceivedDate(false);
-      }
+      if(!row.divisionReceivedDate)
+        row.divisionReceivedDate= formatDate(today);
+        
+      if(isReceivedDateEmpty())
+        setHasReceivedDate(false);
       else
         setHasReceivedDate(true);
         
@@ -306,7 +318,7 @@ const DivisionalStages = React.memo(
                 }} 
                 InputProps={{inputProps: { 
                   min: formatDate(requestStartDate), 
-                  max: formatDate(new Date()),
+                  max: formatDate(today),
                   "aria-label": "Division Received Date" } }}
                 variant="outlined"
                 fullWidth

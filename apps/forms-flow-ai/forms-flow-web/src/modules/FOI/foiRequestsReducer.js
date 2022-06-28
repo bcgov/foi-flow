@@ -5,19 +5,7 @@ const initialState = {
   queueParams: {
     rowsState: { page: 0, pageSize: 100 },
     sortModel: false,
-    filterModel: {
-      fields: [
-        "firstName",
-        "lastName",
-        "requestType",
-        "idNumber",
-        "axisRequestId",
-        "currentState",
-        "assignedToLastName",
-        "assignedToFirstName",
-      ],
-      keyword: null,
-    }
+    keyword: null,
   },
   showAdvancedSearch: false,
   foiAdvancedSearchParams: {},

@@ -29,32 +29,22 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const classes = useStyles();
 
-  const defaultSortModel = [
-    { field: "ministrySorting", sort: "asc" },
-    // { field: "cfrduedate", sort: "asc" }
+  const filterFields = [
+    "applicantcategory",
+    "requestType",
+    "idNumber",
+    "axisRequestId",
+    "currentState",
+    "assignedministrypersonLastName",
+    "assignedministrypersonFirstName",
   ];
 
   const queueParams = useSelector((state) => state.foiRequests.queueParams);
   const rowsState = useSelector((state) => state.foiRequests.queueParams.rowsState);
-  const sortModel = useSelector((state) => state.foiRequests.queueParams.sortModel || defaultSortModel);
+  const sortModel = useSelector((state) => state.foiRequests.queueParams.sortModel || tableInfo.sort);
 
   let serverSortModel;
-  const filterModel = useSelector((state) => state.foiRequests.queueParams.filterModel);
-  useEffect(() => {
-    dispatch(setQueueParams({...queueParams, filterModel: {
-      fields: [
-        "applicantcategory",
-        "requestType",
-        "idNumber",
-        "axisRequestId",
-        "currentState",
-        "assignedministrypersonLastName",
-        "assignedministrypersonFirstName",
-      ],
-      keyword: null,
-    }}));
-  }, [])
-
+  const keyword = useSelector((state) => state.foiRequests.queueParams.keyword);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   // update sortModel for records due, ldd & assignedTo
@@ -71,7 +61,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       });
 
       //add cfrduedate asc to default sorting
-      if(JSON.stringify(smodel) == JSON.stringify(defaultSortModel)) {
+      if(smodel[0]?.field === "ministrySorting") {
         smodel.push(
           { field: "cfrduedate", sort: "asc" },
         );
@@ -89,13 +79,13 @@ const Queue = ({ userDetail, tableInfo }) => {
         rowsState.page + 1,
         rowsState.pageSize,
         serverSortModel,
-        filterModel.fields,
-        filterModel.keyword,
+        filterFields,
+        keyword,
         requestFilter,
         userDetail.preferred_username
       )
     );
-  }, [rowsState, sortModel, filterModel, requestFilter]);
+  }, [rowsState, sortModel, keyword, requestFilter]);
 
   function getRecordsDue(params) {
     let receivedDateString = params.row.cfrduedate;
@@ -321,12 +311,13 @@ const Queue = ({ userDetail, tableInfo }) => {
             dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, pageSize: newpageSize}}))
           }
           components={{
-            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={defaultSortModel} footerFor={"queue"}></CustomFooter>
+            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"}></CustomFooter>
           }}
           sortingOrder={["desc", "asc"]}
+          sortModel={[sortModel[0]]}
           sortingMode={"server"}
           onSortModelChange={(model) => {
-            if (model) {
+            if (model.length > 0) {
               dispatch(setQueueParams({...queueParams, sortModel: model}));
             }
           }}

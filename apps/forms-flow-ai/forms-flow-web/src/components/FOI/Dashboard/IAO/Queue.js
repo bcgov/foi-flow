@@ -32,6 +32,17 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const classes = useStyles();
 
+  const filterFields = [
+    "firstName",
+    "lastName",
+    "requestType",
+    "idNumber",
+    "axisRequestId",
+    "currentState",
+    "assignedToLastName",
+    "assignedToFirstName",
+  ];
+
   const queueParams = useSelector((state) => state.foiRequests.queueParams);
   const rowsState = useSelector((state) => state.foiRequests.queueParams.rowsState);
   const sortModel = useSelector((state) => state.foiRequests.queueParams.sortModel || tableInfo.sort);
@@ -39,7 +50,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   let serverSortModel;
 
   
-  const filterModel = useSelector((state) => state.foiRequests.queueParams.filterModel);
+  const keyword = useSelector((state) => state.foiRequests.queueParams.keyword);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   useEffect(() => {
@@ -50,13 +61,13 @@ const Queue = ({ userDetail, tableInfo }) => {
         rowsState.page + 1,
         rowsState.pageSize,
         serverSortModel,
-        filterModel.fields,
-        filterModel.keyword,
+        filterFields,
+        keyword,
         requestFilter,
         userDetail.preferred_username
       )
     );
-  }, [rowsState, sortModel, filterModel, requestFilter]);
+  }, [rowsState, sortModel, keyword, requestFilter]);
 
   const columnsRef = React.useRef(tableInfo?.columns || []);
 
