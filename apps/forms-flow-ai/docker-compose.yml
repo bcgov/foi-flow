@@ -83,7 +83,7 @@ services:
     tty: true
 
     networks:
-      - forms-flow-network
+      - forms-flow-ai
 
   forms-flow-webapi-db:
     container_name: forms-flow-webapi-db
@@ -98,7 +98,7 @@ services:
     volumes:
       - ./postgres/webapi:/data/postgres
     networks:
-      - forms-flow-network
+      - forms-flow-ai
 
   forms-flow-webapi:
     container_name: forms-flow-webapi
@@ -134,10 +134,12 @@ services:
     stdin_open: true # -i
     tty: true # -t
     networks:
-      - forms-flow-network
+      - forms-flow-ai
       
 networks:
   forms-flow-network:
+    driver: 'bridge'
+  forms-flow-ai:
     driver: 'bridge'
 
 volumes:
