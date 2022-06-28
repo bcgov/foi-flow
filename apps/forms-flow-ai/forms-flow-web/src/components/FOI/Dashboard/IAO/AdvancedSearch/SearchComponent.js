@@ -39,6 +39,8 @@ import {
   addYears
 } from "../../utils";
 
+const DEFAULT_PAGE_SIZE = 100;
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -237,7 +239,7 @@ const AdvancedSearch = ({ userDetail }) => {
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
       page: 1,
-      size: 10,
+      size: advancedSearchParams?.size || DEFAULT_PAGE_SIZE,
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
     });

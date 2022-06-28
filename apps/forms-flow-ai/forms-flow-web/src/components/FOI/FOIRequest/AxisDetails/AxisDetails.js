@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import TextField from '@material-ui/core/TextField';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { useDispatch} from "react-redux";
-import { fetchRequestDataFromAxis } from '../../../../apiManager/services/FOI/foiRequestServices';
+import { checkDuplicateAndFetchRequestDataFromAxis } from '../../../../apiManager/services/FOI/foiRequestServices';
 import { makeStyles } from '@material-ui/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -14,7 +14,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 const AxisDetails = React.memo(({  
     requestDetails,
     createSaveRequestObject,
-    foiAxisRequestIds,
     handleAxisDetailsInitialValue,
     handleAxisDetailsValue,
     handleAxisIdValidation,
@@ -53,13 +52,8 @@ const AxisDetails = React.memo(({
     const handleAxisIdChange = (e) => {
         if(e.target.value) {
             let helperText = "";
-            if(/^[A-Za-z]+(?:[-]){0,2}\d+\-\d+$/.test(e.target.value)){
-                helperText =  foiAxisRequestIds?.includes(e.target.value)
-                    ? "AXIS ID Number already exists": "";
-            }
-            else
+            if(!(/^[A-Za-z]+(?:[-]){0,2}\d+\-\d+$/.test(e.target.value)))
                 helperText = "Invalid Axis ID Number";
-                
             axisIdValidation = {field: "AxisId", helperTextValue: helperText};
             setValidation(axisIdValidation);
         }
@@ -74,8 +68,9 @@ const AxisDetails = React.memo(({
     }
 
     const syncWithAxis = () => {
-        dispatch(fetchRequestDataFromAxis(axisRequestId, false, saveRequestObject,(err, data) => {
+        dispatch(checkDuplicateAndFetchRequestDataFromAxis(axisRequestId, false, saveRequestObject,(err, data) => {
             if(!err){
+                console.log(Object.entries(data).length);
                 if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}
                     setValidation(axisIdValidation);  
@@ -85,6 +80,10 @@ const AxisDetails = React.memo(({
                     responseMsg+='';
                     if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
                       setAxisMessage("ERROR");
+                    else if(responseMsg.indexOf("Axis Id exists") >= 0){
+                        axisIdValidation = {field: "AxisId", helperTextValue: "AXIS ID Number already exists"};
+                        setValidation(axisIdValidation);
+                    }
                 }
             }
             else

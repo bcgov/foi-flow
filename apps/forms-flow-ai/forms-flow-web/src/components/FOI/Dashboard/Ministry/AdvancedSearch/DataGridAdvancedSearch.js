@@ -1,12 +1,5 @@
 import React, { useEffect, useContext } from "react";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+import { DataGrid } from '@mui/x-data-grid';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
 import Loading from "../../../../../containers/Loading";
@@ -21,6 +14,7 @@ import { ConditionalComponent } from "../../../../../helper/FOI/helper";
 import { useDispatch } from "react-redux";
 import Link from "@mui/material/Link";
 import { push } from "connected-react-router";
+import { CustomFooter } from "../../CustomFooter"
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -37,7 +31,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 10 };
+  const defaultRowsState = { page: 0, pageSize: 100 };
   const [rowsState, setRowsState] = React.useState(
     Object.keys(advancedSearchParams).length > 0 ? 
       {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 
@@ -46,7 +40,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
+    // { field: "receivedDateUF", sort: "desc" },
   ];
   const [sortModel, setSortModel] = React.useState(advancedSearchParams?.sort || defaultSortModel);
 
@@ -169,17 +163,18 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         <Grid item xs={12}>
           <h4 className="foi-request-queue-text">Search Results</h4>
         </Grid>
-        <Grid item xs={12} style={{ height: 450 }}>
+        <Grid item xs={12} style={{ minHeight: 300 }}>
           <DataGrid
+            autoHeight
             className="foi-data-grid"
             getRowId={(row) => row.idNumber}
-            rows={searchResults?.data}
+            rows={searchResults?.data || []}
             columns={columns.current}
             rowHeight={30}
             headerHeight={50}
             rowCount={searchResults?.meta?.total || 0}
             pageSize={rowsState.pageSize}
-            rowsPerPageOptions={[10]}
+            // rowsPerPageOptions={[10]}
             hideFooterSelectedRowCount={true}
             disableColumnMenu={true}
             pagination
@@ -187,12 +182,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             initialState={{
               pagination: rowsState
             }}
-            onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-            onPageSizeChange={(pageSize) =>
-              setRowsState((prev) => ({ ...prev, pageSize }))
+            onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+            onPageSizeChange={(newpageSize) =>
+              setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Pagination: CustomPagination,
+              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={defaultSortModel} footerFor={"advancedsearch"}></CustomFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
@@ -210,19 +205,5 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     </ConditionalComponent>
   );
 };
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
 
 export default DataGridAdvancedSearch;

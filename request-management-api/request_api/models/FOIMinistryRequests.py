@@ -335,11 +335,22 @@ class FOIMinistryRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+
         requestpagecount = case([
             (FOIMinistryRequest.requestpagecount.is_(None),
             '0'),
             ],
             else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
+
+        onbehalfformatted = case([
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
+                             func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
+                             onbehalf_applicant.lastname),
+                            (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
+                             onbehalf_applicant.firstname),
+                           ],
+                           else_ = 'N/A').label('onBehalfFormatted')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -376,7 +387,8 @@ class FOIMinistryRequest(db.Model):
             ministrysorting,
             assignedtoformatted,
             ministryassignedtoformatted,
-            FOIMinistryRequest.closedate
+            FOIMinistryRequest.closedate,
+            onbehalfformatted
         ]
 
         basequery = _session.query(
@@ -478,7 +490,7 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting', 'onBehalfFormatted']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -707,6 +719,16 @@ class FOIMinistryRequest(db.Model):
             ],
             else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
 
+        onbehalfformatted = case([
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
+                             func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
+                             onbehalf_applicant.lastname),
+                            (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
+                             onbehalf_applicant.firstname),
+                           ],
+                           else_ = 'N/A').label('onBehalfFormatted')
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -742,7 +764,8 @@ class FOIMinistryRequest(db.Model):
             ministrysorting,
             assignedtoformatted,
             ministryassignedtoformatted,
-            FOIMinistryRequest.closedate
+            FOIMinistryRequest.closedate,
+            onbehalfformatted
         ]
 
         basequery = _session.query(
@@ -881,7 +904,9 @@ class FOIMinistryRequest(db.Model):
     def getfilterforrequeststatus(cls, params, iaoassignee, ministryassignee):        
         #request status: overdue || on time
         if(params['requeststatus'][0] == 'overdue'):
-            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date()
+            #exclude "on hold" for overdue
+            stateid = 11
+            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), FOIMinistryRequest.requeststatusid != stateid)
         else:
             return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now().date()
 

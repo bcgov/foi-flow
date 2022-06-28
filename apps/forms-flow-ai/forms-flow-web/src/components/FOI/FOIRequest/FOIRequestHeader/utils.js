@@ -82,14 +82,14 @@ export const getHeaderText = ({requestDetails, ministryId, status}) => {
   return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
 };
 
-export const getAssignedTo = (requestDetails) => {
-  if (!requestDetails.assignedGroup || requestDetails.assignedTo === "Unassigned") {
+export const getAssignedTo = (assigneeDetails) => {
+  if (!assigneeDetails.assignedGroup || assigneeDetails.assignedTo === "Unassigned") {
     return "|Unassigned";
   }
 
-  return requestDetails.assignedTo
-    ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}|${requestDetails.assignedToFirstName}|${requestDetails.assignedToLastName}`
-    : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
+  return assigneeDetails.assignedTo
+    ? `${assigneeDetails.assignedGroup}|${assigneeDetails.assignedTo}|${assigneeDetails.assignedToFirstName}|${assigneeDetails.assignedToLastName}`
+    : `${assigneeDetails.assignedGroup}|${assigneeDetails.assignedGroup}`;
 };
 
 export const getStatus = ({ headerValue, requestDetails }) => {

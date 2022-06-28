@@ -11,6 +11,12 @@ export const setQueueFilter = (data) => dispatch =>{
         payload:data
     })
 }
+export const setQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_PARAMS,
+        payload:data
+    })
+}
 export const setShowAdvancedSearch = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,
@@ -230,3 +236,9 @@ export const setRequestDueDate = (data) => (dispatch) => {
   });
 };
 
+export const setResumeDefaultSorting = (data) => (dispatch) => {
+    dispatch({
+        type: FOI_ACTION_CONSTANTS.RESUME_DEFAULT_SORTING,
+        payload: data,
+    });
+};

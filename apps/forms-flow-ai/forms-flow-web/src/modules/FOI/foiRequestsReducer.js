@@ -2,6 +2,11 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 const initialState = {
   isLoading: true,
   queueFilter: "myRequests",
+  queueParams: {
+    rowsState: { page: 0, pageSize: 100 },
+    sortModel: false,
+    keyword: null,
+  },
   showAdvancedSearch: false,
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
@@ -32,6 +37,7 @@ const initialState = {
   foiRequestAttachments: [],
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
+  resumeDefaultSorting: false,
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -40,6 +46,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isLoading: action.payload };
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
       return { ...state, queueFilter: action.payload };
+      case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
+        return { ...state, queueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
@@ -112,6 +120,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiOpenedMinistries: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_AXIS_REQUEST_IDS:
       return { ...state, foiAxisRequestIds: action.payload };
+    case FOI_ACTION_CONSTANTS.RESUME_DEFAULT_SORTING:
+      return { ...state, resumeDefaultSorting: action.payload };
     default:
       return state;
   }
