@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
@@ -69,8 +69,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    var keyword = e.target.value.trim();
-    dispatch(setQueueParams({...queueParams, filterModel: {...filterModel, keyword: keyword}}));
+    dispatch(setQueueParams({...queueParams, filterModel: {...filterModel, keyword: e.target.value.trim()}}));
     dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
   }, 500);
 
