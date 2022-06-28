@@ -43,7 +43,7 @@ const FOIRequestHeader = React.memo(
     userDetail,
     disableInput,
     isAddRequest,
-    unSavedRequest
+    _unSavedRequest
   }) => {
     /**
      *  Header of Review request in the UI

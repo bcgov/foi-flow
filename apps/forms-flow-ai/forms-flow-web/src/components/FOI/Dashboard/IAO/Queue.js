@@ -80,7 +80,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    dispatch(setQueueParams({...queueParams, filterModel: {...filterModel, keyword: e.target.value.trim()}}));
+    dispatch(setQueueParams({...queueParams, keyword: e.target.value.trim()}));
     dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
   }, 500);
 
