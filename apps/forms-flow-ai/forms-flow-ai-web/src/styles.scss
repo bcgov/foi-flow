@@ -6,6 +6,16 @@
 @import url(https://cdn.jsdelivr.net/npm/formiojs@4.13.1/dist/formio.full.min.css);
 @import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css);
 
+@font-face {
+  font-family: "BCSans-Bold";
+  src: url("./assets/FOI/fonts/BCSans-Bold.woff") format('woff');
+}
+
+@font-face {
+  font-family: "BCSans-Regular";
+  src: url("./assets/FOI/fonts/BCSans-Regular.woff") format('woff');
+}
+
 
 $white: #fff;
 $grey: #6c757d;
@@ -31,6 +41,7 @@ $green: #3fb618;
 $teal: #20c997;
 $cyan: #9954bb;
 $lightblue: #4d61fc;
+$bcblue: #003366;
 
 $primary: $blue;
 $secondary: $grey;
@@ -52,7 +63,7 @@ $dark: $gray-800;
   padding-left: 0;
   padding-right: 0;
   //height: 100vh;
-  height: 100%;
+  height: 80%;
 }
 .task-container{
   height: 100% !important;
@@ -65,7 +76,7 @@ h4 {
 }
 #main {
   /* margin-top: 2px;*/
-  min-height: 85vh;
+  min-height: 80%;
   //max-height: 85vh;
   padding-bottom: 1.5rem;
   overflow-y: auto;
@@ -199,7 +210,7 @@ i.fa.fa-question-circle.text-muted {
 .main-nav {
   text-decoration: none !important;
   color: $white !important;
-  font-size: 20px !important;
+  // font-size: 20px !important;
 }
 .nav-user-role {
   color: #003366;
@@ -511,9 +522,9 @@ select option:hover {
   background: #fff;
 }
 
-.content {
-  background-color: #f8f8f8;
-}
+// .content {
+//   background-color: #f8f8f8;
+// }
 
 #sidebar ul li.active > a,
 #sidebar a[aria-expanded="true"] {
@@ -530,6 +541,8 @@ header nav {
   padding: 0 0.5rem !important;
   box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2),
     0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12);
+  background: #003366;
+  height: 15%;
 }
 
 .rounded-circle {
@@ -568,3 +581,12 @@ div[disabled] {
 .classApplicationName{
   width: 20%;
 }
+
+// .wrapper {
+//   background-image: url('./assets/FOI/images/BC.bmp');
+//   height:60vh;
+//   min-height: 90vh;
+//   padding-top: 60px;    
+//   background-position: center;
+//   background-size: cover;
+// }

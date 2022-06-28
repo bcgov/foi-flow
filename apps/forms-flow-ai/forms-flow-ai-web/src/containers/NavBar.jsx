@@ -42,16 +42,16 @@ const NavBar = React.memo(() => {
           <Navbar.Brand className="d-flex" >
             <Link to="/">
               <img
-                className="img-fluid"
+                // className="img-fluid"
                 src={logoPath}
-                width="100px"
+                width="150px"
                 min-width="87px"
                 max-width="100px"
                 max-height="55px"
                 alt="Logo"
               />
             </Link>
-            <div className="custom-app-name pl-2">{appName}</div>
+            {/* <div className="custom-app-name pl-2">{appName}</div> */}
           </Navbar.Brand>
          {/*
            <Navbar.Brand className="d-flex">
@@ -230,7 +230,7 @@ const NavBar = React.memo(() => {
                   }
               </NavDropdown>:null}
             </Nav>
-            <Nav className="ml-auto">
+            <Nav className="ml-auto banner-right">
               <Dropdown alignRight>
                 <Dropdown.Toggle id="dropdown-basic" as="div">
                   <span className="mr-1">
