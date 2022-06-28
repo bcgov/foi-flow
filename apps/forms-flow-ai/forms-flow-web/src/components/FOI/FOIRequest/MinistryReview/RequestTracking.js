@@ -1,5 +1,4 @@
-import React, { useEffect, useState }  from 'react';
-import CFRStatus from './CFRStatus';
+import React, { useEffect }  from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import DivisionalStages from './Divisions/DivisionalStages';

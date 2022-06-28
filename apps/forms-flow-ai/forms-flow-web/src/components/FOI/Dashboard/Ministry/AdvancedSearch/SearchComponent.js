@@ -136,7 +136,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const [requestState, setRequestState] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
-      var savedRequestState = {...intitialRequestState}
+      let savedRequestState = {...intitialRequestState}
       advancedSearchParams.requestState.forEach(state => {
         savedRequestState[state] = true;
       });
@@ -153,7 +153,7 @@ const AdvancedSearch = ({ userDetail }) => {
   
   const [requestStatus, setRequestStatus] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestStatus.length > 0) {
-      var savedRequestStatus = { ...intitialRequestStatus }
+      let savedRequestStatus = { ...intitialRequestStatus }
       advancedSearchParams.requestStatus.forEach(status => {
         savedRequestStatus[status] = true;
       });
@@ -171,7 +171,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const [requestTypes, setRequestTypes] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestType.length > 0) {
-      var savedRequestType = {...initialRequestTypes}
+      let savedRequestType = {...initialRequestTypes}
       advancedSearchParams.requestType.forEach(type => {
         savedRequestType[type] = true;
       });
