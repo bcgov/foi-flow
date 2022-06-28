@@ -10,12 +10,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 import { useSelector } from "react-redux";
 
 import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
-import { formatDate, calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import { formatDate, calculateDaysRemaining, ConditionalComponent } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
 
@@ -39,6 +41,12 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#38598A',
     color: '#FFFFFF'
   },
+  checkboxLabel: {
+    marginBottom: 0,
+  },
+  fileUploadBox: {
+    paddingTop: '20px',
+  }
 
 }));
 
@@ -76,12 +84,17 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const isBtnDisabled = () => {
-      if (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init') {
+      if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && mailed === false)) {
         return true;
       }
-      return files.length === 0 && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id) ||
-      (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id ) ||
-      (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id ))
+      return files.length === 0 
+        && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
+            || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
+            || (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id)
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id)
+          )
     }
 
     const handleClose = () => {
@@ -145,13 +158,15 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             && cfrStatus == 'approved')
         )) {
         return (
-          <FileUpload
-            attchmentFileNameList={attchmentFileNameList}
-            multipleFiles={multipleFiles}
-            mimeTypes={MimeTypeList.stateTransition}
-            maxFileSize={MaxFileSizeInMB.stateTransition}
-            updateFilesCb={updateFilesCb}
-          />
+          <div className={classes.fileUploadBox}>
+            <FileUpload
+              attchmentFileNameList={attchmentFileNameList}
+              multipleFiles={multipleFiles}
+              mimeTypes={MimeTypeList.stateTransition}
+              maxFileSize={MaxFileSizeInMB.stateTransition}
+              updateFilesCb={updateFilesCb}
+            />
+          </div>
         );
       }
       else if ((state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init')
@@ -181,6 +196,11 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
       }
     }
+
+    const [mailed, setMailed] = useState(false);
+    const handleMailedChange = (event) => {
+      setMailed(event.target.checked);
+    };
 
     return (
       <div className="state-change-dialog">
@@ -219,6 +239,25 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               Cancel
             </button>
           </DialogActions>
+          <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
+                                            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                                            && !saveRequestObject.email}>
+            <DialogActions>
+              <FormControlLabel
+                className={classes.checkboxLabel}
+                control={
+                  <Checkbox
+                    size="small"
+                    name="mailed"
+                    onChange={handleMailedChange}
+                    checked={mailed}
+                    color="success"
+                  />
+                }
+                label="Call for Records"
+              />
+            </DialogActions>
+          </ConditionalComponent>
         </Dialog>
       </div>
     );

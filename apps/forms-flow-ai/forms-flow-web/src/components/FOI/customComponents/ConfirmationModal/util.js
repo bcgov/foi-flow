@@ -94,7 +94,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
           } else {
             return {
               title: "On Hold",
-              body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> This will <b>stop</b> the clock and automatically email the applicant the fee estimate. </>};
+              body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <b>This will stop the clock and automatically email the applicant the fee estimate.</b> </>};
           }
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
