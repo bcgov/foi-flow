@@ -49,7 +49,7 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   let serverSortModel;
 
-  
+
   const keyword = useSelector((state) => state.foiRequests.queueParams.keyword);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
@@ -80,8 +80,11 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    dispatch(setQueueParams({...queueParams, keyword: e.target.value.trim()}));
-    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
+    dispatch(setQueueParams({
+      ...queueParams,
+      keyword: e.target.value.trim(),
+      rowsState: {...rowsState, page: 0}
+    }));
   }, 500);
 
   const rows = useMemo(() => {
@@ -147,6 +150,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             <InputBase
               id="filter"
               placeholder="Search in Queue ..."
+              value={keyword}
               onChange={setSearch}
               sx={{
                 color: "#38598A",
