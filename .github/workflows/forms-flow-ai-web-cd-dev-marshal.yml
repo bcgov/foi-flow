@@ -31,7 +31,7 @@ jobs:
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
     environment:
-      name: "${{ env.TAG_NAME }}"
+      name: ${{ env.TAG_NAME }}
 
     steps:
       - uses: actions/checkout@v2
