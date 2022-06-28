@@ -6,6 +6,7 @@ set REPO_URL=https://github.com/AOT-Technologies/forms-flow-ai.git
 set REPO_BRANCH=v4.0.5-alpha
 SET START_REDIS=N
 set BPM_DIRECTORY=%cd%/apps/forms-flow-ai/forms-flow-bpm
+set FFA_WEB_DIRECTORY=%cd%/apps/forms-flow-ai/forms-flow-ai-web
 set FFA_DIRECTORY=%BPM_DIRECTORY%/../%REPO_BRANCH%
 
 
@@ -22,6 +23,10 @@ rem Remove formio specific processes
 rmdir "%FFA_DIRECTORY%/forms-flow-bpm/src/main/resources/processes" /q /s
 robocopy "%FFA_DIRECTORY%/forms-flow-bpm/src" "%BPM_DIRECTORY%/src" /E /XC /XN /XO /NP /NFL
 )
+if exist "%FFA_WEB_DIRECTORY%/../%REPO_BRANCH%/forms-flow-web" (
+robocopy "%FFA_DIRECTORY%/forms-flow-web" "%FFA_WEB_DIRECTORY%" /E /XC /XN /XO /NP /NFL
+)
+
 
 set /p choice="Do you want to start all containers? [Y/N]"
 if /I '%choice%'=='Y' (
@@ -30,8 +35,7 @@ docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow
 set /p ypropchoice="Is the role mapping variables provided in .env? [Y/N]"
 if /I !ypropchoice! == y (
 	echo "Starting forms-flow-ai..."
-	docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-webapi
-	docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-web
+	docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-webapi forms-flow-web
 )
 )
 
@@ -59,8 +63,7 @@ set /P servicenames="Enter services(s) here (ex: web, api, bpm, ffa) separated b
 	set /p npropchoice="Is the role mapping variables provided in .env? [Y/N]"	
 		if /I !npropchoice!== y (
 			echo "Starting forms-flow-ai..."
-			docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-webapi
-			docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-web
+			docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-webapi forms-flow-web
 		)
    )
 

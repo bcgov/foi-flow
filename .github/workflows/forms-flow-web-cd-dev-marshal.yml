@@ -6,7 +6,8 @@ on:
     branches:
       - dev-marshal
     paths:
-      - "apps/forms-flow-ai/forms-flow-web/**"
+      - "forms-flow-web/**"
+      - ".github/workflows/forms-flow-web-cd-dev-marshal.yml"
   workflow_dispatch:
     inputs:
       environment:
@@ -17,14 +18,14 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: ./apps/forms-flow-ai/forms-flow-web
+    working-directory: ./forms-flow-web
 
 env:
   APP_NAME: "forms-flow-web"
   TAG_NAME: "dev-marshal"
 
 jobs:
-  forms-flow-web-cd-by-push:
+  forms-flow-web-cd-dev-marshal-by-push:
     runs-on: ubuntu-20.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
@@ -48,7 +49,7 @@ jobs:
       - name: Build from dev-marshal branch
         shell: bash
         run: |
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev-marshal"}}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"contextDir":"forms-flow-web","git":{"ref":"dev-marshal"}}}}'
 
       - name: Start Build Openshift
         shell: bash
@@ -64,7 +65,7 @@ jobs:
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-dev -w
 
       # - name: Rocket.Chat Notification
       #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
