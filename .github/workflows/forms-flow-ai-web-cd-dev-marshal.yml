@@ -31,7 +31,7 @@ jobs:
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
     environment:
-      name: ${{ env.TAG_NAME }}
+      name: "dev"
 
     steps:
       - uses: actions/checkout@v2
@@ -45,7 +45,7 @@ jobs:
       - name: Tools project
         shell: bash
         run: |
-          oc project ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-tools
+          oc project ${{ secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY }}-tools
 
       - name: Build from ${{ env.BRANCH_NAME }} branch
         shell: bash
@@ -66,7 +66,7 @@ jobs:
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
 
       # - name: Rocket.Chat Notification
       #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
