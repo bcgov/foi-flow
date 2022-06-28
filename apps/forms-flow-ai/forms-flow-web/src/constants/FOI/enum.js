@@ -3,6 +3,7 @@ const MimeTypeList = Object.freeze({
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
     '.xls', '.xlsx', '.doc', '.docx'],
+    stateTransitionFees: ['application/pdf'],
     attachmentLog: ['application/pdf', 
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',

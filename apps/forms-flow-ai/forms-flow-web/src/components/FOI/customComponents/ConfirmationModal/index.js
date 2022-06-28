@@ -44,6 +44,10 @@ const useStyles = makeStyles((theme) => ({
   checkboxLabel: {
     marginBottom: 0,
   },
+  checkboxLabelChecked: {
+    marginBottom: 0,
+    color: 'green',
+  },
   fileUploadBox: {
     paddingTop: '20px',
   }
@@ -74,6 +78,12 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
 
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
+    const [mailed, setMailed] = useState(false);
+    const handleMailedChange = (event) => {
+      setMailed(event.target.checked);
+      setDisableSaveBtn(!event.target.checked);
+    };
+    const user = useSelector((state) => state.user.userDetail);
 
     React.useEffect(() => {
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
@@ -86,14 +96,14 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const isBtnDisabled = () => {
       if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
-            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && mailed === false)) {
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)) {
         return true;
       }
       return files.length === 0 
         && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
             || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
             || (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id)
-            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id)
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id && saveRequestObject.email)
           )
     }
 
@@ -162,7 +172,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             <FileUpload
               attchmentFileNameList={attchmentFileNameList}
               multipleFiles={multipleFiles}
-              mimeTypes={MimeTypeList.stateTransition}
+              mimeTypes={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MimeTypeList.stateTransitionFees:MimeTypeList.stateTransition}
               maxFileSize={MaxFileSizeInMB.stateTransition}
               updateFilesCb={updateFilesCb}
             />
@@ -197,10 +207,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       }
     }
 
-    const [mailed, setMailed] = useState(false);
-    const handleMailedChange = (event) => {
-      setMailed(event.target.checked);
-    };
 
     return (
       <div className="state-change-dialog">
@@ -211,7 +217,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           aria-describedby="state-change-dialog-description"
           maxWidth={'md'}
           fullWidth={true}
-          // id="state-change-dialog"
+          id="state-change-dialog"
         >
           <DialogTitle disableTypography id="state-change-dialog-title">
               <h2 className="state-change-header">{message.title}</h2>
@@ -241,22 +247,22 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </DialogActions>
           <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
                                             && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                                            && cfrStatus === 'approved'
                                             && !saveRequestObject.email}>
-            <DialogActions>
+            <div id="state-change-dialog-checkbox">
               <FormControlLabel
-                className={classes.checkboxLabel}
+                className={mailed?classes.checkboxLabelChecked:classes.checkboxLabel}
                 control={
                   <Checkbox
                     size="small"
                     name="mailed"
                     onChange={handleMailedChange}
-                    checked={mailed}
                     color="success"
                   />
                 }
-                label="Call for Records"
+                label={"I " + user?.preferred_username + " have completed placed applicant processing fees letter in outbox to be mailed"}
               />
-            </DialogActions>
+            </div>
           </ConditionalComponent>
         </Dialog>
       </div>
