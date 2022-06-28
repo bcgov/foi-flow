@@ -176,9 +176,11 @@ const Queue = ({ userDetail, tableInfo }) => {
   };
 
   const setSearch = debounce((e) => {
-    var keyword = e.target.value.trim();
-    dispatch(setQueueParams({...queueParams, keyword: keyword}));
-    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
+    dispatch(setQueueParams({
+      ...queueParams,
+      keyword: e.target.value.trim(),
+      rowsState: {...rowsState, page: 0}
+    }));
   }, 500);
 
   const rows = useMemo(() => {
@@ -235,6 +237,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             <InputBase
               id="filter"
               placeholder="Search in Queue ..."
+              value={keyword}
               onChange={setSearch}
               sx={{
                 color: "#38598A",
