@@ -62,7 +62,6 @@ $dark: $gray-800;
 .container {
   padding-left: 0;
   padding-right: 0;
-  //height: 100vh;
   height: 80%;
 }
 .task-container{
@@ -75,12 +74,8 @@ h4 {
   font-size: 1.2rem;
 }
 #main {
-  /* margin-top: 2px;*/
   min-height: 80%;
-  //max-height: 85vh;
   padding-bottom: 1.5rem;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 body {
   font-size: 16px;
@@ -210,7 +205,6 @@ i.fa.fa-question-circle.text-muted {
 .main-nav {
   text-decoration: none !important;
   color: $white !important;
-  // font-size: 20px !important;
 }
 .nav-user-role {
   color: #003366;
@@ -251,8 +245,6 @@ i.fa.fa-question-circle.text-muted {
   background-color: transparent;
 }
 .active-tab {
-  //color: $lightblue !important;
-  //border-bottom: 1px solid red;
   background-color: transparent;
   filter: invert(80%) sepia(81%) saturate(4581%) hue-rotate(345deg) brightness(95%) contrast(101%);
 }
@@ -261,20 +253,14 @@ i.fa.fa-question-circle.text-muted {
 }
 
 .active-tab-dropdown {
-  // color: #fcba19 !important;
-  //border-bottom: 1px solid red;
   background-color: transparent;
   filter: invert(80%) sepia(81%) saturate(4581%) hue-rotate(345deg) brightness(95%) contrast(101%);
 }
 .inactive-tab-dropdown > #dashboard-dropdown {
-  //color: $lightblue !important;
-  //border-bottom: 1px solid red;
   background-color: transparent;
   filter: brightness(0) invert(1);
 }
 .active-tab-dropdown > #task-dropdown {
-  //color: $lightblue !important;
-  //border-bottom: 1px solid red;
   background-color: transparent;
   filter: invert(80%) sepia(81%) saturate(4581%) hue-rotate(345deg) brightness(95%) contrast(101%);
 }
@@ -315,10 +301,7 @@ i.fa.fa-question-circle.text-muted {
   margin-left: 10px;
   cursor: pointer;
 }
-// .dropdown-menu {
-//   height: 17em;
-//   overflow-y: scroll;
-// }
+
 .dropdown-menu:before {
   position: absolute;
   top: -7px;
@@ -445,7 +428,6 @@ i.fa.fa-question-circle.text-muted {
   font-weight: bold;
   font-size: 30px;
   margin-left: 10px !important;
-  //display: flex;
 }
 .icon-wp-forms{
   height: 30px;
@@ -542,7 +524,7 @@ header nav {
   box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2),
     0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12);
   background: #003366;
-  height: 15%;
+  // height: 15%;
 }
 
 .rounded-circle {

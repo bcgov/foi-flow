@@ -30,13 +30,19 @@ padding-bottom: 3px;
 .foi-footer-nav{   
   width: 100%;
 }
-
-nav {
-    background-color: #036 !important;
+.foi-footer-nav{
+  background-color: #036 !important;
     
     padding: 20px 0 !important;
     color: #fff;
-  }
+}
+
+// nav {
+//     background-color: #036 !important;
+    
+//     padding: 20px 0 !important;
+//     color: #fff;
+//   }
   
   nav h2 {
     font-family: 'BCSans-Bold', sans-serif !important;
@@ -50,7 +56,6 @@ nav {
 @media only screen and (max-width: 500px) {
 
 .footerstyle {
-    //padding: 5%!important;
     text-align: center;
     
 
