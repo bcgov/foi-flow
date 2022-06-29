@@ -99,6 +99,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+  const [saveRequestObject, setSaveRequestObject] =
+  React.useState(requestDetails);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -156,8 +158,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   });
   const [removeComment, setRemoveComment] = useState(false);
 
-  const [saveRequestObject, setSaveRequestObject] =
-    React.useState(requestDetails);
   const showDivisionalTracking =
     requestDetails &&
     requestDetails.divisions?.length > 0 &&
@@ -500,6 +500,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
+      dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -917,6 +918,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         setIsAddRequest={setIsAddRequest}
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
+                        attachmentsArray={requestAttachments}
                       />
                     </>
                   </ConditionalComponent>
