@@ -11,6 +11,12 @@ export const setQueueFilter = (data) => dispatch =>{
         payload:data
     })
 }
+export const setQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_PARAMS,
+        payload:data
+    })
+}
 export const setShowAdvancedSearch = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,
@@ -71,7 +77,7 @@ export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
         payload:data
     })
 }
-export const serviceActionError = (data) => dispatch => {
+export const serviceActionError = (_data) => dispatch => {
    //TODO update to a common file
     dispatch({
       type: FOI_ACTION_CONSTANTS.ERROR,
@@ -183,7 +189,7 @@ export const setClosingReasons = (data) => dispatch => {
         payload:data
     })
 }
-export const clearRawRequestComments = (data) => dispatch => {
+export const clearRawRequestComments = (_data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_RAWREQUEST_COMMENTS,
         payload:{}
