@@ -543,7 +543,7 @@ class FOIRawRequest(db.Model):
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
                 if(FOIRawRequest.validatefield(field)):
-                    order = sortingorders.pop()
+                    order = sortingorders.pop(0)
                     if(order == 'desc'):
                         sortingcondition.append(nullslast(desc(field)))
                     else:

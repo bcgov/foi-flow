@@ -490,7 +490,7 @@ class FOIMinistryRequest(db.Model):
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
-                order = sortingorders.pop()
+                order = sortingorders.pop(0)
                 sortingcondition.append(FOIMinistryRequest.getfieldforsorting(field, order, iaoassignee, ministryassignee))
 
         #default sorting
