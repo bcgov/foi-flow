@@ -150,7 +150,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             <InputBase
               id="filter"
               placeholder="Search in Queue ..."
-              value={keyword}
+              defaultValue={keyword}
               onChange={setSearch}
               sx={{
                 color: "#38598A",
