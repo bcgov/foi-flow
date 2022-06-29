@@ -17,6 +17,7 @@ from .FOIRequestWatchers import FOIRequestWatcher
 from .ProgramAreas import ProgramArea
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
+from .FOIRequestExtensions import FOIRequestExtension
 from request_api.utils.enums import RequestorType
 import logging
 from sqlalchemy.sql.sqltypes import Date
@@ -276,7 +277,10 @@ class FOIMinistryRequest(db.Model):
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
         ]
 
-        
+        #subquery for getting extension count
+        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+
+
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
@@ -351,6 +355,12 @@ class FOIMinistryRequest(db.Model):
                              onbehalf_applicant.firstname),
                            ],
                            else_ = 'N/A').label('onBehalfFormatted')
+        
+        extensions = case([
+                            (subquery_extension_count.c.extensions.is_(None),
+                             0),
+                           ],
+                           else_ = subquery_extension_count.c.extensions).label('extensions')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -388,7 +398,8 @@ class FOIMinistryRequest(db.Model):
             assignedtoformatted,
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate,
-            onbehalfformatted
+            onbehalfformatted,
+            extensions
         ]
 
         basequery = _session.query(
@@ -396,6 +407,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 subquery_ministry_maxversion,
                                 and_(*joincondition_ministry)
+                            ).join(
+                                subquery_extension_count,
+                                subquery_extension_count.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+                                isouter=True
                             ).join(
                                 FOIRequest,
                                 and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
@@ -490,7 +505,7 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting', 'onBehalfFormatted']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting', 'onBehalfFormatted', 'extensions']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -659,6 +674,9 @@ class FOIMinistryRequest(db.Model):
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
         ]
 
+        #subquery for getting extension count
+        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+
         
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
@@ -728,6 +746,12 @@ class FOIMinistryRequest(db.Model):
                              onbehalf_applicant.firstname),
                            ],
                            else_ = 'N/A').label('onBehalfFormatted')
+        
+        extensions = case([
+                            (subquery_extension_count.c.extensions.is_(None),
+                             0),
+                           ],
+                           else_ = subquery_extension_count.c.extensions).label('extensions')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -765,7 +789,8 @@ class FOIMinistryRequest(db.Model):
             assignedtoformatted,
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate,
-            onbehalfformatted
+            onbehalfformatted,
+            extensions
         ]
 
         basequery = _session.query(
@@ -773,6 +798,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 subquery_ministry_maxversion,
                                 and_(*joincondition_ministry)
+                            ).join(
+                                subquery_extension_count,
+                                subquery_extension_count.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+                                isouter=True
                             ).join(
                                 FOIRequest,
                                 and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
