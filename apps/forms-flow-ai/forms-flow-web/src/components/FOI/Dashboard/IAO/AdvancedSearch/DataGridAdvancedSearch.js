@@ -145,7 +145,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 0.5,
-      sortable: false,
+      // sortable: false,
       valueGetter: (params) =>
         params.row.extensions === undefined ? "N/A" : params.row.extensions,
     },
