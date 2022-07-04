@@ -35,7 +35,7 @@ const AxisDetails = React.memo(({
     const dispatch = useDispatch();
     const [axisRequestId, setAxisRequestId] = React.useState("");
     const [validation, setValidation] = React.useState({});
-    var axisIdValidation = {};
+    let axisIdValidation = {};
 
 
     useEffect(() => {
