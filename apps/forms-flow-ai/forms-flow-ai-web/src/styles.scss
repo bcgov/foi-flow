@@ -418,9 +418,6 @@ i.fa.fa-question-circle.text-muted {
   height: 30px;
   width: 100%;
 }
-div.main-header h3 {
-  display: none;
-}
 .back-icon{
   display: flex;
 }
@@ -499,8 +496,6 @@ select option:hover {
 #main {
   background-color: #fff;
   padding: 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
   box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2),
     0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12);
 }
@@ -509,9 +504,9 @@ select option:hover {
   background: #fff;
 }
 
-.content {
-  background-color: #f8f8f8;
-}
+// .content {
+//   background-color: #f8f8f8;
+// }
 
 #sidebar ul li.active > a,
 #sidebar a[aria-expanded="true"] {
@@ -568,3 +563,12 @@ div[disabled] {
 .classApplicationName{
   width: 20%;
 }
+
+// .wrapper {
+//   background-image: url('./assets/FOI/images/BC.bmp');
+//   height:60vh;
+//   min-height: 90vh;
+//   padding-top: 60px;    
+//   background-position: center;
+//   background-size: cover;
+// }
