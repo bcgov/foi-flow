@@ -78,7 +78,7 @@ aside li.active>a {
 }
 
 div.formio-component-button>button.btn-outline-bcblue {
-  border-color: #003366 !important;
+  border: 2px solid #003366 !important;
   color: #003366 !important;
   background-color: transparent !important;
 }
