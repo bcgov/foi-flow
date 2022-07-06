@@ -37,10 +37,10 @@ const BaseRouting = React.memo(({store}) => {
               <Route path="/">
                 <PrivateRoute store={store} />
               </Route>
-            </Switch>
-            {isAuth?<Footer />:null}
+            </Switch>            
           </div>
       </div>
+      {isAuth?<Footer />:null}
     </>
   );
 });

@@ -41,7 +41,6 @@ $green: #3fb618;
 $teal: #20c997;
 $cyan: #9954bb;
 $lightblue: #4d61fc;
-$bcblue: #003366;
 
 $primary: $blue;
 $secondary: $grey;
@@ -62,8 +61,24 @@ $dark: $gray-800;
 .container {
   padding-left: 0;
   padding-right: 0;
-  height: 80%;
+  padding-bottom: 2%;
+  // height: 100%;
 }
+
+div.container>div.container {
+  padding-bottom: 2%;
+  height: 80vh;
+}
+.overflow-x-auto{
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.overflow-y-auto{
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .task-container{
   height: 100% !important;
 }
@@ -74,8 +89,12 @@ h4 {
   font-size: 1.2rem;
 }
 #main {
-  min-height: 80%;
+  /* margin-top: 2px;*/
+  height: 70vh;
+  //max-height: 85vh;
   padding-bottom: 1.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 body {
   font-size: 16px;
@@ -205,6 +224,7 @@ i.fa.fa-question-circle.text-muted {
 .main-nav {
   text-decoration: none !important;
   color: $white !important;
+  // font-size: 20px !important;
 }
 .nav-user-role {
   color: #003366;
@@ -301,7 +321,10 @@ i.fa.fa-question-circle.text-muted {
   margin-left: 10px;
   cursor: pointer;
 }
-
+// .dropdown-menu {
+//   height: 17em;
+//   overflow-y: scroll;
+// }
 .dropdown-menu:before {
   position: absolute;
   top: -7px;
@@ -412,7 +435,7 @@ i.fa.fa-question-circle.text-muted {
 }
 .main-header {
   margin-left: 15px !important;
-  display: none;
+  display: flex;
   margin-top: 10px;
   margin-bottom: 25px;
   height: 30px;
@@ -428,6 +451,7 @@ i.fa.fa-question-circle.text-muted {
   font-weight: bold;
   font-size: 30px;
   margin-left: 10px !important;
+  //display: flex;
 }
 .icon-wp-forms{
   height: 30px;
@@ -523,8 +547,7 @@ header nav {
   padding: 0 0.5rem !important;
   box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2),
     0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12);
-  background: #003366;
-  // height: 15%;
+    background: #003366;
 }
 
 .rounded-circle {
@@ -563,12 +586,3 @@ div[disabled] {
 .classApplicationName{
   width: 20%;
 }
-
-// .wrapper {
-//   background-image: url('./assets/FOI/images/BC.bmp');
-//   height:60vh;
-//   min-height: 90vh;
-//   padding-top: 60px;    
-//   background-position: center;
-//   background-size: cover;
-// }
