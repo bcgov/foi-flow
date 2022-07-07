@@ -11,6 +11,12 @@ export const setQueueFilter = (data) => dispatch =>{
         payload:data
     })
 }
+export const setQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_PARAMS,
+        payload:data
+    })
+}
 export const setShowAdvancedSearch = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,
@@ -71,7 +77,7 @@ export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
         payload:data
     })
 }
-export const serviceActionError = (data) => dispatch => {
+export const serviceActionError = (_data) => dispatch => {
    //TODO update to a common file
     dispatch({
       type: FOI_ACTION_CONSTANTS.ERROR,
@@ -149,62 +155,56 @@ export const setFOIProgramAreaList = (data) => dispatch =>{
 export const clearRequestDetails = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS,
-        payload:data
+        payload:data      
     })
 }
 
 export const clearMinistryViewRequestDetails = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLEAR_MINISTRYVIEWREQUEST_DETAILS,
-        payload:data
+        payload:data      
     })
 }
 export const setFOIRequestDescriptionHistory = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY,
-        payload:data
+        payload:data      
     })
 }
 export const setFOIMinistryDivisionalStages = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES,
-        payload:data
+        payload:data      
     })
 }
 export const setFOIWatcherList = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST,
-        payload:data
+        payload:data      
     })
 }
 export const setClosingReasons = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLOSING_REASONS,
-        payload:data
+        payload:data      
     })
 }
-export const clearRawRequestComments = (data) => dispatch => {
+export const clearRawRequestComments = (_data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_RAWREQUEST_COMMENTS,
-        payload:{}
+        payload:{}      
     })
 }
 export const setRequestComments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
-        payload:data
+        payload:data      
     })
 }
 export const setRequestAttachments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
-        payload:data
-    })
-}
-export const setRequestCFRForm = (data) => dispatch => {
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM,
-        payload:data
+        payload:data      
     })
 }
 

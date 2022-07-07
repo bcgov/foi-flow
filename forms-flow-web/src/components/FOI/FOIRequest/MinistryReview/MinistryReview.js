@@ -40,13 +40,13 @@ import RequestTracking from "./RequestTracking";
 import BottomButtonGroup from "./BottomButtonGroup";
 import { CommentSection } from "../../customComponents/Comments";
 import { AttachmentSection } from "../../customComponents/Attachments";
-import { CFRForm } from '../../customComponents/CFRForm';
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
+import HomeIcon from '@mui/icons-material/Home';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -122,10 +122,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    CFRForm: {
-      display: false,
-      active: false,
-    },
     Comments: {
       display: false,
       active: false,
@@ -177,6 +173,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     React.useState(requestDetails);
 
   const [divstages, setdivStages] = React.useState([]);
+  const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -228,9 +225,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    hasincompleteDivstage;
+    hasincompleteDivstage || !hasReceivedDate;
 
-  const createMinistrySaveRequestObject = (propName, value, value2) => {
+  const createMinistrySaveRequestObject = (_propName, _value, _value2) => {
     const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
     setSaveMinistryRequestObject(requestObject);
@@ -267,7 +264,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setcurrentrequestStatus("");
   };
 
-  var foitabheaderBG;
+  let foitabheaderBG;
   const classes = useStyles();
 
   switch (_tabStatus) {
@@ -435,11 +432,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
         existingDivStages={divisions}
         ministrycode={ministrycode}
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
+        requestStartDate = {requestDetails?.requestProcessStart}
+        setHasReceivedDate={setHasReceivedDate}
       />
     );
 
   
-  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
   return !isLoading &&
     requestDetails &&
@@ -463,15 +462,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
             >
               Request
             </div>
-            {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.CFRForm.active,
-              })}
-              name="CFRForm"
-              onClick={() => tabclick("CFRForm")}
-            >
-              CFR Form
-            </div>)}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Attachments.active,
@@ -524,22 +514,27 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   autoComplete="off"
                 >
 
-                    <ConditionalComponent condition={showBreadcrumbs}>
-                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                      {showAdvancedSearch &&
                         <Chip
                           label={"Advanced Search"}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
+                      }
+                      {!showAdvancedSearch &&
                         <Chip
-                          label={getHeaderText(requestDetails)}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
-                      </Breadcrumbs>
-                    </ConditionalComponent>
-                    <ConditionalComponent condition={!showBreadcrumbs}>
-                      <div style={{marginTop: 20}}></div>
-                    </ConditionalComponent>
+                      }
+                      <Chip
+                        label={getHeaderText(requestDetails)}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                    </Breadcrumbs>
                   {Object.entries(requestDetails).length > 0 &&
                     requestDetails !== undefined && (
                       <>
@@ -584,22 +579,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
               </div>
             </div>
           </div>
-          {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
-            id="CFRForm"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.CFRForm.active,
-              [classes.displayed]: tabLinksStatuses.CFRForm.display,
-              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
-            })}
-          >
-            <CFRForm            
-              requestNumber={requestNumber}
-              requestState={requestState}
-              userDetail={userDetail}
-              ministryId={ministryId}
-              requestId={requestId}
-            />
-          </div>)}
           <div
             id="Attachments"
             className={clsx("tabcontent", {
