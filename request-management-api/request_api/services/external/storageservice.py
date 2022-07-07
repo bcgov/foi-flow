@@ -4,6 +4,7 @@ from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
 import mimetypes
+from jinja2 import Template
 
 class storageservice:
     """This class is reserved for S3 storage services integration.
@@ -48,3 +49,38 @@ class storageservice:
 
         attachmentobj = {'filename': filename, 'documentpath': s3uri, 'category': filestatustransition}
         return attachmentobj
+
+
+    def download(self):        
+        formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
+        accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
+        secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
+        s3host = os.getenv('OSS_S3_HOST')
+        s3region = os.getenv('OSS_S3_REGION')
+        s3service = os.getenv('OSS_S3_SERVICE')
+        s3templatefolder= os.getenv('OSS_S3_TEMPLATE_FOLDER')
+        
+        if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
+            raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
+
+        templatetype= 'EMAILS'
+        #template.get('type')
+        templatename= 'fee_estimate_default.html'
+        #template.get('name')
+
+        auth = AWSRequestsAuth(aws_access_key=accesskey,
+                aws_secret_access_key=secretkey,
+                aws_host=s3host,
+                aws_region=s3region,
+                aws_service=s3service) 
+
+
+        s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket,s3templatefolder,templatetype,templatename)      
+        print("s3URI",s3uri)
+        resphtml= requests.get(s3uri, auth=auth)
+        print(resphtml.text)
+        print("Response code:" , resphtml.status_code)
+        template = Template(resphtml.text)
+        templatedhtml = template.render(applicantname='Test', analystname='QA', teamname='QA', paymenturl='http://www.gov.bc.ca/freedomofinformation/')
+        print("<<<>>>",templatedhtml)
+        return templatedhtml
