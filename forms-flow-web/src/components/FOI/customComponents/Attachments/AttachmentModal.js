@@ -58,21 +58,21 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       setExtension("");
       setErrorMessage("");
       if(_attachment && _attachment.filename) {
-        var lastIndex = _attachment.filename.lastIndexOf(".");
+        let lastIndex = _attachment.filename.lastIndexOf(".");
         setNewFilename(lastIndex>0?_attachment.filename.substr(0, lastIndex):_attachment.filename);
         setExtension(lastIndex>0?_attachment.filename.substr(lastIndex+1):"");
       }
     }
 
     const checkInvalidCharacters = (fname) => {
-      var rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
+      let rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
       return !fname || rg1.test(fname);
     };
 
     const validateFilename = (fname) => {
-      var rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
-      var rg2 = /^\./; // cannot start with dot (.)
-      var rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(.|$)/i; // forbidden file names
+      let rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
+      let rg2 = /^\./; // cannot start with dot (.)
+      let rg3 = /^(nul|prn|con|lpt\d|com\d)(.|$)/i; // forbidden file names
 
       return fname && rg1.test(fname) && !rg2.test(fname) && !rg3.test(fname);
     };

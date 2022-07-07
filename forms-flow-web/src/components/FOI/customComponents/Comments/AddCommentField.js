@@ -42,7 +42,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditor
 
   // Check editor text for mentions
   const onSearchChange = ({ value }) => {
-    var filterlist = mentionList.filter(function(item){
+    let filterlist = mentionList.filter(function(item){
       return (item.firstname.indexOf(value.toLowerCase()) === 0 || item.lastname.indexOf(value.toLowerCase()) === 0)
     }).sort(namesort)    
     setSuggestions(defaultSuggestionsFilter(value, filterlist))

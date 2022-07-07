@@ -14,7 +14,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 const AxisDetails = React.memo(({  
     requestDetails,
     createSaveRequestObject,
-    foiAxisRequestIds,
     handleAxisDetailsInitialValue,
     handleAxisDetailsValue,
     handleAxisIdValidation,
@@ -36,7 +35,7 @@ const AxisDetails = React.memo(({
     const dispatch = useDispatch();
     const [axisRequestId, setAxisRequestId] = React.useState("");
     const [validation, setValidation] = React.useState({});
-    var axisIdValidation = {};
+    let axisIdValidation = {};
 
 
     useEffect(() => {

@@ -40,7 +40,6 @@ import "./TabbedContainer.scss";
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
-import { CFRForm } from '../customComponents/CFRForm';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
 import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
@@ -63,6 +62,7 @@ import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
+import HomeIcon from '@mui/icons-material/Home';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -99,8 +99,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
-  const [saveRequestObject, setSaveRequestObject] =
-  React.useState(requestDetails);
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -117,10 +115,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const disableInput =
     requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  var foitabheaderBG = getTabBG(_tabStatus, requestState);
-  var foiAxisRequestIds = useSelector(
-    (state) => state.foiRequests.foiAxisRequestIds
-  );
+  let foitabheaderBG = getTabBG(_tabStatus, requestState);
+
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
@@ -139,10 +135,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    CFRForm: {
-      display: false,
-      active: false,
-    },
     Option4: {
       display: false,
       active: false,
@@ -158,6 +150,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   });
   const [removeComment, setRemoveComment] = useState(false);
 
+  const [saveRequestObject, setSaveRequestObject] =
+    React.useState(requestDetails);
   const showDivisionalTracking =
     requestDetails &&
     requestDetails.divisions?.length > 0 &&
@@ -203,7 +197,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
-      var requestStateFromId = findRequestState(requestDetails.requeststatusid)
+      let requestStateFromId = findRequestState(requestDetails.requeststatusid)
         ? findRequestState(requestDetails.requeststatusid)
         : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
@@ -218,7 +212,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   useEffect(() => {
     if(checkExtension && Object.entries(axisSyncedData).length !== 0){
-      var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
+      let axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
       if(axisDataUpdated)
         setAxisMessage("WARNING");
       else
@@ -231,7 +225,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       if(!err){
         if(typeof(data) !== "string" && Object.entries(data).length > 0){
           setAxisSyncedData(data);
-          var axisDataUpdated = checkIfAxisDataUpdated(data);
+          let axisDataUpdated = checkIfAxisDataUpdated(data);
           if(axisDataUpdated){
             setCheckExtension(false);
             setAxisMessage("WARNING");
@@ -252,9 +246,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   }
 
   const checkIfAxisDataUpdated = (axisData) => {
-    var updateNeeded= false;
+    let updateNeeded= false;
     for(let key of Object.keys(axisData)){
-      var updatedField = isAxisSyncDisplayField(key);
+      let updatedField = isAxisSyncDisplayField(key);
       if(key !== 'Extensions' && updatedField)
         updateNeeded= checkValidation(key, axisData);
       if(updateNeeded){
@@ -265,7 +259,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const checkValidation = (key,axisData) => {
-    var mandatoryField = isMandatoryField(key);
+    let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
       let foiReqAdditionalPersonalInfo = requestDetails[key];
       let axisAdditionalPersonalInfo = axisData[key];
@@ -500,7 +494,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
-      dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -608,7 +601,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const userId = userDetail?.preferred_username;
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random";
-  var lastName = "",
+  let lastName = "",
     firstName = "";
   if (userDetail) {
     firstName = userDetail.given_name;
@@ -635,7 +628,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const stateTransition = requestDetails?.stateTransition;
   
-  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
   const disableBannerForClosed = () => {
    if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase())){
@@ -644,14 +637,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       return true;
     }
     return false;
-  }
-
-  const showCFRTab = () => {
-    return (requestState !== StateEnum.intakeinprogress.name &&
-      requestState !== StateEnum.unopened.name &&
-      requestState !== StateEnum.open.name &&
-      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
-    );
   }
 
   return (!isLoading &&
@@ -691,16 +676,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             </div>
             {!isAddRequest && (
               <>
-                {(showCFRTab() && <div
-                    className={clsx("tablinks", {
-                      active: tabLinksStatuses.CFRForm.active,
-                    })}
-                    name="CFRForm"
-                    onClick={() => tabclick("CFRForm")}
-                  >
-                    CFR Form
-                  </div>
-                )}
                 <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Attachments.active,
@@ -760,22 +735,27 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       isAddRequest
                     }
                   >
-                    <ConditionalComponent condition={showBreadcrumbs}>
-                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                      {showAdvancedSearch &&
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
+                      }
+                      {!showAdvancedSearch &&
                         <Chip
-                          label={headerText}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
-                      </Breadcrumbs>
-                    </ConditionalComponent>
-                    <ConditionalComponent condition={!showBreadcrumbs}>
-                      <div style={{marginTop: 20}}></div>
-                    </ConditionalComponent>
+                      }
+                      <Chip
+                        label={headerText}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                    </Breadcrumbs>
                     <>
                       <FOIRequestHeader
                         headerValue={headerValue}
@@ -787,14 +767,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         userDetail={userDetail}
                         disableInput={disableInput}
                         isAddRequest={isAddRequest}
-                        unSavedRequest={unSavedRequest}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
                         <AxisDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          foiAxisRequestIds={foiAxisRequestIds}
                           handleAxisDetailsInitialValue={
                             handleAxisDetailsInitialValue
                           }
@@ -918,7 +896,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         setIsAddRequest={setIsAddRequest}
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
-                        attachmentsArray={requestAttachments}
                       />
                     </>
                   </ConditionalComponent>
@@ -955,22 +932,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
-          {(showCFRTab() && <div
-            id="CFRForm"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.CFRForm.active,
-              [classes.displayed]: tabLinksStatuses.CFRForm.display,
-              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
-            })}
-          >
-            <CFRForm            
-              requestNumber={requestNumber}
-              requestState={requestState}
-              userDetail={userDetail}
-              ministryId={ministryId}
-              requestId={requestId}
-            />
-          </div>)}
           <div
             id="Comments"
             className={clsx("tabcontent", {

@@ -2,6 +2,11 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 const initialState = {
   isLoading: true,
   queueFilter: "myRequests",
+  queueParams: {
+    rowsState: { page: 0, pageSize: 100 },
+    sortModel: false,
+    keyword: null,
+  },
   showAdvancedSearch: false,
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
@@ -30,24 +35,6 @@ const initialState = {
   foiWatcherList: [],
   foiRequestComments: [],
   foiRequestAttachments: [],
-  foiRequestCFRForm: {
-    overallsuggestions: "",
-    status: "init",
-    feedata: {
-       totalamountdue: 0,
-       actualhardcopypages: 0,
-       actualproducinghrs: 0,
-       actuallocatinghrs: 0,
-       estimatedlocatinghrs: 0,
-       estimatedproducinghrs: 0,
-       estimatedelectronicpages: 0,
-       actualelectronicpages: 0,
-       estimatedpreparinghrs: 0,
-       amountpaid: 0,
-       estimatedhardcopypages: 0,
-       actualpreparinghrs: 0,
-    }
- },
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
@@ -59,6 +46,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isLoading: action.payload };
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
       return { ...state, queueFilter: action.payload };
+      case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
+        return { ...state, queueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
@@ -125,14 +114,6 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestComments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
       return { ...state, foiRequestAttachments: action.payload };
-    case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
-      return { 
-        ...state,
-        foiRequestCFRForm:{
-          ...state.foiRequestCFRForm,
-          ...action.payload
-        }
-      };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:

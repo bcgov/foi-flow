@@ -39,6 +39,8 @@ import {
   addYears
 } from "../../utils";
 
+const DEFAULT_PAGE_SIZE = 100;
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -137,7 +139,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const [requestState, setRequestState] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
-      var savedRequestState = {...intitialRequestState}
+      let savedRequestState = {...intitialRequestState}
       advancedSearchParams.requestState.forEach(state => {
         savedRequestState[state] = true;
       });
@@ -153,7 +155,7 @@ const AdvancedSearch = ({ userDetail }) => {
   };
   const [requestStatus, setRequestStatus] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestStatus.length > 0) {
-      var savedRequestStatus = {...intitialRequestStatus}
+      let savedRequestStatus = {...intitialRequestStatus}
       advancedSearchParams.requestStatus.forEach(status => {
         savedRequestStatus[status] = true;
       });
@@ -169,7 +171,7 @@ const AdvancedSearch = ({ userDetail }) => {
   };
   const [requestTypes, setRequestTypes] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestType.length > 0) {
-      var savedRequestType = {...initialRequestTypes}
+      let savedRequestType = {...initialRequestTypes}
       advancedSearchParams.requestType.forEach(type => {
         savedRequestType[type] = true;
       });
@@ -237,7 +239,7 @@ const AdvancedSearch = ({ userDetail }) => {
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
       page: 1,
-      size: advancedSearchParams?.size || 10,
+      size: advancedSearchParams?.size || DEFAULT_PAGE_SIZE,
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
     });
