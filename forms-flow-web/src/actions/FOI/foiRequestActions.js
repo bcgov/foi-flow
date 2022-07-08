@@ -204,7 +204,13 @@ export const setRequestComments = (data) => dispatch => {
 export const setRequestAttachments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS,
-        payload:data      
+        payload:data
+    })
+}
+export const setRequestCFRForm = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM,
+        payload:data
     })
 }
 

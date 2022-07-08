@@ -35,6 +35,26 @@ const initialState = {
   foiWatcherList: [],
   foiRequestComments: [],
   foiRequestAttachments: [],
+  foiRequestCFRForm: {
+    overallsuggestions: "",
+    status: "init",
+    feedata: {
+       totalamountdue: 0,
+       actualhardcopypages: 0,
+       actualproducinghrs: 0,
+       actuallocatinghrs: 0,
+       estimatedlocatinghrs: 0,
+       estimatedproducinghrs: 0,
+       estimatedelectronicpages: 0,
+       actualelectronicpages: 0,
+       estimatedministrypreparinghrs: 0,
+       estimatediaopreparinghrs: 0,
+       amountpaid: 0,
+       estimatedhardcopypages: 0,
+       actualministrypreparinghrs: 0,
+       actualiaopreparinghrs: 0,
+    }
+ },
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
@@ -114,6 +134,14 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestComments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
       return { ...state, foiRequestAttachments: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
+      return { 
+        ...state,
+        foiRequestCFRForm:{
+          ...state.foiRequestCFRForm,
+          ...action.payload
+        }
+      };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:

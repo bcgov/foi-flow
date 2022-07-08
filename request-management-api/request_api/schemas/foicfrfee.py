@@ -19,8 +19,10 @@ class FOIFeeDataSchema(Schema):
     actuallocatinghrs = fields.Float(data_key="actuallocatinghrs")
     estimatedproducinghrs = fields.Float(data_key="estimatedproducinghrs")
     actualproducinghrs = fields.Float(data_key="actualproducinghrs")
-    estimatedpreparinghrs = fields.Float(data_key="estimatedpreparinghrs")
-    actualpreparinghrs = fields.Float(data_key="actualpreparinghrs")
+    estimatediaopreparinghrs = fields.Float(data_key="estimatediaopreparinghrs")
+    estimatedministrypreparinghrs = fields.Float(data_key="estimatedministrypreparinghrs")
+    actualiaopreparinghrs = fields.Float(data_key="actualiaopreparinghrs")
+    actualministrypreparinghrs = fields.Float(data_key="actualministrypreparinghrs")
     estimatedelectronicpages = fields.Int(data_key="estimatedelectronicpages")
     actualelectronicpages = fields.Int(data_key="actualelectronicpages")
     estimatedhardcopypages = fields.Int(data_key="estimatedhardcopypages")
@@ -40,6 +42,9 @@ class FOIFeeDataSanctionSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
     amountpaid = fields.Float(data_key="amountpaid") 
+    estimatediaopreparinghrs = fields.Float(data_key="estimatediaopreparinghrs")
+    actualiaopreparinghrs = fields.Float(data_key="actualiaopreparinghrs")
+    totalamountdue = fields.Float(data_key="totalamountdue")
     
 class FOICFRFeeSanctionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

@@ -40,6 +40,7 @@ import RequestTracking from "./RequestTracking";
 import BottomButtonGroup from "./BottomButtonGroup";
 import { CommentSection } from "../../customComponents/Comments";
 import { AttachmentSection } from "../../customComponents/Attachments";
+import { CFRForm } from '../../customComponents/CFRForm';
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
@@ -122,6 +123,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
+    CFRForm: {
+      display: false,
+      active: false,
+    },
     Comments: {
       display: false,
       active: false,
@@ -191,6 +196,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
@@ -462,6 +468,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
             >
               Request
             </div>
+            {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.CFRForm.active,
+              })}
+              name="CFRForm"
+              onClick={() => tabclick("CFRForm")}
+            >
+              CFR Form
+            </div>)}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Attachments.active,
@@ -569,6 +584,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           isValidationError={isValidationError}
                           saveMinistryRequestObject={saveMinistryRequestObject}
                           unSavedRequest={unSavedRequest}
+                          CFRUnsaved={CFRUnsaved}
                           handleSaveRequest={handleSaveRequest}
                           currentSelectedStatus={_currentrequestStatus}
                           hasStatusRequestSaved={hasStatusRequestSaved}
@@ -579,6 +595,23 @@ const MinistryReview = React.memo(({ userDetail }) => {
               </div>
             </div>
           </div>
+          {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
+            id="CFRForm"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.CFRForm.active,
+              [classes.displayed]: tabLinksStatuses.CFRForm.display,
+              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+            })}
+          >
+            <CFRForm            
+              requestNumber={requestNumber}
+              requestState={requestState}
+              userDetail={userDetail}
+              ministryId={ministryId}
+              requestId={requestId}
+              setCFRUnsaved={setCFRUnsaved}
+            />
+          </div>)}
           <div
             id="Attachments"
             className={clsx("tabcontent", {
