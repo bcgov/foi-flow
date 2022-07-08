@@ -651,6 +651,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
             </a>
           </div>
+          <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
               requestState={requestState}
