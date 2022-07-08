@@ -194,6 +194,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
@@ -574,6 +575,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           isValidationError={isValidationError}
                           saveMinistryRequestObject={saveMinistryRequestObject}
                           unSavedRequest={unSavedRequest}
+                          CFRUnsaved={CFRUnsaved}
                           handleSaveRequest={handleSaveRequest}
                           currentSelectedStatus={_currentrequestStatus}
                           hasStatusRequestSaved={hasStatusRequestSaved}
@@ -598,6 +600,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               userDetail={userDetail}
               ministryId={ministryId}
               requestId={requestId}
+              setCFRUnsaved={setCFRUnsaved}
             />
           </div>)}
           <div

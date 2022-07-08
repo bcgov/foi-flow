@@ -47,6 +47,7 @@ const BottomButtonGroup = React.memo(
     isValidationError,
     saveMinistryRequestObject,
     unSavedRequest,
+    CFRUnsaved,
     handleSaveRequest,
     currentSelectedStatus,
     hasStatusRequestSaved,
@@ -67,7 +68,7 @@ const BottomButtonGroup = React.memo(
 
     const returnToQueue = (e) => {
       if (
-        !unSavedRequest ||
+        (!unSavedRequest && !CFRUnsaved) ||
         window.confirm(
           "Are you sure you want to leave? Your changes will be lost."
         )
@@ -75,6 +76,8 @@ const BottomButtonGroup = React.memo(
         e.preventDefault();
         window.removeEventListener("beforeunload", alertUser);
         window.location.href = "/foi/dashboard";
+      } else {
+        window.history.pushState(null, null, window.location.pathname);
       }
     };
 
@@ -137,7 +140,7 @@ const BottomButtonGroup = React.memo(
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
-      if (unSavedRequest) {
+      if (unSavedRequest || CFRUnsaved) {
         window.history.pushState(null, null, window.location.pathname);
         window.addEventListener("popstate", handleOnHashChange);
         window.addEventListener("beforeunload", alertUser);
@@ -146,7 +149,7 @@ const BottomButtonGroup = React.memo(
         window.removeEventListener("popstate", handleOnHashChange);
         window.removeEventListener("beforeunload", alertUser);
       };
-    }, [unSavedRequest]);
+    }, [unSavedRequest, CFRUnsaved]);
 
     const saveRequestModal = () => {
       if (currentSelectedStatus !== saveMinistryRequestObject?.currentState)

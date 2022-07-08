@@ -36,7 +36,8 @@ export const CFRForm = ({
   requestState,
   ministryId,
   requestId,
-  userDetail
+  userDetail,
+  setCFRUnsaved
 }: params) => {
 
   const dispatch = useDispatch();
@@ -164,14 +165,16 @@ export const CFRForm = ({
     estimates: {
       locating: 0,
       producing: 0,
-      preparing: 0,
+      ministryPreparing: 0,
+      iaoPreparing: 0,
       electronicPages: 0,
       hardcopyPages: 0
     },
     actual: {
       locating: 0,
       producing: 0,
-      preparing: 0,
+      ministryPreparing: 0,
+      iaoPreparing: 0,
       electronicPages: 0,
       hardcopyPages: 0
     },
@@ -190,14 +193,16 @@ export const CFRForm = ({
       estimates: {
         locating: initialState.feedata.estimatedlocatinghrs,
         producing: initialState.feedata.estimatedproducinghrs,
-        preparing: initialState.feedata.estimatedpreparinghrs,
+        iaoPreparing: initialState.feedata.estimatediaopreparinghrs,
+        ministryPreparing: initialState.feedata.estimatedministrypreparinghrs,
         electronicPages: initialState.feedata.estimatedelectronicpages,
         hardcopyPages: initialState.feedata.estimatedhardcopypages,
       },
       actual: {
         locating: initialState.feedata.actuallocatinghrs,
         producing: initialState.feedata.actualproducinghrs,
-        preparing: initialState.feedata.actualpreparinghrs,
+        iaoPreparing: initialState.feedata.actualiaopreparinghrs,
+        ministryPreparing: initialState.feedata.actualministrypreparinghrs,
         electronicPages: initialState.feedata.actualelectronicpages,
         hardcopyPages: initialState.feedata.actualhardcopypages,
       },
@@ -207,23 +212,19 @@ export const CFRForm = ({
     setFormData(formattedData);
   }, [initialState]);
 
+  const popstateHandler = (e: any) => returnToQueue(e, true);
+  const [firstEditFlag, setFirstEditFlag] = React.useState(true);
+
   React.useEffect(() => {
     if (!_.isEqual(initialFormData, formData)) {
-      window.addEventListener("popstate", (e) => returnToQueue(e, true));
-      window.addEventListener("beforeunload", handleBeforeUnload);
+      setCFRUnsaved(true);
     } else {
-      window.removeEventListener("popstate", (e) => returnToQueue(e, true));
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    }
-    return () => {
-      window.removeEventListener("popstate", (e) => returnToQueue(e, true));
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      setCFRUnsaved(false);
     }
   }, [initialFormData, formData]);
 
-  React.useEffect(() => {
-    window.history.pushState(null, "", null);
-  }, []);
+  // React.useEffect(() => {
+  // }, []);
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -238,7 +239,7 @@ export const CFRForm = ({
     }
     var afield: keyof typeof formData.actual
     for (afield in formData.actual) {
-      if (validateField(formData.estimates[afield], foiFees[afield].unit)) {
+      if (validateField(formData.actual[afield], foiFees[afield].unit)) {
         return false;
       }
     }
@@ -320,8 +321,10 @@ export const CFRForm = ({
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
           actualproducinghrs: formData.actual.producing,
-          estimatedpreparinghrs: formData.estimates.preparing,
-          actualpreparinghrs: formData.actual.preparing,
+          estimatediaopreparinghrs: formData.estimates.iaoPreparing,
+          estimatedministrypreparinghrs: formData.estimates.ministryPreparing,
+          actualiaopreparinghrs: formData.actual.iaoPreparing,
+          actualministrypreparinghrs: formData.actual.ministryPreparing,
           estimatedelectronicpages: formData.estimates.electronicPages,
           actualelectronicpages: formData.actual.electronicPages,
           estimatedhardcopypages: formData.estimates.hardcopyPages,
@@ -334,6 +337,9 @@ export const CFRForm = ({
       data = {
         feedata:{
           amountpaid: formData.amountPaid,
+          estimatediaopreparinghrs: formData.estimates.iaoPreparing,
+          actualiaopreparinghrs: formData.actual.iaoPreparing,
+          totalamountdue: formData.amountDue,
         },
         status: formData.formStatus
       }
@@ -621,56 +627,111 @@ export const CFRForm = ({
               </div>
             </div>
             <div className="row foi-details-row">
-              <div className="col-lg-6 foi-details-col">
+              <div className="col-lg-3 foi-details-col">
                 <TextField
-                  id="estimatedpreparing"
-                  label="Estimated Hours"
+                  id="estimatediaopreparing"
+                  label="Estimated Hours IAO"
                   inputProps={{
                     "aria-labelledby": "estimatedpreparing-label",
-                    step: foiFees.preparing.unit,
+                    step: foiFees.iaoPreparing.unit,
                     min: 0,
                   }}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
                   }}
                   InputLabelProps={{ shrink: true }}
-                  name="preparing"
-                  value={formData?.estimates?.preparing}
+                  name="iaoPreparing"
+                  value={formData?.estimates?.iaoPreparing}
                   onChange={handleEstimateChanges}
                   variant="outlined"
                   fullWidth
                   type="number"
-                  error={validateField(formData?.estimates?.preparing, foiFees.preparing.unit)}
-                  helperText={validateField(formData?.estimates?.preparing, foiFees.preparing.unit) &&
-                    "Hours must be entered in increments of " + foiFees.preparing.unit
+                  error={validateField(formData?.estimates?.iaoPreparing, foiFees.iaoPreparing.unit)}
+                  helperText={validateField(formData?.estimates?.iaoPreparing, foiFees.iaoPreparing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.iaoPreparing.unit
+                  }
+                  disabled={isMinistry || initialFormData?.formStatus !== 'review'}
+                >
+                  {/* {menuItems} */}
+                </TextField>
+              </div>
+              <div className="col-lg-3 foi-details-col">
+                <TextField
+                  id="estimatedministrypreparing"
+                  label="Estimated Hours Ministry"
+                  inputProps={{
+                    "aria-labelledby": "estimatedministrypreparing-label",
+                    step: foiFees.ministryPreparing.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
+                  InputLabelProps={{ shrink: true }}
+                  name="ministryPreparing"
+                  value={formData?.estimates?.ministryPreparing}
+                  onChange={handleEstimateChanges}
+                  variant="outlined"
+                  fullWidth
+                  type="number"
+                  error={validateField(formData?.estimates?.ministryPreparing, foiFees.ministryPreparing.unit)}
+                  helperText={validateField(formData?.estimates?.ministryPreparing, foiFees.ministryPreparing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.ministryPreparing.unit
                   }
                   disabled={!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review'}
                 >
                   {/* {menuItems} */}
                 </TextField>
               </div>
-              <div className="col-lg-6 foi-details-col">
+              <div className="col-lg-3 foi-details-col">
                 <TextField
-                  id="actualpreparing"
-                  label="Actual Hours"
+                  id="actualiaopreparing"
+                  label="Actual Hours IAO"
                   inputProps={{
-                    "aria-labelledby": "actualpreparing-label",
-                    step: foiFees.preparing.unit,
+                    "aria-labelledby": "actualiaopreparing-label",
+                    step: foiFees.iaoPreparing.unit,
                     min: 0,
                   }}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
                   }}
                   InputLabelProps={{ shrink: true }}
-                  name="preparing"
-                  value={formData?.actual?.preparing}
+                  name="iaoPreparing"
+                  value={formData?.actual?.iaoPreparing}
                   onChange={handleActualChanges}
                   variant="outlined"
                   fullWidth
                   type="number"
-                  error={validateField(formData?.actual?.preparing, foiFees.preparing.unit)}
-                  helperText={validateField(formData?.actual?.preparing, foiFees.preparing.unit) &&
-                    "Hours must be entered in increments of " + foiFees.preparing.unit
+                  error={validateField(formData?.actual?.iaoPreparing, foiFees.iaoPreparing.unit)}
+                  helperText={validateField(formData?.actual?.iaoPreparing, foiFees.iaoPreparing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.iaoPreparing.unit
+                  }
+                  disabled={isMinistry || formData?.formStatus !== 'approved' 
+                  || (requestState !== StateEnum.deduplication.name && requestState !== StateEnum.review.name)}
+                />
+              </div>
+              <div className="col-lg-3 foi-details-col">
+                <TextField
+                  id="actualministrypreparing"
+                  label="Actual Hours Ministry"
+                  inputProps={{
+                    "aria-labelledby": "actualministrypreparing-label",
+                    step: foiFees.ministryPreparing.unit,
+                    min: 0,
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">hr(s)</InputAdornment>
+                  }}
+                  InputLabelProps={{ shrink: true }}
+                  name="ministryPreparing"
+                  value={formData?.actual?.ministryPreparing}
+                  onChange={handleActualChanges}
+                  variant="outlined"
+                  fullWidth
+                  type="number"
+                  error={validateField(formData?.actual?.ministryPreparing, foiFees.ministryPreparing.unit)}
+                  helperText={validateField(formData?.actual?.ministryPreparing, foiFees.ministryPreparing.unit) &&
+                    "Hours must be entered in increments of " + foiFees.ministryPreparing.unit
                   }
                   disabled={!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name}
                 />

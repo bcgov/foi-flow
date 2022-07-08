@@ -66,7 +66,7 @@ class CreateFOICFRFee(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicfrfee/ministryrequest/<ministryrequestid>/sanction')
 class SanctionFOICFRFee(Resource):
-    """Updates CFR Fee for status."""
+    """Updates CFR Fee status and iao preparing field."""
        
     @staticmethod
     @TRACER.trace()

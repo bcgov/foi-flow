@@ -372,6 +372,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requiredContactDetailsValue
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const [headerValue, setHeader] = useState("");
   const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
     requiredAxisDetailsValue
@@ -908,6 +909,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         saveRequestObject={saveRequestObject}
                         unSavedRequest={unSavedRequest}
+                        CFRUnsaved={CFRUnsaved}
                         handleSaveRequest={handleSaveRequest}
                         handleOpenRequest={handleOpenRequest}
                         currentSelectedStatus={_currentrequestStatus}
@@ -969,6 +971,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               userDetail={userDetail}
               ministryId={ministryId}
               requestId={requestId}
+              setCFRUnsaved={setCFRUnsaved}
             />
           </div>)}
           <div
