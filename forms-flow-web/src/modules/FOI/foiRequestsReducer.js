@@ -2,6 +2,11 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 const initialState = {
   isLoading: true,
   queueFilter: "myRequests",
+  queueParams: {
+    rowsState: { page: 0, pageSize: 100 },
+    sortModel: false,
+    keyword: null,
+  },
   showAdvancedSearch: false,
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
@@ -61,6 +66,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isLoading: action.payload };
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
       return { ...state, queueFilter: action.payload };
+      case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
+        return { ...state, queueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
