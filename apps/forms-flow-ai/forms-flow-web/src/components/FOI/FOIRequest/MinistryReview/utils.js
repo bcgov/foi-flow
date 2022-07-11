@@ -16,10 +16,8 @@ export const getMinistryBottomTextMap = (
       ? `${_daysRemaining} Days Remaining`
       : `${Math.abs(_daysRemaining)} Days Overdue`;
 
-  const _cfrDaysRemainingText =
-    _cfrDaysRemaining > 0
-      ? `CFR Due in ${_cfrDaysRemaining} Days`
-      : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+  const _cfrDaysRemainingText = `CFR Due in ${_cfrDaysRemaining} Days`;
+      
 
   const hideCFRDaysRemaining = [
     StateEnum.review.name.toLowerCase(),
@@ -51,4 +49,31 @@ export const getHeaderText = (requestDetails) => {
 export const alertUser = (e) => {
   e.returnValue = "";
   e.preventDefault();
+};
+
+
+export const createAssignedToDetailsObject = (
+    value
+) => {
+  const assigneeObject = {
+    assignedministrygroup: "",
+    assignedministryperson: "",
+    assignedministrypersonFirstName: "",
+    assignedministrypersonLastName: ""
+  }
+  const assignedToValue = value?.split("|");
+      if (
+        assignedToValue.length > 1 &&
+        assignedToValue[0] &&
+        assignedToValue[1] &&
+        assignedToValue[2] &&
+        assignedToValue[3]
+      ) {
+        assigneeObject.assignedministrygroup = assignedToValue[0];
+        assigneeObject.assignedministryperson = assignedToValue[1];
+        assigneeObject.assignedministrypersonFirstName = assignedToValue[2];
+        assigneeObject.assignedministrypersonLastName = assignedToValue[3];
+      }
+  return assigneeObject;
+  
 };

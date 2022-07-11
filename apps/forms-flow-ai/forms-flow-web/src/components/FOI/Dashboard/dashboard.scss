@@ -25,6 +25,8 @@ div .foi-dashboard {
     margin-left: auto!important;
     margin-right: auto!important;
     background-color: white;   
+    overflow: scroll;
+    height: 100%;
 }
 
 .foi-dashboard-row2 {
@@ -33,6 +35,25 @@ div .foi-dashboard {
 
 .MuiDataGrid-cell {
     text-transform: capitalize !important;
+}
+
+.foi-advanced-search-result-cell {
+    padding: 0 !important;
+    a {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        line-height: 2.3;
+        text-decoration: none;
+        color: rgba(0, 0, 0, 0.87);
+        div {
+            padding: 0 10px;
+        }
+    }
+    a:hover {        
+        color: rgba(0, 0, 0, 0.87);
+        text-decoration: none;
+    }
 }
 
 .foi-request-queue-text {
@@ -189,4 +210,38 @@ nav.MuiPagination-root {
 	z-index: 999;
 	position: absolute;
     margin: 125px auto auto 97%; 
+}
+
+.hideContent {
+    display: none;
+}
+
+.floatAboveEverythingLeft {
+	position: absolute;
+    margin-left: 10px;
+    margin-top: 170px;
+}
+
+.footerContent {
+    padding: 10px 0;
+    font-size: 0.875rem !important;
+}
+
+.footerContent ul {
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+}
+
+.footerContent .MuiNativeSelect-root::before {
+    transition: none !important;
+    border-bottom: 0px !important;
+}
+
+.footerContent .MuiNativeSelect-root::after {
+    border-bottom: 0px !important;
+}
+
+.MuiNativeSelect-standard {
+    padding-right: 15px !important;
 }

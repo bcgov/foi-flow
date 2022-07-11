@@ -38,6 +38,7 @@ INVALID_REQUEST_ID = 'Invalid Request Id'
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
+@API.route('/foirawrequest/<requestid>/<string:actiontype>')
 class FOIRawRequest(Resource):
     """Consolidates create and retrival of raw request"""
 
@@ -62,7 +63,7 @@ class FOIRawRequest(Resource):
     #@Tracer.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid=None):
+    def post(requestid=None, actiontype=None):
         try :                        
             updaterequest = request.get_json()
             if int(requestid) and str(requestid) != "-1" :
@@ -75,15 +76,16 @@ class FOIRawRequest(Resource):
                 assigneefirstname = requestdata['assigneefirstname']
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneefirstname,assigneemiddlename,assigneelastname)
-                asyncio.create_task(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)
+                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
                 if result.success == True:
-                    asyncio.create_task(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
+                    asyncio.ensure_future(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
-                result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")               
-                asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")
+                if result.success == True:
+                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
@@ -98,21 +100,19 @@ def getparams(updaterequest):
         'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
     }
 
-@cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirawrequest/axisrequestids')
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirawrequest/axisrequestid/<axisrequestid>')
 class FOIAXISRequest(Resource):
-    """Consolidates create and retrival of raw request"""
+    """Check if axis request id already exists in db"""
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    def get():
+    def get(axisrequestid=None):
         try : 
-            jsondata = {}
-            axisrequestids = rawrequestservice().getaxisequestids()                                    
-            jsondata = json.dumps(axisrequestids)
-            return jsondata , 200 
+            isaxisrequestidpresent = rawrequestservice().isaxisrequestidpresent(axisrequestid)                                   
+            return {"axisrequestid" : axisrequestid, "ispresent": isaxisrequestidpresent}, 200
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
@@ -134,10 +134,10 @@ class FOIRawRequestLoadTest(Resource):
             username = 'Super Tester'
             if int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.create_task(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
+                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
-            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
+            return {'status': 400, 'message':INVALID_REQUEST_ID}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 

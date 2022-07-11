@@ -49,17 +49,12 @@ jobs:
       - name: Build from dev branch
         shell: bash
         run: |
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"main"}}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"contextDir":"/apps/forms-flow-ai/forms-flow-web","git":{"ref":"main"}}}}'
 
       - name: Start Build Openshift
         shell: bash
         run: |
           oc start-build ${{ env.APP_NAME }} --wait
-
-      - name: Tag+Deploy for DEV
-        shell: bash
-        run: |
-          oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:dev
 
       - name: Tag+Deploy for TEST
         shell: bash

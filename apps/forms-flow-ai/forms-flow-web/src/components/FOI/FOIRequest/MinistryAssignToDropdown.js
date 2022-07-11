@@ -4,8 +4,14 @@ import "./ministryassigntodropdown.scss";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import { createAssignedToDetailsObject } from './MinistryReview/utils';
+import {
+  saveAssignee
+} from "../../../apiManager/services/FOI/foiAssigneeServices";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import _ from 'lodash';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -20,27 +26,30 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, createSaveRequestObject, isMinistryCoordinator}) => {
+const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, isMinistryCoordinator, requestId, ministryId, setSaveMinistryRequestObject}) => {
    
      /**
      *  Header of Review request in the UI
      *  AssignedTo - Mandatory field
      */ 
     const classes = useStyles();
+    const dispatch = useDispatch();
+    let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
+    'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
 
     //local state management for assignedTo
     //------- update this later when $567 is ready
-    const minsitryAssignedToGroup = requestDetails.assignedministrygroup ? requestDetails.assignedministrygroup : "";
-    const ministryAssignedTo = requestDetails.assignedministryperson ? `${minsitryAssignedToGroup}|${requestDetails.assignedministryperson}|${requestDetails.assignedministrypersonFirstName}|${requestDetails.assignedministrypersonLastName}` : `|Unassigned`;
+    const minsitryAssignedToGroup = assigneeDetails.assignedministrygroup ? assigneeDetails.assignedministrygroup : "";
+    const ministryAssignedTo = assigneeDetails.assignedministryperson ? `${minsitryAssignedToGroup}|${assigneeDetails.assignedministryperson}|${assigneeDetails.assignedministrypersonFirstName}|${assigneeDetails.assignedministrypersonLastName}` : `|Unassigned`;
     const [selectedMinistryAssignedTo, setMinistryAssignedTo] = React.useState(ministryAssignedTo);
-    
+
     const getFullName = (lastName, firstName, username) => {
          return  firstName !== "" ? `${lastName}, ${firstName}` : username;         
     }
     
     //creates the grouped menu items for assignedTo combobox    
     const getMenuItems = () => {
-      var menuItems = [];
+      let menuItems = [];
       menuItems.push(
         <MenuItem className={classes.group} key={0} value={"|"} disabled={true}>
           {}
@@ -95,12 +104,53 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
       return menuItems;
     };
 
-    //handle onChange event for assigned To
-    const handleMinistryAssignedToOnChange = (event) => {
-        setMinistryAssignedTo(event.target.value);
-        handleMinistryAssignedToValue(event.target.value);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO, event.target.value, event.target.name);
+    const saveAssigneeDetails = (event) => {
+      setMinistryAssignedTo(event.target.value);
+      assigneeDetails = createAssignedToDetailsObject(event.target.value);
+      dispatch(
+        saveAssignee(assigneeDetails, requestId, ministryId, isMinistryCoordinator, (err, _res) => {
+          if(!err) {
+            toast.success("Assignee has been saved successfully.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            //event bubble up - to validate required fields
+            handleMinistryAssignedToValue(event.target.value);
+            let reqObj= updateAssigneeInRequestDetails(requestDetails);
+            setSaveMinistryRequestObject(reqObj);
+          }
+          else {
+            toast.error(
+              "Temporarily unable to save the assignee. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+          }
+        })
+      )
     }
+
+    const updateAssigneeInRequestDetails = (requestObject) => {
+        requestObject.assignedministrygroup = assigneeDetails.assignedministrygroup;
+        requestObject.assignedministrypersonFirstName = assigneeDetails.assignedministrypersonFirstName;
+        requestObject.assignedministrypersonLastName = assigneeDetails.assignedministrypersonLastName;
+        requestObject.assignedministryperson = assigneeDetails.assignedministryperson
+        return requestObject;
+    }
+      
+    
 
     return (
             <div className="foi-assigned-to-inner-container">
@@ -108,15 +158,16 @@ const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, min
                     id="ministryAssignedTo"
                     label="Ministry Assigned To"
                     InputLabelProps={{ shrink: true, }}          
+                    inputProps={{ "aria-labelledby": "ministryAssignedTo-label"}}
                     select
                     value={selectedMinistryAssignedTo}
-                    onChange={handleMinistryAssignedToOnChange}
+                    onChange={saveAssigneeDetails}
                     input={<Input />} 
                     variant="outlined"
                     fullWidth
                     required = {isMinistryCoordinator && requestState.toLowerCase() == StateEnum.callforrecords.name.toLowerCase() }
                     disabled = {!isMinistryCoordinator || (requestState.toLowerCase() == StateEnum.closed.name.toLowerCase())}
-                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned")  && requestState.toLowerCase() == StateEnum.callforrecords.name.toLowerCase() }                    
+                    error={isMinistryCoordinator && selectedMinistryAssignedTo.toLowerCase().includes("unassigned") }                    
                 >            
                     {getMenuItems()}
                 </TextField> 

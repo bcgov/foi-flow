@@ -1,6 +1,7 @@
 import React  from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -69,20 +70,20 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
 
    //creates the grouped menu items for assignedTo combobox
    const getMenuItems = () => {
-       var menuItems = [];
-       var i = 1;      
+       let menuItems = [];
+       let i = 1;      
        if (watcherFullList && watcherFullList.length > 0) {
-           for (var group of watcherFullList) {             
+           for (let group of watcherFullList) {             
                menuItems.push(<MenuItem className={`${classes.item} foi-watcher-menuitem`} disabled={true} key={group.id} value={`${group.name}|${group.name}`}>
                    {group.name}
                </MenuItem>);
-               for (var assignee of group.members) {               
+               for (let assignee of group.members) {               
                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={`${classes.item} foi-watcher-menuitem`} 
                    value={`${group.name}|${assignee.username}`} 
                    disabled={assignee.username.toLowerCase().includes("unassigned")}
                    name={`${group.name}|${assignee.username}`}               
                    >
-                        <Checkbox checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} />
+                        <Checkbox id='watcher' inputProps={{'aria-labelledby': 'watcher'}} checked={personName.indexOf(`${group.name}|${assignee.username}`) > -1} name={`${group.name}|${assignee.username}`} />
                         {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
                     </MenuItem>)
                }
@@ -92,7 +93,7 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
    }
 
   const handleWatcherUpdate = (watcher) => {
-    dispatch(saveWatcher(ministryId, watcher, (err, res) => {
+    dispatch(saveWatcher(ministryId, watcher, (err, _res) => {
       if(!err) {
         setUpdateWatchList(!updateWatchList);
       }
@@ -160,7 +161,7 @@ const watcherOnChange = (event) => {
         event.preventDefault();
 }
 
-  const renderValue = (option) => {
+  const renderValue = (_option) => {
     return <span>{noOfWatchers}</span>;
   }
     return (  
@@ -169,14 +170,17 @@ const watcherOnChange = (event) => {
               <div className="foi-watcher-all">
                    <button onClick={watcherOnChange} className="foi-eye-container" disabled = {disableInput} > <i className="fa fa-eye foi-eye"></i> {isUseraWatcher? "Unwatch" : "Watch" }</button>
                 <div className="foi-watcher-select">
-                    <i className="fa fa-user-o"></i>
+                    <i className="fa fa-user-o"></i>                    
+                    <InputLabel id="foi-watcher-label">
+                      Watchers
+                    </InputLabel>
                     <Select
-                    labelId="demo-multiple-checkbox-label"
                     id="foi-watcher"
                     className="foi-watcher"
                     multiple
                     value={personName}
                     onChange={handleChange}
+                    inputProps={{'aria-labelledby': 'foi-watcher-label'}}
                     input={<OutlinedInput label="Tag" />}
                     renderValue={renderValue}                    
                     MenuProps={MenuProps}

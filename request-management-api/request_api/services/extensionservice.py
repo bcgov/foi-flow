@@ -95,15 +95,22 @@ class extensionservice:
     def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
         version = self.__getversionforrequest(ministryrequestid)
         # delete all exisitng extensions for this ministry
-        FOIRequestExtension.deleteextensionbyministry(ministryrequestid)
+        existingextensions = FOIRequestExtension.getextensions(ministryrequestid, version)        
+        for existingextension in existingextensions:            
+            self.__deleteextension(existingextension["foirequestextensionid"], ministryrequestid, userid)
         newextensions = []
         for extension in extensions:
             newextensions.append(self.__createextension(extension, ministryrequestid, version, userid))
         extnsionresult = FOIRequestExtension.saveextensions(newextensions)
         return extnsionresult
 
-    def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid):       
-        extensionreason = extensionreasonservice().getextensionreasonbyid(extension['extensionreasonid'])   
+    def __deleteextension(self, extensionid, ministryrequestid, userid):
+        extension = FOIRequestExtension.getextension(extensionid)
+        extensionversion = extension['version']
+        self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)  
+        FOIRequestExtension.deleteextensionbyministryid(ministryrequestid, userid)
+        
+    def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid): 
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
         approveddate = extension['approveddate'] if 'approveddate' in extension else None
@@ -111,9 +118,7 @@ class extensionservice:
         decisiondate = approveddate if approveddate else denieddate
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
 
-        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value: 
-            extensionstatusid = 2
-        elif 'extensionstatusid' in extension:
+        if 'extensionstatusid' in extension:
             extensionstatusid = extension['extensionstatusid']
         else:
             extensionstatusid = 1        

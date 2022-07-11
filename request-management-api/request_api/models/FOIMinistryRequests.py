@@ -15,9 +15,13 @@ from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .ProgramAreas import ProgramArea
-from request_api.utils.enums import ProcessingTeamWithKeycloackGroup
+from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
+from .FOIRequestExtensions import FOIRequestExtension
 from request_api.utils.enums import RequestorType
+import logging
+from sqlalchemy.sql.sqltypes import Date
+from dateutil import parser
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -88,27 +92,43 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
-        sql = """select created_at from "FOIMinistryRequests" 
+        statusdate = None
+        try:
+            sql = """select created_at from "FOIMinistryRequests" 
                     where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
                     order by version desc limit 1;"""
-        rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
-        return [row[0] for row in rs][0]
+            rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
+            statusdate = [row[0] for row in rs][0]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return statusdate
     
     @classmethod
     def getassignmenttransition(cls,requestid):
-        sql = """select version, assignedto, assignedministryperson from "FOIMinistryRequests" 
+        assignments = []
+        try:
+            sql = """select version, assignedto, assignedministryperson from "FOIMinistryRequests" 
                     where foiministryrequestid = :requestid
                     order by version desc limit 2;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
-        assignments = []
-        for row in rs:
-            assignments.append({"assignedto": row["assignedto"], "assignedministryperson": row["assignedministryperson"], "version": row["version"]})
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                assignments.append({"assignedto": row["assignedto"], "assignedministryperson": row["assignedministryperson"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return assignments
     
     @classmethod
     def deActivateFileNumberVersion(cls, ministryid, idnumber, currentversion, userid)->DefaultMethodResult:
         db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryid, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
         return DefaultMethodResult(True,'Request Updated',idnumber)
+            
     
     @classmethod
     def getrequests(cls, group = None):
@@ -117,7 +137,7 @@ class FOIMinistryRequest(db.Model):
  
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
-        elif (group == 'Flex Team'):
+        elif (group == IAOTeamWithKeycloackGroup.flex.value):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])))).all()
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])))).all()           
@@ -176,11 +196,17 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequeststatusById(cls,ministryrequestid):
-        sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatusid != 3 order by version desc;'
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         summary = []
-        for row in rs:
-            summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
+        try:
+            sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatusid != 3 order by version desc;'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return summary      
 
       
@@ -189,36 +215,52 @@ class FOIMinistryRequest(db.Model):
         return db.session.query(FOIMinistryRequest.version).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
 
     @classmethod
-    def getstatesummary(cls, ministryrequestid):                
-        sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-        where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
- 
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+    def getstatesummary(cls, ministryrequestid):  
         transitions = []
-        for row in rs:
-            transitions.append({"status": row["status"], "version": row["version"]})
+        try:              
+            sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
+ 
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                transitions.append({"status": row["status"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return transitions
 
     @classmethod
-    def getstatenavigation(cls, ministryrequestid):                
-        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-        where foiministryrequestid=:ministryrequestid  order by version desc limit  2"""
- 
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+    def getstatenavigation(cls, ministryrequestid): 
         requeststates = []
-        for row in rs:
-            requeststates.append(row["status"])
+        try:
+            sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid  order by version desc limit  2"""
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                requeststates.append(row["status"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return requeststates
     
     @classmethod
-    def getallstatenavigation(cls, ministryrequestid):                
-        sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-        where foiministryrequestid=:ministryrequestid  order by version desc"""
- 
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
-        requeststates = []
-        for row in rs:
-            requeststates.append(row["status"])
+    def getallstatenavigation(cls, ministryrequestid): 
+        requeststates = []    
+        try:           
+            sql = """select fs2."name" as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid  order by version desc""" 
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                requeststates.append(row["status"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return requeststates
 
     @classmethod
@@ -235,7 +277,10 @@ class FOIMinistryRequest(db.Model):
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
         ]
 
-        
+        #subquery for getting extension count
+        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+
+
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
@@ -245,11 +290,23 @@ class FOIMinistryRequest(db.Model):
             for field in filterfields:
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
 
-        stateforsorting = case([
-                            (FOIRequestStatus.requeststatusid == 1, # Open
+        intakesorting = case([
+                            (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
                              literal(None)),
                            ],
-                           else_ = FOIRequestStatus.name).label('stateForSorting')
+                           else_ = FOIRequest.receiveddate).label('intakeSorting')
+
+        defaultsorting = case([
+                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('defaultSorting')
+
+        ministrysorting = case([
+                            (FOIMinistryRequest.assignedministryperson == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('ministrySorting')
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -282,11 +339,28 @@ class FOIMinistryRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+
         requestpagecount = case([
             (FOIMinistryRequest.requestpagecount.is_(None),
             '0'),
             ],
             else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
+
+        onbehalfformatted = case([
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
+                             func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
+                             onbehalf_applicant.lastname),
+                            (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
+                             onbehalf_applicant.firstname),
+                           ],
+                           else_ = 'N/A').label('onBehalfFormatted')
+        
+        extensions = case([
+                            (subquery_extension_count.c.extensions.is_(None),
+                             0),
+                           ],
+                           else_ = subquery_extension_count.c.extensions).label('extensions')
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
@@ -318,10 +392,14 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting,
+            defaultsorting,
+            intakesorting,
+            ministrysorting,
             assignedtoformatted,
             ministryassignedtoformatted,
-            FOIMinistryRequest.closedate
+            FOIMinistryRequest.closedate,
+            onbehalfformatted,
+            extensions
         ]
 
         basequery = _session.query(
@@ -329,6 +407,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 subquery_ministry_maxversion,
                                 and_(*joincondition_ministry)
+                            ).join(
+                                subquery_extension_count,
+                                subquery_extension_count.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+                                isouter=True
                             ).join(
                                 FOIRequest,
                                 and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
@@ -370,8 +452,10 @@ class FOIMinistryRequest(db.Model):
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
+            activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
+
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(ministryfilter)
+            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter)
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
@@ -406,19 +490,22 @@ class FOIMinistryRequest(db.Model):
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
-                order = sortingorders.pop()
+                order = sortingorders.pop(0)
                 sortingcondition.append(FOIMinistryRequest.getfieldforsorting(field, order, iaoassignee, ministryassignee))
 
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
+
+        #always sort by created_at last to prevent pagination collisions
+        sortingcondition.append(asc('created_at'))
         
         return sortingcondition
     
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting', 'onBehalfFormatted', 'extensions']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -445,6 +532,7 @@ class FOIMinistryRequest(db.Model):
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
             'receivedDate': FOIRequest.receiveddate,
+            'receivedDateUF': FOIRequest.receiveddate,
             'applicantcategory': ApplicantCategory.name,
             'assignedministryperson': FOIMinistryRequest.assignedministryperson,
             'assignedToFirstName': iaoassignee.firstname,
@@ -470,17 +558,20 @@ class FOIMinistryRequest(db.Model):
         else:
             groupfilter = []
             for group in groups:
-                if (group == 'Flex Team' or group in ProcessingTeamWithKeycloackGroup.list()):
+                if (group == IAOTeamWithKeycloackGroup.flex.value or group in ProcessingTeamWithKeycloackGroup.list()):
                     groupfilter.append(
                         and_(
                             FOIMinistryRequest.assignedgroup == group
                         )
                     )
-                elif (group == 'Intake Team'):
+                elif (group == IAOTeamWithKeycloackGroup.intake.value):
                     groupfilter.append(
                         or_(
                             FOIMinistryRequest.assignedgroup == group,
-                            FOIMinistryRequest.requeststatusid.in_([1])
+                            and_(
+                                FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
+                                FOIMinistryRequest.requeststatusid.in_([1])
+                            )
                         )
                     )
                 else:
@@ -508,26 +599,38 @@ class FOIMinistryRequest(db.Model):
          
     @classmethod
     def getupcomingcfrduerecords(cls):
-        sql = """select distinct on (filenumber) filenumber, cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
+        upcomingduerecords = []
+        try:
+            sql = """select distinct on (filenumber) filenumber, to_char(cfrduedate, 'YYYY-MM-DD') as cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
                     where isactive = true and cfrduedate is not null and requeststatusid = 2  
                     and cfrduedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-        rs = db.session.execute(text(sql))
-        upcomingduerecords = []
-        for row in rs:
-            upcomingduerecords.append({"filenumber": row["filenumber"], "cfrduedate": row["cfrduedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+            rs = db.session.execute(text(sql))            
+            for row in rs:
+                upcomingduerecords.append({"filenumber": row["filenumber"], "cfrduedate": row["cfrduedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return upcomingduerecords    
 
     @classmethod
     def getupcominglegislativeduerecords(cls):
-        sql = """select distinct on (filenumber) filenumber, duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
+        upcomingduerecords = []
+        try:
+            sql = """select distinct on (filenumber) filenumber, to_char(duedate, 'YYYY-MM-DD') as duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
                     where isactive = true and duedate is not null and requeststatusid not in (5,6,4,11,3,15)     
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-        rs = db.session.execute(text(sql))
-        upcomingduerecords = []
-        for row in rs:
-            upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return upcomingduerecords    
 
     @classmethod
@@ -541,14 +644,20 @@ class FOIMinistryRequest(db.Model):
     
     @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
-        sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
+        ministries = []
+        try:
+            sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
                     inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 
                     inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
                     where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;""" 
-        rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})
-        ministries = []
-        for row in rs:
-            ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+            rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})           
+            for row in rs:
+                ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return ministries
 
     @classmethod
@@ -565,15 +674,30 @@ class FOIMinistryRequest(db.Model):
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
         ]
 
+        #subquery for getting extension count
+        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+
         
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
-        stateforsorting = case([
-                            (FOIRequestStatus.name == 'Open',
+        intakesorting = case([
+                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
-                           else_ = FOIRequestStatus.name).label('stateForSorting')
+                           else_ = FOIRequest.receiveddate).label('intakeSorting')
+
+        defaultsorting = case([
+                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('defaultSorting')
+
+        ministrysorting = case([
+                            (FOIMinistryRequest.assignedministryperson == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = FOIMinistryRequest.duedate).label('ministrySorting')
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -613,6 +737,22 @@ class FOIMinistryRequest(db.Model):
             ],
             else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
 
+        onbehalfformatted = case([
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
+                             func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
+                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
+                             onbehalf_applicant.lastname),
+                            (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
+                             onbehalf_applicant.firstname),
+                           ],
+                           else_ = 'N/A').label('onBehalfFormatted')
+        
+        extensions = case([
+                            (subquery_extension_count.c.extensions.is_(None),
+                             0),
+                           ],
+                           else_ = subquery_extension_count.c.extensions).label('extensions')
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -643,10 +783,14 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.description,            
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
-            stateforsorting,
+            defaultsorting,
+            intakesorting,
+            ministrysorting,
             assignedtoformatted,
             ministryassignedtoformatted,
-            FOIMinistryRequest.closedate
+            FOIMinistryRequest.closedate,
+            onbehalfformatted,
+            extensions
         ]
 
         basequery = _session.query(
@@ -654,6 +798,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 subquery_ministry_maxversion,
                                 and_(*joincondition_ministry)
+                            ).join(
+                                subquery_extension_count,
+                                subquery_extension_count.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+                                isouter=True
                             ).join(
                                 FOIRequest,
                                 and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
@@ -704,8 +852,11 @@ class FOIMinistryRequest(db.Model):
         groupfilter = []
         for group in params['groups']:
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
+        
+        #ministry advanced search show cfr onwards
+        statefilter = FOIMinistryRequest.requeststatusid.in_([2,3,7,9,8,10,11,12,13,14,16])
 
-        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee).filter(or_(*groupfilter))
+        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee).filter(and_(or_(*groupfilter), statefilter))
 
         #sorting
         sortingcondition = FOIMinistryRequest.getsorting(params['sortingitems'], params['sortingorders'], iaoassignee, ministryassignee)
@@ -761,10 +912,10 @@ class FOIMinistryRequest(db.Model):
             filtercondition.append(searchcondition)
 
         if(params['fromdate'] is not None and params['daterangetype'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) >= params['fromdate'])
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee).cast(Date) >= parser.parse(params['fromdate']))
 
         if(params['todate'] is not None and params['daterangetype'] is not None):
-            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee) <= params['todate'])
+            filtercondition.append(FOIMinistryRequest.findfield(params['daterangetype'], iaoassignee, ministryassignee).cast(Date) <= parser.parse(params['todate']))
         
         return filtercondition
 
@@ -782,9 +933,11 @@ class FOIMinistryRequest(db.Model):
     def getfilterforrequeststatus(cls, params, iaoassignee, ministryassignee):        
         #request status: overdue || on time
         if(params['requeststatus'][0] == 'overdue'):
-            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now()
+            #exclude "on hold" for overdue
+            stateid = 11
+            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), FOIMinistryRequest.requeststatusid != stateid)
         else:
-            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now()
+            return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now().date()
 
     @classmethod
     def getfilterforrequesttype(cls, params, iaoassignee, ministryassignee):  
@@ -819,6 +972,13 @@ class FOIMinistryRequest(db.Model):
                 for keyword in params['keywords']:
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'ministryassigneename'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    searchcondition1.append(FOIMinistryRequest.findfield('assignedministrypersonFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('assignedministrypersonLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
             else:
                 searchcondition = []

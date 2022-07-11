@@ -51,6 +51,12 @@ const useStyles = makeStyles(
             backgroundColor: getHoverBackgroundColor(theme.palette.info.main),
           },
         },
+        "& .not-assigned": {
+          backgroundColor: "#cfd7e3",
+          "&:hover": {
+            backgroundColor: getHoverBackgroundColor(theme.palette.info.main),
+          },
+        },
       },
     };
   },

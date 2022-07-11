@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import "./requestdescriptionbox.scss";
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
 import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,8 +9,14 @@ import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { formatDate } from "../../../helper/FOI/helper";
 import RequestDescriptionHistory from "../RequestDescriptionHistory";
 import { useParams } from 'react-router-dom';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {isValidMinistryCode, countOfMinistrySelected} from '../FOIRequest/utils';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
       headingError: {
         color: "#ff0000"    
       },
@@ -21,6 +25,14 @@ const useStyles = makeStyles((theme) => ({
       },
       btndisabled: { 
         color: "#808080"
+      },
+      heading: {
+        color: '#FFF',
+        fontSize: '16px !important',
+        fontWeight: 'bold !important'
+      },
+      accordionSummary: {
+        flexDirection: 'row-reverse'
       }
   }));
 
@@ -59,9 +71,10 @@ const RequestDescription = React.memo(({
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
-            isProgramAreaSelected: !!requestDetails.selectedMinistries,
+            isProgramAreaSelected: requestDetails?.selectedMinistries?.length === 1 && requestDetails?.selectedMinistries.some(programArea =>
+              (isValidMinistryCode(programArea.code, masterProgramAreaList))),
             ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted
-        }    
+        }
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
     
@@ -138,10 +151,10 @@ const RequestDescription = React.memo(({
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
     const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
-        //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(updatedProgramAreaList.some(programArea => programArea.isChecked), FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     
-        //event bubble up - Updated program area list
-        handleUpdatedProgramAreaList(updatedProgramAreaList);
+        handleOnChangeRequiredRequestDescriptionValues(countOfMinistrySelected(updatedProgramAreaList) === 1 && updatedProgramAreaList.some(programArea =>
+          (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList))), 
+          FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     //event bubble up- update the required fields to validate later
+        handleUpdatedProgramAreaList(updatedProgramAreaList);    //event bubble up - Updated program area list
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, updatedProgramAreaList);
     }
 
@@ -155,7 +168,7 @@ const RequestDescription = React.memo(({
     
     const sortedList = requestDescriptionHistoryList.sort((a, b) => {       
       return new Date(a.createdAt) - new Date(b.createdAt);
-  });
+    });
 
     const filteredList = sortedList.filter((request, index, self) =>
         index === self.findIndex((copyRequest) => (
@@ -163,112 +176,113 @@ const RequestDescription = React.memo(({
         ))
     )
 
+    const statesBeforeOpen = [
+      StateEnum.unopened.name.toLowerCase(),
+      StateEnum.intakeinprogress.name.toLowerCase(),
+    ];
+
      return (
         
-        <Card className="foi-details-card">      
-        
-            <div className="row foi-details-row">              
-              <div className="col-lg-8 foi-details-col">
-                <label className="foi-details-label">REQUEST DESCRIPTION</label>
-              </div>            
-              <div className="col-lg-4 foi-details-col">  
-                <div className="foi-request-description-history">
-                    <button type="button" className={`btn btn-link btn-description-history ${filteredList.length <= 1 ? classes.btndisabled : ""}`} disabled={filteredList.length <= 1}  onClick={handleDescriptionHistoryClick}>
-                        Description History
-                    </button>
-                </div>
-              </div>
-            </div> 
-            <CardContent>
-                <RequestDescriptionHistory 
-                  requestDescriptionHistoryList={filteredList} 
-                  openModal={openModal} 
-                  handleModalClose={handleModalClose}
+      <div className='request-accordian' >
+      <Accordion defaultExpanded={true}>
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="requestDescription-header">
+      <Typography className={classes.heading}>REQUEST DESCRIPTION</Typography>
+      </AccordionSummary>
+      <AccordionDetails>    
+        <div>
+            <button type="button" className={`btn btn-link btn-description-history ${filteredList.length <= 1 ? classes.btndisabled : ""}`} disabled={filteredList.length <= 1}  onClick={handleDescriptionHistoryClick}>
+                Description History
+            </button>
+        </div>
+        <RequestDescriptionHistory 
+          requestDescriptionHistoryList={filteredList} 
+          openModal={openModal} 
+          handleModalClose={handleModalClose}
+        />
+        <div className="row foi-details-row foi-request-description-row">
+            <div className="col-lg-6 foi-details-col">
+                <h5 className="foi-date-range-h5">Date Range for Record Search</h5>
+            </div>
+            <div className="col-lg-3 foi-details-col foi-request-dates">
+              <TextField  
+                  id="recordStartDate"              
+                  label="Start Date"
+                  type="date"
+                  value={startDate}
+                  className={classes.textField}
+                  onChange={handleStartDateChange}
+                  InputLabelProps={{
+                  shrink: true,
+                  }} 
+                  InputProps={{inputProps: { max: formatDate(new Date())} }}   
+                  variant="outlined"
+                  fullWidth
+                  disabled={disableInput}
+              />  
+            </div>
+            <div className="col-lg-3 foi-details-col foi-request-dates">                     
+              <TextField          
+                  id="recordEndDate"          
+                  label="End Date"
+                  type="date" 
+                  value={endDate}        
+                  className={classes.textField}
+                  onChange={handleEndDateChange}
+                  InputLabelProps={{
+                  shrink: true,
+                  }}
+                    InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
+                  variant="outlined" 
+                  fullWidth
+                  disabled={disableInput}
+              />  
+            </div>                                                              
+        </div>
+        <div className="row foi-details-row">
+          <div className="col-lg-12">
+            <div className="foi-request-description-textbox">
+            <TextField
+                id="outlined-multiline-request-description"
+                required={true}
+                label="Request Description"
+                multiline
+                rows={4}
+                value={requestDescriptionText}
+                variant="outlined"
+                InputLabelProps={{ shrink: true, }} 
+                onChange={handleRequestDescriptionChange}
+                error={requestDescriptionText===""}
+                fullWidth
+                disabled={disableInput}
+            />
+            </div>
+          </div>
+        </div>
+        {requiredRequestDetailsValues.requestType.toLowerCase() ===
+              FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
+          <div className="row foi-details-row">
+            <div className="col-lg-12">
+              <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
+                <input
+                  id="noPICheckbox"
+                  type="checkbox"
+                  className="checkmark"
+                  checked={isPIIRedacted}
+                  onChange={handlePIIRedacted}
+                  disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
                 />
-                <div className="row foi-details-row foi-request-description-row">
-                    <div className="col-lg-6 foi-details-col">
-                        <h5 className="foi-date-range-h5">Date Range for Record Search</h5>
-                    </div>
-                    <div className="col-lg-3 foi-details-col foi-request-dates">
-                      <TextField  
-                          id="recordStartDate"              
-                          label="Start Date"
-                          type="date"
-                          value={startDate}
-                          className={classes.textField}
-                          onChange={handleStartDateChange}
-                          InputLabelProps={{
-                          shrink: true,
-                          }} 
-                          InputProps={{inputProps: { max: formatDate(new Date())} }}   
-                          variant="outlined"
-                          fullWidth
-                          disabled={disableInput}
-                      />  
-                    </div>
-                    <div className="col-lg-3 foi-details-col foi-request-dates">                     
-                      <TextField          
-                          id="recordEndDate"          
-                          label="End Date"
-                          type="date" 
-                          value={endDate}        
-                          className={classes.textField}
-                          onChange={handleEndDateChange}
-                          InputLabelProps={{
-                          shrink: true,
-                          }}
-                            InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
-                          variant="outlined" 
-                          fullWidth
-                          disabled={disableInput}
-                      />  
-                    </div>                                                              
-                </div>
-                <div className="row foi-details-row">
-                  <div className="col-lg-12">
-                    <div className="foi-request-description-textbox">
-                    <TextField
-                        id="outlined-multiline-request-description"
-                        required={true}
-                        label="Request Description"
-                        multiline
-                        rows={4}
-                        value={requestDescriptionText}
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true, }} 
-                        onChange={handleRequestDescriptionChange}
-                        error={requestDescriptionText===""}
-                        fullWidth
-                        disabled={disableInput}
-                    />
-                    </div>
-                  </div>
-                </div>
-                {requiredRequestDetailsValues.requestType.toLowerCase() ===
-                      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
-                  <div className="row foi-details-row">
-                    <div className="col-lg-12">
-                      <label className={`check-item no-personal-info ${!isPIIRedacted ? classes.headingError : ""}`}>                  
-                        <input
-                          id="noPICheckbox"
-                          type="checkbox"
-                          className="checkmark"
-                          checked={isPIIRedacted}
-                          onChange={handlePIIRedacted}
-                          disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
-                        />
-                        <span className="checkmark"></span>
-                          Description contains NO Personal Information
-                      </label>  
-                    </div>    
-                  </div>
-                )}
-                { Object.entries(localProgramAreaList).length !== 0 ?
-                <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
-                :null}
-            </CardContent>
-        </Card>
-       
+                <span className="checkmark"></span>
+                  Description contains NO Personal Information
+              </label>  
+            </div>    
+          </div>
+        )}
+        { (Object.entries(localProgramAreaList).length !== 0 && (!requestDetails.currentState || statesBeforeOpen.includes(requestDetails.currentState?.toLowerCase()))) &&
+        <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
+        }
+        </AccordionDetails>
+    </Accordion>
+  </div>
     );
   });
 

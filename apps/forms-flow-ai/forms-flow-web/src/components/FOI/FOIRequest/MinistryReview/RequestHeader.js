@@ -10,9 +10,9 @@ import { useParams } from 'react-router-dom';
 import { getHeaderText } from './utils';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
-const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, createMinistrySaveRequestObject}) => {
+const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, setSaveMinistryRequestObject}) => {
 
-    const {ministryId} = useParams();
+    const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
     const requestState = requestDetails?.currentState;
@@ -23,32 +23,41 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
 
     const dispatch = useDispatch();
     useEffect(() => {
-      if (!assignedToList || assignedToList.length === 0) {
+      if (assignedToList?.length === 0) {
         dispatch(fetchFOIFullAssignedToList());
       }
     }, [dispatch]); 
 
-    function getFullName(assignedToList, requestDetails) {
-        const groupName = requestDetails.assignedGroup ? requestDetails.assignedGroup : "Unassigned";
-        const assignedTo = requestDetails.assignedTo ? requestDetails.assignedTo : groupName;
-        if (assignedToList.length > 0) {
-            const assigneeGroup = assignedToList.find(_assigneeGroup => _assigneeGroup.name === groupName);
-            const assignee = assigneeGroup && assigneeGroup.members && assigneeGroup.members.find(_assignee => _assignee.username === assignedTo);
-            if (groupName === assignedTo) {
-                return groupName;
-            }
-            else {
-                return assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
-            }
-        }
-        else {
-            return groupName;
-        }
+    const getGroupName = () => {
+        if (_requestDetails.assignedGroup)
+            return _requestDetails.assignedGroup;
+        return "Unassigned";
     }
 
-    const headerText = getHeaderText(_requestDetails);
+    const getAssignedTo = (groupName) => {
+        if (_requestDetails.assignedTo)
+            return _requestDetails.assignedTo;
+        return groupName;
+    }
+    function getFullName() {
+        const groupName = getGroupName();
+        const assignedTo = getAssignedTo(groupName);
+        if (assignedToList?.length > 0) {
+            const assigneeGroup = assignedToList.find(_assigneeGroup => _assigneeGroup.name === groupName);
+            const assignee = assigneeGroup?.members?.find(_assignee => _assignee.username === assignedTo);
+            if (groupName === assignedTo) 
+                return groupName;
+            return assignee !== undefined ? `${assignee.lastname}, ${assignee.firstname}`: "invalid user";
+        }
+        return groupName;
+    }
+
     
-    const assignedToValue = getFullName(assignedToList, _requestDetails);
+    const headerText = getHeaderText(_requestDetails);
+
+    document.title = headerText;
+    
+    const assignedToValue = getFullName();
 
     const watcherBox = (
         requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
@@ -69,32 +78,30 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row" style={{marginTop:5+'px',display:'block'}}>
-                  
                     {watcherBox}
-                   
                 </div>
             </div>
-            
             <div className="foi-assigned-to-container">
                 <div className="foi-assigned-to-inner-container">
-                <TextField
-                    id="assignedTo"
-                    label="IAO Assigned To"
-                    InputLabelProps={{ shrink: true, }}                              
-                    value={assignedToValue}                    
-                    input={<InputLabel />} 
-                    variant="outlined"
-                    fullWidth                    
-                    disabled = {true}                                        
-                >                               
-                </TextField> 
+                    <TextField
+                        id="assignedTo"
+                        label="IAO Assigned To"
+                        InputLabelProps={{ shrink: true, }}                              
+                        value={assignedToValue}                    
+                        input={<InputLabel />} 
+                        variant="outlined"
+                        fullWidth                    
+                        disabled = {true}                                        
+                    >                               
+                    </TextField> 
                 </div>
-
-            
-                    <>
-                      <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} ministryAssignedToList={ministryAssignedToList} handleMinistryAssignedToValue={handleMinistryAssignedToValue} createSaveRequestObject={createMinistrySaveRequestObject} isMinistryCoordinator={true} />
-                    </>
-                
+                <>
+                    <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} 
+                    ministryAssignedToList={ministryAssignedToList} 
+                    handleMinistryAssignedToValue={handleMinistryAssignedToValue} 
+                    isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} 
+                    setSaveMinistryRequestObject={setSaveMinistryRequestObject} />
+                </>
             </div>
         </div>
 

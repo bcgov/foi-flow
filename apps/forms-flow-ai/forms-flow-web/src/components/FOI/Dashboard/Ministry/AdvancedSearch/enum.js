@@ -1,11 +1,11 @@
 const SearchFilter = Object.freeze({
-  REQUEST_DESCRIPTION: "REQUEST_DESCRIPTION",
-  RAW_REQUEST_NUM: "RAW_REQUEST_NUMBER",
-  ID_NUM: "ID_NUMBER",
-  AXIS_REQUEST_NUM: "AXIS_REQUEST_NUMBER",
-  APPLICANT_NAME: "APPLICANT_NAME",
-  ASSIGNEE_NAME: "ASSIGNEE_NAME",
-  SUBJECT_CODE: "SUBJECT_CODE",
+  REQUEST_DESCRIPTION: "requestdescription",
+  RAW_REQUEST_NUM: "rawrequest_num",
+  ID_NUM: "idnumber",
+  AXIS_REQUEST_NUM: "axisrequest_number",
+  APPLICANT_NAME: "applicantname",
+  ASSIGNEE_NAME: "ministryassigneename",
+  SUBJECT_CODE: "subjectcode",
 });
 
 const DateRangeTypes = Object.freeze([

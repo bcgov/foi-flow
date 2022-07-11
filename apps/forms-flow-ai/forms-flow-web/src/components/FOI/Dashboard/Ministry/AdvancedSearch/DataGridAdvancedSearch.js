@@ -1,27 +1,20 @@
 import React, { useEffect, useContext } from "react";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+import { DataGrid } from '@mui/x-data-grid';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
-import { useDispatch, useSelector } from "react-redux";
-import { push } from "connected-react-router";
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
 import {
-  getAssigneeValue,
   updateSortModel,
-  getFullName,
   getLDD,
-  getDaysLeft,
+  getRecordsDue
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
+import { useDispatch } from "react-redux";
+import Link from "@mui/material/Link";
+import { push } from "connected-react-router";
+import { CustomFooter } from "../../CustomFooter"
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -33,22 +26,23 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     queryData,
     setSearchLoading,
     advancedSearchComponentLoading,
+    advancedSearchParams,
   } = useContext(ActionContext);
-
-  const assignedToList = useSelector(
-    (state) => state.foiRequests.foiFullAssignedToList
-  );
 
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  const defaultRowsState = { page: 0, pageSize: 100 };
+  const [rowsState, setRowsState] = React.useState(
+    Object.keys(advancedSearchParams).length > 0 ? 
+      {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 
+      defaultRowsState
+  );
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
+    // { field: "receivedDateUF", sort: "desc" },
   ];
-  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  const [sortModel, setSortModel] = React.useState(advancedSearchParams?.sort || defaultSortModel);
 
   useEffect(() => {
     if (searchResults) {
@@ -63,65 +57,90 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   }, [rowsState, sortModel]);
 
+  const hyperlinkRenderCellforMinistry = (params) => {
+    var link;
+    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    return (
+      <Link href={link} onClick={e => renderReviewRequestforMinistry(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link>
+    )
+  };
+  
+  const renderReviewRequestforMinistry = (e, row) => {
+    e.preventDefault()
+    dispatch(push(`/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`));
+  };
+
   const columns = React.useRef([
-    {
-      field: "applicantName",
-      headerName: "APPLICANT NAME",
-      flex: 1,
-      headerAlign: "left",
-      valueGetter: (params) =>
-        getFullName(params.row.firstName, params.row.lastName),
-    },
-    {
-      field: "requestType",
-      headerName: "REQUEST TYPE",
-      flex: 1,
-      headerAlign: "left",
-    },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
+      width: 170,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+    },
+    {
+      field: "applicantcategory",
+      headerName: "CATEGORY",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
     },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      flex: 1,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+    },
+
     {
       field: "currentState",
-      headerName: "CURRENT STATE",
-      headerAlign: "left",
+      headerName: "REQUEST STATE",
       flex: 1,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
     },
+
     {
-      field: "assignedToFormatted",
+      field: "ministryAssignedToFormatted",
       headerName: "ASSIGNED TO",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+    },
+    {
+      field: "CFRDueDateValue",
+      headerName: "RECORDS DUE",
+      flex: 1,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getRecordsDue,
     },
     {
       field: "DueDateValue",
       headerName: "LDD",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getLDD,
     },
     {
-      field: "DaysLeftValue",
-      headerName: "DAYS LEFT",
-      flex: 0.5,
-      headerAlign: "left",
-      valueGetter: getDaysLeft,
+      field: "cfrduedate",
+      headerName: "",
+      width: 0,
+      hide: true,
+      renderCell: (_params) => <span></span>,
     },
-    { field: "xgov", headerName: "XGOV", flex: 0.5, headerAlign: "left" },
   ]);
-
-  const renderReviewRequest = (e) => {
-    if (e.row.ministryrequestid) {
-      dispatch(
-        push(
-          `/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
-        )
-      );
-    }
-  };
 
   if (advancedSearchComponentLoading && queryData) {
     return (
@@ -144,27 +163,31 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         <Grid item xs={12}>
           <h4 className="foi-request-queue-text">Search Results</h4>
         </Grid>
-        <Grid item xs={12} style={{ height: 450 }}>
+        <Grid item xs={12} style={{ minHeight: 300 }}>
           <DataGrid
+            autoHeight
             className="foi-data-grid"
             getRowId={(row) => row.idNumber}
-            rows={searchResults?.data}
+            rows={searchResults?.data || []}
             columns={columns.current}
             rowHeight={30}
             headerHeight={50}
             rowCount={searchResults?.meta?.total || 0}
             pageSize={rowsState.pageSize}
-            rowsPerPageOptions={[10]}
+            // rowsPerPageOptions={[10]}
             hideFooterSelectedRowCount={true}
             disableColumnMenu={true}
             pagination
             paginationMode="server"
-            onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-            onPageSizeChange={(pageSize) =>
-              setRowsState((prev) => ({ ...prev, pageSize }))
+            initialState={{
+              pagination: rowsState
+            }}
+            onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+            onPageSizeChange={(newpageSize) =>
+              setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Pagination: CustomPagination,
+              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={defaultSortModel} footerFor={"advancedsearch"}></CustomFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
@@ -175,7 +198,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
                 .toLowerCase()
                 .replace(/ +/g, "")}`
             }
-            onRowClick={renderReviewRequest}
             loading={searchLoading}
           />
         </Grid>
@@ -183,19 +205,5 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     </ConditionalComponent>
   );
 };
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
 
 export default DataGridAdvancedSearch;

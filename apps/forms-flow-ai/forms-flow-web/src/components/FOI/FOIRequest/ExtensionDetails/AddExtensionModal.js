@@ -41,6 +41,8 @@ import {
   getSelectedDays
 } from "./utils";
 import { fetchExtensions } from "../../../../apiManager/services/FOI/foiExtensionServices";
+import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { fetchFOIRequestNotesList } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 import { useParams } from "react-router-dom";
 import { setRequestDueDate } from "../../../../actions/FOI/foiRequestActions";
 
@@ -78,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AddExtensionModal = () => {
   const classes = useStyles();
-  const { ministryId } = useParams();
+  const { requestId, ministryId } = useParams();
 
   const costumFormat = useMemo(() => {
     return {
@@ -314,6 +316,9 @@ const AddExtensionModal = () => {
             },
             dispatch,
           });
+          dispatch(fetchFOIRequestNotesList(requestId, ministryId));
+          dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+
           setSaveModalOpen(false);
           setSaveLoading(false);
           if (data.newduedate) {
@@ -398,6 +403,7 @@ const AddExtensionModal = () => {
         <DialogTitle disableTypography id="extension-dialog-title">
           <h2 className="extension-header">Extension</h2>
           <IconButton
+            aria-label= "close"
             className="title-col3"
             onClick={() => setSaveModalOpen(false)}
           >
@@ -441,6 +447,7 @@ const AddExtensionModal = () => {
                   required
                   select
                   label="Reason for Extension"
+                  inputProps={{ "aria-labelledby": "extension-reasons-label"}}
                   value={reason?.extensionreasonid || 0}
                   onChange={handleReasonChange}
                   error={!reason}
@@ -524,6 +531,7 @@ const AddExtensionModal = () => {
                   <Grid item xs={6} />
                   <Grid item xs={6}>
                     <TextField
+                      id="approvedDate"
                       label="Approved Date"
                       type="date"
                       value={approvedDate || ""}
@@ -534,7 +542,7 @@ const AddExtensionModal = () => {
                         setApprovedDate(e.target.value);
                       }}
                       InputProps={{
-                        inputProps: { max: formatDate(new Date()) },
+                        inputProps: { max: formatDate(new Date()) , "aria-labelledby": "approvedDate-label"},
                       }}
                       variant="outlined"
                       fullWidth
@@ -544,7 +552,7 @@ const AddExtensionModal = () => {
 
                   <Grid item xs={6}>
                     <TextField
-                      id="outlined-extension-number-days"
+                      id="outlined-approved-number-days"
                       name="approvedNumberDays"
                       value={approvedNumberDays || 0}
                       type="number"
@@ -568,6 +576,7 @@ const AddExtensionModal = () => {
                 >
                   <Grid item xs={6}>
                     <TextField
+                      id="deniedDate"
                       label="Denied Date"
                       type="date"
                       InputLabelProps={{
@@ -578,7 +587,7 @@ const AddExtensionModal = () => {
                         setDeniedDate(e.target.value);
                       }}
                       InputProps={{
-                        inputProps: { max: formatDate(new Date()) },
+                        inputProps: { max: formatDate(new Date()) , "aria-labelledby": "deniedDate-label"},
                       }}
                       variant="outlined"
                       fullWidth

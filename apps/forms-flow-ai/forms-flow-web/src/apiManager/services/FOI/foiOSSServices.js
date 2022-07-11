@@ -8,12 +8,11 @@ import {
     serviceActionError,
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
-  import { saveAs } from "file-saver";
   
   export const getOSSHeaderDetails = (data, dispatch, ...rest) => {
     const done = fnDone(rest);
-    httpPOSTRequest(API.FOI_POST_OSS_HEADER, data)
-      .then((res) => {
+    const response = httpPOSTRequest(API.FOI_POST_OSS_HEADER, data);
+    response.then((res) => {
         if (res.data) {
           done(null, res.data);
         } else {
@@ -25,11 +24,12 @@ import {
         dispatch(serviceActionError(error));
         done("Error in getting OSS Header information");
       });
+    return response;
   };
   
   export const saveFilesinS3Async = async (headerDetails, file, dispatch, ...rest) => {
     const done = fnDone(rest);
-    var requestOptions = {
+    let requestOptions = {
       headers: {
         "X-Amz-Date": headerDetails.amzdate,
         Authorization: headerDetails.authheader,
@@ -52,7 +52,7 @@ import {
   
   export const saveFilesinS3 = (headerDetails, file, dispatch, ...rest) => {
     const done = fnDone(rest);
-    var requestOptions = {
+    let requestOptions = {
       headers: {
         'X-Amz-Date': headerDetails.amzdate,
         'Authorization': headerDetails.authheader,
@@ -73,33 +73,29 @@ import {
       });
   };
   
-  export const getFileFromS3 = (headerDetails, file, ...rest) => {  
+  export const getFileFromS3 = (headerDetails, ...rest) => {  
     const done = fnDone(rest);
-    var requestOptions = {
+    let requestOptions = {
       headers: {
         "X-Amz-Date": headerDetails.amzdate,
         Authorization: headerDetails.authheader,     
       },
       responseType: 'blob'
     };  
-    return (dispatch) => {    
-      httpOSSGETRequest(headerDetails.filepath, requestOptions)
-      .then((res) => {
-          var blob = new Blob([res.data], {type: "application/octet-stream"});
-          saveAs(blob, file.filename)
-          if (res) {
-            done(null, res.status);
-          } else {
-            dispatch(serviceActionError(res));
-            done("Error in getting files from S3");
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          dispatch(serviceActionError(error));
+    return httpOSSGETRequest(headerDetails.filepath, requestOptions)
+      .then((res, dispatch) => {
+        if (res) {
+          done(null, res);
+        } else {
+          dispatch(serviceActionError(res));
           done("Error in getting files from S3");
-        });
-    };
+        }
+      })
+      .catch((error, dispatch) => {
+        console.log(error);
+        dispatch(serviceActionError(error));
+        done("Error in getting files from S3");
+      });
   };
   
   

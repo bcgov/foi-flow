@@ -2,7 +2,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 
-const getFullName = (lastName, firstName, username) => {
+export const getFullName = (lastName, firstName, username) => {
   return firstName !== "" ? `${lastName}, ${firstName}` : username;
 };
 
@@ -12,7 +12,7 @@ export const getMenuItems = ({
   assignedToList,
   selectedAssignedTo,
 }) => {
-  var menuItems = [];
+  let menuItems = [];
   menuItems.push(
     <MenuItem className={classes.group} key={0} value={"|"}>
       {}
@@ -82,14 +82,14 @@ export const getHeaderText = ({requestDetails, ministryId, status}) => {
   return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
 };
 
-export const getAssignedTo = (requestDetails) => {
-  if (!requestDetails.assignedGroup || requestDetails.assignedTo === "Unassigned") {
+export const getAssignedTo = (assigneeDetails) => {
+  if (!assigneeDetails.assignedGroup || assigneeDetails.assignedTo === "Unassigned") {
     return "|Unassigned";
   }
 
-  return requestDetails.assignedTo
-    ? `${requestDetails.assignedGroup}|${requestDetails.assignedTo}|${requestDetails.assignedToFirstName}|${requestDetails.assignedToLastName}`
-    : `${requestDetails.assignedGroup}|${requestDetails.assignedGroup}`;
+  return assigneeDetails.assignedTo
+    ? `${assigneeDetails.assignedGroup}|${assigneeDetails.assignedTo}|${assigneeDetails.assignedToFirstName}|${assigneeDetails.assignedToLastName}`
+    : `${assigneeDetails.assignedGroup}|${assigneeDetails.assignedGroup}`;
 };
 
 export const getStatus = ({ headerValue, requestDetails }) => {

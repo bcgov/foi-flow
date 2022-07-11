@@ -90,7 +90,8 @@ class FOIRequestWrapperSchema(Schema):
     assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True)
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True)
 
-    
+    reopen = fields.Bool(data_key="reopen",allow_none=True)
+
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
     workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])  
     phoneSecondary = fields.Str(data_key="phoneSecondary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
@@ -133,6 +134,7 @@ class FOIMinistryRequestDivisionSchema(Schema):
     stageid = fields.Int(data_key="stageid")
     divisionDueDate = fields.Str(data_key="divisionDueDate",allow_none=True)
     eApproval = fields.Str(data_key="eApproval",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])
+    divisionReceivedDate = fields.Str(data_key="divisionReceivedDate",allow_none=True)
 
   
 class FOIRequestMinistrySchema(Schema):
@@ -143,8 +145,8 @@ class FOIRequestMinistrySchema(Schema):
         unknown = EXCLUDE    
     assignedministrygroup = fields.Str(data_key="assignedministrygroup",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
     assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
-    assignedgroup = fields.Str(data_key="assignedgroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])   
-    assignedto = fields.Str(data_key="assignedto",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
+    assignedgroup = fields.Str(data_key="assignedGroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])   
+    assignedto = fields.Str(data_key="assignedTo",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
     divisions = fields.Nested(FOIMinistryRequestDivisionSchema, many=True,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)

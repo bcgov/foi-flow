@@ -7,10 +7,10 @@ import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constant
 import { toast } from "react-toastify";
 import { KCProcessingTeams } from "../../constants/FOI/enum";
 
-var isBetween = require("dayjs/plugin/isBetween");
-var utc = require("dayjs/plugin/utc");
-var timezone = require("dayjs/plugin/timezone");
-var CryptoJS = require("crypto-js");
+let isBetween = require("dayjs/plugin/isBetween");
+let utc = require("dayjs/plugin/utc");
+let timezone = require("dayjs/plugin/timezone");
+let CryptoJS = require("crypto-js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -45,43 +45,26 @@ const businessDay = (date) => {
   return dayjs(date).isBusinessDay();
 };
 
-const getHolidayList = (years) => {
+const getHolidayList = (startYear, endYear) => {
   let holidays = [];
-  for (const year of years) {
-    holidays = hd.getHolidays(year);
+  if (startYear > endYear) {
+    let temp = startYear;
+    startYear = endYear;
+    endYear = temp;
+  }
+  for (; startYear <= endYear; startYear++) {
+    holidays = holidays.concat(hd.getHolidays(startYear));
   }
   return holidays;
 };
 const getPublicHoliDays = (startDate, endDate) => {
   let publicHoliDays = 0;
-  let years = [];
-  years.push(dayjs(startDate).year());
+  const startYear = dayjs(startDate).year();
   const endYear = dayjs(endDate).year();
-  if (years.includes(endYear) === false) {
-    years.push(endYear);
-  }
-  const holidays = getHolidayList(years);
+  const holidays = getHolidayList(startYear, endYear);
   for (const entry of holidays) {
-    let day = dayjs(entry.date).day();
     if (
       entry.type === "public" &&
-      dayjs(entry.date).isBetween(startDate, endDate, null, "[]") &&
-      day >= 1 &&
-      day <= 5
-    ) {
-      publicHoliDays++;
-    }
-    //Handle Easter Monday
-    if (
-      entry.name === "Good Friday" &&
-      dayjs(entry.date).add(3, "day").isBetween(startDate, endDate, null, "[]")
-    ) {
-      publicHoliDays++;
-    }
-    //Handle Boxing Day weekends
-    if (
-      entry.name === "Boxing Day" &&
-      (day === 6 || day === 0) &&
       dayjs(entry.date).isBetween(startDate, endDate, null, "[]")
     ) {
       publicHoliDays++;
@@ -130,15 +113,15 @@ const removeBusinessDays = (dateText, days) => {
 };
 
 const countWeekendDays = (startDate, endDate) => {
-  var ndays =
+  let ndays =
     1 +
     Math.round((endDate.getTime() - startDate.getTime()) / (24 * 3600 * 1000));
-  var nsaturdays = Math.floor((startDate.getDay() + ndays) / 7);
+  let nsaturdays = Math.floor((startDate.getDay() + ndays) / 7);
   return 2 * nsaturdays + (startDate.getDay() === 0) - (endDate.getDay() === 6);
 };
 
 const daysBetween = (startDate, endDate) => {
-  var millisecondsPerDay = 24 * 60 * 60 * 1000;
+  let millisecondsPerDay = 24 * 60 * 60 * 1000;
   return (endDate - startDate) / millisecondsPerDay;
 };
 const calculateDaysRemaining = (endDate, startDate) => {
@@ -151,12 +134,20 @@ const calculateDaysRemaining = (endDate, startDate) => {
   const publicHoliDays = getPublicHoliDays(startDate, endDate);
   const weekendDays = countWeekendDays(startDate, endDate);
   const noOfDays = daysBetween(startDate, endDate);
-  return (
-    Math.round(noOfDays) -
-    Math.round(publicHoliDays) -
-    Math.round(weekendDays) +
-    1
-  );
+  if (noOfDays < 0) {
+    return (
+      Math.ceil(noOfDays) +
+      Math.round(publicHoliDays) -
+      Math.round(weekendDays)
+    )
+  } else {
+    return (
+      Math.floor(noOfDays) -
+      Math.round(publicHoliDays) -
+      Math.round(weekendDays) +
+      1
+    );
+  }
 };
 
 const isMinistryCoordinator = (userdetail, ministryteam) => {
@@ -230,7 +221,7 @@ const encrypt = (obj) => {
 
 const decrypt = (encrypted) => {
   if (encrypted) {
-    var bytes = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
+    let bytes = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   } else {
     return {};
@@ -238,8 +229,8 @@ const decrypt = (encrypted) => {
 };
 
 const saveSessionData = (key, data) => {
-  var expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
-  var sessionObject = {
+  let expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
+  let sessionObject = {
     expiresAt: new Date(expiresInMilliseconds),
     sessionData: data,
   };
@@ -248,11 +239,11 @@ const saveSessionData = (key, data) => {
 };
 
 const getSessionData = (key) => {
-  var sessionObject = decrypt(sessionStorage.getItem(key));
+  let sessionObject = decrypt(sessionStorage.getItem(key));
 
   if (sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
-    var currentDate = new Date();
-    var expirationDate = sessionObject.expiresAt;
+    let currentDate = new Date();
+    let expirationDate = sessionObject.expiresAt;
 
     if (Date.parse(currentDate) < Date.parse(expirationDate)) {
       return sessionObject.sessionData;

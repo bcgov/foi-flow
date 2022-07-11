@@ -75,6 +75,18 @@ export const updateSortModel = (sortModel) => {
         { field: "duedate", sort: order },
       );
     }
+
+    //add duedate to default sorting
+    if (smodel.length == 1 && (field == "defaultSorting" || field == "intakeSorting")) {
+      smodel.push(
+        { field: "duedate", sort: order },
+      );
+    }
+    if (smodel.length == 1 && field == "currentState") {
+      smodel.push(
+        { field: "receivedDateUF", sort: "desc" },
+      );
+    }
   }
 
   return smodel;
@@ -94,6 +106,18 @@ export const onBehalfFullName = (params) => {
   return `${params.row.onBehalfFirstName || ""} ${
     params.row.onBehalfLastName || ""
   }`;
+};
+
+export const getRecordsDue = (params) => {
+  let receivedDateString = params.row.cfrduedate;
+  const currentStatus = params.row.currentState;
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+    return "N/A";
+  } else if(!receivedDateString) {
+    return "";
+  } else {
+    return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
+  }
 };
 
 export const getLDD = (params) => {
@@ -142,4 +166,9 @@ export const ClickableChip = ({ clicked, ...rest }) => {
       {...rest}
     />
   );
+};
+
+export const addYears = (n) => {
+  const currentDate = new Date();
+  return currentDate.setFullYear(currentDate.getFullYear() + n);
 };

@@ -8,7 +8,7 @@ import { formatDate } from '../../../../helper/FOI/helper';
 import RequestDescriptionHistory from "../../RequestDescriptionHistory";
 import './RequestDescription.scss'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
     headingError: {
         color: "#ff0000"
     },
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 const RequestDescription = React.memo((requestDetails) => {
     const classes = useStyles();
     const _requestDetails = requestDetails.requestDetails;
-    var requestDescriptionHistoryList = useSelector(state => state.foiRequests.foiRequestDescriptionHistoryList);
+    let requestDescriptionHistoryList = useSelector(state => state.foiRequests.foiRequestDescriptionHistoryList);
     const sortedList = requestDescriptionHistoryList.sort((a, b) => {
         return new Date(a.createdAt) - new Date(b.createdAt);
     });
@@ -56,9 +56,9 @@ const RequestDescription = React.memo((requestDetails) => {
               <button
                 type="button"
                 className={`btn btn-link btn-description-history ${
-                  !(filteredList.length > 1) ? classes.btndisabled : ""
+                  filteredList.length <= 1 ? classes.btndisabled : ""
                 }`}
-                disabled={!(filteredList.length > 1)}
+                disabled={filteredList.length <= 1}
                 onClick={handleDescriptionHistoryClick}
               >
                 Description History

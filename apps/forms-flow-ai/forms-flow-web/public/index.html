@@ -67,19 +67,19 @@
     <style>
       .scrollable-page {
         position: relative;
-        overflow-y: scroll;
+        overflow-y: clip;
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
         -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+        scrollbar-width: none;  /* Firefox */
       }
       .scrollable-page::-webkit-scrollbar {
     display: none;
 }
       .no-scroll{
-        overflow: auto;
+        overflow: hidden;
       }
       body {
          

@@ -15,7 +15,7 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
 
   const authToken = decrypt(localStorage.getItem("authToken")); 
   
-  if(authToken !== null && authToken !== '' && authToken !== undefined) {
+  if(Object.keys(authToken).length > 0) {
     isAuth = true;
   }
 
@@ -23,7 +23,7 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
 
   useEffect(()=>{
     if(props.store && isAuth){
-      UserService.initKeycloak(props.store, (err, res) => {
+      UserService.initKeycloak(props.store, (_err, res) => {
         dispatch(setUserAuth(res.authenticated));
       });
     }

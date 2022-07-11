@@ -22,7 +22,6 @@ const FileUpload = ({
     existingDocuments = [],
 }) => {
     const fileInputField = useRef(null);
-    const fileInputFieldMultiple = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]); 
@@ -98,7 +97,7 @@ const FileUpload = ({
           }
         }
         setTotalFileSize(_totalFileSizeInMB);
-        setErrorMessage(getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles));
+        setErrorMessage(getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes));
         return [{...files}, _totalFileSizeInMB, removeFileSize];
     };
 
@@ -186,11 +185,12 @@ const FileUpload = ({
           </div>
           <div className="file-upload-column file-upload-column-2">
             <input
+            id="fileupload"
+            aria-label="fileUpload"
             className={multipleFiles ? "file-upload-input-multiple" : "file-upload-input"}
             type="file"
             ref={fileInputField}
             onChange={handleNewFileUpload}
-            title=""
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import "../../dashboard.scss";
 import { useSelector } from "react-redux";
 
@@ -35,6 +35,12 @@ import { StateEnum } from "../../../../../constants/FOI/statusEnum";
 
 import Tooltip from '../../../customComponents/Tooltip/Tooltip';
 
+import {
+  addYears
+} from "../../utils";
+
+const DEFAULT_PAGE_SIZE = 100;
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -49,7 +55,7 @@ const MenuProps = {
   },
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
   search: {
     borderBottom: "1px solid #38598A",
     backgroundColor: "rgba(56,89,138,0.1)",
@@ -83,6 +89,7 @@ const AdvancedSearch = ({ userDetail }) => {
     advancedSearchComponentLoading,
     setAdvancedSearchComponentLoading,
     setSearchLoading,
+    advancedSearchParams,
   } = useContext(ActionContext);
 
   const programAreaList = useSelector(
@@ -91,67 +98,117 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
-  const tooltipContent = {
+  const tooltipContentRight = {
     "title": "Advanced Search",
-    "content": "In order to search FOI requests you must select one of the advanced search or date filter below to better refine your search results."
+    "content": "To conduct an Advanced Search using one of the six filter buttons, you must also enter one or more key words."
   };
 
-  const [searchText, setSearchText] = useState("");
-  const [keywords, setKeywords] = useState([]);
-  const [searchFilterSelected, setSearchFilterSelected] = useState(
-  );
-  const keywordsMode =
-    searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
+  const tooltipContentLeft = {
+    "title": "Advanced Search",
+    "content": "Use one or more fields from the following sections on their own or to narrow your search: Request State/Status/Type, Date Range, or Public Body."
+  };
+
+
+  const [searchFilterSelected, setSearchFilterSelected] = useState(advancedSearchParams?.search || null);
+  const keywordsMode = searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
+
+  const [searchText, setSearchText] = useState(() => {
+    if (!keywordsMode && Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.keywords.length > 0) {
+      return advancedSearchParams.keywords[0]
+    } else {
+      return "";
+    }
+  });
+  const [keywords, setKeywords] = useState(() => {
+    if (keywordsMode && Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.keywords.length > 0) {
+      return advancedSearchParams.keywords;
+    } else {
+      return [];
+    }
+  });
 
   const intitialRequestState = {
-    unopened: {
-      checked: false,
-      id: StateEnum.unopened.id,
-    },
-    open: {
-      checked: false,
-      id: StateEnum.open.id,
-    },
-    callforrecords: {
-      checked: false,
-      id: StateEnum.callforrecords.id,
-    },
-    review: {
-      checked: false,
-      id: StateEnum.review.id,
-    },
-    signoff: {
-      checked: false,
-      id: StateEnum.signoff.id,
-    },
-    closed: {
-      checked: false,
-      id: StateEnum.closed.id,
-    },
-    callforrecordsoverdue: {
-      checked: false,
-      id: StateEnum.callforrecordsoverdue.id,
-    },
+    [StateEnum.unopened.id]: false,
+    [StateEnum.open.id]: false,
+    [StateEnum.callforrecords.id]: false,
+    [StateEnum.review.id]: false,
+    [StateEnum.signoff.id]: false,
+    [StateEnum.closed.id]: false,
+    [StateEnum.callforrecordsoverdue.id]: false
   };
-  const [requestState, setRequestState] = useState(intitialRequestState);
+
+  const [requestState, setRequestState] = useState(() => {
+    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
+      let savedRequestState = {...intitialRequestState}
+      advancedSearchParams.requestState.forEach(state => {
+        savedRequestState[state] = true;
+      });
+      return savedRequestState;
+    } else {
+      return intitialRequestState;
+    }
+  });
 
   const intitialRequestStatus = {
     overdue: false,
-    onTime: false,
+    ontime: false,
   };
-  const [requestStatus, setRequestStatus] = useState(intitialRequestStatus);
+  const [requestStatus, setRequestStatus] = useState(() => {
+    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestStatus.length > 0) {
+      let savedRequestStatus = {...intitialRequestStatus}
+      advancedSearchParams.requestStatus.forEach(status => {
+        savedRequestStatus[status] = true;
+      });
+      return savedRequestStatus;
+    } else {
+      return intitialRequestStatus;
+    }
+  });
 
   const initialRequestTypes = {
     personal: false,
     general: false,
   };
-  const [requestTypes, setRequestTypes] = useState(initialRequestTypes);
+  const [requestTypes, setRequestTypes] = useState(() => {
+    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestType.length > 0) {
+      let savedRequestType = {...initialRequestTypes}
+      advancedSearchParams.requestType.forEach(type => {
+        savedRequestType[type] = true;
+      });
+      return savedRequestType;
+    } else {
+      return initialRequestTypes;
+    }
+  });
 
-  const [selectedDateRangeType, setSelectedDateRangeType] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [selectedDateRangeType, setSelectedDateRangeType] = useState(advancedSearchParams?.dateRangeType || "");
+  const [fromDate, setFromDate] = useState(advancedSearchParams?.fromDate || "");
+  const [toDate, setToDate] = useState(advancedSearchParams?.toDate || "");
+  const oneYearFromNow = formatDate(addYears(1));
+  //default max fromDate - now
+  const [maxFromDate, setMaxFromDate] = useState(formatDate(new Date()));
+  //default max toDate - 1 year from now
+  const [maxToDate, setMaxToDate] = useState(oneYearFromNow);
+  const resetDateFields = () => {
+    setFromDate("");
+    setToDate("");
+  }
+  const resetMaxFromDate = (dateRangeType) => {
+    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+      setMaxFromDate(formatDate(new Date()));
+    }else{
+      setMaxFromDate(oneYearFromNow);
+    }
+  }
+  const resetMaxToDate = (dateRangeType) => {
+    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+      setMaxToDate(formatDate(new Date()));
+    }else{
+      setMaxToDate(oneYearFromNow);
+    }
+  }
 
-  const [selectedPublicBodies, setSelectedPublicBodies] = useState([]);
+  const [selectedPublicBodies, setSelectedPublicBodies] = useState(advancedSearchParams?.publicBodies || []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl) && Boolean(searchText);
@@ -162,7 +219,7 @@ const AdvancedSearch = ({ userDetail }) => {
         if (value instanceof Object) {
           return value.checked ? value.id : null;
         }
-        return value ? key.toLowerCase() : null;
+        return value ? key : null;
       })
       .filter((value) => value);
   };
@@ -172,8 +229,8 @@ const AdvancedSearch = ({ userDetail }) => {
     }
     setSearchLoading(true);
     handleUpdateSearchFilter({
-      search: searchFilterSelected?.replace("_", "").toLowerCase(),
-      keywords: keywordsMode ? keywords : [searchText],
+      search: searchFilterSelected,
+      keywords: keywordsMode ? keywords : [searchText.trim()],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
@@ -182,21 +239,38 @@ const AdvancedSearch = ({ userDetail }) => {
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
       page: 1,
-      size: 10,
+      size: advancedSearchParams?.size || DEFAULT_PAGE_SIZE,
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
     });
   };
 
+  useEffect(() => {
+    if (Object.keys(advancedSearchParams).length > 0) {
+        if (!advancedSearchComponentLoading) {
+          setAdvancedSearchComponentLoading(true);
+        }
+        setSearchLoading(true);
+        handleUpdateSearchFilter(advancedSearchParams)
+      } 
+  }, []);
+
   const noSearchCriteria = () => {
     let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
     let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
     let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
-    return !searchText && !fromDate && !toDate && selectedPublicBodies.length===0 && selectedRequestStates.length===0 && selectedRequestTypes.length===0 && selectedRequestStatus.length===0;
+    return ((keywords.length===0 && keywordsMode) || (!searchText && !keywordsMode))
+              && !fromDate
+              && !toDate
+              && selectedPublicBodies.length===0
+              && selectedRequestStates.length===0
+              && selectedRequestTypes.length===0
+              && selectedRequestStatus.length===0;
   };
 
   const handleResetSearchFilters = () => {
     setSearchText("");
+    setSelectedDateRangeType("");
     setKeywords([]);
     setSearchFilterSelected();
     setRequestState(intitialRequestState);
@@ -207,12 +281,13 @@ const AdvancedSearch = ({ userDetail }) => {
     setSelectedPublicBodies([]);
   };
 
+
   const handleKeywordAdd = () => {
     if (!searchText) {
       return;
     }
     setAnchorEl(null);
-    setKeywords([...keywords, searchText]);
+    setKeywords([...keywords, searchText.trim()]);
     setSearchText("");
   };
 
@@ -230,10 +305,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const handleRequestStateChange = (event) => {
     setRequestState({
       ...requestState,
-      [event.target.name]: {
-        ...requestState[event.target.name],
-        checked: event.target.checked,
-      },
+      [event.target.parentElement.getAttribute('stateid')]: event.target.checked
     });
   };
 
@@ -252,7 +324,11 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const handleSelectedDateRangeTypeChange = (event) => {
-    setSelectedDateRangeType(event.target.value);
+    const type = event.target.value;
+    setSelectedDateRangeType(type);
+    resetMaxFromDate(type);
+    resetMaxToDate(type);
+    resetDateFields();
   };
 
   const handleSelectedPublicBodiesChange = (event) => {
@@ -332,6 +408,7 @@ const AdvancedSearch = ({ userDetail }) => {
               className={classes.search}
             >
               <Grid item xs={keywordsMode ? 6 : 12}>
+                <label className="hideContent" for="advancedSearch">Search</label>
                 <InputBase
                   id="advancedSearch"
                   placeholder="Search"
@@ -345,6 +422,7 @@ const AdvancedSearch = ({ userDetail }) => {
                   startAdornment={
                     <InputAdornment position="start">
                       <IconButton sx={{ color: "#38598A" }}>
+                        <span className="hideContent">Search</span>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
@@ -362,7 +440,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       key={`keyword-${index}`}
                       label={keyword}
                       onDelete={() => {
-                        setKeywords(keywords.filter((kw, i) => index !== i));
+                        setKeywords(keywords.filter((_kw, i) => index !== i));
                       }}
                       color="primary"
                       sx={{
@@ -410,7 +488,7 @@ const AdvancedSearch = ({ userDetail }) => {
                   }}
                   variant="h6"
                 >
-                  Advanced Search
+                  Filter by
                 </Typography>
               </Grid>
 
@@ -501,8 +579,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="unopened"
+                          stateid={StateEnum.unopened.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.unopened.checked}
+                          checked={requestState[StateEnum.unopened.id]}
                           color="success"
                         />
                       }
@@ -514,8 +593,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="callforrecords"
+                          stateid={StateEnum.callforrecords.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.callforrecords.checked}
+                          checked={requestState[StateEnum.callforrecords.id]}
                           color="success"
                         />
                       }
@@ -527,8 +607,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="review"
+                          stateid={StateEnum.review.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.review.checked}
+                          checked={requestState[StateEnum.review.id]}
                           color="success"
                         />
                       }
@@ -540,8 +621,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="signoff"
+                          stateid={StateEnum.signoff.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.signoff.checked}
+                          checked={requestState[StateEnum.signoff.id]}
                           color="success"
                         />
                       }
@@ -553,8 +635,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="closed"
+                          stateid={StateEnum.closed.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState.closed.checked}
+                          checked={requestState[StateEnum.closed.id]}
                           color="success"
                         />
                       }
@@ -563,7 +646,6 @@ const AdvancedSearch = ({ userDetail }) => {
                   </FormGroup>
                 </Grid>
               </Grid>
-
               <Grid item xs={2} container direction="row" rowSpacing={2}>
                 <Grid item xs={12}>
                   <Typography
@@ -595,9 +677,9 @@ const AdvancedSearch = ({ userDetail }) => {
                       control={
                         <Checkbox
                           size="small"
-                          name="onTime"
+                          name="ontime"
                           onChange={handleRequestStatusChange}
-                          checked={requestStatus.onTime}
+                          checked={requestStatus.ontime}
                           color="success"
                         />
                       }
@@ -665,15 +747,16 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label" shrink>
+                    <InputLabel id="date-type-label" shrink>
                       Type of Date Range
                     </InputLabel>
                     <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
+                      labelId="date-type-label"
+                      id="date-type"
                       displayEmpty
                       value={selectedDateRangeType}
                       onChange={handleSelectedDateRangeTypeChange}
+                      inputProps={{ "aria-labelledby": "date-type-label"}}
                       input={<OutlinedInput label="Type of Date Range" notched />}
                     >
                       <MenuItem disabled value="" key="date-range-type-default">
@@ -714,7 +797,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       value={fromDate || ""}
                       InputProps={{
                         inputProps: {
-                          max: formatDate(toDate) || formatDate(new Date()),
+                          max: formatDate(toDate) || maxFromDate,
                         },
                       }}
                       onChange={(e) => setFromDate(formatDate(e.target.value))}
@@ -745,6 +828,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       InputProps={{
                         inputProps: {
                           min: formatDate(fromDate),
+                          max: maxToDate
                         },
                       }}
                       value={toDate || ""}
@@ -769,16 +853,17 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <InputLabel id="demo-multiple-checkbox-label" shrink>
+                    <InputLabel id="public-body-label" shrink>
                       Public Body
                     </InputLabel>
                     <Select
-                      labelId="demo-multiple-checkbox-label"
-                      id="demo-multiple-checkbox"
+                      labelId="public-body-label"
+                      id="public-body-checkbox"
                       multiple
                       displayEmpty
                       value={selectedPublicBodies}
                       onChange={handleSelectedPublicBodiesChange}
+                      inputProps={{ "aria-labelledby": "public-body-label"}}
                       input={<OutlinedInput label="Public Body" notched />}
                       renderValue={(selected) => {
                         if (selected.length === 0) {
@@ -853,8 +938,13 @@ const AdvancedSearch = ({ userDetail }) => {
           </Paper>
         </Grid>
       </Grid>
+      <Grid className="floatAboveEverythingLeft">
+        <Tooltip content={tooltipContentLeft} position={"bottom right"} />
+        <p className="hideContent" id="popup-6">Information1</p>
+      </Grid>
       <Grid className="floatAboveEverything">
-        <Tooltip content={tooltipContent} />
+        <Tooltip content={tooltipContentRight} />
+        <p className="hideContent" id="popup-7">Information2</p>
       </Grid>
     </>
   );

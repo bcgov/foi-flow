@@ -70,8 +70,11 @@ const API = {
 
   FOI_GET_ADVANCED_SEARCH: `${FOI_BASE_API_URL}/api/advancedsearch`,
 
-  FOI_GET_AXIS_REQUEST_IDS: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestids`,
+  FOI_CHECK_AXIS_REQUEST_ID: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestid/<axisrequestid>`,
   
-  FOI_GET_AXIS_REQUEST_DATA: `${AXIS_API_URL}/api/RequestSearch/<axisrequestid>`
+  FOI_GET_AXIS_REQUEST_DATA: `${AXIS_API_URL}/api/RequestSearch/<axisrequestid>`,
+
+  FOI_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/<usertype>/assignee`,
+  FOI_RAWREQUEST_ASSIGNEE_API:  `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/assignee`,
 };
 export default API;

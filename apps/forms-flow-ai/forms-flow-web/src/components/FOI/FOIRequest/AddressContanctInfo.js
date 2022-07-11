@@ -1,16 +1,28 @@
 import React, { memo } from "react";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
 import TextField from "@material-ui/core/TextField";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { makeStyles } from "@material-ui/core/styles";
 import * as EmailValidator from "email-validator";
 import clsx from "clsx";
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {closeContactInfo} from '../FOIRequest/utils';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
   row: {
     marginBottom: "2em",
   },
+  heading: {
+    color: '#FFF',
+    fontSize: '16px !important',
+    fontWeight: 'bold !important'
+  },
+  accordionSummary: {
+      flexDirection: 'row-reverse'
+  }
 }));
 
 const AddressContactDetails = memo(
@@ -22,6 +34,7 @@ const AddressContactDetails = memo(
     handleContanctDetailsValue,
     handleEmailValidation,
     disableInput,
+    userDetail
   }) => {
     const classes = useStyles();
     /**
@@ -97,7 +110,7 @@ const AddressContactDetails = memo(
     React.useEffect(() => {
       setFieldValues();
       const contanctDetailsObject = {
-        primaryAddress: validateFields(
+        address: validateFields(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY
         ),
@@ -110,7 +123,7 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.COUNTRY
         ),
-        postalCode: validateFields(
+        postal: validateFields(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.POSTALCODE
         ),
@@ -252,7 +265,7 @@ const AddressContactDetails = memo(
 
     //handle onchange of email and the validation
     const handleEmailChange = (e) => {
-      var emailValidation = {};
+      let emailValidation = {};
       if (e.target.value) {
         const helperText = EmailValidator.validate(e.target.value)
           ? ""
@@ -274,13 +287,14 @@ const AddressContactDetails = memo(
         e.target.value
       );
     };
-
     return (
-      <Card className="foi-details-card">
-        <label className="foi-details-label">
-          ADDRESS AND CONTACT INFORMATION
-        </label>
-        <CardContent>
+      <div className='request-accordian' id="addressContactInfo">
+      <Accordion defaultExpanded={!closeContactInfo(userDetail,requestDetails)}>
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
+          id="addressContactInfo-header">
+          <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
           <div className={clsx("row", "foi-details-row", classes.row)}>
             <div className="col-lg-6 foi-details-col">
               <TextField
@@ -447,8 +461,9 @@ const AddressContactDetails = memo(
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
+          </AccordionDetails>
+    </Accordion>
+  </div>
     );
   }
 );

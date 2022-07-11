@@ -5,6 +5,30 @@ export const setFOILoader = (data) => dispatch =>{
         payload:data
     })
 }
+export const setQueueFilter = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_FILTER,
+        payload:data
+    })
+}
+export const setQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_PARAMS,
+        payload:data
+    })
+}
+export const setShowAdvancedSearch = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,
+        payload:data
+    })
+}
+export const setAdvancedSearchParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS,
+        payload:data
+    })
+}
 export const setFOIAssignedToListLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING,
@@ -53,7 +77,7 @@ export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
         payload:data
     })
 }
-export const serviceActionError = (data) => dispatch => {
+export const serviceActionError = (_data) => dispatch => {
    //TODO update to a common file
     dispatch({
       type: FOI_ACTION_CONSTANTS.ERROR,
@@ -165,7 +189,7 @@ export const setClosingReasons = (data) => dispatch => {
         payload:data      
     })
 }
-export const clearRawRequestComments = (data) => dispatch => {
+export const clearRawRequestComments = (_data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_RAWREQUEST_COMMENTS,
         payload:{}      
@@ -212,3 +236,9 @@ export const setRequestDueDate = (data) => (dispatch) => {
   });
 };
 
+export const setResumeDefaultSorting = (data) => (dispatch) => {
+    dispatch({
+        type: FOI_ACTION_CONSTANTS.RESUME_DEFAULT_SORTING,
+        payload: data,
+    });
+};

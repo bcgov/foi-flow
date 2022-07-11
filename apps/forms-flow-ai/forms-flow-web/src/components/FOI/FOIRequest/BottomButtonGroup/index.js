@@ -18,6 +18,7 @@ import {
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { dueDateCalculation, getRequestState, returnToQueue } from "./utils";
 import { handleBeforeUnload } from "../utils";
+import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import clsx from "clsx";
 import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
@@ -60,6 +61,7 @@ const BottomButtonGroup = React.memo(
     hasStatusRequestSaved,
     disableInput,
     stateChanged,
+    setIsAddRequest,
     requestState,
     axisSyncedData,
     axisMessage
@@ -95,16 +97,19 @@ const BottomButtonGroup = React.memo(
       }
     }, [stateChanged]);
 
-    const saveRequest = async () => {
-      if (urlIndexCreateRequest > -1)
+    const saveRequest = async (setLoader = false) => {
+      if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
+        setIsAddRequest(false);
+      }      
+      dispatch(setFOILoader(setLoader))
       dispatch(
         saveRequestDetails(
           saveRequestObject,
           urlIndexCreateRequest,
           requestId,
           ministryId,
-          (err, res) => {
+          (err, res) => {            
             if (!err) {
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
@@ -241,7 +246,7 @@ const BottomButtonGroup = React.memo(
     const handleSaveModal = (value, fileInfoList) => {
       setsaveModal(false);
       if (!value) {
-        handleSaveRequest(requestState, unSavedRequest, "");
+        handleSaveRequest(requestState, true, "");
         return;
       }
 
@@ -365,7 +370,7 @@ const BottomButtonGroup = React.memo(
               [classes.btnenabled]: !isValidationError,
             })}
             disabled={isValidationError || disableInput}
-            onClick={saveRequest}
+            onClick={() => saveRequest(true)}
           >
             Save
           </button>

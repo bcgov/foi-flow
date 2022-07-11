@@ -1,7 +1,7 @@
 from .db import  db, ma
 from .default_method_result import DefaultMethodResult
 from sqlalchemy import text
-
+import logging
 class OperatingTeam(db.Model):
     __tablename__ = 'OperatingTeams' 
     # Defining the columns
@@ -14,20 +14,33 @@ class OperatingTeam(db.Model):
     @classmethod
     def getalloperatingteams(cls):
         teams = []
-        sql = """select name, type from "OperatingTeams" ot where ot.isactive = true"""
-        rs = db.session.execute(text(sql))
-        for row in rs:
-             teams.append({"name":row["name"], "type":row["type"]})
+        try:
+            sql = """select name, type from "OperatingTeams" ot where ot.isactive = true"""
+            rs = db.session.execute(text(sql))
+            for row in rs:
+                teams.append({"name":row["name"], "type":row["type"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return teams
     
     @classmethod
-    def gettype(cls, team):                
-        sql = """select type from "OperatingTeams" ot 
+    def gettype(cls, team):    
+        team_type = None
+        try:            
+            sql = """select type from "OperatingTeams" ot 
                     where replace(lower(name),' ','') = replace(:team,' ','')"""
-        rs = db.session.execute(text(sql), {'team': team})
-        for row in rs:
-            return row["type"]
-        return None
+            rs = db.session.execute(text(sql), {'team': team})
+            for row in rs:
+                team_type = row["type"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return team_type
     
 
 class OperatingTeamSchema(ma.Schema):

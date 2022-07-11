@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -49,15 +49,13 @@ export const getTabBottomText = ({
 };
 
 const getDaysRemainingText = (_daysRemaining) => {
-  return _daysRemaining > 0
+  return _daysRemaining >= 0
     ? `${_daysRemaining} Days Remaining`
     : `${Math.abs(_daysRemaining)} Days Overdue`;
 };
 
-const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
-  return _cfrDaysRemaining > 0
-    ? `CFR Due in ${_cfrDaysRemaining} Days`
-    : `Records late by ${Math.abs(_cfrDaysRemaining)} Days`;
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {  
+     return`CFR Due in ${_cfrDaysRemaining} Days`    
 };
 
 export const getExtensionsCountText = (extensions) => {
@@ -111,8 +109,6 @@ export const getTabBG = (_tabStatus, _requestState) => {
       return "foitabheadercollection foitabheaderClosedBG";
     case StateEnum.callforrecords.name:
       return "foitabheadercollection foitabheaderCFRG";
-    case StateEnum.callforrecordsoverdue.name:
-      return "foitabheadercollection foitabheaderCFROverdueBG";
     case StateEnum.redirect.name:
       return "foitabheadercollection foitabheaderRedirectBG";
     case StateEnum.review.name:
@@ -137,7 +133,7 @@ export const getTabBG = (_tabStatus, _requestState) => {
 };
 
 export const assignValue = (jsonObj, value, name) => {
-  var _obj = { ...jsonObj };
+  let _obj = { ...jsonObj };
   if (_obj[name] !== undefined) {
     _obj[name] = value;
   }
@@ -171,6 +167,37 @@ export const updateAdditionalInfo = (name, value, requestObject) => {
   return requestObject;
 };
 
+export const createAssigneeDetails = (value, value2) => {
+  const assigneeObject = {
+    assignedGroup: "",
+    assignedTo: "",
+    assignedToFirstName: "",
+    assignedToLastName: "",
+    assignedToName: ""
+  }
+  const assignedTo = value.split("|");
+      if (
+        FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(
+          (groupName) =>
+            groupName === assignedTo[0] && groupName === assignedTo[1]
+        ) || KCProcessingTeams.find((groupName) =>
+        groupName === assignedTo[0] && groupName === assignedTo[1])
+      ) {
+        assigneeObject.assignedGroup = assignedTo[0];
+        assigneeObject.assignedTo = "";
+      } else if (assignedTo.length > 3) {
+        assigneeObject.assignedGroup = assignedTo[0];
+        assigneeObject.assignedTo = assignedTo[1];
+        assigneeObject.assignedToFirstName = assignedTo[2];
+        assigneeObject.assignedToLastName = assignedTo[3];
+      } else {
+        assigneeObject.assignedGroup = "Unassigned";
+        assigneeObject.assignedTo = assignedTo[0];
+      }
+      assigneeObject.assignedToName = value2;
+      return assigneeObject;
+}
+
 export const createRequestDetailsObjectFunc = (
   requestObject,
   requiredRequestDetailsValues,
@@ -198,26 +225,12 @@ export const createRequestDetailsObjectFunc = (
       requestObject.deliveryMode = value.deliveryMode;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
-      const assignedTo = value.split("|");
-      if (
-        FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(
-          (groupName) =>
-            groupName === assignedTo[0] && groupName === assignedTo[1]
-        ) || KCProcessingTeams.find((groupName) =>
-        groupName === assignedTo[0] && groupName === assignedTo[1])
-      ) {
-        requestObject.assignedGroup = assignedTo[0];
-        requestObject.assignedTo = "";
-      } else if (assignedTo.length > 3) {
-        requestObject.assignedGroup = assignedTo[0];
-        requestObject.assignedTo = assignedTo[1];
-        requestObject.assignedToFirstName = assignedTo[2];
-        requestObject.assignedToLastName = assignedTo[3];
-      } else {
-        requestObject.assignedGroup = "Unassigned";
-        requestObject.assignedTo = assignedTo[0];
-      }
-      requestObject.assignedToName = value2;
+      const assigneeDetails = createAssigneeDetails(value, value2);
+      requestObject.assignedGroup = assigneeDetails.assignedGroup;
+      requestObject.assignedTo = assigneeDetails.assignedTo;
+      requestObject.assignedToFirstName = assigneeDetails.assignedToFirstName;
+      requestObject.assignedToLastName = assigneeDetails.assignedToLastName;
+      requestObject.assignedToName = assigneeDetails.assignedToName
       break;
     case FOI_COMPONENT_CONSTANTS.RECEIVED_DATE:
       requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
@@ -265,11 +278,11 @@ export const createRequestDetailsObjectFunc = (
 
 export const checkContactGiven = (requiredContactDetails) => {
   return (
-    (requiredContactDetails.primaryAddress === "" ||
+    (requiredContactDetails.address === "" ||
       requiredContactDetails.city === "" ||
       requiredContactDetails.province === "" ||
       requiredContactDetails.country === "" ||
-      requiredContactDetails.postalCode === "") &&
+      requiredContactDetails.postal === "") &&
     requiredContactDetails.email === ""
   );
 };
@@ -287,8 +300,7 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails,
-  isAddRequest
+  requiredAxisDetails
 ) => {
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -311,7 +323,7 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    (isAddRequest && !requiredAxisDetails.axisRequestId)
+    !requiredAxisDetails.axisRequestId
   );
 };
 
@@ -326,7 +338,7 @@ export const alertUser = (e) => {
 
 export const findRequestState = (requestStatusId) => {
   if (requestStatusId != undefined) {
-    var stateArray = Object.entries(StateEnum).find(
+    let stateArray = Object.entries(StateEnum).find(
       (value) => value[1].id === requestStatusId
     );
     return stateArray[1].name;
@@ -357,3 +369,28 @@ export  const isAxisSyncDisplayField = (field) => {
 export const isMandatoryField = (field) => {
   return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
 };
+
+export const closeApplicantDetails = (user, requestType) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
+}
+
+export const closeChildDetails = (user, requestType) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+}
+
+export const closeContactInfo = (user,requestDetails) => {
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  return !!(Object.entries(requestDetails)?.length !== 0 && (isProcessingTeam(userGroups) || isFlexTeam(userGroups)));
+}
+
+export const isValidMinistryCode = (selectedMinistry, ministriesList) => {
+  return ministriesList.some(ministry => ministry.bcgovcode === selectedMinistry)
+}
+
+export const countOfMinistrySelected = (selectedMinistryList) => {
+  return selectedMinistryList.reduce(function(n, ministry) {
+    return n + (ministry.isChecked);
+  }, 0);
+}

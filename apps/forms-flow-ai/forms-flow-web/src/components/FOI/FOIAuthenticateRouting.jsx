@@ -1,5 +1,5 @@
 import React, {useEffect}from "react";
-import { Route } from "react-router-dom";
+import { Redirect, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
 
@@ -14,7 +14,7 @@ import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
 import { isMinistryLogin } from '../../helper/FOI/helper';
 import UnAuthorized from "./UnAuthorized";
 
-//import TabbedContainer from "./TabbedContainer/TabbedContainer";
+
 const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated); 
@@ -23,7 +23,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
   useEffect(()=>{
     console.log('authenticate')
     if(props.store){
-      UserService.initKeycloak(props.store, (err, res) => {
+      UserService.initKeycloak(props.store, (_err, res) => {
         dispatch(setUserAuth(res.authenticated));
       });
     }
@@ -42,7 +42,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
           isAuthorized ? (
             <>
               <FOIHeader /> 
-              <Route exact path={["/foi", "/foi/dashboard"]}>
+              <Route exact path="/foi/dashboard">
                 {isMinistry ? 
                 <MinistryDashboard userDetail={userDetail} />
                 : <Dashboard userDetail={userDetail} />
@@ -59,6 +59,9 @@ const FOIAuthenticateRouting = React.memo((props) => {
               </Route>
               <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId">
                 <MinistryReview userDetail={userDetail} />
+              </Route>
+              <Route exact path={["/foi", "/foi/dashboard/"]}>
+                <Redirect to="/foi/dashboard"/>
               </Route>
               <FOIFooter />
             </>

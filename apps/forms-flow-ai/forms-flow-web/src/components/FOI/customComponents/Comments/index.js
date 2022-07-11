@@ -26,14 +26,14 @@ export const CommentSection = ({
   const [comments, setcomments] = useState([])
   const [filterValue, setfilterValue] = useState(-1)
   useEffect(() => {
-    var _comments = parseInt(filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    let _comments = parseInt(filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
     setcomments(_comments)  
   }, [filterValue,commentsArray])
 
   
  
   const onfilterchange = (e) => {
-    var _filterValue = parseInt(e.target.value) 
+    let _filterValue = parseInt(e.target.value) 
     setfilterValue(_filterValue)       
     setcomments([])
   }
@@ -80,12 +80,15 @@ export const CommentSection = ({
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
-            <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange} checked={filterValue === -1 ? true:false} />
-            <label htmlFor="rballcomments">All Comments</label>
-            <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
-            <label htmlFor="rbrequesthistory">Request History</label>
-            <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
-            <label htmlFor="rbusercomments">User Comments</label>
+            <fieldset>
+              <legend style={{display: 'none'}}>Filter Comments</legend>
+              <input type="radio" id="rballcomments" name="commentsfilter" value={-1} onChange={onfilterchange} checked={filterValue === -1 ? true:false} />
+              <label htmlFor="rballcomments">All Comments</label>
+              <input type="radio" id="rbrequesthistory" name="commentsfilter" value={2} onChange={onfilterchange} />
+              <label htmlFor="rbrequesthistory">Request History</label>
+              <input type="radio" id="rbusercomments" name="commentsfilter" value={1} onChange={onfilterchange} />
+              <label htmlFor="rbusercomments">User Comments</label>
+            </fieldset>
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
           //Handles Navigate Away

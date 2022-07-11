@@ -1,8 +1,9 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIProgramAreaList } from "../../../../../apiManager/services/FOI/foiMasterDataServices";
 import { fetchAdvancedSearchData } from "../../../../../apiManager/services/FOI/foiAdvancedSearchServices";
 import { errorToast } from "../../../../../helper/FOI/helper";
+import { setAdvancedSearchParams } from "../../../../../actions/FOI/foiRequestActions";
 export const ActionContext = createContext();
 ActionContext.displayName = "AdvancedSearchContext";
 export const ActionProvider = ({ children }) => {
@@ -13,14 +14,16 @@ export const ActionProvider = ({ children }) => {
   const [advancedSearchComponentLoading, setAdvancedSearchComponentLoading] =
     useState(true);
   const [searchResults, setSearchResults] = useState(null);
+  const advancedSearchParams = useSelector((state) => state.foiRequests.foiAdvancedSearchParams);
 
   const handleUpdateSearchFilter = (filterData) => {
+    dispatch(setAdvancedSearchParams(filterData))
     setQueryData({ ...(queryData || {}), ...filterData });
   };
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
+    // { field: "receivedDateUF", sort: "desc" },
   ];
 
   useEffect(() => {
@@ -57,6 +60,7 @@ export const ActionProvider = ({ children }) => {
         defaultSortModel,
         advancedSearchComponentLoading,
         setAdvancedSearchComponentLoading,
+        advancedSearchParams,
       }}
     >
       {children}

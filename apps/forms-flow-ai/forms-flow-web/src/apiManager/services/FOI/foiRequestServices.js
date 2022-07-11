@@ -10,10 +10,10 @@ import {
   setFOIRequestDetail,
   setFOIMinistryViewRequestDetail,
   clearRequestDetails,
+  clearMinistryViewRequestDetails,
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
-  setExistingAxisRequestIds
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -45,7 +45,7 @@ export const fetchFOIRequestList = () => {
 export const fetchFOIRequestListByPage = (
   page = 1,
   size = 10,
-  sort = [{ field: "currentState", sort: "desc" }],
+  sort = [{ field: "defaultSorting", sort: "asc" }],
   filters = null,
   keyword = null,
   additionalFilter = "All",
@@ -99,7 +99,7 @@ export const fetchFOIMinistryRequestList = () => {
             foiRequest.bcgovcode = foiRequest.idNumber.split("-")[0];
             return { ...foiRequest };
           });
-          dispatch(clearRequestDetails({}));
+          dispatch(clearMinistryViewRequestDetails({}));
           if (foiRequests > 0)
             dispatch(fetchFOIMinistryAssignedToList( foiRequests[0].bcgovcode.toLowerCase()));     
           dispatch(setFOIMinistryRequestList(data));
@@ -115,7 +115,7 @@ export const fetchFOIMinistryRequestList = () => {
   };
 };
 
-export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{field:'currentState', sort:'desc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
   let sortingItems = [];
   let sortingOrders = [];
   sort.forEach((item)=>{
@@ -139,7 +139,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
           UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(clearRequestDetails({}));
+          dispatch(clearMinistryViewRequestDetails({}));
           dispatch(setFOIMinistryRequestList(res.data));
           dispatch(setFOILoader(false));
           if (res.data?.data[0]?.bcgovcode)
@@ -232,7 +232,7 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId) => {
       .then((res) => {
         if (res.data) {
           const foiRequest = res.data;
-          dispatch(clearRequestDetails({}));
+          dispatch(clearMinistryViewRequestDetails({}));
           dispatch(setFOIMinistryViewRequestDetail(foiRequest));
           dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
           dispatch(setFOILoader(false));
@@ -270,7 +270,6 @@ export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, minis
     httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {
-          console.log("Request saved successfully!");
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
@@ -291,7 +290,6 @@ export const openRequestDetails = (data, ...rest) => {
       .then((res) => {
         if (res.data) {
           done(null, res.data);
-          console.log("Request opened successfully!");
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error while opening the request");
@@ -318,7 +316,6 @@ export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest)
         .then((res) => {
           if (res.data) {
             done(null, res.data);
-            console.log("Request saved successfully!");
           } else {
             dispatch(serviceActionError(res));
             throw new Error(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);            
@@ -390,15 +387,30 @@ export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
   }
 };
 
-export const fetchExistingAxisRequestIds = (...rest) => {
+export const checkDuplicateAndFetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, ...rest) => {
   const done = fnDone(rest);
-  const apiUrlgetRequestDetails = replaceUrl(API.FOI_GET_AXIS_REQUEST_IDS);
+  const apiUrlCheckAxisIdExists = replaceUrl(
+    API.FOI_CHECK_AXIS_REQUEST_ID,
+    "<axisrequestid>",
+    axisRequestId
+  );
   return (dispatch) => {
-    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+    httpGETRequest(apiUrlCheckAxisIdExists, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(setExistingAxisRequestIds(res.data));
-          done(null, res.data);
+          if(!res.data.ispresent){
+            dispatch(fetchRequestDataFromAxis(axisRequestId, isModal,requestDetails,(err, data) => {
+              if(!err)
+                done(null, data);
+              else {
+                  done(null,"Exception happened while fetching request from AXIS.");
+                  dispatch(serviceActionError(res));
+                  throw new Error(`Error in fetching request from AXIS.`);
+              }
+            }));
+          }
+          else
+            done(null,"Axis Id exists");
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching axis request ids.`);
@@ -410,7 +422,7 @@ export const fetchExistingAxisRequestIds = (...rest) => {
   }
 };
 
-export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
+export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, ...rest) => {
   const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_GET_AXIS_REQUEST_DATA,
@@ -421,10 +433,18 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal, ...rest) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          if(!isModal && Object.entries(res.data).length !== 0){
-            dispatch(setFOIRequestDetail(res.data));
+          let newRequest = res.data;
+          if(!isModal && Object.entries(newRequest).length !== 0){
+            if(Object.entries(requestDetails).length !== 0){
+              newRequest['assignedGroup'] = requestDetails['assignedGroup'];
+              newRequest['assignedTo'] = requestDetails['assignedTo'];
+              newRequest['assignedToFirstName'] = requestDetails['assignedToFirstName'];
+              newRequest['assignedToLastName'] = requestDetails['assignedToLastName'];
+              newRequest['assignedToName'] = requestDetails['assignedToName'];
+            }
+            dispatch(setFOIRequestDetail(newRequest));
           }
-          done(null, res.data);
+          done(null, newRequest);
         } else {
           done(null,"Exception happened while GET operations of request");
           dispatch(serviceActionError(res));

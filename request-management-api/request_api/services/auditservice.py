@@ -15,20 +15,20 @@ class auditservice:
 
     """
     
-    def getauditforfield(self, type, id, field, groups,isall=False):
+    def getauditforfield(self, type, id, field, isall=False):
         if field == "description":
-            return self.__getauditfordescription(type, id, groups,isall) 
+            return self.__getauditfordescription(type, id, isall) 
         else:
             return None
         
         
-    def __getauditfordescription(self, type, id, groups,isall):     
+    def __getauditfordescription(self, type, id, isall):     
         _alldescriptions = []   
         if type == "ministryrequest":
             ministryrsp = self.__getauditfromministryrequest(id)
-            _alldescriptions =  self.__getauditfromrawrequest(type, ministryrsp['foirequestid'], groups) +  ministryrsp['audit'] 
+            _alldescriptions =  self.__getauditfromrawrequest(type, ministryrsp['foirequestid']) +  ministryrsp['audit'] 
         else:
-            _alldescriptions =  self.__getauditfromrawrequest(type, id, groups)     
+            _alldescriptions =  self.__getauditfromrawrequest(type, id)     
         #Filter summary of changes
         datasummary=[]
         _data, _startdate, _enddate = None, None, None
@@ -54,7 +54,7 @@ class auditservice:
             _ministrydescriptions.append({"description": entry['description'], "fromdate": fromdate, "todate": todate, "createdat": createdat, "createdby": entry['createdby'], "status": entry['requeststatus.name']})
         return {"foirequestid" :foirequestid  , "audit":_ministrydescriptions}
     
-    def __getauditfromrawrequest(self, type, id, groups):
+    def __getauditfromrawrequest(self, type, id):
         _rawdescriptions = []
         if type == "ministryrequest":
             requestrecord  = FOIRequest().getrequest(id)

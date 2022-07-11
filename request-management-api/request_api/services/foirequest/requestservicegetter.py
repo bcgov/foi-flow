@@ -109,7 +109,7 @@ class requestservicegetter:
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
             'axisSyncDate': parse(requestministry["axissyncdate"]).strftime('%Y-%m-%d %H:%M:%S.%f') if axissyncdatenoneorempty == False else None,
-            'requestPageCount': requestministry["requestpagecount"],
+            'requestPageCount': int(requestministry["requestpagecount"]) if requestministry["requestpagecount"] is not None else 0 ,
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
@@ -146,7 +146,8 @@ class requestservicegetter:
                     "stageid": ministrydivision["stage.stageid"],
                     "stagename": ministrydivision["stage.name"],
                     "divisionDueDate": parse(ministrydivision['divisionduedate']).strftime(self.__genericdateformat()) if ministrydivision['divisionduedate'] is not None else None,
-                    "eApproval": ministrydivision["eapproval"]
+                    "eApproval": ministrydivision["eapproval"],
+                    "divisionReceivedDate": parse(ministrydivision['divisionreceiveddate']).strftime(self.__genericdateformat()) if ministrydivision['divisionreceiveddate'] is not None else None,
                     } 
                 divisions.append(division) 
         return divisions

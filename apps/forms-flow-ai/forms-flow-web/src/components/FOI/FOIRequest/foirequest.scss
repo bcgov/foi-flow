@@ -40,6 +40,11 @@
     
 }
 
+.foi-breadcrumb {
+    margin-top: 15px !important;
+    background-color: white !important;
+}
+
 .foi-details-card {
     margin-top: 50px;
     box-shadow: none !important;
@@ -48,7 +53,7 @@
 }
 .foi-details-label {
    // font-family: "BCSans-Regular", sans-serif;
-    color: grey;
+    color: #000 !important;
     padding-left: 15px;
 
 }
@@ -105,4 +110,51 @@ height: fit-content;
     width: 179px;
     font-size: 16px;
     font-weight: bold;
+}
+
+.dialog-close-button {
+    display: none;
+}
+
+.remaining-days-alert {
+    font-size: 15px;
+    font-weight: bolder;
+    padding-bottom: 1rem;
+}
+
+.request-accordian {
+
+    .MuiAccordion-root {       
+        border: #003366 1px solid;
+        margin-top: 30px !important;
+        margin-bottom: 30px !important;
+        background-color: #FFFFFF !important; 
+    }
+
+    .MuiAccordionDetails-root {
+        padding: 16px !important;
+        display: block !important;
+    }
+
+    .MuiAccordionSummary-root {
+        background-color: #003366 !important;  
+    }
+
+    .MuiIconButton-edgeEnd{
+        margin-right: 0px !important;
+    }
+
+    > div > div > div > .MuiIconButton-label {
+        color: white !important;
+    }
+
+    .MuiAccordionSummary-content.Mui-expanded {
+        margin: 0px !important;
+    }
+}
+
+.request-scrollbar-height {
+    &::-webkit-scrollbar-track {
+        margin-top: 105px !important;
+    }
 }

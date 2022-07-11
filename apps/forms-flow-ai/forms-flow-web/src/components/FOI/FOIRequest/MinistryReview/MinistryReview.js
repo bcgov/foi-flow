@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Chip from "@mui/material/Chip";
 import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
 import '../FOIRequestHeader/foirequestheader.scss'
@@ -7,6 +9,7 @@ import "./MinistryReviewTabbedContainer.scss";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import { push } from "connected-react-router";
 import {  
   fetchFOIMinistryViewRequestDetails,
   fetchFOIRequestDescriptionList
@@ -41,8 +44,9 @@ import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConst
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
-import { getMinistryBottomTextMap, alertUser } from "./utils";
+import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
+import HomeIcon from '@mui/icons-material/Home';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -158,7 +162,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
-  }, [requestId]);
+  }, [requestId, ministryId, comment, attachments]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] =
@@ -169,6 +173,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     React.useState(requestDetails);
 
   const [divstages, setdivStages] = React.useState([]);
+  const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -186,7 +191,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
-
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
@@ -221,47 +225,27 @@ const MinistryReview = React.memo(({ userDetail }) => {
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    hasincompleteDivstage;
+    hasincompleteDivstage || !hasReceivedDate;
 
-  const createMinistryRequestDetailsObject = (
-    requestObject,
-    propName,
-    value
-  ) => {
-    // requestDetails.
-    if (propName === FOI_COMPONENT_CONSTANTS.MINISTRY_ASSIGNED_TO) {
-      const assignedToValue = value.split("|");
-      if (
-        assignedToValue.length > 1 &&
-        assignedToValue[0] &&
-        assignedToValue[1] &&
-        assignedToValue[2] &&
-        assignedToValue[3]
-      ) {
-        requestObject.assignedministrygroup = assignedToValue[0];
-        requestObject.assignedministryperson = assignedToValue[1];
-        requestObject.assignedministrypersonFirstName = assignedToValue[2];
-        requestObject.assignedministrypersonLastName = assignedToValue[3];
-      }
-    }
-  };
-
-  const createMinistrySaveRequestObject = (propName, value, value2) => {
+  const createMinistrySaveRequestObject = (_propName, _value, _value2) => {
     const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
-    createMinistryRequestDetailsObject(requestObject, propName, value);
     setSaveMinistryRequestObject(requestObject);
   };
+
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    setUnSavedRequest(_unSaved);
     if (!_unSaved && ministryId && requestId) {
+      setUnSavedRequest(_unSaved);
+      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+      dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        window.location.href = `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`;
+        dispatch(push(`/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`))
+        dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -280,7 +264,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setcurrentrequestStatus("");
   };
 
-  var foitabheaderBG;
+  let foitabheaderBG;
   const classes = useStyles();
 
   switch (_tabStatus) {
@@ -291,11 +275,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       foitabheaderBG = "foitabheadercollection foitabheaderClosedBG";
       break;
     case StateEnum.callforrecords.name:
-      if (_cfrDaysRemaining < 0) {
-        foitabheaderBG = "foitabheadercollection foitabheaderCFROverdueBG";
-      } else {
-        foitabheaderBG = "foitabheadercollection foitabheaderCFRG";
-      }
+      foitabheaderBG = "foitabheadercollection foitabheaderCFRG";
       break;
     case StateEnum.redirect.name:
       foitabheaderBG = "foitabheadercollection foitabheaderRedirectBG";
@@ -433,6 +413,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         handleStateChange={handleStateChange}
         isMinistryCoordinator={true}
         isValidationError={isValidationError}
+        requestType={requestDetails?.requestType}
       />
     );
 
@@ -451,8 +432,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
         existingDivStages={divisions}
         ministrycode={ministrycode}
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
+        requestStartDate = {requestDetails?.requestProcessStart}
+        setHasReceivedDate={setHasReceivedDate}
       />
     );
+
+  
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
   return !isLoading &&
     requestDetails &&
@@ -462,10 +448,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1>
-              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
-            </h1>
+            <a href="/foi/dashboard" aria-label="dashboard link"><i className='fa fa-home' style={{fontSize:"45px", color: "white"}}></i></a>
           </div>
+          <h4 className="foileftpanelrequestno">{getHeaderText(requestDetails)}</h4>
           <div className="foileftpaneldropdown">{stateBox}</div>
 
           <div className="tab">
@@ -509,7 +494,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               condition={!hideBottomText.includes(requestState?.toLowerCase())}
             >
               {Array.from(bottomTextMap.values()).map((value) => (
-                <h4>{value}</h4>
+                <div className='remaining-days-alert'>{value}</div>
               ))}
             </ConditionalComponent>
           </div>
@@ -529,6 +514,28 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   className={`${classes.root} foi-request-form`}
                   autoComplete="off"
                 >
+
+                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                      {showAdvancedSearch &&
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />
+                      }
+                      {!showAdvancedSearch &&
+                        <Chip
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />
+                      }
+                      <Chip
+                        label={getHeaderText(requestDetails)}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                    </Breadcrumbs>
                   {Object.entries(requestDetails).length > 0 &&
                     requestDetails !== undefined && (
                       <>
@@ -538,8 +545,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           handleMinistryAssignedToValue={
                             handleMinistryAssignedToValue
                           }
-                          createMinistrySaveRequestObject={
-                            createMinistrySaveRequestObject
+                          setSaveMinistryRequestObject={
+                            setSaveMinistryRequestObject
                           }
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
@@ -614,7 +621,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
           >
             {!isLoading &&
             requestNotes &&
-            iaoassignedToList.length > 0 &&
+            iaoassignedToList.length > 0 ||
             ministryAssignedToList.length > 0 ? (
               <>
                 <CommentSection

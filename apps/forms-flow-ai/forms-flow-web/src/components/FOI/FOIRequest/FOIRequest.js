@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Chip from "@mui/material/Chip";
 import './foirequest.scss';
 import FOIRequestHeader from './FOIRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -10,7 +12,6 @@ import RequestDescriptionBox from './RequestDescriptionBox';
 import RequestDetails from "./RequestDetails";
 import ExtensionDetails from "./ExtensionDetails";
 import AdditionalApplicantDetails from './AdditionalApplicantDetails';
-import RequestNotes from './RequestNotes';
 import BottomButtonGroup from './BottomButtonGroup';
 import { useParams } from 'react-router-dom';
 import {
@@ -25,7 +26,6 @@ import {
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
-  fetchExistingAxisRequestIds,
   fetchRequestDataFromAxis
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
@@ -42,7 +42,7 @@ import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
-import { getAssignedTo } from "./FOIRequestHeader/utils";
+import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
 import {
   getTabBottomText,
   confirmChangesLost,
@@ -62,6 +62,7 @@ import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
+import HomeIcon from '@mui/icons-material/Home';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -93,7 +94,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
-  const isAddRequest = urlIndexCreateRequest > -1;
+  const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
   //gets the request detail from the store
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -114,10 +115,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const disableInput =
     requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  var foitabheaderBG = getTabBG(_tabStatus, requestState);
-  var foiAxisRequestIds = useSelector(
-    (state) => state.foiRequests.foiAxisRequestIds
-  );
+  let foitabheaderBG = getTabBG(_tabStatus, requestState);
+
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
@@ -163,12 +162,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
+  const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));  
+  document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
     }
-    dispatch(fetchExistingAxisRequestIds());
   }, []);
 
   const dispatch = useDispatch();
@@ -197,43 +197,22 @@ const FOIRequest = React.memo(({ userDetail }) => {
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
-      var requestStateFromId = findRequestState(requestDetails.requeststatusid)
+      let requestStateFromId = findRequestState(requestDetails.requeststatusid)
         ? findRequestState(requestDetails.requeststatusid)
         : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
-      if(requestDetails.axisRequestId){
-        dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, true, (err, data) => {
-          if(!err){
-            if(typeof(data) !== "string" && Object.entries(data).length > 0){
-              setAxisSyncedData(data);
-              var axisDataUpdated = checkIfAxisDataUpdated(data);
-              if(axisDataUpdated){
-                setCheckExtension(false);
-                setAxisMessage("WARNING");
-              }
-            }
-            else if(data){
-              let responseMsg = data;
-              responseMsg+='';
-              if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
-                setAxisMessage("ERROR");
-            }
-            
-          }
-          else
-            setAxisMessage("ERROR");
-
-        }));
-      }
+      setHeaderText(getHeaderText({requestDetails, ministryId, requestState}));
+      if(requestDetails.axisRequestId)
+        axisBannerCheck();
     }
   }, [requestDetails]);
 
 
   useEffect(() => {
     if(checkExtension && Object.entries(axisSyncedData).length !== 0){
-      var axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
+      let axisDataUpdated = extensionComparison(axisSyncedData, 'Extensions');
       if(axisDataUpdated)
         setAxisMessage("WARNING");
       else
@@ -241,10 +220,35 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [axisSyncedData, requestExtensions, checkExtension]);
 
+  const axisBannerCheck = () =>{
+    dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
+      if(!err){
+        if(typeof(data) !== "string" && Object.entries(data).length > 0){
+          setAxisSyncedData(data);
+          let axisDataUpdated = checkIfAxisDataUpdated(data);
+          if(axisDataUpdated){
+            setCheckExtension(false);
+            setAxisMessage("WARNING");
+          }
+          else
+            setAxisMessage("");
+        }
+        else if(data){
+          let responseMsg = data;
+          responseMsg+='';
+          if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+            setAxisMessage("ERROR");
+        }
+      }
+      else
+        setAxisMessage("ERROR");
+    }));
+  }
+
   const checkIfAxisDataUpdated = (axisData) => {
-    var updateNeeded= false;
+    let updateNeeded= false;
     for(let key of Object.keys(axisData)){
-      var updatedField = isAxisSyncDisplayField(key);
+      let updatedField = isAxisSyncDisplayField(key);
       if(key !== 'Extensions' && updatedField)
         updateNeeded= checkValidation(key, axisData);
       if(updateNeeded){
@@ -255,7 +259,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const checkValidation = (key,axisData) => {
-    var mandatoryField = isMandatoryField(key);
+    let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
       let foiReqAdditionalPersonalInfo = requestDetails[key];
       let axisAdditionalPersonalInfo = axisData[key];
@@ -290,18 +294,18 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
       
     if(requestExtensions.length > 0 && axisData[key].length > 0){
-      axisData[key].forEach(axisObj => {
-        requestExtensions?.forEach(foiReqObj => {
+      for(let axisObj of axisData[key]){
+        for(let foiReqObj of requestExtensions){
           if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
             if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
               axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
               axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
               !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
-              return true;
+                return true;
             }
           }
-        })
-      });
+        }
+      }
     }
     else{
       if(axisData[key]?.length > 0)
@@ -336,11 +340,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const requiredContactDetailsValue = {
-    primaryAddress: "",
+    address: "",
     city: "",
     province: "",
     country: "",
-    postalCode: "",
+    postal: "",
   };
 
   const requiredAxisDetailsValue = {
@@ -448,8 +452,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     validation,
     assignedToValue,
     requiredRequestDetailsValues,
-    requiredAxisDetails,
-    isAddRequest
+    requiredAxisDetails
   );
 
   const classes = useStyles();
@@ -467,9 +470,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const createSaveRequestObject = (name, value, value2) => {
     let requestObject = { ...saveRequestObject };
-    setUnSavedRequest(
-      name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
-    );
+    if(name !== 'assignedTo'){
+      setUnSavedRequest(
+        name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
+      );  
+    }
 
     requestObject = createRequestDetailsObject(
       requestObject,
@@ -481,21 +486,19 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
+
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    setUnSavedRequest(_unSaved);
 
     if (!_unSaved) {
+      setUnSavedRequest(_unSaved);
+      dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
+      dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        const redirectUrl = getRedirectAfterSaveUrl(ministryId, requestId);
-
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-        } else {
-          dispatch(push(`/foi/reviewrequest/${id}`));
-        }
+        dispatch(push(getRedirectAfterSaveUrl(ministryId, id || requestId)));
+        dispatch(fetchFOIRequestNotesList(id || requestId, ministryId));
       }, 1000);
     } else {
       setUpdateStateDropdown(!updateStateDropDown);
@@ -505,8 +508,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handleOpenRequest = (parendId, _ministryId, unSaved) => {
-    setUnSavedRequest(unSaved);
     if (!unSaved) {
+      setUnSavedRequest(unSaved);
       setStateChanged(false);
       setcurrentrequestStatus(StateEnum.open.name);
 
@@ -526,9 +529,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining) => {
-    if (_status === StateEnum.callforrecords.name && _cfrDaysRemaining < 0) {
-      settabStatus(StateEnum.callforrecordsoverdue.name);
-    }
 
     const mappedBottomText = getTabBottomText({
       _daysRemaining,
@@ -601,9 +601,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const userId = userDetail?.preferred_username;
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random";
-  var lastName = "",
+  let lastName = "",
     firstName = "";
-
   if (userDetail) {
     firstName = userDetail.given_name;
     lastName = userDetail.family_name;
@@ -628,19 +627,31 @@ const FOIRequest = React.memo(({ userDetail }) => {
   );
 
   const stateTransition = requestDetails?.stateTransition;
+  
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
+
+  const disableBannerForClosed = () => {
+   if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase())){
+      if(axisMessage === "WARNING")
+        setAxisMessage("");
+      return true;
+    }
+    return false;
+  }
 
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
     isAddRequest ? (
-    <div className="foiformcontent">
+    <div className={`foiformcontent ${axisMessage === "WARNING" && !disableBannerForClosed() && 'request-scrollbar-height'}`}>
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <h1>
-              <a href="/foi/dashboard"><i className='fa fa-home' style={{fontSize:"45px"}}></i></a>
-            </h1>
+            <a href="/foi/dashboard" aria-label="dashboard link">
+              <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
+            </a>
           </div>
+          <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
               requestState={requestState}
@@ -650,6 +661,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               handleStateChange={handleStateChange}
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
+              requestType={requestDetails?.requestType}
             />
           </div>
 
@@ -696,12 +708,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
-                return <h4>{text}</h4>;
+                return <div className='remaining-days-alert'>{text}</div>;
               })}
           </div>
         </div>
         <div className="foitabpanelcollection">
-        { requestState !== StateEnum.intakeinprogress.name &&
+        { requestState !== StateEnum.intakeinprogress.name && !disableBannerForClosed() &&
           <AxisMessageBanner axisMessage= {axisMessage} requestDetails={requestDetails}/>
         }
           <div
@@ -724,28 +736,51 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       isAddRequest
                     }
                   >
+                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                      {showAdvancedSearch &&
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />
+                      }
+                      {!showAdvancedSearch &&
+                        <Chip
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                        />
+                      }
+                      <Chip
+                        label={headerText}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                    </Breadcrumbs>
                     <>
                       <FOIRequestHeader
                         headerValue={headerValue}
+                        headerText={headerText}
                         requestDetails={requestDetails}
                         handleAssignedToValue={handleAssignedToValue}
                         createSaveRequestObject={createSaveRequestObject}
                         handlestatusudpate={handlestatusudpate}
                         userDetail={userDetail}
                         disableInput={disableInput}
+                        isAddRequest={isAddRequest}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
                         <AxisDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          foiAxisRequestIds={foiAxisRequestIds}
                           handleAxisDetailsInitialValue={
                             handleAxisDetailsInitialValue
                           }
                           handleAxisDetailsValue={handleAxisDetailsValue}
                           handleAxisIdValidation={handleAxisIdValidation}
                           setAxisMessage={setAxisMessage}
+                          saveRequestObject={saveRequestObject}
                         />
                       )}
                       <ApplicantDetails
@@ -760,6 +795,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         }
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
+                        userDetail={userDetail}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -770,7 +806,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                             }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput}
-                          />
+                            userDetail={userDetail}
+                            requestType={
+                              requestDetails?.requestType
+                            }                          />
                           <OnBehalfOfDetails
                             additionalInfo={
                               requestDetails.additionalPersonalInfo
@@ -791,6 +830,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handleContanctDetailsValue={handleContanctDetailsValue}
                         disableInput={disableInput}
                         handleEmailValidation={handleEmailValidation}
+                        userDetail={userDetail}
                       />
 
                       <RequestDescriptionBox
@@ -840,7 +880,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
-                      <RequestNotes />
 
                       <BottomButtonGroup
                         stateChanged={stateChanged}
@@ -855,6 +894,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         disableInput={disableInput}
                         requestState={requestState}
                         setSaveRequestObject={setSaveRequestObject}
+                        setIsAddRequest={setIsAddRequest}
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
                       />

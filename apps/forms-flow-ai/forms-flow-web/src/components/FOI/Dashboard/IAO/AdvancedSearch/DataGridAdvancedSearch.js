@@ -1,27 +1,29 @@
-import React, { useEffect, useContext } from "react";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from '@mui/x-data-grid';
-import Pagination from '@mui/material/Pagination';
+import React, { useEffect, useContext, useState } from "react";
+import { DataGrid } from '@mui/x-data-grid';
 import "../../dashboard.scss";
 import useStyles from "../../CustomStyle";
-import { useDispatch, useSelector } from "react-redux";
-import { push } from "connected-react-router";
+import { useSelector, useDispatch } from "react-redux";
 import Loading from "../../../../../containers/Loading";
 import Grid from "@mui/material/Grid";
 import {
-  getAssigneeValue,
   updateSortModel,
   getFullName,
-  getLDD,
   getDaysLeft,
+  getReceivedDate,
+  // onBehalfFullName,
+  getRecordsDue
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
-import { ConditionalComponent } from "../../../../../helper/FOI/helper";
+import {
+  ConditionalComponent,
+  isProcessingTeam,
+  isFlexTeam,
+  isIntakeTeam,
+} from "../../../../../helper/FOI/helper";
+import clsx from "clsx";
+import Link from "@mui/material/Link";
+import { push } from "connected-react-router";
+import { CustomFooter } from "../../CustomFooter"
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -33,22 +35,320 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     queryData,
     setSearchLoading,
     advancedSearchComponentLoading,
+    advancedSearchParams,
   } = useContext(ActionContext);
 
-  const assignedToList = useSelector(
-    (state) => state.foiRequests.foiFullAssignedToList
-  );
+  const user = useSelector((state) => state.user.userDetail);
 
+  const hyperlinkRenderCell = (params) => {
+    let link;
+    if (params.row.ministryrequestid) { 
+      link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    } else {
+      link = "./reviewrequest/" + params.row.id;
+    }
+    return (
+      <Link href={link} onClick={e => renderReviewRequest(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link>
+    )
+  };
+  
+  const renderReviewRequest = (e, row) => {
+    e.preventDefault()
+    if (row.ministryrequestid) {
+      dispatch(
+        push(
+          `/foi/foirequests/${row.id}/ministryrequest/${row.ministryrequestid}`
+        )
+      );
+    } else {
+      dispatch(push(`/foi/reviewrequest/${row.id}`));
+    }
+  };
+
+  const ProcessingTeamColumns = [
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      width: 160,
+    },
+    {
+      field: "applicantName",
+      headerName: "APPLICANT NAME",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
+      width: 180,
+    },
+    {
+      field: "onBehalfFormatted",
+      headerName: "ON BEHALF",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      // valueGetter: onBehalfFullName,
+      // sortable: false,
+      width: 180,
+    },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 0.75,
+    },
+    {
+      field: "applicantcategory",
+      headerName: "CATEGORY",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "currentState",
+      headerName: "CURRENT STATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "assignedToFormatted",
+      headerName: "ASSIGNED TO",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "DaysLeftValue",
+      headerName: "DAYS LEFT",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getDaysLeft,
+      flex: 0.75,
+      // sortable: false,
+    },
+    {
+      field: "extensions",
+      headerName: "EXT.",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 0.5,
+      // sortable: false,
+      valueGetter: (params) =>
+        params.row.extensions === undefined ? "N/A" : params.row.extensions,
+    },
+    {
+      field: "requestPageCount",
+      headerName: "PAGES",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 0.5,
+    },
+  ];
+  
+  const IntakeTeamColumns = [
+    {
+      field: "applicantName",
+      headerName: "APPLICANT NAME",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
+      width: 180,
+    },
+    {
+      field: "requestType",
+      headerName: "REQUEST TYPE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "currentState",
+      headerName: "CURRENT STATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "assignedToFormatted",
+      headerName: "ASSIGNED TO",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "receivedDate",
+      headerName: "RECEIVED DATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getReceivedDate,
+      flex: 1,
+    },
+    {
+      field: "receivedDateUF",
+      headerName: "",
+      width: 0,
+      hide: true,
+      renderCell: (_params) => <span></span>,
+    },
+  ];
+  
+  const FlexTeamColumns = [
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      width: 160,
+    },
+    {
+      field: "applicantName",
+      headerName: "APPLICANT NAME",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        getFullName(params.row.firstName, params.row.lastName),
+      width: 180,
+    },
+    {
+      field: "applicantcategory",
+      headerName: "CATEGORY",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "currentState",
+      headerName: "CURRENT STATE",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "assignedToFormatted",
+      headerName: "ASSIGNED TO",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    },
+    {
+      field: "cfrduedate",
+      headerName: "CFR DUE",
+      flex: 1,
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getRecordsDue,
+    },
+    {
+      field: "DaysLeftValue",
+      headerName: "DAYS LEFT",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getDaysLeft,
+      flex: 0.75,
+      // sortable: false,
+    },
+  ];
+  
+  const defaultTableInfo = {
+    columns: IntakeTeamColumns,
+    sort: [
+      { field: "currentState", sort: "desc" },
+      // { field: "receivedDateUF", sort: "desc" },
+    ],
+    stateClassName: {
+      open: "flex-open",
+    },
+  };
+  
+  const getTableInfo = (userGroups) => {
+    if (!userGroups || isIntakeTeam(userGroups)) {
+      return defaultTableInfo;
+    }
+  
+    if (isProcessingTeam(userGroups)) {
+      return {
+        columns: ProcessingTeamColumns,
+        sort: [
+          { field: "currentState", sort: "desc" },
+          // { field: "receivedDateUF", sort: "desc" },
+        ],
+      };
+    }
+  
+    if (isFlexTeam(userGroups)) {
+      return {
+        columns: FlexTeamColumns,
+        sort: [
+          { field: "currentState", sort: "desc" },
+          // { field: "receivedDateUF", sort: "desc" },
+        ],
+        stateClassName: {
+          open: "flex--open",
+        },
+      };
+    }
+  
+    return defaultTableInfo;
+  };
+  const tableInfo = getTableInfo(user.groups);
+  
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = React.useState(defaultRowsState);
+  const defaultRowsState = { page: 0, pageSize: 100 };
+  const [rowsState, setRowsState] = useState(
+    Object.keys(advancedSearchParams).length > 0 ? 
+      {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 
+      defaultRowsState
+  );
 
   const defaultSortModel = [
     { field: "currentState", sort: "desc" },
-    { field: "receivedDateUF", sort: "desc" },
+    // { field: "receivedDateUF", sort: "desc" },
   ];
-  const [sortModel, setSortModel] = React.useState(defaultSortModel);
+  const [sortModel, setSortModel] = useState(advancedSearchParams?.sort || defaultSortModel);
 
   useEffect(() => {
     if (searchResults) {
@@ -63,67 +363,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   }, [rowsState, sortModel]);
 
-  const columns = React.useRef([
-    {
-      field: "applicantName",
-      headerName: "APPLICANT NAME",
-      flex: 1,
-      headerAlign: "left",
-      valueGetter: (params) =>
-        getFullName(params.row.firstName, params.row.lastName),
-    },
-    {
-      field: "requestType",
-      headerName: "REQUEST TYPE",
-      flex: 1,
-      headerAlign: "left",
-    },
-    {
-      field: "axisRequestId",
-      headerName: "ID NUMBER",
-      flex: 1,
-      headerAlign: "left",
-    },
-    {
-      field: "currentState",
-      headerName: "CURRENT STATE",
-      headerAlign: "left",
-      flex: 1,
-    },
-    {
-      field: "assignedToFormatted",
-      headerName: "ASSIGNED TO",
-      flex: 1,
-      headerAlign: "left",
-    },
-    {
-      field: "DueDateValue",
-      headerName: "LDD",
-      flex: 1,
-      headerAlign: "left",
-      valueGetter: getLDD,
-    },
-    {
-      field: "DaysLeftValue",
-      headerName: "DAYS LEFT",
-      flex: 0.5,
-      headerAlign: "left",
-      valueGetter: getDaysLeft,
-    },
-    { field: "xgov", headerName: "XGOV", flex: 0.5, headerAlign: "left" },
-  ]);
-
-  const renderReviewRequest = (e) => {
-    if (e.row.ministryrequestid) {
-      dispatch(
-        push(
-          `/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
-        )
-      );
-    } else {
-      dispatch(push(`/foi/reviewrequest/${e.row.id}`));
-    }
-  };
+  const columnsRef = React.useRef(tableInfo?.columns || []);
 
   if (advancedSearchComponentLoading && queryData) {
     return (
@@ -146,38 +386,46 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         <Grid item xs={12}>
           <h4 className="foi-request-queue-text">Search Results</h4>
         </Grid>
-        <Grid item xs={12} style={{ height: 450 }}>
+        <Grid item xs={12} style={{ minHeight: 300 }}>
           <DataGrid
+            autoHeight
             className="foi-data-grid"
             getRowId={(row) => row.idNumber}
-            rows={searchResults?.data}
-            columns={columns.current}
+            rows={searchResults?.data || []}
+            columns={columnsRef?.current}
             rowHeight={30}
             headerHeight={50}
             rowCount={searchResults?.meta?.total || 0}
             pageSize={rowsState.pageSize}
-            rowsPerPageOptions={[10]}
+            // rowsPerPageOptions={[10]}
             hideFooterSelectedRowCount={true}
             disableColumnMenu={true}
             pagination
             paginationMode="server"
-            onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-            onPageSizeChange={(pageSize) =>
-              setRowsState((prev) => ({ ...prev, pageSize }))
+            initialState={{
+              pagination: rowsState
+            }}
+            onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+            onPageSizeChange={(newpageSize) =>
+              setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Pagination: CustomPagination,
+              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
             sortingMode={"server"}
             onSortModelChange={(model) => setSortModel(model)}
             getRowClassName={(params) =>
-              `super-app-theme--${params.row.currentState
-                .toLowerCase()
-                .replace(/ +/g, "")}`
+              clsx(
+                `super-app-theme--${params.row.currentState
+                  .toLowerCase()
+                  .replace(/ +/g, "")}`,
+                tableInfo?.stateClassName?.[
+                  params.row.currentState.toLowerCase().replace(/ +/g, "")
+                ]
+              )
             }
-            onRowClick={renderReviewRequest}
             loading={searchLoading}
           />
         </Grid>
@@ -185,19 +433,5 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     </ConditionalComponent>
   );
 };
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
 
 export default DataGridAdvancedSearch;

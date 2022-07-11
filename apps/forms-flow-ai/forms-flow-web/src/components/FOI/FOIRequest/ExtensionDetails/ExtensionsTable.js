@@ -13,6 +13,7 @@ import Popover from "@material-ui/core/Popover";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import { extensionStatusId } from "../../../../constants/FOI/enum";
+import { StateEnum } from "../../../../constants/FOI/statusEnum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,6 +41,7 @@ const ExtensionsTable = ({ showActions = true }) => {
     setSaveModalOpen,
     setDeleteModalOpen,
     setExtensionId,
+    requestState
   } = useContext(ActionContext);
 
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -133,24 +135,13 @@ const ExtensionsTable = ({ showActions = true }) => {
             <TableCell className={classes.columnLabel}>DAYS</TableCell>
             <TableCell className={classes.columnLabel}>NEW DUE DATE</TableCell>
             <TableCell className={classes.columnLabel}>STATUS</TableCell>
-            <ConditionalTableCell
+            <ConditionalTableCell className={classes.columnLabel}
               condition={showActions}
-            ></ConditionalTableCell>
+            >ACTIONS</ConditionalTableCell>
           </TableRow>
         </TableHead>
         <ConditionalTableBody empty={!extensions || extensions.length < 1}>
-          {extensions
-            .sort((extensionA, extensionB) => {
-              if (!extensionA.extendedduedate || !extensionB.extendedduedate) {
-                return 0;
-              } else {
-                return (
-                  new Date(extensionB.extendedduedate) -
-                  new Date(extensionA.extendedduedate)
-                );
-              }
-            })
-            .map((extension, index) => {
+          {extensions.map((extension, index) => {
               return (
                 <TableRow key={`extenstion-row-${index}`} hover>
                   <TableCell>{extension.extensionreson}</TableCell>
@@ -163,6 +154,7 @@ const ExtensionsTable = ({ showActions = true }) => {
                   <TableCell>{extension.extensionstatus}</TableCell>
                   <ConditionalTableCell condition={showActions}>
                     <IconButton
+                      aria-label= "actions"
                       id={`ellipse-icon-${index}`}
                       key={`ellipse-icon-${index}`}
                       color="primary"
@@ -174,8 +166,9 @@ const ExtensionsTable = ({ showActions = true }) => {
                         setExtensionId(extension.foirequestextensionid);
                       }}
                       disabled={
-                        index > 0 &&
-                        extension.extensionstatus !== extensionStatusId.pending
+                        (index > 0 &&
+                        extension.extensionstatus !== extensionStatusId.pending) || requestState?.toLowerCase() ===  StateEnum.onhold.name.toLowerCase() || 
+                        requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase()
                       }
                     >
                       <MoreHorizIcon />

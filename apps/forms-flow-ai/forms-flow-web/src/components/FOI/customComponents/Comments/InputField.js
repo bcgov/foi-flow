@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect} from 'react'
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
 import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
@@ -45,7 +45,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
 
   // Check editor text for mentions
   const onSearchChange = ({ value }) => {      
-    var filterlist = mentionList.filter(function(item){      
+    let filterlist = mentionList.filter(function(item){      
       return (item.firstname?.indexOf(value?.toLowerCase()) === 0 || item.lastname?.indexOf(value?.toLowerCase()) === 0)
     }).sort(namesort)        
     if(filterlist?.length >0 )    
@@ -302,7 +302,10 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             disabled={uftext.trim().length === 0}
           >
             {' '}
-            <FontAwesomeIcon disabled={uftext.trim().length === 0} icon={faPaperPlane} size='2x' color={uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'} />
+            <svg aria-hidden="true" aria-describedby="postComment" focusable="false" data-prefix="fas" data-icon="paper-plane" class="svg-inline--fa fa-paper-plane fa-w-16 fa-2x " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" disabled={uftext.trim().length === 0} color={uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'}>
+              <title id="postComment" style={{display: 'none'}}>Post Comment</title>
+              <path fill="currentColor" d="M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z"></path>
+            </svg>
           </button>
         </div>
       </div>

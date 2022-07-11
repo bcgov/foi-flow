@@ -1,18 +1,12 @@
-import React, { useEffect, useState, useMemo } from "react";
-import {
-  DataGrid,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
-} from "@mui/x-data-grid";
-import Pagination from "@mui/material/Pagination";
+import React, { useEffect, useMemo } from "react";
+import { DataGrid } from "@mui/x-data-grid";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
+import { setQueueFilter, setQueueParams } from "../../../../actions/FOI/foiRequestActions";
 import {
   debounce,
   ClickableChip,
@@ -26,6 +20,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import clsx from "clsx";
+import { CustomFooter } from "../CustomFooter"
 
 const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
@@ -37,25 +32,26 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 10 };
-  const [rowsState, setRowsState] = useState(defaultRowsState);
-  const [sortModel, setSortModel] = useState(tableInfo.sort);
+  const filterFields = [
+    "firstName",
+    "lastName",
+    "requestType",
+    "idNumber",
+    "axisRequestId",
+    "currentState",
+    "assignedToLastName",
+    "assignedToFirstName",
+  ];
+
+  const queueParams = useSelector((state) => state.foiRequests.queueParams);
+  const rowsState = useSelector((state) => state.foiRequests.queueParams.rowsState);
+  const sortModel = useSelector((state) => state.foiRequests.queueParams.sortModel || tableInfo.sort);
 
   let serverSortModel;
-  const [filterModel, setFilterModel] = useState({
-    fields: [
-      "firstName",
-      "lastName",
-      "requestType",
-      "idNumber",
-      "axisRequestId",
-      "currentState",
-      "assignedToLastName",
-      "assignedToFirstName",
-    ],
-    keyword: null,
-  });
-  const [requestFilter, setRequestFilter] = useState("myRequests");
+
+
+  const keyword = useSelector((state) => state.foiRequests.queueParams.keyword);
+  const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
@@ -65,13 +61,13 @@ const Queue = ({ userDetail, tableInfo }) => {
         rowsState.page + 1,
         rowsState.pageSize,
         serverSortModel,
-        filterModel.fields,
-        filterModel.keyword,
+        filterFields,
+        keyword,
         requestFilter,
         userDetail.preferred_username
       )
     );
-  }, [rowsState, sortModel, filterModel, requestFilter]);
+  }, [rowsState, sortModel, keyword, requestFilter]);
 
   const columnsRef = React.useRef(tableInfo?.columns || []);
 
@@ -79,14 +75,16 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (filter === requestFilter) {
       return;
     }
-    setRowsState(defaultRowsState);
-    setRequestFilter(filter);
+    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
+    dispatch(setQueueFilter(filter));
   };
 
   const setSearch = debounce((e) => {
-    var keyword = e.target.value;
-    setFilterModel((prev) => ({ ...prev, keyword }));
-    setRowsState(defaultRowsState);
+    dispatch(setQueueParams({
+      ...queueParams,
+      keyword: e.target.value.trim(),
+      rowsState: {...rowsState, page: 0}
+    }));
   }, 500);
 
   const rows = useMemo(() => {
@@ -117,8 +115,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (model.length === 0) {
       return;
     }
-
-    setSortModel(model);
+    dispatch(setQueueParams({...queueParams, sortModel: model}));
   };
 
   return (
@@ -149,9 +146,11 @@ const Queue = ({ userDetail, tableInfo }) => {
               backgroundColor: "rgba(56,89,138,0.1)",
             }}
           >
+            <label className="hideContent" for="filter">Search in Queue</label>
             <InputBase
               id="filter"
               placeholder="Search in Queue ..."
+              defaultValue={keyword}
               onChange={setSearch}
               sx={{
                 color: "#38598A",
@@ -159,6 +158,7 @@ const Queue = ({ userDetail, tableInfo }) => {
               startAdornment={
                 <InputAdornment position="start">
                   <IconButton sx={{ color: "#38598A" }}>
+                    <span className="hideContent">Search in Queue</span>
                     <SearchIcon />
                   </IconButton>
                 </InputAdornment>
@@ -206,8 +206,9 @@ const Queue = ({ userDetail, tableInfo }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ height: 450 }} className={classes.root}>
+      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
         <DataGrid
+          autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
           rows={rows}
@@ -216,18 +217,18 @@ const Queue = ({ userDetail, tableInfo }) => {
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
           pageSize={rowsState.pageSize}
-          rowsPerPageOptions={[10]}
+          // rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
           disableColumnMenu={true}
           pagination
           paginationMode="server"
           page={rowsState.page}
-          onPageChange={(page) => setRowsState((prev) => ({ ...prev, page }))}
-          onPageSizeChange={(pageSize) =>
-            setRowsState((prev) => ({ ...prev, pageSize }))
+          onPageChange={(newPage) => dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: newPage}}))}
+          onPageSizeChange={(newpageSize) =>
+            dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, pageSize: newpageSize}}))
           }
           components={{
-            Pagination: CustomPagination,
+            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"}></CustomFooter>
           }}
           sortingOrder={["desc", "asc"]}
           sortModel={[sortModel[0]]}
@@ -244,7 +245,9 @@ const Queue = ({ userDetail, tableInfo }) => {
                 .replace(/ +/g, "")}`,
               tableInfo?.stateClassName?.[
                 params.row.currentState.toLowerCase().replace(/ +/g, "")
-              ]
+              ],
+              (params.row.assignedTo == null && userDetail?.groups?.indexOf("/" + params.row.assignedGroup) > -1)
+              && tableInfo?.noAssignedClassName
             )
           }
           onRowClick={renderReviewRequest}
@@ -252,20 +255,6 @@ const Queue = ({ userDetail, tableInfo }) => {
         />
       </Grid>
     </>
-  );
-};
-
-const CustomPagination = () => {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
   );
 };
 

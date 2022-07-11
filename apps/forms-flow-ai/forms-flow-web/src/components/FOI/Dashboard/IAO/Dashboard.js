@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
@@ -10,6 +10,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
 import { getTableInfo } from "./columns";
+import { setShowAdvancedSearch, setResumeDefaultSorting } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -30,11 +31,19 @@ const Dashboard = ({ userDetail }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const [advnacedSearchEnabled, setAdvancedSearchEnabled] = useState(false);
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch);
 
-  const addRequest = (e) => {
+  const addRequest = (_e) => {
     dispatch(push(`/foi/addrequest`));
   };
+
+  React.useEffect(() => {
+    if (showAdvancedSearch) {
+      document.title = 'FOI Advanced Search'
+    } else {
+      document.title = 'FOI Request Queue'
+    }
+  }, [showAdvancedSearch]);
 
   return (
     <div className="container foi-container">
@@ -62,12 +71,15 @@ const Dashboard = ({ userDetail }) => {
             alignItems="center"
           >
             <ButtonBase
-              onClick={() => setAdvancedSearchEnabled(false)}
+              onClick={() => {
+                dispatch(setShowAdvancedSearch(false));
+                dispatch(setResumeDefaultSorting(true));
+              }}
               disableRipple
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: advnacedSearchEnabled,
+                  [classes.disabledTitle]: showAdvancedSearch,
                 })}
               >
                 Your FOI Request Queue
@@ -85,12 +97,15 @@ const Dashboard = ({ userDetail }) => {
               orientation="vertical"
             />
             <ButtonBase
-              onClick={() => setAdvancedSearchEnabled(true)}
+              onClick={() => {
+                dispatch(setShowAdvancedSearch(true));
+                dispatch(setResumeDefaultSorting(true));
+              }}
               disableRipple
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: !advnacedSearchEnabled,
+                  [classes.disabledTitle]: !showAdvancedSearch,
                 })}
               >
                 Advanced Search
@@ -112,7 +127,7 @@ const Dashboard = ({ userDetail }) => {
           direction="row"
           spacing={1}
           className={clsx({
-            [classes.hidden]: advnacedSearchEnabled,
+            [classes.hidden]: showAdvancedSearch,
           })}
           sx={{
             marginTop: "2em",
@@ -129,7 +144,7 @@ const Dashboard = ({ userDetail }) => {
             marginTop: "2em",
           }}
           className={clsx({
-            [classes.hidden]: !advnacedSearchEnabled,
+            [classes.hidden]: !showAdvancedSearch,
           })}
         >
           <AdvancedSearch userDetail={userDetail} />

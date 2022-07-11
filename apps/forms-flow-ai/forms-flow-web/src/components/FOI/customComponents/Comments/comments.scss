@@ -1,6 +1,5 @@
 /* add css module styles here (optional) */
 #Comments{  
-  overflow-y: scroll;
   background-color:white;
   height: 100%;
 }
@@ -10,6 +9,7 @@
   flex-direction: column;
   overflow-x: hidden;;
   background-color: white;
+  margin-top: 40px;
       
   .addcommentBox{
     width:99%;
@@ -305,8 +305,6 @@ button[disabled]{
 
 .characterlen{
   font-size: 12px;
-  color: grey;
-  //margin-left: 25px;
   margin-top: 3px;
 }
 .commenttext .ql-editor{
@@ -340,9 +338,12 @@ border: 0px!important;
 }
 
 .commentdate{
-  color:grey;
-  font-size:13px;
-  padding-left: 10px
+  padding-left: 10px;
+  font-size: 13px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 19px;
 }
 .textred{
   color:red
@@ -447,11 +448,13 @@ border: 0px!important;
   }
 
   div.filterComments{
-    display: inline-flex;
     margin-left: 15px;
     margin-top: 15px;
     margin-bottom: 15px;
     width: 100%;
+    fieldset {
+      display: contents;
+    }
     label {
       padding-right: 5%;
       color:#68686d;
@@ -546,17 +549,21 @@ button.bc4rxid {
     text-decoration: none;
 }
 
+.post-comment-btn {
+  height: 1em;
+}
+
 strong {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }
 
 span[style="font-weight: bold;"] > span  {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }
 span[style="font-weight: bold;"] > *  {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }
 
 span[style*="font-weight: bold;"] > *  {
-  font-family: "BCSans-Bold"!important;
+  font-family: "BCSans-Bold", sans-serif!important;
 }

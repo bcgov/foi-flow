@@ -1,8 +1,5 @@
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
-from request_api.models.FOIRequestWatchers import FOIRequestWatcher
-from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
-from request_api.services.extensionservice import extensionservice
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
@@ -20,9 +17,6 @@ class dashboardservice:
     This service class manages dashboard retrival for both unopened and opened request with consideration of user types.
 
     """
-
-    def __init__(self):
-        self.extension_service = extensionservice()
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
         idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
@@ -78,10 +72,9 @@ class dashboardservice:
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 requestqueue.append(unopenrequest)
             else:
-                extensionscount = self.extension_service.getrequestextensionscount(requestid = request.ministryrequestid)
                 _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid': request.ministryrequestid})
-                _openrequest.update({'extensions': extensionscount})
+                _openrequest.update({'extensions': request.extensions})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 requestqueue.append(_openrequest)    
@@ -156,6 +149,7 @@ class dashboardservice:
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                _openrequest.update({'extensions': request.extensions})
                 _openrequest.update({'description':request.description})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})

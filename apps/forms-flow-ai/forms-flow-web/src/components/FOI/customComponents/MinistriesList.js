@@ -3,13 +3,21 @@ import "./ministrieslist.scss";
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 import clsx from 'clsx'
+import {isValidMinistryCode, countOfMinistrySelected} from '../FOIRequest/utils';
 
-const useStyles = makeStyles((theme) => ({  
+const useStyles = makeStyles((_theme) => ({  
   headingError: {
-    color: "#ff0000"    
+    color: "#9e2929"    
   },
   headingNormal: {
     color: "000000"
+  },
+  hideValidation: {
+    visibility: 'hidden'
+  },
+  showValidation: {
+    color: "#9e2929",
+    marginTop: '12px'
   }
 }));
 
@@ -31,7 +39,7 @@ const MinistriesList = React.memo(
     useEffect(() => {
       setProgramAreaListItems(masterProgramAreaList);
       setError(
-        !programAreaList.some((programArea) => programArea.isChecked)
+        countOfMinistrySelected(programAreaList) !== 1 || !programAreaList.some((programArea) => (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)))
       );
     },[masterProgramAreaList, programAreaList])
 
@@ -51,6 +59,8 @@ const MinistriesList = React.memo(
       //event bubble up - send the updated list to RequestDescriptionBox component
       handleUpdatedMasterProgramAreaList(newProgramAreaList);
     };
+
+    const countOfMinistry = countOfMinistrySelected(programAreaList);
     return (
       <div className="foi-ministries-container">
         <h4
@@ -79,6 +89,14 @@ const MinistriesList = React.memo(
             </label>
           ))}
         </div>
+        <h5
+          className={clsx({
+            [classes.showValidation]: countOfMinistry > 1,
+            [classes.hideValidation]: countOfMinistry <= 1,
+          })}
+        >
+          * Only Select 1 Ministry Client per request. Please deselect all expect 1 and open others as separate requests
+        </h5>
       </div>
     );
   }

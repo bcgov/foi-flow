@@ -30,7 +30,7 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     receivedMode:"Received Mode",
     deliveryMode:"Delivery Mode",
     compareReceivedDate: "Received Date",
-    requestStartDate:"Request Start Date",
+    requestProcessStart:"Request Start Date",
     dueDate:"Legislated Due Date",
 
     general:"Request Type General",
@@ -38,7 +38,8 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
  
     Extensions : "Extensions",
 
-    cfrDueDate: "CFR Due Date"
+    cfrDueDate: "CFR Due Date",
+    requestPageCount: "Total number of pages"
   };
   
   export default AXIS_SYNC_DISPLAY_FIELDS;

@@ -6,6 +6,7 @@ from request_api.services.watcherservice import watcherservice
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.services.notifications.notificationconfig import notificationconfig
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 class notificationuser:
     """ Notfication user service
@@ -20,6 +21,8 @@ class notificationuser:
             _users = self.__getcommentusers(foirequest, foicomment, requesttype)
         elif 'Tagged User Comments' in notificationtype:
             _users = self.__gettaggedusers(foicomment)
+        elif 'Group Members' in notificationtype:
+            _users = self.__getgroupmembers(foirequest["assignedministrygroup"])
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
         for user in _users:
@@ -67,14 +70,14 @@ class notificationuser:
     def __getcommentusers(self, foirequest, comment, requesttype):
         _requestusers = self.getnotificationusers("General", requesttype, "nouser", foirequest)
         commentusers = []
-        commentusers.append({"userid":comment["createdby"], "usertype":self.__getcommentusertype(comment, comment["createdby"],_requestusers)})
+        commentusers.append({"userid":comment["createdby"], "usertype":self.__getcommentusertype(comment["createdby"],_requestusers)})
         taggedusers = self.__gettaggedusers(comment)
         if taggedusers is not None:
             commentusers.extend(taggedusers)
         if comment["parentcommentid"]:
             _commentusers = self.__getrelatedusers(comment, requesttype)
             for _commentuser in _commentusers:
-                commentusers.append({"userid":_commentuser["createdby"], "usertype":self.__getcommentusertype(comment, _commentuser["createdby"],_requestusers)})
+                commentusers.append({"userid":_commentuser["createdby"], "usertype":self.__getcommentusertype(_commentuser["createdby"],_requestusers)})
                 _skiptaguserforreplies = True
                 if _skiptaguserforreplies == False:
                     taggedusers = self.__gettaggedusers(_commentuser)
@@ -82,7 +85,7 @@ class notificationuser:
                         commentusers.extend(taggedusers)   
         return commentusers  
     
-    def __getcommentusertype(self, comment, userid, requestusers):
+    def __getcommentusertype(self, userid, requestusers):
         for requestuser in requestusers:
             if requestuser["userid"] == userid:  
                 return  requestuser["usertype"]   
@@ -104,4 +107,12 @@ class notificationuser:
         for entry in data:
             taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypeid("comment tagged user")})
         return taggedusers
+
+    def __getgroupmembers(self,groupid):
+        notificationusers = []
+        notificationtypeid = notificationconfig().getnotificationusertypeid("Group Members")
+        usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname(groupid) 
+        for user in usergroupfromkeycloak[0].get("members"):
+            notificationusers.append({"userid":user["username"], "usertype":notificationtypeid})
+        return notificationusers 
         
