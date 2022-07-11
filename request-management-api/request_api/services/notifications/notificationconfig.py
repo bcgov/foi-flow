@@ -28,6 +28,8 @@ class notificationconfig:
             return 9  
         elif notificationtype == "Tagged User Comments":
             return 10 
+        elif notificationtype == "CFR Fee Form":
+            return 11  
         elif notificationtype == "Group Members":
             return 12 
         return 0     
