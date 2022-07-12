@@ -9,6 +9,7 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     anotherFirstName: "On Behalf Of - First Name",
     anotherLastName: "On Behalf Of - Last Name",
     anotherMiddleName: "On Behalf Of - Middle Name",
+    birthDate: "Date of Birth",
 
     email:"Applicant Email",
     phonePrimary:"Home Phone",

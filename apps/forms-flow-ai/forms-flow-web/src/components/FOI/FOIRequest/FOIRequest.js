@@ -234,14 +234,17 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setAxisMessage("");
         }
         else if(data){
+          console.log("0011");
           let responseMsg = data;
           responseMsg+='';
           if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
             setAxisMessage("ERROR");
         }
       }
-      else
+      else{
+        console.log("002");
         setAxisMessage("ERROR");
+      }
     }));
   }
 
@@ -261,13 +264,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const checkValidation = (key,axisData) => {
     let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
-      let foiReqAdditionalPersonalInfo = requestDetails[key];
-      let axisAdditionalPersonalInfo = axisData[key];
-      for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
-        for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-          if(axisKey === reqKey){
-            if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
-              return true;
+      if(axisData['requestType'] === 'personal'){
+        let foiReqAdditionalPersonalInfo = requestDetails[key];
+        let axisAdditionalPersonalInfo = axisData[key];
+        for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+          for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+            if(axisKey === reqKey){
+              if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+                return true;
+              }
             }
           }
         }
