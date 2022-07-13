@@ -70,7 +70,6 @@ const AxisDetails = React.memo(({
     const syncWithAxis = () => {
         dispatch(checkDuplicateAndFetchRequestDataFromAxis(axisRequestId, false, saveRequestObject,(err, data) => {
             if(!err){
-                console.log(Object.entries(data).length);
                 if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}
                     setValidation(axisIdValidation);  

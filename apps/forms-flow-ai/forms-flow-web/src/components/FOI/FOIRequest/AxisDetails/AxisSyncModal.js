@@ -127,18 +127,16 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
         case 'additionalPersonalInfo':
-          let foiReqAdditionalPersonalInfo = saveRequestObject[key];
-          let axisAdditionalPersonalInfo = requestDetailsFromAxis[key];
-          for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
-            for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-              updatedObj = compareAdditionalPersonalInfo(axisKey , reqKey, axisAdditionalPersonalInfo, 
-                foiReqAdditionalPersonalInfo, updatedObj);
-            }
-          }
-          for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-              if(!Object.keys(axisAdditionalPersonalInfo).includes(reqKey)){
-                axisAdditionalPersonalInfo[reqKey] = foiReqAdditionalPersonalInfo[reqKey];
+          if(requestDetailsFromAxis.requestType === 'personal'){
+            let foiReqAdditionalPersonalInfo = saveRequestObject[key];
+            let axisAdditionalPersonalInfo = requestDetailsFromAxis[key];
+            for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+              for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+                updatedObj = compareAdditionalPersonalInfo(axisKey , reqKey, axisAdditionalPersonalInfo, 
+                  foiReqAdditionalPersonalInfo, updatedObj);
               }
+            }
+            persistAdditionalDetailFieldsNotInAxis(foiReqAdditionalPersonalInfo, axisAdditionalPersonalInfo)
           }
           break;
         case 'Extensions':
@@ -158,20 +156,25 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       foiReqAdditionalPersonalInfo, updatedObj) => {
       if(axisKey === reqKey){
         if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
-          if(axisKey === 'birthDate')
-            updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey] && 
-              formatDate(axisAdditionalPersonalInfo[axisKey], "MMM dd yyyy");
-          else{
-            if(isAxisSyncDisplayField(axisKey))
-              updatedObj[isAxisSyncDisplayField(axisKey)] = axisAdditionalPersonalInfo[axisKey];
-            else
-              updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey];
+          if(isAxisSyncDisplayField(axisKey)){
+            updatedObj[isAxisSyncDisplayField(axisKey)] = (axisKey === 'birthDate' && axisAdditionalPersonalInfo[axisKey]) ? 
+            formatDate(axisAdditionalPersonalInfo[axisKey], "MMM dd yyyy") : axisAdditionalPersonalInfo[axisKey];
           }
-            
+          else
+            updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey];
         }
       }
       return updatedObj;
     }
+
+    const persistAdditionalDetailFieldsNotInAxis = (foiReqAdditionalPersonalInfo,axisAdditionalPersonalInfo) => {
+      for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+        if(!Object.keys(axisAdditionalPersonalInfo).includes(reqKey)){
+          axisAdditionalPersonalInfo[reqKey] = foiReqAdditionalPersonalInfo[reqKey];
+        }
+      }
+    }
+
 
     const compareExtensions = (key) => {
       let extensionsArr = [];

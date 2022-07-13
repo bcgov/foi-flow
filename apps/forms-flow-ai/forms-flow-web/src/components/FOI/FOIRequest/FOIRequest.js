@@ -238,8 +238,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setAxisMessage("ERROR");
         }
       }
-      else
+      else{
         setAxisMessage("ERROR");
+      }
     }));
   }
 
@@ -259,13 +260,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const checkValidation = (key,axisData) => {
     let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
-      let foiReqAdditionalPersonalInfo = requestDetails[key];
-      let axisAdditionalPersonalInfo = axisData[key];
-      for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
-        for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-          if(axisKey === reqKey){
-            if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
-              return true;
+      if(axisData.requestType === 'personal'){
+        let foiReqAdditionalPersonalInfo = requestDetails[key];
+        let axisAdditionalPersonalInfo = axisData[key];
+        for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+          for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+            if(axisKey === reqKey){
+              if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+                return true;
+              }
             }
           }
         }
