@@ -40,6 +40,9 @@ with open('request_api/schemas/schemas/rawrequest.json') as f:
 
 INVALID_REQUEST_ID = 'Invalid Request Id'
 
+SHORT_DATE_FORMAT = '%Y-%m-%d'
+LONG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
 @API.route('/foirawrequest/<requestid>/<string:actiontype>')
@@ -189,10 +192,10 @@ class FOIRawRequests(Resource):
             requestdatajson = request_json['requestData']  
 
             #add received date to json
-            receiveddatetext = requestdatajson["receivedDateUF"] if 'receivedDateUF' in requestdatajson else datetime.now(pytz.timezone("America/Vancouver")).strftime("%Y-%m-%d %H:%M:%S")
+            receiveddatetext = requestdatajson["receivedDateUF"] if 'receivedDateUF' in requestdatajson else datetime.now(pytz.timezone("America/Vancouver")).strftime(LONG_DATE_FORMAT)
             receiveddate = _skiptoworkday(receiveddatetext, 0)
-            requestdatajson['receivedDate'] = receiveddate.strftime("%Y-%m-%d")
-            requestdatajson['receivedDateUF'] = receiveddate.strftime("%Y-%m-%d %H:%M:%S")
+            requestdatajson['receivedDate'] = receiveddate.strftime(SHORT_DATE_FORMAT)
+            requestdatajson['receivedDateUF'] = receiveddate.strftime(LONG_DATE_FORMAT)
 
             #get attachments
             attachments = requestdatajson['Attachments'] if 'Attachments' in requestdatajson else None
@@ -212,16 +215,16 @@ class FOIRawRequests(Resource):
 
 def _skiptoworkday(datetimevalue, extradiff=0):
     """skip weekend, holiday, weekdays (after 16:30)"""
-    receiveddate = datetime.strptime(datetimevalue, "%Y-%m-%d %H:%M:%S") if isinstance(datetimevalue, str) else datetimevalue
+    receiveddate = datetime.strptime(datetimevalue, LONG_DATE_FORMAT) if isinstance(datetimevalue, str) else datetimevalue
 
     ca_holidays = _getholidays()
     diff = 0
     if receiveddate.isoweekday() in [6, 7]: #weekend - add 1 day
         diff += 1
-        if _isholiday(receiveddate.strftime("%Y-%m-%d"), ca_holidays): #holiday in weekend - add an extra day
+        if _isholiday(receiveddate.strftime(SHORT_DATE_FORMAT), ca_holidays): #holiday in weekend - add an extra day
             extradiff += 1
     else:
-        if _isholiday(receiveddate.strftime("%Y-%m-%d"), ca_holidays): #holiday in weekdays - add 1 day
+        if _isholiday(receiveddate.strftime(SHORT_DATE_FORMAT), ca_holidays): #holiday in weekdays - add 1 day
             diff += 1
         else: # submitted after 16:30 in weekdays
             if receiveddate.hour > 16 or (receiveddate.hour == 16 and receiveddate.minute > 30):
@@ -237,7 +240,7 @@ def _skiptoworkday(datetimevalue, extradiff=0):
 def _getholidays():        
     ca_holidays = []
     for date, name in sorted(holidays.CA(prov='BC', years=datetime.today().year).items()):
-        ca_holidays.append(date.strftime("%Y-%m-%d"))
+        ca_holidays.append(date.strftime(SHORT_DATE_FORMAT))
     if 'FOI_ADDITIONAL_HOLIDAYS' in os.environ and os.getenv('FOI_ADDITIONAL_HOLIDAYS') != '':
         _addldays = os.getenv('FOI_ADDITIONAL_HOLIDAYS')
         for _addlday in _addldays.split(","):
