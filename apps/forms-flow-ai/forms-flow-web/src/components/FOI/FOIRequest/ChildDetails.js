@@ -55,6 +55,24 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     const [childNickNameText, setNickName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME));
     const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_DOB);
     const [childDOBText, setDOB] = React.useState(dob);
+
+    React.useEffect(() => {
+        setChildFirstName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME)
+        );
+        setChildMiddleName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME)
+        );
+        setChildLastName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME)
+        );
+        setNickName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME)
+        );
+        setDOB(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.CHILD_DOB)
+        );
+    }, [additionalInfo]);
  
     const handleFirtNameChange = (e) => {
         setChildFirstName(e.target.value);
