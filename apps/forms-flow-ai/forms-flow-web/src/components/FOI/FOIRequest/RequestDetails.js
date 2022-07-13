@@ -102,17 +102,18 @@ const RequestDetails = React.memo(
       if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {        
           receivedDateString = addBusinessDays(receivedDateString, 1);
       }
-        return receivedDateString;
-      }
+      return receivedDateString;
+    }
+
     //updates the default values from the request details    
     React.useEffect(() => {
 
-     setSelectedRequestType(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
-     setSelectedReceivedMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
-     setSelectedDeliveryMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
-     setReceivedDate(getReceivedDateForLocalState);
-     setStartDate(getProcessStartDateForLocalState);
-     setDueDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
+      setSelectedRequestType(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
+      setSelectedReceivedMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
+      setSelectedDeliveryMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
+      setReceivedDate(getReceivedDateForLocalState);
+      setStartDate(getProcessStartDateForLocalState);
+      setDueDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
 
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);     
       receivedDate = calculateReceivedDate(receivedDate);
@@ -128,7 +129,7 @@ const RequestDetails = React.memo(
       //event bubble up - sets the initial value to validate the required fields      
       handleRequestDetailsInitialValue(requestDetailsObject);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
-  },[requestDetails, handleRequestDetailsInitialValue])
+    },[requestDetails, handleRequestDetailsInitialValue])
 
     const getReceivedDateForLocalState = () => {
       let receivedDate = validateFields(
@@ -177,11 +178,11 @@ const RequestDetails = React.memo(
     });
     //handling the received date change
     const handleReceivedDateChange = (e) => {
-      setReceivedDate(e.target.value);
-
+      const receivedDate = calculateReceivedDate(e.target.value);
+      setReceivedDate(receivedDate);
       //event bubble up - for required feild validation
-      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, e.target.value);
+      handleRequestDetailsValue(receivedDate, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, receivedDate);
     }
     const handleStartDateChange = (e) => {
       setStartDate(e.target.value);
