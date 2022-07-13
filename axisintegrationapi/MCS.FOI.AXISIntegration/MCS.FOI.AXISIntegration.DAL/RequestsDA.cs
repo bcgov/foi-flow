@@ -137,7 +137,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcFirstName as firstName,
                 requesters.vcLastName as lastName,
                 requesters.vcMiddleName as middleName,
-                [dbo].[cst_GetRqstCustFieldValue](requests.iRequestID, 'DOB') as birthDate,
+                requestorfields.CUSTOMFIELD35 as birthDate,
                 requesters.vcCompany as businessName,
                 requesters.vcEmailID as email,
                 onbehalf.vcFirstName as onbehalfFirstName,
@@ -168,6 +168,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID
                 LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID
                 LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID
+                LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID
                 WHERE 
                 vcVisibleRequestID = @vcVisibleRequestID
                 GROUP BY requests.sdtReceivedDate, requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription,
@@ -176,7 +177,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
-                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID";
+                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {

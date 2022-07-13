@@ -740,10 +740,12 @@ class FOIRawRequest(db.Model):
     def __getfilterforassigneename(cls,params):
         searchcondition1 = []
         searchcondition2 = []
+        searchcondition3 = []
         for keyword in params['keywords']:
             searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
-        return or_(and_(*searchcondition1), and_(*searchcondition2))
+            searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
 
     @classmethod
     def __getfilterforidnumber(cls,params):
