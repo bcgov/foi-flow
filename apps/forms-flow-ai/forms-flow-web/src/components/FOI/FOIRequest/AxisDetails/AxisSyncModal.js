@@ -136,11 +136,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
                   foiReqAdditionalPersonalInfo, updatedObj);
               }
             }
-            for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-                if(!Object.keys(axisAdditionalPersonalInfo).includes(reqKey)){
-                  axisAdditionalPersonalInfo[reqKey] = foiReqAdditionalPersonalInfo[reqKey];
-                }
-            }
+            persistAdditionalDetailFieldsNotInAxis(foiReqAdditionalPersonalInfo, axisAdditionalPersonalInfo)
           }
           break;
         case 'Extensions':
@@ -170,6 +166,15 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       }
       return updatedObj;
     }
+
+    const persistAdditionalDetailFieldsNotInAxis = (foiReqAdditionalPersonalInfo,axisAdditionalPersonalInfo) => {
+      for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+        if(!Object.keys(axisAdditionalPersonalInfo).includes(reqKey)){
+          axisAdditionalPersonalInfo[reqKey] = foiReqAdditionalPersonalInfo[reqKey];
+        }
+      }
+    }
+
 
     const compareExtensions = (key) => {
       let extensionsArr = [];
