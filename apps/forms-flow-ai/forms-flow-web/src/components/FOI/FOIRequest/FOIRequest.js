@@ -234,7 +234,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setAxisMessage("");
         }
         else if(data){
-          console.log("0011");
           let responseMsg = data;
           responseMsg+='';
           if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
@@ -242,7 +241,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
         }
       }
       else{
-        console.log("002");
         setAxisMessage("ERROR");
       }
     }));
