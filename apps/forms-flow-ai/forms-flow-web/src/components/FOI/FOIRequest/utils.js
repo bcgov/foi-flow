@@ -404,6 +404,10 @@ export const persistRequestFieldsNotInAxis = (newRequestDetails, existingRequest
   let foiReqAdditionalPersonalInfo = existingRequestDetails.additionalPersonalInfo;
   let axisAdditionalPersonalInfo = newRequestDetails.additionalPersonalInfo;
   if(newRequestDetails.requestType === 'personal'){
+    for(let key of Object.keys(existingRequestDetails)){
+      if((key == 'correctionalServiceNumber' || key == 'publicServiceEmployeeNumber' ) && !isAxisSyncDisplayField(key))
+        newRequestDetails[key] = existingRequestDetails[key];
+    }
     for(let key of Object.keys(foiReqAdditionalPersonalInfo)){
       if(!isAxisSyncDisplayField(key)){
         axisAdditionalPersonalInfo[key] = foiReqAdditionalPersonalInfo[key];
