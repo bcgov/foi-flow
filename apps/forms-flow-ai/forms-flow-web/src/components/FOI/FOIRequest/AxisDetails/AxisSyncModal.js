@@ -127,7 +127,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
         case 'additionalPersonalInfo':
-          if(requestDetailsFromAxis['requestType'] === 'personal'){
+          if(requestDetailsFromAxis.requestType === 'personal'){
             let foiReqAdditionalPersonalInfo = saveRequestObject[key];
             let axisAdditionalPersonalInfo = requestDetailsFromAxis[key];
             for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){

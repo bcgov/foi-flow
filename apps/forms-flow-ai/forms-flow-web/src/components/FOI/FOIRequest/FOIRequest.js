@@ -262,7 +262,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const checkValidation = (key,axisData) => {
     let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
-      if(axisData['requestType'] === 'personal'){
+      if(axisData.requestType === 'personal'){
         let foiReqAdditionalPersonalInfo = requestDetails[key];
         let axisAdditionalPersonalInfo = axisData[key];
         for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
