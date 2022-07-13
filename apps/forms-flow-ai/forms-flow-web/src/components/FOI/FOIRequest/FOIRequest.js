@@ -150,15 +150,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   });
   const [removeComment, setRemoveComment] = useState(false);
 
-  const [saveRequestObject, setSaveRequestObject] =
-    React.useState(requestDetails);
+  const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const showDivisionalTracking =
     requestDetails &&
     requestDetails.divisions?.length > 0 &&
     requestState &&
     requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
-    requestState.toLowerCase() !==
-      StateEnum.intakeinprogress.name.toLowerCase();
+    requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
