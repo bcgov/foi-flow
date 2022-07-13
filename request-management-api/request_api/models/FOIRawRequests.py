@@ -335,12 +335,12 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
         receiveddate = case([
-                            (FOIRawRequest.status == 'Unopened',
+                            (and_(FOIRawRequest.status == 'Unopened', FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
                            ],
                            else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
         receiveddateuf = case([
-                            (FOIRawRequest.status == 'Unopened',
+                            (and_(FOIRawRequest.status == 'Unopened', FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
                            ],
                            else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
