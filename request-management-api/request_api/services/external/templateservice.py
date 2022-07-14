@@ -7,10 +7,10 @@ class templateservice:
     """
     
    
-    def generatetemplate(self, emailtemplatename, dynamictemplatevalues):        
+    def generatetemplate(self, dynamictemplatevalues):        
         
         print("Values::",dynamictemplatevalues)
-        emailtemplatehtml= storageservice().download(emailtemplatename)
+        emailtemplatehtml= storageservice().prepares3urianddownload()
         if(emailtemplatehtml is None):
             raise ValueError('No template found')
 

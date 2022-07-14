@@ -7,6 +7,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.schemas.foidocument import CreateDocumentSchema
 from request_api.services.external.storageservice import storageservice
+from request_api.services.external.templateservice import templateservice
 import json
 import base64
 import maya
@@ -128,5 +129,29 @@ class documentservice:
         document['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
         return document
 
+    def getrequestdocumentsbycategory(self, requestid, requesttype, category, version=None):
+        requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
+        documents = FOIMinistryRequestDocument.getdocumentsbycategory(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
+        return self.__formatcreateddate(documents)
+
+    def test_download(self):
+        print("Inside")
+        #dynamictemplatevalues = {'applicantname':'Test', 'analystname':'QA', 'teamname':'QA', 'paymenturl':'http://www.gov.bc.ca/freedomofinformation/'}
+        # emailtemplatename = "fee_estimate_default"
+        attachmentresponse = self.getattachments(4, 'ministryrequest','feeassessed-onhold')
+        #attachmentresponse = templateservice().generatetemplate(dynamictemplatevalues)
+        print("Response in documentservice:",attachmentresponse)
+        return attachmentresponse
+
+    def getattachments(self,requestid, requesttype, category):        
+        documents =documentservice().getrequestdocumentsbycategory(requestid, requesttype, category)  
+        print(documents)
+        print("Single",documents[0])
+        if(documents is None):
+            raise ValueError('No template found')
+        s3uri = documents[0].get('documentpath')
+        print("!!!!",s3uri)
+        attachment= storageservice().download(s3uri)
+        return attachment
 
 
