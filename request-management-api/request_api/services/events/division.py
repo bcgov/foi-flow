@@ -44,7 +44,7 @@ class divisionevent:
             if self.__isdivisionpresent(self.__getdivisioname(cdivision), pdivisions) == False:
                divisions.append(self.__createdivisionsummary(cdivision, EventType.add.value)) 
             else:
-                if self.__isstagechanged(self.__getdivisioname(cdivision), self.__getstagename(cdivision), pdivisions) == True or self.__isdivisionduedatechanged(self.__getdivisioname(cdivision), self.__getdivisionduedate(cdivision), pdivisions) or self.__iseapprovalchanged(self.__getdivisioname(cdivision), self.__geteaproval(cdivision), pdivisions) :
+                if self.__isstagechanged(self.__getdivisioname(cdivision), self.__getstagename(cdivision), pdivisions) == True or self.__isdivisionduedatechanged(self.__getdivisioname(cdivision), self.__getdivisionduedate(cdivision), pdivisions) or self.__iseapprovalchanged(self.__getdivisioname(cdivision), self.__geteaproval(cdivision), pdivisions) or self.__isdivisionreceiveddatechanged(self.__getdivisioname(cdivision), self.__getdivisionreceiveddate(cdivision), pdivisions) :
                     divisions.append(self.__createdivisionsummary(cdivision, EventType.modify.value))                  
         return divisions            
     
@@ -78,12 +78,19 @@ class divisionevent:
             if self.__getdivisioname(division) == divisionid and self.__geteaproval(division) != ceapproval:
                 return True
         return False
+    
+    def __isdivisionreceiveddatechanged(self, divisionid, cdivisionreceiveddate, divisionlist):
+        for division in divisionlist:
+            if self.__getdivisioname(division) == divisionid and self.__getdivisionreceiveddate(division) != cdivisionreceiveddate:
+                return True
+        return False
 
     def __createdivisionsummary(self, division, event):
         return {'division': self.__getdivisioname(division), 
         'stage': self.__getstagename(division), 
         'divisionduedate':self.__getdivisionduedate(division), 
         'eapproval': self.__geteaproval(division),
+        'divisionreceiveddate': self.__getdivisionreceiveddate(division),
         'event': event}
         
     def __getdivisioname(self, dataschema):
@@ -98,12 +105,17 @@ class divisionevent:
     def __geteaproval(self, dataschema):
         return dataschema['eapproval']
 
+    def __getdivisionreceiveddate(self, dataschema):
+        return parse(dataschema['divisionreceiveddate']).strftime(self.__genericdateformat()) if dataschema['divisionreceiveddate'] is not None else None
+
     def __preparemessage(self, division):
         message = ""
         if division['eapproval'] is not None:
             message = ' E-App/Other reference Number: ' + division['eapproval']
         if division['divisionduedate'] is not None:
             message += ' Due on ' + division['divisionduedate']
+        if division['divisionreceiveddate'] is not None:
+            message += ' Received on ' + division['divisionreceiveddate']
 
         if division['event'] == EventType.modify.value:
             return self.__formatmessage(division['division'])+' division has been updated to stage '+ self.__formatmessage(division['stage']) + message 

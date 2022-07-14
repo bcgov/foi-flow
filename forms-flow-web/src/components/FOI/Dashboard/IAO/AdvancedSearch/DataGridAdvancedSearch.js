@@ -41,7 +41,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   const user = useSelector((state) => state.user.userDetail);
 
   const hyperlinkRenderCell = (params) => {
-    var link;
+    let link;
     if (params.row.ministryrequestid) { 
       link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     } else {
@@ -145,7 +145,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 0.5,
-      sortable: false,
+      // sortable: false,
       valueGetter: (params) =>
         params.row.extensions === undefined ? "N/A" : params.row.extensions,
     },
@@ -337,7 +337,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 10 };
+  const defaultRowsState = { page: 0, pageSize: 100 };
   const [rowsState, setRowsState] = useState(
     Object.keys(advancedSearchParams).length > 0 ? 
       {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 

@@ -133,7 +133,7 @@ export const getTabBG = (_tabStatus, _requestState) => {
 };
 
 export const assignValue = (jsonObj, value, name) => {
-  var _obj = { ...jsonObj };
+  let _obj = { ...jsonObj };
   if (_obj[name] !== undefined) {
     _obj[name] = value;
   }
@@ -338,7 +338,7 @@ export const alertUser = (e) => {
 
 export const findRequestState = (requestStatusId) => {
   if (requestStatusId != undefined) {
-    var stateArray = Object.entries(StateEnum).find(
+    let stateArray = Object.entries(StateEnum).find(
       (value) => value[1].id === requestStatusId
     );
     return stateArray[1].name;

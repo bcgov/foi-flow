@@ -22,7 +22,7 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, bcgovcode, hasAnotherUserComment, fullName }) => {
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName }) => {
 
   const actions = useContext(ActionContext)
   const edit = true
@@ -48,7 +48,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const toggleCollapse = (e, parentcommentId) => {
 
-    var hiddenreplies = document.getElementsByName(`hiddenreply_${parentcommentId}`)
+    let hiddenreplies = document.getElementsByName(`hiddenreply_${parentcommentId}`)
     hiddenreplies.forEach((commentnode) => {
       commentnode.style.display === 'none' ? setnodeDisplay(commentnode, 'flex') : setnodeDisplay(commentnode, 'none')
     })

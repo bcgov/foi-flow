@@ -164,6 +164,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             ministrydivision.stageid = division["stage.stageid"]
             ministrydivision.divisionduedate = division["divisionduedate"]
             ministrydivision.eapproval = division["eapproval"]
+            ministrydivision.divisionreceiveddate = division["divisionreceiveddate"]
             ministrydivision.foiministryrequest_id = requestid
             ministrydivision.foiministryrequestversion_id = version
             ministrydivision.createdby = userid
@@ -254,6 +255,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydivision.stageid = division["stageid"]
                 ministrydivision.divisionduedate = division["divisionDueDate"] if "divisionDueDate" in division and division["divisionDueDate"] != '' else None
                 ministrydivision.eapproval = division["eApproval"] if "eApproval" in division else None
+                ministrydivision.divisionreceiveddate = division["divisionReceivedDate"] if "divisionReceivedDate" in division and division["divisionReceivedDate"] != '' else None
                 ministrydivision.foiministryrequest_id = requestid
                 ministrydivision.foiministryrequestversion_id = version
                 ministrydivision.createdby = userid

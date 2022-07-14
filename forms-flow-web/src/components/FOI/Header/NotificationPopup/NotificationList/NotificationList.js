@@ -66,11 +66,8 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   }
 
   const checkCommentType = (type) => {
-    if(type === 'New User Comments' || type === 'Reply User Comments' ||
-      type === 'Tagged User Comments'){
-      return true;
-    }
-    return false;
+    return !!(type === 'New User Comments' || type === 'Reply User Comments' ||
+      type === 'Tagged User Comments');
   }
 
   const commentTitle = (type) => {

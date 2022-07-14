@@ -13,7 +13,13 @@
         "unit": 0.25,
         "price": 7.5
     },
-    "preparing": {
+    "ministryPreparing": {
+        "type": "hour",
+        "freehours": 0,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "iaoPreparing": {
         "type": "hour",
         "freehours": 0,
         "unit": 0.25,

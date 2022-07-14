@@ -9,7 +9,7 @@ const RequestDetails = React.memo((requestDetails) => {
     const _requestDetails = requestDetails.requestDetails;    
 
     return Object.entries(_requestDetails).length > 0 &&
-      _requestDetails != undefined ? (
+      _requestDetails != undefined && (
       <>
         <Card id="requestDetailsMinistry" className="foi-details-card">
           <div className="row foi-details-row">
@@ -50,8 +50,7 @@ const RequestDetails = React.memo((requestDetails) => {
                   <b>Records Due Date</b>
                 </span>
                 <span className="foi-rowtoppadding">
-                  {_requestDetails.currentState &&
-                  _requestDetails.currentState.toLowerCase() !==
+                  {_requestDetails?.currentState?.toLowerCase() !==
                     StateEnum.onhold.name.toLowerCase()
                     ? formatDate(
                         _requestDetails.cfrDueDate,
@@ -65,8 +64,7 @@ const RequestDetails = React.memo((requestDetails) => {
                   <b>Legislated Due Date</b>
                 </span>
                 <span className="foi-rowtoppadding">
-                  {_requestDetails.currentState &&
-                  _requestDetails.currentState.toLowerCase() !==
+                  {_requestDetails?.currentState?.toLowerCase() !==
                     StateEnum.onhold.name.toLowerCase()
                     ? formatDate(
                         _requestDetails.dueDate,
@@ -79,7 +77,7 @@ const RequestDetails = React.memo((requestDetails) => {
           </CardContent>
         </Card>{" "}
       </>
-    ) : null;
+    );
 
 
 })

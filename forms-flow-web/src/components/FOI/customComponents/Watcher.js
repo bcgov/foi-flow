@@ -70,14 +70,14 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
 
    //creates the grouped menu items for assignedTo combobox
    const getMenuItems = () => {
-       var menuItems = [];
-       var i = 1;      
+       let menuItems = [];
+       let i = 1;      
        if (watcherFullList && watcherFullList.length > 0) {
-           for (var group of watcherFullList) {             
+           for (let group of watcherFullList) {             
                menuItems.push(<MenuItem className={`${classes.item} foi-watcher-menuitem`} disabled={true} key={group.id} value={`${group.name}|${group.name}`}>
                    {group.name}
                </MenuItem>);
-               for (var assignee of group.members) {               
+               for (let assignee of group.members) {               
                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={`${classes.item} foi-watcher-menuitem`} 
                    value={`${group.name}|${assignee.username}`} 
                    disabled={assignee.username.toLowerCase().includes("unassigned")}

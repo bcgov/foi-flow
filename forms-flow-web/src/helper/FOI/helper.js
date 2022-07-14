@@ -7,10 +7,10 @@ import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constant
 import { toast } from "react-toastify";
 import { KCProcessingTeams } from "../../constants/FOI/enum";
 
-var isBetween = require("dayjs/plugin/isBetween");
-var utc = require("dayjs/plugin/utc");
-var timezone = require("dayjs/plugin/timezone");
-var CryptoJS = require("crypto-js");
+let isBetween = require("dayjs/plugin/isBetween");
+let utc = require("dayjs/plugin/utc");
+let timezone = require("dayjs/plugin/timezone");
+let CryptoJS = require("crypto-js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -48,7 +48,7 @@ const businessDay = (date) => {
 const getHolidayList = (startYear, endYear) => {
   let holidays = [];
   if (startYear > endYear) {
-    var temp = startYear;
+    let temp = startYear;
     startYear = endYear;
     endYear = temp;
   }
@@ -113,15 +113,15 @@ const removeBusinessDays = (dateText, days) => {
 };
 
 const countWeekendDays = (startDate, endDate) => {
-  var ndays =
+  let ndays =
     1 +
     Math.round((endDate.getTime() - startDate.getTime()) / (24 * 3600 * 1000));
-  var nsaturdays = Math.floor((startDate.getDay() + ndays) / 7);
+  let nsaturdays = Math.floor((startDate.getDay() + ndays) / 7);
   return 2 * nsaturdays + (startDate.getDay() === 0) - (endDate.getDay() === 6);
 };
 
 const daysBetween = (startDate, endDate) => {
-  var millisecondsPerDay = 24 * 60 * 60 * 1000;
+  let millisecondsPerDay = 24 * 60 * 60 * 1000;
   return (endDate - startDate) / millisecondsPerDay;
 };
 const calculateDaysRemaining = (endDate, startDate) => {
@@ -221,7 +221,7 @@ const encrypt = (obj) => {
 
 const decrypt = (encrypted) => {
   if (encrypted) {
-    var bytes = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
+    let bytes = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   } else {
     return {};
@@ -229,8 +229,8 @@ const decrypt = (encrypted) => {
 };
 
 const saveSessionData = (key, data) => {
-  var expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
-  var sessionObject = {
+  let expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
+  let sessionObject = {
     expiresAt: new Date(expiresInMilliseconds),
     sessionData: data,
   };
@@ -239,11 +239,11 @@ const saveSessionData = (key, data) => {
 };
 
 const getSessionData = (key) => {
-  var sessionObject = decrypt(sessionStorage.getItem(key));
+  let sessionObject = decrypt(sessionStorage.getItem(key));
 
   if (sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
-    var currentDate = new Date();
-    var expirationDate = sessionObject.expiresAt;
+    let currentDate = new Date();
+    let expirationDate = sessionObject.expiresAt;
 
     if (Date.parse(currentDate) < Date.parse(expirationDate)) {
       return sessionObject.sessionData;

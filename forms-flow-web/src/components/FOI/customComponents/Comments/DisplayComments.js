@@ -42,9 +42,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   }
 
   const showhiddencomments = (_e, count) => {
-    var hiddencomments = document.getElementsByName('commentsectionhidden')
+    let hiddencomments = document.getElementsByName('commentsectionhidden')
     if (hiddencomments && Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length > 0) {
-      var cnt = 0
+      let cnt = 0
       hiddencomments.forEach(_com => {
 
         if (cnt < count && _com.style.display === 'none') {
@@ -69,7 +69,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   const [showmorehidden, setshowmorehidden] = useState(false)
 
   const checkcommentlengthforindex = (comment, index) => {
-    var commentlenghchecker = new Object()
+    let commentlenghchecker = new Object()
 
     commentlenghchecker.totalcharacterCount = comment.text.length
     commentlenghchecker.reachedLimit = false
@@ -98,15 +98,15 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   }
 
   const dynamicIndexFinder = () => {
-    var _commentscopy = [...comments]
-    var returnindex = 10
-    var totalcharacterCount = 0
-    var reachedLimit = false;
+    let _commentscopy = [...comments]
+    let returnindex = 10
+    let totalcharacterCount = 0
+    let reachedLimit = false;
 
     _commentscopy.forEach((comment, index) => {
 
       if (!reachedLimit) {
-        var commentlenghchecker = checkcommentlengthforindex(comment, index)
+        let commentlenghchecker = checkcommentlengthforindex(comment, index)
         totalcharacterCount += commentlenghchecker.totalcharacterCount
         reachedLimit = commentlenghchecker.reachedLimit
         returnindex = commentlenghchecker.returnindex
@@ -145,7 +145,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               i={a}
               reply
               parentId={i.commentId}
-              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={getfullName(a.commentTypeId, a.userId)}
+              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} hasAnotherUserComment={false} fullName={getfullName(a.commentTypeId, a.userId)}
             />
           )}
           {actions.replies.filter((id) => id === a.commentId).length !==
@@ -184,7 +184,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 <InputField cancellor={i.commentId} inputvalue={i.text} edit fullnameList={fullnameList} //Handles Navigate Away
                   setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
               ) : (
-                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
+                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
               )}
               {
                 actions.replies.filter((id) => id === i.commentId).length !== 0 &&

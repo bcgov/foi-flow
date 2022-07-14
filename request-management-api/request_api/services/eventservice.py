@@ -68,7 +68,7 @@ class eventservice:
             return DefaultMethodResult(True,'Comment notifications created',commentresponse.identifier)
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
-            
+
     async def posteventforcfrfeeform(self, ministryrequestid, userid, username):
         try:
             cfrfeeeventresponse = cfrfeeformevent().createstatetransitionevent(ministryrequestid, userid, username)

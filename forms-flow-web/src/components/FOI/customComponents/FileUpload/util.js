@@ -31,7 +31,11 @@
       _errorMessage.push(<>The specified file(s) <b>{_overSizedFiles.join(", ")}</b> could not be uploaded. Only files <b>{maxFileSize}MB</b> or under can be uploaded.</>);
     }
     if (_typeErrorFiles.length > 0) {
-      _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : singleFileUploadAllowedFileExtensions}</b></>);
+      if(!multipleFiles && mimeTypes[0] === 'application/pdf') {
+        _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>.pdf</b></>);
+      } else {
+        _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : singleFileUploadAllowedFileExtensions}</b></>);
+      }
     }
     return _errorMessage;
   }

@@ -71,7 +71,7 @@ const ProcessingTeamColumns = [
     headerName: "EXT.",
     headerAlign: "left",
     flex: 0.5,
-    sortable: false,
+    // sortable: false,
     valueGetter: (params) =>
       params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
