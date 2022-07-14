@@ -47,6 +47,7 @@ import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
+import HomeIcon from '@mui/icons-material/Home';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -177,6 +178,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     React.useState(requestDetails);
 
   const [divstages, setdivStages] = React.useState([]);
+  const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -194,6 +196,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
@@ -228,9 +231,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    hasincompleteDivstage;
+    hasincompleteDivstage || !hasReceivedDate;
 
-  const createMinistrySaveRequestObject = (propName, value, value2) => {
+  const createMinistrySaveRequestObject = (_propName, _value, _value2) => {
     const requestObject = { ...saveMinistryRequestObject };
     setUnSavedRequest(true);
     setSaveMinistryRequestObject(requestObject);
@@ -267,7 +270,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setcurrentrequestStatus("");
   };
 
-  var foitabheaderBG;
+  let foitabheaderBG;
   const classes = useStyles();
 
   switch (_tabStatus) {
@@ -435,11 +438,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
         existingDivStages={divisions}
         ministrycode={ministrycode}
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
+        requestStartDate = {requestDetails?.requestProcessStart}
+        setHasReceivedDate={setHasReceivedDate}
       />
     );
 
   
-  const showBreadcrumbs = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
   return !isLoading &&
     requestDetails &&
@@ -524,22 +529,27 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   autoComplete="off"
                 >
 
-                    <ConditionalComponent condition={showBreadcrumbs}>
-                      <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
+                      {showAdvancedSearch &&
                         <Chip
                           label={"Advanced Search"}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19, cursor: 'pointer' }}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
+                      }
+                      {!showAdvancedSearch &&
                         <Chip
-                          label={getHeaderText(requestDetails)}
-                          sx={{ backgroundColor: '#929090', color: 'white', height: 19 }}
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={() => dispatch(push(`/foi/dashboard`))}
                         />
-                      </Breadcrumbs>
-                    </ConditionalComponent>
-                    <ConditionalComponent condition={!showBreadcrumbs}>
-                      <div style={{marginTop: 20}}></div>
-                    </ConditionalComponent>
+                      }
+                      <Chip
+                        label={getHeaderText(requestDetails)}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                    </Breadcrumbs>
                   {Object.entries(requestDetails).length > 0 &&
                     requestDetails !== undefined && (
                       <>
@@ -574,6 +584,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           isValidationError={isValidationError}
                           saveMinistryRequestObject={saveMinistryRequestObject}
                           unSavedRequest={unSavedRequest}
+                          CFRUnsaved={CFRUnsaved}
                           handleSaveRequest={handleSaveRequest}
                           currentSelectedStatus={_currentrequestStatus}
                           hasStatusRequestSaved={hasStatusRequestSaved}
@@ -598,6 +609,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               userDetail={userDetail}
               ministryId={ministryId}
               requestId={requestId}
+              setCFRUnsaved={setCFRUnsaved}
             />
           </div>)}
           <div

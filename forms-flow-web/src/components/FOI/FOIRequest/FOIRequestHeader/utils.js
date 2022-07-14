@@ -12,7 +12,7 @@ export const getMenuItems = ({
   assignedToList,
   selectedAssignedTo,
 }) => {
-  var menuItems = [];
+  let menuItems = [];
   menuItems.push(
     <MenuItem className={classes.group} key={0} value={"|"}>
       {}
