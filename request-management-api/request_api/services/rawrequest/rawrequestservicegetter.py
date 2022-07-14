@@ -28,14 +28,16 @@ class rawrequestservicegetter:
             
             assignedgroupvalue = request.assignedgroup if request.assignedgroup else "Unassigned" 
             assignedtovalue = request.assignedto if request.assignedto else "Unassigned"
-            _createddate = request.created_at
+            dt = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+            _createddate = dt
+
             unopenrequest = {'id': request.requestid,
                              'firstName': firstname,
                              'lastName': lastname,
                              'requestType': requesttype,
                              'currentState': request.status,
-                             'receivedDate': _createddate.strftime('%Y %b, %d'),
-                             'receivedDateUF': str(_createddate),
+                             'receivedDate': request.requestrawdata["receivedDate"] if "receivedDate" in request.requestrawdata else _createddate.strftime('%Y %b, %d'),
+                             'receivedDateUF':request.requestrawdata["receivedDateUF"] if "receivedDateUF" in request.requestrawdata else str(_createddate),
                              'assignedGroup': assignedgroupvalue,
                              'assignedTo': assignedtovalue,
                              'xgov': 'No',
@@ -125,8 +127,8 @@ class rawrequestservicegetter:
                                'lastName': contactinfo['lastName'],
                                'businessName': contactinfo['businessName'],                               
                                'currentState': request['status'],
-                               'receivedDate': _createddate.strftime('%Y %b, %d'),
-                               'receivedDateUF': _createddate.strftime('%Y-%m-%d %H:%M:%S.%f'),
+                               'receivedDate': requestrawdata["receivedDate"] if "receivedDate" in requestrawdata else _createddate.strftime('%Y %b, %d'),
+                               'receivedDateUF':requestrawdata["receivedDateUF"] if "receivedDateUF" in requestrawdata else _createddate.strftime('%Y-%m-%d %H:%M:%S.%f'),
                                'assignedGroup': request["assignedgroup"] if "assignedgroup" in request else "Unassigned",
                                'assignedTo': request["assignedto"] if "assignedto" in request else "Unassigned",
                                'assignedToFirstName': assignee["firstname"] if assignee is not None and "firstname" in assignee else None,

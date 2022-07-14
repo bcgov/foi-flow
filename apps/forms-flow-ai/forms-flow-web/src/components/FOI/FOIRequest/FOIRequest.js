@@ -150,15 +150,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   });
   const [removeComment, setRemoveComment] = useState(false);
 
-  const [saveRequestObject, setSaveRequestObject] =
-    React.useState(requestDetails);
+  const [saveRequestObject, setSaveRequestObject] = React.useState(requestDetails);
   const showDivisionalTracking =
     requestDetails &&
     requestDetails.divisions?.length > 0 &&
     requestState &&
     requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
-    requestState.toLowerCase() !==
-      StateEnum.intakeinprogress.name.toLowerCase();
+    requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
@@ -240,8 +238,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setAxisMessage("ERROR");
         }
       }
-      else
+      else{
         setAxisMessage("ERROR");
+      }
     }));
   }
 
@@ -261,13 +260,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const checkValidation = (key,axisData) => {
     let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
-      let foiReqAdditionalPersonalInfo = requestDetails[key];
-      let axisAdditionalPersonalInfo = axisData[key];
-      for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
-        for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-          if(axisKey === reqKey){
-            if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
-              return true;
+      if(axisData.requestType === 'personal'){
+        let foiReqAdditionalPersonalInfo = requestDetails[key];
+        let axisAdditionalPersonalInfo = axisData[key];
+        for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+          for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+            if(axisKey === reqKey){
+              if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+                return true;
+              }
             }
           }
         }
@@ -651,6 +652,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
             </a>
           </div>
+          <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
               requestState={requestState}
