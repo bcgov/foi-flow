@@ -985,6 +985,13 @@ class FOIMinistryRequest(db.Model):
                 for keyword in params['keywords']:
                     searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return and_(*searchcondition)
+    @classmethod
+    def getfilenumberforrequest(cls,requestid, ministryrequestid):
+        return db.session.query(FOIMinistryRequest.filenumber).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
+
+    @classmethod
+    def getaxisrequestidforrequest(cls,requestid, ministryrequestid):   
+        return db.session.query(FOIMinistryRequest.axisrequestid).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
