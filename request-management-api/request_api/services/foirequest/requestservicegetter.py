@@ -7,6 +7,7 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from dateutil.parser import parse
+from request_api.services.cfrfeeservice import cfrfeeservice
 
 
 class requestservicegetter:
@@ -91,6 +92,17 @@ class requestservicegetter:
             additionalpersonalinfo.update(additionalpersonalinfodetails)                
             baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
         return baserequestinfo
+    
+    def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):        
+        axisrequestid = FOIMinistryRequest.getaxisrequestidforrequest(foirequestid, foiministryrequestid)
+        filenumber = FOIMinistryRequest.getfilenumberforrequest(foirequestid, foiministryrequestid)
+        cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
+        requestdetailsforpayment = {
+            "axisrequestid": axisrequestid,
+            "filenumber": filenumber,
+            "balancedue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
+        }
+        return requestdetailsforpayment
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
