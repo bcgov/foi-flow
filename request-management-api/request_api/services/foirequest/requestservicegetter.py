@@ -101,6 +101,11 @@ class requestservicegetter:
         assignedgroup = requestministry["assignedgroup"]
         idnumber = requestministry["filenumber"]
         axisrequestid = requestministry["axisrequestid"]
+        requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
+        email = ""
+        for contactinfo in requestcontactinformation:
+            if contactinfo['contacttype.name'] == 'Email':
+                email =contactinfo['contactinformation']
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         firstname = ""
         middlename = ""
@@ -115,6 +120,7 @@ class requestservicegetter:
             "firstName": firstname,
             "middleName": middlename,
             "lastName": lastname,
+            "email": email,
             "assignedToFirstName": assignedtofirstname,
             "assignedToLastName": assignedtolastname,
             "assignedGroup" : assignedgroup,

@@ -18,6 +18,7 @@ const PublicRoute =({store})=>{
           <div className="container">
               <NavBar/>
               <Route exact path="/public/form/:formId" component={View}/>
+              <Route exact path="/public/form/:formId/submission/:submissionId" component={View}/>
               <Route path="/public/form/:formId/:notavailable" component={NotFound}/>
               <Footer/>
           </div>
