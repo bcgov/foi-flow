@@ -93,14 +93,34 @@ class requestservicegetter:
             baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
         return baserequestinfo
     
-    def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):        
-        axisrequestid = FOIMinistryRequest.getaxisrequestidforrequest(foirequestid, foiministryrequestid)
-        filenumber = FOIMinistryRequest.getfilenumberforrequest(foirequestid, foiministryrequestid)
+    def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
+        request = FOIRequest.getrequest(foirequestid)
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        assignedtofirstname = requestministry["assignee.firstname"] if requestministry["assignedto"] != None else None
+        assignedtolastname = requestministry["assignee.lastname"] if requestministry["assignedto"] != None else None
+        assignedgroup = requestministry["assignedgroup"]
+        idnumber = requestministry["filenumber"]
+        axisrequestid = requestministry["axisrequestid"]
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+        firstname = ""
+        middlename = ""
+        lastname = ""
+        for applicant in requestapplicants:
+            firstname = applicant['foirequestapplicant.firstname']
+            middlename = applicant['foirequestapplicant.middlename']
+            lastname = applicant['foirequestapplicant.lastname']
+        
         cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
         requestdetailsforpayment = {
-            "axisrequestid": axisrequestid,
-            "filenumber": filenumber,
-            "balancedue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
+            "firstName": firstname,
+            "middleName": middlename,
+            "lastName": lastname,
+            "assignedToFirstName": assignedtofirstname,
+            "assignedToLastName": assignedtolastname,
+            "assignedGroup" : assignedgroup,
+            "axisRequestId": axisrequestid,
+            "idNumber": idnumber,
+            "balanceDue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
         }
         return requestdetailsforpayment
 

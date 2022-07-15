@@ -43,11 +43,17 @@
 }
 connector.getVariable("statusCode");</camunda:script>
             </camunda:outputParameter>
-            <camunda:outputParameter name="axisRequestId">${S(response).prop("axisrequestid").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="fee">${S(response).prop("balancedue").numberValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="fileNumber">${S(response).prop("filenumber").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="ministryId">${ministryid}</camunda:outputParameter>
+            <camunda:outputParameter name="axisRequestId">${S(response).prop("axisRequestId").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="fee">${S(response).prop("balanceDue").numberValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="ministryRequestId">${ministryid}</camunda:outputParameter>
             <camunda:outputParameter name="foiRequestId">${requestid}</camunda:outputParameter>
+            <camunda:outputParameter name="firstName">${S(response).prop("firstName").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="middleName">${S(response).prop("middleName").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="lastName">${S(response).prop("lastName").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedGroup">${S(response).prop("assignedGroup").stringValue()}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -111,7 +117,7 @@ execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
       <bpmn:incoming>Flow_0nqsrai</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0nqsrai" sourceRef="Activity_0k05bsn" targetRef="Event_0jatpgl" />
-    <bpmn:task id="Activity_0k05bsn" name="Output Task">
+    <bpmn:userTask id="Activity_0k05bsn" name="Output Task">
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="formName" value="payfeeonline" />
@@ -124,7 +130,7 @@ execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0hjhi4p</bpmn:incoming>
       <bpmn:outgoing>Flow_0nqsrai</bpmn:outgoing>
-    </bpmn:task>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmn:error id="Error_06fsjjn" name="FOI-REMINDER-API-ERR" camunda:errorMessage="FOI Request invocation failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
@@ -197,7 +203,7 @@ execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
       <bpmndi:BPMNShape id="Event_0jatpgl_di" bpmnElement="Event_0jatpgl">
         <dc:Bounds x="1032" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_00ukxzd_di" bpmnElement="Activity_0k05bsn">
+      <bpmndi:BPMNShape id="Activity_1qjgxto_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="770" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="Event_17odcea">
