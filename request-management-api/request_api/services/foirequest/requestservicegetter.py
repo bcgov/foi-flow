@@ -7,6 +7,7 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from dateutil.parser import parse
+from request_api.services.cfrfeeservice import cfrfeeservice
 
 
 class requestservicegetter:
@@ -91,6 +92,37 @@ class requestservicegetter:
             additionalpersonalinfo.update(additionalpersonalinfodetails)                
             baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
         return baserequestinfo
+    
+    def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
+        request = FOIRequest.getrequest(foirequestid)
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        assignedtofirstname = requestministry["assignee.firstname"] if requestministry["assignedto"] != None else None
+        assignedtolastname = requestministry["assignee.lastname"] if requestministry["assignedto"] != None else None
+        assignedgroup = requestministry["assignedgroup"]
+        idnumber = requestministry["filenumber"]
+        axisrequestid = requestministry["axisrequestid"]
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+        firstname = ""
+        middlename = ""
+        lastname = ""
+        for applicant in requestapplicants:
+            firstname = applicant['foirequestapplicant.firstname']
+            middlename = applicant['foirequestapplicant.middlename']
+            lastname = applicant['foirequestapplicant.lastname']
+        
+        cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
+        requestdetailsforpayment = {
+            "firstName": firstname,
+            "middleName": middlename,
+            "lastName": lastname,
+            "assignedToFirstName": assignedtofirstname,
+            "assignedToLastName": assignedtolastname,
+            "assignedGroup" : assignedgroup,
+            "axisRequestId": axisrequestid,
+            "idNumber": idnumber,
+            "balanceDue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
+        }
+        return requestdetailsforpayment
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
