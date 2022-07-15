@@ -86,20 +86,24 @@ class ProcessingTeamWithKeycloackGroup(Enum):
         return list(map(lambda c: c.value, ProcessingTeamWithKeycloackGroup))
 
 class IAOTeamWithKeycloackGroup(Enum):
-    intake = "Intake Team"    
+    intake = "Intake Team"
     flex = "Flex Team"
-    
+
     @staticmethod
     def list():
         return list(map(lambda c: c.value, IAOTeamWithKeycloackGroup)) + list(map(lambda c: c.value, ProcessingTeamWithKeycloackGroup))
-    
+
 class UserGroup(Enum):
-    intake = "Intake Team"    
+    intake = "Intake Team"
     flex = "Flex Team"
     processing = "@processing"
-    ministry = "@bcgovcode Ministry Team" 
+    ministry = "@bcgovcode Ministry Team"
 
 class RequestorType(Enum):
-    applicant = 1    
+    applicant = 1
     onbehalfof = 2
     child = 3
+class FeeType(Enum):
+    application = 'FOI0001'
+    processing = 'FOI0002'
+
