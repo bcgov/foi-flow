@@ -178,7 +178,8 @@ class requestservicegetter:
                     "stageid": ministrydivision["stage.stageid"],
                     "stagename": ministrydivision["stage.name"],
                     "divisionDueDate": parse(ministrydivision['divisionduedate']).strftime(self.__genericdateformat()) if ministrydivision['divisionduedate'] is not None else None,
-                    "eApproval": ministrydivision["eapproval"]
+                    "eApproval": ministrydivision["eapproval"],
+                    "divisionReceivedDate": parse(ministrydivision['divisionreceiveddate']).strftime(self.__genericdateformat()) if ministrydivision['divisionreceiveddate'] is not None else None,
                     } 
                 divisions.append(division) 
         return divisions

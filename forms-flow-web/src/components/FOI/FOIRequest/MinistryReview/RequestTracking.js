@@ -1,5 +1,4 @@
-import React, { useEffect, useState }  from 'react';
-import CFRStatus from './CFRStatus';
+import React, { useEffect }  from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import DivisionalStages from './Divisions/DivisionalStages';
@@ -7,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     fetchFOIMinistryDivisionalStages
   } from "../../../../apiManager/services/FOI/foiMasterDataServices";
-const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,ministrycode,createMinistrySaveRequestObject}) => {
+const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,ministrycode,createMinistrySaveRequestObject,requestStartDate, setHasReceivedDate}) => {
 
     const dispatch = useDispatch();
     useEffect(() => {    
@@ -36,7 +35,7 @@ const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,min
                 <div className="col-lg-12 foi-details-col">
                     {
 
-                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 && divisionalstages.divisions.length >0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popSelectedDivStages={popselecteddivstages}  createMinistrySaveRequestObject={createMinistrySaveRequestObject} /> : <span className="nodivstages">Divisional stages does not exists for this ministry</span>
+                        divisionalstages!=undefined && Object.entries(divisionalstages).length >0 && divisionalstages.divisions.length >0 ? <DivisionalStages divisionalstages={divisionalstages} existingDivStages={existingDivStages} popSelectedDivStages={popselecteddivstages}  createMinistrySaveRequestObject={createMinistrySaveRequestObject} requestStartDate= {requestStartDate} setHasReceivedDate={setHasReceivedDate} /> : <span className="nodivstages">Divisional stages does not exists for this ministry</span>
                     }                      
                   
                 </div>

@@ -5,14 +5,16 @@ export type CFRFormData = {
     estimates: {
       locating: number;
       producing: number;
-      preparing: number;
+      ministryPreparing: number;
+      iaoPreparing: number;
       electronicPages: number;
       hardcopyPages: number;
     };
     actual: {
       locating: number;
       producing: number;
-      preparing: number;
+      ministryPreparing: number;
+      iaoPreparing: number;
       electronicPages: number;
       hardcopyPages: number;
     };
@@ -27,4 +29,5 @@ export type params = {
   userDetail: {
     groups: string[];
   };
+  setCFRUnsaved: Function;
 }

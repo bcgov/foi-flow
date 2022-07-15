@@ -265,7 +265,7 @@ const AddressContactDetails = memo(
 
     //handle onchange of email and the validation
     const handleEmailChange = (e) => {
-      var emailValidation = {};
+      let emailValidation = {};
       if (e.target.value) {
         const helperText = EmailValidator.validate(e.target.value)
           ? ""

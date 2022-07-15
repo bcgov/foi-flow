@@ -171,7 +171,7 @@ export const AttachmentSection = ({
       if (!err) {
         res.map(async (header, _index) => {
           getFileFromS3(header, (_err, response) => {
-            var blob = new Blob([response.data], {type: "application/octet-stream"});
+            let blob = new Blob([response.data], {type: "application/octet-stream"});
             saveAs(blob, file.filename)
           });
         });
@@ -180,7 +180,7 @@ export const AttachmentSection = ({
   }
 
   const downloadAllDocuments = async () => {
-    var fileInfoList = []
+    let fileInfoList = []
     attachments.forEach(attachment => {
       if (!(isMinistryCoordinator && attachment.category == 'personal')) {
         fileInfoList.push({
@@ -192,12 +192,12 @@ export const AttachmentSection = ({
         });
       }
     })
-    var blobs = [];
+    let blobs = [];
     try {
       const response = await getOSSHeaderDetails(fileInfoList, dispatch);
       for (let header of response.data) {
         await getFileFromS3(header, (_err, res) => {
-          var blob = new Blob([res.data], {type: "application/octet-stream"});
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
           blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
         });
       }
@@ -279,8 +279,8 @@ export const AttachmentSection = ({
     return `Request #U-00${requestId}`;
   }
 
-  var attachmentsList = [];
-  for(var i=0; i<attachments.length; i++) {
+  let attachmentsList = [];
+  for(let i=0; i<attachments.length; i++) {
     attachmentsList.push(
     <Attachment 
       key={i}
