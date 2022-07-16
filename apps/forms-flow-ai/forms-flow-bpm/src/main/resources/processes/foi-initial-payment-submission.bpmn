@@ -126,7 +126,7 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
     <bpmn:userTask id="Activity_0udfchk">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="paymenturl">${foiwebUrl}/public/form/${formPathName}/submission/${submissionId}</camunda:inputParameter>
+          <camunda:inputParameter name="paymenturl">${foiwebUrl}/form/${formPathName}/submission/${submissionId}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1qsjo13</bpmn:incoming>

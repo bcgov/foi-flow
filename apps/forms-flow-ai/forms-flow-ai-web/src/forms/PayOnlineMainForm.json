@@ -22,7 +22,7 @@
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
-               "customDefaultValue":"",
+               "customDefaultValue":"value = window.location.href.split(\"/\")[9]",
                "calculateValue":"",
                "calculateServer":false,
                "key":"ministryRequestId",
@@ -91,7 +91,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"edxyei"
+               "id":"ek8qn9l"
             },
             {
                "label":"FOI Request Id",
@@ -105,7 +105,7 @@
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
-               "customDefaultValue":"",
+               "customDefaultValue":"value = window.location.href.split(\"/\")[7]",
                "calculateValue":"",
                "calculateServer":false,
                "key":"foiRequestId",
@@ -174,15 +174,15 @@
                   
                ],
                "inputType":"hidden",
-               "id":"e26zww"
+               "id":"eq2qk5n"
             },
             {
-               "label":"AXIS Request Id",
+               "label":"FOI API Url",
                "labelWidth":"",
                "labelMargin":"",
-               "customClass":"mb-4",
+               "customClass":"",
                "modalEdit":false,
-               "defaultValue":"HTH-2022-12345",
+               "defaultValue":"http://localhost:15000",
                "persistent":true,
                "protected":false,
                "dbIndex":false,
@@ -190,6 +190,172 @@
                "redrawOn":"",
                "customDefaultValue":"",
                "calculateValue":"",
+               "calculateServer":false,
+               "key":"apiUrl",
+               "tags":[
+                  
+               ],
+               "properties":{
+                  
+               },
+               "logic":[
+                  
+               ],
+               "attributes":{
+                  
+               },
+               "overlay":{
+                  "style":"",
+                  "page":"",
+                  "left":"",
+                  "top":"",
+                  "width":"",
+                  "height":""
+               },
+               "type":"hidden",
+               "input":true,
+               "tableView":false,
+               "placeholder":"",
+               "prefix":"",
+               "suffix":"",
+               "multiple":false,
+               "unique":false,
+               "hidden":false,
+               "clearOnHide":true,
+               "refreshOn":"",
+               "dataGridLabel":false,
+               "labelPosition":"top",
+               "description":"",
+               "errorLabel":"",
+               "tooltip":"",
+               "hideLabel":false,
+               "tabindex":"",
+               "disabled":false,
+               "autofocus":false,
+               "widget":{
+                  "type":"input"
+               },
+               "validateOn":"change",
+               "validate":{
+                  "required":false,
+                  "custom":"",
+                  "customPrivate":false,
+                  "strictDateValidation":false,
+                  "multiple":false,
+                  "unique":false
+               },
+               "conditional":{
+                  "show":null,
+                  "when":null,
+                  "eq":""
+               },
+               "allowCalculateOverride":false,
+               "showCharCount":false,
+               "showWordCount":false,
+               "allowMultipleMasks":false,
+               "addons":[
+                  
+               ],
+               "inputType":"hidden",
+               "id":"eivd6a"
+            },
+            {
+               "label":"Request Details",
+               "labelWidth":"",
+               "labelMargin":"",
+               "customClass":"",
+               "modalEdit":false,
+               "defaultValue":null,
+               "persistent":true,
+               "protected":false,
+               "dbIndex":false,
+               "encrypted":false,
+               "redrawOn":"",
+               "customDefaultValue":"const dataUrl = `${data.apiUrl}/api/foirequests/${data.foiRequestId}/ministryrequest/${data.ministryRequestId}/payonline`;\r\n\r\nif(data.foiRequestId && data.ministryRequestId){\r\n  const requestData = fetch(dataUrl)\r\n  .then(res => res.json())\r\n  .then(resData =>{\r\n    instance.setValue(resData)\r\n  })\r\n  .catch(err=>alert(err));\r\n}",
+               "calculateValue":"",
+               "calculateServer":false,
+               "key":"requestDetails",
+               "tags":[
+                  
+               ],
+               "properties":{
+                  
+               },
+               "logic":[
+                  
+               ],
+               "attributes":{
+                  
+               },
+               "overlay":{
+                  "style":"",
+                  "page":"",
+                  "left":"",
+                  "top":"",
+                  "width":"",
+                  "height":""
+               },
+               "type":"hidden",
+               "input":true,
+               "tableView":false,
+               "placeholder":"",
+               "prefix":"",
+               "suffix":"",
+               "multiple":false,
+               "unique":false,
+               "hidden":false,
+               "clearOnHide":true,
+               "refreshOn":"",
+               "dataGridLabel":false,
+               "labelPosition":"top",
+               "description":"",
+               "errorLabel":"",
+               "tooltip":"",
+               "hideLabel":false,
+               "tabindex":"",
+               "disabled":false,
+               "autofocus":false,
+               "widget":{
+                  "type":"input"
+               },
+               "validateOn":"change",
+               "validate":{
+                  "required":false,
+                  "custom":"",
+                  "customPrivate":false,
+                  "strictDateValidation":false,
+                  "multiple":false,
+                  "unique":false
+               },
+               "conditional":{
+                  "show":null,
+                  "when":null,
+                  "eq":""
+               },
+               "allowCalculateOverride":false,
+               "showCharCount":false,
+               "showWordCount":false,
+               "allowMultipleMasks":false,
+               "addons":[
+                  
+               ],
+               "inputType":"hidden",
+               "id":"eirhsrn"
+            },
+            {
+               "label":"AXIS Request Id",
+               "labelWidth":"",
+               "labelMargin":"",
+               "customClass":"mb-4",
+               "modalEdit":false,
+               "defaultValue":null,
+               "persistent":true,
+               "protected":false,
+               "dbIndex":false,
+               "encrypted":false,
+               "redrawOn":"",
+               "customDefaultValue":"",
+               "calculateValue":"if(data.requestDetails){\r\n    value = data.requestDetails.axisRequestId\r\n}\r\n",
                "calculateServer":false,
                "key":"axisRequestId",
                "tags":[
@@ -257,7 +423,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"efi86h3"
+               "id":"eyob6hua"
             },
             {
                "label":"File Number",
@@ -265,14 +431,14 @@
                "labelMargin":"",
                "customClass":"",
                "modalEdit":false,
-               "defaultValue":"#HTH-2021-0001",
+               "defaultValue":"",
                "persistent":true,
                "protected":false,
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
                "customDefaultValue":"",
-               "calculateValue":"",
+               "calculateValue":"if(data.requestDetails){\r\n    value = data.requestDetails.fileNumber\r\n}",
                "calculateServer":false,
                "key":"fileNumber",
                "tags":[
@@ -340,7 +506,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"evq2sqr"
+               "id":"eh6p52n"
             },
             {
                "label":"Fee",
@@ -355,7 +521,7 @@
                "encrypted":false,
                "redrawOn":"",
                "customDefaultValue":"",
-               "calculateValue":"",
+               "calculateValue":"if(data.requestDetails){\r\n    value = data.requestDetails.balanceDue\r\n}",
                "calculateServer":false,
                "key":"fee",
                "tags":[
@@ -423,7 +589,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"edc8st"
+               "id":"eql6xkd"
             },
             {
                "label":"Half",
@@ -507,89 +673,6 @@
                ],
                "inputType":"hidden",
                "id":"ecsy60i"
-            },
-            {
-               "label":"FOI API Url",
-               "labelWidth":"",
-               "labelMargin":"",
-               "customClass":"",
-               "modalEdit":false,
-               "defaultValue":"test",
-               "persistent":true,
-               "protected":false,
-               "dbIndex":false,
-               "encrypted":false,
-               "redrawOn":"",
-               "customDefaultValue":"",
-               "calculateValue":"",
-               "calculateServer":false,
-               "key":"apiUrl",
-               "tags":[
-                  
-               ],
-               "properties":{
-                  
-               },
-               "logic":[
-                  
-               ],
-               "attributes":{
-                  
-               },
-               "overlay":{
-                  "style":"",
-                  "page":"",
-                  "left":"",
-                  "top":"",
-                  "width":"",
-                  "height":""
-               },
-               "type":"hidden",
-               "input":true,
-               "tableView":false,
-               "placeholder":"",
-               "prefix":"",
-               "suffix":"",
-               "multiple":false,
-               "unique":false,
-               "hidden":false,
-               "clearOnHide":true,
-               "refreshOn":"",
-               "dataGridLabel":false,
-               "labelPosition":"top",
-               "description":"",
-               "errorLabel":"",
-               "tooltip":"",
-               "hideLabel":false,
-               "tabindex":"",
-               "disabled":false,
-               "autofocus":false,
-               "widget":{
-                  "type":"input"
-               },
-               "validateOn":"change",
-               "validate":{
-                  "required":false,
-                  "custom":"",
-                  "customPrivate":false,
-                  "strictDateValidation":false,
-                  "multiple":false,
-                  "unique":false
-               },
-               "conditional":{
-                  "show":null,
-                  "when":null,
-                  "eq":""
-               },
-               "allowCalculateOverride":false,
-               "showCharCount":false,
-               "showWordCount":false,
-               "allowMultipleMasks":false,
-               "addons":[
-                  
-               ],
-               "inputType":"hidden",
-               "id":"es48jz8"
             },
             {
                "label":"Current Page",
@@ -803,12 +886,12 @@
                            "id":"evhw97n"
                         },
                         {
-                           "html":"<p style=\"text-align:center;\"><span class=\"text-huge\" style=\"color:#003366;\"><strong>FOI Request #{{data.axisRequestId}} --- {{data.apiUrl}}</strong></span></p><p style=\"text-align:center;\">&nbsp;</p>",
+                           "html":"<p style=\"text-align:center;\"><span class=\"text-huge\" style=\"color:#003366;\"><strong>FOI Request #{{data.axisRequestId}}</strong></span></p><p style=\"text-align:center;\">&nbsp;</p>",
                            "label":"Content",
                            "labelWidth":"",
                            "labelMargin":"",
                            "customClass":"",
-                           "refreshOnChange":false,
+                           "refreshOnChange":true,
                            "hidden":false,
                            "modalEdit":false,
                            "key":"content1",
@@ -884,7 +967,7 @@
                            "addons":[
                               
                            ],
-                           "id":"e6ieajb"
+                           "id":"e9ow007"
                         },
                         {
                            "label":"HTML",
@@ -2640,7 +2723,7 @@
                                                       }
                                                    ],
                                                    "content":"<span style='color: #003366'>Processing Fees for\n<br><b>#{{data.axisRequestId}}</b> </span>",
-                                                   "refreshOnChange":false,
+                                                   "refreshOnChange":true,
                                                    "customClass":"",
                                                    "hidden":false,
                                                    "modalEdit":false,
@@ -2717,7 +2800,7 @@
                                                    "addons":[
                                                       
                                                    ],
-                                                   "id":"enohxb8"
+                                                   "id":"ewbunw4"
                                                 }
                                              ],
                                              "width":8,
@@ -2742,7 +2825,7 @@
                                                       }
                                                    ],
                                                    "content":"<span style='color: #003366'>${{data.fee}}</span>",
-                                                   "refreshOnChange":false,
+                                                   "refreshOnChange":true,
                                                    "customClass":"",
                                                    "hidden":false,
                                                    "modalEdit":false,
@@ -2819,7 +2902,7 @@
                                                    "addons":[
                                                       
                                                    ],
-                                                   "id":"e335cu"
+                                                   "id":"ezxq4yr"
                                                 }
                                              ],
                                              "width":4,
@@ -3692,7 +3775,7 @@
                                        "shortcut":"",
                                        "description":"",
                                        "tooltip":"",
-                                       "customClass":"",
+                                       "customClass":"btn-outline-bcblue",
                                        "tabindex":"",
                                        "disableOnInvalid":false,
                                        "hidden":false,
@@ -3770,7 +3853,7 @@
                                        "addons":[
                                           
                                        ],
-                                       "id":"e5puxq"
+                                       "id":"e84xhv"
                                     }
                                  ],
                                  "width":2,
@@ -4676,8 +4759,8 @@
                                                          "value":""
                                                       }
                                                    ],
-                                                   "content":"<span style='color: #003366'>Processing Fees for\n<br><strong>{{data.ministry}}</strong>\n<br><b>{{data.requestNo}}</b> </span>",
-                                                   "refreshOnChange":false,
+                                                   "content":"<span style='color: #003366'>Processing Fees for\n<br><b>#{{data.axisRequestId}}</b> </span>",
+                                                   "refreshOnChange":true,
                                                    "customClass":"",
                                                    "hidden":false,
                                                    "modalEdit":false,
@@ -4754,7 +4837,7 @@
                                                    "addons":[
                                                       
                                                    ],
-                                                   "id":"et6a2jf"
+                                                   "id":"etl5zbf"
                                                 }
                                              ],
                                              "width":8,
@@ -4779,7 +4862,7 @@
                                                       }
                                                    ],
                                                    "content":"<span style='color: #003366'>${{parseFloat(data.half ? data.fee/2 : data.fee).toFixed(2)}}</span>",
-                                                   "refreshOnChange":false,
+                                                   "refreshOnChange":true,
                                                    "customClass":"",
                                                    "hidden":false,
                                                    "modalEdit":false,
@@ -4856,7 +4939,7 @@
                                                    "addons":[
                                                       
                                                    ],
-                                                   "id":"e561e7"
+                                                   "id":"edhgjjh"
                                                 }
                                              ],
                                              "width":4,
@@ -5180,7 +5263,7 @@
                                           "height":""
                                        },
                                        "type":"button",
-                                       "custom":"console.log(data)\nFormio.request(\n  data.foiApiUrl + '/api/foirawrequests/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"returnRoute\",\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    console.log(result);\n    window.location.href = result.paybc_url\n  });",
+                                       "custom":"console.log(data)\nFormio.request(\n  data.apiUrl + '/api/foirawrequests/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"returnRoute\",\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
                                        "input":true,
                                        "placeholder":"",
                                        "prefix":"",
@@ -5221,7 +5304,7 @@
                                        "addons":[
                                           
                                        ],
-                                       "id":"ehr69fb"
+                                       "id":"eji4myd"
                                     }
                                  ],
                                  "width":6,
