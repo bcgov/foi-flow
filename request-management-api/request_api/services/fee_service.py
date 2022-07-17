@@ -9,7 +9,9 @@ import requests
 from flask import current_app
 
 from request_api.exceptions import BusinessException, Error
-from request_api.models import FeeCode, Payment, RevenueAccount, FOIRawRequest
+from request_api.models import FeeCode, Payment, RevenueAccount, FOIRawRequest, FOIMinistryRequest
+from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.utils.enums import FeeType
 from .hash_service import HashService
 
 
@@ -20,11 +22,24 @@ class FeeService:
 
     """
 
-    def __init__(self, request_id: int, payment_id=None):
+    def __init__(self, request_id: int, code: str=None, payment_id=None):
         self.request_id = request_id
-        if FOIRawRequest.get_request(request_id) is None:
+        if payment_id:
+            self.payment: Payment = Payment.find_by_id(payment_id)
+            self.fee_code: FeeCode = FeeCode.find_by_id(self.payment.fee_code_id)
+        else:
+            self.payment = None
+            self.fee_code: FeeCode = FeeCode.get_fee(code=code, valid_date=date.today())
+        if not self.fee_code:
             raise BusinessException(Error.INVALID_INPUT)
-        self.payment: Payment = Payment.find_by_id(payment_id) if payment_id else None
+
+        # If application fee, use raw request id, else use minsitry request id
+        if self.fee_code.code == FeeType.application.value:
+            if FOIRawRequest.get_request(request_id) is None:
+                raise BusinessException(Error.INVALID_INPUT)
+        else:
+            if FOIMinistryRequest.getrequestbyministryrequestid(request_id) is None:
+                raise BusinessException(Error.INVALID_INPUT)
 
     @staticmethod
     def get_fee(code: str, quantity: int, valid_date: date):
@@ -46,24 +61,21 @@ class FeeService:
         return fee_response
 
     def init_payment(self, pay_request: Dict):
-        """Initialize payment request."""
-        fee = FeeCode.get_fee(
-            code=pay_request.get('fee_code'), valid_date=date.today()
-        )
-        if not fee:
-            raise BusinessException(Error.INVALID_INPUT)
-
         return_route = pay_request.get('return_route')
         quantity = int(pay_request.get('quantity', 1))
+        if self.fee_code.code == FeeType.processing.value:
+            total = self._get_cfr_fee(self.request_id, pay_request['half'])
+        else:
+            total = quantity * self.fee_code.fee
         self.payment = Payment(
-            fee_code_id=fee.fee_code_id,
+            fee_code_id=self.fee_code.fee_code_id,
             quantity=quantity,
-            total=quantity * fee.fee,
+            total=total,
             status='PENDING',
             request_id=self.request_id
         ).flush()
 
-        self.payment.paybc_url = self._get_paybc_url(fee, return_route)
+        self.payment.paybc_url = self._get_paybc_url(self.fee_code, return_route)
         self.payment.transaction_number = self._get_transaction_number()
         self.payment.commit()
         pay_response = self._dump()
@@ -209,3 +221,10 @@ class FeeService:
 
         current_app.logger.debug('>Getting token')
         return response
+
+    def _get_cfr_fee(self, ministry_request_id, half=False):
+        fee = cfrfeeservice().getcfrfee(ministry_request_id)['feedata']['totalamountdue']
+        if half:
+            return fee/2
+        else:
+            return fee

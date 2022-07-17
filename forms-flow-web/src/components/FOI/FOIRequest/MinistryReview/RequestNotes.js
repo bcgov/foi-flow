@@ -4,7 +4,6 @@ import CardContent from '@material-ui/core/CardContent';
 
 
 const RequestNotes = React.memo(() => {
-    //const _requestDetails = RequestDetails.requestDetails;
     const notes = [
       {
         username: "Username1",
@@ -18,8 +17,8 @@ const RequestNotes = React.memo(() => {
       },
     ];
 
-    var notesArray = [];
-    for(var i=0; i<notes.length; i++) {
+    let notesArray = [];
+    for(let i=0; i<notes.length; i++) {
       notesArray.push(<Note key={i} note={notes[i]} />);
     }
 

@@ -59,6 +59,7 @@ const BottomButtonGroup = React.memo(
     urlIndexCreateRequest,
     saveRequestObject,
     unSavedRequest,
+    CFRUnsaved,
     handleSaveRequest,
     handleOpenRequest,
     currentSelectedStatus,
@@ -154,7 +155,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleOnHashChange = (e) => {
-      returnToQueue(e, unSavedRequest);
+      returnToQueue(e, unSavedRequest || CFRUnsaved);
     };
 
     React.useEffect(() => {
@@ -180,7 +181,7 @@ const BottomButtonGroup = React.memo(
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
-      if (unSavedRequest) {
+      if (unSavedRequest || CFRUnsaved) {
         window.history.pushState(null, null, window.location.pathname);
         window.addEventListener("popstate", handleOnHashChange);
         window.addEventListener("beforeunload", handleBeforeUnload);
@@ -189,7 +190,7 @@ const BottomButtonGroup = React.memo(
           window.removeEventListener("beforeunload", handleBeforeUnload);
         };
       }
-    }, [unSavedRequest]);
+    }, [unSavedRequest, CFRUnsaved]);
 
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id
