@@ -5,17 +5,35 @@ import os
 import uuid
 import mimetypes
 
+formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
+accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
+secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
+s3host = os.getenv('OSS_S3_HOST')
+s3region = os.getenv('OSS_S3_REGION')
+s3service = os.getenv('OSS_S3_SERVICE')
 class storageservice:
     """This class is reserved for S3 storage services integration.
     """
     
+    def uploadbytes(self, filename, bytes):
+        auth = AWSRequestsAuth(aws_access_key=accesskey,
+                aws_secret_access_key=secretkey,
+                aws_host=s3host,
+                aws_region=s3region,
+                aws_service=s3service) 
+        
+        s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket,'EDUC','EDUC-2021-11236',filename)        
+        response = requests.put(s3uri, data=None, auth=auth)
+        header = {
+            'X-Amz-Date': response.request.headers['x-amz-date'],
+            'Authorization': response.request.headers['Authorization'],
+            'Content-Type': mimetypes.MimeTypes().guess_type(filename)[0]
+        }
+
+        #upload to S3
+        requests.put(s3uri, data=bytes, headers=header)
+        
     def upload(self, attachment):        
-        formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
-        accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
-        secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
-        s3host = os.getenv('OSS_S3_HOST')
-        s3region = os.getenv('OSS_S3_REGION')
-        s3service = os.getenv('OSS_S3_SERVICE')
         
         if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
             raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
@@ -48,3 +66,30 @@ class storageservice:
 
         attachmentobj = {'filename': filename, 'documentpath': s3uri, 'category': filestatustransition}
         return attachmentobj
+    
+    def download(self, s3uri): 
+
+        if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
+            raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
+        
+        auth = AWSRequestsAuth(aws_access_key=accesskey,
+                    aws_secret_access_key=secretkey,
+                    aws_host=s3host,
+                    aws_region=s3region,
+                    aws_service=s3service)
+
+        templatefile= requests.get(s3uri, auth=auth)
+        return templatefile
+
+
+    def downloadtemplate(self, templatename): 
+
+        s3templatefolder= "TEMPLATES"
+        if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
+            raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
+        #To DO : make the values of templatetype and templatename dynamic
+        templatetype= 'EMAILS'
+        s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket,s3templatefolder,templatetype,templatename)
+        templatefile= self.download(s3uri)
+        responsehtml=templatefile.text
+        return responsehtml
