@@ -50,8 +50,8 @@ connector.getVariable("statusCode");</camunda:script>
             <camunda:outputParameter name="foiRequestId">${foiRequestID}</camunda:outputParameter>
             <camunda:outputParameter name="firstName">${S(response).prop("firstName").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="lastName">${S(response).prop("lastName").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName")}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName")}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName") != null ? S(response).prop("assignedToFirstName").stringValue() : ""}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName") != null ?S(response).prop("assignedToLastName").stringValue() : ""}</camunda:outputParameter>
             <camunda:outputParameter name="assignedGroup">${S(response).prop("assignedGroup").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="email">${S(response).prop("email").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="apiUrl">${foiApiUrl}</camunda:outputParameter>
@@ -323,7 +323,7 @@ execution.setVariable("eretry", current+1); </camunda:script>
       <bpmndi:BPMNShape id="Event_1b3k3ug_di" bpmnElement="Event_1tmmrt5">
         <dc:Bounds x="522" y="402" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="513" y="447.5" width="54" height="27" />
+          <dc:Bounds x="513" y="448" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0jatpgl_di" bpmnElement="Event_0jatpgl">
