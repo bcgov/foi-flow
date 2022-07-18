@@ -100,6 +100,20 @@ class documentservice:
             documentschema = CreateDocumentSchema().load({'documents': attachmentlist})
             return self.createrequestdocument(requestid, documentschema, None, "rawrequest")        
 
+    def getattachments(self, requestid, requesttype, category):        
+        documents = self.getrequestdocumentsbycategory(requestid, requesttype, category)  
+        if(documents is None):
+            raise ValueError('No template found')
+        s3uri = documents[0].get('documentpath')
+        attachment= storageservice().download(s3uri)
+        return attachment
+    
+    def getrequestdocumentsbycategory(self, requestid, requesttype, category, version=None):
+        requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
+        documents = FOIMinistryRequestDocument.getdocumentsbycategory(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
+        return self.__formatcreateddate(documents)    
+
+    
     def __getversionforrequest(self, requestid, requesttype):
         """ Returns the active version of the request id based on type.
         """

@@ -65,8 +65,8 @@
     </script>
     <style>
       .scrollable-page {
-        position: relative;
-        overflow-y: clip;
+        position: fixed;
+        overflow-y: scroll;
         top: 0;
         right: 0;
         bottom: 0;
@@ -77,9 +77,9 @@
       .scrollable-page::-webkit-scrollbar {
     display: none;
 }
-      /* .no-scroll{
+      .no-scroll{
         overflow: hidden;
-      } */
+      }
       body {
          
          font-family: 'BCSans-Regular', sans-serif !important;
