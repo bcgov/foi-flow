@@ -28,7 +28,7 @@ class inboxservice:
     
     def _get_deliverystatus_by_text(self, text):
         try:
-            mailbox = MailBox(os.getenv('EMAIL_SERVER'))
+            mailbox = MailBox(os.getenv('EMAIL_SERVER_IMAP'))
             mailbox.login(os.getenv('EMAIL_SRUSERID'), os.getenv('EMAIL_SRPWD'))
             messages = mailbox.fetch(criteria=AND(subject='Delivery Status Notification')) 
             for message in messages:

@@ -25,7 +25,7 @@ class emailservice:
             _templatename = templateconfig().gettemplatename("PAYONLINE")
             _messagepart = templateservice().generatetemplate(_templatename, requestjson)
             _messageattachment = documentservice().getattachments(ministryrequestid, 'ministryrequest','feeassessed-onhold')
-            senderservice().send(_messagepart, _messageattachment.content)
+            senderservice().send(_messagepart, _messageattachment.content, requestjson)
         #template
         #senderservice.send(metadata, template, attachments)
         

@@ -15,11 +15,11 @@ class senderservice:
     """
 
     
-    def send(self, content, attachment):
+    def send(self, content, attachment, requestjson):
         msg = MIMEMultipart("alternative")
         msg['From'] = os.getenv('EMAIL_SRUSERID')
-        msg['To'] = "sumathi.thirumani@aot-technologies.com"
-        msg['Subject'] = "Hello email"
+        msg['To'] = requestjson["email"]
+        msg['Subject'] = "Your FOI Request ["+requestjson["axisRequestId"]+"]"
         part = MIMEText(content, "html")
         msg.attach(part)
         # Add Attachment
@@ -35,7 +35,7 @@ class senderservice:
         )
         msg.attach(part)
         try:
-            with smtplib.SMTP('smtp.gmail.com', 587) as smtpobj:
+            with smtplib.SMTP(os.getenv('EMAIL_SERVER_SMTP'), os.getenv('EMAIL_SERVER_SMTP_PORT')) as smtpobj:
                 smtpobj.ehlo()
                 smtpobj.starttls()
                 smtpobj.ehlo()

@@ -50,8 +50,8 @@ connector.getVariable("statusCode");</camunda:script>
             <camunda:outputParameter name="foiRequestId">${foiRequestID}</camunda:outputParameter>
             <camunda:outputParameter name="firstName">${S(response).prop("firstName").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="lastName">${S(response).prop("lastName").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName")}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName")}</camunda:outputParameter>
             <camunda:outputParameter name="assignedGroup">${S(response).prop("assignedGroup").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="email">${S(response).prop("email").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="apiUrl">${foiApiUrl}</camunda:outputParameter>
@@ -188,7 +188,8 @@ connector.getVariable("statusCode");</camunda:script>
 "balanceDue": execution.getVariable("fee"),
 "firstName": execution.getVariable("firstName"),
 "lastName": execution.getVariable("lastName"),
-"paymenturl": execution.getVariable("foiwebUrl")+"/payfeeonline/foirequest/"+execution.getVariable("foiRequestID")+"/ministryrequest/"+execution.getVariable("ministryRequestID")
+"email": execution.getVariable("email"),
+"paymenturl": execution.getVariable("foiwebUrl")+"/public/form/payfeeonline/foirequest/"+execution.getVariable("foiRequestID")+"/ministryrequest/"+execution.getVariable("ministryRequestID")
 };
 execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camunda:script>
         </camunda:executionListener>
@@ -272,7 +273,7 @@ execution.setVariable("eretry", current+1); </camunda:script>
         <di:waypoint x="198" y="117" />
         <di:waypoint x="310" y="117" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="222" y="93" width="68" height="14" />
+          <dc:Bounds x="223" y="93" width="68" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_017kmm6_di" bpmnElement="Flow_017kmm6">
