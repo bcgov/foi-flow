@@ -121,7 +121,7 @@ class FOIRequestsById(Resource):
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
-                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})                           
                 asyncio.ensure_future(requestservice().posteventtoworkflow(foiministryrequestid,  result.args[1], foirequestschema, json.loads(metadata),"iao"))
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
@@ -190,4 +190,27 @@ class FOIRequestUpdateById(Resource):
         except ValidationError as err:
             return {'status': False, 'message':err.messages}, 40
         except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/payonline')
+class FOIRequestDetailsByMinistryId(Resource):
+    """Retrieve foi request for opened request"""
+    
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # @auth.require
+    def get(foirequestid, foiministryrequestid):
+        try :
+            jsondata = {}
+            statuscode = 200            
+            jsondata = requestservice().getrequestdetailsforonlinepayment(foirequestid, foiministryrequestid)            
+            return jsondata , statuscode 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
