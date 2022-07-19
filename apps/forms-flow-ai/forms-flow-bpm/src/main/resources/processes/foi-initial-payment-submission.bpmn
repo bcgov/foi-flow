@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="1">
     <bpmn:serviceTask id="get-api-token" name="Get Token">
       <bpmn:extensionElements>
@@ -106,7 +106,8 @@ var base64userpass = base64.getEncoder().encodeToString(userpass.getBytes());
 execution.setVariable('base64userpass', base64userpass);
 execution.setVariable('realm', system.getenv('KEYCLOAK_URL_REALM'));
 execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
-execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda:script>
+execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));
+execution.setVariable('test', 'test');</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;eretry&#34;, 0)}" event="take" />
       </bpmn:extensionElements>
@@ -238,6 +239,10 @@ execution.setVariable("eretry", current+1); </camunda:script>
   <bpmn:message id="Message_0a9jdmw" name="foi-fee-payment" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="foi-fee-processing">
+      <bpmndi:BPMNEdge id="Flow_0j3oa0s_di" bpmnElement="Flow_0j3oa0s">
+        <di:waypoint x="590" y="117" />
+        <di:waypoint x="790" y="117" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0t5omzu_di" bpmnElement="Flow_0t5omzu">
         <di:waypoint x="975" y="310" />
         <di:waypoint x="840" y="310" />
@@ -303,10 +308,6 @@ execution.setVariable("eretry", current+1); </camunda:script>
         <di:waypoint x="410" y="117" />
         <di:waypoint x="490" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0j3oa0s_di" bpmnElement="Flow_0j3oa0s">
-        <di:waypoint x="590" y="117" />
-        <di:waypoint x="790" y="117" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1r0oka0_di" bpmnElement="get-api-token">
         <dc:Bounds x="310" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -329,6 +330,9 @@ execution.setVariable("eretry", current+1); </camunda:script>
       <bpmndi:BPMNShape id="Event_0jatpgl_di" bpmnElement="Event_0jatpgl">
         <dc:Bounds x="1132" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
+        <dc:Bounds x="640" y="150" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1wipndr_di" bpmnElement="Event_0crrhhb">
         <dc:Bounds x="162" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -346,9 +350,6 @@ execution.setVariable("eretry", current+1); </camunda:script>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_00eqdwt_di" bpmnElement="Event_0zmjrgk">
         <dc:Bounds x="982" y="402" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
-        <dc:Bounds x="640" y="150" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1ctb9ag_di" bpmnElement="Event_1ctb9ag">
         <dc:Bounds x="982" y="139" width="36" height="36" />
