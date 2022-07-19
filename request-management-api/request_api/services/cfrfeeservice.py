@@ -26,6 +26,12 @@ class cfrfeeservice:
         cfrfee = self.__preparecfrfee(ministryrequestid, data)   
         cfrfee.feedata.update(data['feedata'])
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
+
+    def paycfrfee(self, ministryrequestid, amountpaid):
+        cfrfee = self.getcfrfee(ministryrequestid)
+        cfrfee.version += 1
+        cfrfee.feedata.update({'amountpaid': amountpaid})
+        return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
   
     def __preparecfrfee(self, ministryrequestid, data):

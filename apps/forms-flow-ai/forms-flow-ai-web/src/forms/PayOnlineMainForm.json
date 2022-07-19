@@ -257,7 +257,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"eivd6a"
+               "id":"ee3jh7w"
             },
             {
                "label":"Request Details",
@@ -3220,7 +3220,7 @@
                                           "eq":"",
                                           "json":""
                                        },
-                                       "customConditional":"",
+                                       "customConditional":"if (data.fee > 0) {\n  show = true;\n}\nelse {\n  show = false;\n}",
                                        "logic":[
                                           
                                        ],
@@ -3277,7 +3277,7 @@
                                        "addons":[
                                           
                                        ],
-                                       "id":"er3yoof"
+                                       "id":"exh1l3q"
                                     }
                                  ],
                                  "width":3,
@@ -5263,7 +5263,7 @@
                                           "height":""
                                        },
                                        "type":"button",
-                                       "custom":"console.log(data)\nFormio.request(\n  data.apiUrl + '/api/foirawrequests/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"returnRoute\",\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
+                                       "custom":"console.log(data)\nFormio.request(\n  data.apiUrl + '/api/foirawrequests/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"/public/form/paymentlanding\",\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
                                        "input":true,
                                        "placeholder":"",
                                        "prefix":"",
@@ -5304,7 +5304,7 @@
                                        "addons":[
                                           
                                        ],
-                                       "id":"eji4myd"
+                                       "id":"e54qkw"
                                     }
                                  ],
                                  "width":6,

@@ -271,6 +271,11 @@ objects:
                 secretKeyRef:
                   name: "${REQUEST_MANAGEMENT_SECRETS}"
                   key: FOI_WEB_PAY_URL
+            - name: FOI_FFA_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_FFA_URL
             - name: PAYBC_REF_NUMBER
               valueFrom:
                 secretKeyRef:
