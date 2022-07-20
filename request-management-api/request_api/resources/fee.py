@@ -85,7 +85,7 @@ class Payment(Resource):
             request_json = request.get_json()
             fee_service: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
             pay_response, parsed_args = fee_service.complete_payment(request_json)
-            cfrfeeservice().paycfrfee(parsed_args.get('trnAmount'))
+            cfrfeeservice().paycfrfee(ministry_request_id, parsed_args.get('trnAmount'))
             # add call to event service to move request from on hold to cfr
             return pay_response, 201
         except BusinessException as e:
