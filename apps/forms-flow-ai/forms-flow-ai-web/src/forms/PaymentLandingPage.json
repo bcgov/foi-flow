@@ -91,7 +91,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"e0u41ww"
+               "id":"eyy5w0i"
             },
             {
                "label":"Payment Id",
@@ -354,7 +354,7 @@
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
-               "customDefaultValue":"var url = new URL(window.location.href);\ntrnApproved = url.searchParams.get('trnApproved');\nconsole.log(data.apiUrl)\nif (trnApproved === '1') {\n  Formio.request(\n    data.apiUrl + '/api/foirequests/' + data.ministryRequestId + '/payments/' + data.paymentId,\n    'PUT',\n    {\n     \"response_url\": window.location.href.split(\"?\")[1]\n    },\n    null,\n    {\n      headers: {\n        'content-type': 'application/json'\n      },\n      mode: 'no-cors'\n    }).then(function(result) {\n      if (result.status === 'PAID') {\n        value = true;\n      } else {\n        value = false;\n      }\n    });\n} else {\n  value = false;\n}",
+               "customDefaultValue":"var url = new URL(window.location.href);\ntrnApproved = url.searchParams.get('trnApproved');\n// console.log(data.apiUrl)\nif (trnApproved === '1') {\n  value = true\n} else {\n  value = false;\n}",
                "calculateValue":"",
                "calculateServer":false,
                "key":"transactionApproved",
@@ -423,7 +423,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"eo6n70n"
+               "id":"e5lqibj"
             },
             {
                "label":"PayOnlineCard",
@@ -449,7 +449,24 @@
                },
                "customConditional":"",
                "logic":[
-                  
+                  {
+                     "name":"Call Update API",
+                     "trigger":{
+                        "type":"simple",
+                        "simple":{
+                           "show":true,
+                           "when":"transactionApproved",
+                           "eq":"true"
+                        }
+                     },
+                     "actions":[
+                        {
+                           "name":"Call Update API",
+                           "type":"customAction",
+                           "customAction":"console.log(\"here\")\nFormio.request(\n    data.apiUrl + '/api/foirequests/' + data.ministryRequestId + '/payments/' + data.paymentId,\n    'PUT',\n    {\n    \"response_url\": window.location.href.split(\"?\")[1]\n    },\n    null,\n    {\n      headers: {\n        'content-type': 'application/json'\n      },\n      mode: 'no-cors'\n    }).then(function(result) {\n      if (result.status === 'PAID') {\n        data.transactionApproved = true;\n      } else {\n        data.transactionApproved = false;\n      }\n    });"
+                        }
+                     ]
+                  }
                ],
                "attributes":{
                   
@@ -553,7 +570,7 @@
                                  "addons":[
                                     
                                  ],
-                                 "id":"ecy7aya"
+                                 "id":"e7t6eb"
                               },
                               {
                                  "html":"<p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\"><span class=\"text-huge\" style=\"color:#003366;\"><strong>You have received an email regarding your request details including your new Legislated Due Date and a copy of your receipt</strong></span></p>",
@@ -626,7 +643,7 @@
                                  "addons":[
                                     
                                  ],
-                                 "id":"egc0px"
+                                 "id":"eseos36"
                               },
                               {
                                  "html":"<p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\"><span style=\"background-color:rgb(255,255,255);color:rgb(0,51,102);\">If you would like to contact the Information Access Operations representative, please Email FOI at: FOI.Requests@gov.bc.ca, or call, Phone: 250-387-1321 | Toll Free: 833-283-8200</span></p>",
@@ -699,7 +716,7 @@
                                  "addons":[
                                     
                                  ],
-                                 "id":"e6jzc1q"
+                                 "id":"e6o0z2"
                               }
                            ],
                            "width":10,
@@ -791,7 +808,7 @@
                      "tree":false,
                      "lazyLoad":false,
                      "autoAdjust":false,
-                     "id":"er9cyvj"
+                     "id":"eul58al"
                   },
                   {
                      "label":"HTML",
@@ -871,7 +888,7 @@
                         
                      ],
                      "tag":"p",
-                     "id":"ej9kjip"
+                     "id":"efhfvot"
                   },
                   {
                      "label":"HTML",
@@ -951,7 +968,7 @@
                         
                      ],
                      "tag":"p",
-                     "id":"e0bgdx6"
+                     "id":"evw6n3d"
                   }
                ],
                "placeholder":"",
@@ -996,7 +1013,7 @@
                ],
                "tree":false,
                "lazyLoad":false,
-               "id":"e4dsm08"
+               "id":"eg4n6r"
             },
             {
                "legend":"",
