@@ -28,8 +28,7 @@ class cfrfeeservice:
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
 
     def paycfrfee(self, ministryrequestid, amountpaid):
-        cfrfee = self.getcfrfee(ministryrequestid)
-        cfrfee.version += 1
+        cfrfee = self.__preparecfrfee(ministryrequestid, {'status': 'approved'}) # status should always be approved before payment
         cfrfee.feedata.update({'amountpaid': amountpaid})
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
