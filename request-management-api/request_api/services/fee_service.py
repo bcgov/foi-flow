@@ -75,7 +75,7 @@ class FeeService:
             request_id=self.request_id
         ).flush()
 
-        self.payment.paybc_url = self._get_paybc_url(self.fee_code, return_route)
+        self.payment.paybc_url = self._get_paybc_url(self.fee_code, return_route, pay_request.get('half', False))
         self.payment.transaction_number = self._get_transaction_number()
         self.payment.commit()
         pay_response = self._dump()
@@ -146,7 +146,7 @@ class FeeService:
         )
         return pay_response
 
-    def _get_paybc_url(self, fee_code: FeeCode, return_route):
+    def _get_paybc_url(self, fee_code: FeeCode, return_route, half):
         """Return the payment system url."""
         date_val = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime(
             '%Y-%m-%d')
@@ -166,7 +166,8 @@ class FeeService:
                            'paymentMethod': 'CC',
                            'redirectUri': return_url,
                            'currency': 'CAD',
-                           'revenue': self._get_gl_coding(self.payment.total, revenue_account)
+                           'revenue': self._get_gl_coding(self.payment.total, revenue_account),
+                           'half': half
                            }
 
         url_params = urlencode(url_params_dict)
