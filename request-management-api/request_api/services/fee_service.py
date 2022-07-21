@@ -64,7 +64,7 @@ class FeeService:
         return_route = pay_request.get('return_route')
         quantity = int(pay_request.get('quantity', 1))
         if self.fee_code.code == FeeType.processing.value:
-            total = self._get_cfr_fee(self.request_id, pay_request['half'])
+            total = self._get_cfr_fee(self.request_id, pay_request)
         else:
             total = quantity * self.fee_code.fee
         self.payment = Payment(
@@ -75,7 +75,7 @@ class FeeService:
             request_id=self.request_id
         ).flush()
 
-        self.payment.paybc_url = self._get_paybc_url(self.fee_code, return_route, pay_request.get('half', False))
+        self.payment.paybc_url = self._get_paybc_url(self.fee_code, return_route)
         self.payment.transaction_number = self._get_transaction_number()
         self.payment.commit()
         pay_response = self._dump()
@@ -146,7 +146,7 @@ class FeeService:
         )
         return pay_response
 
-    def _get_paybc_url(self, fee_code: FeeCode, return_route, half):
+    def _get_paybc_url(self, fee_code: FeeCode, return_route):
         """Return the payment system url."""
         date_val = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime(
             '%Y-%m-%d')
@@ -166,8 +166,7 @@ class FeeService:
                            'paymentMethod': 'CC',
                            'redirectUri': return_url,
                            'currency': 'CAD',
-                           'revenue': self._get_gl_coding(self.payment.total, revenue_account),
-                           'half': half
+                           'revenue': self._get_gl_coding(self.payment.total, revenue_account)
                            }
 
         url_params = urlencode(url_params_dict)
@@ -227,9 +226,12 @@ class FeeService:
         current_app.logger.debug('>Getting token')
         return response
 
-    def _get_cfr_fee(self, ministry_request_id, half=False):
-        fee = cfrfeeservice().getcfrfee(ministry_request_id)['feedata']['totalamountdue']
-        if half:
-            return fee/2
+    def _get_cfr_fee(self, ministry_request_id, pay_request):
+        if pay_request.get('retry', False):
+            return Payment.find_paid_transaction(pay_request['transaction_number']).total
         else:
-            return fee
+            fee = cfrfeeservice().getcfrfee(ministry_request_id)['feedata']['totalamountdue']
+            if pay_request.get('half', False):
+                return fee/2
+            else:
+                return fee
