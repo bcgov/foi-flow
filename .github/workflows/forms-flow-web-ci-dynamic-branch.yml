@@ -1,0 +1,31 @@
+name: dynamic branch name - Forms-Flow-Web CD
+
+
+on:
+  push:
+    branches:
+      # - dev-marshal
+      # - test-marshal
+      - dev-marshal-RQ-2270
+      - dev-marshal-RQ-merge-main
+
+jobs:
+  forms-flow-web-cd-by-push:
+    runs-on: ubuntu-20.04
+
+    if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
+    steps:
+      - name: Extract branch name
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      # extract branch name on pull request
+      - name: Print branch name
+        if: github.event_name == 'pull_request'
+        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_HEAD_REF})"
+
+      # print branch name
+      - name: Get branch name
+        run: echo 'The branch name is' $BRANCH_NAME
