@@ -50,20 +50,20 @@ connector.getVariable("statusCode");</camunda:script>
             <camunda:outputParameter name="foiRequestId">${foiRequestID}</camunda:outputParameter>
             <camunda:outputParameter name="firstName">${S(response).prop("firstName").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="lastName">${S(response).prop("lastName").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName")}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName")}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName") != null ? S(response).prop("assignedToFirstName").stringValue() : ""}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName") != null ?S(response).prop("assignedToLastName").stringValue() : ""}</camunda:outputParameter>
             <camunda:outputParameter name="assignedGroup">${S(response).prop("assignedGroup").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="email">${S(response).prop("email").stringValue()}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
         <camunda:executionListener event="end">
-          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry");
-execution.setVariable("retry", current+1); </camunda:script>
+          <camunda:script scriptFormat="javascript">var current = execution.getVariable("pretry");
+execution.setVariable("pretry", current+1); </camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_17bdgfc</bpmn:incoming>
-      <bpmn:outgoing>Flow_0hjhi4p</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0j3oa0s</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_17odcea" attachedToRef="invoke-reqmgmt-api">
       <bpmn:outgoing>Flow_1ys38a6</bpmn:outgoing>
@@ -84,18 +84,18 @@ execution.setVariable("retry", current+1); </camunda:script>
     <bpmn:sequenceFlow id="Flow_1ys38a6" sourceRef="Event_17odcea" targetRef="Event_1k8aoc7" />
     <bpmn:sequenceFlow id="Flow_1kzesmk" sourceRef="Event_1k8aoc7" targetRef="Gateway_0q2f2o1" />
     <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="get-api-token">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &lt;= 3}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${pretry &lt;= 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:intermediateThrowEvent id="Event_1tmmrt5" name="API Failure Message">
       <bpmn:incoming>Flow_017kmm6</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0950kk2" messageRef="Message_1yee5gs" />
     </bpmn:intermediateThrowEvent>
     <bpmn:sequenceFlow id="Flow_017kmm6" name="Retry &#62; 3" sourceRef="Gateway_0q2f2o1" targetRef="Event_1tmmrt5">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &gt; 3}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${pretry &gt; 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0w9yqn4" name="apply settings" sourceRef="Event_0crrhhb" targetRef="get-api-token">
       <bpmn:extensionElements>
-        <camunda:executionListener expression="${execution.setVariable(&#34;retry&#34;, 0)}" event="take" />
+        <camunda:executionListener expression="${execution.setVariable(&#34;pretry&#34;, 0)}" event="take" />
         <camunda:executionListener event="take">
           <camunda:script scriptFormat="javascript">var system = java.lang.System;
 var base64 = java.util.Base64;
@@ -161,10 +161,6 @@ connector.getVariable("statusCode");</camunda:script>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
-        <camunda:executionListener event="end">
-          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry");
-execution.setVariable("retry", current+1); </camunda:script>
-        </camunda:executionListener>
         <camunda:executionListener event="start">
           <camunda:script scriptFormat="javascript">
 var paymentPayload = {
@@ -209,10 +205,10 @@ execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camund
       <bpmn:messageEventDefinition id="MessageEventDefinition_0c9qj9y" />
     </bpmn:intermediateThrowEvent>
     <bpmn:sequenceFlow id="Flow_03c4tff" name="Retry &#62; 3" sourceRef="Gateway_0ubhnez" targetRef="Event_0zmjrgk">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &gt; 3}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eretry &gt; 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0t5omzu" name="Retry [1..3]" sourceRef="Gateway_0ubhnez" targetRef="Activity_182gpr3">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &lt;= 3}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eretry &lt;= 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_135z2sh" sourceRef="Activity_0k05bsn" targetRef="Activity_182gpr3">
       <bpmn:extensionElements>

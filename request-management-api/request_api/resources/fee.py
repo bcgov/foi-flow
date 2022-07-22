@@ -20,6 +20,7 @@ from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
 
 from request_api.services import FeeService
+from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
@@ -67,11 +68,29 @@ class Payment(Resource):
         try:
             request_json = request.get_json()
             fee_service: FeeService = FeeService(request_id=request_id, payment_id=payment_id)
-            pay_response = fee_service.complete_payment(request_json)
+            pay_response = fee_service.complete_payment(request_json)[0]
             return pay_response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
 
+
+@cors_preflight('PUT,OPTIONS')
+@API.route('/foirequests/<int:ministry_request_id>/payments/<int:payment_id>')
+class Payment(Resource):
+
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    def put(ministry_request_id: int, payment_id: int):
+        try:
+            request_json = request.get_json()
+            fee_service: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
+            pay_response, parsed_args = fee_service.complete_payment(request_json)
+            if (pay_response['status'] == 'PAID'):
+                cfrfeeservice().paycfrfee(ministry_request_id, float(parsed_args.get('trnAmount')))
+                # add call to event service to move request from on hold to cfr
+            return pay_response, 201
+        except BusinessException as e:
+            return {'status': e.code, 'message': e.message}, e.status_code
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirawrequests/<int:request_id>/payments/<int:payment_id>/receipt')
 class Payment(Resource):

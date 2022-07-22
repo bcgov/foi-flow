@@ -100,7 +100,7 @@ class documentservice:
             documentschema = CreateDocumentSchema().load({'documents': attachmentlist})
             return self.createrequestdocument(requestid, documentschema, None, "rawrequest")        
 
-    def getattachments(self,requestid, requesttype, category):        
+    def getattachments(self, requestid, requesttype, category):        
         documents = self.getrequestdocumentsbycategory(requestid, requesttype, category)  
         if(documents is None):
             raise ValueError('No template found')

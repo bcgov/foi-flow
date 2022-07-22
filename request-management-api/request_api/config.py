@@ -129,6 +129,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     # Fees
     LEGISLATIVE_TIMEZONE = 'America/Vancouver'
     FOI_WEB_PAY_URL = os.getenv('FOI_WEB_PAY_URL')
+    FOI_FFA_URL = os.getenv('FOI_FFA_URL')
     PAYBC_REF_NUMBER = os.getenv('PAYBC_REF_NUMBER')
     PAYBC_PORTAL_URL = os.getenv('PAYBC_PORTAL_URL')
     PAYBC_TXN_PREFIX = os.getenv('PAYBC_TXN_PREFIX', 'FOI')
