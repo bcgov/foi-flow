@@ -18,9 +18,13 @@ from datetime import datetime
 from flask import request, send_file, Response
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
+import json
+import asyncio
 
 from request_api.services import FeeService
 from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.requestservice import requestservice
+from request_api.services.eventservice import eventservice
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
@@ -84,11 +88,19 @@ class Payment(Resource):
         try:
             request_json = request.get_json()
             fee_service: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
-            pay_response, parsed_args = fee_service.complete_payment(request_json)
-            if (pay_response['status'] == 'PAID'):
+            response, parsed_args = fee_service.complete_payment(request_json)
+            if (response['status'] == 'PAID'):
                 cfrfeeservice().paycfrfee(ministry_request_id, float(parsed_args.get('trnAmount')))
-                # add call to event service to move request from on hold to cfr
-            return pay_response, 201
+                foirequestschema = requestservice().getrequest(fee_service.request['foirequest_id'], ministry_request_id)
+                foirequestschema['requeststatusid'] = 2
+                result = requestservice().saverequestversion(foirequestschema, fee_service.request['foirequest_id'], ministry_request_id,'Online Payment')
+                if result.success == True:
+                    asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id,'Online Payment','Applicant through Online Payment'))
+                    metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                    asyncio.ensure_future(requestservice().posteventtoworkflow(ministry_request_id,  result.args[1], foirequestschema, json.loads(metadata),"iao"))                    
+                    # add call to send email to applicant
+                response.update({'wf_status': result.success, 'message':result.message,'id':result.identifier})
+            return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
 @cors_preflight('POST,OPTIONS')

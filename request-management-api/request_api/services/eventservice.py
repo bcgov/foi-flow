@@ -9,6 +9,7 @@ from request_api.services.events.comment import commentevent
 from request_api.services.events.legislativedate import legislativedateevent
 from request_api.services.events.extension import extensionevent
 from request_api.services.events.cfrfeeform import cfrfeeformevent
+from request_api.services.events.payment import paymentevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 import json
@@ -75,6 +76,14 @@ class eventservice:
             if cfrfeeeventresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
         except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+
+    async def postpaymentevent(self, requestid, userid, username):
+        try:
+            paymeneteventresponse = paymentevent().createpaymentevent(requestid, userid, username)
+            if paymeneteventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for payment event for request= %s ; event response=%s" % (requestid, paymeneteventresponse.message))
+        except BusinessException as exception:
             self.__logbusinessexception(exception)
         
     def __logbusinessexception(self, exception):
