@@ -105,14 +105,12 @@ class documentservice:
         if(documents is None):
             raise ValueError('No template found')
         attachmentlist = []
-        print("documents",documents)
         for document in documents:  
             filename = document.get('filename')
             s3uri = document.get('documentpath')
             attachment= storageservice().download(s3uri)
             attachdocument = {"filename": filename, "file": attachment}
             attachmentlist.append(attachdocument)
-        print("attachmentlist",attachmentlist)
         return attachmentlist
     
     def getrequestdocumentsbycategory(self, requestid, requesttype, category, version=None):
