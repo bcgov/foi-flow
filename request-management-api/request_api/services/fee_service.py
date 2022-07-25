@@ -64,7 +64,7 @@ class FeeService:
         return_route = pay_request.get('return_route')
         quantity = int(pay_request.get('quantity', 1))
         if self.fee_code.code == FeeType.processing.value:
-            total = self._get_cfr_fee(self.request_id, pay_request['half'])
+            total = self._get_cfr_fee(self.request_id, pay_request)
         else:
             total = quantity * self.fee_code.fee
         self.payment = Payment(
@@ -226,9 +226,12 @@ class FeeService:
         current_app.logger.debug('>Getting token')
         return response
 
-    def _get_cfr_fee(self, ministry_request_id, half=False):
-        fee = cfrfeeservice().getcfrfee(ministry_request_id)['feedata']['totalamountdue']
-        if half:
-            return fee/2
+    def _get_cfr_fee(self, ministry_request_id, pay_request):
+        if pay_request.get('retry', False):
+            return Payment.find_failed_transaction(pay_request['transaction_number']).total
         else:
-            return fee
+            fee = cfrfeeservice().getcfrfee(ministry_request_id)['feedata']['totalamountdue']
+            if pay_request.get('half', False):
+                return fee/2
+            else:
+                return fee
