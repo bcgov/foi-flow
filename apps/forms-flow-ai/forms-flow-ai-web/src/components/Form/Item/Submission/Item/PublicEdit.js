@@ -6,11 +6,21 @@ import {setFormSubmissionError, setFormSubmissionLoading} from '../../../../../a
 import SubmissionError from '../../../../../containers/SubmissionError';
 import {useParams} from "react-router-dom";
 import LoadingOverlay from "react-loading-overlay";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(() => ({
+  publicstyle: {
+    display: "none !important",
+    height: "0px !important",
+    marginTop: "0px !important",
+    marginBottom: "0px !important",
+  },
+}));
 
 const PublicEdit = React.memo((props) => {
   const dispatch = useDispatch();
   const {formId, submissionId} = useParams();
-  console.log(`formId: ${formId}, submissionId: ${submissionId}`)
+  const classes = useStyles();
   const {
     hideComponents,
     onSubmit,
@@ -27,15 +37,14 @@ const PublicEdit = React.memo((props) => {
     dispatch(getForm('form',formId));
     dispatch(getSubmission('submission', submissionId, formId));
     dispatch(setFormSubmissionLoading(false));
-  }, [dispatch, submissionId, formId, onFormSubmit ]);  
+  }, [dispatch, submissionId, formId]);  
 
   if ((isFormActive ||  (isSubActive && !isFormSubmissionLoading))) {
       return <Loading />;
   }
-  console.log(form) 
   return (
-      <div className="container">
-        <div className="main-header">
+      <div className="container overflow-y-auto">
+        <div className={`main-header ${classes.publicstyle}`}>
           <SubmissionError modalOpen={props.submissionError.modalOpen}
             message={props.submissionError.message}
             onConfirm={props.onConfirm}
@@ -50,7 +59,7 @@ const PublicEdit = React.memo((props) => {
           submission={submission}
           url={url}
           hideComponents={hideComponents}
-          onSubmit={(submission)=>onSubmit(submission,onFormSubmit,form._id)}
+          onSubmit={(_submission)=>onSubmit(_submission, onFormSubmit, form._id)}
           options={{ ...options }}
           onCustomEvent={onCustomEvent}
         />
@@ -89,26 +98,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onSubmit: (submission, onFormSubmit, formId) => {
-      console.log(`formId = ${formId}`)
       dispatch(setFormSubmissionLoading(true));
-      dispatch(saveSubmission('submission', submission, onFormSubmit?formId: ownProps.match.params.formId, (err, submission) => {
-        // if (!err) {
-        //     // dispatch(resetSubmissions('submission'));
-        //     dispatch(setFormSubmissionLoading(false));
-        //     if(onFormSubmit){
-        //     onFormSubmit();
-        //   } else {
-        //     toast.success("Submission Saved.");
-        //     dispatch(push(`/public/form/${ownProps.match.params.formId}/submission/${submission._id}/edit`))
-        //   }          
-        // }
-        // else {
-        //   dispatch(setFormSubmissionLoading(false));
-        //   const ErrorDetails = { modalOpen: true, message: "Submission cannot be done" }
-        //   toast.error("Error while Submission.");
-        //   dispatch(setFormSubmissionError(ErrorDetails))
-        // }
-      }));
+      dispatch(saveSubmission('submission', submission, onFormSubmit?formId: ownProps.match.params.formId));
     },
     onConfirm: () => {
       const ErrorDetails = { modalOpen: false, message: "" }
