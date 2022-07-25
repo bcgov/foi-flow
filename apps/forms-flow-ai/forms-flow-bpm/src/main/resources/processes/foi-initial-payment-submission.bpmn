@@ -219,6 +219,12 @@ execution.setVariable('paymentUrl', paymentUrl);</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
+    <bpmn:startEvent id="Event_0crrhhb">
+      <bpmn:outgoing>Flow_0w9yqn4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1sjuwuo" messageRef="Message_0a9jdmw" />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0ic2930" sourceRef="Activity_182gpr3" targetRef="Activity_0v6jdes" />
+    <bpmn:sequenceFlow id="Flow_02qamqn" sourceRef="Activity_0v6jdes" targetRef="Event_0jatpgl" />
     <bpmn:task id="Activity_0k05bsn" name="Create Submission">
       <bpmn:extensionElements>
         <camunda:properties>
@@ -239,12 +245,6 @@ execution.setVariable('paymentUrl', paymentUrl);</camunda:script>
       <bpmn:incoming>Flow_0hjhi4p</bpmn:incoming>
       <bpmn:outgoing>Flow_135z2sh</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:startEvent id="Event_0crrhhb">
-      <bpmn:outgoing>Flow_0w9yqn4</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1sjuwuo" messageRef="Message_0a9jdmw" />
-    </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_0ic2930" sourceRef="Activity_182gpr3" targetRef="Activity_0v6jdes" />
-    <bpmn:sequenceFlow id="Flow_02qamqn" sourceRef="Activity_0v6jdes" targetRef="Event_0jatpgl" />
   </bpmn:process>
   <bpmn:error id="Error_06fsjjn" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
@@ -359,14 +359,14 @@ execution.setVariable('paymentUrl', paymentUrl);</camunda:script>
       <bpmndi:BPMNShape id="Event_00eqdwt_di" bpmnElement="Event_0zmjrgk">
         <dc:Bounds x="982" y="1252" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1r7ne7x_di" bpmnElement="Activity_0k05bsn">
-        <dc:Bounds x="630" y="927" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0l9ppnk_di" bpmnElement="Event_0crrhhb">
         <dc:Bounds x="162" y="949" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0jatpgl_di" bpmnElement="Event_0jatpgl">
         <dc:Bounds x="1222" y="949" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1l3rr77_di" bpmnElement="Activity_0k05bsn">
+        <dc:Bounds x="630" y="927" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1ctb9ag_di" bpmnElement="Event_1ctb9ag">
         <dc:Bounds x="1043" y="989" width="36" height="36" />
