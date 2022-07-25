@@ -33,7 +33,7 @@ class emailservice:
         
     def acknowledge(self, requestid):
         try:
-            #print("test")
+            print("test")
             #inboxservice._get_failure
             #storageservice().uploadbytes("email2.pdf",pdf_content)
             
