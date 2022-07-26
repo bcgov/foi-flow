@@ -96,8 +96,8 @@ class requestservicegetter:
     def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        assignedtofirstname = requestministry["assignee.firstname"] if requestministry["assignedto"] != None else None
-        assignedtolastname = requestministry["assignee.lastname"] if requestministry["assignedto"] != None else None
+        assignedtofirstname = requestministry["assignee.firstname"] if requestministry["assignedto"] != None else ""
+        assignedtolastname = requestministry["assignee.lastname"] if requestministry["assignedto"] != None else ""
         assignedgroup = requestministry["assignedgroup"]
         idnumber = requestministry["filenumber"]
         axisrequestid = requestministry["axisrequestid"]

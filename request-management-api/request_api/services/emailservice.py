@@ -24,8 +24,8 @@ class emailservice:
         if requestjson is not None:
             _templatename = templateconfig().gettemplatename("PAYONLINE")
             _messagepart = templateservice().generatetemplate(_templatename, requestjson)
-            _messageattachment = documentservice().getattachments(ministryrequestid, 'ministryrequest','feeassessed-onhold')
-            senderservice().send(_messagepart, _messageattachment.content, requestjson)
+            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest','feeassessed-onhold')
+            senderservice().send(_messagepart, _messageattachmentlist, requestjson)
         #template
         #senderservice.send(metadata, template, attachments)
         

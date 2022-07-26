@@ -1,13 +1,14 @@
-import React, {useEffect} from 'react'
-import { Route } from 'react-router-dom'
-import { connect } from 'react-redux'
-import { getForm } from 'react-formio'
+import React, {useEffect} from 'react';
+import { Route } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { getForm } from 'react-formio';
 
-import UserService from '../services/UserService'
-import View from '../components/Form/Item/View'
+import UserService from '../services/UserService';
+import View from '../components/Form/Item/View';
+import PublicEdit from '../components/Form/Item/Submission/Item/PublicEdit';
 import NavBar from "../containers/NavBar";
 import Footer from './Footer';
-import NotFound from './NotFound'
+import NotFound from './NotFound';
  
 const PublicRoute =({store})=>{
 
@@ -17,9 +18,9 @@ const PublicRoute =({store})=>{
     return (
           <div className="container">
               <NavBar/>
-              <Route path="/public/form/:formId/:ministryRequestId/:paymentId" component={View}/>
-              <Route path="/public/form/:formId/foirequest/:foiRequestId/ministryrequest/:ministryRequestId" component={View}/>
-              <Route exact path="/public/form/:formId/submission/:submissionId" component={View}/>
+              {/* <Route path="/public/form/:formId/foirequest/:foiRequestId/ministryrequest/:ministryRequestId" component={View}/> */}
+              <Route exact path="/public/form/:formId/submission/:submissionId/edit" component={PublicEdit}/>
+              {/* <Route exact path="/public/form/:formId/:ministryRequestId/:paymentId" component={View}/> */}
               <Route exact path="/public/form/:formId/:notavailable" component={NotFound}/>
               <Footer/>
           </div>
