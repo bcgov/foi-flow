@@ -345,6 +345,9 @@ execution.setVariable("eretry", current+1); </camunda:script>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="630" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
+        <dc:Bounds x="640" y="150" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1wipndr_di" bpmnElement="Event_0crrhhb">
         <dc:Bounds x="162" y="169" width="36" height="36" />
       </bpmndi:BPMNShape>
