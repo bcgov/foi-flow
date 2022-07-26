@@ -3646,7 +3646,7 @@
                                           "height":""
                                        },
                                        "type":"button",
-                                       "custom":"data[\"currentPage\"] = \"payOnlinePage2\"",
+                                       "custom":"if (data.fee >= 200) {\n  data[\"currentPage\"] = \"payOnlinePage2\";\n}\nelse {\n  data[\"currentPage\"] = \"payOnlinePage1\"\n}",
                                        "input":true,
                                        "placeholder":"",
                                        "prefix":"",
@@ -3687,7 +3687,7 @@
                                        "addons":[
                                           
                                        ],
-                                       "id":"e84xhv"
+                                       "id":"excdkz"
                                     }
                                  ],
                                  "width":2,
