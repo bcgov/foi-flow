@@ -18,7 +18,7 @@ import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
 import { formatDate, calculateDaysRemaining, ConditionalComponent } from "../../../../helper/FOI/helper";
-import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
 
 const useStyles = makeStyles((theme) => ({
@@ -69,7 +69,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const axisRequestId = saveRequestObject?.axisRequestId;
     const currentState = saveRequestObject?.currentState;
     const daysRemainingLDD = calculateDaysRemaining(saveRequestObject?.dueDate);
-    const multipleFiles = false;
+    const multipleFiles = state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?true:false;
     const reOpenRequest = currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
     const [files, setFiles] = useState([]);
     const updateFilesCb = (_files) => {
@@ -177,8 +177,10 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               attchmentFileNameList={attchmentFileNameList}
               multipleFiles={multipleFiles}
               mimeTypes={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MimeTypeList.stateTransitionFees:MimeTypeList.stateTransition}
-              maxFileSize={MaxFileSizeInMB.stateTransition}
+              maxFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.feeEstimateAttachment:MaxFileSizeInMB.stateTransition}
               updateFilesCb={updateFilesCb}
+              totalFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.totalFeeEstimateFileSize:MaxFileSizeInMB.totalFileSize}
+              maxNumberOfFiles={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxNumberOfFiles.feeEstimateFiles:MaxNumberOfFiles.attachments}
             />
           </div>
         );
