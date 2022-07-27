@@ -9,12 +9,11 @@ from imap_tools import MailBox, AND
 import logging
 from request_api.services.documentservice import documentservice
 from request_api.services.external.storageservice import storageservice
-from request_api.services.requestservice import requestservice
 from request_api.services.email.templates.templateservice import templateservice
 from request_api.services.email.templates.templateconfig import templateconfig
 from request_api.services.email.senderservice import senderservice
 from request_api.services.email.inboxservice import inboxservice
-from request_api.schemas.foidocument import  CreateDocumentSchema, DocumentSchema
+from request_api.services.eventservice import eventservice
 
 import weasyprint
 
@@ -39,6 +38,7 @@ class emailservice:
             ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicekey, requestjson), requestjson["email"])
             if ackresponse["success"] == False:
                 self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson)   
+                eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicekey), "xyz")
         except Exception as ex:
             logging.exception(ex)
         logging.debug("Acknowledge email for foi request= "+json.dumps(requestjson) )
