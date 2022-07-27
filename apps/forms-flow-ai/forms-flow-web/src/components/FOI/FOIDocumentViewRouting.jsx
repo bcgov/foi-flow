@@ -14,26 +14,24 @@ import AttachmentViewer from "./customComponents/AttachmentViewer"
 
 const FOIDocumentViewRouting = React.memo((props) => {
   const dispatch = useDispatch();
-  const isAuth = useSelector((state) => state.user.isAuthenticated); 
-
-
-  useEffect(()=>{
-    console.log('authenticate')
-    if(props.store){
-      UserService.initKeycloak(props.store, (_err, res) => {
+  useEffect(()=>{  
+    let _store =  props.store;
+    if(_store){
+      UserService.initKeycloak(_store, (_err, res) => {
         dispatch(setUserAuth(res.authenticated));
       });
     }
   },[props.store, dispatch]);
-  const userDetail = useSelector(state=> state.user.userDetail);
-  const isAuthorized = useSelector(state=> state.user.isAuthorized);
 
-  const queryParams = new URLSearchParams(window.location.search);
-  const _filepath = queryParams.get('filepath');
+  const _userDetail = useSelector(state=> state.user.userDetail);
+  const _isAuthorized = useSelector(state=> state.user.isAuthorized);
+  const _isAuth = useSelector((state) => state.user.isAuthenticated); 
+  const _queryParams = new URLSearchParams(window.location.search);
+  const _filepath = _queryParams.get('filepath');
 
   const renderViewer =()=>{
 
-    if(isAuthorized)
+    if(_isAuthorized)
     {
       return (
         <>                          
@@ -55,7 +53,7 @@ const FOIDocumentViewRouting = React.memo((props) => {
 
   return (
       <>
-        {isAuth && Object.entries(userDetail).length !== 0 ? (
+        {_isAuth && Object.entries(_userDetail).length !== 0 ? (
           renderViewer()
         ) : (
           <Loading />
