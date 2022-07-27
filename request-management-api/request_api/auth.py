@@ -60,7 +60,24 @@ class Auth:
                 else:
                     return func(type, id, field,*args, **kwargs)            
         return decorated           
-           
+
+    @classmethod
+    def documentbelongstosameministry(cls,func):
+        @wraps(func)
+        def decorated( ministryrequestid, *args, **kwargs):           
+            usertype = AuthHelper.getusertype()
+            if(usertype == "iao"):
+                return func( ministryrequestid,*args, **kwargs)
+            elif(usertype == "ministry"):    
+                requestministry = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+                ministrygroups = AuthHelper.getministrygroups()
+                expectedministrygroup = MinistryTeamWithKeycloackGroup[requestministry['programarea.bcgovcode']].value
+                retval = "Unauthorized" , 401
+                if(expectedministrygroup not in ministrygroups):
+                    return retval
+                else:
+                    return func(id, *args, **kwargs)            
+        return decorated        
              
     
     @classmethod

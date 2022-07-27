@@ -289,6 +289,7 @@ export const AttachmentSection = ({
       handlePopupButtonClick={handlePopupButtonClick} 
       getFullname={getFullname} 
       isMinistryCoordinator={isMinistryCoordinator}
+      ministryId={ministryId}
       classes={classes} 
     />);
   }
@@ -365,7 +366,7 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
+const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId}) => {
   
   const classes = useStyles();
   const [disabled, setDisabled] = useState(isMinistryCoordinator && attachment.category == 'personal');
@@ -407,7 +408,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
     else{
       return (
         <div onClick={()=>{
-          opendocumentintab(attachment);
+          opendocumentintab(attachment,ministryId);
         }}
           className="attachment-name viewattachment"
         >
@@ -452,6 +453,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
           attachment={attachment}
           handlePopupButtonClick={handlePopupButtonClick}
           disabled={disabled}
+          ministryId={ministryId}
         />
       </Grid>
 
@@ -480,14 +482,14 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   );
 })
 
-const opendocumentintab =(attachment)=>
+const opendocumentintab =(attachment,ministryId)=>
 {
   let relativedocpath = attachment.documentpath.split('/').slice(4).join('/')
-  let url =`/foidocument?filepath=${relativedocpath}`;
+  let url =`/foidocument?id=${ministryId}&filepath=${relativedocpath}`;
   window.open(url, '_blank').focus();
 }
 
-const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled}) => {
+const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled,ministryId}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
@@ -508,7 +510,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
 
   const handleView =()=>{
     closeTooltip();    
-    opendocumentintab(attachment);
+    opendocumentintab(attachment,ministryId);
   }
 
   const handleDelete = () => {
