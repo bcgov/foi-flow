@@ -8,6 +8,7 @@ import {
     serviceActionError,
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
+  import UserService from "../../../services/UserService";
   
   export const getOSSHeaderDetails = (data, dispatch, ...rest) => {
     const done = fnDone(rest);
