@@ -397,7 +397,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
     {
       return (
         <div 
-          className={`attachment-name ${disabled ? "attachment-disabled" : ""}`}
+          className="attachment-name attachment-disabled"
         >
           {attachment.filename}
         </div>
@@ -409,7 +409,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
         <div onClick={()=>{
           opendocumentintab(attachment);
         }}
-          className={`attachment-name viewattachment ${disabled ? "attachment-disabled" : ""}`}
+          className="attachment-name viewattachment"
         >
           {attachment.filename}
         </div>
