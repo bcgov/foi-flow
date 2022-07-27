@@ -1,7 +1,7 @@
 import {
     httpPOSTRequest,
     httpOSSPUTRequest,
-    httpOSSGETRequest,
+    httpOSSGETRequest,httpGETRequest
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
   import {
