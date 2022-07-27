@@ -96,11 +96,7 @@ class requestservicegetter:
     def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        assignedtofirstname = requestministry["assignee.firstname"] if requestministry["assignedto"] != None else ""
-        assignedtolastname = requestministry["assignee.lastname"] if requestministry["assignedto"] != None else ""
-        assignedgroup = requestministry["assignedgroup"]
         idnumber = requestministry["filenumber"]
-        axisrequestid = requestministry["axisrequestid"]
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         email = ""
         for contactinfo in requestcontactinformation:
@@ -121,13 +117,15 @@ class requestservicegetter:
             "middleName": middlename,
             "lastName": lastname,
             "email": email,
-            "assignedToFirstName": assignedtofirstname,
-            "assignedToLastName": assignedtolastname,
-            "assignedGroup" : assignedgroup,
-            "axisRequestId": axisrequestid,
-            "idNumber": idnumber,
-            "balanceDue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
+            "assignedToFirstName": requestministry["assignee.firstname"] if requestministry["assignedto"] != None else "",
+            "assignedToLastName":  requestministry["assignee.lastname"] if requestministry["assignedto"] != None else "",
+            "assignedGroup" : requestministry["assignedgroup"],
+            "axisRequestId":  requestministry["axisrequestid"],
+            "bcgovcode": requestministry["programarea.bcgovcode"]
+            #"balanceDue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
         }
+        if cfrfee is not None:
+            requestdetailsforpayment["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']    
         return requestdetailsforpayment
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
