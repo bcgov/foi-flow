@@ -17,9 +17,11 @@ class emailevent:
     def createemailevent(self, requestid, requesttype, stage, reason):
         try: 
             self.__createcomment(requestid, requesttype, stage, reason)
+            #self.__createnotification(requestid, requesttype, stage)
+            return DefaultMethodResult(True, "Email Failure Notification - saved", requestid)    
         except BusinessException as ex:            
             logging.exception(ex)
-            return DefaultMethodResult(False,'Comment notifications failed',requestid)     
+            return DefaultMethodResult(False,'Email Failure Notification - failed',requestid)     
 
     def __createcomment(self, requestid, requesttype, stage, reason):
         comment = self.__preparecomment(requestid, requesttype, stage, reason)
@@ -27,6 +29,13 @@ class emailevent:
             return commentservice().createministryrequestcomment(comment, self.__defaultuserid(), 2)
         else:
             logging.info("Unsupported requesttype")
+    
+    def __createnotification(self, requestid, requesttype, stage):
+        notification = self.__preparenotification(stage)
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser), userid)
+
+    def __preparenotification(self, stage):
+        return self.__notificationmessage(stage)
             
     def __preparecomment(self, requestid, requesttype, stage, reason):
         comment = {"comment": self.__commentmessage(stage, reason)}
@@ -37,7 +46,10 @@ class emailevent:
         return comment
 
     def __commentmessage(self, stage, reason):
-        return  stage+' correspondence failed to send to applicant due to reason '+ reason + '. - see attachment log for details'
+        return  stage+' correspondence failed to send to applicant due to reason: "<i>'+reason+'"</i>. - see attachment log for details.'
+    
+    def __notificationmessage(self, stage):
+        return  stage+' correspondence failed to send to applicant. - see attachment log for details.' 
     
     def __defaultuserid(self):
         return "System"

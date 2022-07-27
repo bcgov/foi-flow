@@ -38,7 +38,7 @@ class emailservice:
             ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicekey, requestjson), requestjson["email"])
             if ackresponse["success"] == False:
                 self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson)   
-                eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicekey), "xyz")
+                eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicekey), ackresponse["reason"])
         except Exception as ex:
             logging.exception(ex)
         logging.debug("Acknowledge email for foi request= "+json.dumps(requestjson) )
