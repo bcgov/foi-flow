@@ -201,7 +201,7 @@ class FOIRequestDetailsByMinistryId(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
+    @auth.require
     def get(foirequestid, foiministryrequestid):
         try :
             jsondata = {}

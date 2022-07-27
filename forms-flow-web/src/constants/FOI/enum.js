@@ -19,7 +19,14 @@ const MaxFileSizeInMB = Object.freeze({
   stateTransition: 50,
   attachmentLog: 100,
   totalFileSize: 500,
-  extensionAttachment: 50
+  extensionAttachment: 50,
+  feeEstimateAttachment: 25,
+  totalFeeEstimateFileSize:50
+});
+
+const MaxNumberOfFiles = Object.freeze({
+  feeEstimateFiles:2,
+  attachments:10
 });
 
 const extensionStatusId = Object.freeze({
@@ -46,6 +53,7 @@ const KCProcessingTeams = [
 export {
 MimeTypeList,
 MaxFileSizeInMB,
+MaxNumberOfFiles,
 extensionStatusId,
 extensionStatusLabel,
 KCProcessingTeams,

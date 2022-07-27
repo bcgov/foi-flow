@@ -26,8 +26,8 @@ class emailservice:
         try:
             _templatename = templateconfig().gettemplatename(servicekey)
             _messagepart = templateservice().generatetemplate(_templatename, requestjson)
-            _messageattachment = documentservice().getattachments(ministryrequestid, 'ministryrequest','feeassessed-onhold')
-            return senderservice().send(servicekey, _messagepart, _messageattachment.content, requestjson)
+            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest','feeassessed-onhold')
+            return senderservice().send(servicekey, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
         logging.debug("Sent email for foi request= "+json.dumps(requestjson) )

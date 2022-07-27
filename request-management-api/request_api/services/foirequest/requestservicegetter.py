@@ -96,6 +96,7 @@ class requestservicegetter:
     def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        idnumber = requestministry["filenumber"]
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         email = ""
         for contactinfo in requestcontactinformation:
@@ -116,8 +117,8 @@ class requestservicegetter:
             "middleName": middlename,
             "lastName": lastname,
             "email": email,
-            "assignedToFirstName": requestministry["assignee.firstname"] if requestministry["assignedto"] != None else None,
-            "assignedToLastName":  requestministry["assignee.lastname"] if requestministry["assignedto"] != None else None,
+            "assignedToFirstName": requestministry["assignee.firstname"] if requestministry["assignedto"] != None else "",
+            "assignedToLastName":  requestministry["assignee.lastname"] if requestministry["assignedto"] != None else "",
             "assignedGroup" : requestministry["assignedgroup"],
             "axisRequestId":  requestministry["axisrequestid"],
             "bcgovcode": requestministry["programarea.bcgovcode"]

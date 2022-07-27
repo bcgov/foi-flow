@@ -20,6 +20,7 @@ const FileUpload = ({
     attachment,
     customFormat = {},
     existingDocuments = [],
+    maxNumberOfFiles = 10
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
@@ -107,8 +108,8 @@ const FileUpload = ({
     };
 
     const validateFiles = (newFiles, totalFiles) => {
-      if (multipleFiles && (newFiles.length > 10  || totalFiles > 10)) {
-        setErrorMessage(["A maximum of 10 files can be uploaded at one time. Only 10 files have been added this upload window, please upload additional files separately"]);
+      if (multipleFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
+        setErrorMessage(["A maximum of "+maxNumberOfFiles+ " files can be uploaded at one time. Only "+maxNumberOfFiles+ " files have been added on this upload window, please upload additional files separately"]);
       } else if (!multipleFiles && totalFiles > 1) {
         return
       } else if (newFiles.length) {
