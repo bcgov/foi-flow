@@ -375,6 +375,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
     }
   }, [attachment])
 
+  
   const getCategory = (category) => {
     switch(category) {
       case "cfr-review":
@@ -390,6 +391,34 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
     }
   }
 
+  const attachmenttitle = ()=>{
+
+    if(attachment.documentpath.toLowerCase().indexOf('.eml') > 0  || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 || disabled)
+    {
+      return (
+        <div 
+          className={`attachment-name ${disabled ? "attachment-disabled" : ""}`}
+        >
+          {attachment.filename}
+        </div>
+      )
+     
+    }
+    else{
+      return (
+        <div onClick={()=>{
+          opendocumentintab(attachment);
+        }}
+          className={`attachment-name viewattachment ${disabled ? "attachment-disabled" : ""}`}
+        >
+          {attachment.filename}
+        </div>
+      )
+    }
+
+    
+  }
+
   return (
     <Grid
       container
@@ -401,11 +430,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
       spacing={1}
     >
       <Grid item xs={11}>
-        <div
-          className={`attachment-name ${disabled ? "attachment-disabled" : ""}`}
-        >
-          {attachment.filename}
-        </div>
+        {attachmenttitle()}
         <Chip
           label={getCategory(attachment.category).toUpperCase()}
           size="small"
@@ -455,6 +480,13 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   );
 })
 
+const opendocumentintab =(attachment)=>
+{
+  let relativedocpath = attachment.documentpath.split('/').slice(4).join('/')
+  let url =`/foidocument?filepath=${relativedocpath}`;
+  window.open(url, '_blank').focus();
+}
+
 const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
@@ -472,6 +504,11 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
   const handleDownload = () =>{
     closeTooltip();   
     handlePopupButtonClick("download", attachment);
+  }
+
+  const handleView =()=>{
+    closeTooltip();    
+    opendocumentintab(attachment);
   }
 
   const handleDelete = () => {
@@ -527,7 +564,8 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
     return (<DeleteMenu />)
   }
 
-  const ActionsPopover = () => {
+  const ActionsPopover = ({RestrictViewInBrowser}) => {
+
     return (
       <Popover
         anchorReference="anchorPosition"
@@ -549,6 +587,16 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
         onClose={() => setPopoverOpen(false)}
       >
         <MenuList>
+{!RestrictViewInBrowser ?
+        <MenuItem
+            onClick={() => {
+                handleView();
+                setPopoverOpen(false);
+            }}
+          >
+            View
+          </MenuItem>
+          :""}
           <MenuItem
             onClick={() => {
                 handleDownload();
@@ -590,7 +638,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
       >
       <MoreHorizIcon />
     </IconButton>
-    <ActionsPopover />
+    <ActionsPopover RestrictViewInBrowser={attachment.documentpath.toLowerCase().indexOf('.eml') > 0 || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 ? true:false }/>
   </>
   );
 })
