@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from "react-redux";
 import  { params } from './types'
-
+import './index.scss'
 import {getFOIS3DocumentPreSignedUrl} from '../../../../apiManager/services/FOI/foiOSSServices'
 
 
@@ -29,9 +29,8 @@ const [presignedUrl, setpresignedUrl] = React.useState(filepath);
             }            
       },[filepath]);
 
-return (<div><h5><iframe
-      height="750px"
-      width="100%"
+return (<div><h5><iframe className="documentviewer"
+      
       src={presignedUrl}
      /></h5></div>);
 
