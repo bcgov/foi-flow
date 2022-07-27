@@ -36,14 +36,14 @@ class emailservice:
     def acknowledge(self, servicekey, ministryrequestid, requestjson):
         try:
             self.__upload_sent_email(servicekey, ministryrequestid, requestjson)
-            ackresponse = inboxservice().get_failure_deliverystatus_as_pdf(requestjson["email"])
+            ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicekey, requestjson), requestjson["email"])
             if ackresponse["success"] == False:
-                self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".pdf", ackresponse["content"], ministryrequestid, requestjson)   
+                self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson)   
         except Exception as ex:
             logging.exception(ex)
         logging.debug("Acknowledge email for foi request= "+json.dumps(requestjson) )
-     
-        
+    
+ 
     def __upload_sent_email(self, servicekey, ministryrequestid, requestjson):
         try:
             _originalmsg = senderservice().read_outbox_as_bytes(servicekey, requestjson)
