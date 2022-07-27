@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import FOIAuthenticateRouting from "./FOIAuthenticateRouting";
 import FOIUnAuthenticateRouting from "./FOIUnAuthenticateRouting";
+import FOIDocumentViewRouting from "./FOIDocumentViewRouting";
 
 const FOIBaseRouting = React.memo(({store}) => {
     return (
