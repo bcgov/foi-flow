@@ -97,5 +97,24 @@ import {
         done("Error in getting files from S3");
       });
   };
+
+  export const getFOIS3DocumentPreSignedUrl = (filepath,dispatch, ...rest) => {
+    const done = fnDone(rest);
+    const apiurl = API.FOI_GET_S3DOCUMENT_PRESIGNEDURL +"?filepath="+filepath
+    const response = httpGETRequest(apiurl, {}, UserService.getToken());
+    response.then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error in getFOIS3DocumentPreSignedUrl");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done("Error in getFOIS3DocumentPreSignedUrl");
+      });
+    return response;
+  };
   
   
