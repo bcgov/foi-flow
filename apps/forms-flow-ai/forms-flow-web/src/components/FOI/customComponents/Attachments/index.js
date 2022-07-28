@@ -394,7 +394,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
 
   const attachmenttitle = ()=>{
 
-    if(attachment.documentpath.toLowerCase().indexOf('.eml') > 0  || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 || disabled)
+    if (disabled)
     {
       return (
         <div 
@@ -403,8 +403,19 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
           {attachment.filename}
         </div>
       )
-     
     }
+
+    if(attachment.documentpath.toLowerCase().indexOf('.eml') > 0  || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 || attachment.documentpath.toLowerCase().indexOf('.txt') > 0)
+    {
+      return (
+        <div 
+          className="attachment-name viewattachment" onClick={()=>handlePopupButtonClick("download", attachment)}
+        >
+          {attachment.filename}
+        </div>
+      )
+     
+    }   
     else{
       return (
         <div onClick={()=>{
