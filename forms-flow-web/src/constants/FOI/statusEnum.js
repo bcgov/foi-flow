@@ -81,4 +81,16 @@ feeonhold: {
 },
 });
 
-export { StateList, MinistryStateList, StateEnum, StateTransitionCategories };
+const AttachmentLetterCategories = Object.freeze({
+  feeestimateletter: {
+    name: "Fee Estimate - Letter",
+  },
+  feeestimatesuccessful: {
+    name: "Fee Estimate - Successful",
+  },
+  feeestimatefailed: {
+    name: "Fee Estimate - Failed",
+  },
+  });
+
+export { StateList, MinistryStateList, StateEnum, StateTransitionCategories, AttachmentLetterCategories };
