@@ -73,3 +73,4 @@ class FOIAcknowledgeSendEmail(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+        
