@@ -28,7 +28,7 @@ class emailservice:
             return senderservice().send(servicekey, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
-        logging.debug("Sent email for foi request= "+json.dumps(requestjson) )
+        
         
 
     def acknowledge(self, servicekey, ministryrequestid, requestjson):
@@ -38,9 +38,10 @@ class emailservice:
             if ackresponse["success"] == False:
                 self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson)   
                 eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicekey), ackresponse["reason"], requestjson["assignedto"])
+            return {"success" : True, "message": "Acknowledgement successful"}
         except Exception as ex:
             logging.exception(ex)
-        logging.debug("Acknowledge email for foi request= "+json.dumps(requestjson) )
+            return {"success" : False, "message": "Acknowledgement successful"}
     
  
     def __upload_sent_email(self, servicekey, ministryrequestid, requestjson):
@@ -50,16 +51,15 @@ class emailservice:
                 return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson)
         except Exception as ex:
             logging.exception(ex)
-        logging.debug("Upload sent email for foi request= "+json.dumps(requestjson))
         
     def __upload(self, filename, filebytes, ministryrequestid, requestjson):
         try:
             logging.info("Upload file for payload"+ json.dumps(requestjson))
             _response =  storageservice().uploadbytes(filename, filebytes, requestjson["bcgovcode"], requestjson["idNumber"])
+            logging.info("Upload status for payload"+ json.dumps(_response))
             if _response["success"] == True:
                 _documentschema = {"documents": [{"filename": _response["filename"], "documentpath": _response["documentpath"], "category": "feeassessed-onhold"}]}
                 documentservice().createrequestdocument(ministryrequestid, _documentschema, "SYSTEM", "ministryrequest")
-            logging.info("Upload status for payload"+ json.dumps(_response))
             return _response
         except Exception as ex:
             logging.exception(ex)
