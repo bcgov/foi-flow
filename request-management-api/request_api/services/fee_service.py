@@ -35,10 +35,12 @@ class FeeService:
 
         # If application fee, use raw request id, else use minsitry request id
         if self.fee_code.code == FeeType.application.value:
-            if FOIRawRequest.get_request(request_id) is None:
+            self.request = FOIRawRequest.get_request(request_id)
+            if self.request is None:
                 raise BusinessException(Error.INVALID_INPUT)
         else:
-            if FOIMinistryRequest.getrequestbyministryrequestid(request_id) is None:
+            self.request = FOIMinistryRequest.getrequestbyministryrequestid(request_id)
+            if self.request is None:
                 raise BusinessException(Error.INVALID_INPUT)
 
     @staticmethod
