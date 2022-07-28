@@ -17,7 +17,7 @@ class emailevent:
     def createemailevent(self, requestid, requesttype, stage, reason, userid):
         try: 
             _commentresponse = self.__createcomment(requestid, requesttype, stage, reason, userid)
-            _notificationresponse = self.__createnotification(requestid, requesttype, stage, userid)
+            _notificationresponse = self.__createnotification(requestid, requesttype, stage)
             if _commentresponse.success == True and _notificationresponse.success == True and _notificationresponse.success == True:
                 return DefaultMethodResult(True,'Email Failure Notification posted',requestid)
             else:   
@@ -33,7 +33,7 @@ class emailevent:
         else:
             logging.info("Unsupported requesttype")
     
-    def __createnotification(self, requestid, requesttype, stage, userid):
+    def __createnotification(self, requestid, requesttype, stage):
         notification = self.__preparenotification(stage)
         return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "Email Failure",  "System")
 
