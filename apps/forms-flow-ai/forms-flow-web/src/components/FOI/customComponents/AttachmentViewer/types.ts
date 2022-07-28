@@ -1,3 +1,4 @@
 export type params = {
-    filepath: string;   
+    filepath: string; 
+    ministryrequestid:string;  
   }

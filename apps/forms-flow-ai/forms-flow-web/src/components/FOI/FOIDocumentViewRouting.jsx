@@ -28,6 +28,7 @@ const FOIDocumentViewRouting = React.memo((props) => {
   const _isAuth = useSelector((state) => state.user.isAuthenticated); 
   const _queryParams = new URLSearchParams(window.location.search);
   const _filepath = _queryParams.get('filepath');
+  const _id = _queryParams.get('id');
 
   const renderViewer =()=>{
 
@@ -36,7 +37,7 @@ const FOIDocumentViewRouting = React.memo((props) => {
       return (
         <>                          
               <Route path="/foidocument">
-                <AttachmentViewer filepath={_filepath} />
+                <AttachmentViewer filepath={_filepath} ministryrequestid={_id} />
               </Route>
              
             </>

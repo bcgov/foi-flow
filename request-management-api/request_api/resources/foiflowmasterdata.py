@@ -262,15 +262,15 @@ class FOIFlowDocumentStorage(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/oss/presigned')
+@API.route('/foiflow/oss/presigned/<ministryrequestid>')
 class FOIFlowS3Presigned(Resource):
 
     @staticmethod
     @TRACER.trace()    
     @cross_origin(origins=allowedorigins())       
     @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
-    def get():
+    @auth.documentbelongstosameministry
+    def get(ministryrequestid):
         try :
             formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
             accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 

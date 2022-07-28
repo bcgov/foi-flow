@@ -5,24 +5,22 @@ import './index.scss'
 import {getFOIS3DocumentPreSignedUrl} from '../../../../apiManager/services/FOI/foiOSSServices'
 
 
-export  const AttachmentViewer = ({filepath}:params) => {
+export  const AttachmentViewer = ({filepath, ministryrequestid}:params) => {
 const dispatch = useDispatch();
 const [presignedUrl, setpresignedUrl] = React.useState(filepath);
 
     React.useEffect(() => {
             if(filepath)
             {
-                  const response = getFOIS3DocumentPreSignedUrl(filepath, dispatch)
-                  response.then((result)=>{
-                        console.log(result.data)
+                  const response = getFOIS3DocumentPreSignedUrl(filepath,ministryrequestid, dispatch)
+                  response.then((result)=>{                        
                         var viwerUrl =   result.data
                         if(filepath.toLowerCase().indexOf('.docx') >-1 ||filepath.toLowerCase().indexOf('.doc') >-1 || filepath.toLowerCase().indexOf('.xls') >-1 || filepath.toLowerCase().indexOf('.xlsx')>-1)
                         { 
                          viwerUrl =`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(result.data)}`
                         }
                                                    
-                        setpresignedUrl(viwerUrl)
-                        console.log(JSON.stringify(result));
+                        setpresignedUrl(viwerUrl)                        
                   })
                            
                   console.log(filepath)
