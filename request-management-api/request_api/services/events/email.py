@@ -35,7 +35,7 @@ class emailevent:
     
     def __createnotification(self, requestid, requesttype, stage):
         notification = self.__preparenotification(stage)
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "Email Failure",  "System")
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "Email Failure",  self.__defaultuserid())
 
     def __preparenotification(self, stage):
         return self.__notificationmessage(stage)
@@ -49,7 +49,7 @@ class emailevent:
         return comment
 
     def __commentmessage(self, stage, reason):
-        return  stage+' correspondence failed to send to applicant due to reason: "<i>'+reason+'"</i>. - see attachment log for details.'
+        return  stage+' correspondence failed to send to applicant due to reason: "<i>'+reason+'"</i>. See attachment log for details.'
     
     def __notificationmessage(self, stage):
         return  stage+' correspondence failed to send to applicant. - see attachment log for details.' 
