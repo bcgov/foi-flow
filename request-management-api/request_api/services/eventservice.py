@@ -78,9 +78,9 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
     
-    def posteventforemailfailure(self, ministryrequestid, requesttype, stage, reason):
+    def posteventforemailfailure(self, ministryrequestid, requesttype, stage, reason, userid):
         try:
-            emaileventresponse = emailevent().createemailevent(ministryrequestid, requesttype, stage, reason)
+            emaileventresponse = emailevent().createemailevent(ministryrequestid, requesttype, stage, reason, userid)
             if emaileventresponse.success == False: 
                     current_app.logger.error("FOI Notification failed for email event = %s" % (emaileventresponse))
         except BusinessException as exception:            

@@ -116,13 +116,14 @@ class requestservicegetter:
             "middleName": middlename,
             "lastName": lastname,
             "email": email,
+            "assignedto": requestministry["assignedto"],
+            'assignedministryperson':requestministry["assignedministryperson"], 
             "assignedToFirstName": requestministry["assignee.firstname"] if requestministry["assignedto"] != None else "",
             "assignedToLastName":  requestministry["assignee.lastname"] if requestministry["assignedto"] != None else "",
             "assignedGroup" : requestministry["assignedgroup"],
             "axisRequestId":  requestministry["axisrequestid"],
             "idNumber":  requestministry["filenumber"],
             "bcgovcode": requestministry["programarea.bcgovcode"]
-            #"balanceDue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
         }
         if cfrfee is not None:
             requestdetailsforpayment["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']    

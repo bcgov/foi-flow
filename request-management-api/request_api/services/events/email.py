@@ -14,25 +14,28 @@ import logging
 class emailevent:
     """ FOI Event management service
     """
-    def createemailevent(self, requestid, requesttype, stage, reason):
+    def createemailevent(self, requestid, requesttype, stage, reason, userid):
         try: 
-            self.__createcomment(requestid, requesttype, stage, reason)
-            #self.__createnotification(requestid, requesttype, stage)
-            return DefaultMethodResult(True, "Email Failure Notification - saved", requestid)    
+            _commentresponse = self.__createcomment(requestid, requesttype, stage, reason, userid)
+            _notificationresponse = self.__createnotification(requestid, requesttype, stage, userid)
+            if _commentresponse.success == True and _notificationresponse.success == True and _notificationresponse.success == True:
+                return DefaultMethodResult(True,'Email Failure Notification posted',requestid)
+            else:   
+                return DefaultMethodResult(False,'Email Failure Notification - failed',requestid)
         except BusinessException as ex:            
             logging.exception(ex)
             return DefaultMethodResult(False,'Email Failure Notification - failed',requestid)     
 
-    def __createcomment(self, requestid, requesttype, stage, reason):
+    def __createcomment(self, requestid, requesttype, stage, reason, userid):
         comment = self.__preparecomment(requestid, requesttype, stage, reason)
         if requesttype == "ministryrequest":
-            return commentservice().createministryrequestcomment(comment, self.__defaultuserid(), 2)
+            return commentservice().createministryrequestcomment(comment, userid, 2)
         else:
             logging.info("Unsupported requesttype")
     
-    def __createnotification(self, requestid, requesttype, stage):
+    def __createnotification(self, requestid, requesttype, stage, userid):
         notification = self.__preparenotification(stage)
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser), userid)
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "Email Failure",  "System")
 
     def __preparenotification(self, stage):
         return self.__notificationmessage(stage)
