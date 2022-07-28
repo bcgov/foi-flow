@@ -3,7 +3,6 @@ from os import stat
 import imaplib
 import os
 from imap_tools import MailBox, AND
-import weasyprint
 import logging
 import email
 
@@ -19,13 +18,6 @@ class inboxservice:
 
     """
 
-    def get_failure_deliverystatus_as_pdf(self, subject, email):
-        message = self._get_deliverystatus_by_text(MAIL_DELIVERY_FAILURE_TXT,subject, email)
-        if message is not None:
-            pdf_content = weasyprint.HTML(string=message.html).write_pdf()
-            return {"success" : False, "message": "Unable to send", "content": pdf_content, "reason": message["reason"]}
-        return {"success" : True, "message": "Sent successfully", "content": None, "reason": None}
-    
     def get_failure_deliverystatus_as_eml(self, subject, email):    
         message = self._get_deliverystatus_by_text(MAIL_DELIVERY_FAILURE_TXT, subject, email)
         if message is not None:

@@ -15,7 +15,6 @@ from request_api.services.email.senderservice import senderservice
 from request_api.services.email.inboxservice import inboxservice
 from request_api.services.eventservice import eventservice
 
-import weasyprint
 
 class emailservice:
     """ FOI Email Service
