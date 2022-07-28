@@ -16,8 +16,8 @@
         <bpmn:flowNodeRef>Event_1tmmrt5</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0crrhhb</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_17odcea</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0k05bsn</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1y2hfyk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0k05bsn</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_1mwmv1p" name="Notify Payment Details">
         <bpmn:flowNodeRef>Activity_182gpr3</bpmn:flowNodeRef>
@@ -99,6 +99,8 @@ connector.getVariable("statusCode");</camunda:script>
 "email": execution.getVariable("email"),
 "bcgovcode": execution.getVariable("bcgovcode"),
 "idNumber": execution.getVariable("fileNumber"),
+"assignedto": execution.getVariable("assignedto"),
+"assignedministryperson": execution.getVariable("assignedministryperson"),
 "paymenturl": execution.getVariable('foiwebUrl') + "/public/form/" + execution.getVariable('formId') + "/submission/" + execution.getVariable('submissionId') + "/edit"
 };
 execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camunda:script>
@@ -184,6 +186,8 @@ connector.getVariable("statusCode");</camunda:script>
 "email": execution.getVariable("email"),
 "bcgovcode": execution.getVariable("bcgovcode"),
 "idNumber": execution.getVariable("fileNumber"),
+"assignedto": execution.getVariable("assignedto"),
+"assignedministryperson": execution.getVariable("assignedministryperson"),
 "paymenturl": execution.getVariable('foiwebUrl') + "/public/form/" + execution.getVariable('formId') + "/submission/" + execution.getVariable('submissionId') + "/edit"
 };
 execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camunda:script>
@@ -231,6 +235,8 @@ execution.setVariable("retry3", current+1); </camunda:script>
                 <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
+            <camunda:outputParameter name="assignedministryperson">${S(response).prop("assignedministryperson").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="assignedto">${S(response).prop("assignedto").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="bcgovcode">${S(response).prop("bcgovcode").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
@@ -372,25 +378,6 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
     <bpmn:sequenceFlow id="Flow_0pgmxi6" sourceRef="Event_0f47rv1" targetRef="Activity_0fgoo7p" />
     <bpmn:sequenceFlow id="Flow_1ntbf1z" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0k05bsn" />
     <bpmn:sequenceFlow id="Flow_0s3l3je" sourceRef="Activity_0k05bsn" targetRef="Event_1y2hfyk" />
-    <bpmn:task id="Activity_0k05bsn" name="Create Submission">
-      <bpmn:extensionElements>
-        <camunda:properties>
-          <camunda:property name="formName" value="payfeeonline" />
-        </camunda:properties>
-        <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.execution.ExternalSubmissionListener" event="start">
-          <camunda:field name="formName">
-            <camunda:expression>payfeeonline</camunda:expression>
-          </camunda:field>
-        </camunda:executionListener>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="formName">payfeeonline</camunda:inputParameter>
-          <camunda:outputParameter name="formId">${execution.getVariable("formUrl").split("/")[4]}</camunda:outputParameter>
-          <camunda:outputParameter name="submissionId">${execution.getVariable("formUrl").split("/")[6]}</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1ntbf1z</bpmn:incoming>
-      <bpmn:outgoing>Flow_0s3l3je</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:intermediateThrowEvent id="Event_1y2hfyk" name="Notify Payment">
       <bpmn:incoming>Flow_0s3l3je</bpmn:incoming>
       <bpmn:linkEventDefinition id="LinkEventDefinition_0pjgoce" name="NOTIFY-FEE-PAYMENT" />
@@ -414,6 +401,25 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
     <bpmn:endEvent id="Event_04nwpdo">
       <bpmn:incoming>Flow_13syt42</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:task id="Activity_0k05bsn" name="Create Submission">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="formName" value="payfeeonline" />
+        </camunda:properties>
+        <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.execution.ExternalSubmissionListener" event="start">
+          <camunda:field name="formName">
+            <camunda:expression>payfeeonline</camunda:expression>
+          </camunda:field>
+        </camunda:executionListener>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="formName">payfeeonline</camunda:inputParameter>
+          <camunda:outputParameter name="formId">${execution.getVariable("formUrl").split("/")[4]}</camunda:outputParameter>
+          <camunda:outputParameter name="submissionId">${execution.getVariable("formUrl").split("/")[6]}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ntbf1z</bpmn:incoming>
+      <bpmn:outgoing>Flow_0s3l3je</bpmn:outgoing>
+    </bpmn:task>
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-fee-payment" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -430,13 +436,25 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
       <bpmndi:BPMNShape id="Lane_1u9yqiq_di" bpmnElement="Lane_1u9yqiq" isHorizontal="true">
         <dc:Bounds x="170" y="80" width="1400" height="271" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_13syt42_di" bpmnElement="Flow_13syt42">
+        <di:waypoint x="568" y="780" />
+        <di:waypoint x="832" y="780" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1n41ajc_di" bpmnElement="Flow_1n41ajc">
+        <di:waypoint x="418" y="780" />
+        <di:waypoint x="532" y="780" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zagnjs_di" bpmnElement="Flow_0zagnjs">
+        <di:waypoint x="1350" y="438" />
+        <di:waypoint x="1402" y="438" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0s3l3je_di" bpmnElement="Flow_0s3l3je">
-        <di:waypoint x="1200" y="198" />
+        <di:waypoint x="1130" y="198" />
         <di:waypoint x="1282" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1ntbf1z_di" bpmnElement="Flow_1ntbf1z">
         <di:waypoint x="640" y="198" />
-        <di:waypoint x="1100" y="198" />
+        <di:waypoint x="1030" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0pgmxi6_di" bpmnElement="Flow_0pgmxi6">
         <di:waypoint x="978" y="438" />
@@ -544,18 +562,6 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
           <dc:Bounds x="783" y="591" width="54" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0zagnjs_di" bpmnElement="Flow_0zagnjs">
-        <di:waypoint x="1350" y="438" />
-        <di:waypoint x="1402" y="438" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1n41ajc_di" bpmnElement="Flow_1n41ajc">
-        <di:waypoint x="418" y="780" />
-        <di:waypoint x="532" y="780" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_13syt42_di" bpmnElement="Flow_13syt42">
-        <di:waypoint x="568" y="780" />
-        <di:waypoint x="832" y="780" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_182gpr3_di" bpmnElement="Activity_182gpr3">
         <dc:Bounds x="540" y="398" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -626,9 +632,6 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
           <dc:Bounds x="950" y="463" width="20" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
-        <dc:Bounds x="1100" y="158" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0hao12d_di" bpmnElement="Event_1y2hfyk">
         <dc:Bounds x="1282" y="180" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -655,6 +658,9 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_04nwpdo_di" bpmnElement="Event_04nwpdo">
         <dc:Bounds x="832" y="762" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
+        <dc:Bounds x="1030" y="158" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="Event_17odcea">
         <dc:Bounds x="572" y="220" width="36" height="36" />
