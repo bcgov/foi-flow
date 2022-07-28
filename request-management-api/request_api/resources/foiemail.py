@@ -44,7 +44,7 @@ class FOISendEmail(Resource):
         try:
             requestjson = request.get_json() 
             result = emailservice().send_payonline("PAYONLINE", ministryrequestid, requestjson)
-            return json.dumps(result), 200
+            return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
         except KeyError as err:
@@ -66,10 +66,11 @@ class FOIAcknowledgeSendEmail(Resource):
         try:
             requestjson = request.get_json() 
             result = emailservice().acknowledge("PAYONLINE", ministryrequestid, requestjson)
-            return json.dumps(result), 200
+            return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+        

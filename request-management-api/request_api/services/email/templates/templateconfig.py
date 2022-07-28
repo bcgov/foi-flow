@@ -12,7 +12,12 @@ class templateconfig:
     def getsubject(self, key, requestjson):        
         if key == "PAYONLINE":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
-        return None      
+        return None   
+        
+    def getstage(self, key):        
+        if key == "PAYONLINE":
+            return "Fee Estimate"
+        return None 
     
     def getattachmentname(self, key):
         if key == "PAYONLINE":
