@@ -83,13 +83,13 @@ feeonhold: {
 
 const AttachmentLetterCategories = Object.freeze({
   feeestimateletter: {
-    name: "Fee Estimate - Letter",
+    name: "fee estimate - letter",
   },
   feeestimatesuccessful: {
-    name: "Fee Estimate - Successful",
+    name: "fee estimate - successful",
   },
   feeestimatefailed: {
-    name: "Fee Estimate - Failed",
+    name: "fee estimate - failed",
   },
   });
 

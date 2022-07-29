@@ -370,13 +370,13 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   const classes = useStyles();
   
   const disableCategory = () => {
-    if (attachment.category in('personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatesuccessful.name) )
+    if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatesuccessful.name].includes(attachment.category?.toLowerCase()) )
       return true;      
   }
   const [disabled, setDisabled] = useState(isMinistryCoordinator && disableCategory());
   useEffect(() => {
     if(attachment && attachment.filename) {
-      setDisabled(isMinistryCoordinator && attachment.category == 'personal')
+      setDisabled(isMinistryCoordinator && disableCategory())
     }
   }, [attachment])
 
