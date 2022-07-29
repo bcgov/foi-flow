@@ -116,13 +116,13 @@ class requestservicegetter:
             "middleName": middlename,
             "lastName": lastname,
             "email": email,
-            "assignedto": requestministry["assignedto"],
+            "assignedto": requestministry["assignedto"] if requestministry["assignedto"] != None else "",
             'assignedministryperson':requestministry["assignedministryperson"], 
             "assignedToFirstName": requestministry["assignee.firstname"] if requestministry["assignedto"] != None else "",
             "assignedToLastName":  requestministry["assignee.lastname"] if requestministry["assignedto"] != None else "",
-            "assignedGroup" : requestministry["assignedgroup"],
-            "axisRequestId":  requestministry["axisrequestid"],
-            "idNumber":  requestministry["filenumber"],
+            "assignedGroup" : requestministry["assignedgroup"] if requestministry["assignedgroup"] != None else "",
+            "axisRequestId":  requestministry["axisrequestid"] if requestministry["axisrequestid"] != None else "",
+            "idNumber":  requestministry["filenumber"] if requestministry["filenumber"] != None else "",
             "bcgovcode": requestministry["programarea.bcgovcode"]
         }
         if cfrfee is not None:
