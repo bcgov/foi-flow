@@ -96,11 +96,6 @@ class requestservicegetter:
     def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        assignedtofirstname = requestministry["assignee.firstname"] if requestministry["assignedto"] != None else ""
-        assignedtolastname = requestministry["assignee.lastname"] if requestministry["assignedto"] != None else ""
-        assignedgroup = requestministry["assignedgroup"]
-        idnumber = requestministry["filenumber"]
-        axisrequestid = requestministry["axisrequestid"]
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         email = ""
         for contactinfo in requestcontactinformation:
@@ -121,13 +116,17 @@ class requestservicegetter:
             "middleName": middlename,
             "lastName": lastname,
             "email": email,
-            "assignedToFirstName": assignedtofirstname,
-            "assignedToLastName": assignedtolastname,
-            "assignedGroup" : assignedgroup,
-            "axisRequestId": axisrequestid,
-            "idNumber": idnumber,
-            "balanceDue": cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']
+            "assignedto": requestministry["assignedto"] if requestministry["assignedto"] != None else "",
+            'assignedministryperson':requestministry["assignedministryperson"], 
+            "assignedToFirstName": requestministry["assignee.firstname"] if requestministry["assignedto"] != None else "",
+            "assignedToLastName":  requestministry["assignee.lastname"] if requestministry["assignedto"] != None else "",
+            "assignedGroup" : requestministry["assignedgroup"] if requestministry["assignedgroup"] != None else "",
+            "axisRequestId":  requestministry["axisrequestid"] if requestministry["axisrequestid"] != None else "",
+            "idNumber":  requestministry["filenumber"] if requestministry["filenumber"] != None else "",
+            "bcgovcode": requestministry["programarea.bcgovcode"]
         }
+        if cfrfee is not None:
+            requestdetailsforpayment["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']    
         return requestdetailsforpayment
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):

@@ -85,7 +85,17 @@ class FOIMinistryRequestDocument(db.Model):
         newdocument = FOIMinistryRequestDocument(documentpath=document["documentpath"], foiministrydocumentid=document["foiministrydocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
         db.session.add(newdocument)
         db.session.commit()               
-        return DefaultMethodResult(True,'New Document version created', newdocument.foiministrydocumentid)   
+        return DefaultMethodResult(True,'New Document version created', newdocument.foiministrydocumentid)  
+
+    @classmethod
+    def getlatestdocumentsforfeeestimateemail(cls, ministryrequestid, ministryrequestversion, category):
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion and category = :category and version = 1 ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion, 'category': category})
+        documents = []
+        for row in rs:
+            if row["isactive"] == True:
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        return documents  
     
     
 class FOIMinistryRequestDocumentSchema(ma.Schema):

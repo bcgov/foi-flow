@@ -101,7 +101,7 @@ class documentservice:
             return self.createrequestdocument(requestid, documentschema, None, "rawrequest")        
 
     def getattachments(self, requestid, requesttype, category):        
-        documents = self.getrequestdocumentsbycategory(requestid, requesttype, category)  
+        documents = self.getlatestdocumentsforfeeestimateemail(requestid, requesttype, category)  
         if(documents is None):
             raise ValueError('No template found')
         attachmentlist = []
@@ -113,9 +113,9 @@ class documentservice:
             attachmentlist.append(attachdocument)
         return attachmentlist
     
-    def getrequestdocumentsbycategory(self, requestid, requesttype, category, version=None):
+    def getlatestdocumentsforfeeestimateemail(self, requestid, requesttype, category, version=None):
         requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
-        documents = FOIMinistryRequestDocument.getdocumentsbycategory(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
+        documents = FOIMinistryRequestDocument.getlatestdocumentsforfeeestimateemail(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
         return self.__formatcreateddate(documents)    
 
     

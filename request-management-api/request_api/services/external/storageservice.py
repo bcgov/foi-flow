@@ -4,6 +4,7 @@ from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
 import mimetypes
+import logging
 
 formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
 accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
@@ -15,23 +16,29 @@ class storageservice:
     """This class is reserved for S3 storage services integration.
     """
     
-    def uploadbytes(self, filename, bytes):
-        auth = AWSRequestsAuth(aws_access_key=accesskey,
+    def uploadbytes(self, filename, bytes, ministrycode, requestnumber):
+        try: 
+            auth = AWSRequestsAuth(aws_access_key=accesskey,
                 aws_secret_access_key=secretkey,
                 aws_host=s3host,
                 aws_region=s3region,
                 aws_service=s3service) 
         
-        s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket,'EDUC','EDUC-2021-11236',filename)        
-        response = requests.put(s3uri, data=None, auth=auth)
-        header = {
-            'X-Amz-Date': response.request.headers['x-amz-date'],
-            'Authorization': response.request.headers['Authorization'],
-            'Content-Type': mimetypes.MimeTypes().guess_type(filename)[0]
-        }
+            s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket, ministrycode, requestnumber, filename)        
+            response = requests.put(s3uri, data=None, auth=auth)
+            header = {
+                'X-Amz-Date': response.request.headers['x-amz-date'],
+                'Authorization': response.request.headers['Authorization'],
+                'Content-Type': mimetypes.MimeTypes().guess_type(filename)[0]
+            }
 
-        #upload to S3
-        requests.put(s3uri, data=bytes, headers=header)
+            #upload to S3
+            requests.put(s3uri, data=bytes, headers=header)
+            attachmentobj = {"success": True, 'filename': filename, 'documentpath': s3uri}
+        except Exception as ex:
+            logging.error(ex)
+            attachmentobj = {"success": False, 'filename': filename, 'documentpath': None}   
+        return attachmentobj
         
     def upload(self, attachment):        
         
