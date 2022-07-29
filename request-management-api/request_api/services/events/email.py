@@ -17,7 +17,7 @@ class emailevent:
     def createemailevent(self, requestid, requesttype, stage, reason, userid):
         try: 
             _commentresponse = self.__createcomment(requestid, requesttype, stage, reason, userid)
-            _notificationresponse = self.__createnotification(requestid, requesttype, stage, userid)
+            _notificationresponse = self.__createnotification(requestid, requesttype, stage)
             if _commentresponse.success == True and _notificationresponse.success == True and _notificationresponse.success == True:
                 return DefaultMethodResult(True,'Email Failure Notification posted',requestid)
             else:   
@@ -33,9 +33,9 @@ class emailevent:
         else:
             logging.info("Unsupported requesttype")
     
-    def __createnotification(self, requestid, requesttype, stage, userid):
+    def __createnotification(self, requestid, requesttype, stage):
         notification = self.__preparenotification(stage)
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "Email Failure",  "System")
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "Email Failure",  self.__defaultuserid())
 
     def __preparenotification(self, stage):
         return self.__notificationmessage(stage)
@@ -49,7 +49,7 @@ class emailevent:
         return comment
 
     def __commentmessage(self, stage, reason):
-        return  stage+' correspondence failed to send to applicant due to reason: "<i>'+reason+'"</i>. - see attachment log for details.'
+        return  stage+' correspondence failed to send to applicant due to reason: "<i>'+reason+'"</i>. See attachment log for details.'
     
     def __notificationmessage(self, stage):
         return  stage+' correspondence failed to send to applicant. - see attachment log for details.' 

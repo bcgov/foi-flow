@@ -5,7 +5,7 @@ import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
+import { StateTransitionCategories, AttachmentLetterCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -368,10 +368,15 @@ export const AttachmentSection = ({
 const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
   
   const classes = useStyles();
-  const [disabled, setDisabled] = useState(isMinistryCoordinator && attachment.category == 'personal');
+  
+  const disableCategory = () => {
+    if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatesuccessful.name].includes(attachment.category?.toLowerCase()))
+      return true;      
+  }
+  const [disabled, setDisabled] = useState(isMinistryCoordinator && disableCategory());
   useEffect(() => {
     if(attachment && attachment.filename) {
-      setDisabled(isMinistryCoordinator && attachment.category == 'personal')
+      setDisabled(isMinistryCoordinator && disableCategory())
     }
   }, [attachment])
 
@@ -484,7 +489,11 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
     StateTransitionCategories.cfrreview.name,
     StateTransitionCategories.cfrfeeassessed.name,
     StateTransitionCategories.signoffresponse.name,
-    StateTransitionCategories.harmsreview.name
+    StateTransitionCategories.harmsreview.name,
+    StateTransitionCategories.feeonhold.name,
+    AttachmentLetterCategories.feeestimatefailed.name,
+    AttachmentLetterCategories.feeestimateletter.name,
+    AttachmentLetterCategories.feeestimatesuccessful.name
   ];
 
   const showReplace = (category) => {

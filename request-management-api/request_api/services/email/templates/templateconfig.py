@@ -24,6 +24,15 @@ class templateconfig:
             return "Fees - Estimate Sent"
         elif key == "PAYONLINE-SEND-FAILURE":
             return "Fees - Estimate Correspondence Failed"
+        return None
+
+    def getattachmentcategory(self, key):
+        if key == "FEE-ESTIMATE-LETTER":
+            return "Fee Estimate - Letter"
+        elif key == "FEE-ESTIMATE-SUCCESSFUL":
+            return "Fee Estimate - Successful"
+        elif key == "FEE-ESTIMATE-FAILED":
+            return "Fee Estimate - Failed"
         return None 
     
 

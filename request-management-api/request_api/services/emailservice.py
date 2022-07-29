@@ -28,7 +28,7 @@ class emailservice:
             return senderservice().send(servicekey, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
-        logging.debug("Sent email for foi request= "+json.dumps(requestjson) )
+        
         
 
     def acknowledge(self, servicekey, ministryrequestid, requestjson):
@@ -36,30 +36,30 @@ class emailservice:
             self.__upload_sent_email(servicekey, ministryrequestid, requestjson)
             ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicekey, requestjson), requestjson["email"])
             if ackresponse["success"] == False:
-                self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson)   
+                self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson, templateconfig().getattachmentcategory("FEE-ESTIMATE-FAILED"))   
                 eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicekey), ackresponse["reason"], requestjson["assignedto"])
+            return {"success" : True, "message": "Acknowledgement successful"}
         except Exception as ex:
             logging.exception(ex)
-        logging.debug("Acknowledge email for foi request= "+json.dumps(requestjson) )
+            return {"success" : False, "message": "Acknowledgement successful"}
     
  
     def __upload_sent_email(self, servicekey, ministryrequestid, requestjson):
         try:
             _originalmsg = senderservice().read_outbox_as_bytes(servicekey, requestjson)
             if _originalmsg is not None:
-                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson)
+                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson, templateconfig().getattachmentcategory("FEE-ESTIMATE-LETTER"))
         except Exception as ex:
             logging.exception(ex)
-        logging.debug("Upload sent email for foi request= "+json.dumps(requestjson))
         
-    def __upload(self, filename, filebytes, ministryrequestid, requestjson):
+    def __upload(self, filename, filebytes, ministryrequestid, requestjson, category):
         try:
             logging.info("Upload file for payload"+ json.dumps(requestjson))
             _response =  storageservice().uploadbytes(filename, filebytes, requestjson["bcgovcode"], requestjson["idNumber"])
-            if _response["success"] == True:
-                _documentschema = {"documents": [{"filename": _response["filename"], "documentpath": _response["documentpath"], "category": "feeassessed-onhold"}]}
-                documentservice().createrequestdocument(ministryrequestid, _documentschema, "SYSTEM", "ministryrequest")
             logging.info("Upload status for payload"+ json.dumps(_response))
+            if _response["success"] == True:
+                _documentschema = {"documents": [{"filename": _response["filename"], "documentpath": _response["documentpath"], "category": category}]}
+                documentservice().createrequestdocument(ministryrequestid, _documentschema, "SYSTEM", "ministryrequest")
             return _response
         except Exception as ex:
             logging.exception(ex)
