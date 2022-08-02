@@ -32,7 +32,6 @@ class cfrfeeservice:
         cfrfee.feedata.update({'amountpaid': amountpaid})
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
-  
     def __preparecfrfee(self, ministryrequestid, data):
         cfrfee = FOIRequestCFRFee()
         lkupcfrfee = self.getcfrfee(ministryrequestid)           

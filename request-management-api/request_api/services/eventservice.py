@@ -80,9 +80,9 @@ class eventservice:
             self.__logbusinessexception(exception)
 
 
-    async def postpaymentevent(self, requestid, userid, username):
+    async def postpaymentevent(self, requestid):
         try:
-            paymeneteventresponse = paymentevent().createpaymentevent(requestid, userid, username)
+            paymeneteventresponse = paymentevent().createpaymentevent(requestid)
             if paymeneteventresponse.success == False:
                 current_app.logger.error("FOI Notification failed for payment event for request= %s ; event response=%s" % (requestid, paymeneteventresponse.message))
         except BusinessException as exception:

@@ -31,7 +31,12 @@ class requestservice:
 
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
-        
+    
+    def updaterequeststatus(self, requestid, ministryrequestid, statusid):
+        foirequestschema = self.getrequest(requestid, ministryrequestid)
+        foirequestschema['requeststatusid'] = statusid
+        return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
+               
     def getrequest(self,foirequestid,foiministryrequestid):  
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
     
@@ -60,7 +65,10 @@ class requestservice:
     
     def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
-            
+    
+    def postfeeeventtoworkflow(self, axisrequestid, status):        
+        workflowservice().postfeeevent(axisrequestid, status)            
+    
     async def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
         if requeststatusid is not None:

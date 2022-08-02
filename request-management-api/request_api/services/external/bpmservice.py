@@ -71,6 +71,19 @@ class bpmservice(camundaservice):
             return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return    
+        
+    def feeevent(self,axisrequestid, feestatus, token=None):
+        if self.bpmengineresturl is not None:
+            messageschema = MessageSchema().dump({"messageName": MessageType.feepayment.value,
+                                              "correlationKeys":{
+                                                  "axisRequestId": VariableSchema().dump({"type" : VariableType.String.value, "value": axisrequestid})
+                                                  },
+                                              "processVariables":{
+                                                  "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": feestatus})}
+                                              })
+            return requests.post(self._getUrl_(MessageType.feepayment.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+        else:
+            return  
  
 
     def reopenevent(self,processinstanceid, data, messagetype, token=None): 
@@ -107,5 +120,6 @@ class MessageType(Enum):
     iaoreopen = "foi-iao-reopen"  
     ministryclaim = "foi-ministry-assignment"
     ministrycomplete = "foi-ministry-complete"   
+    feepayment = "foi-fee-payment"
               
      
