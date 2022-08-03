@@ -78,6 +78,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
 
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
+    const amountDue = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata.totalamountdue);
     const [mailed, setMailed] = useState(false);
     const handleMailedChange = (event) => {
       setMailed(event.target.checked);
@@ -95,6 +96,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
     const isBtnDisabled = () => {
       if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)) {
         return true;
@@ -169,7 +171,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
             && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
             && saveRequestObject.email
-            && cfrStatus == 'approved')
+            && cfrStatus == 'approved'
+            && amountDue !== 0)
         )) {
         return (
           <div className={classes.fileUploadBox}>
@@ -268,6 +271,17 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 }
                 label={"I " + user?.preferred_username + " have completed placed applicant processing fees letter in outbox to be mailed"}
               />
+            </div>
+          </ConditionalComponent>
+          <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
+                                            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                                            && cfrStatus === 'approved'
+                                            && amountDue === 0}>
+            <div class="state-change-dialog-error">
+              <span>
+                There are $0 in fees for this request.
+                There must be fees in the CFR form in order to be able to put the request on hold.
+              </span>
             </div>
           </ConditionalComponent>
         </Dialog>
