@@ -125,3 +125,20 @@ class Payment(Resource):
 
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
+
+@cors_preflight('PUT,OPTIONS')
+@API.route('/foirequests/<int:ministry_request_id>/payments/<int:payment_id>/test')
+class Payment(Resource):
+
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    def put(ministry_request_id: int, payment_id: int):
+        try:
+            result = requestservice().updaterequeststatus(payment_id, ministry_request_id, 2)
+            if result.success == True:
+                asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
+                requestservice().postfeeeventtoworkflow(result.args[0][0]["axisrequestid"], "PAID")
+                asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
+            return {"code": "OK"}, 201
+        except BusinessException as e:
+            return {'status': e.code, 'message': e.message}, e.status_code
