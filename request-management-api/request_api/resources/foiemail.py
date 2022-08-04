@@ -23,15 +23,16 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.emailservice import emailservice
+from request_api.services.requestservice import requestservice
+
 import json
 from flask_cors import cross_origin
-
 
 API = Namespace('FOIEmail', description='Endpoints for FOI EMAIL management')
 TRACER = Tracer.get_instance()
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/payonline')
+@API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/<servicename>')
 class FOISendEmail(Resource):
     """Retrieve watchers for unopened request"""
 
@@ -40,10 +41,9 @@ class FOISendEmail(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid, ministryrequestid):      
+    def post(requestid, ministryrequestid, servicename):      
         try:
-            requestjson = request.get_json() 
-            result = emailservice().send_payonline("PAYONLINE", ministryrequestid, requestjson)
+            result = emailservice().send(servicename.upper(), requestid, ministryrequestid)
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
