@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1nln4il" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1nln4il" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:message id="Message_0zu4vx8" name="foi-reminder-error" />
   <bpmn:message id="Message_0yf3hf3" name="foi-fee-payment" />
   <bpmn:message id="Message_1pac8jy" name="foi-fee-payment" />
@@ -11,9 +11,9 @@
   <bpmn:error id="Error_122bzm9" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
   <bpmn:error id="Error_15esvtw" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
   <bpmn:collaboration id="Collaboration_18fcj2s">
-    <bpmn:participant id="Participant_00kyu4q" name="FOI Email Processing" processRef="Process_1tpi8m8" />
+    <bpmn:participant id="Participant_00kyu4q" name="FOI Email Processing" processRef="foi-email-processing" />
   </bpmn:collaboration>
-  <bpmn:process id="Process_1tpi8m8" isExecutable="false">
+  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="3">
     <bpmn:laneSet id="LaneSet_13e9jxh">
       <bpmn:lane id="Lane_05egm04" name="Audit  Email Correspondence">
         <bpmn:flowNodeRef>Event_18tkl5h</bpmn:flowNodeRef>
@@ -74,7 +74,6 @@ execution.setVariable('foiwfUrl', system.getenv('FORMSFLOW_WF_URL'));</camunda:s
     <bpmn:sequenceFlow id="Flow_0lwrbkv" name="Retry &#62; 3" sourceRef="Gateway_1bljwhp" targetRef="Event_18y2ddl">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry2 &gt; 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0c6bshd" sourceRef="Activity_0jce81c" targetRef="Activity_1pzega7" />
     <bpmn:sequenceFlow id="Flow_143hkjl" name="Retry [1..3]" sourceRef="Gateway_1bljwhp" targetRef="Activity_0jce81c" />
     <bpmn:intermediateCatchEvent id="Event_18tkl5h" name="Audit &#38; Acknowledge">
       <bpmn:outgoing>Flow_178iob8</bpmn:outgoing>
@@ -150,7 +149,7 @@ execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camund
 execution.setVariable("retry2", current+1); </camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0c6bshd</bpmn:incoming>
+      <bpmn:incoming>Flow_1s9fomh</bpmn:incoming>
       <bpmn:outgoing>Flow_15lxe2a</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_1ny8po2" attachedToRef="Activity_1pzega7">
@@ -253,7 +252,7 @@ execution.setVariable("retry3", current+1); </camunda:script>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1p4cujg</bpmn:incoming>
       <bpmn:incoming>Flow_143hkjl</bpmn:incoming>
-      <bpmn:outgoing>Flow_0c6bshd</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1s9fomh</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_1mxv51q" name="Get Token">
       <bpmn:extensionElements>
@@ -278,6 +277,7 @@ execution.setVariable("retry3", current+1); </camunda:script>
       <bpmn:incoming>Flow_178iob8</bpmn:incoming>
       <bpmn:outgoing>Flow_0zb37ap</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1s9fomh" sourceRef="Activity_0jce81c" targetRef="Activity_1pzega7" />
   </bpmn:process>
   <bpmn:message id="Message_057bflt" name="foi-reminder-error" />
   <bpmn:message id="Message_0swb9l4" name="foi-email" />
@@ -297,6 +297,10 @@ execution.setVariable("retry3", current+1); </camunda:script>
       <bpmndi:BPMNShape id="Lane_05egm04_di" bpmnElement="Lane_05egm04" isHorizontal="true">
         <dc:Bounds x="190" y="398" width="1080" height="312" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1s9fomh_di" bpmnElement="Flow_1s9fomh">
+        <di:waypoint x="540" y="198" />
+        <di:waypoint x="700" y="198" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_100drxx_di" bpmnElement="Flow_100drxx">
         <di:waypoint x="800" y="478" />
         <di:waypoint x="1132" y="478" />
@@ -313,10 +317,6 @@ execution.setVariable("retry3", current+1); </camunda:script>
         <bpmndi:BPMNLabel>
           <dc:Bounds x="788" y="342" width="54" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0c6bshd_di" bpmnElement="Flow_0c6bshd">
-        <di:waypoint x="540" y="198" />
-        <di:waypoint x="700" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0lwrbkv_di" bpmnElement="Flow_0lwrbkv">
         <di:waypoint x="905" y="300" />
