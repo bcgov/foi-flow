@@ -43,8 +43,8 @@ class requestservice:
     def getrequestdetailsforministry(self,foirequestid, foiministryrequestid, authmembershipgroups):
         return requestservicegetter().getrequestdetailsforministry(foirequestid,foiministryrequestid, authmembershipgroups)
     
-    def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
-        return requestservicegetter().getrequestdetailsforonlinepayment(foirequestid, foiministryrequestid)
+    def getrequestdetails(self,foirequestid, foiministryrequestid):
+        return requestservicegetter().getrequestdetails(foirequestid, foiministryrequestid)
     
     def copywatchers(self, rawrequestid, ministries, userid):
         watchers = watcherservice().getrawrequestwatchers(int(rawrequestid))
