@@ -114,7 +114,8 @@ class Payment(Resource):
             paid = fee_service.check_if_paid()
             if paid is False:
                 return {'status': False, 'message': "Fee has not been paid"}, 400
-            document_service : DocumentGenerationService = DocumentGenerationService()
+            documenttypename='receipt'
+            document_service : DocumentGenerationService = DocumentGenerationService(documenttypename)
             response = document_service.generate_receipt(data= request_json)
             
             return Response(

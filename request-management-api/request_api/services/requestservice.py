@@ -9,6 +9,7 @@ from request_api.services.foirequest.requestserviceconfigurator import requestse
 from request_api.services.foirequest.requestservicegetter import requestservicegetter 
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate 
+from request_api.services.document_generation_service import DocumentGenerationService
 
 class requestservice:
     """ FOI Request management service
@@ -37,13 +38,22 @@ class requestservice:
         foirequestschema['requeststatusid'] = statusid
         return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
                
-    def getrequest(self,foirequestid,foiministryrequestid):  
+    def getrequest(self,foirequestid,foiministryrequestid): 
+        #For testing - remove afterwards 
+        documenttypename='cfr_fee_payment_receipt'
+        receipt_template_path='request_api/receipt_templates/cfr_fee_payment_receipt.docx'
+        data = self.getrequestdetails(3,3)  
+        print("data",data)   
+        print("INSIDE getrequestdocuments()")  
+        document_service : DocumentGenerationService = DocumentGenerationService(documenttypename)
+        response = document_service.generate_receipt(data,receipt_template_path)
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
     
     def getrequestdetailsforministry(self,foirequestid, foiministryrequestid, authmembershipgroups):
         return requestservicegetter().getrequestdetailsforministry(foirequestid,foiministryrequestid, authmembershipgroups)
     
     def getrequestdetails(self,foirequestid, foiministryrequestid):
+        print("!!")
         return requestservicegetter().getrequestdetails(foirequestid, foiministryrequestid)
     
     def copywatchers(self, rawrequestid, ministries, userid):
