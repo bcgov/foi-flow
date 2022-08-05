@@ -27,20 +27,19 @@ export const CommentSection = ({
   const [showaddbox, setshowaddbox] = useState(false)
   const [comments, setcomments] = useState([])
   const [filterValue, setfilterValue] = useState(-1)
+  const [filterkeyValue, setfilterkeyValue] = useState("")
   useEffect(() => {
-    let _comments = parseInt(filterValue) === -1 ? commentsArray : commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    let _comments = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    _comments = filterkeyValue === "" ? _comments : _comments.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
     setcomments(_comments)  
-  }, [filterValue,commentsArray])
-
-  
+  }, [filterValue,commentsArray ,filterkeyValue])
  
-  const onfilterchange = (_filterValue) => {
-    console.log(`Filtervalue ${_filterValue}`)
-    //let _filterValue = parseInt(e.target.value) 
+  const onfilterchange = (_filterValue) => {    
     setfilterValue(_filterValue)       
     setcomments([])
   }
 
+  
   const getRequestNumber = ()=>{
     let requestHeaderString = 'Request #'
     if(requestNumber)
@@ -83,7 +82,7 @@ export const CommentSection = ({
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
-            <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue}/>
+            <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue} oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}}/>
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
           //Handles Navigate Away

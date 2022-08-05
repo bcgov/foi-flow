@@ -15,8 +15,9 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 
 
-export  const CommentFilter = ({oncommentfilterchange, filterValue}:params) => {
+export  const CommentFilter = ({oncommentfilterchange, filterValue,oncommentfilterkeychange}:params) => {
 const dispatch = useDispatch();
+
 
 return (   
 <Grid item container alignItems="center" xs={12} sx={{ display: "inline-block"}}>
@@ -48,10 +49,10 @@ return (
   >
     <label className="hideContent">Search Comments</label>
     <InputBase
-      id="filter"
+      id="foicommentfilter"
       placeholder="Search Comments ..."
       defaultValue={""}
-      onChange={()=>{}}
+      onChange={(e)=>{oncommentfilterkeychange(e.target.value.trim())}}
       sx={{
         color: "#38598A",
       }}
