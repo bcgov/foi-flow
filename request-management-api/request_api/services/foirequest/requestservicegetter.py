@@ -8,6 +8,7 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.paymentservice import paymentservice
 
 
 class requestservicegetter:
@@ -96,9 +97,12 @@ class requestservicegetter:
     def getrequestdetails(self,foirequestid, foiministryrequestid):
         requestdetails = self.getrequest(foirequestid, foiministryrequestid)
         cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
+        payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if cfrfee is not None and cfrfee != {}:
             requestdetails['cfrfee'] = cfrfee
-            requestdetails["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']    
+            requestdetails["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']   
+        if payment is not None and payment != {}: 
+            requestdetails['paymenturl'] = payment['paymenturl']
         return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
