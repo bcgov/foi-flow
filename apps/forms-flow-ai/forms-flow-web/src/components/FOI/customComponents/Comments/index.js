@@ -26,12 +26,13 @@ export const CommentSection = ({
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)
   const [comments, setcomments] = useState([])
-  const [filterValue, setfilterValue] = useState(-1)
+  const [filterValue, setfilterValue] = useState(1)
   const [filterkeyValue, setfilterkeyValue] = useState("")
   useEffect(() => {
-    let _comments = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
-    _comments = filterkeyValue === "" ? _comments : _comments.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
-    setcomments(_comments)  
+    let _commentsbyCategory = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
+    let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)      
+    setcomments(filteredcomments)         
   }, [filterValue,commentsArray ,filterkeyValue])
  
   const onfilterchange = (_filterValue) => {    
@@ -39,7 +40,22 @@ export const CommentSection = ({
     setcomments([])
   }
 
-  
+  const filterkeyinCommentsandReplies = (_comments,filtercomments)=>{
+      _comments.forEach(_comment=>{
+            if(_comment.replies!=undefined && _comment.replies.length > 0 )
+            {
+                        let _filteredreply = _comment.replies.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
+                        let _parentcomments = filtercomments.filter(fp => fp.commentId == _comment.commentId)
+
+                        if(_filteredreply!=undefined && _filteredreply.length > 0 && _parentcomments.length === 0)
+                        {
+                          filtercomments.push(_comment)
+                        }
+                }
+          });
+
+    return filtercomments;
+  }
   const getRequestNumber = ()=>{
     let requestHeaderString = 'Request #'
     if(requestNumber)
