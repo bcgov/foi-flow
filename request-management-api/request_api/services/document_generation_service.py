@@ -30,7 +30,6 @@ class DocumentGenerationService:
     """document generation Service class."""
 
     def __init__(self,documenttypename='receipt'):
-        print("INSIDE docgeneration()",documenttypename) 
         self.cdgos_api_service = CdogsApiService()
         self.documenttypename = documenttypename
         receipt_document_type : DocumentType = DocumentType.get_document_type_by_name(self.documenttypename)
@@ -44,7 +43,6 @@ class DocumentGenerationService:
         
 
     def generate_receipt(self, data, receipt_template_path='request_api/receipt_templates/receipt_word.docx'):
-        print("INSIDE generate_receipt()")
         template_cached = False
         if self.receipt_template.cdogs_hash_code:
             current_app.logger.info('Checking if template %s is cached', self.receipt_template.cdogs_hash_code)

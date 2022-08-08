@@ -33,7 +33,6 @@ class CdogsApiService:
     
 
     def generate_receipt(self, template_hash_code: str, data):
-        print("INSIDE cdogs()") 
         request_body = {
             "options": {
                 "cachereport": False,
@@ -49,9 +48,7 @@ class CdogsApiService:
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.access_token}'
         }
-        print("json_request_body",json_request_body)
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}/render"
-        print("url",url)
         return self._post_generate_receipt(json_request_body, headers, url)
 
     def _post_generate_receipt(self, json_request_body, headers, url):
