@@ -9,7 +9,7 @@
     <bpmn:group id="Group_087f8ap" categoryValueRef="CategoryValue_03nhs8k" />
     <bpmn:group id="Group_1e997n9" categoryValueRef="CategoryValue_1fxkssh" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="3">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="5">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0ot5l60</bpmn:flowNodeRef>
@@ -116,7 +116,7 @@ connector.getVariable("statusCode");</camunda:script>
             <camunda:outputParameter name="axisRequestId">${S(response).prop("axisRequestId").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="fee">${S(response).prop("balanceDue").numberValue()}</camunda:outputParameter>
             <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="paymentStatus">Not Paid</camunda:outputParameter>
+            <camunda:outputParameter name="paymentstatus">NOT PAID</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -204,7 +204,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
+      <bpmn:incoming>Flow_0xfujpo</bpmn:incoming>
       <bpmn:outgoing>Flow_0hup5yp</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_1ka6mqq" name="Change to Call For Records">
@@ -232,7 +232,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1ffvmgj" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0szq4un" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0k05bsn" />
-    <bpmn:sequenceFlow id="Flow_02gzt5c" name="PAID" sourceRef="Gateway_1rpwru8" targetRef="Activity_0jc83dv">
+    <bpmn:sequenceFlow id="Flow_02gzt5c" name="PAID" sourceRef="Gateway_1rpwru8" targetRef="Activity_1mkqp7n">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "PAID"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0ldn3y8" name="Retry &#62; 3" sourceRef="Gateway_0q2f2o1" targetRef="Event_1tmmrt5">
@@ -381,11 +381,18 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
     <bpmn:sequenceFlow id="Flow_0ggtdbm" sourceRef="Activity_0v6rrmr" targetRef="Activity_1a43pmz" />
     <bpmn:sequenceFlow id="Flow_0nelrfi" sourceRef="Event_0fn9w12" targetRef="Event_0hclu9b" />
     <bpmn:sequenceFlow id="Flow_0w0leqj" sourceRef="Activity_0k05bsn" targetRef="Activity_0v6rrmr" />
-    <bpmn:task id="Activity_1mkqp7n" name="Get FormIO Token">
+    <bpmn:task id="Activity_1mkqp7n" name="Update Form Submission">
       <bpmn:extensionElements>
-        <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.execution.FormAccessTokenCacheListener" event="start" />
+        <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.BPMFormDataPipelineListener" event="start">
+          <camunda:field name="fields">
+            <camunda:expression>["status","paymentstatus"]</camunda:expression>
+          </camunda:field>
+        </camunda:executionListener>
       </bpmn:extensionElements>
+      <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xfujpo</bpmn:outgoing>
     </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_0xfujpo" sourceRef="Activity_1mkqp7n" targetRef="Activity_0jc83dv" />
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
   <bpmn:message id="Message_1rsz89u" name="Message_14ovgjp" />
@@ -509,14 +516,18 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_02gzt5c_di" bpmnElement="Flow_02gzt5c">
         <di:waypoint x="485" y="910" />
-        <di:waypoint x="1030" y="910" />
+        <di:waypoint x="660" y="910" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="527" y="883" width="25" height="14" />
+          <dc:Bounds x="515" y="883" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0szq4un_di" bpmnElement="Flow_0szq4un">
         <di:waypoint x="640" y="288" />
         <di:waypoint x="980" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xfujpo_di" bpmnElement="Flow_0xfujpo">
+        <di:waypoint x="760" y="910" />
+        <di:waypoint x="1030" y="910" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="980" y="248" width="100" height="80" />
@@ -605,7 +616,8 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
         <dc:Bounds x="1422" y="362" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vpot1m_di" bpmnElement="Activity_1mkqp7n">
-        <dc:Bounds x="680" y="740" width="100" height="80" />
+        <dc:Bounds x="660" y="870" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1ufjazf" bpmnElement="Event_0fn9w12">
         <dc:Bounds x="1422" y="310" width="36" height="36" />
