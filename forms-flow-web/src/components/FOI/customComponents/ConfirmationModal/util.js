@@ -40,7 +40,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     return _selectedMinistry;
   }
 
-  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus) => {
+  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid) => {
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       _saveRequestObject.reopen = true;
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
@@ -57,7 +57,9 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
       case StateEnum.callforrecords.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
       case StateEnum.review.name.toLowerCase():
-        if (_saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
+        if(!allowStateChange)
+          return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};
+        else if (!isAnyAmountPaid &&  _saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
           return {title: "Review Request", body: `Upload completed Call for Records form to change the state.`};
         else if (_saveRequestObject.requeststatusid === StateEnum.harms.id)
           return {title: "Review Request", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
@@ -77,6 +79,9 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
             return {title: "Fee Estimate", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}? The CFR Form will be locked for editing and sent to IAO for review.`};
           }
       case StateEnum.deduplication.name.toLowerCase():
+        if(!allowStateChange)
+          return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};
+        else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.deduplication.name}?`};
       case StateEnum.harms.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
