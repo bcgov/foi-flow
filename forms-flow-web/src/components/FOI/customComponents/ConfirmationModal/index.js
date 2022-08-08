@@ -117,7 +117,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
-            || !allowStateChange) {
+            || (saveRequestObject.requeststatusid === StateEnum.callforrecords.id && 
+                (state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
+                  state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
       }
       return files.length === 0 
