@@ -33,6 +33,8 @@ class templateconfig:
             return "Fee Estimate - Successful"
         elif key == "FEE-ESTIMATE-FAILED":
             return "Fee Estimate - Failed"
+        elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
+            return "Fee Estimate - Payment Receipt"
         return None 
     
 

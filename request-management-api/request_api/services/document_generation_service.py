@@ -19,6 +19,11 @@ from flask import current_app
 from request_api.exceptions import BusinessException, Error
 from request_api.models import DocumentTemplate, DocumentType
 from request_api.services.cdogs_api_service import CdogsApiService
+from request_api.services.external.storageservice import storageservice
+from request_api.services.email.templates.templateconfig import templateconfig
+from request_api.services.documentservice import documentservice
+import json
+import logging
 
 
 class DocumentGenerationService:
@@ -53,3 +58,15 @@ class DocumentGenerationService:
         
         current_app.logger.info('Generating receipt')
         return self.cdgos_api_service.generate_receipt(template_hash_code= self.receipt_template.cdogs_hash_code, data= data)
+
+    def upload_receipt(self, filename, filebytes, ministryrequestid, ministrycode, filenumber):
+        try:
+            logging.info("Upload receipt for ministry request id"+ str(ministryrequestid))
+            _response =  storageservice().uploadbytes(filename, filebytes, ministrycode, filenumber)
+            logging.info("Upload status for payload"+ json.dumps(_response))
+            if _response["success"] == True:
+                _documentschema = {"documents": [{"filename": _response["filename"], "documentpath": _response["documentpath"], "category": templateconfig().getattachmentcategory("FEE-ESTIMATE-PAYMENT-RECEIPT")}]}
+                documentservice().createrequestdocument(ministryrequestid, _documentschema, "SYSTEM", "ministryrequest")
+            return _response
+        except Exception as ex:
+            logging.exception(ex)
