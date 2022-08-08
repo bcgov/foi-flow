@@ -24,6 +24,7 @@ import asyncio
 from request_api.services import FeeService
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.requestservice import requestservice
+from request_api.services.external.storageservice import storageservice
 from request_api.services.eventservice import eventservice
 
 from request_api.services.document_generation_service import DocumentGenerationService
@@ -92,7 +93,19 @@ class Payment(Resource):
             response, parsed_args = fee_service.complete_payment(request_json)
             if (response['status'] == 'PAID'):
                 cfrfeeservice().paycfrfee(ministry_request_id, float(parsed_args.get('trnAmount')))
-                result = requestservice().updaterequeststatus(payment_id, ministry_request_id, 2)
+                receipt_template_path='request_api/receipt_templates/cfr_fee_payment_receipt.docx'
+                data = requestservice().getrequestdetails(1, ministry_request_id)
+                data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
+                data.update({'paymentInfo': {
+                    'paymentDate': fee_service.payment['completed_on'],
+                    'orderId': fee_service.payment['order_id'],
+                    'transactionId': fee_service.payment['transaction_number'],
+                    'cardType': parsed_args['cardType']
+                }})
+                document_service : DocumentGenerationService = DocumentGenerationService('cfr_fee_payment_receipt')
+                receipt = document_service.generate_receipt(data,receipt_template_path)
+                document_service.upload_receipt('fee_estimate_payment_receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
+                result = requestservice().updaterequeststatus(1, ministry_request_id, 2)
                 if result.success == True:
                     asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
                     requestservice().postfeeeventtoworkflow(result.args[0][0]["axisrequestid"], "PAID")
@@ -114,7 +127,8 @@ class Payment(Resource):
             paid = fee_service.check_if_paid()
             if paid is False:
                 return {'status': False, 'message': "Fee has not been paid"}, 400
-            document_service : DocumentGenerationService = DocumentGenerationService()
+            documenttypename='receipt'
+            document_service : DocumentGenerationService = DocumentGenerationService(documenttypename)
             response = document_service.generate_receipt(data= request_json)
             
             return Response(

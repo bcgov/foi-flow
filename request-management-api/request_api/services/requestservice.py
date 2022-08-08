@@ -9,6 +9,7 @@ from request_api.services.foirequest.requestserviceconfigurator import requestse
 from request_api.services.foirequest.requestservicegetter import requestservicegetter 
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate 
+from request_api.services.document_generation_service import DocumentGenerationService
 
 class requestservice:
     """ FOI Request management service
@@ -37,7 +38,7 @@ class requestservice:
         foirequestschema['requeststatusid'] = statusid
         return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
                
-    def getrequest(self,foirequestid,foiministryrequestid):  
+    def getrequest(self,foirequestid,foiministryrequestid): 
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
     
     def getrequestdetailsforministry(self,foirequestid, foiministryrequestid, authmembershipgroups):
