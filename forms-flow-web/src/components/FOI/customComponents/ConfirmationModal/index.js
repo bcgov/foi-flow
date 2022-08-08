@@ -78,7 +78,25 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
 
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
-    const amountDue = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata.totalamountdue);
+    const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
+    const actualsFeeDataFields = [
+      "actualelectronicpages",
+      "actualhardcopypages",
+      "actualiaopreparinghrs",
+      "actuallocatinghrs",
+      "actualministrypreparinghrs",
+      "actualproducinghrs"
+    ];
+    let allowStateChange = true;
+    let isAnyAmountPaid = false;
+    if(cfrFeeData?.amountpaid > 0){
+      isAnyAmountPaid = true;
+      allowStateChange = Object.keys(cfrFeeData).some(function(k) {
+          return actualsFeeDataFields.includes(k) && cfrFeeData[k] > 0
+      });
+    } 
+
+    const amountDue = cfrFeeData?.totalamountdue;
     const [mailed, setMailed] = useState(false);
     const handleMailedChange = (event) => {
       setMailed(event.target.checked);
@@ -98,11 +116,12 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
-            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)) {
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
+            || !allowStateChange) {
         return true;
       }
       return files.length === 0 
-        && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
+        && ((!isAnyAmountPaid && state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
             || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
             || (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id && saveRequestObject.email)
@@ -141,7 +160,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus);
+    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
@@ -162,8 +181,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase())
         && 
         (
-          (state.toLowerCase() === StateEnum.review.name.toLowerCase() 
-            && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid))
+          (state.toLowerCase() === StateEnum.review.name.toLowerCase() && (saveRequestObject.requeststatusid === StateEnum.harms.id
+            || (saveRequestObject.requeststatusid === StateEnum.callforrecords.id && !isAnyAmountPaid)))
           ||
           (state.toLowerCase() === StateEnum.response.name.toLowerCase()
             && saveRequestObject.requeststatusid === StateEnum.signoff.id)
