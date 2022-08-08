@@ -32,6 +32,8 @@ class notificationconfig:
             return 11  
         elif notificationtype == "Group Members":
             return 12 
+        elif notificationtype == "Email Failure":
+            return 13 
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):

@@ -43,9 +43,8 @@ class FOISendEmail(Resource):
     def post(requestid, ministryrequestid):      
         try:
             requestjson = request.get_json() 
-            print(requestjson)
-            result = emailservice().send_payonline(requestid, ministryrequestid, requestjson)
-            return json.dumps(result), 200
+            result = emailservice().send_payonline("PAYONLINE", ministryrequestid, requestjson)
+            return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
         except KeyError as err:
@@ -53,8 +52,8 @@ class FOISendEmail(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiemail/acknowledge/<requestid>')
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/payonline/acknowledge')
 class FOIAcknowledgeSendEmail(Resource):
     """Retrieve watchers for unopened request"""
 
@@ -63,13 +62,15 @@ class FOIAcknowledgeSendEmail(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def get(requestid):      
+    def post(requestid, ministryrequestid):      
         try:
-            result = emailservice().read(requestid)
-            return json.dumps(result), 200
+            requestjson = request.get_json() 
+            result = emailservice().acknowledge("PAYONLINE", ministryrequestid, requestjson)
+            return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+        
