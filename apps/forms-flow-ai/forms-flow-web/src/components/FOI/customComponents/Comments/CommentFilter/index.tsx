@@ -1,8 +1,5 @@
-import React from 'react';
-import { useDispatch } from "react-redux";
 import './index.scss'
 import  { params } from './types'
-
 import {
   ClickableChip  
 } from "../../../Dashboard/utils";
@@ -14,10 +11,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 
-
 export  const CommentFilter = ({oncommentfilterchange, filterValue,oncommentfilterkeychange}:params) => {
-const dispatch = useDispatch();
-
 
 return (   
 <Grid item container alignItems="center" xs={12} sx={{ display: "inline-block"}}>
