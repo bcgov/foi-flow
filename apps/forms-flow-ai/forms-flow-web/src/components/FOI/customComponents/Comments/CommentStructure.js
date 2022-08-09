@@ -20,6 +20,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import NewCommentIndicator from './NewCommentIndicator'
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName }) => {
@@ -207,6 +208,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     )
   };
 
+  
   return (
     <>
       <div name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
@@ -214,9 +216,10 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
           className="userInfo"
           style={reply && { marginLeft: 15, marginTop: '6px' }}
         >
+           <NewCommentIndicator commentdate={i.dateUF}/>
           <div className="commentsTwo">
 
-            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
+            <div className="fullName">   {fullName} </div> |  <div className="commentdate">{i.date} </div>
 
           </div>
           <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
