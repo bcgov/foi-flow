@@ -53,7 +53,7 @@ class CreateFOIFeeWaiver(Resource):
             requestjson = request.get_json()
             feewaiverschema = FOIFeeWaiverIAOSchema().load(requestjson)
             result = feewaiverservice().savefeewaiver(ministryrequestid, feewaiverschema, AuthHelper.getuserid())
-            # asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            # asyncio.ensure_future(eventservice().posteventforfeewaiver(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValidationError as verr:
             logging.error(verr)
@@ -89,5 +89,23 @@ class ApproveFOIFeeWaiver(Resource):
         except KeyError as err:
             logging.error(err)
             return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foifeewaiver/ministryrequest/<requestid>')
+class FOIFeeWaiver(Resource):
+    """Retrieves fee waiver form based on ministry id."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(requestid):
+        try:
+            result = feewaiverservice().getfeewaiver(requestid)
+            return json.dumps(result), 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500

@@ -26,6 +26,7 @@ class feewaiverservice:
         feewaiver = FOIRequestFeeWaiver()
         lkupfeewaiver = self.getfeewaiver(ministryrequestid)
         _version = 1
+        feewaiver.formdata = {}
         if lkupfeewaiver:
             feewaiver.__dict__.update(lkupfeewaiver)
             _version =  lkupfeewaiver['version'] + 1
@@ -33,7 +34,6 @@ class feewaiverservice:
         feewaiver.ministryrequestid = ministryrequestid
         feewaiver.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         feewaiver.waiverstatusid = feewaiverstatusservice().getfeewaiverstatusidbyname(data['status'])
-        feewaiver.formdata = {}
         return feewaiver
 
 
