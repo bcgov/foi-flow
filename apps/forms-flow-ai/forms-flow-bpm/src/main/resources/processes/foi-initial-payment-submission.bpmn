@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
-  <bpmn:error id="Error_06fsjjn" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:error id="Error_06fsjjn" name="FOI-REQ-DETAIL-API-ERR" camunda:errorMessage="FOI Get Request Details Failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
   <bpmn:message id="Message_0a9jdmw" name="foi-fee-payment" />
   <bpmn:collaboration id="Collaboration_1rbxo3f">
@@ -9,7 +9,7 @@
     <bpmn:group id="Group_087f8ap" categoryValueRef="CategoryValue_03nhs8k" />
     <bpmn:group id="Group_1e997n9" categoryValueRef="CategoryValue_1fxkssh" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="5">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="7">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0ot5l60</bpmn:flowNodeRef>
@@ -29,7 +29,7 @@
         <bpmn:flowNodeRef>get-api-token</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>invoke-reqmgmt-api</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1k8aoc7</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_17odcea</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>get-req-details</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1cv04sw</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1y2hfyk</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0xd3neq</bpmn:flowNodeRef>
@@ -37,7 +37,7 @@
         <bpmn:flowNodeRef>Activity_0v6rrmr</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1a43pmz</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0hclu9b</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0fn9w12</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>save-sub-link</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:task id="Activity_0k05bsn" name="Create Submission">
@@ -109,7 +109,7 @@
             </camunda:inputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
-	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-RAWREQUEST-API-ERR", response);
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-REQ-DETAIL-API-ERR", response);
 }
 connector.getVariable("statusCode");</camunda:script>
             </camunda:outputParameter>
@@ -167,6 +167,9 @@ var foistatuspayload = {
 }
 execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</camunda:script>
         </camunda:executionListener>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="servicekey">payonline</camunda:outputParameter>
+        </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_17nmoz9</bpmn:incoming>
       <bpmn:outgoing>Flow_1qzjx1y</bpmn:outgoing>
@@ -227,7 +230,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
       <bpmn:incoming>Flow_0hup5yp</bpmn:incoming>
       <bpmn:outgoing>Flow_1eu3lad</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:boundaryEvent id="Event_17odcea" attachedToRef="invoke-reqmgmt-api">
+    <bpmn:boundaryEvent id="get-req-details" attachedToRef="invoke-reqmgmt-api">
       <bpmn:outgoing>Flow_1ys38a6</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1ffvmgj" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
     </bpmn:boundaryEvent>
@@ -239,7 +242,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry1 &gt; 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_17bdgfc" sourceRef="get-api-token" targetRef="invoke-reqmgmt-api" />
-    <bpmn:sequenceFlow id="Flow_1ys38a6" sourceRef="Event_17odcea" targetRef="Event_1k8aoc7" />
+    <bpmn:sequenceFlow id="Flow_1ys38a6" sourceRef="get-req-details" targetRef="Event_1k8aoc7" />
     <bpmn:sequenceFlow id="Flow_1kzesmk" sourceRef="Event_1k8aoc7" targetRef="Gateway_0q2f2o1" />
     <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="get-api-token">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry1 &lt;= 3}</bpmn:conditionExpression>
@@ -339,7 +342,7 @@ execution.setVariable('formioRootPassword', system.getenv('FORMIO_ROOT_PASSWORD'
             <camunda:inputParameter name="payload">${saveDataPayload}</camunda:inputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
-	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-RAWREQUEST-API-ERR", response);
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-SAVE-SUB-API-ERR", response);
 }
 connector.getVariable("statusCode");</camunda:script>
             </camunda:outputParameter>
@@ -367,9 +370,9 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:boundaryEvent id="Event_0fn9w12" attachedToRef="Activity_1a43pmz">
+    <bpmn:boundaryEvent id="save-sub-link" attachedToRef="Activity_1a43pmz">
       <bpmn:outgoing>Flow_0nelrfi</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_11vo5r8" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_11vo5r8" errorRef="Error_0ccuaf4" camunda:errorCodeVariable="responseCode" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_1uccg6l" name="Retry &#62; 3" sourceRef="Gateway_03s9u5q" targetRef="Event_0xd3neq">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry4 &gt; 3}</bpmn:conditionExpression>
@@ -379,7 +382,7 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry4 &lt;= 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0ggtdbm" sourceRef="Activity_0v6rrmr" targetRef="Activity_1a43pmz" />
-    <bpmn:sequenceFlow id="Flow_0nelrfi" sourceRef="Event_0fn9w12" targetRef="Event_0hclu9b" />
+    <bpmn:sequenceFlow id="Flow_0nelrfi" sourceRef="save-sub-link" targetRef="Event_0hclu9b" />
     <bpmn:sequenceFlow id="Flow_0w0leqj" sourceRef="Activity_0k05bsn" targetRef="Activity_0v6rrmr" />
     <bpmn:task id="Activity_1mkqp7n" name="Update Form Submission">
       <bpmn:extensionElements>
@@ -405,6 +408,7 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
   <bpmn:category id="Category_0u5q9y4">
     <bpmn:categoryValue id="CategoryValue_1fxkssh" value="Save Submission Link" />
   </bpmn:category>
+  <bpmn:error id="Error_0ccuaf4" name="FOI-SAVE-SUB-API-ERR" camunda:errorMessage="FOI Save Submission Link Failed." />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1rbxo3f">
       <bpmndi:BPMNShape id="Participant_105327x_di" bpmnElement="Participant_105327x" isHorizontal="true">
@@ -619,13 +623,13 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
         <dc:Bounds x="660" y="870" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_1ufjazf" bpmnElement="Event_0fn9w12">
+      <bpmndi:BPMNShape id="BPMNShape_1ufjazf" bpmnElement="save-sub-link">
         <dc:Bounds x="1422" y="310" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="548" y="182" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="Event_17odcea">
+      <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="get-req-details">
         <dc:Bounds x="572" y="310" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="548" y="182" width="25" height="14" />
