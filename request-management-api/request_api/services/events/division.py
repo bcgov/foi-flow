@@ -36,7 +36,8 @@ class divisionevent:
         
     def createcomment(self, requestid, division, userid):
         comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division)}
-        commentservice().createministryrequestcomment(comment, userid, CommentType.DivisionStages)
+        print('Comment type is {0}'.format(CommentType.DivisionStages.value))
+        commentservice().createministryrequestcomment(comment, userid, CommentType.DivisionStages.value)
 
     
     def __maintained(self,cdivisions, pdivisions):
