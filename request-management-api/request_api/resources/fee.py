@@ -24,9 +24,8 @@ import asyncio
 from request_api.services import FeeService
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.requestservice import requestservice
-from request_api.services.external.storageservice import storageservice
+from request_api.services.paymentservice import paymentservice
 from request_api.services.eventservice import eventservice
-
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
@@ -81,31 +80,20 @@ class Payment(Resource):
 
 
 @cors_preflight('PUT,OPTIONS')
-@API.route('/foirequests/<int:ministry_request_id>/payments/<int:payment_id>')
+@API.route('/foirequests/<int:request_id>/ministryrequest/<int:ministry_request_id>/payments/<int:payment_id>')
 class Payment(Resource):
 
     @staticmethod
     @cross_origin(origins=allowedorigins())
-    def put(ministry_request_id: int, payment_id: int):
+    def put(request_id: int, ministry_request_id: int, payment_id: int):
         try:
             request_json = request.get_json()
-            fee_service: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
-            response, parsed_args = fee_service.complete_payment(request_json)
+            fee: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
+            response, parsed_args = fee.complete_payment(request_json)
             if (response['status'] == 'PAID'):
                 cfrfeeservice().paycfrfee(ministry_request_id, float(parsed_args.get('trnAmount')))
-                receipt_template_path='request_api/receipt_templates/cfr_fee_payment_receipt.docx'
-                data = requestservice().getrequestdetails(1, ministry_request_id)
-                data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
-                data.update({'paymentInfo': {
-                    'paymentDate': fee_service.payment['completed_on'],
-                    'orderId': fee_service.payment['order_id'],
-                    'transactionId': fee_service.payment['transaction_number'],
-                    'cardType': parsed_args['cardType']
-                }})
-                document_service : DocumentGenerationService = DocumentGenerationService('cfr_fee_payment_receipt')
-                receipt = document_service.generate_receipt(data,receipt_template_path)
-                document_service.upload_receipt('fee_estimate_payment_receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
-                result = requestservice().updaterequeststatus(1, ministry_request_id, 2)
+                paymentservice().createpaymentreceipt(request_id, ministry_request_id, fee)
+                result = requestservice().updaterequeststatus(request_id, ministry_request_id, 2)
                 if result.success == True:
                     asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
                     requestservice().postfeeeventtoworkflow(result.args[0][0]["axisrequestid"], "PAID")
@@ -140,19 +128,3 @@ class Payment(Resource):
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
 
-@cors_preflight('PUT,OPTIONS')
-@API.route('/foirequests/<int:ministry_request_id>/payments/<int:payment_id>/test')
-class Payment(Resource):
-
-    @staticmethod
-    @cross_origin(origins=allowedorigins())
-    def put(ministry_request_id: int, payment_id: int):
-        try:
-            result = requestservice().updaterequeststatus(payment_id, ministry_request_id, 2)
-            if result.success == True:
-                asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
-                requestservice().postfeeeventtoworkflow(result.args[0][0]["axisrequestid"], "PAID")
-                asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
-            return {"code": "OK"}, 201
-        except BusinessException as e:
-            return {'status': e.code, 'message': e.message}, e.status_code

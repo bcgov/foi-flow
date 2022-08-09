@@ -53,7 +53,7 @@ class FOISendEmail(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/payonline/acknowledge')
+@API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/<servicename>/acknowledge')
 class FOIAcknowledgeSendEmail(Resource):
     """Retrieve watchers for unopened request"""
 
@@ -62,10 +62,9 @@ class FOIAcknowledgeSendEmail(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid, ministryrequestid):      
+    def post(requestid, ministryrequestid, servicename):      
         try:
-            requestjson = request.get_json() 
-            result = emailservice().acknowledge("PAYONLINE", ministryrequestid, requestjson)
+            result = emailservice().acknowledge(servicename.upper(), requestid, ministryrequestid)
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500

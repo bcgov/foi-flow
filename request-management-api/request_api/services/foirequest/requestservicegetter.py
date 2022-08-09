@@ -100,9 +100,9 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if cfrfee is not None and cfrfee != {}:
             requestdetails['cfrfee'] = cfrfee
-            requestdetails["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']   
+            requestdetails['cfrfee']['feedata']["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']   
         if payment is not None and payment != {}: 
-            requestdetails['paymenturl'] = payment['paymenturl']
+            requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']
         return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):

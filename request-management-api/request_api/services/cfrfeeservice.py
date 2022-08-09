@@ -10,7 +10,10 @@ from dateutil import parser
 from dateutil import tz
 import pytz
 import maya
-
+from datetime import date
+from datetime import datetime
+import requests
+from flask import current_app
 
 class cfrfeeservice:
     """ FOI CFR Fee Form management service
@@ -30,6 +33,7 @@ class cfrfeeservice:
     def paycfrfee(self, ministryrequestid, amountpaid):
         cfrfee = self.__preparecfrfee(ministryrequestid, {'status': 'approved'}) # status should always be approved before payment
         cfrfee.feedata['amountpaid'] += amountpaid
+        cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
     def __preparecfrfee(self, ministryrequestid, data):
