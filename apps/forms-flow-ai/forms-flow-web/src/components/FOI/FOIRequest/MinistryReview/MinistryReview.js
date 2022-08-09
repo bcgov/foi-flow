@@ -329,6 +329,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const tabclick = (param) => {
     if (param === "Comments") {
+      sessionStorage.setItem('foicommentcategory',1)
       setRemoveComment(false);
       changeTabLinkStatuses(param);
       return;
