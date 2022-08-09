@@ -28,11 +28,16 @@ class cfrfeeservice:
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
 
     def paycfrfee(self, ministryrequestid, amountpaid):
-        cfrfee = self.__preparecfrfee(ministryrequestid, {'status': 'approved'}) # status should always be approved before payment
+        cfrfee = self.__preparecfrfee(ministryrequestid)
         cfrfee.feedata['amountpaid'] += amountpaid
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
+
+    def waivecfrfee(self, ministryrequestid, waivedamount, userid):
+        cfrfee = self.__preparecfrfee(ministryrequestid)
+        cfrfee.feedata['totalamountdue'] -= waivedamount
+        return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
     
-    def __preparecfrfee(self, ministryrequestid, data):
+    def __preparecfrfee(self, ministryrequestid, data={}):
         cfrfee = FOIRequestCFRFee()
         lkupcfrfee = self.getcfrfee(ministryrequestid)           
         _version = 1
@@ -42,7 +47,8 @@ class cfrfeeservice:
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status']) if "status" in data and data['status'] not in (None,'') else None
+        if "status" in data and data['status'] not in (None,''):
+            cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status'])
         return cfrfee
     
     
