@@ -26,16 +26,19 @@ export const CommentSection = ({
 }) => {
   const [showaddbox, setshowaddbox] = useState(false)
   const [comments, setcomments] = useState([])
-  const [filterValue, setfilterValue] = useState(1)
+  let _commentcategory = sessionStorage.getItem('foicommentcategory')
+  const [filterValue, setfilterValue] = useState(_commentcategory === '' || _commentcategory === undefined  ? 1 : _commentcategory)
   const [filterkeyValue, setfilterkeyValue] = useState("")
   useEffect(() => {
     let _commentsbyCategory = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
     let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
-    let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)      
+    let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments) 
+    setfilterValue(_commentcategory)     
     setcomments(filteredcomments)         
   }, [filterValue,commentsArray ,filterkeyValue])
  
-  const onfilterchange = (_filterValue) => {    
+  const onfilterchange = (_filterValue) => { 
+    sessionStorage.setItem('foicommentcategory',_filterValue)   
     setfilterValue(_filterValue)       
     setcomments([])
   }
