@@ -48,7 +48,7 @@ class emailservice:
         try:
             _originalmsg = senderservice().read_outbox_as_bytes(servicekey, requestjson)
             if _originalmsg is not None:
-                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson, templateconfig().getattachmentcategory(servicename+"-SUCCESSFUL"))
+                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson, templateconfig().getattachmentcategory(servicekey+"-SUCCESSFUL"))
         except Exception as ex:
             logging.exception(ex)
         
