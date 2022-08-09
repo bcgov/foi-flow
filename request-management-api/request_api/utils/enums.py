@@ -103,3 +103,10 @@ class RequestorType(Enum):
     applicant = 1    
     onbehalfof = 2
     child = 3
+
+class CommentType(Enum):
+    """Authorization header types."""
+
+    UserComment = 1
+    SystemGenerated = 2
+    DivisionStages = 3

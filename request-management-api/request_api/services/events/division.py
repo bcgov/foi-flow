@@ -11,6 +11,7 @@ from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
 from request_api.exceptions import BusinessException
 from dateutil.parser import parse
+from request_api.utils.enums import CommentType
 
 class divisionevent:
     """ FOI Event management service
@@ -35,7 +36,7 @@ class divisionevent:
         
     def createcomment(self, requestid, division, userid):
         comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(division)}
-        commentservice().createministryrequestcomment(comment, userid, 2)
+        commentservice().createministryrequestcomment(comment, userid, CommentType.DivisionStages)
 
     
     def __maintained(self,cdivisions, pdivisions):
