@@ -85,12 +85,19 @@ const AttachmentLetterCategories = Object.freeze({
   feeestimateletter: {
     name: "fee estimate - letter",
   },
-  feeestimatesuccessful: {
-    name: "fee estimate - successful",
-  },
   feeestimatefailed: {
     name: "fee estimate - failed",
   },
+  feeestimatepaymentreceipt: {
+    name: "fee estimate - payment receipt"
+  },
+  feeestimatepaymentcorrespondencesuccessful: {
+    name: "fee estimate - payment - correspondence - successful"
+  },
+  feeestimatepaymentcorrespondencefailed: {
+    name: "fee estimate - payment - correspondence - failed"
+  }
+
   });
 
 export { StateList, MinistryStateList, StateEnum, StateTransitionCategories, AttachmentLetterCategories };

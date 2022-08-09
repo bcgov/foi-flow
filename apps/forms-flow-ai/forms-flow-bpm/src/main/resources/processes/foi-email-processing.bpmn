@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1nln4il" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1nln4il" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:message id="Message_0zu4vx8" name="foi-reminder-error" />
   <bpmn:message id="Message_0yf3hf3" name="foi-fee-payment" />
   <bpmn:message id="Message_1pac8jy" name="foi-fee-payment" />
@@ -13,7 +13,7 @@
   <bpmn:collaboration id="Collaboration_18fcj2s">
     <bpmn:participant id="Participant_00kyu4q" name="FOI Email Processing" processRef="foi-email-processing" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="3">
+  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="5">
     <bpmn:laneSet id="LaneSet_13e9jxh">
       <bpmn:lane id="Lane_05egm04" name="Audit  Email Correspondence">
         <bpmn:flowNodeRef>Event_18tkl5h</bpmn:flowNodeRef>
@@ -113,7 +113,6 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
       <bpmn:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
-            <camunda:inputParameter name="payload">${paymentPayload}</camunda:inputParameter>
             <camunda:inputParameter name="url">${foiApiUrl}/api/foiemail/${foiRequestID}/ministryrequest/${ministryRequestID}/${servicekey}</camunda:inputParameter>
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
             <camunda:inputParameter name="headers">
@@ -124,31 +123,13 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
             </camunda:inputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
-	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-RAWREQUEST-API-ERR", response);
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-PAYMENT-EMAIL-API-ERR", response);
 }
 connector.getVariable("statusCode");</camunda:script>
             </camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
-        <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">var paymentPayload = {
-"assignedGroup": execution.getVariable("assignedGroup"),
-"assignedToFirstName": execution.getVariable("assignedToFirstName"),
-"assignedToLastName": execution.getVariable("assignedToLastName"),
-"axisRequestId": execution.getVariable("axisRequestId"),
-"balanceDue": execution.getVariable("fee"),
-"firstName": execution.getVariable("firstName"),
-"lastName": execution.getVariable("lastName"),
-"email": execution.getVariable("email"),
-"bcgovcode": execution.getVariable("bcgovcode"),
-"idNumber": execution.getVariable("fileNumber"),
-"assignedto": execution.getVariable("assignedto"),
-"assignedministryperson": execution.getVariable("assignedministryperson"),
-"paymenturl": execution.getVariable('foiwebUrl') + "/public/form/" + execution.getVariable('formId') + "/submission/" + execution.getVariable('submissionId') + "/edit"
-};
-execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camunda:script>
-        </camunda:executionListener>
         <camunda:executionListener event="end">
           <camunda:script scriptFormat="javascript">var current = execution.getVariable("e_retry1");
 execution.setVariable("e_retry1", current+1); 
@@ -173,7 +154,6 @@ execution.setVariable("e_retry1", current+1);
       <bpmn:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
-            <camunda:inputParameter name="payload">${paymentPayload}</camunda:inputParameter>
             <camunda:inputParameter name="url">${foiApiUrl}/api/foiemail/${foiRequestID}/ministryrequest/${ministryRequestID}/${servicekey}/acknowledge</camunda:inputParameter>
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
             <camunda:inputParameter name="headers">
@@ -184,31 +164,13 @@ execution.setVariable("e_retry1", current+1);
             </camunda:inputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
-	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-RAWREQUEST-API-ERR", response);
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-PAYMENT-ACK-EMAIL-API-ERR", response);
 }
 connector.getVariable("statusCode");</camunda:script>
             </camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
-        <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">var paymentPayload = {
-"assignedGroup": execution.getVariable("assignedGroup"),
-"assignedToFirstName": execution.getVariable("assignedToFirstName"),
-"assignedToLastName": execution.getVariable("assignedToLastName"),
-"axisRequestId": execution.getVariable("axisRequestId"),
-"balanceDue": execution.getVariable("fee"),
-"firstName": execution.getVariable("firstName"),
-"lastName": execution.getVariable("lastName"),
-"email": execution.getVariable("email"),
-"bcgovcode": execution.getVariable("bcgovcode"),
-"idNumber": execution.getVariable("fileNumber"),
-"assignedto": execution.getVariable("assignedto"),
-"assignedministryperson": execution.getVariable("assignedministryperson"),
-"paymenturl": execution.getVariable('foiwebUrl') + "/public/form/" + execution.getVariable('formId') + "/submission/" + execution.getVariable('submissionId') + "/edit"
-};
-execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camunda:script>
-        </camunda:executionListener>
         <camunda:executionListener event="end">
           <camunda:script scriptFormat="javascript">var current = execution.getVariable("e_retry2");
 execution.setVariable("e_retry2", current+1); </camunda:script>
@@ -290,7 +252,7 @@ execution.setVariable("e_retry2", current+1); </camunda:script>
   <bpmn:message id="Message_0swb9l4" name="foi-email" />
   <bpmn:message id="Message_1t48dlf" name="foi-fee-payment" />
   <bpmn:error id="Error_1qgec1g" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
-  <bpmn:error id="Error_0zzkp8y" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
+  <bpmn:error id="Error_0zzkp8y" name="FOI-PAYMENT-ACK-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Acknoledgement Email invocation failed." />
   <bpmn:error id="Error_0226bnc" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
   <bpmn:error id="Error_10rktt0" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

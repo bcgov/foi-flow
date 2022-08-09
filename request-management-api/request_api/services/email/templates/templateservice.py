@@ -46,7 +46,11 @@ class templateservice:
 
         if(dynamictemplatevalues is None):
             raise ValueError('Values not found')
-        
+            
+        if dynamictemplatevalues["assignedTo"] == None:
+                dynamictemplatevalues["assignedToFirstName"] = ""
+                dynamictemplatevalues["assignedToLastName"] = ""
+
         template = Template(emailtemplatehtml)
         templatedhtml = template.render(dynamictemplatevalues)
         return templatedhtml
