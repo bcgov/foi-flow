@@ -114,7 +114,7 @@
 connector.getVariable("statusCode");</camunda:script>
             </camunda:outputParameter>
             <camunda:outputParameter name="axisRequestId">${S(response).prop("axisRequestId").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="fee">${S(response).prop("balanceDue").numberValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="fee">${S(response).prop("cfrfee").prop("feedata").prop("balanceDue").numberValue()}</camunda:outputParameter>
             <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="paymentstatus">NOT PAID</camunda:outputParameter>
           </camunda:inputOutput>
@@ -182,7 +182,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
     <bpmn:intermediateThrowEvent id="Event_0q2irqu" name="Notify Payment Confirmation">
       <bpmn:extensionElements>
         <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).correlateWithResult();</camunda:script>
+          <camunda:script scriptFormat="javascript">execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","fee-estimate-payment-receipt").correlateWithResult();</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1eu3lad</bpmn:incoming>
