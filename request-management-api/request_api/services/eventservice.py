@@ -9,6 +9,8 @@ from request_api.services.events.comment import commentevent
 from request_api.services.events.legislativedate import legislativedateevent
 from request_api.services.events.extension import extensionevent
 from request_api.services.events.cfrfeeform import cfrfeeformevent
+from request_api.services.events.feewaiver import feewaiverevent
+from request_api.services.events.payment import paymentevent
 from request_api.services.events.email import emailevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
@@ -77,6 +79,24 @@ class eventservice:
                 current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
+
+    async def posteventforfeewaiver(self, ministryrequestid, userid, username):
+        try:
+            response = feewaiverevent().createstatetransitionevent(ministryrequestid, userid, username)
+            if response.success == False:
+                current_app.logger.error("FOI Notification failed for event for FEEWAIVERFORM= %s" % (ministryrequestid))
+        except BusinessException as exception:
+            self.__logbusinessexception(exception)
+
+
+    async def postpaymentevent(self, requestid):
+        try:
+            paymeneteventresponse = paymentevent().createpaymentevent(requestid)
+            if paymeneteventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for payment event for request= %s ; event response=%s" % (requestid, paymeneteventresponse.message))
+        except BusinessException as exception:
+            self.__logbusinessexception(exception)
+
     
     def posteventforemailfailure(self, ministryrequestid, requesttype, stage, reason, userid):
         try:
@@ -85,6 +105,7 @@ class eventservice:
                     current_app.logger.error("FOI Notification failed for email event = %s" % (emaileventresponse))
         except BusinessException as exception:            
             self.__logbusinessexception(exception) 
+
         
     def __logbusinessexception(self, exception):
         current_app.logger.error("%s,%s" % ('FOI Comment Notification Error', exception.message))
