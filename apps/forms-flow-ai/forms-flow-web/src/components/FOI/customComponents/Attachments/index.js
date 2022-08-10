@@ -19,6 +19,7 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
+import AttachmentFilter from './AttachmentFilter';
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -80,6 +81,9 @@ export const AttachmentSection = ({
   const [modalFor, setModalFor] = useState("add");
   const [updateAttachment, setUpdateAttachment] = useState({});
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [attachmentsForDisplay, setAttachmentsForDisplay] = useState(attachments)
+  const [filterValue, setFilterValue] = useState('');
+  const [keywordValue, setKeywordValue] = useState('');
 
   const addAttachments = () => {
     setModalFor('add');
@@ -102,6 +106,15 @@ export const AttachmentSection = ({
       }
     }
   },[successCount])
+
+  React.useEffect(() => {
+    setAttachmentsForDisplay(searchAttachments(attachments, filterValue, keywordValue));
+  },[filterValue, keywordValue])
+
+  const searchAttachments = (_attachments, _filterValue, _keywordValue) =>  {
+    // let newAttachments = JSON.parse(JSON.stringify(_attachments));
+    return _attachments.filter(attachment => attachment.category.toLowerCase().includes(_filterValue?.toLowerCase()) && ( attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase())));
+  }
 
   const replaceAttachment = () => {
     const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
@@ -280,12 +293,12 @@ export const AttachmentSection = ({
   }
 
   let attachmentsList = [];
-  for(let i=0; i<attachments.length; i++) {
+  for(let i=0; i<attachmentsForDisplay.length; i++) {
     attachmentsList.push(
     <Attachment 
       key={i}
       indexValue={i} 
-      attachment={attachments[i]} 
+      attachment={attachmentsForDisplay[i]} 
       handlePopupButtonClick={handlePopupButtonClick} 
       getFullname={getFullname} 
       isMinistryCoordinator={isMinistryCoordinator}
@@ -293,7 +306,15 @@ export const AttachmentSection = ({
       classes={classes} 
     />);
   }
-  
+
+  const handleFilterChange = (_newFilterValue) => {
+    setFilterValue(_newFilterValue);
+  }
+
+  const handleKeywordChange = (_newKeywordValue) => {
+    setKeywordValue(_newKeywordValue);
+  }
+
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -335,6 +356,16 @@ export const AttachmentSection = ({
               >
                 + Add Attachment
               </button>
+            </Grid>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              spacing={1}
+              className={classes.attachmentLog}
+            >
+              <AttachmentFilter handleFilterChange={handleFilterChange} filterValue={filterValue} handleKeywordChange={handleKeywordChange} keyWordValue={keywordValue} />
             </Grid>
             <Grid
               container
@@ -432,64 +463,81 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   }
 
   return (
-    <Grid
-      container
-      item
-      xs={12}
-      direction="row"
-      justify="flex-start"
-      alignItems="flex-start"
-      spacing={1}
-    >
-      <Grid item xs={11}>
-        {attachmenttitle()}
-        <Chip
-          label={getCategory(attachment.category).toUpperCase()}
-          size="small"
-          className={clsx(classes.chip, {
-            [classes.chipPrimary]: !disabled,
-          })}
-        />
+    <>
+      <Grid
+        container
+        item
+        xs={12}
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={1}
+      >
+        <Grid item xs={11}>
+          {attachmenttitle()}
+        </Grid>
+        <Grid 
+          item 
+          xs={1}
+          container
+          direction="row-reverse"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <AttachmentPopup
+            indexValue={indexValue}
+            attachment={attachment}
+            handlePopupButtonClick={handlePopupButtonClick}
+            disabled={disabled}
+            ministryId={ministryId}
+          />
+        </Grid>
       </Grid>
       <Grid 
-        item 
-        xs={1}
         container
-        direction="row-reverse"
-        justifyContent="flex-start"
+        direction="row"
+        justify="flex-start"
         alignItems="flex-start"
+        spacing={1}
       >
-        <AttachmentPopup
-          indexValue={indexValue}
-          attachment={attachment}
-          handlePopupButtonClick={handlePopupButtonClick}
-          disabled={disabled}
-          ministryId={ministryId}
-        />
+        <Grid item xs={1}>
+          <Chip
+            label={getCategory(attachment.category).toUpperCase()}
+            size="small"
+            className={clsx(classes.chip, {
+              [classes.chipPrimary]: !disabled,
+            })}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <div
+            className={`attachment-owner ${
+              disabled ? "attachment-disabled" : ""
+            }`}
+          >
+            {getFullname(attachment.createdby)}
+          </div>
+        </Grid>
+        <Grid item xs={4}>
+          <div
+            className={`attachment-time ${disabled ? "attachment-disabled" : ""}`}
+          >
+            {attachment.created_at}
+          </div>
+        </Grid>
       </Grid>
-
-      <Grid item xs={12}>
-        <div
-          className={`attachment-time ${disabled ? "attachment-disabled" : ""}`}
-        >
-          {attachment.created_at}
-        </div>
+      <Grid 
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={3}
+      >
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
       </Grid>
-
-      <Grid item xs={12}>
-        <div
-          className={`attachment-owner ${
-            disabled ? "attachment-disabled" : ""
-          }`}
-        >
-          {getFullname(attachment.createdby)}
-        </div>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Divider />
-      </Grid>
-    </Grid>
+    </>
   );
 })
 
