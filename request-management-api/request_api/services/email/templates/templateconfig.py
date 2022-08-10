@@ -46,13 +46,13 @@ class templateconfig:
         if key == "PAYONLINE":
             return "Fee Estimate - Letter"
         elif key == "PAYONLINE-SUCCESSFUL":
-            return "Fee Estimate - Correspondence Successful"
+            return "Fee Estimate - Letter"
         elif key == "PAYONLINE-FAILED":
             return "Fee Estimate - Correspondence Failed"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
             return "Fee Estimate - Payment Receipt"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT-SUCCESSFUL":
-            return "Fee Estimate - Payment Success - Correspondence Successful"
+            return "Fee Estimate - Payment Success"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT-FAILED":
             return "Fee Estimate - Payment Success - Correspondence Failed"
         return None 

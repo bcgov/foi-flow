@@ -86,16 +86,19 @@ const AttachmentLetterCategories = Object.freeze({
     name: "fee estimate - letter",
   },
   feeestimatefailed: {
-    name: "fee estimate - failed",
+    name: "fee estimate - correspondence - failed",
+  },
+  feeestimatesuccessful: {
+    name: "fee estimate - successful",
   },
   feeestimatepaymentreceipt: {
     name: "fee estimate - payment receipt"
   },
   feeestimatepaymentcorrespondencesuccessful: {
-    name: "fee estimate - payment - correspondence - successful"
+    name: "fee estimate - payment success"
   },
   feeestimatepaymentcorrespondencefailed: {
-    name: "fee estimate - payment - correspondence - failed"
+    name: "fee estimate - payment success - correspondence failed"
   }
 
   });

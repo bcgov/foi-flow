@@ -490,17 +490,25 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
     StateTransitionCategories.cfrfeeassessed.name,
     StateTransitionCategories.signoffresponse.name,
     StateTransitionCategories.harmsreview.name,
-    StateTransitionCategories.feeonhold.name,
+    StateTransitionCategories.feeonhold.name    
+  ];
+
+  const emailCategories = [
     AttachmentLetterCategories.feeestimatefailed.name,
     AttachmentLetterCategories.feeestimateletter.name,
     AttachmentLetterCategories.feeestimatepaymentreceipt.name,
     AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name,
     AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name
-  ];
+  ]
 
   const showReplace = (category) => {
     return transitionStates.includes(category.toLowerCase());
   }
+
+  const showDelete = (category) => {
+    return !emailCategories.includes(category.toLowerCase());
+  }
+
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
 
@@ -535,6 +543,8 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
   const AddMenuItems = () => {
     if (showReplace(attachment.category))
       return (<ReplaceMenu />)
+    else if (!showDelete(attachment.category))
+      return null;
     return (<DeleteMenu />)
   }
 
