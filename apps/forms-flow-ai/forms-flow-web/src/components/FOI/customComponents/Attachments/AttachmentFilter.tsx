@@ -11,7 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import type { params } from './types';
 
-const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange, keyWordValue}: params) => {
+const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange, keyWordValue, isMinistryCoordinator}: params) => {
     return (   
         <Grid item container alignItems="center" xs={12} sx={{ display: "inline-block"}}>
             <Paper
@@ -77,7 +77,7 @@ const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange,
                             onClick={()=>{handleFilterChange('GENERAL')}}
                             clicked={filterValue == 'GENERAL'}
                         />
-                        <ClickableChip
+                        {!isMinistryCoordinator && (<ClickableChip
                             id="applicantAttachments"
                             key={`applicant-attachments`}
                             label={"APPLICANT"}
@@ -85,7 +85,7 @@ const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange,
                             size="small"
                             onClick={()=>{handleFilterChange('APPLICANT')}}
                             clicked={filterValue == 'APPLICANT'}
-                        />
+                        />)}
                         <ClickableChip
                             id="extensionsAttachments"
                             key={`extensions-attachments`}

@@ -3,4 +3,5 @@ export type params = {
     filterValue: string;
     handleKeywordChange: (params: any) => any;
     keyWordValue: string;
+    isMinistryCoordinator: boolean;
 }

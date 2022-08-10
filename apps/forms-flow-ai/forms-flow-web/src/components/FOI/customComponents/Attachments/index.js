@@ -5,7 +5,7 @@ import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum'
+import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -34,7 +34,8 @@ const useStyles = makeStyles((_theme) => ({
   },
   chipPrimary: {
     color: "#fff",
-    backgroundColor: "#003366",
+    height: "18px",
+    marginBottom: "15px",
   },
   ellipses: {
     color: "#38598A",
@@ -109,11 +110,12 @@ export const AttachmentSection = ({
 
   React.useEffect(() => {
     setAttachmentsForDisplay(searchAttachments(attachments, filterValue, keywordValue));
-  },[filterValue, keywordValue])
+  },[filterValue, keywordValue, attachments])
 
   const searchAttachments = (_attachments, _filterValue, _keywordValue) =>  {
     // let newAttachments = JSON.parse(JSON.stringify(_attachments));
-    return _attachments.filter(attachment => attachment.category.toLowerCase().includes(_filterValue?.toLowerCase()) && ( attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase())));
+    return _attachments.filter( attachment => attachment.category.toLowerCase().includes(_filterValue?.toLowerCase()) 
+              && ( attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.createdby.toLowerCase().includes(_keywordValue?.toLowerCase()) ));
   }
 
   const replaceAttachment = () => {
@@ -194,7 +196,7 @@ export const AttachmentSection = ({
 
   const downloadAllDocuments = async () => {
     let fileInfoList = []
-    attachments.forEach(attachment => {
+    attachmentsForDisplay.forEach(attachment => {
       if (!(isMinistryCoordinator && attachment.category == 'personal')) {
         fileInfoList.push({
             ministrycode: "Misc",
@@ -365,7 +367,7 @@ export const AttachmentSection = ({
               spacing={1}
               className={classes.attachmentLog}
             >
-              <AttachmentFilter handleFilterChange={handleFilterChange} filterValue={filterValue} handleKeywordChange={handleKeywordChange} keyWordValue={keywordValue} />
+              <AttachmentFilter handleFilterChange={handleFilterChange} filterValue={filterValue} handleKeywordChange={handleKeywordChange} keyWordValue={keywordValue} isMinistryCoordinator={isMinistryCoordinator} />
             </Grid>
             <Grid
               container
@@ -409,18 +411,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
 
   
   const getCategory = (category) => {
-    switch(category) {
-      case "cfr-review":
-        return "cfr - review";
-      case "cfr-feeassessed":
-        return "cfr - fee estimate";
-      case "signoff-response":
-        return "signoff - response";
-      case "harms-review":
-        return "harms assessment - review";
-      default:
-        return category || "general";
-    }
+    return AttachmentCategories.categorys.find(element => element.name === category);
   }
 
   const attachmenttitle = ()=>{
@@ -500,13 +491,14 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
         alignItems="flex-start"
         spacing={1}
       >
-        <Grid item xs={1}>
+        <Grid item xs={2}>
           <Chip
-            label={getCategory(attachment.category).toUpperCase()}
+            label={getCategory(attachment.category).display}
             size="small"
             className={clsx(classes.chip, {
               [classes.chipPrimary]: !disabled,
             })}
+            style={{backgroundColor: getCategory(attachment.category).bgcolor, width: "130px"}}
           />
         </Grid>
         <Grid item xs={2}>
@@ -534,7 +526,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
         spacing={3}
       >
         <Grid item xs={12}>
-          <Divider />
+          <Divider className={"attachment-divider"} />
         </Grid>
       </Grid>
     </>

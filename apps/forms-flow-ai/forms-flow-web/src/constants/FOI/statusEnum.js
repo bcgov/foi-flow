@@ -77,88 +77,90 @@ const StateTransitionCategories = Object.freeze({
 });
 
 const AttachmentCategories = Object.freeze({
-  general: {
-    name: "general",
-    display: "General",
-    bgcolor: "#003366",
-  },
-  personal: {
-    name: "personal",
-    display: "Personal",
-    bgcolor: "#FAA915",
-  },
-  extensiondenied: {
-    name: "extension - denied",
-    display: "Extension - Denied",
-    bgcolor: "#F03E22",
-  },
-  extensionapproved: {
-    name: "extension - approved",
-    display: "Extension - Approved",
-    bgcolor: "#136C14",
-  },
-  cfrreview: {
-    name: "cfr-review",
-    display: "CFR > Review",
-    bgcolor: "#04596C",
-  },
-  cfrfeeassessed: {
-    name: "cfr-feeassessed",
-    display: "CFR > Fee Estimate",
-    bgcolor: "#721121",
-  },
-  signoffresponse: {
-    name: "signoff-response",
-    display: "Sign Off > Response",
-    bgcolor: "#020A80",
-  },
-  harmsreview: {
-    name: "harms-review",
-    display: "Harms > Review",
-    bgcolor: "#04596C",
-  },
-  applicant: {
-    name: "applicant",
-    display: "Applicant",
-    bgcolor: "#F99F16",
-  },
-  cfr: {
-    name: "cfr",
-    display: "CFR",
-    bgcolor: "#D0017A",
-  },
-  recordsreview: {
-    name: "recordsreview",
-    display: "Records Review",
-    bgcolor: "#04596C",
-  },
-  fees: {
-    name: "fees",
-    display: "Fees",
-    bgcolor: "#721121",
-  },
-  response: {
-    name: "response",
-    display: "Response",
-    bgcolor: "#020A80",
-  },
-  harms: {
-    name: "harms",
-    display: "Harms",
-    bgcolor: "#832AB7",
-  },
-  oipc: {
-    name: "oipc",
-    display: "OIPC",
-    bgcolor: "#595959",
-  },
-  extensions: {
-    name: "extensions",
-    display: "Extensions",
-    bgcolor: "#1A1A1A",
-  },
+  categorys: [
+    {
+      name: "general",
+      display: "General",
+      bgcolor: "#003366",
+    },
+    {
+      name: "personal",
+      display: "Personal",
+      bgcolor: "#FAA915",
+    },
+    {
+      name: "extension - denied",
+      display: "Extension - Denied",
+      bgcolor: "#F03E22",
+    },
+    {
+      name: "extension - approved",
+      display: "Extension - Approved",
+      bgcolor: "#136C14",
+    },
+    {
+      name: "cfr-review",
+      display: "CFR > Review",
+      bgcolor: "#04596C",
+    },
+    {
+      name: "cfr-feeassessed",
+      display: "CFR > Fee Estimate",
+      bgcolor: "#721121",
+    },
+    {
+      name: "signoff-response",
+      display: "Sign Off > Response",
+      bgcolor: "#020A80",
+    },
+    {
+      name: "harms-review",
+      display: "Harms > Review",
+      bgcolor: "#04596C",
+    },
+    {
+      name: "applicant",
+      display: "Applicant",
+      bgcolor: "#F99F16",
+    },
+    {
+      name: "cfr",
+      display: "CFR",
+      bgcolor: "#D0017A",
+    },
+    {
+      name: "recordsreview",
+      display: "Records Review",
+      bgcolor: "#04596C",
+    },
+    {
+      name: "fees",
+      display: "Fees",
+      bgcolor: "#721121",
+    },
+    {
+      name: "response",
+      display: "Response",
+      bgcolor: "#020A80",
+    },
+    {
+      name: "harms",
+      display: "Harms",
+      bgcolor: "#832AB7",
+    },
+    {
+      name: "oipc",
+      display: "OIPC",
+      bgcolor: "#595959",
+    },
+    {
+      name: "extensions",
+      display: "Extensions",
+      bgcolor: "#1A1A1A",
+    },
+  ]
 });
 
 
 
-export { StateList, MinistryStateList, StateEnum, StateTransitionCategories };
+export { StateList, MinistryStateList, StateEnum, StateTransitionCategories, AttachmentCategories };
