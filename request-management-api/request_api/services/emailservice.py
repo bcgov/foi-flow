@@ -29,15 +29,16 @@ class emailservice:
         except Exception as ex:
             logging.exception(ex)
         
-        
 
-    def acknowledge(self, servicekey, ministryrequestid, requestjson):
+    def acknowledge(self, servicename, requestid, ministryrequestid):
         try:
-            self.__upload_sent_email(servicekey, ministryrequestid, requestjson)
-            ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicekey, requestjson), requestjson["email"])
+            requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
+            self.__upload_sent_email(servicename, ministryrequestid, requestjson)
+            ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicename, requestjson), requestjson["email"])
             if ackresponse["success"] == False:
-                self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson, templateconfig().getattachmentcategory("FEE-ESTIMATE-FAILED"))   
-                eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicekey), ackresponse["reason"], requestjson["assignedto"])
+                self.__upload(templateconfig().getattachmentname(servicename+"-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson, templateconfig().getattachmentcategory(servicename+"-FAILED"))   
+                eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicename), ackresponse["reason"], requestjson["assignedTo"])
+
             return {"success" : True, "message": "Acknowledgement successful"}
         except Exception as ex:
             logging.exception(ex)
@@ -48,7 +49,7 @@ class emailservice:
         try:
             _originalmsg = senderservice().read_outbox_as_bytes(servicekey, requestjson)
             if _originalmsg is not None:
-                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson, templateconfig().getattachmentcategory("FEE-ESTIMATE-LETTER"))
+                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson, templateconfig().getattachmentcategory(servicekey+"-SUCCESSFUL"))
         except Exception as ex:
             logging.exception(ex)
         

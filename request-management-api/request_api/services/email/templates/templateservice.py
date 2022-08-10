@@ -21,11 +21,23 @@ class templateservice:
 
     def generate_by_servicename_and_schema(self, servicename, requestjson):
         try:
-            _templatename = templateconfig().gettemplatename(servicename)
+            _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
             return self.__generatetemplate(_templatename, requestjson)
         except Exception as ex:
             logging.exception(ex)
         return None
+
+    def __gettemplatenamewrapper(self, servicename, requestjson):
+        _templatename = templateconfig().gettemplatename(servicename)
+        if _templatename is None:
+            if requestjson is not None and requestjson != {}:
+                balancedue = requestjson["cfrfee"]['feedata']['totalamountdue'] - requestjson["cfrfee"]['feedata']['amountpaid']
+                if balancedue > 0:
+                    return templateconfig().gettemplatename("HALFPAYMENT")
+                elif balancedue == 0:
+                    return templateconfig().gettemplatename("FULLPAYMENT")
+                else: 
+                    return None
     
     def __generatetemplate(self, emailtemplatename, dynamictemplatevalues):  
         emailtemplatehtml= storageservice().downloadtemplate(emailtemplatename)
@@ -34,7 +46,11 @@ class templateservice:
 
         if(dynamictemplatevalues is None):
             raise ValueError('Values not found')
-        
+            
+        if dynamictemplatevalues["assignedTo"] == None:
+                dynamictemplatevalues["assignedToFirstName"] = ""
+                dynamictemplatevalues["assignedToLastName"] = ""
+
         template = Template(emailtemplatehtml)
         templatedhtml = template.render(dynamictemplatevalues)
         return templatedhtml

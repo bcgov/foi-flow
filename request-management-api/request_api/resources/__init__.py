@@ -43,6 +43,7 @@ from .foinotification import API as FOINOTIFICATION_API
 from .foicfrfee import API as FOICFRFEE_API
 from .foifeewaiver import API as FOIFEEWAIVER_API
 from .foiemail import API as FOIEMAIL_API
+from .foipayment import API as FOIPAYMENT_API
 
 __all__ = ('API_BLUEPRINT')
 
@@ -80,3 +81,4 @@ API.add_namespace(FOINOTIFICATION_API,'/api')
 API.add_namespace(FOICFRFEE_API, '/api')
 API.add_namespace(FOIFEEWAIVER_API, '/api')
 API.add_namespace(FOIEMAIL_API, '/api')
+API.add_namespace(FOIPAYMENT_API, '/api')

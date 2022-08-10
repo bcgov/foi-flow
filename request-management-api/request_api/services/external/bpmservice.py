@@ -72,16 +72,17 @@ class bpmservice(camundaservice):
         else:
             return    
         
-    def feeevent(self,axisrequestid, feestatus, token=None):
+    def feeevent(self,axisrequestid, data, paymentstatus, token=None):
         if self.bpmengineresturl is not None:
-            messageschema = MessageSchema().dump({"messageName": MessageType.feepayment.value,
-                                              "correlationKeys":{
-                                                  "axisRequestId": VariableSchema().dump({"type" : VariableType.String.value, "value": axisrequestid})
-                                                  },
-                                              "processVariables":{
-                                                  "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": feestatus})}
-                                              })
-            return requests.post(self._getUrl_(MessageType.feepayment.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            messageschema = MessageSchema().dump({"messageName": MessageType.managepayment.value,
+                                            "correlationKeys":{
+                                                "axisRequestId": VariableSchema().dump({"type" : VariableType.String.value, "value": axisrequestid})
+                                            },
+                                            "processVariables":{
+                                                "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data}),
+                                                "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": paymentstatus})}
+                                            })
+            return requests.post(self._getUrl_(MessageType.managepayment.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return  
  
@@ -121,5 +122,6 @@ class MessageType(Enum):
     ministryclaim = "foi-ministry-assignment"
     ministrycomplete = "foi-ministry-complete"   
     feepayment = "foi-fee-payment"
+    managepayment = "foi-manage-payment"
               
      
