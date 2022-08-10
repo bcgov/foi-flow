@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:error id="Error_06fsjjn" name="FOI-REQ-DETAIL-API-ERR" camunda:errorMessage="FOI Get Request Details Failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
   <bpmn:message id="Message_0a9jdmw" name="foi-fee-payment" />
@@ -145,32 +145,7 @@ execution.setVariable("retry1", current+1); </camunda:script>
       <bpmn:outgoing>Flow_00aq624</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:intermediateCatchEvent id="Event_05bv4ti" name="Payment Update Received">
-      <bpmn:extensionElements>
-        <camunda:executionListener event="end">
-          <camunda:script scriptFormat="javascript">var foiRequestMetaData = {
-			"id" : execution.getVariable("fileNumber"),
-			"status" : "Call For Records",
-			"assignedGroup" : execution.getVariable("assignedGroup"),
-			"assignedTo" : execution.getVariable("assignedto"),
-			"assignedministrygroup" : execution.getVariable("assignedministrygroup"),
-			"ministryRequestID" : execution.getVariable("ministryRequestId"),
-			"foiRequestID" : execution.getVariable("foiRequestId")			
-}
-var foistatuspayload = {
-  "messageName" : "foi-iao-complete",
-  "localCorrelationKeys" : {
-    "id" : {"value" : execution.getVariable("fileNumber") , "type": "String"}
-  },
-  "processVariables" : {
-    "foiRequestMetaData" : {"value" : JSON.stringify(foiRequestMetaData) , "type": "String"}
-  }
-}
-execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</camunda:script>
-        </camunda:executionListener>
-        <camunda:inputOutput>
-          <camunda:outputParameter name="servicekey">payonline</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_17nmoz9</bpmn:incoming>
       <bpmn:outgoing>Flow_1qzjx1y</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1cne5rs" messageRef="Message_1x26sx5" />
@@ -207,7 +182,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0xfujpo</bpmn:incoming>
+      <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
       <bpmn:outgoing>Flow_0hup5yp</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_1ka6mqq" name="Change to Call For Records">
@@ -226,6 +201,18 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">var foistatuspayload = {
+  "messageName" : "foi-iao-complete",
+  "localCorrelationKeys" : {
+    "id" : {"value" : execution.getVariable("fileNumber") , "type": "String"}
+  },
+  "processVariables" : {
+    "foiRequestMetaData" : {"value" : execution.getVariable("foiRequestMetaData") , "type": "String"}
+  }
+}
+execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</camunda:script>
+        </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0hup5yp</bpmn:incoming>
       <bpmn:outgoing>Flow_1eu3lad</bpmn:outgoing>
@@ -235,7 +222,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1ffvmgj" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0szq4un" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0k05bsn" />
-    <bpmn:sequenceFlow id="Flow_02gzt5c" name="PAID" sourceRef="Gateway_1rpwru8" targetRef="Activity_1mkqp7n">
+    <bpmn:sequenceFlow id="Flow_02gzt5c" name="PAID" sourceRef="Gateway_1rpwru8" targetRef="Activity_0jc83dv">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "PAID"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0ldn3y8" name="Retry &#62; 3" sourceRef="Gateway_0q2f2o1" targetRef="Event_1tmmrt5">
@@ -392,10 +379,7 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
           </camunda:field>
         </camunda:executionListener>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
-      <bpmn:outgoing>Flow_0xfujpo</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_0xfujpo" sourceRef="Activity_1mkqp7n" targetRef="Activity_0jc83dv" />
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
   <bpmn:message id="Message_1rsz89u" name="Message_14ovgjp" />
@@ -420,10 +404,6 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
       <bpmndi:BPMNShape id="Lane_1aaq844_di" bpmnElement="Lane_1aaq844" isHorizontal="true">
         <dc:Bounds x="170" y="650" width="1950" height="490" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0xfujpo_di" bpmnElement="Flow_0xfujpo">
-        <di:waypoint x="760" y="910" />
-        <di:waypoint x="1030" y="910" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0w0leqj_di" bpmnElement="Flow_0w0leqj">
         <di:waypoint x="1080" y="288" />
         <di:waypoint x="1200" y="288" />
@@ -524,9 +504,9 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_02gzt5c_di" bpmnElement="Flow_02gzt5c">
         <di:waypoint x="485" y="910" />
-        <di:waypoint x="660" y="910" />
+        <di:waypoint x="1030" y="910" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="515" y="883" width="25" height="14" />
+          <dc:Bounds x="605" y="883" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0szq4un_di" bpmnElement="Flow_0szq4un">
@@ -620,7 +600,7 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
         <dc:Bounds x="1422" y="362" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vpot1m_di" bpmnElement="Activity_1mkqp7n">
-        <dc:Bounds x="660" y="870" width="100" height="80" />
+        <dc:Bounds x="680" y="800" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1ufjazf" bpmnElement="save-sub-link">
