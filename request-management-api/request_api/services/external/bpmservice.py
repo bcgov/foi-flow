@@ -72,15 +72,16 @@ class bpmservice(camundaservice):
         else:
             return    
         
-    def feeevent(self,axisrequestid, feestatus, token=None):
+    def feeevent(self,axisrequestid, data, paymentstatus, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": MessageType.managepayment.value,
-                                              "correlationKeys":{
-                                                  "axisRequestId": VariableSchema().dump({"type" : VariableType.String.value, "value": axisrequestid})
-                                                  },
-                                              "processVariables":{
-                                                  "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": feestatus})}
-                                              })
+                                            "correlationKeys":{
+                                                "axisRequestId": VariableSchema().dump({"type" : VariableType.String.value, "value": axisrequestid})
+                                            },
+                                            "processVariables":{
+                                                "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data}),
+                                                "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": paymentstatus})}
+                                            })
             return requests.post(self._getUrl_(MessageType.managepayment.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return  

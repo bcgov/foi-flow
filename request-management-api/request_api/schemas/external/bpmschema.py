@@ -22,6 +22,7 @@ class MessageSchema(Schema):
     processInstanceId = fields.Str(data_key="processInstanceId")
     processVariables = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
     localCorrelationKeys = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
+    correlationKeys = fields.Dict(keys=fields.String(),values=fields.Nested(VariableSchema))
     
 class VariableMessageSchema(Schema):
     

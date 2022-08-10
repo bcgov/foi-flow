@@ -96,7 +96,7 @@ class Payment(Resource):
                 result = requestservice().updaterequeststatus(request_id, ministry_request_id, 2)
                 if result.success == True:
                     asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
-                    requestservice().postfeeeventtoworkflow(result.args[0][0]["axisrequestid"], "PAID")
+                    requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
                     asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
             return response, 201
         except BusinessException as e:
@@ -127,4 +127,5 @@ class Payment(Resource):
 
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
+
 
