@@ -206,7 +206,7 @@ class FOIRequestDetailsByMinistryId(Resource):
         try :
             jsondata = {}
             statuscode = 200            
-            jsondata = requestservice().getrequestdetailsforonlinepayment(foirequestid, foiministryrequestid)            
+            jsondata = requestservice().getrequestdetails(foirequestid, foiministryrequestid)            
             return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500

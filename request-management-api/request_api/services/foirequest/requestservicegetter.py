@@ -8,6 +8,7 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.paymentservice import paymentservice
 
 
 class requestservicegetter:
@@ -93,41 +94,16 @@ class requestservicegetter:
             baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
         return baserequestinfo
     
-    def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
-        request = FOIRequest.getrequest(foirequestid)
-        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
-        email = ""
-        for contactinfo in requestcontactinformation:
-            if contactinfo['contacttype.name'] == 'Email':
-                email =contactinfo['contactinformation']
-        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
-        firstname = ""
-        middlename = ""
-        lastname = ""
-        for applicant in requestapplicants:
-            firstname = applicant['foirequestapplicant.firstname']
-            middlename = applicant['foirequestapplicant.middlename']
-            lastname = applicant['foirequestapplicant.lastname']
-        
+    def getrequestdetails(self,foirequestid, foiministryrequestid):
+        requestdetails = self.getrequest(foirequestid, foiministryrequestid)
         cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
-        requestdetailsforpayment = {
-            "firstName": firstname,
-            "middleName": middlename,
-            "lastName": lastname,
-            "email": email,
-            "assignedto": requestministry["assignedto"] if requestministry["assignedto"] != None else "",
-            'assignedministryperson':requestministry["assignedministryperson"], 
-            "assignedToFirstName": requestministry["assignee.firstname"] if requestministry["assignedto"] != None else "",
-            "assignedToLastName":  requestministry["assignee.lastname"] if requestministry["assignedto"] != None else "",
-            "assignedGroup" : requestministry["assignedgroup"] if requestministry["assignedgroup"] != None else "",
-            "axisRequestId":  requestministry["axisrequestid"] if requestministry["axisrequestid"] != None else "",
-            "idNumber":  requestministry["filenumber"] if requestministry["filenumber"] != None else "",
-            "bcgovcode": requestministry["programarea.bcgovcode"]
-        }
-        if cfrfee is not None:
-            requestdetailsforpayment["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']    
-        return requestdetailsforpayment
+        payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
+        if cfrfee is not None and cfrfee != {}:
+            requestdetails['cfrfee'] = cfrfee
+            requestdetails['cfrfee']['feedata']["balanceDue"] = cfrfee['feedata']['totalamountdue'] - cfrfee['feedata']['amountpaid']   
+        if payment is not None and payment != {}: 
+            requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']
+        return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
@@ -155,6 +131,7 @@ class requestservicegetter:
             'requestProcessStart': parse(requestministry['startdate']).strftime(self.__genericdateformat()) if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
             'programareaid':requestministry['programarea.programareaid'],
+            'bcgovcode':requestministry['programarea.bcgovcode'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
             'assignedministrygroup':requestministry["assignedministrygroup"],

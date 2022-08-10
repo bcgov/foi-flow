@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API endpoints for managing a FOI Email Communication"""
+"""API endpoints for managing a FOI Payment"""
 
 
 from flask import g, request
@@ -22,54 +22,53 @@ from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
-from request_api.services.emailservice import emailservice
-from request_api.services.requestservice import requestservice
+from request_api.services.paymentservice import paymentservice
+from request_api.schemas.foipayment import  FOIRequestPaymentSchema
+
 
 import json
 from flask_cors import cross_origin
 
-API = Namespace('FOIEmail', description='Endpoints for FOI EMAIL management')
+API = Namespace('FOIPayment', description='Endpoints for FOI Payment management')
 TRACER = Tracer.get_instance()
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/<servicename>')
-class FOISendEmail(Resource):
-    """Retrieve watchers for unopened request"""
+@API.route('/foipayment/<requestid>/ministryrequest/<ministryrequestid>')
+class CreateFOIPayment(Resource):
+    """Handles applicant payment actions"""
 
        
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid, ministryrequestid, servicename):      
+    def post(requestid, ministryrequestid):      
         try:
-            result = emailservice().send(servicename.upper(), requestid, ministryrequestid)
-            return json.dumps(result), 200 if result["success"] == True else 500
-        except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
+            requestjson = request.get_json()
+            paymentschema = FOIRequestPaymentSchema().load(requestjson)  
+            result = paymentservice().createpayment(requestid, ministryrequestid, paymentschema)
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('POST,OPTIONS')
-@API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/<servicename>/acknowledge')
-class FOIAcknowledgeSendEmail(Resource):
-    """Retrieve watchers for unopened request"""
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foipayment/<requestid>/ministryrequest/<ministryrequestid>')
+class GetFOIPayment(Resource):
+    """Handles applicant payment actions"""
 
        
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid, ministryrequestid, servicename):      
+    def get(requestid, ministryrequestid):      
         try:
-            result = emailservice().acknowledge(servicename.upper(), requestid, ministryrequestid)
-            return json.dumps(result), 200 if result["success"] == True else 500
-        except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
+            result = paymentservice().getpayment(requestid, ministryrequestid)
+            return json.dumps(result), 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-        
