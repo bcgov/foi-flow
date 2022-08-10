@@ -64,6 +64,7 @@ import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import HomeIcon from '@mui/icons-material/Home';
+import { FeeWaiverForm } from '../customComponents/FeeWaiverForm';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -137,6 +138,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
       active: false,
     },    
     CFRForm: {
+      display: false,
+      active: false,
+    },
+    FeeWaiverForm: {
       display: false,
       active: false,
     },
@@ -703,6 +708,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   </div>
                 )}
                 <div
+                    className={clsx("tablinks", {
+                      active: tabLinksStatuses.FeeWaiverForm.active,
+                    })}
+                    name="Fee Waiver Form"
+                    onClick={() => tabclick("FeeWaiverForm")}
+                  >
+                    Fee Waiver Form
+                  </div>
+                <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Attachments.active,
                   })}
@@ -968,6 +982,23 @@ const FOIRequest = React.memo(({ userDetail }) => {
             })}
           >
             <CFRForm            
+              requestNumber={requestNumber}
+              requestState={requestState}
+              userDetail={userDetail}
+              ministryId={ministryId}
+              requestId={requestId}
+              setCFRUnsaved={setCFRUnsaved}
+            />
+          </div>)}
+          {(showCFRTab() && <div
+            id="FeeWaiverForm"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.FeeWaiverForm.active,
+              [classes.displayed]: tabLinksStatuses.FeeWaiverForm.display,
+              [classes.hidden]: !tabLinksStatuses.FeeWaiverForm.display,
+            })}
+          >
+            <FeeWaiverForm            
               requestNumber={requestNumber}
               requestState={requestState}
               userDetail={userDetail}
