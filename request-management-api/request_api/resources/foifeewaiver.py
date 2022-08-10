@@ -53,7 +53,7 @@ class CreateFOIFeeWaiver(Resource):
             requestjson = request.get_json()
             feewaiverschema = FOIFeeWaiverIAOSchema().load(requestjson)
             result = feewaiverservice().savefeewaiver(ministryrequestid, feewaiverschema, AuthHelper.getuserid())
-            # asyncio.ensure_future(eventservice().posteventforfeewaiver(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncio.ensure_future(eventservice().posteventforfeewaiver(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValidationError as verr:
             logging.error(verr)
@@ -81,7 +81,7 @@ class ApproveFOIFeeWaiver(Resource):
             feewaiverschema = FOIFeeWaiverMinistrySchema().load(requestjson)
             result = feewaiverservice().savefeewaiver(ministryrequestid, feewaiverschema,AuthHelper.getuserid())
             cfrfeeservice().waivecfrfee(ministryrequestid, feewaiverschema['formdata']['decision']['amount'] , AuthHelper.getuserid())
-            # asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncio.ensure_future(eventservice().posteventforfeewaiver(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValidationError as verr:
             logging.error(verr)
