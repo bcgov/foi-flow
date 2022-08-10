@@ -38,6 +38,7 @@ class templateservice:
                     return templateconfig().gettemplatename("FULLPAYMENT")
                 else: 
                     return None
+        return _templatename
     
     def __generatetemplate(self, emailtemplatename, dynamictemplatevalues):  
         emailtemplatehtml= storageservice().downloadtemplate(emailtemplatename)
