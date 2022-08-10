@@ -38,6 +38,7 @@ class emailservice:
             if ackresponse["success"] == False:
                 self.__upload(templateconfig().getattachmentname(servicename+"-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson, templateconfig().getattachmentcategory(servicename+"-FAILED"))   
                 eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicename), ackresponse["reason"], requestjson["assignedTo"])
+
             return {"success" : True, "message": "Acknowledgement successful"}
         except Exception as ex:
             logging.exception(ex)

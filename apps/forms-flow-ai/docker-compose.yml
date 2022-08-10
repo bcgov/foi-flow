@@ -110,7 +110,7 @@ services:
     links:
       - forms-flow-webapi-db
     ports:
-      - '16000:5000'
+      - '5000:5000'
     volumes:
       - ./:/app:rw
     environment:
