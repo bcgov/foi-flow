@@ -31,6 +31,8 @@ const useStyles = makeStyles((_theme) => ({
   },
   chip: {
     fontWeight: "bold",
+    height: "18px",
+    marginBottom: "15px",
   },
   chipPrimary: {
     color: "#fff",
@@ -113,7 +115,6 @@ export const AttachmentSection = ({
   },[filterValue, keywordValue, attachments])
 
   const searchAttachments = (_attachments, _filterValue, _keywordValue) =>  {
-    // let newAttachments = JSON.parse(JSON.stringify(_attachments));
     return _attachments.filter( attachment => attachment.category.toLowerCase().includes(_filterValue?.toLowerCase()) 
               && ( attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.createdby.toLowerCase().includes(_keywordValue?.toLowerCase()) ));
   }
@@ -498,7 +499,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
             className={clsx(classes.chip, {
               [classes.chipPrimary]: !disabled,
             })}
-            style={{backgroundColor: getCategory(attachment.category).bgcolor, width: "130px"}}
+            style={{backgroundColor: disabled?"#e0e0e0":getCategory(attachment.category).bgcolor, width: "130px"}}
           />
         </Grid>
         <Grid item xs={2}>
