@@ -492,7 +492,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
         alignItems="flex-start"
         spacing={1}
       >
-        <Grid item xs={2}>
+        <Grid item xs={2} style={{ minWidth: "150px" }} >
           <Chip
             label={getCategory(attachment.category).display}
             size="small"
