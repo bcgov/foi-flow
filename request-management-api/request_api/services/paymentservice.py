@@ -51,7 +51,7 @@ class paymentservice:
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
                 'orderId': parsed_args.get('trnOrderId'),
-                'transactionId': parsed_args.get('FOIDM00000077'),
+                'transactionId': parsed_args.get('pbcTxnNumber'),
                 'cardType': parsed_args.get('cardType')
             }})
             document_service : DocumentGenerationService = DocumentGenerationService('cfr_fee_payment_receipt')
