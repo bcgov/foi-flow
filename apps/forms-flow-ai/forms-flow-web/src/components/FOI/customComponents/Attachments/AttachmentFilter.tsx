@@ -36,8 +36,8 @@ const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange,
                     direction="row"
                     xs={true}
                     sx={{
-                    borderRight: "2px solid #38598A",
-                    backgroundColor: "rgba(56,89,138,0.1)",
+                        borderRight: "2px solid #38598A",
+                        backgroundColor: "rgba(56,89,138,0.1)",
                     }}
                 >
                     <label className="hideContent">Search Attachments</label>
@@ -65,7 +65,11 @@ const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange,
                     container
                     alignItems="flex-start"
                     justifyContent="center"
-                    xs={true}    
+                    xs={true}
+                    sx={{
+                        width: "300px",
+                        maxWidth: "300px !important",
+                    }}
                 >
                     <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
                         <ClickableChip
