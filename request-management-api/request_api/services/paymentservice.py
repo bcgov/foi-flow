@@ -5,6 +5,9 @@ from request_api.models.FOIRequestPayments import FOIRequestPayment
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.services.external.storageservice import storageservice
+from request_api.services.requestservice import requestservice
+from request_api.models.default_method_result import DefaultMethodResult
+
 import json
 from dateutil.parser import parse
 import datetime 
@@ -40,7 +43,7 @@ class paymentservice:
     def getpayment(self, requestid, ministryrequestid):
         return FOIRequestPayment.getpayment(requestid, ministryrequestid) 
 
-    def createpaymentreceipt(self, request_id, ministry_request_id, fee):
+    def createpaymentreceipt(self, request_id, ministry_request_id, fee, parsed_args):
         try:
             data = requestservice().getrequestdetails(request_id, ministry_request_id)
             receipt_template_path='request_api/receipt_templates/cfr_fee_payment_receipt.docx'
@@ -55,6 +58,6 @@ class paymentservice:
             receipt = document_service.generate_receipt(data,receipt_template_path)
             document_service.upload_receipt('fee_estimate_payment_receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
             return DefaultMethodResult(True,'Payment Receipt created',ministry_request_id)
-        except BusinessException as ex:   
+        except Exception as ex:   
             logging.exception(ex)         
             return DefaultMethodResult(False,'Unable to create Payment Receipt',ministry_request_id)     
