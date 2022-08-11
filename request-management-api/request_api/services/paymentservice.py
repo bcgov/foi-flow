@@ -51,7 +51,7 @@ class paymentservice:
                 'paymentDate': fee.payment['completed_on'],
                 'orderId': fee.payment['order_id'],
                 'transactionId': fee.payment['transaction_number'],
-                'cardType': parsed_args['cardType']
+                'cardType': parsed_args.get('cardType')
             }})
             document_service : DocumentGenerationService = DocumentGenerationService('cfr_fee_payment_receipt')
             receipt = document_service.generate_receipt(data,receipt_template_path)
