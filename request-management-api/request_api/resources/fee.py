@@ -92,6 +92,7 @@ class Payment(Resource):
             response, parsed_args = fee.complete_payment(request_json)
             if (response['status'] == 'PAID'):
                 cfrfeeservice().paycfrfee(ministry_request_id, float(parsed_args.get('trnAmount')))
+                data = requestservice().getrequestdetails(request_id, ministry_request_id)
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, fee, parsed_args)
                 result = requestservice().updaterequeststatus(request_id, ministry_request_id, 2)
                 if result.success == True:
