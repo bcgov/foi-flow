@@ -1,271 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
-  <bpmn:error id="Error_06fsjjn" name="FOI-PAYMENT-EMAIL-API-ERR" camunda:errorMessage="FOI Payment Email invocation failed." />
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:error id="Error_06fsjjn" name="FOI-REQ-DETAIL-API-ERR" camunda:errorMessage="FOI Get Request Details Failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
   <bpmn:message id="Message_0a9jdmw" name="foi-fee-payment" />
   <bpmn:collaboration id="Collaboration_1rbxo3f">
     <bpmn:participant id="Participant_105327x" name="FOI Fee Processing" processRef="foi-fee-processing" />
+    <bpmn:group id="Group_0nmwgct" categoryValueRef="CategoryValue_1dcilzu" />
+    <bpmn:group id="Group_087f8ap" categoryValueRef="CategoryValue_03nhs8k" />
+    <bpmn:group id="Group_1e997n9" categoryValueRef="CategoryValue_1fxkssh" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="1">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="7">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
-      <bpmn:lane id="Lane_1u9yqiq" name="Create Payment Submission">
-        <bpmn:flowNodeRef>Event_1k8aoc7</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>invoke-reqmgmt-api</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>get-api-token</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_0q2f2o1</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1tmmrt5</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0crrhhb</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_17odcea</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1y2hfyk</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0k05bsn</bpmn:flowNodeRef>
-      </bpmn:lane>
-      <bpmn:lane id="Lane_1mwmv1p" name="Notify Payment Details">
-        <bpmn:flowNodeRef>Activity_182gpr3</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0v6jdes</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_06k5kp5</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_0ubhnez</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0zmjrgk</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0fgoo7p</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0ox451z</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_099ar88</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_1bp6h44</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0azng2r</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1f8p61m</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1ctb9ag</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0shkw9l</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0f47rv1</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1fo4ezm</bpmn:flowNodeRef>
-      </bpmn:lane>
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
-        <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0ot5l60</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1rpwru8</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_05bv4ti</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_04nwpdo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0q2irqu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0jc83dv</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1ka6mqq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1mkqp7n</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_1u9yqiq" name="Create Payment Submission">
+        <bpmn:flowNodeRef>Activity_0k05bsn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0crrhhb</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1tmmrt5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0q2f2o1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>get-api-token</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>invoke-reqmgmt-api</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1k8aoc7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>get-req-details</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1cv04sw</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1y2hfyk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0xd3neq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_03s9u5q</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0v6rrmr</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1a43pmz</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0hclu9b</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>save-sub-link</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:serviceTask id="Activity_182gpr3" name="Get Token">
+    <bpmn:task id="Activity_0k05bsn" name="Create Submission">
       <bpmn:extensionElements>
-        <camunda:connector>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="url">${keycloakURL}/auth/realms/${realm}/protocol/openid-connect/token</camunda:inputParameter>
-            <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
-                <camunda:entry key="Authorization">Basic ${base64userpass}</camunda:entry>
-                <camunda:entry key="Accept">application/json</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
-            <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
-            <camunda:outputParameter name="accessToken">${S(response).prop("access_token").stringValue()}</camunda:outputParameter>
-          </camunda:inputOutput>
-          <camunda:connectorId>http-connector</camunda:connectorId>
-        </camunda:connector>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0t5omzu</bpmn:incoming>
-      <bpmn:incoming>Flow_15ihwrs</bpmn:incoming>
-      <bpmn:outgoing>Flow_1l1mo2d</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_0v6jdes" name="Invoke Email Notification API">
-      <bpmn:extensionElements>
-        <camunda:connector>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="payload">${paymentPayload}</camunda:inputParameter>
-            <camunda:inputParameter name="url">${foiApiUrl}/api/foiemail/${foiRequestID}/ministryrequest/${ministryRequestID}/payonline</camunda:inputParameter>
-            <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/json</camunda:entry>
-                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
-            <camunda:outputParameter name="responseCode">
-              <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
-	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-RAWREQUEST-API-ERR", response);
-}
-connector.getVariable("statusCode");</camunda:script>
-            </camunda:outputParameter>
-          </camunda:inputOutput>
-          <camunda:connectorId>http-connector</camunda:connectorId>
-        </camunda:connector>
-        <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">var paymentPayload = {
-"assignedGroup": execution.getVariable("assignedGroup"),
-"assignedToFirstName": execution.getVariable("assignedToFirstName"),
-"assignedToLastName": execution.getVariable("assignedToLastName"),
-"axisRequestId": execution.getVariable("axisRequestId"),
-"balanceDue": execution.getVariable("fee"),
-"firstName": execution.getVariable("firstName"),
-"lastName": execution.getVariable("lastName"),
-"email": execution.getVariable("email"),
-"bcgovcode": execution.getVariable("bcgovcode"),
-"idNumber": execution.getVariable("fileNumber"),
-"assignedto": execution.getVariable("assignedto"),
-"assignedministryperson": execution.getVariable("assignedministryperson"),
-"paymenturl": execution.getVariable('foiwebUrl') + "/public/form/" + execution.getVariable('formId') + "/submission/" + execution.getVariable('submissionId') + "/edit"
-};
-execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camunda:script>
+        <camunda:properties>
+          <camunda:property name="formName" value="payfeeonline" />
+        </camunda:properties>
+        <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.execution.ExternalSubmissionListener" event="start">
+          <camunda:field name="formName">
+            <camunda:expression>payfeeonline</camunda:expression>
+          </camunda:field>
         </camunda:executionListener>
-        <camunda:executionListener event="end">
-          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry2");
-execution.setVariable("retry2", current+1); </camunda:script>
-        </camunda:executionListener>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="formName">payfeeonline</camunda:inputParameter>
+          <camunda:outputParameter name="formId">${execution.getVariable("formUrl").split("/")[4]}</camunda:outputParameter>
+          <camunda:outputParameter name="submissionId">${execution.getVariable("formUrl").split("/")[6]}</camunda:outputParameter>
+        </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1l1mo2d</bpmn:incoming>
-      <bpmn:outgoing>Flow_0d0meej</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:intermediateCatchEvent id="Event_06k5kp5" name="1M">
-      <bpmn:incoming>Flow_1khj1st</bpmn:incoming>
-      <bpmn:outgoing>Flow_18ddb1s</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_0cbghzk">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
-      </bpmn:timerEventDefinition>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:exclusiveGateway id="Gateway_0ubhnez">
-      <bpmn:incoming>Flow_18ddb1s</bpmn:incoming>
-      <bpmn:outgoing>Flow_03c4tff</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0t5omzu</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:intermediateThrowEvent id="Event_0zmjrgk">
-      <bpmn:incoming>Flow_03c4tff</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0c9qj9y" />
+      <bpmn:incoming>Flow_0szq4un</bpmn:incoming>
+      <bpmn:outgoing>Flow_0w0leqj</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:startEvent id="Event_0crrhhb">
+      <bpmn:outgoing>Flow_0w9yqn4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0951h23" messageRef="Message_0a9jdmw" />
+    </bpmn:startEvent>
+    <bpmn:intermediateThrowEvent id="Event_1tmmrt5" name="API Failure Message">
+      <bpmn:incoming>Flow_0ldn3y8</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0950kk2" messageRef="Message_1yee5gs" />
     </bpmn:intermediateThrowEvent>
-    <bpmn:serviceTask id="Activity_0fgoo7p" name="Get Token">
-      <bpmn:extensionElements>
-        <camunda:connector>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="url">${keycloakURL}/auth/realms/${realm}/protocol/openid-connect/token</camunda:inputParameter>
-            <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
-                <camunda:entry key="Authorization">Basic ${base64userpass}</camunda:entry>
-                <camunda:entry key="Accept">application/json</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
-            <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
-            <camunda:outputParameter name="accessToken">${S(response).prop("access_token").stringValue()}</camunda:outputParameter>
-          </camunda:inputOutput>
-          <camunda:connectorId>http-connector</camunda:connectorId>
-        </camunda:connector>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_06o94h9</bpmn:incoming>
-      <bpmn:incoming>Flow_0pgmxi6</bpmn:incoming>
-      <bpmn:outgoing>Flow_1nw0kay</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_0ox451z" name="Invoke Email Ack API">
-      <bpmn:extensionElements>
-        <camunda:connector>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="payload">${paymentPayload}</camunda:inputParameter>
-            <camunda:inputParameter name="url">${foiApiUrl}/api/foiemail/${foiRequestID}/ministryrequest/${ministryRequestID}/payonline/acknowledge</camunda:inputParameter>
-            <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/json</camunda:entry>
-                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
-            <camunda:outputParameter name="responseCode">
-              <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
-	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-RAWREQUEST-API-ERR", response);
-}
-connector.getVariable("statusCode");</camunda:script>
-            </camunda:outputParameter>
-          </camunda:inputOutput>
-          <camunda:connectorId>http-connector</camunda:connectorId>
-        </camunda:connector>
-        <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">var paymentPayload = {
-"assignedGroup": execution.getVariable("assignedGroup"),
-"assignedToFirstName": execution.getVariable("assignedToFirstName"),
-"assignedToLastName": execution.getVariable("assignedToLastName"),
-"axisRequestId": execution.getVariable("axisRequestId"),
-"balanceDue": execution.getVariable("fee"),
-"firstName": execution.getVariable("firstName"),
-"lastName": execution.getVariable("lastName"),
-"email": execution.getVariable("email"),
-"bcgovcode": execution.getVariable("bcgovcode"),
-"idNumber": execution.getVariable("fileNumber"),
-"assignedto": execution.getVariable("assignedto"),
-"assignedministryperson": execution.getVariable("assignedministryperson"),
-"paymenturl": execution.getVariable('foiwebUrl') + "/public/form/" + execution.getVariable('formId') + "/submission/" + execution.getVariable('submissionId') + "/edit"
-};
-execution.setVariable("paymentPayload", JSON.stringify(paymentPayload));</camunda:script>
-        </camunda:executionListener>
-        <camunda:executionListener event="end">
-          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry3");
-execution.setVariable("retry3", current+1); </camunda:script>
-        </camunda:executionListener>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1nw0kay</bpmn:incoming>
-      <bpmn:outgoing>Flow_0zagnjs</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:intermediateCatchEvent id="Event_099ar88" name="1M">
-      <bpmn:incoming>Flow_16pku41</bpmn:incoming>
-      <bpmn:outgoing>Flow_0d9mrw9</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_0qwmgoy">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
-      </bpmn:timerEventDefinition>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:exclusiveGateway id="Gateway_1bp6h44">
-      <bpmn:incoming>Flow_0d9mrw9</bpmn:incoming>
-      <bpmn:outgoing>Flow_172wc0k</bpmn:outgoing>
-      <bpmn:outgoing>Flow_06o94h9</bpmn:outgoing>
+    <bpmn:exclusiveGateway id="Gateway_0q2f2o1">
+      <bpmn:incoming>Flow_1kzesmk</bpmn:incoming>
+      <bpmn:outgoing>Flow_1o3gosy</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ldn3y8</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:intermediateThrowEvent id="Event_0azng2r">
-      <bpmn:incoming>Flow_172wc0k</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0dp1zvl" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:intermediateCatchEvent id="Event_1k8aoc7">
-      <bpmn:incoming>Flow_1ys38a6</bpmn:incoming>
-      <bpmn:outgoing>Flow_1kzesmk</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_18j8uyi">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
-      </bpmn:timerEventDefinition>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:serviceTask id="invoke-reqmgmt-api" name="Invoke Payment Details API">
-      <bpmn:extensionElements>
-        <camunda:connector>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="url">${foiApiUrl}/api/foirequests/${foiRequestID}/ministryrequest/${ministryRequestID}/payonline</camunda:inputParameter>
-            <camunda:inputParameter name="method">GET</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/json</camunda:entry>
-                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
-            <camunda:outputParameter name="assignedministryperson">${S(response).prop("assignedministryperson").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedto">${S(response).prop("assignedto").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="bcgovcode">${S(response).prop("bcgovcode").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="responseCode">
-              <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
-	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-RAWREQUEST-API-ERR", response);
-}
-connector.getVariable("statusCode");</camunda:script>
-            </camunda:outputParameter>
-            <camunda:outputParameter name="axisRequestId">${S(response).prop("axisRequestId").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="fee">${S(response).prop("balanceDue").numberValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="ministryRequestId">${ministryRequestID}</camunda:outputParameter>
-            <camunda:outputParameter name="foiRequestId">${foiRequestID}</camunda:outputParameter>
-            <camunda:outputParameter name="firstName">${S(response).prop("firstName").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="lastName">${S(response).prop("lastName").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToFirstName">${S(response).prop("assignedToFirstName") != null ? S(response).prop("assignedToFirstName").stringValue() : ""}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedToLastName">${S(response).prop("assignedToLastName") != null ?S(response).prop("assignedToLastName").stringValue() : ""}</camunda:outputParameter>
-            <camunda:outputParameter name="assignedGroup">${S(response).prop("assignedGroup").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="email">${S(response).prop("email").stringValue()}</camunda:outputParameter>
-          </camunda:inputOutput>
-          <camunda:connectorId>http-connector</camunda:connectorId>
-        </camunda:connector>
-        <camunda:executionListener event="end">
-          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry1");
-execution.setVariable("retry1", current+1); </camunda:script>
-        </camunda:executionListener>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_17bdgfc</bpmn:incoming>
-      <bpmn:outgoing>Flow_1ntbf1z</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:serviceTask id="get-api-token" name="Get Token">
       <bpmn:extensionElements>
         <camunda:connector>
@@ -289,40 +95,145 @@ execution.setVariable("retry1", current+1); </camunda:script>
       <bpmn:incoming>Flow_0w9yqn4</bpmn:incoming>
       <bpmn:outgoing>Flow_17bdgfc</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="Gateway_0q2f2o1">
-      <bpmn:incoming>Flow_1kzesmk</bpmn:incoming>
-      <bpmn:outgoing>Flow_1o3gosy</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0ldn3y8</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:intermediateThrowEvent id="Event_1tmmrt5" name="API Failure Message">
-      <bpmn:incoming>Flow_0ldn3y8</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0950kk2" messageRef="Message_1yee5gs" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:intermediateCatchEvent id="Event_1f8p61m" name="Notify Payment">
-      <bpmn:outgoing>Flow_15ihwrs</bpmn:outgoing>
-      <bpmn:linkEventDefinition id="LinkEventDefinition_1d0sz40" name="NOTIFY-FEE-PAYMENT" />
+    <bpmn:serviceTask id="invoke-reqmgmt-api" name="Invoke Payment Details API">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${foiApiUrl}/api/foirequests/${foiRequestID}/ministryrequest/${ministryRequestID}/payonline</camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="responseCode">
+              <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-REQ-DETAIL-API-ERR", response);
+}
+connector.getVariable("statusCode");</camunda:script>
+            </camunda:outputParameter>
+            <camunda:outputParameter name="axisRequestId">${S(response).prop("axisRequestId").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="fee">${S(response).prop("cfrfee").prop("feedata").prop("balanceDue").numberValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="paymentstatus">NOT PAID</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+        <camunda:executionListener event="end">
+          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry1");
+execution.setVariable("retry1", current+1); </camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17bdgfc</bpmn:incoming>
+      <bpmn:outgoing>Flow_0szq4un</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="Event_1k8aoc7">
+      <bpmn:incoming>Flow_1ys38a6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kzesmk</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_18j8uyi">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:boundaryEvent id="Event_1ctb9ag" attachedToRef="Activity_0v6jdes">
-      <bpmn:outgoing>Flow_1khj1st</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1gtp9q6" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
-    </bpmn:boundaryEvent>
-    <bpmn:boundaryEvent id="Event_0shkw9l" attachedToRef="Activity_0ox451z">
-      <bpmn:outgoing>Flow_16pku41</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1mpo1n3" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
-    </bpmn:boundaryEvent>
-    <bpmn:boundaryEvent id="Event_17odcea" attachedToRef="invoke-reqmgmt-api">
+    <bpmn:intermediateThrowEvent id="Event_0ot5l60">
+      <bpmn:incoming>Flow_00aq624</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1wtszeh" camunda:expression="${payment_status != &#34;PAID&#34;}" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:exclusiveGateway id="Gateway_1rpwru8">
+      <bpmn:incoming>Flow_1qzjx1y</bpmn:incoming>
+      <bpmn:outgoing>Flow_02gzt5c</bpmn:outgoing>
+      <bpmn:outgoing>Flow_00aq624</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="Event_05bv4ti" name="Payment Update Received">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_17nmoz9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qzjx1y</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1cne5rs" messageRef="Message_1x26sx5" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="Event_0dlzac7" name="Manage Payament">
+      <bpmn:outgoing>Flow_17nmoz9</bpmn:outgoing>
+      <bpmn:linkEventDefinition id="LinkEventDefinition_0egrnr9" name="MANAGE-FEE-PAYMENT" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateThrowEvent id="Event_0q2irqu" name="Notify Payment Confirmation">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","fee-estimate-payment-receipt").correlateWithResult();</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1eu3lad</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0gs70y7" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:serviceTask id="Activity_0jc83dv" name="Get Token">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${keycloakURL}/auth/realms/${realm}/protocol/openid-connect/token</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Authorization">Basic ${base64userpass}</camunda:entry>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
+            <camunda:outputParameter name="accessToken">${S(response).prop("access_token").stringValue()}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hup5yp</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1ka6mqq" name="Change to Call For Records">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">${foistatuspayload}</camunda:inputParameter>
+            <camunda:inputParameter name="url">${foiwfUrl}/message</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">var foistatuspayload = {
+  "messageName" : "foi-iao-complete",
+  "localCorrelationKeys" : {
+    "id" : {"value" : execution.getVariable("fileNumber") , "type": "String"}
+  },
+  "processVariables" : {
+    "foiRequestMetaData" : {"value" : execution.getVariable("foiRequestMetaData") , "type": "String"}
+  }
+}
+execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0hup5yp</bpmn:incoming>
+      <bpmn:outgoing>Flow_1eu3lad</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="get-req-details" attachedToRef="invoke-reqmgmt-api">
       <bpmn:outgoing>Flow_1ys38a6</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1ffvmgj" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
     </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_0t5omzu" name="Retry [1..3]" sourceRef="Gateway_0ubhnez" targetRef="Activity_182gpr3">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry2 &lt;= 3}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0szq4un" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0k05bsn" />
+    <bpmn:sequenceFlow id="Flow_02gzt5c" name="PAID" sourceRef="Gateway_1rpwru8" targetRef="Activity_0jc83dv">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "PAID"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_03c4tff" name="Retry &#62; 3" sourceRef="Gateway_0ubhnez" targetRef="Event_0zmjrgk">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry2 &gt; 3}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0ldn3y8" name="Retry &#62; 3" sourceRef="Gateway_0q2f2o1" targetRef="Event_1tmmrt5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry1 &gt; 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_18ddb1s" sourceRef="Event_06k5kp5" targetRef="Gateway_0ubhnez" />
-    <bpmn:sequenceFlow id="Flow_1khj1st" sourceRef="Event_1ctb9ag" targetRef="Event_06k5kp5" />
-    <bpmn:sequenceFlow id="Flow_1l1mo2d" sourceRef="Activity_182gpr3" targetRef="Activity_0v6jdes" />
+    <bpmn:sequenceFlow id="Flow_17bdgfc" sourceRef="get-api-token" targetRef="invoke-reqmgmt-api" />
+    <bpmn:sequenceFlow id="Flow_1ys38a6" sourceRef="get-req-details" targetRef="Event_1k8aoc7" />
+    <bpmn:sequenceFlow id="Flow_1kzesmk" sourceRef="Event_1k8aoc7" targetRef="Gateway_0q2f2o1" />
+    <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="get-api-token">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry1 &lt;= 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0w9yqn4" name="apply settings" sourceRef="Event_0crrhhb" targetRef="get-api-token">
       <bpmn:extensionElements>
         <camunda:executionListener event="take">
@@ -334,345 +245,393 @@ var base64userpass = base64.getEncoder().encodeToString(userpass.getBytes());
 execution.setVariable('base64userpass', base64userpass);
 execution.setVariable('realm', system.getenv('KEYCLOAK_URL_REALM'));
 execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
-execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda:script>
+execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));
+execution.setVariable('foiwfUrl', system.getenv('FORMSFLOW_WF_URL'));
+execution.setVariable('formioURL', system.getenv('FORMIO_URL'));
+execution.setVariable('formioRootEmail', system.getenv('FORMIO_ROOT_EMAIL'));
+execution.setVariable('formioRootPassword', system.getenv('FORMIO_ROOT_PASSWORD'));</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;retry1&#34;, 0)}" event="take" />
+        <camunda:executionListener expression="${execution.setVariable(&#34;retry4&#34;, 0)}" event="take" />
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="get-api-token">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry1 &lt;= 3}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_00aq624" name="NOT PAID" sourceRef="Gateway_1rpwru8" targetRef="Event_0ot5l60">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus != "PAID"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1kzesmk" sourceRef="Event_1k8aoc7" targetRef="Gateway_0q2f2o1" />
-    <bpmn:sequenceFlow id="Flow_1ys38a6" sourceRef="Event_17odcea" targetRef="Event_1k8aoc7" />
-    <bpmn:sequenceFlow id="Flow_17bdgfc" sourceRef="get-api-token" targetRef="invoke-reqmgmt-api" />
-    <bpmn:sequenceFlow id="Flow_0d0meej" name="Audit &#38; Acknowledge" sourceRef="Activity_0v6jdes" targetRef="Event_0f47rv1" />
-    <bpmn:sequenceFlow id="Flow_1nw0kay" sourceRef="Activity_0fgoo7p" targetRef="Activity_0ox451z" />
-    <bpmn:sequenceFlow id="Flow_16pku41" sourceRef="Event_0shkw9l" targetRef="Event_099ar88" />
-    <bpmn:sequenceFlow id="Flow_0d9mrw9" sourceRef="Event_099ar88" targetRef="Gateway_1bp6h44" />
-    <bpmn:sequenceFlow id="Flow_172wc0k" name="Retry &#62; 3" sourceRef="Gateway_1bp6h44" targetRef="Event_0azng2r">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry3 &gt; 3}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_06o94h9" name="Retry [1..3]" sourceRef="Gateway_1bp6h44" targetRef="Activity_0fgoo7p">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry3 &lt;= 3}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0ldn3y8" name="Retry &#62; 3" sourceRef="Gateway_0q2f2o1" targetRef="Event_1tmmrt5">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry1 &gt; 3}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_15ihwrs" sourceRef="Event_1f8p61m" targetRef="Activity_182gpr3">
+    <bpmn:sequenceFlow id="Flow_1qzjx1y" sourceRef="Event_05bv4ti" targetRef="Gateway_1rpwru8" />
+    <bpmn:sequenceFlow id="Flow_17nmoz9" sourceRef="Event_0dlzac7" targetRef="Event_05bv4ti">
       <bpmn:extensionElements>
-        <camunda:executionListener expression="${execution.setVariable(&#34;retry2&#34;, 0)}" event="take" />
-        <camunda:executionListener expression="${execution.setVariable(&#34;retry3&#34;, 0)}" event="take" />
+        <camunda:executionListener expression="${execution.setVariable(&#34;paymentstatus&#34;, &#34;NOT PAID&#34;)}" event="take" />
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
-    <bpmn:startEvent id="Event_0crrhhb">
-      <bpmn:outgoing>Flow_0w9yqn4</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0951h23" messageRef="Message_0a9jdmw" />
-    </bpmn:startEvent>
-    <bpmn:intermediateCatchEvent id="Event_0f47rv1" name="10S">
-      <bpmn:incoming>Flow_0d0meej</bpmn:incoming>
-      <bpmn:outgoing>Flow_0pgmxi6</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_0jssbmg">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT10S</bpmn:timeDuration>
+    <bpmn:sequenceFlow id="Flow_1eu3lad" sourceRef="Activity_1ka6mqq" targetRef="Event_0q2irqu" />
+    <bpmn:sequenceFlow id="Flow_0hup5yp" sourceRef="Activity_0jc83dv" targetRef="Activity_1ka6mqq" />
+    <bpmn:sequenceFlow id="Flow_0efzjr3" sourceRef="Activity_1a43pmz" targetRef="Event_1y2hfyk" />
+    <bpmn:intermediateThrowEvent id="Event_1cv04sw" name="Manage Payment">
+      <bpmn:incoming>Flow_04inq0o</bpmn:incoming>
+      <bpmn:linkEventDefinition id="LinkEventDefinition_09p3juk" name="MANAGE-FEE-PAYMENT" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:intermediateThrowEvent id="Event_1y2hfyk" name="Notify Payment">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","payonline").correlateWithResult();</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0efzjr3</bpmn:incoming>
+      <bpmn:outgoing>Flow_04inq0o</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_078vvwz" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_04inq0o" sourceRef="Event_1y2hfyk" targetRef="Event_1cv04sw" />
+    <bpmn:intermediateThrowEvent id="Event_0xd3neq" name="API Failure Message">
+      <bpmn:incoming>Flow_1uccg6l</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0rp52q4" messageRef="Message_1yee5gs" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:exclusiveGateway id="Gateway_03s9u5q">
+      <bpmn:incoming>Flow_0q4etoe</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uccg6l</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1vyo7eu</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Activity_0v6rrmr" name="Get Token">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${keycloakURL}/auth/realms/${realm}/protocol/openid-connect/token</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Authorization">Basic ${base64userpass}</camunda:entry>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
+            <camunda:outputParameter name="accessToken">${S(response).prop("access_token").stringValue()}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1vyo7eu</bpmn:incoming>
+      <bpmn:incoming>Flow_0w0leqj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ggtdbm</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1a43pmz" name="Invoke Save API">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${foiApiUrl}/api/foipayment/${foiRequestID}/ministryrequest/${ministryRequestID}</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">${saveDataPayload}</camunda:inputParameter>
+            <camunda:outputParameter name="responseCode">
+              <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-SAVE-SUB-API-ERR", response);
+}
+connector.getVariable("statusCode");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+        <camunda:executionListener event="end">
+          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry4");
+execution.setVariable("retry4", current+1); </camunda:script>
+        </camunda:executionListener>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">var saveDataPayload = {
+"paymenturl": execution.getVariable('foiwebUrl') + "/public/form/" + execution.getVariable('formId') + "/submission/" + execution.getVariable('submissionId') + "/edit"
+}
+execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ggtdbm</bpmn:incoming>
+      <bpmn:outgoing>Flow_0efzjr3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="Event_0hclu9b">
+      <bpmn:incoming>Flow_0nelrfi</bpmn:incoming>
+      <bpmn:outgoing>Flow_0q4etoe</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_10qatp1">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="Flow_0pgmxi6" sourceRef="Event_0f47rv1" targetRef="Activity_0fgoo7p" />
-    <bpmn:sequenceFlow id="Flow_1ntbf1z" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0k05bsn" />
-    <bpmn:sequenceFlow id="Flow_0s3l3je" sourceRef="Activity_0k05bsn" targetRef="Event_1y2hfyk" />
-    <bpmn:intermediateThrowEvent id="Event_1y2hfyk" name="Notify Payment">
-      <bpmn:incoming>Flow_0s3l3je</bpmn:incoming>
-      <bpmn:linkEventDefinition id="LinkEventDefinition_0pjgoce" name="NOTIFY-FEE-PAYMENT" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:sequenceFlow id="Flow_0zagnjs" sourceRef="Activity_0ox451z" targetRef="Event_1fo4ezm" />
-    <bpmn:intermediateThrowEvent id="Event_1fo4ezm" name="Manage Payment">
-      <bpmn:incoming>Flow_0zagnjs</bpmn:incoming>
-      <bpmn:linkEventDefinition id="LinkEventDefinition_1exp83n" name="MANAGE-FEE-PAYMENT" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:intermediateCatchEvent id="Event_0dlzac7" name="Manage Payament">
-      <bpmn:outgoing>Flow_1n41ajc</bpmn:outgoing>
-      <bpmn:linkEventDefinition id="LinkEventDefinition_0egrnr9" name="MANAGE-FEE-PAYMENT" />
-    </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="Flow_1n41ajc" sourceRef="Event_0dlzac7" targetRef="Event_05bv4ti" />
-    <bpmn:intermediateCatchEvent id="Event_05bv4ti" name="Payment Update Received">
-      <bpmn:incoming>Flow_1n41ajc</bpmn:incoming>
-      <bpmn:outgoing>Flow_13syt42</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1cne5rs" messageRef="Message_1x26sx5" />
-    </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="Flow_13syt42" sourceRef="Event_05bv4ti" targetRef="Event_04nwpdo" />
-    <bpmn:endEvent id="Event_04nwpdo">
-      <bpmn:incoming>Flow_13syt42</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:task id="Activity_0k05bsn" name="Create Submission">
+    <bpmn:boundaryEvent id="save-sub-link" attachedToRef="Activity_1a43pmz">
+      <bpmn:outgoing>Flow_0nelrfi</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_11vo5r8" errorRef="Error_0ccuaf4" camunda:errorCodeVariable="responseCode" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1uccg6l" name="Retry &#62; 3" sourceRef="Gateway_03s9u5q" targetRef="Event_0xd3neq">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry4 &gt; 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0q4etoe" sourceRef="Event_0hclu9b" targetRef="Gateway_03s9u5q" />
+    <bpmn:sequenceFlow id="Flow_1vyo7eu" name="Retry [1..3]" sourceRef="Gateway_03s9u5q" targetRef="Activity_0v6rrmr">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry4 &lt;= 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0ggtdbm" sourceRef="Activity_0v6rrmr" targetRef="Activity_1a43pmz" />
+    <bpmn:sequenceFlow id="Flow_0nelrfi" sourceRef="save-sub-link" targetRef="Event_0hclu9b" />
+    <bpmn:sequenceFlow id="Flow_0w0leqj" sourceRef="Activity_0k05bsn" targetRef="Activity_0v6rrmr" />
+    <bpmn:task id="Activity_1mkqp7n" name="Update Form Submission">
       <bpmn:extensionElements>
-        <camunda:properties>
-          <camunda:property name="formName" value="payfeeonline" />
-        </camunda:properties>
-        <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.execution.ExternalSubmissionListener" event="start">
-          <camunda:field name="formName">
-            <camunda:expression>payfeeonline</camunda:expression>
+        <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.BPMFormDataPipelineListener" event="start">
+          <camunda:field name="fields">
+            <camunda:expression>["status","paymentstatus"]</camunda:expression>
           </camunda:field>
         </camunda:executionListener>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="formName">payfeeonline</camunda:inputParameter>
-          <camunda:outputParameter name="formId">${execution.getVariable("formUrl").split("/")[4]}</camunda:outputParameter>
-          <camunda:outputParameter name="submissionId">${execution.getVariable("formUrl").split("/")[6]}</camunda:outputParameter>
-        </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1ntbf1z</bpmn:incoming>
-      <bpmn:outgoing>Flow_0s3l3je</bpmn:outgoing>
     </bpmn:task>
   </bpmn:process>
-  <bpmn:message id="Message_1x26sx5" name="foi-fee-payment" />
+  <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
+  <bpmn:message id="Message_1rsz89u" name="Message_14ovgjp" />
+  <bpmn:category id="Category_1y77j5j">
+    <bpmn:categoryValue id="CategoryValue_1dcilzu" value="State Change" />
+  </bpmn:category>
+  <bpmn:category id="Category_0nrgupy">
+    <bpmn:categoryValue id="CategoryValue_03nhs8k" value="Get Request Details" />
+  </bpmn:category>
+  <bpmn:category id="Category_0u5q9y4">
+    <bpmn:categoryValue id="CategoryValue_1fxkssh" value="Save Submission Link" />
+  </bpmn:category>
+  <bpmn:error id="Error_0ccuaf4" name="FOI-SAVE-SUB-API-ERR" camunda:errorMessage="FOI Save Submission Link Failed." />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1rbxo3f">
       <bpmndi:BPMNShape id="Participant_105327x_di" bpmnElement="Participant_105327x" isHorizontal="true">
-        <dc:Bounds x="140" y="80" width="1430" height="870" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_1aaq844_di" bpmnElement="Lane_1aaq844" isHorizontal="true">
-        <dc:Bounds x="170" y="638" width="1400" height="312" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_1mwmv1p_di" bpmnElement="Lane_1mwmv1p" isHorizontal="true">
-        <dc:Bounds x="170" y="351" width="1400" height="287" />
+        <dc:Bounds x="140" y="80" width="1980" height="1060" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_1u9yqiq_di" bpmnElement="Lane_1u9yqiq" isHorizontal="true">
-        <dc:Bounds x="170" y="80" width="1400" height="271" />
+        <dc:Bounds x="170" y="80" width="1950" height="570" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_13syt42_di" bpmnElement="Flow_13syt42">
-        <di:waypoint x="568" y="780" />
-        <di:waypoint x="832" y="780" />
+      <bpmndi:BPMNShape id="Lane_1aaq844_di" bpmnElement="Lane_1aaq844" isHorizontal="true">
+        <dc:Bounds x="170" y="650" width="1950" height="490" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0w0leqj_di" bpmnElement="Flow_0w0leqj">
+        <di:waypoint x="1080" y="288" />
+        <di:waypoint x="1200" y="288" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1n41ajc_di" bpmnElement="Flow_1n41ajc">
-        <di:waypoint x="418" y="780" />
-        <di:waypoint x="532" y="780" />
+      <bpmndi:BPMNEdge id="BPMNEdge_1s22htt" bpmnElement="Flow_0nelrfi">
+        <di:waypoint x="1440" y="346" />
+        <di:waypoint x="1440" y="362" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0zagnjs_di" bpmnElement="Flow_0zagnjs">
-        <di:waypoint x="1350" y="438" />
-        <di:waypoint x="1402" y="438" />
+      <bpmndi:BPMNEdge id="BPMNEdge_00777j8" bpmnElement="Flow_0ggtdbm">
+        <di:waypoint x="1300" y="288" />
+        <di:waypoint x="1390" y="288" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0s3l3je_di" bpmnElement="Flow_0s3l3je">
-        <di:waypoint x="1130" y="198" />
-        <di:waypoint x="1282" y="198" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1ntbf1z_di" bpmnElement="Flow_1ntbf1z">
-        <di:waypoint x="640" y="198" />
-        <di:waypoint x="1030" y="198" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0pgmxi6_di" bpmnElement="Flow_0pgmxi6">
-        <di:waypoint x="978" y="438" />
-        <di:waypoint x="1100" y="438" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_15ihwrs_di" bpmnElement="Flow_15ihwrs">
-        <di:waypoint x="418" y="438" />
-        <di:waypoint x="540" y="438" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ldn3y8_di" bpmnElement="Flow_0ldn3y8">
-        <di:waypoint x="745" y="290" />
-        <di:waypoint x="862" y="290" />
+      <bpmndi:BPMNEdge id="BPMNEdge_0xyfqc8" bpmnElement="Flow_1vyo7eu">
+        <di:waypoint x="1570" y="405" />
+        <di:waypoint x="1570" y="430" />
+        <di:waypoint x="1250" y="430" />
+        <di:waypoint x="1250" y="328" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="781" y="272" width="46" height="14" />
+          <dc:Bounds x="1477" y="410" width="54" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06o94h9_di" bpmnElement="Flow_06o94h9">
-        <di:waypoint x="1390" y="573" />
-        <di:waypoint x="1390" y="608" />
-        <di:waypoint x="1150" y="608" />
-        <di:waypoint x="1150" y="478" />
+      <bpmndi:BPMNEdge id="BPMNEdge_0liuar4" bpmnElement="Flow_0q4etoe">
+        <di:waypoint x="1458" y="380" />
+        <di:waypoint x="1545" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1bc7ykq" bpmnElement="Flow_1uccg6l">
+        <di:waypoint x="1595" y="380" />
+        <di:waypoint x="1712" y="380" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1313" y="591" width="54" height="14" />
+          <dc:Bounds x="1617" y="362" width="46" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_172wc0k_di" bpmnElement="Flow_172wc0k">
-        <di:waypoint x="1415" y="548" />
-        <di:waypoint x="1512" y="548" />
+      <bpmndi:BPMNEdge id="Flow_04inq0o_di" bpmnElement="Flow_04inq0o">
+        <di:waypoint x="1908" y="288" />
+        <di:waypoint x="2022" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0efzjr3_di" bpmnElement="Flow_0efzjr3">
+        <di:waypoint x="1490" y="288" />
+        <di:waypoint x="1872" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hup5yp_di" bpmnElement="Flow_0hup5yp">
+        <di:waypoint x="1130" y="910" />
+        <di:waypoint x="1170" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1eu3lad_di" bpmnElement="Flow_1eu3lad">
+        <di:waypoint x="1270" y="910" />
+        <di:waypoint x="1422" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17nmoz9_di" bpmnElement="Flow_17nmoz9">
+        <di:waypoint x="298" y="910" />
+        <di:waypoint x="362" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qzjx1y_di" bpmnElement="Flow_1qzjx1y">
+        <di:waypoint x="398" y="910" />
+        <di:waypoint x="435" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00aq624_di" bpmnElement="Flow_00aq624">
+        <di:waypoint x="460" y="935" />
+        <di:waypoint x="460" y="1002" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1441" y="530" width="46" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0d9mrw9_di" bpmnElement="Flow_0d9mrw9">
-        <di:waypoint x="1318" y="548" />
-        <di:waypoint x="1365" y="548" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_16pku41_di" bpmnElement="Flow_16pku41">
-        <di:waypoint x="1300" y="496" />
-        <di:waypoint x="1300" y="530" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1nw0kay_di" bpmnElement="Flow_1nw0kay">
-        <di:waypoint x="1200" y="438" />
-        <di:waypoint x="1250" y="438" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0d0meej_di" bpmnElement="Flow_0d0meej">
-        <di:waypoint x="800" y="438" />
-        <di:waypoint x="942" y="438" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="927" y="386" width="65" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_17bdgfc_di" bpmnElement="Flow_17bdgfc">
-        <di:waypoint x="450" y="198" />
-        <di:waypoint x="540" y="198" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1ys38a6_di" bpmnElement="Flow_1ys38a6">
-        <di:waypoint x="590" y="256" />
-        <di:waypoint x="590" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1kzesmk_di" bpmnElement="Flow_1kzesmk">
-        <di:waypoint x="608" y="290" />
-        <di:waypoint x="695" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1o3gosy_di" bpmnElement="Flow_1o3gosy">
-        <di:waypoint x="720" y="315" />
-        <di:waypoint x="720" y="340" />
-        <di:waypoint x="400" y="340" />
-        <di:waypoint x="400" y="238" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="627" y="320" width="54" height="14" />
+          <dc:Bounds x="465" y="953" width="51" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0w9yqn4_di" bpmnElement="Flow_0w9yqn4">
-        <di:waypoint x="248" y="198" />
-        <di:waypoint x="350" y="198" />
+        <di:waypoint x="248" y="288" />
+        <di:waypoint x="350" y="288" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="266" y="183" width="68" height="14" />
+          <dc:Bounds x="266" y="273" width="68" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1l1mo2d_di" bpmnElement="Flow_1l1mo2d">
-        <di:waypoint x="640" y="438" />
-        <di:waypoint x="700" y="438" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1khj1st_di" bpmnElement="Flow_1khj1st">
-        <di:waypoint x="750" y="496" />
-        <di:waypoint x="750" y="530" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_18ddb1s_di" bpmnElement="Flow_18ddb1s">
-        <di:waypoint x="768" y="548" />
-        <di:waypoint x="835" y="548" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_03c4tff_di" bpmnElement="Flow_03c4tff">
-        <di:waypoint x="885" y="548" />
-        <di:waypoint x="992" y="548" />
+      <bpmndi:BPMNEdge id="Flow_1o3gosy_di" bpmnElement="Flow_1o3gosy">
+        <di:waypoint x="720" y="405" />
+        <di:waypoint x="720" y="430" />
+        <di:waypoint x="400" y="430" />
+        <di:waypoint x="400" y="328" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="917" y="531" width="46" height="14" />
+          <dc:Bounds x="627" y="410" width="54" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0t5omzu_di" bpmnElement="Flow_0t5omzu">
-        <di:waypoint x="860" y="573" />
-        <di:waypoint x="860" y="608" />
-        <di:waypoint x="590" y="608" />
-        <di:waypoint x="590" y="478" />
+      <bpmndi:BPMNEdge id="Flow_1kzesmk_di" bpmnElement="Flow_1kzesmk">
+        <di:waypoint x="608" y="380" />
+        <di:waypoint x="695" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ys38a6_di" bpmnElement="Flow_1ys38a6">
+        <di:waypoint x="590" y="346" />
+        <di:waypoint x="590" y="362" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17bdgfc_di" bpmnElement="Flow_17bdgfc">
+        <di:waypoint x="450" y="288" />
+        <di:waypoint x="540" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ldn3y8_di" bpmnElement="Flow_0ldn3y8">
+        <di:waypoint x="745" y="380" />
+        <di:waypoint x="862" y="380" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="783" y="591" width="54" height="14" />
+          <dc:Bounds x="767" y="362" width="46" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_182gpr3_di" bpmnElement="Activity_182gpr3">
-        <dc:Bounds x="540" y="398" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0v6jdes_di" bpmnElement="Activity_0v6jdes">
-        <dc:Bounds x="700" y="398" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_06k5kp5_di" bpmnElement="Event_06k5kp5">
-        <dc:Bounds x="732" y="530" width="36" height="36" />
+      <bpmndi:BPMNEdge id="Flow_02gzt5c_di" bpmnElement="Flow_02gzt5c">
+        <di:waypoint x="485" y="910" />
+        <di:waypoint x="1030" y="910" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="712" y="541" width="16" height="14" />
+          <dc:Bounds x="605" y="883" width="25" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0ubhnez_di" bpmnElement="Gateway_0ubhnez" isMarkerVisible="true">
-        <dc:Bounds x="835" y="523" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_00eqdwt_di" bpmnElement="Event_0zmjrgk">
-        <dc:Bounds x="992" y="530" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0fgoo7p_di" bpmnElement="Activity_0fgoo7p">
-        <dc:Bounds x="1100" y="398" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ox451z_di" bpmnElement="Activity_0ox451z">
-        <dc:Bounds x="1250" y="398" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_080npf2_di" bpmnElement="Event_099ar88">
-        <dc:Bounds x="1282" y="530" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1262" y="541" width="16" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1bp6h44_di" bpmnElement="Gateway_1bp6h44" isMarkerVisible="true">
-        <dc:Bounds x="1365" y="523" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0t3o42c_di" bpmnElement="Event_0azng2r">
-        <dc:Bounds x="1512" y="530" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1k8aoc7_di" bpmnElement="Event_1k8aoc7">
-        <dc:Bounds x="572" y="272" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0gfn3o4_di" bpmnElement="invoke-reqmgmt-api">
-        <dc:Bounds x="540" y="158" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1r0oka0_di" bpmnElement="get-api-token">
-        <dc:Bounds x="350" y="158" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0q2f2o1_di" bpmnElement="Gateway_0q2f2o1" isMarkerVisible="true">
-        <dc:Bounds x="695" y="265" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1b3k3ug_di" bpmnElement="Event_1tmmrt5">
-        <dc:Bounds x="862" y="272" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="853" y="234.5" width="54" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_06vslwr_di" bpmnElement="Event_1f8p61m">
-        <dc:Bounds x="382" y="420" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="362" y="463" width="76" height="14" />
-        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0szq4un_di" bpmnElement="Flow_0szq4un">
+        <di:waypoint x="640" y="288" />
+        <di:waypoint x="980" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
+        <dc:Bounds x="980" y="248" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1wipndr_di" bpmnElement="Event_0crrhhb">
-        <dc:Bounds x="212" y="180" width="36" height="36" />
+        <dc:Bounds x="212" y="270" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1lo5qj7_di" bpmnElement="Event_0f47rv1">
-        <dc:Bounds x="942" y="420" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_1b3k3ug_di" bpmnElement="Event_1tmmrt5">
+        <dc:Bounds x="862" y="362" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="950" y="463" width="20" height="14" />
+          <dc:Bounds x="853" y="325" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0hao12d_di" bpmnElement="Event_1y2hfyk">
-        <dc:Bounds x="1282" y="180" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1264" y="223" width="76" height="14" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNShape id="Gateway_0q2f2o1_di" bpmnElement="Gateway_0q2f2o1" isMarkerVisible="true">
+        <dc:Bounds x="695" y="355" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1aueu4h_di" bpmnElement="Event_1fo4ezm">
-        <dc:Bounds x="1402" y="420" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_1r0oka0_di" bpmnElement="get-api-token">
+        <dc:Bounds x="350" y="248" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gfn3o4_di" bpmnElement="invoke-reqmgmt-api">
+        <dc:Bounds x="540" y="248" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1k8aoc7_di" bpmnElement="Event_1k8aoc7">
+        <dc:Bounds x="572" y="362" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jlghix_di" bpmnElement="Event_0ot5l60">
+        <dc:Bounds x="442" y="1002" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1rpwru8_di" bpmnElement="Gateway_1rpwru8" isMarkerVisible="true">
+        <dc:Bounds x="435" y="885" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1kkmbsm_di" bpmnElement="Event_05bv4ti">
+        <dc:Bounds x="362" y="892" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1376" y="463" width="88" height="14" />
+          <dc:Bounds x="339" y="935" width="83" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_18m62c9_di" bpmnElement="Event_0dlzac7">
-        <dc:Bounds x="382" y="762" width="36" height="36" />
+        <dc:Bounds x="262" y="892" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="376" y="805" width="51" height="27" />
+          <dc:Bounds x="256" y="935" width="51" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1kkmbsm_di" bpmnElement="Event_05bv4ti">
-        <dc:Bounds x="532" y="762" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_0zd2d2z_di" bpmnElement="Event_0q2irqu">
+        <dc:Bounds x="1422" y="892" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="509" y="805" width="83" height="27" />
+          <dc:Bounds x="1404" y="935" width="76" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_04nwpdo_di" bpmnElement="Event_04nwpdo">
-        <dc:Bounds x="832" y="762" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_0jc83dv_di" bpmnElement="Activity_0jc83dv">
+        <dc:Bounds x="1030" y="870" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
-        <dc:Bounds x="1030" y="158" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_1ka6mqq_di" bpmnElement="Activity_1ka6mqq">
+        <dc:Bounds x="1170" y="870" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="Event_17odcea">
-        <dc:Bounds x="572" y="220" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_0xnzbrg_di" bpmnElement="Event_1cv04sw">
+        <dc:Bounds x="2022" y="270" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1997" y="313" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0889zox_di" bpmnElement="Event_1y2hfyk">
+        <dc:Bounds x="1872" y="270" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1854" y="313" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_047xdxn" bpmnElement="Event_0xd3neq">
+        <dc:Bounds x="1712" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1703" y="325" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0i34i3o" bpmnElement="Gateway_03s9u5q" isMarkerVisible="true">
+        <dc:Bounds x="1545" y="355" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_163125u" bpmnElement="Activity_0v6rrmr">
+        <dc:Bounds x="1200" y="248" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0xbvyxr" bpmnElement="Activity_1a43pmz">
+        <dc:Bounds x="1390" y="248" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1cc6od7" bpmnElement="Event_0hclu9b">
+        <dc:Bounds x="1422" y="362" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vpot1m_di" bpmnElement="Activity_1mkqp7n">
+        <dc:Bounds x="680" y="800" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1ufjazf" bpmnElement="save-sub-link">
+        <dc:Bounds x="1422" y="310" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="548" y="182" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0shkw9l_di" bpmnElement="Event_0shkw9l">
-        <dc:Bounds x="1282" y="460" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="get-req-details">
+        <dc:Bounds x="572" y="310" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="548" y="182" width="25" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1ctb9ag_di" bpmnElement="Event_1ctb9ag">
-        <dc:Bounds x="732" y="460" width="36" height="36" />
+      <bpmndi:BPMNShape id="Group_0nmwgct_di" bpmnElement="Group_0nmwgct">
+        <dc:Bounds x="1000" y="850" width="300" height="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1106" y="836" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Group_087f8ap_di" bpmnElement="Group_087f8ap">
+        <dc:Bounds x="330" y="210" width="590" height="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="593" y="176" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_09k3yv3" bpmnElement="Group_1e997n9">
+        <dc:Bounds x="1165" y="210" width="615" height="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1409" y="174" width="86" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

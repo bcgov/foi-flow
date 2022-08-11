@@ -41,7 +41,18 @@ class workflowservice:
                     metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id})
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
-        
+    
+    def postfeeevent(self, requestid, ministryrequestid, requestsschema, status):
+        metadata = json.dumps({
+            "id": requestsschema["idNumber"], 
+            "status": "Call For Records", 
+            "assignedGroup": requestsschema["assignedGroup"], 
+            "assignedTo": requestsschema["assignedTo"],
+            "assignedministrygroup" : requestsschema["assignedministrygroup"],
+            "ministryRequestID" : ministryrequestid,
+			"foiRequestID" :requestid
+            })
+        return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, status)    
     
     def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
         if activity == Activity.complete.value:

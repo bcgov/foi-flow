@@ -14,41 +14,42 @@ from request_api.services.email.templates.templateconfig import templateconfig
 from request_api.services.email.senderservice import senderservice
 from request_api.services.email.inboxservice import inboxservice
 from request_api.services.eventservice import eventservice
-
+from request_api.services.requestservice import requestservice
 
 class emailservice:
     """ FOI Email Service
     """
   
-    def send_payonline(self, servicekey, ministryrequestid, requestjson):
+    def send(self, servicename, requestid, ministryrequestid):
         try:
-            _templatename = templateconfig().gettemplatename(servicekey)
-            _messagepart = templateservice().generatetemplate(_templatename, requestjson)
-            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest','feeassessed-onhold')
-            return senderservice().send(servicekey, _messagepart, _messageattachmentlist, requestjson)
+            requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
+            _messagepart = templateservice().generate_by_servicename_and_schema(servicename, requestjson)
+            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
+            return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
         
-        
 
-    def acknowledge(self, servicekey, ministryrequestid, requestjson):
+    def acknowledge(self, servicename, requestid, ministryrequestid):
         try:
-            self.__upload_sent_email(servicekey, ministryrequestid, requestjson)
-            ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicekey, requestjson), requestjson["email"])
+            requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
+            self.__upload_sent_email(servicename, ministryrequestid, requestjson)
+            ackresponse = inboxservice().get_failure_deliverystatus_as_eml(templateconfig().getsubject(servicename, requestjson), requestjson["email"])
             if ackresponse["success"] == False:
-                self.__upload(templateconfig().getattachmentname("PAYONLINE-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson, templateconfig().getattachmentcategory("FEE-ESTIMATE-FAILED"))   
-                eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicekey), ackresponse["reason"], requestjson["assignedto"])
+                self.__upload(templateconfig().getattachmentname(servicename+"-SEND-FAILURE")+".eml", ackresponse["content"], ministryrequestid, requestjson, templateconfig().getattachmentcategory(servicename+"-FAILED"))   
+                eventservice().posteventforemailfailure(ministryrequestid, "ministryrequest", templateconfig().getstage(servicename), ackresponse["reason"], requestjson["assignedTo"])
+
             return {"success" : True, "message": "Acknowledgement successful"}
         except Exception as ex:
             logging.exception(ex)
             return {"success" : False, "message": "Acknowledgement successful"}
     
- 
+
     def __upload_sent_email(self, servicekey, ministryrequestid, requestjson):
         try:
             _originalmsg = senderservice().read_outbox_as_bytes(servicekey, requestjson)
             if _originalmsg is not None:
-                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson, templateconfig().getattachmentcategory("FEE-ESTIMATE-LETTER"))
+                return self.__upload(templateconfig().getattachmentname(servicekey)+".eml",_originalmsg, ministryrequestid, requestjson, templateconfig().getattachmentcategory(servicekey+"-SUCCESSFUL"))
         except Exception as ex:
             logging.exception(ex)
         

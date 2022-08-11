@@ -370,7 +370,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   const classes = useStyles();
   
   const disableCategory = () => {
-    if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatesuccessful.name].includes(attachment.category?.toLowerCase()))
+    if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimatesuccessful.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatepaymentreceipt.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name].includes(attachment.category?.toLowerCase()) )
       return true;      
   }
   const [disabled, setDisabled] = useState(isMinistryCoordinator && disableCategory());
@@ -495,13 +495,17 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
 
   const emailCategories = [
     AttachmentLetterCategories.feeestimatefailed.name,
+    AttachmentLetterCategories.feeestimatesuccessful.name,    
     AttachmentLetterCategories.feeestimateletter.name,
-    AttachmentLetterCategories.feeestimatesuccessful.name
+    AttachmentLetterCategories.feeestimatepaymentreceipt.name,
+    AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name,
+    AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name
   ]
 
   const showReplace = (category) => {
     return transitionStates.includes(category.toLowerCase());
   }
+
   const showDelete = (category) => {
     return !emailCategories.includes(category.toLowerCase());
   }
