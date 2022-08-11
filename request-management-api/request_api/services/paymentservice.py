@@ -5,7 +5,6 @@ from request_api.models.FOIRequestPayments import FOIRequestPayment
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.services.external.storageservice import storageservice
-from request_api.services.requestservice import requestservice
 from request_api.models.default_method_result import DefaultMethodResult
 
 import json
@@ -43,9 +42,8 @@ class paymentservice:
     def getpayment(self, requestid, ministryrequestid):
         return FOIRequestPayment.getpayment(requestid, ministryrequestid) 
 
-    def createpaymentreceipt(self, request_id, ministry_request_id, fee, parsed_args):
+    def createpaymentreceipt(self, request_id, ministry_request_id, data, fee, parsed_args):
         try:
-            data = requestservice().getrequestdetails(request_id, ministry_request_id)
             print(data)
             receipt_template_path='request_api/receipt_templates/cfr_fee_payment_receipt.docx'
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
