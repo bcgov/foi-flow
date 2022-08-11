@@ -156,15 +156,9 @@ class FOIRequestsByIdAndType(Resource):
             if actiontype == "assignee":
                 ministryrequestschema = FOIRequestAssigneeSchema().load(request_json)                
                 if(usertype == "iao"):
-                    if(ministryrequestschema['assignedToFirstName'] != '' and ministryrequestschema['assignedToLastName'] != ''):
-                        assigneename = '{0}, {1}'.format(ministryrequestschema['assignedToLastName'],ministryrequestschema['assignedToFirstName'])
-                    elif (ministryrequestschema['assignedgroup'] != '' and ministryrequestschema['assignedToFirstName'] ==  '' and ministryrequestschema['assignedToLastName'] ==  ''):
-                        assigneename = ministryrequestschema['assignedgroup']
+                    assigneename = getiaoassigneename(ministryrequestschema)                    
                 elif(usertype == "ministry"):
-                    if (ministryrequestschema['assignedministrypersonLastName'] != '' and ministryrequestschema['assignedministrypersonFirstName'] != '' ):
-                        assigneename = '{0}, {1}'.format(ministryrequestschema['assignedministrypersonLastName'],ministryrequestschema['assignedministrypersonFirstName'])    
-                    elif (ministryrequestschema['assignedministrygroup'] != ''  and ministryrequestschema['assignedministrypersonLastName'] == '' and ministryrequestschema['assignedministrypersonFirstName'] == ''):
-                        assigneename = ministryrequestschema['assignedministrygroup']               
+                   assigneename = getministryassigneename(ministryrequestschema)               
             else:
                 ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
@@ -181,8 +175,18 @@ class FOIRequestsByIdAndType(Resource):
             return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-        
 
+def getiaoassigneename(assigneeschema):
+    if(assigneeschema['assignedToFirstName'] != '' and assigneeschema['assignedToLastName'] != ''):
+        return '{0}, {1}'.format(assigneeschema['assignedToLastName'],assigneeschema['assignedToFirstName'])
+    elif (assigneeschema['assignedgroup'] != '' and assigneeschema['assignedToFirstName'] ==  '' and assigneeschema['assignedToLastName'] ==  ''):
+        return   assigneeschema['assignedgroup']            
+
+def getministryassigneename(assigneeschema):
+    if (assigneeschema['assignedministrypersonLastName'] != '' and assigneeschema['assignedministrypersonFirstName'] != '' ):
+        return '{0}, {1}'.format(assigneeschema['assignedministrypersonLastName'],assigneeschema['assignedministrypersonFirstName'])    
+    elif (assigneeschema['assignedministrygroup'] != ''  and assigneeschema['assignedministrypersonLastName'] == '' and assigneeschema['assignedministrypersonFirstName'] == ''):
+         return assigneeschema ['assignedministrygroup'] 
 
 @cors_preflight('GET,POST,PUT,OPTIONS')
 @API.route('/foirequests/<int:foirequestid>')

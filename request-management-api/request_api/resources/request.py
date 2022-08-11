@@ -87,10 +87,7 @@ class FOIRawRequest(Resource):
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
                 assignee = ''
                 if(actiontype == 'assignee'):
-                    if(assigneefirstname !='' and assigneelastname!=''):
-                        assignee = "{0}, {1}".format(assigneelastname,assigneefirstname)
-                    else: 
-                        assignee =  assigneegroup                   
+                    assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)                  
                 asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember(),assignee))
                 if result.success == True:
                     asyncio.ensure_future(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
@@ -104,7 +101,13 @@ class FOIRawRequest(Resource):
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-    
+
+def getassignee(assigneefirstname,assigneelastname,assigneegroup):
+    if(assigneefirstname !='' and assigneelastname!=''):
+        return  "{0}, {1}".format(assigneelastname,assigneefirstname)
+    else: 
+        return  assigneegroup
+
 def getparams(updaterequest):
     return {
         'assigneegroup': updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None,
