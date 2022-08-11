@@ -91,7 +91,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"ewztwje"
+               "id":"ek5qrur"
             },
             {
                "label":"FOI Request Id",
@@ -5227,7 +5227,7 @@
                                           "height":""
                                        },
                                        "type":"button",
-                                       "custom":"var foiBaseApiUrl = localStorage.getItem(\"foiApiUrl\")\nFormio.request(\n  foiBaseApiUrl + '/api/foirawrequests/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"/public/form/paymentlanding\",\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
+                                       "custom":"var foiBaseApiUrl = localStorage.getItem(\"foiApiUrl\")\nFormio.request(\n  foiBaseApiUrl + '/api/foirawrequests/' + data.ministryRequestID + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"/public/form/paymentlanding/foirequest/\"+data.foiRequestID,\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
                                        "input":true,
                                        "placeholder":"",
                                        "prefix":"",
@@ -5268,7 +5268,7 @@
                                        "addons":[
                                           
                                        ],
-                                       "id":"e9xec"
+                                       "id":"e3v4ry"
                                     }
                                  ],
                                  "width":6,
