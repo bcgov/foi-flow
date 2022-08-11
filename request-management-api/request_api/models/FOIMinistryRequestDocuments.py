@@ -89,7 +89,7 @@ class FOIMinistryRequestDocument(db.Model):
 
     @classmethod
     def getlatestdocumentsforfeeestimateemail(cls, ministryrequestid, ministryrequestversion, category):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion and category = :category and version = 1 ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion and lower(category) = lower(:category) and version = 1 ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion, 'category': category})
         documents = []
         for row in rs:
