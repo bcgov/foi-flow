@@ -84,8 +84,14 @@ class FOIRawRequest(Resource):
                 assigneefirstname = requestdata['assigneefirstname']
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)
-                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
+                assignee = ''
+                if(actiontype == 'assignee'):
+                    if(assigneefirstname !='' and assigneelastname!=''):
+                        assignee = "{0}, {1}".format(assigneelastname,assigneefirstname)
+                    else: 
+                        assignee =  assigneegroup                   
+                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember(),assignee))
                 if result.success == True:
                     asyncio.ensure_future(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
@@ -142,7 +148,7 @@ class FOIRawRequestLoadTest(Resource):
             username = 'Super Tester'
             if int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
+                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False,''))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 400, 'message':INVALID_REQUEST_ID}, 400    
