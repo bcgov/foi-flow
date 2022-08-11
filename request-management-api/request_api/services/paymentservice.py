@@ -42,15 +42,16 @@ class paymentservice:
     def getpayment(self, requestid, ministryrequestid):
         return FOIRequestPayment.getpayment(requestid, ministryrequestid) 
 
-    def createpaymentreceipt(self, request_id, ministry_request_id, data, fee, parsed_args):
+    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
+            
             print(data)
             receipt_template_path='request_api/receipt_templates/cfr_fee_payment_receipt.docx'
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
-                'paymentDate': fee.payment['completed_on'],
-                'orderId': fee.payment['order_id'],
-                'transactionId': fee.payment['transaction_number'],
+                'paymentDate': parsed_args.get('trnDate'),
+                'orderId': parsed_args.get('trnOrderId'),
+                'transactionId': parsed_args.get('FOIDM00000077'),
                 'cardType': parsed_args.get('cardType')
             }})
             document_service : DocumentGenerationService = DocumentGenerationService('cfr_fee_payment_receipt')
