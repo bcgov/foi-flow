@@ -44,7 +44,7 @@ class templateconfig:
 
     def getattachmentcategory(self, key):
         if key == "PAYONLINE":
-            return "Fee Estimate - Letter"
+            return "FEEASSESSED-ONHOLD"
         elif key == "PAYONLINE-SUCCESSFUL":
             return "Fee Estimate - Letter"
         elif key == "PAYONLINE-FAILED":
