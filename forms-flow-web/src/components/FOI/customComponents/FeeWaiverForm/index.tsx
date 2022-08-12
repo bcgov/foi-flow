@@ -28,6 +28,9 @@ import IconButton from '@material-ui/core/IconButton';
 import { formatDate, addBusinessDays } from "../../../../helper/FOI/helper";
 
 export const FeeWaiverForm = ({
+  requestDescription,
+  fromDate,
+  toDate,
   requestNumber,
   requestState,
   ministryId,
@@ -37,31 +40,31 @@ export const FeeWaiverForm = ({
 }: params) => {
 
   const dispatch = useDispatch();
-
   const userGroups = userDetail.groups.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
+  const cfrTotalAmountDue: number = useSelector((state: any) => state.foiRequests.foiRequestCFRForm.feedata.totalamountdue);
 
-  const CFRStatuses = [
+  const FeeWaiverStatuses = [
     {
-      value: 'init',
-      label: 'Select CFR Form Status',
-      disabled: true,
-    },
-    {
-      value: 'review',
-      label: 'In Review with IAO',
+      value: 'iao',
+      label: 'In Progress IAO',
       disabled: false,
     },
     {
-      value: 'clarification',
-      label: 'Needs Clarification with Ministry',
+      value: 'review',
+      label: 'Ministry Review',
       disabled: false
     },
     {
-      value: 'approved',
-      label: 'Approved',
+      value: 'decision',
+      label: 'Ministry Decision',
       disabled: isMinistry,
     },
+    {
+       value: 'completed',
+       label: 'Completed',
+       disabled: true,
+    }
   ];
 
   React.useEffect(() => {
@@ -72,143 +75,161 @@ export const FeeWaiverForm = ({
       );
     }
   }, [ministryId]);
+  
 
-  const tooltipLocating = {
-    "title": "Locating/Retrieving",
-    "content": [
-      <div className="toolTipContent">
-        <strong>Areas to consider searching:</strong>
-        <ul>
-          <li>Outlook (including 'deleted' and 'sent' folders)</li>
-          <li>Records management systems (ex. EDRMS)</li>
-          <li>LAN, shared drives, SharePoint, databases</li>
-          <li>Offsite records</li>
-        </ul>
-      </div>]
-  };
-  const tooltipProducing = {
-    "title": "Producing",
-    "content": [
-      <div className="toolTipContent">
-        <strong>Tasks include:</strong>
-        <ul>
-          <li>Includes gathering and providing records, not creating records</li>
-          <li>Identifying relevant sources of data/information</li>
-          <li>Manual time spent creating and producing records</li>
-          <li>Ex: generating a custom report from a database using existing data</li>
-        </ul>
-      </div>]
-  };
-  const tooltipPreparing = {
-    "title": "Preparing",
-    "content": [
-      <div className="toolTipContent">
-        <strong>Tasks include:</strong>
-        <ul>
-          <li>Converting records to PDF</li>
-          <li>Consolidating records into a single PDF document</li>
-          <li>Organizing records packages (e.g. by date department, staff, records type, etc.)</li>
-          <li>Photocopying or scanning records into electronic format</li>
-          <li>Ensuring completeness of responsive records</li>
-          <li>Copying other types of media (audio and /or video)</li>
-          <li>For electronic records, you do not need to provide a time estimate, please provide the number of files where requested below and IAO will be in a position to calculate the time required and to consider charging a fee.</li>
-        </ul>
-      </div>]
-  };
-  const tooltipVolume = {
-    "title": "Volume",
-    "content": [
-      <div className="toolTipContent">
-        <strong>Electronic:</strong>
-        <ul>
-          <li>Files (e.g. emails, Word Docs, Excel sheets, PDFs, photos, etc.)</li>
-        </ul>
-        <strong>Hardcopy:</strong>
-        <ul>
-          <li>Average file folder = 1" and holds approx. 200 pages (single-sided)</li>
-          <li>1 standard Records Centre</li>
-        </ul>
-        <strong>Services box:</strong>
-        <ul>
-          <li>Legal sized folders = 1800 pages</li>
-          <li>Letter sized folders = 2200 pages</li>
-        </ul>
-      </div>]
-  };
-
-  React.useEffect(() => {
-    if (ministryId) {
-      fetchCFRForm(
-        ministryId,
-        dispatch,
-      );
-    }
-  }, [ministryId]);
-
-  const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name : string = e.target.name;
-    const value : string = e.target.value;
-    
-    setFeeWaiverData(values => ({...values, [name]: value}));
-  };
-
-  const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
+  const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestFeeWaiverForm);
 
   const blankForm: FeeWaiverFormData = {
-    "status": "iao",
-    "formdata": {    
-        "requesteddate": "2012-04-23T18:25:43.511Z",
-        "receiveddate": "2012-04-23T18:25:43.511Z",
-        "summary": "full text",
-        "recordsdescription": "full text",
-        "type": "public", // public or inability
-        "inability": {
-            "hasproof": false,
-            "description": "full text"
+    status: "iao",
+    formdata: {    
+        requesteddate: "",
+        receiveddate: "",
+        summary: "",
+        recordsdescription: "",
+        inability: false,
+        publicinterest: false,
+        inabilitydetails: {
+            hasproof: false,
+            description: ""
         },
-        "public": {
-            "debate": false,
-            "environment": false,
-            "disclosing": false,
-            "understanding": false,
-            "newpolicy": false,
-            "financing": false,
-            "other": "free text",
-            "analysis": "partial", //partial yes or no
-            "description": "free text"
+        publicinterestdetails: {
+            debate: false,
+            environment: false,
+            disclosing: false,
+            understanding: false,
+            newpolicy: false,
+            financing: false,
+            other: "",
+            analysis: "partial", //partial yes or no
+            description: ""
 
         },
-        "disseminate": false,
-        "abletodisseminate": false,
-        "narrow": false,
-        "exceed": false,
-        "timelines": false,
-        "previous": false,
-        "recommendation": {
-            "waive": "partial", //partial yes or no
-            "summary": "free text",
-            "amount": 0
+        disseminate: false,
+        abletodisseminate: false,
+        narrow: false,
+        exceed: false,
+        timelines: false,
+        previous: false,
+        description: "",
+        recommendation: {
+            waive: "partial", //partial yes or no
+            summary: "",
+            amount: 0
         }
     }
   };
 
-  const [initialFormData, setInitialFormData] = React.useState(blankForm);
+  const [feeWaiverData, setFeeWaiverData] = React.useState(blankForm);
+  
+  const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name : string = e.target.name;
+    const value : string = e.target.value;
+    setFeeWaiverData(values => ({...values, [name]: value}));
+  };
 
-  const [feeWaiverData, setFeeWaiverData] = React.useState(initialFormData);
+  const handleFormDataChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: string = e.target.value;
+    
+    const formData = feeWaiverData?.formdata;
+    const newFormData = {...formData, [name]: (name === 'requesteddate' || name === 'receiveddate' || name === 'summary'||
+                                            name === 'recordsdescription' || name === 'description' ) ? value : JSON.parse(value)};
+    let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: newFormData};
+    setFeeWaiverData(newFeeWaiverData);
+  };
+
+  const handleInabilityDetailsChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: string = e.target.value;
+
+    console.log("name",name);
+    console.log("value",JSON.parse(value));
+
+    const formData = feeWaiverData?.formdata;
+    const inabilityDetails = formData?.inabilitydetails;
+    const newInabilityDetails = {...inabilityDetails, [name]: name === 'hasproof' ? JSON.parse(value) : value};
+    console.log("newInabilityDetails",newInabilityDetails);
+    const newFormData = {...formData, ["inabilitydetails"]: newInabilityDetails};
+    let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: newFormData};
+    console.log("newFeeWaiverData",newFeeWaiverData);
+    setFeeWaiverData(newFeeWaiverData);
+  };
+
+  const handlePublicInterestDetailsChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: string = e.target.value;
+    console.log("name",name);
+    console.log("value",value);
+    const formData = feeWaiverData?.formdata;
+    const publicinterestdetails = formData?.publicinterestdetails;
+    const newPublicInterestDetails = {...publicinterestdetails, [name]: (name !== 'description' && name !== 'analysis' && name !== 'other') ? 
+                                        JSON.parse(value) :value};
+    const newFormData = {...formData, ["publicinterestdetails"]: newPublicInterestDetails};
+    let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: newFormData};
+    console.log("newFeeWaiverData",newFeeWaiverData);
+    setFeeWaiverData(newFeeWaiverData);
+  };
+
+  const handleRecommendationChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: string = e.target.value;
+
+    console.log("name",name);
+    console.log("value",value);
+    const formData = feeWaiverData?.formdata;
+    const recommendation = formData?.recommendation;
+    const newRecommendation = {...recommendation, [name]: name === 'waive' ? JSON.parse(value) : name === 'amount'? Number(value): value};
+    const newFormData = {...formData, ["recommendation"]: newRecommendation};
+    let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: newFormData};
+    console.log("newFeeWaiverData",newFeeWaiverData);
+    setFeeWaiverData(newFeeWaiverData);
+  };
+  
+
+  const handleFeeWaiverTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: boolean = e.target.checked;
+
+    const formData = feeWaiverData?.formdata;
+    const newFormData = {...formData, [name]: value};
+    let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: newFormData};
+    setFeeWaiverData(newFeeWaiverData);
+  };
+
+  const handleRequestedDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name: string = e.target.name;
+    const value: string = e.target.value;
+    console.log("name",name);
+    console.log("value",value);
+    const formData = feeWaiverData?.formdata;
+    const newFormData = {...formData, [name]: value};
+    calculateFeeWaiverReceivedDate(e.target.value, newFormData);
+  }
+
+  const calculateFeeWaiverReceivedDate = (requestedDate : string, newFormData : any) => {
+    const dateString = requestedDate ? requestedDate.substring(0,10): "";
+    const feeWaiverReceivedDate= dateString? addBusinessDays(dateString, 20) : "";
+    const name = "receiveddate";
+    const value = feeWaiverReceivedDate ? formatDate(feeWaiverReceivedDate) : "";
+    const updatedFormData = {...newFormData, [name]: value};
+    let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: updatedFormData};
+    setFeeWaiverData(newFeeWaiverData);
+   }  
+
+  //const [initialFormData, setInitialFormData] = React.useState(blankForm);
+
 
   React.useEffect(() => {
-    if (!_.isEqual(initialFormData, feeWaiverData)) {
-      setCFRUnsaved(true);
-    } else {
-      setCFRUnsaved(false);
-    }
-  }, [initialFormData, feeWaiverData]);
+    //setInitialFormData(initialState);
+    console.log("initialState",initialState);
+    if(initialState && Object.entries(initialState).length > 0)
+        setFeeWaiverData(initialState);
+  }, [initialState]);
 
 
   const save = () => {
 
   }; 
-
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState(<></>);
@@ -221,23 +242,20 @@ export const FeeWaiverForm = ({
     setModalOpen(false);
   };
 
-  const [feeWaiverRequested, setFeeWaiverRequested] = React.useState("");
-  const [feeWaiverReceived, setFeeWaiverReceived] = React.useState("");
+ 
 
-  const handleFeeWaiverRequestedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //const requestedDate = formatDate(e.target.value);
-    setFeeWaiverRequested(e.target.value);
-    let receivedDateText = calculateFeeWaiverReceivedDate(e.target.value);
-    setFeeWaiverReceived(receivedDateText ? formatDate(receivedDateText) : "");
-    
-  }
+   const isValidationError = () => {
+        if(!(!!feeWaiverData?.formdata.requesteddate) || !(!!feeWaiverData?.formdata?.summary) ||
+            (!feeWaiverData?.formdata.inability && !feeWaiverData?.formdata.publicinterest) || 
+                !(!!feeWaiverData?.formdata?.recordsdescription))
+            return true;
+        return false;
+   }
 
-  const calculateFeeWaiverReceivedDate = (requestedDate : string) => {
-    const dateString = requestedDate ? requestedDate.substring(0,10): "";
-    return dateString? addBusinessDays(dateString, 20) : "";
-   }   
+   const [dirty, setDirty] = React.useState(false);
+   const markFormDirty = () => setDirty(true);
 
-
+   console.log("Boolean-check:",feeWaiverData?.formdata?.inabilitydetails.hasproof.toString());
   return (
     <div className="foi-review-container">
     <Box
@@ -246,6 +264,7 @@ export const FeeWaiverForm = ({
         '& .MuiTextField-root': { m: 1 },
       }}
       autoComplete="off"
+      onChange={markFormDirty}
     ><div className="foi-request-form">
     <div style={{marginTop: 20}}></div>
     <div className="container foi-review-request-container cfrform-container">
@@ -253,21 +272,21 @@ export const FeeWaiverForm = ({
         <div className="col-9 foi-request-number-header">
           <h3 className="foi-review-request-text">{requestNumber}</h3>
         </div>
-        {/* <div className="col-3">
+        <div className="col-3">
           <TextField
-            id="feeWaiverFormStatus"
+            id="status"
             label={"Form Status"}
-            inputProps={{ "aria-labelledby": "feeWaiverFormStatus-label"}}
+            inputProps={{ "aria-labelledby": "status-label"}}
             InputLabelProps={{ shrink: true }}
             select
-            name="feeWaiverFormStatus"
-            value={formData?.formStatus}
+            name="status"
+            value={feeWaiverData?.status}
             onChange={handleStatusChange}
             variant="outlined"
             fullWidth
             required
           >
-            {CFRStatuses.map((option) => (
+            {FeeWaiverStatuses.map((option) => (
             <MenuItem
               key={option.value}
               value={option.value}
@@ -277,7 +296,7 @@ export const FeeWaiverForm = ({
             </MenuItem>
             ))}
           </TextField>
-        </div> */}
+        </div>
       </div>
       <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
@@ -288,51 +307,67 @@ export const FeeWaiverForm = ({
             <div className="row foi-details-row">
               <div className="col-lg-6 foi-details-col">
                 <TextField
-                    id="feeWaiverRequested"
+                    id="requesteddate"
+                    name="requesteddate"
                     label="Fee Waiver Requested"
                     type="date" 
-                    value={feeWaiverRequested || ''} 
-                    onChange={handleFeeWaiverRequestedChange}
-                    inputProps={{ "aria-labelledby": "feeWaiverRequested-label"}}
+                    value={feeWaiverData?.formdata.requesteddate || ''} 
+                    onChange={handleRequestedDateChange}
+                    inputProps={{ "aria-labelledby": "requesteddate-label"}}
                     InputLabelProps={{
                     shrink: true,
                     }}
                     InputProps={{inputProps: { max: formatDate(new Date())} }}
                     variant="outlined" 
                     required
-                    error={feeWaiverRequested === undefined || feeWaiverRequested === ""}
+                    error={feeWaiverData?.formdata.requesteddate === undefined || feeWaiverData?.formdata.requesteddate === ""}
                     fullWidth
                 />
               </div>
               <div className="col-lg-6 foi-details-col">
                 <TextField
-                    id="feeWaiverReceived"
+                    id="receiveddate"
+                    name="receiveddate"
                     label="Fee Waiver Received"
                     type="date" 
-                    value={feeWaiverReceived || ''} 
-                    //onChange={calculateFeeWaiverReceivedDate(feeWaiverReceived)}
-                    inputProps={{ "aria-labelledby": "feeWaiverReceived-label"}}
+                    value={feeWaiverData?.formdata.receiveddate || ''} 
+                    inputProps={{ "aria-labelledby": "receiveddate-label"}}
                     InputLabelProps={{
                     shrink: true,
                     }}
                     //InputProps={{inputProps: { min: feeWaiverReceived, max: formatDate(new Date())} }}
                     variant="outlined" 
                     required
-                    error={feeWaiverReceived === undefined || feeWaiverReceived === ""}
+                    error={feeWaiverData?.formdata.receiveddate === undefined || feeWaiverData?.formdata.receiveddate === ""}
                     fullWidth
                     disabled= {true}
                 />
               </div>
             </div>
             <div className="row foi-details-row">
-                <div className="col-lg-12 foi-details-col">
-                    <span className="formLabel">Request Description</span>
+                <div className="col-lg-12">
+                    <div className="labelBold" style={{margin:"15px 8px"}}>Request Description</div>
                 </div>
-              <div className="col-lg-4 foi-details-col">
-                <span className="formLabel">Total Fees Due</span>
-              </div>
-              <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">{"$"}</span>
+                <div className="col-lg-12">
+                    <div className="contentStyle">{requestDescription}</div>
+                </div>
+            </div>
+            <br/>
+            <div className="row foi-details-row">
+                <div className="col-lg-12">
+                    <div className="contentStyle">Date Range for Records Search</div>
+                </div>
+                <div className="col-lg-12">
+                    <div className="contentStyle">{fromDate} - {toDate}</div>
+                </div>
+            </div>
+            <br/>
+            <div className="row foi-details-row">
+                <div className="col-lg-12">
+                    <span className="contentStyle">Total Fees Due</span>
+                </div>
+              <div className="col-lg-12">
+                <span className="contentStyle">{"$"+cfrTotalAmountDue}</span>
               </div>
             </div>
           </AccordionDetails>
@@ -344,46 +379,54 @@ export const FeeWaiverForm = ({
             <Typography className="heading">APPLICANTS REQUEST</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="row foi-details-row">
-              <div className="col-lg-12 foi-details-col">
+            <div className="row foi-details-row textPadding">
+              <div className="col-lg-12">
                 <TextField
                   id="summary"
                   label="Summary of Applicants Request to Waive Fee"
                   multiline
                   rows={4}
                   name="summary"
-                  value={feeWaiverData?.formdata.summary}
+                  value={feeWaiverData?.formdata?.summary}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
-                  onChange={handleTextChanges}
+                  onChange={handleFormDataChanges}
                   fullWidth
+                  required
+                  error={!(!!feeWaiverData?.formdata?.summary)}
                 />
               </div>
-              <div className="col-lg-12 foi-details-col formLabel">
-                    <span><b>Type of Fee Waiver requested by applicant?</b></span>
-                    <span><i>Check 1 or more that apply and complete the applicable sections 2 or 3 below.</i></span>
-              </div>
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row">
+                <div className="col-lg-12 foi-details-col contentStyle">
+                        <span><b>Type of Fee Waiver requested by applicant?* </b></span>
+                        <span><i>Check 1 or more that apply and complete the applicable sections 2 or 3 below.</i></span>
+                </div>
+            </div>
+            <div className="row foi-details-row labelText textPadding">
                 <div className="col-lg-4">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
+                        id="inability"
+                        name="inability"
                         type="checkbox"
                         className="checkmark"
-                        checked={false}
+                        checked={feeWaiverData?.formdata.inability}
+                        onChange={handleFeeWaiverTypeChange}
                         />
                         <span className="checkmark"></span>
                         INABILITY TO PAY
                     </label>  
                 </div>
                 <div className="col-lg-4">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
+                        id="publicinterest"
+                        name="publicinterest"
                         type="checkbox"
                         className="checkmark"
-                        checked={true}
+                        checked={feeWaiverData?.formdata.publicinterest}
+                        onChange={handleFeeWaiverTypeChange}
                         />
                         <span className="checkmark"></span>
                         PUBLIC INTEREST
@@ -398,15 +441,18 @@ export const FeeWaiverForm = ({
                         multiline
                         rows={4}
                         name="recordsdescription"
-                        value={feeWaiverData?.formdata.recordsdescription}
+                        value={feeWaiverData?.formdata?.recordsdescription}
                         variant="outlined"
                         InputLabelProps={{ shrink: true, }}
-                        onChange={handleTextChanges}
+                        onChange={handleFormDataChanges}
+                        required={feeWaiverData?.formdata.publicinterest || feeWaiverData?.formdata.inability}
                         fullWidth
+                        error={feeWaiverData?.formdata.publicinterest || feeWaiverData?.formdata.inability &&
+                            !(!!feeWaiverData?.formdata?.recordsdescription)}
                     />
                 </div>
                 <div className="col-lg-12 foi-details-col">
-                    <div className="formLabel"><i>
+                    <div className="contentStyle"><i>
                     If provided by public body and relevant to the consideration of form 
                     (ie: volume, document types, content and/or format) 
                     </i>
@@ -417,35 +463,39 @@ export const FeeWaiverForm = ({
         </Accordion>
       </div>
       <div className='request-accordian'>
-        <Accordion defaultExpanded={true}>
+        <Accordion expanded={feeWaiverData?.formdata.inability}>
           <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
             <Typography className="heading">INABILITY TO PAY</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 textPadding">
                     Has the applicant provided documentary evidence of the inability to pay?*
                     (e.g.: bank statement, pay stub or tax return)?
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        name="hasproof"
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleInabilityDetailsChanges}
+                        checked={feeWaiverData?.formdata?.inabilitydetails.hasproof}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        name="hasproof"
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleInabilityDetailsChanges}
+                        checked={!feeWaiverData?.formdata?.inabilitydetails.hasproof}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -460,10 +510,13 @@ export const FeeWaiverForm = ({
                   multiline
                   rows={4}
                   name="description"
-                  value={feeWaiverData?.formdata?.inability.description}
+                  value={feeWaiverData?.formdata?.inabilitydetails.description}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
-                  onChange={handleTextChanges}
+                  onChange={handleInabilityDetailsChanges}
+                  required={feeWaiverData?.formdata.inabilitydetails.hasproof}
+                  error={feeWaiverData?.formdata.inabilitydetails.hasproof && 
+                    !(!!feeWaiverData?.formdata?.inabilitydetails.description) }
                   fullWidth
                 />
               </div>
@@ -472,211 +525,221 @@ export const FeeWaiverForm = ({
         </Accordion>
       </div>
       <div className='request-accordian'>
-        <Accordion defaultExpanded={true}>
+        <Accordion expanded={feeWaiverData?.formdata.publicinterest}>
           <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
             <Typography className="heading">PUBLIC INTEREST</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 labelBold">
                     Has the subject of the records been a matter of recent public debate?*
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="debate"
+                        name='debate'
+                        type="radio"
+                        value='true'
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.debate}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="debate"
+                        name='debate'
+                        value='false'
+                        type="radio"
                         className="checkmark"
-                        checked={true}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={!feeWaiverData?.formdata?.publicinterestdetails.debate}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 labelBold">
                 Does the subject matter of the records relate directly to the environment, 
                 public health, or safety?* 
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="environment"
+                        name='environment'
+                        type="radio"
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.environment}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="environment"
+                        name='environment'
+                        type="radio"
                         className="checkmark"
-                        checked={true}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={!feeWaiverData?.formdata?.publicinterestdetails.environment}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 labelBold">
                  Could dissemination of the information in the records reasonably be expected to yield a public benefit by: *
                 </div>
-                <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
-                        <input
-                        id="inabilityToPay"
-                        type="checkbox"
-                        className="checkmark"
-                        checked={false}
-                        />
-                        <span className="checkmark"></span>
-                        YES
-                    </label>  
-                </div>
-                <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
-                        <input
-                        id="publicInterest"
-                        type="checkbox"
-                        className="checkmark"
-                        checked={true}
-                        />
-                        <span className="checkmark"></span>
-                        NO
-                    </label> 
-                </div> 
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                 Disclosing an environmental concern or a public health or safety concern?  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="disclosing"
+                        name="disclosing"
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.disclosing}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="disclosing"
+                        name="disclosing"
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={!feeWaiverData?.formdata?.publicinterestdetails.disclosing}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                 Contributing to the development or public understanding of, or debate on, an
                 important environmental or public health or safety issue? 
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="understanding"
+                        name='understanding'
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.understanding}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="understanding"
+                        name='understanding'
+                        type="radio"
                         className="checkmark"
-                        checked={true}
+                        value="false"
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={!feeWaiverData?.formdata?.publicinterestdetails.understanding}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                 Contributing to public understanding of, or debate on, an important new policy, law, program,
                 or service?
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="newpolicy"
+                        name='newpolicy'
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.newpolicy}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="newpolicy"
+                        name='newpolicy'
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={!feeWaiverData?.formdata?.publicinterestdetails.newpolicy}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
-                Do the records show how the public body is allocating financial or other resources? *
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 labelBold textPadding">
+                    Do the records show how the public body is allocating financial or other resources? *
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="financing"
+                        name='financing'
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.financing}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="financing"
+                        name='financing'
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={!feeWaiverData?.formdata?.publicinterestdetails.financing}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -684,57 +747,66 @@ export const FeeWaiverForm = ({
                 </div> 
             </div>
             <div className="row foi-details-row">
-              <div className="col-lg-12 foi-details-col">
+              <div className="col-lg-12 textPadding">
                 <TextField
-                  id="publicInterestDescription"
+                  id="other"
                   label="Other public interest considerations (if any)"
                   multiline
                   rows={4}
-                  name="publicInterestDescription"
-                  value={feeWaiverData?.formdata?.public.description}
+                  name="other"
+                  value={feeWaiverData?.formdata?.publicinterestdetails.other}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
-                  onChange={handleTextChanges}
+                  onChange={handlePublicInterestDetailsChanges}
                   fullWidth
                 />
               </div>
             </div>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-6 foi-details-col">
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-6 labelBold textPadding">
                 Based on the analysis above, do the requested records relate to a matter 
                 of public interest? *  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="analysis"
+                        name="analysis"
+                        type="radio"
+                        value="partial"
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.analysis == 'partial'}
                         />
                         <span className="checkmark"></span>
                         PARTIALLY
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="analysis"
+                        name="analysis"
+                        type="radio"
+                        value="yes"
                         className="checkmark"
-                        checked={false}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.analysis == 'yes'}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="analysis"
+                        name="analysis"
+                        type="radio"
+                        value="no"
                         className="checkmark"
-                        checked={true}
+                        onChange={handlePublicInterestDetailsChanges}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.analysis == 'no'}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -748,11 +820,16 @@ export const FeeWaiverForm = ({
                   label="Provide description of which records relate to a matter of public interest, partially."
                   multiline
                   rows={4}
-                  name="publicInterestDescription"
-                  value={feeWaiverData?.formdata?.public.description}
+                  name="description"
+                  value={feeWaiverData?.formdata?.publicinterestdetails.description}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
-                  onChange={handleTextChanges}
+                  onChange={handlePublicInterestDetailsChanges}
+                  required={feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
+                  feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes'}
+                  error={feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
+                        feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes' && 
+                        !(!!feeWaiverData?.formdata?.publicinterestdetails.description)}
                   fullWidth
                 />
               </div>
@@ -765,61 +842,73 @@ export const FeeWaiverForm = ({
           <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
             <Typography className="heading">EXCUSING PART OR FULL FEE</Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
+          <AccordionDetails className='labelBold'>
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 labelBold">
                     Is the applicant's primary purpose for requesting records to disseminate information 
                     in a way that could reasonably be expected to benefit the public rather than serving
                     a private interest? 
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="disseminate"
+                        name="disseminate"
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleFormDataChanges}
+                        checked={feeWaiverData?.formdata?.disseminate}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="disseminate"
+                        name="disseminate"
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleFormDataChanges}
+                        checked={!feeWaiverData?.formdata?.disseminate}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                     Is the applicant able to disseminate the information to the public? 
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="abletodisseminate"
+                        name='abletodisseminate'
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleFormDataChanges}
+                        checked={feeWaiverData?.formdata?.abletodisseminate}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="abletodisseminate"
+                        name='abletodisseminate'
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleFormDataChanges}
+                        checked={!feeWaiverData?.formdata?.abletodisseminate}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -835,123 +924,147 @@ export const FeeWaiverForm = ({
             <Typography className="heading">ANY OTHER REASON TO EXCUSE FEE</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-12 labelBold">
                     Is there any other reason it is fair to excuse payment?  Factors to consider include: *  
                 </div>
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                     Was the applicant willing to narrow the request for records to reduce the fee?    
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="narrow"
+                        name='narrow'
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleFormDataChanges}
+                        checked={feeWaiverData?.formdata?.narrow}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="narrow"
+                        name='narrow'
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleFormDataChanges}
+                        checked={!feeWaiverData?.formdata?.narrow}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                     Do the costs of processing the applicant's FOI request exceed the fee estimate considerably
                     and, if so, is it reasonable to require the public body to bear some or all of those costs? 
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="exceed"
+                        name='exceed'
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleFormDataChanges}
+                        checked={feeWaiverData?.formdata?.exceed}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="exceed"
+                        name='exceed'
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleFormDataChanges}
+                        checked={!feeWaiverData?.formdata?.exceed}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                     Have statutory timelines on the FOI file been met to date?     
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="timelines"
+                        name='timelines'
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleFormDataChanges}
+                        checked={feeWaiverData?.formdata?.timelines}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="timelines"
+                        name='timelines'
+                        type="radio"
+                        value="false"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleFormDataChanges}
+                        checked={!feeWaiverData?.formdata?.timelines}
                         />
                         <span className="checkmark"></span>
                         NO
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText textPadding">
                 <div className="col-lg-8 foi-details-col">
                     Have previous orders of the OIPC ruled that similar types of records or information should
                     or should not be subject to a fee?
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="previous"
+                        name="previous"
+                        type="radio"
+                        value="true"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleFormDataChanges}
+                        checked={feeWaiverData?.formdata?.previous}
                         />
                         <span className="checkmark"></span>
                         YES
                     </label>  
                 </div>
                 <div className="col-lg-2">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="previous"
+                        name="previous"
+                        value="false"
+                        type="radio"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleFormDataChanges}
+                        checked={!feeWaiverData?.formdata?.previous}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -966,10 +1079,14 @@ export const FeeWaiverForm = ({
                   multiline
                   rows={4}
                   name="description"
-                  value={feeWaiverData?.formdata?.inability.description}
+                  value={feeWaiverData?.formdata?.description}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
-                  onChange={handleTextChanges}
+                  onChange={handleFormDataChanges}
+                  required={feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed || feeWaiverData?.formdata?.timelines ||
+                            feeWaiverData?.formdata?.previous}
+                  error={(feeWaiverData?.formdata?.previous || feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed || 
+                        feeWaiverData?.formdata?.timelines) && !(!!feeWaiverData?.formdata?.description)}
                   fullWidth
                 />
               </div>
@@ -983,61 +1100,73 @@ export const FeeWaiverForm = ({
             <Typography className="heading">IAO ANALYST RECOMMENDATIONS</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="row foi-details-row label-text">
-                <div className="col-lg-8 foi-details-col">
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 labelBold">
                     Select with Overall IAO Recommendations:*  
                 </div>
             </div>
-            <div className="row foi-details-row label-text">
+            <div className="row foi-details-row labelText textPadding">
                 <div className="col-lg-12">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="inabilityToPay"
-                        type="checkbox"
+                        id="waive"
+                        name='waive'
+                        type="radio"
+                        value="partial"
                         className="checkmark"
-                        checked={false}
+                        onChange={handleRecommendationChanges}
+                        checked={feeWaiverData?.formdata?.recommendation.waive === 'partial'}
                         />
                         <span className="checkmark"></span>
                         Waive Fee in Part
                     </label>  
                 </div>
                 <div className="col-lg-12">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="waive"
+                        name='waive'
+                        type="radio"
+                        value="yes"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleRecommendationChanges}
+                        checked={feeWaiverData?.formdata?.recommendation.waive === 'yes'}
                         />
                         <span className="checkmark"></span>
                         Waive Fee in Full
                     </label> 
                 </div> 
                 <div className="col-lg-12">
-                    <label className='checkbox-style'>                  
+                    <label className='check-item checkboxStyle'>                  
                         <input
-                        id="publicInterest"
-                        type="checkbox"
+                        id="waive"
+                        name='waive'
+                        value="no"
+                        type="radio"
                         className="checkmark"
-                        checked={true}
+                        onChange={handleRecommendationChanges}
+                        checked={feeWaiverData?.formdata?.recommendation.waive === 'no'}
                         />
                         <span className="checkmark"></span>
                         Do Not Waive Fee
                     </label> 
                 </div> 
             </div>
-            <div className="row foi-details-row">
+            <div className="row foi-details-row textPadding">
               <div className="col-lg-12 foi-details-col">
                 <TextField
-                  id="description"
+                  id="recommendationSummary"
                   label="Summarize Rational"
                   multiline
                   rows={4}
-                  name="description"
-                  value={feeWaiverData?.formdata?.inability.description}
+                  name="summary"
+                  value={feeWaiverData?.formdata?.recommendation.summary}
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
-                  onChange={handleTextChanges}
+                  onChange={handleRecommendationChanges}
+                  required={feeWaiverData?.formdata?.recommendation.waive === 'partial' || feeWaiverData?.formdata?.recommendation.waive === 'yes'}
+                  error={(feeWaiverData?.formdata?.recommendation.waive === 'partial' || feeWaiverData?.formdata?.recommendation.waive === 'yes')
+                   && !(!!feeWaiverData?.formdata?.recommendation.summary)}
                   fullWidth
                 />
               </div>
@@ -1061,7 +1190,7 @@ export const FeeWaiverForm = ({
                     name="amounttobewaived"
                     type="number"
                     value={feeWaiverData?.formdata?.recommendation.amount}
-                    //onChange={handleAmountPaidChanges}
+                    onChange={handleRecommendationChanges}
                     onBlur={(e) => {
                         e.target.value = parseFloat(e.target.value).toFixed(2);
                     }}
@@ -1087,7 +1216,7 @@ export const FeeWaiverForm = ({
           </AccordionDetails>
         </Accordion>
       </div>
-
+      {/* </form> */}
       
       <div className="col-lg-4 buttonContainer">
         <button
@@ -1095,7 +1224,7 @@ export const FeeWaiverForm = ({
           className="btn saveButton"
           onClick={save}
           color="primary"
-          //disabled={!validateFields()}
+          disabled={isValidationError() || !dirty}
         >
           Save
         </button>

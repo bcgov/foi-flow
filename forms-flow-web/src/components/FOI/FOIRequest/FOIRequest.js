@@ -627,6 +627,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
     ? requestDetails.axisRequestId
     : requestDetails?.idNumber;
 
+  const requestDescription = requestDetails?.description;
+  const recordsSearchFromDate = requestDetails?.fromDate;
+  const recordsSearchToDate = requestDetails?.toDate;
+
   let iaoassignedToList = useSelector(
     (state) => state.foiRequests.foiFullAssignedToList
   );
@@ -998,7 +1002,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.FeeWaiverForm.display,
             })}
           >
-            <FeeWaiverForm            
+            <FeeWaiverForm    
+              requestDescription={requestDescription}   
+              fromDate={recordsSearchFromDate}     
+              toDate={recordsSearchToDate}  
               requestNumber={requestNumber}
               requestState={requestState}
               userDetail={userDetail}

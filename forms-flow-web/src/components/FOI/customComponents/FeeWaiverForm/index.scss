@@ -2,18 +2,28 @@
     flex-direction: row-reverse;
   }
   
-.formLabel {
+.contentStyle {
     margin: 0px 8px;
-    font-size: 13px;
+    font-size: 14px;
 }
 
-.label-text {
+.labelText {
     padding: 5px 8px;
     font-size: 14px;
 }
 
-.checkbox-style {
-    padding-left: 25px !important;
+.checkboxStyle {
+    padding: 5px 25px !important;
     position: relative;
-    padding: 2px;
+    width: auto;
+}
+
+.labelBold {
+    font-size: 15px;
+    font-weight: 600;
+    //margin: 15px 8px;
+}
+
+.textPadding {
+    padding-bottom: 16px;
 }
