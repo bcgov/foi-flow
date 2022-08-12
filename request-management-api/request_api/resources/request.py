@@ -73,17 +73,16 @@ class FOIRawRequest(Resource):
     def post(requestid=None, actiontype=None):
         try :                        
             updaterequest = request.get_json()
+            requestdata = getparams(updaterequest)
+            assigneegroup = requestdata['assigneegroup']
+            assignee = requestdata['assignee']
+            assigneefirstname = requestdata['assigneefirstname']
+            assigneemiddlename = requestdata['assigneemiddlename']
+            assigneelastname = requestdata['assigneelastname']
 
             if int(requestid) and str(requestid) != "-1" :
                 status = rawrequestservice().getstatus(updaterequest)
-                rawrequest = rawrequestservice().getrawrequest(requestid)
-                requestdata = getparams(updaterequest)
-
-                assigneegroup = requestdata['assigneegroup']
-                assignee = requestdata['assignee']
-                assigneefirstname = requestdata['assigneefirstname']
-                assigneemiddlename = requestdata['assigneemiddlename']
-                assigneelastname = requestdata['assigneelastname']
+                rawrequest = rawrequestservice().getrawrequest(requestid)            
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
                 assignee = ''
                 if(actiontype == 'assignee'):
@@ -95,7 +94,8 @@ class FOIRawRequest(Resource):
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")
                 if result.success == True:
-                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                    assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)
+                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assignee))
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
