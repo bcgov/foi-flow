@@ -68,7 +68,11 @@ return (
     container
     alignItems="flex-start"
     justifyContent="center"
-    xs={true}    
+    xs={true}
+    sx={{
+        width: "450px",
+        maxWidth: "450px !important",
+    }}
   >
     <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
       <ClickableChip
