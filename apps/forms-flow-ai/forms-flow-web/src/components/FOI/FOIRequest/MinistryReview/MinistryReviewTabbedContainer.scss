@@ -174,10 +174,10 @@
 
   .foileftpanelstatus
   {
-    position: absolute;
+    position: relative;
     bottom: 0;
     padding-bottom: 20%;
-    padding-top: 30%;
+    /*padding-top: 30%;*/
     padding-left: 10%;
     color: white;
     font-size: 15px;
@@ -224,7 +224,8 @@
 /* Style the tab */
 .tab {
   overflow: hidden;
- 
+  height: 35%;
+ position: relative;
 }
 
 /* Style the buttons inside the tab */
