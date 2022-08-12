@@ -79,7 +79,6 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-
     async def postpaymentevent(self, requestid):
         try:
             paymeneteventresponse = paymentevent().createpaymentevent(requestid)
@@ -88,7 +87,6 @@ class eventservice:
         except BusinessException as exception:
             self.__logbusinessexception(exception)
 
-    
     def posteventforemailfailure(self, ministryrequestid, requesttype, stage, reason, userid):
         try:
             emaileventresponse = emailevent().createemailevent(ministryrequestid, requesttype, stage, reason, userid)
@@ -97,6 +95,14 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception) 
 
-        
+    def postpaymentexpiryevent(self, ministryrequestid):
+        try:
+            paymeneteventresponse = paymentevent().createpaymentexpiredevent(ministryrequestid)
+            if paymeneteventresponse.success == False:
+                current_app.logger.error("FOI Expiry Notification failed for payment event for request= %s ; event response=%s" % (ministryrequestid, paymeneteventresponse.message))
+            return paymeneteventresponse
+        except BusinessException as exception:
+            self.__logbusinessexception(exception)
+
     def __logbusinessexception(self, exception):
         current_app.logger.error("%s,%s" % ('FOI Comment Notification Error', exception.message))
