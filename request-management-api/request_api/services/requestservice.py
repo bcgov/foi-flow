@@ -9,6 +9,7 @@ from request_api.services.foirequest.requestserviceconfigurator import requestse
 from request_api.services.foirequest.requestservicegetter import requestservicegetter 
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate 
+from request_api.services.document_generation_service import DocumentGenerationService
 
 class requestservice:
     """ FOI Request management service
@@ -31,15 +32,20 @@ class requestservice:
 
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
-        
-    def getrequest(self,foirequestid,foiministryrequestid):  
+    
+    def updaterequeststatus(self, requestid, ministryrequestid, statusid):
+        foirequestschema = self.getrequest(requestid, ministryrequestid)
+        foirequestschema['requeststatusid'] = statusid
+        return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
+               
+    def getrequest(self,foirequestid,foiministryrequestid): 
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
     
     def getrequestdetailsforministry(self,foirequestid, foiministryrequestid, authmembershipgroups):
         return requestservicegetter().getrequestdetailsforministry(foirequestid,foiministryrequestid, authmembershipgroups)
     
-    def getrequestdetailsforonlinepayment(self,foirequestid, foiministryrequestid):
-        return requestservicegetter().getrequestdetailsforonlinepayment(foirequestid, foiministryrequestid)
+    def getrequestdetails(self,foirequestid, foiministryrequestid):
+        return requestservicegetter().getrequestdetails(foirequestid, foiministryrequestid)
     
     def copywatchers(self, rawrequestid, ministries, userid):
         watchers = watcherservice().getrawrequestwatchers(int(rawrequestid))
@@ -60,7 +66,11 @@ class requestservice:
     
     def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
-            
+    
+    def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus):
+        foirequestschema = self.getrequest(requestid, ministryrequestid)        
+        workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus)            
+    
     async def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
         if requeststatusid is not None:

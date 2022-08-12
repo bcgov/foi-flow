@@ -23,6 +23,7 @@ from dateutil.parser import parse
 from pytz import timezone
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.models.OperatingTeams import OperatingTeam
+import logging
 
 class notificationservice:
     """ FOI notification management service
@@ -89,11 +90,15 @@ class notificationservice:
     
     def __createnotification(self, message, requestid, requesttype, notificationtype, userid, foirequest, foicomment=None):
         notification = self.__preparenotification(message, requesttype, notificationtype, userid, foirequest, foicomment)
-        if notification is not None:      
-            if requesttype == "ministryrequest": 
-                return FOIRequestNotification.savenotification(notification)
-            else:
-                return FOIRawRequestNotification.savenotification(notification)
+        if notification is not None:   
+            try:   
+                if requesttype == "ministryrequest": 
+                    return FOIRequestNotification.savenotification(notification)
+                else:
+                    return FOIRawRequestNotification.savenotification(notification)
+            except Exception as ex:
+                logging.exception(ex)
+                return  DefaultMethodResult(True,'Unable to save notification',requestid) 
         return  DefaultMethodResult(True,'No change',requestid) 
     
     def __cleanupnotifications(self, requesttype, notificationtype, foirequest):

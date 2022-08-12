@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Chip from "@mui/material/Chip";
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import './foirequest.scss';
 import FOIRequestHeader from './FOIRequestHeader';
 import ApplicantDetails from './ApplicantDetails';
@@ -136,19 +138,21 @@ const FOIRequest = React.memo(({ userDetail }) => {
     Attachments: {
       display: false,
       active: false,
-    },    
-    CFRForm: {
+    },
+    Forms: {
       display: false,
       active: false,
-    },
-    FeeWaiverForm: {
-      display: false,
-      active: false,
-    },
-    Option4: {
-      display: false,
-      active: false,
-    },
+      options: {
+        CFRForm: {
+          display: false,
+          active: false,
+        },
+        FeeWaiver: {
+          display: false,
+          active: false,
+        },
+      }
+    }
   };
 
   const [tabLinksStatuses, setTabLinksStatuses] = useState({
@@ -575,6 +579,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   }, [editorChange]);
 
   const tabclick = (param) => {
+    setForm("")
     if (param === "Comments") {
       setRemoveComment(false);
       changeTabLinkStatuses(param);
@@ -608,6 +613,27 @@ const FOIRequest = React.memo(({ userDetail }) => {
       },
     });
   };
+
+  const [form, setForm] = useState("");
+
+  const handleTabLinkDropdown = (tab, value) => {
+    setForm(value)
+    setTabLinksStatuses({
+      ...initialStatuses,
+      [tab]: {
+        ...tabLinksStatuses[tab],
+        active: true,
+        display: true,
+        options: {
+          ...initialStatuses[tab].options,
+          [value]: {
+            active: true,
+            display: true
+          }
+        }
+      },
+    });
+  }
 
   const bottomTextArray = _requestStatus.split("|");
 
@@ -655,7 +681,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     return false;
   }
 
-  const showCFRTab = () => {
+  const showFormsTab = () => {
     return (requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
@@ -701,25 +727,24 @@ const FOIRequest = React.memo(({ userDetail }) => {
             {!isAddRequest && (
               <>
               
-                {(showCFRTab() && <div
-                    className={clsx("tablinks", {
-                      active: tabLinksStatuses.CFRForm.active,
-                    })}
-                    name="CFRForm"
-                    onClick={() => tabclick("CFRForm")}
+                {(showFormsTab() && <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.Forms.active,
+                  })}
+                  name="Forms"
+                >
+                  <Select
+                    onChange={(e) => handleTabLinkDropdown("Forms", e.target.value)}
+                    value={form}
+                    variant="standard"
+                    displayEmpty="true"
+                    renderValue={() => 'Forms'}
+                    className="foitablinkdropdown"
                   >
-                    CFR Form
-                  </div>
-                )}
-                <div
-                    className={clsx("tablinks", {
-                      active: tabLinksStatuses.FeeWaiverForm.active,
-                    })}
-                    name="Fee Waiver Form"
-                    onClick={() => tabclick("FeeWaiverForm")}
-                  >
-                    Fee Waiver Form
-                  </div>
+                    <MenuItem value={"CFRForm"}>CFR Form</MenuItem>
+                    <MenuItem value={"FeeWaiver"}>Fee Waiver Form</MenuItem>
+                  </Select>
+                </div>)}
                 <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Attachments.active,
@@ -977,12 +1002,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
-          {(showCFRTab() && <div
+          {(showFormsTab() && <div
             id="CFRForm"
             className={clsx("tabcontent", {
-              active: tabLinksStatuses.CFRForm.active,
-              [classes.displayed]: tabLinksStatuses.CFRForm.display,
-              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+              active: tabLinksStatuses.Forms.options.CFRForm.active,
+              [classes.displayed]: tabLinksStatuses.Forms.options.CFRForm.display,
+              [classes.hidden]: !tabLinksStatuses.Forms.options.CFRForm.display,
             })}
           >
             <CFRForm            
@@ -994,12 +1019,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
               setCFRUnsaved={setCFRUnsaved}
             />
           </div>)}
-          {(showCFRTab() && <div
+          {(showFormsTab() && <div
             id="FeeWaiverForm"
             className={clsx("tabcontent", {
-              active: tabLinksStatuses.FeeWaiverForm.active,
-              [classes.displayed]: tabLinksStatuses.FeeWaiverForm.display,
-              [classes.hidden]: !tabLinksStatuses.FeeWaiverForm.display,
+              active: tabLinksStatuses.Forms.options.FeeWaiver.active,
+              [classes.displayed]: tabLinksStatuses.Forms.options.FeeWaiver.display,
+              [classes.hidden]: !tabLinksStatuses.Forms.options.FeeWaiver.display,
             })}
           >
             <FeeWaiverForm    

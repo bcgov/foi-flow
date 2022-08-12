@@ -232,6 +232,26 @@
     background-color: transparent!important;
 }
 
+.foitablinkdropdown {
+  > div {
+    width: 134px;
+    color: white;
+    font-size: 17px;
+    &:focus {
+      background-color: rgba(0,0,0,0)
+    }
+  }
+  &::before {
+    border-bottom: none !important;
+  }
+  &::after {
+    border-bottom: none !important;
+  }
+  > svg {
+    color: white;
+  }
+}
+
 
 
 
@@ -265,6 +285,14 @@
 .tab div.active {
   background-color: #fff;
   color:black !important;
+  div {
+    div {
+      color: black;
+    }
+    svg {
+      color: black;
+    }
+  }
 }
 
 span.circle

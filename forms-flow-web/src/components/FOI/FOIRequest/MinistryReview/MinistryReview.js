@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Chip from "@mui/material/Chip";
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import './MinistryReview.scss'
 import { StateDropDown } from '../../customComponents';
 import '../FOIRequestHeader/foirequestheader.scss'
@@ -41,6 +43,7 @@ import BottomButtonGroup from "./BottomButtonGroup";
 import { CommentSection } from "../../customComponents/Comments";
 import { AttachmentSection } from "../../customComponents/Attachments";
 import { CFRForm } from '../../customComponents/CFRForm';
+import { FeeWaiverForm } from '../../customComponents/FeeWaiverForm';
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
@@ -123,19 +126,25 @@ const MinistryReview = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    CFRForm: {
+    Forms: {
       display: false,
       active: false,
+      options: {
+        CFRForm: {
+          display: false,
+          active: false,
+        },
+        FeeWaiver: {
+          display: false,
+          active: false,
+        },
+      }
     },
     Comments: {
       display: false,
       active: false,
     },
     Attachments: {
-      display: false,
-      active: false,
-    },
-    Option4: {
       display: false,
       active: false,
     },
@@ -334,6 +343,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [editorChange]);
 
   const tabclick = (param) => {
+    setForm("")
     if (param === "Comments") {
       setRemoveComment(false);
       changeTabLinkStatuses(param);
@@ -367,6 +377,27 @@ const MinistryReview = React.memo(({ userDetail }) => {
       },
     });
   };
+
+  const [form, setForm] = useState("");
+
+  const handleTabLinkDropdown = (tab, value) => {
+    setForm(value)
+    setTabLinksStatuses({
+      ...initialStatuses,
+      [tab]: {
+        ...tabLinksStatuses[tab],
+        active: true,
+        display: true,
+        options: {
+          ...initialStatuses[tab].options,
+          [value]: {
+            active: true,
+            display: true
+          }
+        }
+      },
+    });
+  }
 
   const confirmChangesLost = (positiveCallback, negativeCallback) => {
     if (
@@ -470,12 +501,21 @@ const MinistryReview = React.memo(({ userDetail }) => {
             </div>
             {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
               className={clsx("tablinks", {
-                active: tabLinksStatuses.CFRForm.active,
+                active: tabLinksStatuses.Forms.active,
               })}
-              name="CFRForm"
-              onClick={() => tabclick("CFRForm")}
+              name="Forms"
             >
-              CFR Form
+              <Select
+                onChange={(e) => handleTabLinkDropdown("Forms", e.target.value)}
+                value={form}
+                variant="standard"
+                displayEmpty="true"
+                renderValue={() => 'Forms'}
+                className="foitablinkdropdown"
+              >
+                <MenuItem value={"CFRForm"}>CFR Form</MenuItem>
+                <MenuItem value={"FeeWaiver"}>Fee Waiver Form</MenuItem>
+              </Select>
             </div>)}
             <div
               className={clsx("tablinks", {
@@ -598,12 +638,30 @@ const MinistryReview = React.memo(({ userDetail }) => {
           {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
             id="CFRForm"
             className={clsx("tabcontent", {
-              active: tabLinksStatuses.CFRForm.active,
-              [classes.displayed]: tabLinksStatuses.CFRForm.display,
-              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+              active: tabLinksStatuses.Forms.options.CFRForm.active,
+              [classes.displayed]: tabLinksStatuses.Forms.options.CFRForm.display,
+              [classes.hidden]: !tabLinksStatuses.Forms.options.CFRForm.display,
             })}
           >
             <CFRForm            
+              requestNumber={requestNumber}
+              requestState={requestState}
+              userDetail={userDetail}
+              ministryId={ministryId}
+              requestId={requestId}
+              setCFRUnsaved={setCFRUnsaved}
+            />
+          </div>
+          )}
+          {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
+            id="FeeWaiverForm"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.Forms.options.FeeWaiver.active,
+              [classes.displayed]: tabLinksStatuses.Forms.options.FeeWaiver.display,
+              [classes.hidden]: !tabLinksStatuses.Forms.options.FeeWaiver.display,
+            })}
+          >
+            <FeeWaiverForm
               requestNumber={requestNumber}
               requestState={requestState}
               userDetail={userDetail}

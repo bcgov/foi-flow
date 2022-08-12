@@ -10,7 +10,10 @@ from dateutil import parser
 from dateutil import tz
 import pytz
 import maya
-
+from datetime import date
+from datetime import datetime
+import requests
+from flask import current_app
 
 class cfrfeeservice:
     """ FOI CFR Fee Form management service
@@ -28,12 +31,17 @@ class cfrfeeservice:
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
 
     def paycfrfee(self, ministryrequestid, amountpaid):
-        cfrfee = self.__preparecfrfee(ministryrequestid, {'status': 'approved'}) # status should always be approved before payment
-        cfrfee.feedata.update({'amountpaid': amountpaid})
+        cfrfee = self.__preparecfrfee(ministryrequestid)
+        cfrfee.feedata['amountpaid'] += amountpaid
+        cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
+
+    def waivecfrfee(self, ministryrequestid, waivedamount, userid):
+        cfrfee = self.__preparecfrfee(ministryrequestid)
+        cfrfee.feedata['totalamountdue'] -= waivedamount
+        return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
     
-  
-    def __preparecfrfee(self, ministryrequestid, data):
+    def __preparecfrfee(self, ministryrequestid, data={}):
         cfrfee = FOIRequestCFRFee()
         lkupcfrfee = self.getcfrfee(ministryrequestid)           
         _version = 1
@@ -43,7 +51,8 @@ class cfrfeeservice:
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status']) if "status" in data and data['status'] not in (None,'') else None
+        if "status" in data and data['status'] not in (None,''):
+            cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status'])
         return cfrfee
     
     

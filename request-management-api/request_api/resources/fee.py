@@ -18,9 +18,14 @@ from datetime import datetime
 from flask import request, send_file, Response
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
+import json
+import asyncio
 
 from request_api.services import FeeService
 from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.requestservice import requestservice
+from request_api.services.paymentservice import paymentservice
+from request_api.services.eventservice import eventservice
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
@@ -75,22 +80,28 @@ class Payment(Resource):
 
 
 @cors_preflight('PUT,OPTIONS')
-@API.route('/foirequests/<int:ministry_request_id>/payments/<int:payment_id>')
+@API.route('/foirequests/<int:request_id>/ministryrequest/<int:ministry_request_id>/payments/<int:payment_id>')
 class Payment(Resource):
 
     @staticmethod
     @cross_origin(origins=allowedorigins())
-    def put(ministry_request_id: int, payment_id: int):
+    def put(request_id: int, ministry_request_id: int, payment_id: int):
         try:
             request_json = request.get_json()
-            fee_service: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
-            pay_response, parsed_args = fee_service.complete_payment(request_json)
-            if (pay_response['status'] == 'PAID'):
+            fee: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
+            response, parsed_args = fee.complete_payment(request_json)
+            if (response['status'] == 'PAID'):
                 cfrfeeservice().paycfrfee(ministry_request_id, float(parsed_args.get('trnAmount')))
-                # add call to event service to move request from on hold to cfr
-            return pay_response, 201
+                paymentservice().createpaymentreceipt(request_id, ministry_request_id, fee)
+                result = requestservice().updaterequeststatus(request_id, ministry_request_id, 2)
+                if result.success == True:
+                    asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
+                    requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
+                    asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
+            return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
+
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirawrequests/<int:request_id>/payments/<int:payment_id>/receipt')
 class Payment(Resource):
@@ -104,7 +115,8 @@ class Payment(Resource):
             paid = fee_service.check_if_paid()
             if paid is False:
                 return {'status': False, 'message': "Fee has not been paid"}, 400
-            document_service : DocumentGenerationService = DocumentGenerationService()
+            documenttypename='receipt'
+            document_service : DocumentGenerationService = DocumentGenerationService(documenttypename)
             response = document_service.generate_receipt(data= request_json)
             
             return Response(
@@ -115,3 +127,5 @@ class Payment(Resource):
 
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
+
+
