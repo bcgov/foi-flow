@@ -45,10 +45,11 @@ class paymentservice:
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
             balancedue = data['cfrfee']['feedata']["balanceDue"]
+            basepath = 'request_api/receipt_templates/'
             if balancedue > 0:
-                receipt_template_path='request_api/receipt_templates/' + self.getreceiptename('HALFPAYMENT')
+                receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT')
             else:
-                receipt_template_path='request_api/receipt_templates/' + self.getreceiptename('FULLPAYMENT')
+                receipt_template_path= basepath + self.getreceiptename('FULLPAYMENT')
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
