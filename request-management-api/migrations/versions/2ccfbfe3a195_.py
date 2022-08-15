@@ -18,8 +18,6 @@ depends_on = None
 
 def upgrade():
     op.execute('ALTER TABLE public."FOIRequestPayments" ADD paymentexpirydate timestamp') 
-#ALTER TABLE order_details
- # ADD order_date date
 
 
 def downgrade():
