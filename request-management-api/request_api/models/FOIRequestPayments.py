@@ -24,6 +24,7 @@ class FOIRequestPayment(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    paymentexpirydate = db.Column(db.DateTime, nullable=True)
 
     @classmethod
     def savepayment(cls, newpayment)->DefaultMethodResult:                
@@ -41,4 +42,4 @@ class FOIRequestPayment(db.Model):
       
 class FOIRequestPaymentSchema(ma.Schema):
     class Meta:
-        fields = ('paymentid', 'version', 'foirequestid', 'ministryrequestid', 'paymenturl','created_at','createdby','updated_at','updatedby') 
+        fields = ('paymentid', 'version', 'foirequestid', 'ministryrequestid', 'paymenturl','created_at','createdby','updated_at','updatedby', 'paymentexpirydate') 
