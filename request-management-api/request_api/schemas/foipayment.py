@@ -14,3 +14,4 @@ class FOIRequestPaymentSchema(Schema):
 
         unknown = EXCLUDE    
     paymenturl = fields.Str(data_key="paymenturl")
+    paymentexpirydate = fields.Date(data_key="paymentexpirydate")

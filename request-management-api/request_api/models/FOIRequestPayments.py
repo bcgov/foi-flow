@@ -19,6 +19,7 @@ class FOIRequestPayment(db.Model):
     ministryrequestid =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     ministryrequestversion=db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
     paymenturl = db.Column(db.Text, unique=False, nullable=True) 
+    paymentexpirydate = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
