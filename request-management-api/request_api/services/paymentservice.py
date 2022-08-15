@@ -49,10 +49,13 @@ class paymentservice:
             print(data)
             print("balancedue ===== ", balancedue)
             basepath = 'request_api/receipt_templates/'
+            receiptname = 'cfr_fee_payment_receipt'
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT')
+                receiptname = self.getreceiptename('HALFPAYMENT')
             else:
                 receipt_template_path= basepath + self.getreceiptename('FULLPAYMENT')
+                receiptname = self.getreceiptename('FULLPAYMENT')
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
@@ -60,7 +63,7 @@ class paymentservice:
                 'transactionId': parsed_args.get('pbcTxnNumber'),
                 'cardType': parsed_args.get('cardType')
             }})
-            document_service : DocumentGenerationService = DocumentGenerationService('cfr_fee_payment_receipt')
+            document_service : DocumentGenerationService = DocumentGenerationService(receiptname)
             receipt = document_service.generate_receipt(data,receipt_template_path)
             document_service.upload_receipt('fee_estimate_payment_receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
             return DefaultMethodResult(True,'Payment Receipt created',ministry_request_id)
