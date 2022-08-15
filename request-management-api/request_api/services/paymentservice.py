@@ -51,10 +51,10 @@ class paymentservice:
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
             if balancedue > 0:
-                receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT')
+                receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
             else:
-                receipt_template_path= basepath + self.getreceiptename('FULLPAYMENT')
+                receipt_template_path= basepath + self.getreceiptename('FULLPAYMENT')+".docx"
                 receiptname = self.getreceiptename('FULLPAYMENT')
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
@@ -73,9 +73,9 @@ class paymentservice:
 
     def getreceiptename(self, key):
         if key == "HALFPAYMENT":
-            return "cfr_fee_payment_receipt_half.docx"
+            return "cfr_fee_payment_receipt_half"
         elif key == "FULLPAYMENT":
-            return "cfr_fee_payment_receipt_full.docx"
+            return "cfr_fee_payment_receipt_full"
         else:
             logging.info("Unknown key")
             return None
