@@ -26,6 +26,7 @@ class paymentevent:
 
     def __createnotification(self, requestid):
         notification = self.__preparenotification(requestid)
+        print("notification =========== ", notification)
         return notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", "State", self.__defaultuserid())
 
     def __preparenotification(self, requestid):
