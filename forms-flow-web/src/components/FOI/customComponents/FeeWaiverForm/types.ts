@@ -8,27 +8,27 @@ export type FeeWaiverFormData = {
         inability: boolean,
         publicinterest: boolean,
         inabilitydetails: {
-            hasproof: boolean,
+            hasproof: any,
             description: string
         },
         publicinterestdetails: {
-            debate: boolean,
-            environment: boolean,
-            disclosing: boolean,
-            understanding: boolean,
-            newpolicy: boolean,
-            financing: boolean,
+            debate: any,
+            environment: any,
+            disclosing: any,
+            understanding: any,
+            newpolicy: any,
+            financing: any,
             other: string,
             analysis: string, //partial yes or no
             description: string
 
         },
-        disseminate: boolean,
-        abletodisseminate: boolean,
-        narrow: boolean,
-        exceed: boolean,
-        timelines: boolean,
-        previous: boolean,
+        disseminate: any,
+        abletodisseminate: any,
+        narrow: any,
+        exceed: any,
+        timelines: any,
+        previous: any,
         description: string,
         recommendation: {
             waive: string, //partial yes or no
