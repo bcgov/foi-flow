@@ -45,6 +45,9 @@ class paymentservice:
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
             balancedue = data['cfrfee']['feedata']["balanceDue"]
+            print("data ===== ")
+            print(data)
+            print("balancedue ===== ", balancedue)
             basepath = 'request_api/receipt_templates/'
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT')
