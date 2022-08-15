@@ -10,7 +10,7 @@ const FOIFooter = React.memo(() => {
   <div className="footerstyle">
     <div className="row ">
 
-      <Navbar collapseOnSelect fixed="bottom" expand="sm" bg="#036" variant="dark" style={{borderTop: "2px solid #fcba19"}} className="foi-footer-nav">
+      <Navbar collapseOnSelect  expand="sm" bg="#036" variant="dark" style={{borderTop: "2px solid #fcba19"}} className="foi-footer-nav">
         <Container className="foiContainer">
           <Nav className="ml-auto">
             
