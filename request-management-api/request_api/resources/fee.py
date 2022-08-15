@@ -96,7 +96,6 @@ class Payment(Resource):
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
                 result = requestservice().updaterequeststatus(request_id, ministry_request_id, 2)
                 if result.success == True:
-                    print("***********Success*******************")
                     asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
                     requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
                     asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
