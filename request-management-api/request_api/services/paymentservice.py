@@ -45,9 +45,12 @@ class paymentservice:
 
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
-            
-            print(data)
-            receipt_template_path='request_api/receipt_templates/cfr_fee_payment_receipt.docx'
+            balancedue = data['cfrfee']['feedata']["balanceDue"]
+            basepath = 'request_api/receipt_templates/'
+            if balancedue > 0:
+                receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT')
+            else:
+                receipt_template_path= basepath + self.getreceiptename('FULLPAYMENT')
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
@@ -61,4 +64,13 @@ class paymentservice:
             return DefaultMethodResult(True,'Payment Receipt created',ministry_request_id)
         except Exception as ex:   
             logging.exception(ex)         
-            return DefaultMethodResult(False,'Unable to create Payment Receipt',ministry_request_id)     
+            return DefaultMethodResult(False,'Unable to create Payment Receipt',ministry_request_id)
+
+    def getreceiptename(self, key):
+        if key == "HALFPAYMENT":
+            return "cfr_fee_payment_receipt_half.docx"
+        elif key == "FULLPAYMENT":
+            return "cfr_fee_payment_receipt_full.docx"
+        else:
+            logging.info("Unknown key")
+            return None
