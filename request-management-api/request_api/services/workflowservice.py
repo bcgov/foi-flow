@@ -32,13 +32,14 @@ class workflowservice:
         assignedgroup = self.__getopenedassigneevalue(usertype, requestsschema, "assignedgroup")
         assignedto = self.__getopenedassigneevalue(usertype, requestsschema, "assignedto")
         idnumber = self.__getvaluefromschema(requestsschema,"idNumber") if usertype == "iao" else None
+        paymentexpirydate = self.__getvaluefromschema(requestsschema,"paymentExpiryDate")
         if data.get("ministries") is not None:
             for ministry in data.get("ministries"): 
                 filenumber =  ministry["filenumber"] if (idnumber is None and  usertype == "ministry") else idnumber
                 if (ministry["filenumber"] == filenumber and usertype == "iao") or usertype == UserType.ministry.value:
                     oldstatus = self.__getministrystatus(filenumber, ministry["version"])
                     activity = self.__getministryactivity(oldstatus,newstatus)
-                    metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id})
+                    metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "paymentExpiryDate": paymentexpirydate})
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
     
